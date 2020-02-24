@@ -1,15 +1,12 @@
 <?php
 
-namespace Webkul\User\Http\Controllers;
+namespace Modules\User\Http\Controllers;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
 
 /**
  * Admin user session controller
- *
- * @author    Jitendra Singh <jitendra@webkul.com>
- * @copyright 2018 Webkul Software Pvt Ltd (http://www.webkul.com)
  */
 class SessionController extends Controller
 {
@@ -27,76 +24,38 @@ class SessionController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('admin')->except(['create','store']);
+        $this->middleware('admin')->except(['login']);
 
-        $this->_config = request('_config');
-
-        $this->middleware('guest', ['except' => 'destroy']);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource
      *
-     * @return \Illuminate\View\View
      */
-    public function create()
+
+    public function login()
     {
-        if (auth()->guard('admin')->check()) {
-            return redirect()->route('admin.dashboard.index');
-        } else {
-            if (strpos(url()->previous(), 'admin') !== false) {
-                $intendedUrl = url()->previous();
-            } else {
-                $intendedUrl = route('admin.dashboard.index');
-            }
-
-            session()->put('url.intended', $intendedUrl);
-
-            return view($this->_config['view']);
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store()
-    {
-        $this->validate(request(), [
+        request()->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        $remember = request('remember');
+        $jwtToken = null;
 
-        if (! auth()->guard('admin')->attempt(request(['email', 'password']), $remember)) {
-            session()->flash('error', trans('admin::app.users.users.login-error'));
 
-            return redirect()->back();
+        if (! $jwtToken = Auth::guard('admin')->attempt(request()->only('email', 'password'))) {
+            return response()->json([
+                'error' => 'Invalid Email or Password',
+            ], 401);
         }
 
-        if (auth()->guard('admin')->user()->status == 0) {
-            session()->flash('warning', trans('admin::app.users.users.activate-warning'));
-
-            auth()->guard('admin')->logout();
-
-            return redirect()->route('admin.session.create');
-        }
-
-        return redirect()->intended(route($this->_config['redirect']));
+        $admin = auth('admin')->user();
+        return response()->json([
+            'token' => $jwtToken,
+            'message' => 'Logged in successfully.',
+            'data' => $admin
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        auth()->guard('admin')->logout();
 
-        return redirect()->route($this->_config['redirect']);
-    }
 }
