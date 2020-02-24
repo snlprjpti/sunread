@@ -1,10 +1,11 @@
 <?php
 
-namespace Webkul\User\Http\Controllers;
+namespace Modules\User\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Event;
-use Webkul\User\Repositories\RoleRepository;
+use Modules\User\Repositories\RoleRepository;
+
 
 /**
  * Admin user role controller
@@ -28,128 +29,61 @@ class RoleController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param  \Webkul\User\Repositories\RoleRepository $roleRepository
+     * @param  \Modules\User\Repositories\RoleRepository $roleRepository
      * @return void
      */
     public function __construct(RoleRepository $roleRepository)
     {
-        $this->middleware('admin');
-
         $this->roleRepository = $roleRepository;
-
-        $this->_config = request('_config');
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\View\View
-     */
+
     public function index()
     {
-        return view($this->_config['view']);
+        $roles = $this->roleRepository->all();
+        return $roles;
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function create()
+    public function show($id)
     {
-        return view($this->_config['view']);
+        return $this->roleRepository->findOneOrFail($id);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function store()
     {
         $this->validate(request(), [
             'name' => 'required',
             'permission_type' => 'required',
         ]);
-
-        Event::dispatch('user.role.create.before');
-
         $role = $this->roleRepository->create(request()->all());
-
-        Event::dispatch('user.role.create.after', $role);
-
-        session()->flash('success', trans('admin::app.response.create-success', ['name' => 'Role']));
-
-        return redirect()->route($this->_config['redirect']);
+        return response()->json($role, 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\View\View
-     */
+
     public function edit($id)
     {
-        $role = $this->roleRepository->findOrFail($id);
+        return $this->roleRepository->findOrFail($id);
 
-        return view($this->_config['view'], compact('role'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update($id)
     {
         $this->validate(request(), [
             'name' => 'required',
             'permission_type' => 'required',
         ]);
+        $role = $this->roleRepository->find($id);
+        $this->roleRepository = new RoleRepository($role);
+        $this->roleRepository->update(request()->all());
+        return response()->json($role, 200);
 
-        Event::dispatch('user.role.update.before', $id);
-
-        $role = $this->roleRepository->update(request()->all(), $id);
-
-        Event::dispatch('user.role.update.after', $role);
-
-        session()->flash('success', trans('admin::app.response.update-success', ['name' => 'Role']));
-
-        return redirect()->route($this->_config['redirect']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $role = $this->roleRepository->findOrFail($id);
-
-        if ($role->admins->count() >= 1) {
-            session()->flash('error', trans('admin::app.response.being-used', ['name' => 'Role', 'source' => 'Admin User']));
-        } else if($this->roleRepository->count() == 1) {
-            session()->flash('error', trans('admin::app.response.last-delete-error', ['name' => 'Role']));
-        } else {
-            try {
-                Event::dispatch('user.role.delete.before', $id);
-
-                $this->roleRepository->delete($id);
-
-                Event::dispatch('user.role.delete.after', $id);
-
-                session()->flash('success', trans('admin::app.response.delete-success', ['name' => 'Role']));
-
-                return response()->json(['message' => true], 200);
-            } catch(\Exception $e) {
-                session()->flash('error', trans('admin::app.response.delete-failed', ['name' => 'Role']));
-            }
-        }
-
-        return response()->json(['message' => false], 400);
+        dd($role);
     }
+
 }

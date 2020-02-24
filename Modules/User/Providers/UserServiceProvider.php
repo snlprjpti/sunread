@@ -4,6 +4,8 @@ namespace Modules\User\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\User\Repositories\Contracts\RoleRepositoryInterface;
+use Modules\User\Repositories\RoleRepository;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,8 @@ class UserServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('User', 'Database/Migrations'));
+        $this->registerRepositories();
+
     }
 
     /**
@@ -102,5 +106,10 @@ class UserServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    private function registerRepositories()
+    {
+        $this->app->singleton(RoleRepositoryInterface::class,RoleRepository::class);
     }
 }
