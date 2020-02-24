@@ -2,8 +2,11 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Event;
+
+use Illuminate\Support\Facades\Validator;
 use Modules\User\Repositories\RoleRepository;
 
 
@@ -50,12 +53,13 @@ class RoleController extends Controller
         return $this->roleRepository->findOneOrFail($id);
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $this->validate(request(), [
+        $validator = Validator::make(request(), [
             'name' => 'required',
             'permission_type' => 'required',
         ]);
+        dd($validator);
         $role = $this->roleRepository->create(request()->all());
         return response()->json($role, 201);
     }
