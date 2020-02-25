@@ -19,19 +19,16 @@ use Illuminate\Http\Request;
 
 Route::group(['middleware' => ['api']], function () {
     Route::prefix('admin')->group(function () {
-
-
-
+        
         // Login Routes
         Route::post('/login', 'SessionController@login')->name('admin.session.login');
 
 
         //Roles Routes
-        Route::group(['as' => 'admin.'],function(){
-            Route::resource('roles' ,'RoleController')->middleware('jwt.auth');
-            Route::resource('users' ,'UserController')->middleware('jwt.auth');
+        Route::group(['as' => 'admin.', 'middleware' => ['jwt.auth']],function(){
+            Route::resource('roles' ,'RoleController');
+            Route::resource('users' ,'UserController');
         });
-
 
     });
 });
