@@ -21,7 +21,6 @@ class UserServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('User', 'Database/Migrations'));
-        $this->registerRepositories();
 
     }
 
@@ -108,8 +107,4 @@ class UserServiceProvider extends ServiceProvider
         return [];
     }
 
-    private function registerRepositories()
-    {
-        $this->app->singleton(RoleRepositoryInterface::class,RoleRepository::class);
-    }
 }

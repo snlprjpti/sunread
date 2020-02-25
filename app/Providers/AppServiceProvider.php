@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Core\BaseModule\BaseRepository;
-use App\Core\BaseModule\BaseRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,8 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
 
-        $this->app->singleton(BaseRepositoryInterface::class, BaseRepository::class);
     }
 }

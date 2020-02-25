@@ -13,7 +13,7 @@ class Role extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'permission_type', 'permissions',
+        'name', 'description', 'permission_type', 'permissions','slug'
     ];
 
     protected $casts = [

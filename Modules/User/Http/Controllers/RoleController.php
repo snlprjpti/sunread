@@ -2,92 +2,81 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Event;
-
 use Illuminate\Support\Facades\Validator;
-use Modules\User\Repositories\RoleRepository;
-
-
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Modules\User\Entities\Role;
+    
 /**
  * Admin user role controller
  */
 class RoleController extends Controller
 {
-    /**
-     * Contains route related configuration
-     *
-     * @var array
-     */
-    protected $_config;
-
-    /**
-     * RoleRepository object
-     *
-     * @var array
-     */
-    protected $roleRepository;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @param  \Modules\User\Repositories\RoleRepository $roleRepository
-     * @return void
-     */
-    public function __construct(RoleRepository $roleRepository)
+    public function __construct()
     {
-        $this->roleRepository = $roleRepository;
+
     }
 
 
     public function index()
     {
-        $roles = $this->roleRepository->all();
+        $roles = Role::all();
         return $roles;
-
     }
 
     public function show($id)
     {
-        return $this->roleRepository->findOneOrFail($id);
+       return Role::find($id);
     }
 
     public function store(Request $request)
     {
-        $validator = Validator::make(request(), [
-            'name' => 'required',
-            'permission_type' => 'required',
-        ]);
-        dd($validator);
-        $role = $this->roleRepository->create(request()->all());
-        return response()->json($role, 201);
-    }
-
-
-    public function edit($id)
-    {
-        return $this->roleRepository->findOrFail($id);
-
-    }
-
-    public function update($id)
-    {
-        $this->validate(request(), [
-            'name' => 'required',
-            'permission_type' => 'required',
-        ]);
-        $role = $this->roleRepository->find($id);
-        $this->roleRepository = new RoleRepository($role);
-        $this->roleRepository->update(request()->all());
-        return response()->json($role, 200);
+        try{
+            Validator::make(request()->all(), [
+                'name' => 'required',
+                'permission_type' => 'required',
+                'description' => 'required',
+                'permissions' => 'required|json'
+            ]);
+            $params =  $request->all();
+            $params =  array_merge($params, ['slug' => Str::slug($params['name'])]);
+            $role = Role::create($params);
+            return response()->json($role, 201);
+        } catch (ValidationException $exception){
+            return $exception->getMessage();
+        } catch (ModelNotFoundException $exception){
+            return $exception->getMessage();
+        } catch (\Exception $exception){
+            return $exception->getMessage();
+        }
 
     }
 
-    public function destroy($id)
+
+    public function update(Request $request, $id)
     {
-        $role = $this->roleRepository->findOrFail($id);
-        dd($role);
+        try{
+            $role = Role::find($id);
+            Validator::make(request()->all(), [
+                'name' => 'required',
+                'permission_type' => 'required',
+                'description' => 'required',
+                'permissions' => 'required|json'
+            ]);
+            $params =  $request->all();
+            $role = Role::create($params);
+            return response()->json($role, 201);
+        } catch (ValidationException $exception){
+            return $exception->getMessage();
+        } catch (ModelNotFoundException $exception){
+            return $exception->getMessage();
+        } catch (\Exception $exception){
+            return $exception->getMessage();
+        }
+
     }
 
 }
