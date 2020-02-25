@@ -2,12 +2,9 @@
 
 namespace Modules\User\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Role;
 
@@ -18,7 +15,7 @@ class RoleController extends BaseController
 {
     public function __construct()
     {
-        $this->middleware('admin');
+
     }
 
     public function index()
