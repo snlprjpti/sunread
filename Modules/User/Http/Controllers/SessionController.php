@@ -4,11 +4,12 @@ namespace Modules\User\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
+use Modules\Core\Http\Controllers\BaseController;
 
 /**
  * Admin user session controller
  */
-class SessionController extends Controller
+class SessionController extends BaseController
 {
 
 
@@ -20,7 +21,6 @@ class SessionController extends Controller
     public function __construct()
     {
         $this->middleware('admin')->except(['login']);
-
     }
 
     /**
@@ -32,18 +32,17 @@ class SessionController extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
+        $remember = request('remember');
         $jwtToken = null;
         if (!$jwtToken = Auth::guard('admin')->attempt(request()->only('email', 'password'))) {
-            return response()->json([
-                'error' => 'Invalid Email or Password',
-            ], 401);
+           return $this->errorResponse(401,"Invalid email or password");
         }
-        $admin = auth('admin')->user();
-        return response()->json([
+        $admin = auth()->guard('admin')->user();
+        $payload = [
             'token' => $jwtToken,
-            'message' => 'Logged in successfully.',
-            'data' => $admin
-        ]);
+            'user' => $admin
+        ];
+        return $this->successResponse(200, $payload , "Logged in successfully");
     }
 
 
