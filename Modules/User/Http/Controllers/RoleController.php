@@ -18,7 +18,7 @@ class RoleController extends BaseController
 
     }
 
-    public function index()
+    public function index(Request $request)
     {
         return $this->successResponse(200, $payload = Role::all());
     }
@@ -32,9 +32,10 @@ class RoleController extends BaseController
     {
         $validator = Validator::make(request()->all(), [
             'name' => 'required',
-            'permission_type' => 'required',
-            'description' => 'required',
-            'permissions' => 'required|array'
+            'email' => 'required',
+            'password' => 'required',
+            'role' => 'required|array',
+            'status' => 'required|array'
         ]);
 
         if ($validator->fails()) {

@@ -28,9 +28,9 @@ Route::group(['middleware' => ['api']], function () {
 
         //Roles Routes
         Route::group(['as' => 'admin.'],function(){
-            Route::resource('roles' ,'RoleController');
+            Route::resource('roles' ,'RoleController')->middleware('jwt.auth');
+            Route::resource('users' ,'UserController')->middleware('jwt.auth');
         });
-
 
 
     });

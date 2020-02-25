@@ -63,7 +63,8 @@ class Handler extends ExceptionHandler
      * @throws \Exception
      */
     public function render($request, Exception $exception)
-    {   
+    {
+        dd("Reached handler",$exception);
         if ($exception instanceof ValidationException) {
             $errors = $exception->errors();
             return $this->errorResponse(400,$errors);
