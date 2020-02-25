@@ -4,79 +4,82 @@ namespace Modules\User\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Role;
     
 /**
  * Admin user role controller
  */
-class RoleController extends Controller
+class RoleController extends BaseController
 {
     public function __construct()
     {
 
     }
 
-
     public function index()
     {
-        $roles = Role::all();
-        return $roles;
+        return $this->successResponse(200,$payload = Role::all());
     }
 
     public function show($id)
     {
-       return Role::find($id);
+        return $this->successResponse(200,$payload = Role::findOrFail($id));
     }
 
     public function store(Request $request)
     {
-        try{
-            Validator::make(request()->all(), [
-                'name' => 'required',
-                'permission_type' => 'required',
-                'description' => 'required',
-                'permissions' => 'required|json'
-            ]);
-            $params =  $request->all();
-            $params =  array_merge($params, ['slug' => Str::slug($params['name'])]);
-            $role = Role::create($params);
-            return response()->json($role, 201);
-        } catch (ValidationException $exception){
-            return $exception->getMessage();
-        } catch (ModelNotFoundException $exception){
-            return $exception->getMessage();
-        } catch (\Exception $exception){
-            return $exception->getMessage();
-        }
+        $validator = Validator::make(request()->all(), [
+            'name' => 'required',
+            'slug' => 'required',
+            'permission_type' => 'required',
+            'description' => 'required',
+            'permissions' => 'required|array'
+        ]);
 
+        if($validator->fails()){
+            return $this->errorResponse(400,$validator->errors());
+        }
+        $params =  $request->all();
+        $params =  array_merge($params, ['slug' => Str::slug($params['name'])]);
+        try{
+            $role = Role::create($params);
+        }catch (\Exception $exception){
+            $this->errorResponse(400,$exception->getMessage());
+        }
+        return $this->successResponse(201, $role, "Role created Successfully");
     }
 
 
     public function update(Request $request, $id)
     {
+        $validator = Validator::make(request()->all(), [
+            'name' => 'required',
+            'slug' => 'required',
+            'permission_type' => 'required',
+            'description' => 'required',
+            'permissions' => 'required|array'
+        ]);
+        $params =  $request->all();
         try{
-            $role = Role::find($id);
-            Validator::make(request()->all(), [
-                'name' => 'required',
-                'permission_type' => 'required',
-                'description' => 'required',
-                'permissions' => 'required|json'
-            ]);
-            $params =  $request->all();
-            $role = Role::create($params);
-            return response()->json($role, 201);
-        } catch (ValidationException $exception){
-            return $exception->getMessage();
-        } catch (ModelNotFoundException $exception){
-            return $exception->getMessage();
-        } catch (\Exception $exception){
-            return $exception->getMessage();
+            $role = Role::update($params);
+        }catch (\Exception $exception){
+            $this->errorResponse(400,$exception->getMessage());
         }
+        return $this->successResponse(201, $role, "Role update Successfully");
+    }
 
+    public function destroy($id)
+    {
+        $role = Role::find($id);
+        if($role->slug == 'super-admin'){
+            $this->errorResponse(403, "Super Admin cannot be deleted");
+        }
+        
     }
 
 }
