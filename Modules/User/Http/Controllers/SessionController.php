@@ -10,12 +10,7 @@ use Illuminate\Routing\Controller;
  */
 class SessionController extends Controller
 {
-    /**
-     * Contains route related configuration
-     *
-     * @var array
-     */
-    protected $_config;
+
 
     /**
      * Create a new controller instance.
@@ -29,26 +24,20 @@ class SessionController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource
-     *
+     * @return \Illuminate\Http\JsonResponse
      */
-
     public function login()
     {
         request()->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
-
         $jwtToken = null;
-
-
-        if (! $jwtToken = Auth::guard('admin')->attempt(request()->only('email', 'password'))) {
+        if (!$jwtToken = Auth::guard('admin')->attempt(request()->only('email', 'password'))) {
             return response()->json([
                 'error' => 'Invalid Email or Password',
             ], 401);
         }
-
         $admin = auth('admin')->user();
         return response()->json([
             'token' => $jwtToken,

@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Role;
-    
+
 /**
  * Admin user role controller
  */
@@ -18,38 +18,37 @@ class RoleController extends BaseController
 {
     public function __construct()
     {
-
+        $this->middleware('admin');
     }
 
     public function index()
     {
-        return $this->successResponse(200,$payload = Role::all());
+        return $this->successResponse(200, $payload = Role::all());
     }
 
     public function show($id)
     {
-        return $this->successResponse(200,$payload = Role::findOrFail($id));
+        return $this->successResponse(200, $payload = Role::findOrFail($id));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make(request()->all(), [
             'name' => 'required',
-            'slug' => 'required',
             'permission_type' => 'required',
             'description' => 'required',
             'permissions' => 'required|array'
         ]);
 
-        if($validator->fails()){
-            return $this->errorResponse(400,$validator->errors());
+        if ($validator->fails()) {
+            return $this->errorResponse(400, $validator->errors());
         }
-        $params =  $request->all();
-        $params =  array_merge($params, ['slug' => Str::slug($params['name'])]);
-        try{
+        $params = $request->all();
+        $params = array_merge($params, ['slug' => Str::slug($params['name'])]);
+        try {
             $role = Role::create($params);
-        }catch (\Exception $exception){
-            $this->errorResponse(400,$exception->getMessage());
+        } catch (\Exception $exception) {
+            $this->errorResponse(400, $exception->getMessage());
         }
         return $this->successResponse(201, $role, "Role created Successfully");
     }
@@ -59,16 +58,16 @@ class RoleController extends BaseController
     {
         $validator = Validator::make(request()->all(), [
             'name' => 'required',
-            'slug' => 'required',
             'permission_type' => 'required',
             'description' => 'required',
             'permissions' => 'required|array'
         ]);
-        $params =  $request->all();
-        try{
-            $role = Role::update($params);
-        }catch (\Exception $exception){
-            $this->errorResponse(400,$exception->getMessage());
+        $params = $request->all();
+        $role = Role::find($id);
+        try {
+            $role = $role->update($params);
+        } catch (\Exception $exception) {
+            $this->errorResponse(400, $exception->getMessage());
         }
         return $this->successResponse(201, $role, "Role update Successfully");
     }
@@ -76,10 +75,11 @@ class RoleController extends BaseController
     public function destroy($id)
     {
         $role = Role::find($id);
-        if($role->slug == 'super-admin'){
+        if ($role->slug == 'super-admin') {
             $this->errorResponse(403, "Super Admin cannot be deleted");
         }
-        
+        $role->delete();
+        return $this->successResponse(400, null, "Role deleted success");
     }
 
 }
