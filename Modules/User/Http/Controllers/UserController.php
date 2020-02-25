@@ -37,7 +37,6 @@ class UserController extends BaseController
         $params = $request->all();
         if (isset($params['password']) && $params['password']) {
             $params['password'] = bcrypt($params['password']);
-            $params['api_token'] = Str::random(80);
         }
         try {
             $admin = Admin::create($params);
