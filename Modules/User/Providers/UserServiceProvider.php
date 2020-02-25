@@ -2,10 +2,11 @@
 
 namespace Modules\User\Providers;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
-use Modules\User\Repositories\Contracts\RoleRepositoryInterface;
-use Modules\User\Repositories\RoleRepository;
+use Modules\User\Facades\Bouncer as BouncerFacade;
+use Modules\User\Services\Bouncer;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -18,10 +19,9 @@ class UserServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerConfig();
-        $this->registerViews();
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('User', 'Database/Migrations'));
-
+        include __DIR__ . '/../Http/helpers.php';
     }
 
     /**
@@ -32,6 +32,7 @@ class UserServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
+        $this->registerBouncer();
     }
 
     /**
@@ -47,26 +48,6 @@ class UserServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path('User', 'Config/config.php'), 'user'
         );
-    }
-
-    /**
-     * Register views.
-     *
-     * @return void
-     */
-    public function registerViews()
-    {
-        $viewPath = resource_path('views/modules/user');
-
-        $sourcePath = module_path('User', 'Resources/views');
-
-        $this->publishes([
-            $sourcePath => $viewPath
-        ],'views');
-
-        $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/modules/user';
-        }, \Config::get('view.paths')), [$sourcePath]), 'user');
     }
 
     /**
@@ -105,6 +86,16 @@ class UserServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    protected function registerBouncer()
+    {
+        $loader = AliasLoader::getInstance();
+        $loader->alias('Bouncer', BouncerFacade::class);
+
+        $this->app->singleton('bouncer', function () {
+            return new Bouncer();
+        });
     }
 
 }

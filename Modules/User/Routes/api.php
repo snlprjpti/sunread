@@ -20,8 +20,9 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => ['api']], function () {
     Route::prefix('admin')->group(function () {
 
-        // Login Routes
+        // Session Routes
         Route::post('/login', 'SessionController@login')->name('admin.session.login');
+        Route::get('/logout', 'SessionController@logout')->name('admin.session.logout');
 
 
         //Roles Routes

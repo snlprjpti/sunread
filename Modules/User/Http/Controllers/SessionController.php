@@ -20,7 +20,7 @@ class SessionController extends BaseController
      */
     public function __construct()
     {
-        $this->middleware('admin')->except(['login']);
+        $this->middleware('admin')->except(['login','logout']);
     }
 
     /**
@@ -43,6 +43,12 @@ class SessionController extends BaseController
             'user' => $admin
         ];
         return $this->successResponse(200, $payload , "Logged in successfully");
+    }
+
+    public function logout()
+    {
+        auth()->guard('admin')->logout();
+        return $this->successResponse(200,null, "User logged out successfully");
     }
 
 
