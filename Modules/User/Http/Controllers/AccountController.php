@@ -9,6 +9,11 @@ use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
+/**
+ * Account Controller for the Admin
+ * @author    Hemant Achhami
+ * @copyright 2020 Hazesoft Pvt Ltd
+ */
 class AccountController extends BaseController
 {
     /**

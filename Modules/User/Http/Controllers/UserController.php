@@ -9,7 +9,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
 
 /**
- * Session Controller for the Admin
+ * User Controller for the Admin
  * @author    Hemant Achhami
  * @copyright 2020 Hazesoft Pvt Ltd
  */

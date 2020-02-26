@@ -35,6 +35,7 @@ class ForgotPasswordController extends BaseController
 
             $email = $request->get('email');
             $admin = Admin::where('email', $email)->first();
+
             if (!$admin) {
                 return $this->errorResponse(400, "Email does not exist");
             }
