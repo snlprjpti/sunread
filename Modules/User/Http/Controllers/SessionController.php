@@ -5,6 +5,7 @@ namespace Modules\User\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 
 /**
@@ -14,7 +15,6 @@ use Modules\Core\Http\Controllers\BaseController;
  */
 class SessionController extends BaseController
 {
-
 
     /**
      * Create a new controller instance.
@@ -32,24 +32,27 @@ class SessionController extends BaseController
      */
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        try{
+        $this->validate($request, [
             'email' => 'required|email',
             'password' => 'required'
         ]);
-        if ($validator->fails()) {
-            return $this->errorResponse(400, $validator->errors());
-        }
         $jwtToken = null;
         if (!$jwtToken = Auth::guard('admin')->attempt(request()->only('email', 'password'))) {
-            return $this->errorResponse(401, "Invalid email or password");
+            return $this->errorResponse(400, "Invalid email or password");
         }
-
         $admin = auth()->guard('admin')->user();
         $payload = [
             'token' => $jwtToken,
             'user' => $admin
         ];
         return $this->successResponse(200, $payload, "Logged in successfully");
+        }catch (ValidationException $exception){
+            return $this->errorResponse(400, $exception->getMessage());
+        }
+        catch ( \Exception  $exception){
+            return $this->errorResponse(400, $exception->getMessage());
+        }
     }
 
     /**
@@ -58,7 +61,12 @@ class SessionController extends BaseController
      */
     public function logout()
     {
-        auth()->guard('admin')->logout();
-        return $this->successResponse(200, null, "User logged out successfully");
+        try{
+            auth()->guard('admin')->logout();
+            return $this->successResponse(200, null, "User logged out successfully");
+        }catch (\Exception $exception){
+            return $this->errorResponse(400,$exception->getMessage());
+        }
+
     }
 }
