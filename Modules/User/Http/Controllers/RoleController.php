@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\User\Entities\Admin;
 use Modules\User\Entities\Role;
 
 /**
@@ -18,7 +19,7 @@ class RoleController extends BaseController
         $this->middleware('admin');
     }
 
-    public function index(Request $request)
+    public function index()
     {
         return $this->successResponse(200, $payload = Role::all());
     }
@@ -30,54 +31,49 @@ class RoleController extends BaseController
 
     public function store(Request $request)
     {
-        $validator = Validator::make(request()->all(), [
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
-            'role' => 'required|array',
-            'status' => 'required|array'
-        ]);
+        $params = $request->all();
 
+        $validator = Validator::make($params, Role::rules());
         if ($validator->fails()) {
             return $this->errorResponse(400, $validator->errors());
         }
-        $params = $request->all();
-        $params = array_merge($params, ['slug' => Str::slug($params['name'])]);
+
         try {
+            $params = array_merge($params, ['slug' => Str::slug($params['name'])]);
             $role = Role::create($params);
+            return $this->successResponse(201, $role, "Role created Successfully");
         } catch (\Exception $exception) {
             $this->errorResponse(400, $exception->getMessage());
         }
-        return $this->successResponse(201, $role, "Role created Successfully");
     }
 
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make(request()->all(), [
-            'name' => 'required',
-            'permission_type' => 'required',
-            'description' => 'required',
-            'permissions' => 'required|array'
-        ]);
         $params = $request->all();
-        $role = Role::find($id);
+        $validator = Validator::make(request()->all(), Admin::rules($id));
+        if ($validator->fails()) {
+            return $this->errorResponse(400, $validator->errors());
+        }
         try {
+            $role = Role::find($id);
             $role = $role->update($params);
+            return $this->successResponse(201, $role, "Role update Successfully");
         } catch (\Exception $exception) {
             $this->errorResponse(400, $exception->getMessage());
         }
-        return $this->successResponse(201, $role, "Role update Successfully");
     }
 
     public function destroy($id)
     {
-        $role = Role::find($id);
-        if ($role->slug == 'super-admin') {
-            $this->errorResponse(403, "Super Admin cannot be deleted");
+        try {
+            $role = Role::find($id);
+            $role->delete();
+            return $this->successResponse(400, null, "Role deleted success");
+        } catch (\Exception $exception) {
+            $this->errorResponse(400, $exception->getMessage());
         }
-        $role->delete();
-        return $this->successResponse(400, null, "Role deleted success");
+
     }
 
 }

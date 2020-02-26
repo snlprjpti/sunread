@@ -64,7 +64,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        dd("Reached handler",$exception);
+        //development phase debug:
+        if(app()->environment(['local','development'])) {
+            dd("Try to handle early : reached handler", $exception);
+        }
+
         if ($exception instanceof ValidationException) {
             $errors = $exception->errors();
             return $this->errorResponse(400,$errors);
