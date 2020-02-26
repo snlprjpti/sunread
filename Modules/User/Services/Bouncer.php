@@ -2,13 +2,13 @@
 
 namespace Modules\User\Services;
 
-class   Bouncer
+class  Bouncer
 {
     /**
      * Checks if user allowed or not for certain action
      *
      * @param  String $permission
-     * @return Void
+     * @return bool
      */
     public function hasPermission($permission)
     {
@@ -26,11 +26,14 @@ class   Bouncer
      * Checks if user allowed or not for certain action
      *
      * @param  String $permission
-     * @return Void
+     * @return bool
      */
     public static function allow($permission)
     {
-        if (! auth()->guard('admin')->check() || ! auth()->guard('admin')->user()->hasPermission($permission))
-            abort(401, 'This action is unauthorized');
+        if (!auth()->guard('admin')->check())
+            return false;
+        if( auth()->guard('admin')->user()->hasPermission($permission))
+            return true;
+        return false;
     }
 }

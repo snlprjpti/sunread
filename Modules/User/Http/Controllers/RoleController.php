@@ -15,7 +15,7 @@ class RoleController extends BaseController
 {
     public function __construct()
     {
-
+        $this->middleware('admin');
     }
 
     public function index(Request $request)

@@ -3,10 +3,11 @@
 namespace Modules\User\Providers;
 
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\User\Facades\Bouncer as BouncerFacade;
-use Modules\User\Services\Bouncer;
+use Modules\User\Http\Middleware\Bouncer as BouncerMiddleware;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -15,12 +16,13 @@ class UserServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Router $router)
     {
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('User', 'Database/Migrations'));
+        $router->aliasMiddleware('admin', BouncerMiddleware::class);
         include __DIR__ . '/../Http/helpers.php';
     }
 

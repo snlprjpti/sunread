@@ -47,7 +47,6 @@ class Admin extends Authenticatable implements JWTSubject
     {
         if ($this->role->permission_type == 'custom' && ! $this->role->permissions)
             return false;
-
         return in_array($permission, $this->role->permissions);
     }
 
@@ -71,4 +70,6 @@ class Admin extends Authenticatable implements JWTSubject
         return [];
         // TODO: Implement getJWTCustomClaims() method.
     }
+
+
 }
