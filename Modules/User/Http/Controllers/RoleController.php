@@ -2,9 +2,11 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
 use Modules\User\Entities\Role;
@@ -32,7 +34,13 @@ class RoleController extends BaseController
      */
     public function index()
     {
-        return $this->successResponse(200, $payload = Role::all());
+        try {
+            return $this->successResponse(200, $payload = Role::all());
+        } catch (QueryException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        }
     }
 
     /**
@@ -42,29 +50,33 @@ class RoleController extends BaseController
      */
     public function show($id)
     {
-        return $this->successResponse(200, $payload = Role::findOrFail($id));
+        try {
+            return $this->successResponse(200, $payload = Role::findOrFail($id));
+        } catch (QueryException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        }
     }
 
     /**
      * Stores new role
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
         $params = $request->all();
-
-        $validator = Validator::make($params, Role::rules());
-        if ($validator->fails()) {
-            return $this->errorResponse(400, $validator->errors());
-        }
-
+        $this->validate($request, Role::rules());
         try {
             $params = array_merge($params, ['slug' => Str::slug($params['name'])]);
             $role = Role::create($params);
             return $this->successResponse(201, $role, "Role created Successfully");
+        } catch (ValidationException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {
-            $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse(400, $exception->getMessage());
         }
     }
 
@@ -74,20 +86,22 @@ class RoleController extends BaseController
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws ValidationException
      */
     public function update(Request $request, $id)
     {
         $params = $request->all();
-        $validator = Validator::make(request()->all(), Admin::rules($id));
-        if ($validator->fails()) {
-            return $this->errorResponse(400, $validator->errors());
-        }
+        $this->validate($request, Admin::rules($id));
         try {
             $role = Role::find($id);
             $role = $role->update($params);
             return $this->successResponse(201, $role, "Role update Successfully");
+        } catch (ValidationException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        } catch (QueryException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {
-            $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse(400, $exception->getMessage());
         }
     }
 
@@ -102,8 +116,10 @@ class RoleController extends BaseController
             $role = Role::find($id);
             $role->delete();
             return $this->successResponse(400, null, "Role deleted success");
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {
-            $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse(400, $exception->getMessage());
         }
 
     }

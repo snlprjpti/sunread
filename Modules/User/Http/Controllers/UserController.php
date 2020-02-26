@@ -2,9 +2,10 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
 
@@ -22,7 +23,14 @@ class UserController extends BaseController
      */
     public function index()
     {
-        return $this->successResponse(200, $payload = Admin::all());
+        try {
+            return $this->successResponse(200, Admin::all());
+        } catch (QueryException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        }
+
     }
 
     /**
@@ -31,29 +39,34 @@ class UserController extends BaseController
      */
     public function show($id)
     {
-        return $this->successResponse(200, $payload = Admin::findOrFail($id));
+        try {
+            return $this->successResponse(200, $payload = Admin::findOrFail($id));
+        } catch (QueryException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        } catch (\Exception $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
+        }
     }
 
     /**
      * store the new admin resource
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
         try {
             $params = $request->all();
-
-            $validator = Validator::make($params, Admin::rules());
-            if ($validator->fails()) {
-                return $this->errorResponse(400, $validator->errors());
-            }
+            $this->validate($request, Admin::rules());
             if (isset($params['password']) && $params['password']) {
                 $params['password'] = bcrypt($params['password']);
             }
             $admin = Admin::create($params);
             return $this->successResponse(201, $admin, "Admin created Successfully");
+        } catch (ValidationException $exception) {
+            return $this->errorResponse(400, $exception->errors());
         } catch (\Exception $exception) {
-            $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse(400, $exception->getMessage());
         }
     }
 
@@ -68,21 +81,17 @@ class UserController extends BaseController
         try {
 
             $params = $request->all();
-
-            $validator = Validator::make($params, Admin::rules($id));
-            if ($validator->fails()) {
-                return $this->errorResponse(400, $validator->errors());
-            }
-
+            $this->validate($params, Admin::rules($id));
             if (isset($params['password']) && $params['password']) {
                 $params['password'] = bcrypt($params['password']);
             }
             $admin = Admin::find($id);
             $admin = $admin->update($params);
             return $this->successResponse(200, $admin, "Admin updated Successfully");
-
+        } catch (ValidationException $exception) {
+            return $this->errorResponse(400, $exception->errors());
         } catch (\Exception $exception) {
-            $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse(400, $exception->getMessage());
         }
 
     }
@@ -99,6 +108,8 @@ class UserController extends BaseController
             $admin = Admin::find($id);
             $admin->delete();
             return $this->successResponse(400, null, "Admin deleted success");
+        } catch (QueryException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }
