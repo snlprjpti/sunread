@@ -31,6 +31,8 @@ Route::group(['middleware' => ['api']], function () {
         Route::group(['middleware' => 'jwt.auth'],function(){
             Route::resource('roles' ,'RoleController');
             Route::resource('users' ,'UserController');
+            Route::get('/account', 'AccountController@edit')->name('account.edit');
+            Route::put('/account', 'AccountController@update')->name('account.update');
         });
     });
 
