@@ -7,6 +7,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Modules\Core\Traits\ApiResponseFormat;
 
+/**
+ * Bouncer Middleware for Admin resource
+ * @author    Hemant Achhami
+ * @copyright 2020 Hazesoft Pvt Ltd
+ */
+
 class Bouncer
 {
     use ApiResponseFormat;
@@ -32,6 +38,11 @@ class Bouncer
         return $next($request);
     }
 
+    /**
+     * Checks authorisation for particular resources
+     * @param $request
+     * @return bool
+     */
     public function checkIfAuthorized($request)
     {
         if (! $role = auth()->guard('admin')->user()->role)

@@ -5,7 +5,7 @@ namespace Modules\User\Services;
 class  Bouncer
 {
     /**
-     * Checks if user allowed or not for certain action
+     * Checks if admin is allowed or not for certain action
      *
      * @param  String $permission
      * @return bool
@@ -23,7 +23,7 @@ class  Bouncer
     }
 
     /**
-     * Checks if user allowed or not for certain action
+     * Checks if admin is  allowed or not for certain action
      *
      * @param  String $permission
      * @return bool

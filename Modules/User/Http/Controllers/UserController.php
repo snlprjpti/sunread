@@ -8,24 +8,42 @@ use Illuminate\Support\Facades\Validator;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
 
+/**
+ * Session Controller for the Admin
+ * @author    Hemant Achhami
+ * @copyright 2020 Hazesoft Pvt Ltd
+ */
 class UserController extends BaseController
 {
+
+    /**
+     * returns all the admins
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         return $this->successResponse(200, $payload = Admin::all());
     }
 
+    /**
+     * Get the particular admin
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
         return $this->successResponse(200, $payload = Admin::findOrFail($id));
     }
 
+    /**
+     * store the new admin resource
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         try {
             $params = $request->all();
 
-            $validator = Validator::make($params,Admin::rules());
+            $validator = Validator::make($params, Admin::rules());
             if ($validator->fails()) {
                 return $this->errorResponse(400, $validator->errors());
             }
@@ -39,13 +57,19 @@ class UserController extends BaseController
         }
     }
 
+    /**
+     * Update the admin details
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
         try {
 
             $params = $request->all();
 
-            $validator = Validator::make($params,Admin::rules($id));
+            $validator = Validator::make($params, Admin::rules($id));
             if ($validator->fails()) {
                 return $this->errorResponse(400, $validator->errors());
             }
@@ -65,17 +89,17 @@ class UserController extends BaseController
 
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified  admin resource from storage.
      * @param int $id
      * @return Response
      */
     public function destroy($id)
     {
-        try{
+        try {
             $admin = Admin::find($id);
             $admin->delete();
             return $this->successResponse(400, null, "Admin deleted success");
-        } catch (\Exception $exception){
+        } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }
     }

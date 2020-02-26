@@ -10,25 +10,46 @@ use Modules\User\Entities\Admin;
 use Modules\User\Entities\Role;
 
 /**
- * Admin user role controller
+ * Role controller for the Admin
+ * @author    Hemant Achhami
+ * @copyright 2020 Hazesoft Pvt Ltd
  */
 class RoleController extends BaseController
 {
+    /**
+     * RoleController constructor.
+     * Admin middleware checks the admin against admins table
+     */
+
     public function __construct()
     {
         $this->middleware('admin');
     }
 
+    /**
+     * Returns all the roles
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         return $this->successResponse(200, $payload = Role::all());
     }
 
+    /**
+     * Get the particular role
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($id)
     {
         return $this->successResponse(200, $payload = Role::findOrFail($id));
     }
 
+    /**
+     * Stores new role
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $params = $request->all();
@@ -48,6 +69,12 @@ class RoleController extends BaseController
     }
 
 
+    /**
+     * Updates the role details
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
         $params = $request->all();
@@ -64,6 +91,11 @@ class RoleController extends BaseController
         }
     }
 
+    /**
+     * Destroys the particular role
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy($id)
     {
         try {
