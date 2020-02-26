@@ -19,18 +19,18 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => ['api']], function () {
 
     //ADMIN USER ROUTES
-    Route::prefix('admin')->group(function () {
+    Route::group(['prefix'=>'admin','as' => 'admin.'],function () {
 
         // Session Routes
-        Route::post('/login', 'SessionController@login')->name('admin.session.login');
-        Route::get('/logout', 'SessionController@logout')->name('admin.session.logout');
+        Route::post('/login', 'SessionController@login')->name('session.login');
+        Route::get('/logout', 'SessionController@logout')->name('session.logout');
+        Route::post('/forget-password', 'ForgotPasswordController@store')->name('forget-password.store');
+        Route::post('/reset-password', 'ResetPasswordController@store')->name('reset-password.store');
 
-        //Roles Routes
-        Route::group(['as' => 'admin.', 'middleware' => ['jwt.auth']],function(){
+        Route::group(['middleware' => 'jwt.auth'],function(){
             Route::resource('roles' ,'RoleController');
             Route::resource('users' ,'UserController');
         });
-
     });
 
 });
