@@ -2,21 +2,24 @@
 
 namespace Modules\Customer\Providers;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Webkul\Customer\Http\Middleware\RedirectIfNotCustomer;
 
 class CustomerServiceProvider extends ServiceProvider
 {
     /**
      * Boot the application events.
      *
+     * @param Router $router
      * @return void
      */
-    public function boot()
+    public function boot(Router $router)
     {
         $this->registerTranslations();
         $this->registerConfig();
-        $this->registerViews();
+        $router->aliasMiddleware('customer', RedirectIfNotCustomer::class);
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('Customer', 'Database/Migrations'));
     }
@@ -44,26 +47,6 @@ class CustomerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path('Customer', 'Config/config.php'), 'customer'
         );
-    }
-
-    /**
-     * Register views.
-     *
-     * @return void
-     */
-    public function registerViews()
-    {
-        $viewPath = resource_path('views/modules/customer');
-
-        $sourcePath = module_path('Customer', 'Resources/views');
-
-        $this->publishes([
-            $sourcePath => $viewPath
-        ],'views');
-
-        $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/modules/customer';
-        }, \Config::get('view.paths')), [$sourcePath]), 'customer');
     }
 
     /**
