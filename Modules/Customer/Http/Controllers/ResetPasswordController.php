@@ -2,6 +2,7 @@
 
 namespace Modules\Customer\Http\Controllers;
 
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -51,8 +52,8 @@ class ResetPasswordController extends BaseController
             ]);
 
             $response = $this->broker()->reset(
-                request(['email', 'password', 'password_confirmation', 'token']), function ($admin, $password) {
-                $this->resetPassword($admin, $password);
+                request(['email', 'password', 'password_confirmation', 'token']), function ($customer, $password) {
+                $this->resetPassword($customer, $password);
             });
 
             if ($response == Password::PASSWORD_RESET) {
@@ -70,16 +71,17 @@ class ResetPasswordController extends BaseController
     /**
      * Reset the given customer password.
      *
-     * @param $admin
+     * @param $customer
      * @param  string $password
      * @return void
      */
-    protected function resetPassword($admin, $password)
+    protected function resetPassword($customer, $password)
     {
 
-        $admin->password = Hash::make($password);
-        $admin->setRememberToken(Str::random(60));
-        $admin->save();
+        $customer->password = Hash::make($password);
+        $customer->setRememberToken(Str::random(60));
+        $customer->save();
+        event(new PasswordReset($customer));
     }
 
     /**
