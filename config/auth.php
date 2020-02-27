@@ -50,6 +50,10 @@ return [
         'admin' => [
             'driver' => 'jwt',
             'provider' => 'admins',
+        ],
+        'customer' => [
+            'driver' => 'jwt',
+            'provider' => 'customers',
         ]
     ],
 
@@ -83,7 +87,13 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => Modules\User\Entities\Admin::class,
+        ],
+        'customers' => [
+            'driver' => 'eloquent',
+            'model' => Modules\Customer\Entities\Customer::class,
         ]
+
+
     ],
 
     /*
@@ -111,6 +121,11 @@ return [
         'admins' => [
             'provider' => 'admins',
             'table' => 'admin_password_resets',
+            'expire' => 60,
+        ],
+        'customers' => [
+            'provider' => 'customers',
+            'table' => 'customer_password_resets',
             'expire' => 60,
         ],
     ],

@@ -1,14 +1,14 @@
 <?php
 
-namespace Modules\User\Notifications;
+namespace Modules\Customer\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
-class ResetPasswordNotification extends Notification
+class CustomerResetPassword extends Notification
 {
+
     use Queueable;
     public $token;
 
@@ -44,7 +44,7 @@ class ResetPasswordNotification extends Notification
         return (new MailMessage)
             ->subject('Reset Password')
             ->line('You are receiving this email because we received a password reset request for your account.')
-            ->action('Reset Password', route('admin.reset-password.create', $this->token))
+            ->action('Reset Password', route('customer.reset-password.create', $this->token))
             ->line('If you did not request a password reset, no further action is required.');
     }
 
