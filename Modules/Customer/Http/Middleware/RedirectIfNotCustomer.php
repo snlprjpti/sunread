@@ -6,6 +6,12 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use Modules\Core\Traits\ApiResponseFormat;
 
+/**
+ * Reset Password controller for the Customer
+ * @author    Hemant Achhami
+ * @copyright 2020 Hazesoft Pvt Ltd
+ */
+
 class RedirectIfNotCustomer
 {
     use ApiResponseFormat;

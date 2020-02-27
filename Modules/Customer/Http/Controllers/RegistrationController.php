@@ -8,8 +8,9 @@ use Modules\Customer\Entities\Customer;
 
 
 /**
- * Registration controller
- *
+ * Registration Controller customer
+ * @author    Hemant Achhami
+ * @copyright 2020 Hazesoft Pvt Ltd
  */
 class RegistrationController extends BaseController
 {
