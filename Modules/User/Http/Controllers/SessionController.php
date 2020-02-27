@@ -38,7 +38,8 @@ class SessionController extends BaseController
             'password' => 'required'
         ]);
         $jwtToken = null;
-        if (!$jwtToken = Auth::guard('admin')->attempt(request()->only('email', 'password'))) {
+        $admin_jwt_ttl = config('jwt.admin_jwt_ttl');
+        if (!$jwtToken = Auth::guard('admin')->setTTl($admin_jwt_ttl)->attempt(request()->only('email', 'password'))) {
             return $this->errorResponse(400, trans('core::app.users.users.login-error'));
         }
         $admin = auth()->guard('admin')->user();

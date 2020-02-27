@@ -38,7 +38,8 @@ class SessionController extends BaseController
                 'password' => 'required'
             ]);
             $jwtToken = null;
-            if (!$jwtToken = Auth::guard('customer')->attempt(request()->only('email', 'password'))) {
+            $customer_jwt_ttl = config('jwt.customer_jwt_ttl');
+            if (!$jwtToken = Auth::guard('customer')->setTTL($customer_jwt_ttl)->attempt(request()->only('email', 'password'))) {
                 return $this->errorResponse(400, "Invalid email or password");
             }
             $customer = auth()->guard('customer')->user();

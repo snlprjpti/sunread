@@ -102,6 +102,8 @@ return [
     */
 
     'ttl' => env('JWT_TTL', 60),
+    'customer_jwt_ttl' => env('CUSTOMER_JWT_TTL', env('JWT_TTL', 60)),
+    'admin_jwt_ttl' => env('ADMIN_JWT_TTL', env('JWT_TTL', 60)),
 
     /*
     |--------------------------------------------------------------------------
