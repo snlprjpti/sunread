@@ -56,7 +56,7 @@ class ResetPasswordController extends BaseController
             });
 
             if ($response == Password::PASSWORD_RESET) {
-                return $this->successResponse(200, null, "User Password reset success");
+                return $this->successResponse(200, null,  trans('core::app.response.create-success', ['name' => 'Password reset ']));
             }
             return $this->errorResponse(400, "Invalid token");
         } catch(ValidationException $exception){

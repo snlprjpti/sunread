@@ -37,7 +37,7 @@ class RegistrationController extends BaseController
 
             $data['token'] = $verificationData['token'];
             $customer = Customer::create($data);
-            return $this->successResponse(200,$customer,"Customer registered success");
+            return $this->successResponse(200,$customer, trans('core::app.response.create-success', ['name' => 'Account']));
         }catch (ValidationException $exception){
             return $this->errorResponse(400, $exception->errors());
         }catch (\Exception $exception){

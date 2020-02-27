@@ -46,7 +46,7 @@ class SessionController extends BaseController
                 'token' => $jwtToken,
                 'user' => $customer
             ];
-            return $this->successResponse(200, $payload, "Logged in successfully");
+            return $this->successResponse(200, $payload,  trans('core::app.users.users.login-success'));
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception  $exception) {
@@ -62,7 +62,7 @@ class SessionController extends BaseController
     {
         try {
             auth()->guard('customer')->logout();
-            return $this->successResponse(200, null, "Customer logged out successfully");
+            return $this->successResponse(200, null,  trans('core::app.users.users.logout-success'));
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }
