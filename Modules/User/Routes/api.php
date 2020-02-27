@@ -28,7 +28,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::post('/reset-password', 'ResetPasswordController@store')->name('reset-password.store');
         Route::get('/reset-password/{token}', 'ResetPasswordController@create')->name('reset-password.create');
 
-        Route::group(['middleware' => 'jwt.auth'],function(){
+        Route::group(['middleware' => 'jwt.verify'],function(){
             Route::resource('roles' ,'RoleController');
             Route::resource('users' ,'UserController');
             Route::get('/account', 'AccountController@edit')->name('account.edit');
