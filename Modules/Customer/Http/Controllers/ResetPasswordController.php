@@ -63,7 +63,7 @@ class ResetPasswordController extends BaseController
         } catch(ValidationException $exception){
             return $this->errorResponse(400,$exception->errors());
         }catch (\Exception $e) {
-            return $this->errorResponse(200, $e->getMessage());
+            return $this->errorResponse(400, $e->getMessage());
         }
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 
 /**
@@ -43,16 +44,13 @@ class ResetPasswordController extends BaseController
     public function store(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+             $this->validate($request, [
                 'token' => 'required',
                 'email' => 'required|email',
                 'password' => 'required|confirmed|min:6',
             ]);
-            if ($validator->fails()) {
-                $this->errorResponse(400, $validator->errors());
-            }
 
-            $response = $this->broker()->reset(
+             $response = $this->broker()->reset(
                 request(['email', 'password', 'password_confirmation', 'token']), function ($admin, $password) {
                 $this->resetPassword($admin, $password);
             }
@@ -62,8 +60,10 @@ class ResetPasswordController extends BaseController
             }
             return $this->errorResponse(400, "Invalid token");
 
+        }catch (ValidationException $exception){
+            return $this->errorResponse(400, $exception->errors());
         } catch (\Exception $e) {
-            return $this->errorResponse(200, $e->getMessage());
+            return $this->errorResponse(400, $e->getMessage());
         }
     }
 
