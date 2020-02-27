@@ -52,12 +52,12 @@ class AccountController extends BaseController
             ]);
             $data = request()->input();
             if (!Hash::check($data['current_password'], auth()->guard('admin')->user()->password)) {
-                return $this->errorResponse(401, "Invalid password. Fail to update");
+                return $this->errorResponse(401,  trans('core::app.users.incorrect-password'));
             }
             if (isset($data['password']))
                 $data['password'] = bcrypt($data['password']);
             $user->update($data);
-            return $this->successResponse(200, null, "Account updated successfully");
+            return $this->successResponse(200, null,  trans('core::app.response.update-success', ['name' => 'Customer Account']));
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->errors());
         } catch (\Exception $exception) {

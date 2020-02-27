@@ -35,12 +35,12 @@ class UserController extends BaseController
 
     /**
      * Get the particular admin
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
         try {
-            return $this->successResponse(200, $payload = Admin::findOrFail($id));
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {
@@ -62,7 +62,7 @@ class UserController extends BaseController
                 $params['password'] = bcrypt($params['password']);
             }
             $admin = Admin::create($params);
-            return $this->successResponse(201, $admin, "Admin created Successfully");
+            return $this->successResponse(201, $admin,  trans('core::app.response.create-success', ['name' => 'Admin']));
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->errors());
         } catch (\Exception $exception) {
@@ -81,13 +81,13 @@ class UserController extends BaseController
         try {
 
             $params = $request->all();
-            $this->validate($params, Admin::rules($id));
+            $this->validate($request, Admin::rules($id));
             if (isset($params['password']) && $params['password']) {
                 $params['password'] = bcrypt($params['password']);
             }
             $admin = Admin::find($id);
             $admin = $admin->update($params);
-            return $this->successResponse(200, $admin, "Admin updated Successfully");
+            return $this->successResponse(200, $admin,  trans('core::app.response.update-success', ['name' => 'Admin']));
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->errors());
         } catch (\Exception $exception) {
@@ -107,7 +107,7 @@ class UserController extends BaseController
         try {
             $admin = Admin::find($id);
             $admin->delete();
-            return $this->successResponse(400, null, "Admin deleted success");
+            return $this->successResponse(400, null,  trans('core::app.response.create-success', ['name' => 'Admin']));
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {

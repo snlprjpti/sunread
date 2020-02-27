@@ -39,14 +39,14 @@ class SessionController extends BaseController
         ]);
         $jwtToken = null;
         if (!$jwtToken = Auth::guard('admin')->attempt(request()->only('email', 'password'))) {
-            return $this->errorResponse(400, "Invalid email or password");
+            return $this->errorResponse(400, trans('core::app.users.users.login-error'));
         }
         $admin = auth()->guard('admin')->user();
         $payload = [
             'token' => $jwtToken,
             'user' => $admin
         ];
-        return $this->successResponse(200, $payload, "Logged in successfully");
+        return $this->successResponse(200, $payload, trans('core::app.users.users.login-success'));
         }catch (ValidationException $exception){
             return $this->errorResponse(400, $exception->getMessage());
         }
@@ -63,7 +63,7 @@ class SessionController extends BaseController
     {
         try{
             auth()->guard('admin')->logout();
-            return $this->successResponse(200, null, "User logged out successfully");
+            return $this->successResponse(200, null, trans('core::app.users.users.logout-success'));
         }catch (\Exception $exception){
             return $this->errorResponse(400,$exception->getMessage());
         }
