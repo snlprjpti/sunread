@@ -1,6 +1,6 @@
 <?php
 
-namespace Webkul\Customer\Http\Middleware;
+namespace Modules\Customer\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;

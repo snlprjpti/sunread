@@ -5,7 +5,7 @@ namespace Modules\Customer\Providers;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
-use Webkul\Customer\Http\Middleware\RedirectIfNotCustomer;
+use Modules\Customer\Http\Middleware\RedirectIfNotCustomer;
 
 class CustomerServiceProvider extends ServiceProvider
 {
