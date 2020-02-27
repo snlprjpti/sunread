@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 
 /**
@@ -43,26 +44,24 @@ class ResetPasswordController extends BaseController
     public function store(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            $this->validate($request, [
                 'token' => 'required',
                 'email' => 'required|email',
                 'password' => 'required|confirmed|min:6',
             ]);
-            if ($validator->fails()) {
-                $this->errorResponse(400, $validator->errors());
-            }
 
             $response = $this->broker()->reset(
                 request(['email', 'password', 'password_confirmation', 'token']), function ($admin, $password) {
                 $this->resetPassword($admin, $password);
-            }
-            );
+            });
+
             if ($response == Password::PASSWORD_RESET) {
                 return $this->successResponse(200, null, "User Password reset success");
             }
             return $this->errorResponse(400, "Invalid token");
-
-        } catch (\Exception $e) {
+        } catch(ValidationException $exception){
+            return $this->errorResponse(400,$exception->errors());
+        }catch (\Exception $e) {
             return $this->errorResponse(200, $e->getMessage());
         }
     }
@@ -89,7 +88,7 @@ class ResetPasswordController extends BaseController
      */
     protected function broker()
     {
-        return Password::broker('admins');
+        return Password::broker('customers');
     }
 
 }
