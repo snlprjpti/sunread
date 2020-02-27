@@ -22,7 +22,7 @@ class SessionController extends BaseController
      */
     public function __construct()
     {
-      //  $this->middleware('guest:customer')->except(['logout']);
+        $this->middleware('guest:customer')->except(['logout']);
     }
 
     /**

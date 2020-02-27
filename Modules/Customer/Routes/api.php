@@ -20,7 +20,7 @@ Route::group(['middleware' => ['api']], function () {
     Route::group(['prefix'=>'customer','as' => 'customer.'],function () {
 
 
-        Route::post('/register', 'RegisterController@register')->name('register');
+        Route::post('/register', 'RegistrationController@register')->name('register');
 
         // Session Routes
         Route::post('/login', 'SessionController@login')->name('session.login');
