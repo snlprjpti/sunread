@@ -2,6 +2,7 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -41,6 +42,7 @@ class UserController extends BaseController
     public function show($id)
     {
         try {
+            return $this->successResponse(200, Admin::find($id));
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {
@@ -62,7 +64,7 @@ class UserController extends BaseController
                 $params['password'] = bcrypt($params['password']);
             }
             $admin = Admin::create($params);
-            return $this->successResponse(201, $admin,  trans('core::app.response.create-success', ['name' => 'Admin']));
+            return $this->successResponse(201, $admin, trans('core::app.response.create-success', ['name' => 'Admin']));
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->errors());
         } catch (\Exception $exception) {
@@ -85,9 +87,11 @@ class UserController extends BaseController
             if (isset($params['password']) && $params['password']) {
                 $params['password'] = bcrypt($params['password']);
             }
-            $admin = Admin::find($id);
+            $admin = Admin::findOrFail($id);
             $admin = $admin->update($params);
-            return $this->successResponse(200, $admin,  trans('core::app.response.update-success', ['name' => 'Admin']));
+            return $this->successResponse(200, $admin, trans('core::app.response.update-success', ['name' => 'Admin']));
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->errors());
         } catch (\Exception $exception) {
@@ -105,9 +109,9 @@ class UserController extends BaseController
     public function destroy($id)
     {
         try {
-            $admin = Admin::find($id);
+            $admin = Admin::findOrFail($id);
             $admin->delete();
-            return $this->successResponse(400, null,  trans('core::app.response.create-success', ['name' => 'Admin']));
+            return $this->successResponse(400, null, trans('core::app.response.create-success', ['name' => 'Admin']));
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {

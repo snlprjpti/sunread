@@ -67,9 +67,9 @@ class RoleController extends BaseController
      */
     public function store(Request $request)
     {
-        $params = $request->all();
-        $this->validate($request, Role::rules());
         try {
+            $params = $request->all();
+            $this->validate($request, Role::rules());
             $params = array_merge($params, ['slug' => Str::slug($params['name'])]);
             $role = Role::create($params);
             return $this->successResponse(201, $role,  trans('core::app.response.create-success', ['name' => 'Role']));
@@ -90,9 +90,9 @@ class RoleController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        $params = $request->all();
-        $this->validate($request, Admin::rules($id));
         try {
+            $params = $request->all();
+            $this->validate($request, Admin::rules($id));
             $role = Role::find($id);
             $role = $role->update($params);
             return $this->successResponse(201, $role,  trans('core::app.response.update-success', ['name' => 'Role']));
@@ -115,7 +115,7 @@ class RoleController extends BaseController
         try {
             $role = Role::find($id);
             $role->delete();
-            return $this->successResponse(400, null,  trans('core::app.response.deleted-success', ['name' => 'Role']));
+            return $this->successResponse(400, null,  trans('core::app.response.d-success', ['name' => 'Role']));
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {
