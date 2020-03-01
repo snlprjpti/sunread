@@ -4,17 +4,28 @@ namespace Modules\Category\Entities;
 
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Category extends Model
 {
-    use NodeTrait,Translatable;
+    use Translatable,NodeTrait;
     public $translatedAttributes = ['name', 'description', 'slug', 'url_path', 'meta_title', 'meta_description', 'meta_keywords'];
 
     protected $fillable = ['position', 'status', 'parent_id'];
+    protected  $with = ['translations'];
 
+    public static function rules()
+    {
+        return [
+            'slug' => ['required ','unique:category_translations,slug'],
+            'name' => 'required',
+            'image' => 'mimes:jpeg,jpg,bmp,png',
+        ];
+
+    }
 
 
     /**
@@ -43,13 +54,9 @@ class Category extends Model
      *
      * @return Category
      */
-    public function getRootCategory(): Category
+    public function getRootCategories(): Collection
     {
-        return Category::where([
-            ['parent_id', '=', null],
-            ['_lft', '<=', $this->_lft],
-            ['_rgt', '>=', $this->_rgt],
-        ])->first();
+        return Category::where('parent_id', '=', null)->get();
     }
 
     /**
