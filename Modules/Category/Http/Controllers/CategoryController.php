@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Modules\Category\Entities\CategoryTranslation;
 use Modules\Core\Entities\Core;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Entities\Category;
@@ -78,7 +79,7 @@ class CategoryController extends BaseController
         try {
             $this->validate($request, Category::rules());
             //store
-            $category = $this->saveCategory($request->all());
+            $category = $this->saveCategory($request);
             $this->uploadImages($category);
             return $this->successResponse(201, $category, trans('core::app.response.create-success', ['name' => 'Category']));
 
@@ -92,25 +93,28 @@ class CategoryController extends BaseController
 
 
 
-    private function saveCategory($data)
+    private function saveCategory($request)
     {
-        //Convert in all the locales
+
         $category = new Category();
+        $category = Category::create($request->all());
 
-        //Getting selected locales
-        //Translating using  package
-        $locales = Core::getRelatedLocales($data);
-        foreach ($locales as $locale) {
-            foreach ($category->translatedAttributes as $attribute) {
-                if (isset($data[$attribute])) {
-                    $data[$locale->code][$attribute] = $data[$attribute];
-                    $data[$locale->code]['locale_id'] = $locale->id;
-                }
-
+        //format data according to locales
+        $locale_values = $request->get('locales');
+        if(isset($locale_values) && is_array($locale_values)){
+            foreach ($locale_values as $key => $item){
+                $data = array_merge($item,
+                    [
+                        'locale' => $key,
+                        'category_id' => $category->id,
+                        'slug' => $request->slug
+                    ]);
             }
+
+            $category_translation = CategoryTranslation::create($data);
+            $category->translations()->save($category_translation);
         }
 
-        $category = Category::create($data);
         return $category;
     }
 
@@ -144,7 +148,7 @@ class CategoryController extends BaseController
             $params = $request->all();
             $this->validate($request, Category::rules($id));
             $category = Category::findOrFail($id);
-                $this->saveCategory($params);
+            $this->saveCategory($params);
             $this->uploadImages($category);
             return $this->successResponse(200, $category, trans('core::app.response.update-success', ['name' => 'Category']));
 
