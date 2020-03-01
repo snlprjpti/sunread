@@ -29,7 +29,7 @@ class CategoryController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        //$this->middleware('admin');
+       // $this->middleware('admin');
     }
 
     /**
@@ -40,6 +40,7 @@ class CategoryController extends BaseController
     {
 
         try {
+
             return $this->successResponse(200, Category::paginate($this->pagination_limit));
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
@@ -58,8 +59,10 @@ class CategoryController extends BaseController
     {
         try {
             return $this->successResponse(200, Category::findOrFail($id));
+
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
+
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }
@@ -73,9 +76,7 @@ class CategoryController extends BaseController
     public function store(Request $request)
     {
         try {
-            //validation
-            $this->validate(request(), Category::rules());
-
+            $this->validate($request, Category::rules());
             //store
             $category = $this->saveCategory($request->all());
             $this->uploadImages($category);
@@ -96,7 +97,8 @@ class CategoryController extends BaseController
         //Convert in all the locales
         $category = new Category();
 
-        //Change the values according to locales selected
+        //Getting selected locales
+        //Translating using  package
         $locales = Core::getRelatedLocales($data);
         foreach ($locales as $locale) {
             foreach ($category->translatedAttributes as $attribute) {
@@ -107,7 +109,7 @@ class CategoryController extends BaseController
 
             }
         }
-        
+
         $category = Category::create($data);
         return $category;
     }
@@ -141,21 +143,17 @@ class CategoryController extends BaseController
 
             $params = $request->all();
             $this->validate($request, Category::rules($id));
-
-            //Check if new category has same root node name as of parent
-            $same_root_name = $this->checkParentCategoryWithSameName(request('name'));
-            if ($same_root_name) {
-                return $this->errorResponse(400, "Category with same name already exists");
-            }
-
             $category = Category::findOrFail($id);
-            $category->update($params);
+                $this->saveCategory($params);
             $this->uploadImages($category);
             return $this->successResponse(200, $category, trans('core::app.response.update-success', ['name' => 'Category']));
+
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
+
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->errors());
+
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }
@@ -173,8 +171,10 @@ class CategoryController extends BaseController
             $admin = Category::findOrFail($id);
             $admin->delete();
             return $this->successResponse(400, null, trans('core::app.response.create-success', ['name' => 'Category']));
+
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
+
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }

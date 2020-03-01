@@ -17,13 +17,13 @@ class Category extends Model
     protected $fillable = ['position', 'status', 'parent_id'];
     protected  $with = ['translations'];
 
-    public static function rules()
+    public static function rules($id=0,$merge = [])
     {
-        return [
-            'slug' => ['required ','unique:category_translations,slug'],
+        return  array_merge([
+            'slug' => 'required |unique:category_translations,slug'.($id ? ",$id" : ''),
             'name' => 'required',
             'image' => 'mimes:jpeg,jpg,bmp,png',
-        ];
+        ],$merge);
 
     }
 
