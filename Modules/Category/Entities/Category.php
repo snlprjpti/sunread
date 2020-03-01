@@ -2,6 +2,7 @@
 
 namespace Modules\Category\Entities;
 
+use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
@@ -9,12 +10,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Category extends Model
 {
-    use NodeTrait;
+    use NodeTrait,Translatable;
     public $translatedAttributes = ['name', 'description', 'slug', 'url_path', 'meta_title', 'meta_description', 'meta_keywords'];
 
     protected $fillable = ['position', 'status', 'parent_id'];
 
-    protected $with = ['translations'];
+
 
     /**
      * Get image url for the category image.

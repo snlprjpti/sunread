@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/category', function (Request $request) {
-    return $request->user();
+//USER MODULE ROUTES
+
+Route::group(['middleware' => ['api']], function () {
+
+    //ADMIN USER ROUTES
+    Route::group(['prefix'=>'admin/catalog','as' => 'admin.catalog.','middleware' => []],function () {
+        Route::resource('categories' ,'CategoryController');
+    });
 });
