@@ -11,18 +11,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Category extends Model
 {
-    use Translatable,NodeTrait;
-    public $translatedAttributes = ['name', 'description', 'slug', 'url_path', 'meta_title', 'meta_description', 'meta_keywords'];
+    use NodeTrait;
 
     protected $fillable = ['position', 'status', 'parent_id'];
-    protected  $with = ['translations'];
 
     public static function rules($id=0,$merge = [])
     {
         return  array_merge([
             'slug' => 'required |unique:category_translations,slug'.($id ? ",$id" : ''),
             'name' => 'required',
-            'image' => 'mimes:jpeg,jpg,bmp,png',
+            'image' => 'base64image',
         ],$merge);
 
     }
@@ -102,5 +100,10 @@ class Category extends Model
             return $category;
         }
         return $this->findInTree($category->children);
+    }
+
+    public function translations()
+    {
+        return $this->hasMany(Category::class, 'category_id');
     }
 }
