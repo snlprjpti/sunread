@@ -18,6 +18,18 @@ use Modules\User\Entities\Admin;
 class UserController extends BaseController
 {
 
+
+    protected  $pagination_limit;
+
+    /**
+     * UserController constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('admin');
+    }
+
     /**
      * returns all the admins
      * @return \Illuminate\Http\JsonResponse
@@ -25,7 +37,7 @@ class UserController extends BaseController
     public function index()
     {
         try {
-            return $this->successResponse(200, Admin::all());
+            return $this->successResponse(200, Admin::paginate($this->pagination_limit));
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {

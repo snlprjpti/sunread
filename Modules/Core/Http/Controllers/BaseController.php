@@ -10,4 +10,11 @@ use Modules\Core\Traits\ApiResponseFormat;
 class BaseController extends Controller
 {
     use ApiResponseFormat ,ValidatesRequests;
+
+    protected $pagination_limit;
+    public function __construct()
+    {
+        $this->pagination_limit = 25;
+    }
+
 }

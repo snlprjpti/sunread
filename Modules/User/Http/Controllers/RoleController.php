@@ -18,6 +18,8 @@ use Modules\User\Entities\Role;
  */
 class RoleController extends BaseController
 {
+    protected  $pagination_limit;
+
     /**
      * RoleController constructor.
      * Admin middleware checks the admin against admins table
@@ -26,6 +28,7 @@ class RoleController extends BaseController
     public function __construct()
     {
         $this->middleware('admin');
+        parent::__construct();
     }
 
     /**
@@ -35,7 +38,7 @@ class RoleController extends BaseController
     public function index()
     {
         try {
-            return $this->successResponse(200, $payload = Role::all());
+            return $this->successResponse(200, $payload = Role::paginate($this->pagination_limit));
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {
