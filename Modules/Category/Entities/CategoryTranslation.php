@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CategoryTranslation extends Model
 {
-    protected $fillable = [];
+    public $timestamps = false;
+
+    protected $fillable = ['name', 'description', 'slug', 'meta_title', 'meta_description', 'meta_keywords'];
 }

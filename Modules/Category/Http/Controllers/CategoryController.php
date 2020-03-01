@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Modules\Category\Entities\CategoryTranslation;
+use Modules\Core\Entities\Core;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Entities\Category;
 
@@ -20,7 +21,7 @@ class CategoryController extends BaseController
 {
 
 
-    protected  $pagination_limit;
+    protected $pagination_limit;
 
     /**
      * CategoryController constructor.
@@ -32,13 +33,13 @@ class CategoryController extends BaseController
     }
 
     /**
-     * returns all the admins
+     * returns all the category
      * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        try {
 
+        try {
             return $this->successResponse(200, Category::paginate($this->pagination_limit));
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
@@ -49,7 +50,7 @@ class CategoryController extends BaseController
     }
 
     /**
-     * Get the particular admin
+     * Get the particular category
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
@@ -65,41 +66,71 @@ class CategoryController extends BaseController
     }
 
     /**
-     * store the new admin resource
+     * store the new category
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
         try {
+            //validation
+            $this->validate(request(), Category::rules());
 
-            $this->validate(request(), [
-                'slug' => ['required ','unique:category_translations,slug'],
-                'name' => 'required',
-                'image.*' => 'mimes:jpeg,jpg,bmp,png',
-            ]);
+            //store
+            $category = $this->saveCategory($request->all());
+            $this->uploadImages($category);
+            return $this->successResponse(201, $category, trans('core::app.response.create-success', ['name' => 'Category']));
 
-            $categoryTransalation = new CategoryTranslation();
-            $result = $categoryTransalation->where('name', request()->input('name'))->get();
-            if(count($result) > 0) {
-                $this->errorResponse(400, "Category with same name already exists");
-            }
-
-            $this->saveCategory($request->all());
-            $this->uploadImages();
-
-            $params = $request->all();
-            $admin = Category::create($params);
-            return $this->successResponse(201, $admin, trans('core::app.response.create-success', ['name' => 'Category']));
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->errors());
+
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }
     }
 
+
+
+    private function saveCategory($data)
+    {
+        //Convert in all the locales
+        $category = new Category();
+
+        //Change the values according to locales selected
+        $locales = Core::getRelatedLocales($data);
+        foreach ($locales as $locale) {
+            foreach ($category->translatedAttributes as $attribute) {
+                if (isset($data[$attribute])) {
+                    $data[$locale->code][$attribute] = $data[$attribute];
+                    $data[$locale->code]['locale_id'] = $locale->id;
+                }
+
+            }
+        }
+        
+        $category = Category::create($data);
+        return $category;
+    }
+
+    public function uploadImages($category, $type = "image")
+    {
+        $data = request()->all();
+        if (isset($data[$type])) {
+            $request = request();
+            $dir = 'category/' . $category->id;
+            if ($request->hasFile('image')) {
+                if ($category->{$type}) {
+                    Storage::delete($category->{$type});
+                }
+                $category->{$type} = $request->file('image')->store($dir);
+                $category->save();
+            }
+
+        }
+    }
+
     /**
-     * Update the admin details
+     * Update the category
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
@@ -110,12 +141,17 @@ class CategoryController extends BaseController
 
             $params = $request->all();
             $this->validate($request, Category::rules($id));
-            if (isset($params['password']) && $params['password']) {
-                $params['password'] = bcrypt($params['password']);
+
+            //Check if new category has same root node name as of parent
+            $same_root_name = $this->checkParentCategoryWithSameName(request('name'));
+            if ($same_root_name) {
+                return $this->errorResponse(400, "Category with same name already exists");
             }
-            $admin = Category::findOrFail($id);
-            $admin = $admin->update($params);
-            return $this->successResponse(200, $admin, trans('core::app.response.update-success', ['name' => 'Category']));
+
+            $category = Category::findOrFail($id);
+            $category->update($params);
+            $this->uploadImages($category);
+            return $this->successResponse(200, $category, trans('core::app.response.update-success', ['name' => 'Category']));
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (ValidationException $exception) {
@@ -125,7 +161,6 @@ class CategoryController extends BaseController
         }
 
     }
-
 
     /**
      * Remove the specified  admin resource from storage.
@@ -144,24 +179,4 @@ class CategoryController extends BaseController
             return $this->errorResponse(400, $exception->getMessage());
         }
     }
-
-    private function saveCategory($params)
-    {
-
-        if (isset($data['locale']) && $data['locale'] == 'all') {
-
-
-            foreach (config('locales') as $locale) {
-                foreach ($model->translatedAttributes as $attribute) {
-                    if (isset($data[$attribute])) {
-                        $data[$locale][$attribute] = $data[$attribute];
-                        $data[$locale->code]['locale_id'] = $locale->id;
-                    }
-                }
-            }
-        }
-
-
-    }
-
 }
