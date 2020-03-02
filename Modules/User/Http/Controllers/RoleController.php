@@ -86,7 +86,6 @@ class RoleController extends BaseController
             if(!$request->get('slug')){
                 $request->merge(['slug' =>  Role::createSlug($request->get('name'))]);
             }
-
             $role = Role::create(
                 $request->only('name' ,'description', 'permissions', 'permission_type', 'slug')
             );
@@ -115,11 +114,12 @@ class RoleController extends BaseController
     {
         try {
             $this->validate($request, Admin::rules($id));
-            $role = Role::findOrFail($id);
 
+            $role = Role::findOrFail($id);
             $role = $role->update(
-                $request->only('name' ,'description', 'permissions', 'permission_type', 'slug')
+                $request->only('name' ,'description', 'permissions', 'permission_type')
             );
+
             return $this->successResponseWithMessage($role,trans('core::app.response.update-success', ['name' => 'Role']),200);
 
         } catch (ValidationException $exception) {
