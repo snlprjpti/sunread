@@ -4,7 +4,6 @@ namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 
@@ -37,21 +36,26 @@ class SessionController extends BaseController
                 'email' => 'required|email',
                 'password' => 'required'
             ]);
+
             $jwtToken = null;
             $customer_jwt_ttl = config('jwt.customer_jwt_ttl');
             if (!$jwtToken = Auth::guard('customer')->setTTL($customer_jwt_ttl)->attempt(request()->only('email', 'password'))) {
-                return $this->errorResponse(400, "Invalid email or password");
+                return $this->errorResponse(trans('core::app.users.users.login-error'), 400);
             }
+
             $customer = auth()->guard('customer')->user();
             $payload = [
                 'token' => $jwtToken,
                 'user' => $customer
             ];
-            return $this->successResponse(200, $payload,  trans('core::app.users.users.login-success'));
+
+            return $this->successResponseWithMessage($payload, trans('core::app.users.users.login-success'), 200);
+
         } catch (ValidationException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 400);
+
         } catch (\Exception  $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 500);
         }
     }
 
@@ -63,9 +67,11 @@ class SessionController extends BaseController
     {
         try {
             auth()->guard('customer')->logout();
-            return $this->successResponse(200, null,  trans('core::app.users.users.logout-success'));
+            return $this->successResponseWithMessage(null,trans('core::app.users.users.logout-success'),200);
+
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
+
         }
 
     }

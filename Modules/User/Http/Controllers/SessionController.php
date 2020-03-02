@@ -32,27 +32,29 @@ class SessionController extends BaseController
      */
     public function login(Request $request)
     {
-        try{
-        $this->validate($request, [
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
-        $jwtToken = null;
-        $admin_jwt_ttl = config('jwt.admin_jwt_ttl');
-        if (!$jwtToken = Auth::guard('admin')->setTTl($admin_jwt_ttl)->attempt(request()->only('email', 'password'))) {
-            return $this->errorResponse(400, trans('core::app.users.users.login-error'));
-        }
-        $admin = auth()->guard('admin')->user();
-        $payload = [
-            'token' => $jwtToken,
-            'user' => $admin
-        ];
-        return $this->successResponse($payload, 200, trans('core::app.users.users.login-success'));
-        }catch (ValidationException $exception){
-            return $this->errorResponse(400, $exception->getMessage());
-        }
-        catch ( \Exception  $exception){
-            return $this->errorResponse(400, $exception->getMessage());
+        try {
+            $this->validate($request, [
+                'email' => 'required|email',
+                'password' => 'required'
+            ]);
+
+            $jwtToken = null;
+            $admin_jwt_ttl = config('jwt.admin_jwt_ttl');
+            if (!$jwtToken = Auth::guard('admin')->setTTl($admin_jwt_ttl)->attempt(request()->only('email', 'password'))) {
+                return $this->errorResponse(trans('core::app.users.users.login-error'), 400);
+            }
+            $admin = auth()->guard('admin')->user();
+            $payload = [
+                'token' => $jwtToken,
+                'user' => $admin
+            ];
+            return $this->successResponseWithMessage($payload, 200, trans('core::app.users.users.login-success'));
+
+        } catch (ValidationException $exception) {
+            return $this->errorResponse($exception->getMessage(), 400);
+
+        } catch (\Exception  $exception) {
+            return $this->errorResponse($exception->getMessage(), 500);
         }
     }
 
@@ -62,11 +64,11 @@ class SessionController extends BaseController
      */
     public function logout()
     {
-        try{
+        try {
             auth()->guard('admin')->logout();
-            return $this->successResponse(200, null, trans('core::app.users.users.logout-success'));
-        }catch (\Exception $exception){
-            return $this->errorResponse(400,$exception->getMessage());
+            return $this->successResponseWithMessage(null, trans('core::app.users.users.logout-success'), 200);
+        } catch (\Exception $exception) {
+            return $this->errorResponse(400, $exception->getMessage());
         }
 
     }
