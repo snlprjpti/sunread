@@ -76,7 +76,7 @@ class Admin extends Authenticatable implements JWTSubject
     public static function rules ($id = 0, $merge=[]) {
         return array_merge([
             'name' => 'required',
-            'email' => 'required|unique:admins,email',
+            'email' => 'required|unique:admins,email'.($id ? ",$id" : ''),
             'password' => 'nullable|confirmed',
             'status' => 'required|boolean',
             'role_id' => 'required|integer'

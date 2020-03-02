@@ -19,7 +19,7 @@ class UserController extends BaseController
 {
 
 
-    protected  $pagination_limit;
+    protected $pagination_limit;
 
     /**
      * UserController constructor.
@@ -37,11 +37,14 @@ class UserController extends BaseController
     public function index()
     {
         try {
-            return $this->successResponse(200, Admin::paginate($this->pagination_limit));
+            $payload = Admin::paginate($this->pagination_limit);
+            return $this->successResponse($payload, 200);
+
         } catch (QueryException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 400);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 500);
         }
 
     }
@@ -54,9 +57,12 @@ class UserController extends BaseController
     public function show($id)
     {
         try {
-            return $this->successResponse(200, Admin::find($id));
+            $payload = Admin::findOrFail($id);
+            return $this->successResponse($payload, 200);
+
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
+
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }
@@ -70,17 +76,28 @@ class UserController extends BaseController
     public function store(Request $request)
     {
         try {
-            $params = $request->all();
+
             $this->validate($request, Admin::rules());
-            if (isset($params['password']) && $params['password']) {
-                $params['password'] = bcrypt($params['password']);
+
+            $password = $request->get('password');
+            if (isset($password)) {
+                $request->merge(['password' => bcrypt($password)]);
             }
-            $admin = Admin::create($params);
-            return $this->successResponse(201, $admin, trans('core::app.response.create-success', ['name' => 'Admin']));
+
+            $admin = Admin::create(
+                $request->only('name', 'email', 'password', 'role_id', 'status')
+            );
+
+            return $this->successResponseWithMessage($admin, trans('core::app.response.create-success', ['name' => 'Admin']), 201);
+
         } catch (ValidationException $exception) {
-            return $this->errorResponse(400, $exception->errors());
+            return $this->errorResponse($exception->errors(), 400);
+
+        } catch (QueryException $exception) {
+            return $this->errorResponse($exception->errors(), 400);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 500);
         }
     }
 
@@ -94,20 +111,27 @@ class UserController extends BaseController
     {
         try {
 
-            $params = $request->all();
             $this->validate($request, Admin::rules($id));
-            if (isset($params['password']) && $params['password']) {
-                $params['password'] = bcrypt($params['password']);
+            $password = $request->get('password');
+            if (isset($password)) {
+                $request->merge(['password' => bcrypt($password)]);
             }
+
             $admin = Admin::findOrFail($id);
-            $admin = $admin->update($params);
-            return $this->successResponse(200, $admin, trans('core::app.response.update-success', ['name' => 'Admin']));
+            $admin = $admin->update(
+                $request->only('name', 'email', 'password', 'role_id', 'status')
+            );
+
+            return $this->successResponseWithMessage($admin, trans('core::app.response.update-success', ['name' => 'Admin']), 200);
+
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 400);
+
         } catch (ValidationException $exception) {
-            return $this->errorResponse(400, $exception->errors());
+            return $this->errorResponse($exception->errors(), 400);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 500);
         }
 
     }
@@ -123,11 +147,13 @@ class UserController extends BaseController
         try {
             $admin = Admin::findOrFail($id);
             $admin->delete();
-            return $this->successResponse(400, null, trans('core::app.response.create-success', ['name' => 'Admin']));
+            return $this->successResponseWithMessage(null, trans('core::app.response.delete-success', ['name' => 'Admin']), 400);
+
         } catch (QueryException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 400);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 500);
         }
     }
 
