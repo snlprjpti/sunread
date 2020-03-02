@@ -87,12 +87,7 @@ class Admin extends Authenticatable implements JWTSubject
 
     public function sendPasswordResetNotification($token)
     {
-        // Your your own implementation.
         $this->notify(new ResetPasswordNotification($token));
     }
-
-
-
-
 
 }

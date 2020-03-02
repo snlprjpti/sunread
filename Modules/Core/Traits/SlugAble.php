@@ -22,11 +22,10 @@ trait SlugAble
         // Normalize the title attribute
         $slug = Str::slug($title);
 
-       // dd("SDf");
         // Get any that could possibly be related.
         // This cuts the queries down by doing it once.
 
-        $allSlugs = self::getRelatedSlugs( $slug, $id);
+        $allSlugs = self::getRelatedSlugs($slug, $id);
 
         // If we haven't used it before then we are all good.
         if (!$allSlugs->contains('slug', $slug)) {
@@ -34,14 +33,14 @@ trait SlugAble
         }
 
         //if used,then count them
-        $count  = $allSlugs->count();
+        $count = $allSlugs->count();
 
 
-        while (self::checkIfSlugExist($slug, $id) && $slug != ""){
-            $slug =  $slug . '-' . $count++;
+        while (self::checkIfSlugExist($slug, $id) && $slug != "") {
+            $slug = $slug . '-' . $count++;
         }
 
-        if($slug == "")
+        if ($slug == "")
             throw new SlugCouldNotBeGenerated();
 
         return $slug;
@@ -56,7 +55,7 @@ trait SlugAble
 
     protected static function checkIfSlugExist($slug, $id = 0)
     {
-        return  static::select('slug')->where('slug', $slug)
+        return static::select('slug')->where('slug', $slug)
             ->where('id', '<>', $id)
             ->exists();
 
