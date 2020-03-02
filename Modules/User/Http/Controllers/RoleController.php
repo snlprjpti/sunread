@@ -113,7 +113,7 @@ class RoleController extends BaseController
     public function update(Request $request, $id)
     {
         try {
-            $this->validate($request, Admin::rules($id));
+            $this->validate($request, Role::rules($id));
 
             $role = Role::findOrFail($id);
             $role = $role->update(

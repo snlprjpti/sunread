@@ -37,7 +37,7 @@ class ForgotPasswordController extends BaseController
                 return $this->errorResponse("Missing email", 400);
             }
 
-            $response = $this->broker()->sendResetLink($email);
+            $response = $this->broker()->sendResetLink(['email' => $email]);
             if ($response != Password::RESET_LINK_SENT) {
                 throw new TokenGenerationException();
             }
