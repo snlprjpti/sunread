@@ -11,28 +11,29 @@ use Modules\Core\Traits\ApiResponseFormat;
  * @author    Hemant Achhami
  * @copyright 2020 Hazesoft Pvt Ltd
  */
-
 class RedirectIfNotCustomer
 {
     use ApiResponseFormat;
+
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string|null  $guard
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
+     * @param  string|null $guard
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = 'customer')
     {
-        if (! Auth::guard($guard)->check()) {
-            return $this->errorResponse(400,"Unauthenticated user");
-        } else {
-            if (Auth::guard($guard)->user()->status == 0) {
-                Auth::guard($guard)->logout();
-                return $this->errorResponse(400,"Customer disabled");
-            }
+        if (!Auth::guard($guard)->check()) {
+            return $this->errorResponse("Unauthenticated user", 400);
         }
+
+        if (Auth::guard($guard)->user()->status == 0) {
+            Auth::guard($guard)->logout();
+            return $this->errorResponse("Customer disabled", 400);
+        }
+
         return $next($request);
     }
 }

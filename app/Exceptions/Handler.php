@@ -100,7 +100,7 @@ class Handler extends ExceptionHandler
         if(env('APP_DEBUG', false)) {
             return parent::render($request, $exception);
         }
-        
+
         return parent::render($request, $exception);
     }
 }
