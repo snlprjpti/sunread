@@ -62,7 +62,7 @@ class ResetPasswordController extends BaseController
             return $this->successResponseWithMessage(null, trans('core::app.response.create-success', ['name' => 'Password reset ']), 200);
 
         } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 400);
+            return $this->errorResponse($exception->errors(), 422);
 
         } catch (TokenGenerationException $exception) {
             return $this->errorResponse(trans('core::app.users.token-generation-problem'), 500);

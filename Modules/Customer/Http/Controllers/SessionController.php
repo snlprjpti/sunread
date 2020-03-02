@@ -52,7 +52,7 @@ class SessionController extends BaseController
             return $this->successResponseWithMessage($payload, trans('core::app.users.users.login-success'), 200);
 
         } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
+            return $this->errorResponse($exception->getMessage(), 422);
 
         } catch (\Exception  $exception) {
             return $this->errorResponse($exception->getMessage(), 500);

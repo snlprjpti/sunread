@@ -147,10 +147,10 @@ class RoleController extends BaseController
             return $this->successResponse(trans('core::app.response.deleted-success', ['name' => 'Role']),400);
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(404, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(),404);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse(500, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(),500);
         }
 
     }
