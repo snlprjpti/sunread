@@ -25,11 +25,13 @@ class AccountController extends BaseController
     {
         try {
             $me = auth()->guard('admin')->user();
-            return $this->successResponse(200, $me);
+            return $this->successResponse($me, 200);
+
         } catch (UnauthorizedHttpException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 401);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 500);
         }
 
     }
@@ -43,25 +45,36 @@ class AccountController extends BaseController
     public function update(Request $request)
     {
         try {
+
             $user = auth()->guard('admin')->user();
+
             $this->validate($request, [
                 'name' => 'required',
                 'email' => 'email|unique:admins,email,' . $user->id,
                 'password' => 'nullable|min:6|confirmed',
                 'current_password' => 'required|min:6'
             ]);
-            $data = request()->input();
-            if (!Hash::check($data['current_password'], auth()->guard('admin')->user()->password)) {
-                return $this->errorResponse(401,  trans('core::app.users.incorrect-password'));
+
+            $current_password = request()->get('current_password');
+            if (!Hash::check($current_password, auth()->guard('admin')->user()->password)) {
+                return $this->errorResponse(trans('core::app.users.incorrect-password') , 401);
             }
-            if (isset($data['password']))
-                $data['password'] = bcrypt($data['password']);
-            $user->update($data);
-            return $this->successResponse(200, null,  trans('core::app.response.update-success', ['name' => 'Customer Account']));
+
+            if ($request->get('password')){
+                $request->merge(['password' => bcrypt($request->get('password'))]);
+            }
+
+            $user->update(
+                $request->only('name' ,'email' , 'password')
+            );
+
+            return $this->successResponseWithMessage(null, trans('core::app.response.update-success', ['name' => 'Customer Account']),200);
+
         } catch (ValidationException $exception) {
-            return $this->errorResponse(400, $exception->errors());
+            return $this->errorResponse($exception->errors(), 422);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 500);
         }
 
     }
