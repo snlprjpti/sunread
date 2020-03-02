@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\User\Exceptions\AdminNotFoundException;
 use Modules\User\Exceptions\TokenGenerationException;
 
 /**
@@ -57,8 +58,12 @@ class ResetPasswordController extends BaseController
                 $this->resetPassword($admin, $password);
             });
 
-            if ($response != Password::PASSWORD_RESET) {
-                throw new TokenGenerationException();
+            if ($response == Password::INVALID_TOKEN) {
+                throw  new TokenGenerationException();
+            }
+
+            if ($response == Password::INVALID_USER) {
+                throw  new AdminNotFoundException();
             }
             return $this->successResponseWithMessage($payload = null, trans('core::app.users.users.password-reset-success'), 200);
 
@@ -66,7 +71,9 @@ class ResetPasswordController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token-generation-problem'),  500);
+            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'), 500);
+
+        }catch (AdminNotFoundException $exception){
 
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 500);

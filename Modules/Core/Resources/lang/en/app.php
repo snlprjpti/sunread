@@ -92,6 +92,7 @@ return [
             'token-missing' => 'Missing token',
             'token-invalid' => 'Invalid token',
             'token-expired' => 'Token is expired',
+            'token-generation-problem' => 'Unable to generate token'
 
         ]
     ],

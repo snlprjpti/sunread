@@ -31,7 +31,7 @@ class RegistrationController extends BaseController
                 'password' => 'confirmed|min:6|required',
             ]);
 
-            $request->merge(['password' => $request->get('password')]);
+            $request->merge(['password' => bcrypt($request->get('password'))]);
 
             $email = $request->get('email');
             $token = md5(uniqid(rand(), true));

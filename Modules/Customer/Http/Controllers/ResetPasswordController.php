@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Customer\Exceptions\CustomerNotFoundException;
 use Modules\Customer\Exceptions\TokenGenerationException;
+
 
 /**
  * Reset Password controller for the Customer
@@ -56,16 +58,25 @@ class ResetPasswordController extends BaseController
                 $this->resetPassword($customer, $password);
             });
 
-            if ($response != Password::PASSWORD_RESET) {
+
+            if ($response == Password::INVALID_TOKEN) {
                 throw  new TokenGenerationException();
             }
+
+            if ($response == Password::INVALID_USER) {
+                throw  new CustomerNotFoundException();
+            }
+
             return $this->successResponseWithMessage(null, trans('core::app.response.create-success', ['name' => 'Password reset ']), 200);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
+        } catch(CustomerNotFoundException $exception){
+            return $this->errorResponse('Customer not found exception', 422);
+
         } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token-generation-problem'), 500);
+            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'), 500);
 
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 500);

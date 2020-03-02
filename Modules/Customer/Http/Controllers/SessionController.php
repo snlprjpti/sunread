@@ -21,7 +21,7 @@ class SessionController extends BaseController
      */
     public function __construct()
     {
-        $this->middleware('guest:customer')->except(['logout']);
+        $this->middleware('customer')->except(['login']);
     }
 
     /**
@@ -70,7 +70,7 @@ class SessionController extends BaseController
             return $this->successResponseWithMessage(null,trans('core::app.users.users.logout-success'),200);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage() , 500);
 
         }
 
