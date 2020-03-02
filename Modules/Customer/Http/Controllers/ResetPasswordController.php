@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Customer\Exceptions\TokenGenerationException;
 
 /**
  * Reset Password controller for the Customer
@@ -20,8 +21,7 @@ class ResetPasswordController extends BaseController
 {
     use ResetsPasswords;
 
-
-    /**
+    /** OPTIONAL route
      * Display the password reset token is valid
      * If no token is present, display the error
      * @param  string|null $token
@@ -34,6 +34,7 @@ class ResetPasswordController extends BaseController
         }
         return $this->successResponse(200, $payload = ['token' => $token]);
     }
+
 
     /**
      *
@@ -51,18 +52,22 @@ class ResetPasswordController extends BaseController
             ]);
 
             $response = $this->broker()->reset(
-                request(['email', 'password', 'password_confirmation', 'token']), function ($customer, $password) {
+                $request->only(['email', 'password', 'password_confirmation', 'token']), function ($customer, $password) {
                 $this->resetPassword($customer, $password);
             });
 
-            if ($response == Password::PASSWORD_RESET) {
-                return $this->successResponse(200, null,  trans('core::app.response.create-success', ['name' => 'Password reset ']));
+            if ($response != Password::PASSWORD_RESET) {
+                throw  new TokenGenerationException();
             }
-            return $this->errorResponse(400, "Invalid token");
+            return $this->successResponseWithMessage(null,  trans('core::app.response.create-success', ['name' => 'Password reset ']),200);
+
         } catch(ValidationException $exception){
-            return $this->errorResponse(400,$exception->errors());
+            return $this->errorResponse($exception->errors(), 400);
+
+        }catch (TokenGenerationException $exception){
+            return $this->errorResponse("Unable to generate token", 500);
         }catch (\Exception $e) {
-            return $this->errorResponse(400, $e->getMessage());
+            return $this->errorResponse($e->getMessage() ,500);
         }
     }
 

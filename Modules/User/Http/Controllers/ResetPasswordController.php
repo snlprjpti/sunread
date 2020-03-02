@@ -6,7 +6,6 @@ use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
@@ -22,6 +21,7 @@ class ResetPasswordController extends BaseController
 
 
     /**
+     * OPTIONAL route
      * Display the password reset token is valid
      * If no token is present, display the error
      * @param  string|null $token
