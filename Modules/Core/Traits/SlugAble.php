@@ -4,7 +4,8 @@ namespace Modules\Core\Traits;
 
 
 use Illuminate\Support\Str;
-use SlugCouldNotBeGenerated;
+use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
+
 
 trait SlugAble
 {
@@ -21,7 +22,7 @@ trait SlugAble
         // Normalize the title attribute
         $slug = Str::slug($title);
 
-
+       // dd("SDf");
         // Get any that could possibly be related.
         // This cuts the queries down by doing it once.
 
@@ -35,30 +36,30 @@ trait SlugAble
         //if used,then count them
         $count  = $allSlugs->count();
 
-        //then append a number at end
-        $newSlug =  false;
-        while (self::checkIfSlugExist($slug, $id) ){
-            $newSlug = $slug . '-' . $count++;
+
+        while (self::checkIfSlugExist($slug, $id) && $slug != ""){
+            $slug =  $slug . '-' . $count++;
         }
 
-        if((!$newSlug) || $newSlug == "")
+        if($slug == "")
             throw new SlugCouldNotBeGenerated();
 
-        return $newSlug;
+        return $slug;
     }
 
     protected static function getRelatedSlugs($slug, $id = 0)
     {
-        return static()->whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")
+        return static::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")
             ->where('id', '<>', $id)
             ->get();
     }
 
     protected static function checkIfSlugExist($slug, $id = 0)
     {
-        return  static()->select('slug')->where('slug', $slug)
+        return  static::select('slug')->where('slug', $slug)
             ->where('id', '<>', $id)
             ->exists();
+
     }
 
 

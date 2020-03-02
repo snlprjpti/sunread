@@ -32,9 +32,8 @@ class Role extends Model
     public static function rules ($id = 0, $merge=[]) {
         return array_merge([
             'name' => 'required',
-            'password' => 'nullable|confirmed',
-            'status' => 'required|boolean',
-            'role_id' => 'required|integer'
+            'permission_type' => 'required',
+            'permissions' => 'nullable'
         ], $merge);
 
     }
