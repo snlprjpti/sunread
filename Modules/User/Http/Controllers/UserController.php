@@ -118,7 +118,7 @@ class UserController extends BaseController
             }
 
             $admin = Admin::findOrFail($id);
-            $admin = $admin->update(
+            $admin->update(
                 $request->only('name', 'email', 'password', 'role_id', 'status')
             );
 
