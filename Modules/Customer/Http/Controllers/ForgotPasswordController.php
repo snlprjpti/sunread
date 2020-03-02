@@ -5,10 +5,10 @@ namespace Modules\Customer\Http\Controllers;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
+use Modules\Customer\Exceptions\TokenGenerationException;
 
 
 /**
@@ -31,21 +31,28 @@ class ForgotPasswordController extends BaseController
     {
         try {
             $this->validate($request, ['email' => 'required|email']);
+
             $email = $request->get('email');
             $customer = Customer::where('email', $email)->first();
             if (!$customer) {
-                return $this->errorResponse(400, "Email does not exist");
+                return $this->errorResponse("Missing email" , 400);
             }
-            $response = $this->broker()->sendResetLink(request(['email']));
-            if ($response == Password::RESET_LINK_SENT) {
-                return $this->successResponse(200, $customer, "Reset Link sent to your email {$customer->email}");
+
+            $response = $this->broker()->sendResetLink($email);
+            if ($response != Password::RESET_LINK_SENT) {
+                throw new TokenGenerationException();
             }
-            return $this->errorResponse(400, "Unable to generate token. Try again later");
-        }catch (ValidationException $exception){
-             return $this->errorResponse(400, $exception->getMessage());
+
+            return $this->successResponseWithMessage($customer, "Reset Link sent to your email {$customer->email}" , 200);
+
+        } catch (ValidationException $exception) {
+            return $this->errorResponse($exception->errors() , 400);
+
+        }catch(TokenGenerationException $exception){
+            return $this->errorResponse("Unable to generate token" ,400);
+
         } catch (\Exception $e) {
-            dd($e);
-            return $this->errorResponse(400, $e->getMessage());
+            return $this->errorResponse($e->getMessage() , 400);
         }
     }
 

@@ -5,9 +5,9 @@ namespace Modules\User\Http\Controllers;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Customer\Exceptions\TokenGenerationException;
 use Modules\User\Entities\Admin;
 
 /**
@@ -30,20 +30,26 @@ class ForgotPasswordController extends BaseController
     {
         try {
             $this->validate($request, ['email' => 'required|email']);
+
             $email = $request->get('email');
             $admin = Admin::where('email', $email)->first();
             if (!$admin) {
-                return $this->errorResponse(400, "Email does not exist");
+                return $this->errorResponse("Missing email", 400);
             }
-            $response = $this->broker()->sendResetLink(request(['email']));
-            if ($response == Password::RESET_LINK_SENT) {
-                return $this->successResponse(200, $admin, "Reset Link sent to your email {$admin->email}");
+
+            $response = $this->broker()->sendResetLink($email);
+            if ($response != Password::RESET_LINK_SENT) {
+                throw new TokenGenerationException();
             }
-            return $this->errorResponse(400, $admin, "Unable to generate token. Try again later");
+
+            return $this->successResponseWithMessage($admin, "Reset Link sent to your email {$admin->email}", 200);
+
+
         } catch (ValidationException $exception) {
-            return $this->errorResponse(400, $exception->errors());
+            return $this->errorResponse($exception->errors(), 400);
+
         } catch (\Exception $e) {
-            return $this->errorResponse(400, $e->getMessage());
+            return $this->errorResponse($e->getMessage(), 400);
         }
     }
 
