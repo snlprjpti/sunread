@@ -47,7 +47,7 @@ class SessionController extends BaseController
             'token' => $jwtToken,
             'user' => $admin
         ];
-        return $this->successResponse(200, $payload, trans('core::app.users.users.login-success'));
+        return $this->successResponse($payload, 200, trans('core::app.users.users.login-success'));
         }catch (ValidationException $exception){
             return $this->errorResponse(400, $exception->getMessage());
         }

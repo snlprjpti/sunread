@@ -11,6 +11,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
 use Modules\User\Entities\Role;
 
+
 /**
  * Role controller for the Admin
  * @author    Hemant Achhami
@@ -18,7 +19,7 @@ use Modules\User\Entities\Role;
  */
 class RoleController extends BaseController
 {
-    protected  $pagination_limit;
+    protected $pagination_limit;
 
     /**
      * RoleController constructor.
@@ -38,11 +39,15 @@ class RoleController extends BaseController
     public function index()
     {
         try {
-            return $this->successResponse(200, $payload = Role::paginate($this->pagination_limit));
+
+            $payload = Role::paginate($this->pagination_limit);
+            return $this->successResponse($payload, 200);
+
         } catch (QueryException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(),400);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse ($exception->getMessage(),500);
         }
     }
 
@@ -54,30 +59,42 @@ class RoleController extends BaseController
     public function show($id)
     {
         try {
-            return $this->successResponse(200, $payload = Role::findOrFail($id));
-        } catch (QueryException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+
+            $payload = Role::findOrFail($id);
+            return $this->successResponse($payload,200);
+
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse($exception->getMessage(), 400);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage() ,500);
         }
     }
+
 
     /**
      * Stores new role
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
         try {
-            $params = $request->all();
-            $this->validate($request, Role::rules());
-            $params = array_merge($params, ['slug' => Str::slug($params['name'])]);
-            $role = Role::create($params);
-            return $this->successResponse(201, $role,  trans('core::app.response.create-success', ['name' => 'Role']));
+
+           $this->validate($request, Role::rules());
+            if(!$request->get('slug')){
+                $request->merge(['slug' =>  Role::createSlug($request->get('title'))]);
+            }
+
+            $role = Role::create(
+                $request->only('name' ,'description', 'permissions', 'permission_type', 'slug')
+            );
+
+            return $this->successResponse(201, $role, trans('core::app.response.create-success', ['name' => 'Role']));
+
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
+
         } catch (\Exception $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         }
@@ -98,7 +115,7 @@ class RoleController extends BaseController
             $this->validate($request, Admin::rules($id));
             $role = Role::find($id);
             $role = $role->update($params);
-            return $this->successResponse(201, $role,  trans('core::app.response.update-success', ['name' => 'Role']));
+            return $this->successResponse(201, $role, trans('core::app.response.update-success', ['name' => 'Role']));
         } catch (ValidationException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (QueryException $exception) {
@@ -118,7 +135,7 @@ class RoleController extends BaseController
         try {
             $role = Role::find($id);
             $role->delete();
-            return $this->successResponse(400, null,  trans('core::app.response.d-success', ['name' => 'Role']));
+            return $this->successResponse(400, null, trans('core::app.response.d-success', ['name' => 'Role']));
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
         } catch (\Exception $exception) {

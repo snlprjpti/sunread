@@ -22,17 +22,19 @@ class JwtMiddleware extends BaseMiddleware
     public function handle($request, Closure $next)
     {
         try {
-            JWTAuth::parseToken()->authenticate();
-        } catch (Exception $e) {
-            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
-                return $this->errorResponse(400, ['status' => 'Token is Invalid']);
 
-            } else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
-                return $this->errorResponse(400, ['status' => 'Token is Expired']);
-            } else {
-                return $this->errorResponse(400, ['status' => 'Token is Invalid']);;
-            }
+            JWTAuth::parseToken()->authenticate();
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $exception) {
+            return $this->errorResponse("Invalid Token exception", 400);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $exception) {
+            return $this->errorResponse("Token expired", 400);
+
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), 500);
         }
+
         return $next($request);
     }
 }
