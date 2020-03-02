@@ -26,10 +26,10 @@ class JwtMiddleware extends BaseMiddleware
             JWTAuth::parseToken()->authenticate();
 
         } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $exception) {
-            return $this->errorResponse("Invalid Token exception", 400);
+            return $this->errorResponse(trans('core::app.users.token-invalid'), 400);
 
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $exception) {
-            return $this->errorResponse("Token expired", 400);
+            return $this->errorResponse(trans('core::app.users.token-expired'), 400);
 
         } catch (Exception $exception) {
             return $this->errorResponse($exception->getMessage(), 500);

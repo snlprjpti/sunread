@@ -59,18 +59,27 @@ class ResetPasswordController extends BaseController
             if ($response != Password::PASSWORD_RESET) {
                 throw  new TokenGenerationException();
             }
-            return $this->successResponseWithMessage(null,  trans('core::app.response.create-success', ['name' => 'Password reset ']),200);
+            return $this->successResponseWithMessage(null, trans('core::app.response.create-success', ['name' => 'Password reset ']), 200);
 
-        } catch(ValidationException $exception){
+        } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 400);
 
-        }catch (TokenGenerationException $exception){
-            return $this->errorResponse("Unable to generate token", 500);
-        }catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage() ,500);
+        } catch (TokenGenerationException $exception) {
+            return $this->errorResponse(trans('core::app.users.token-generation-problem'), 500);
+
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 
+    /**
+     * Get the broker to be used during password reset.
+     * @return \Illuminate\Contracts\Auth\PasswordBroker
+     */
+    protected function broker()
+    {
+        return Password::broker('customers');
+    }
 
     /**
      * Reset the given customer password.
@@ -86,15 +95,6 @@ class ResetPasswordController extends BaseController
         $customer->setRememberToken(Str::random(60));
         $customer->save();
         event(new PasswordReset($customer));
-    }
-
-    /**
-     * Get the broker to be used during password reset.
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
-     */
-    protected function broker()
-    {
-        return Password::broker('customers');
     }
 
 }

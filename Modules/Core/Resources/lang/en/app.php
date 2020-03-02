@@ -86,6 +86,13 @@ return [
             'forget-password-link-title' => 'Forget Password ?',
             'remember-me' => 'Remember Me',
             'submit-btn-title' => 'Sign In'
+        ],
+
+        'token' =>[
+            'token-missing' => 'Missing token',
+            'token-invalid' => 'Invalid token',
+            'token-expired' => 'Token is expired',
+
         ]
     ],
 ];

@@ -71,24 +71,25 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof ValidationException) {
             $errors = $exception->errors();
-            return $this->errorResponse(400,$errors);
+            return $this->errorResponse($errors ,422);
         }
+
         if($exception instanceof MethodNotAllowedHttpException){
-            return $this->errorResponse(422,$request->method()." method is not allowed");
+            return $this->errorResponse($request->method()." method is not allowed" , 422);
         }
 
         if ($exception instanceof  NotFoundHttpException ){
-            return $this->errorResponse(404,"No such route found.");
+            return $this->errorResponse("No such route found.", 404);
         }
 
         if($exception instanceof ModelNotFoundException) {
             $model = Str::kebab( class_basename($exception->getModel()));
             $message = $model ? str_replace('-', ' ', $model) . "not found" : $exception->getMessage();
-            return $this->errorResponse(404,$message);
+            return $this->errorResponse($message , 404);
         }
 
         if ($exception instanceof TokenMismatchException) {
-            return $this->errorResponse(400,'Token mismatch exception');
+            return $this->errorResponse('Token mismatch exception' , 400);
         }
 
         if ($exception instanceof UnauthorizedException){
@@ -99,6 +100,7 @@ class Handler extends ExceptionHandler
         if(env('APP_DEBUG', false)) {
             return parent::render($request, $exception);
         }
+        
         return parent::render($request, $exception);
     }
 }

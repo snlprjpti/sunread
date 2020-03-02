@@ -46,7 +46,7 @@ class ForgotPasswordController extends BaseController
 
 
         } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 400);
+            return $this->errorResponse($exception->errors(), 422);
 
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 400);

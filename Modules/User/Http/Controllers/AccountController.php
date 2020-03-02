@@ -17,8 +17,7 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 class AccountController extends BaseController
 {
     /**
-     * Show the form for creating a new resource.
-     *
+     * Show the form for creating a new resource
      * @return \Illuminate\View\View
      */
     public function edit()
@@ -57,18 +56,16 @@ class AccountController extends BaseController
 
             $current_password = request()->get('current_password');
             if (!Hash::check($current_password, auth()->guard('admin')->user()->password)) {
-                return $this->errorResponse(trans('core::app.users.incorrect-password') , 401);
+                return $this->errorResponse(trans('core::app.users.incorrect-password'), 401);
             }
 
-            if ($request->get('password')){
+            if ($request->get('password')) {
                 $request->merge(['password' => bcrypt($request->get('password'))]);
             }
 
-            $user->update(
-                $request->only('name' ,'email' , 'password')
-            );
+            $user->update($request->only('name', 'email', 'password'));
 
-            return $this->successResponseWithMessage(null, trans('core::app.response.update-success', ['name' => 'Customer Account']),200);
+            return $this->successResponseWithMessage(null, trans('core::app.response.update-success', ['name' => 'Customer Account']), 200);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);

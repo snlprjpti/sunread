@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\User\Exceptions\TokenGenerationException;
 
 /**
  * Reset Password controller for the Admin
@@ -21,7 +22,7 @@ class ResetPasswordController extends BaseController
 
 
     /**
-     * OPTIONAL route
+     * OPTIONAL route: using frontend routes in future
      * Display the password reset token is valid
      * If no token is present, display the error
      * @param  string|null $token
@@ -30,9 +31,9 @@ class ResetPasswordController extends BaseController
     public function create($token = null)
     {
         if (!$token) {
-            return $this->errorResponse(400, "Missing token");
+            return $this->errorResponse(trans('core::app.users.token-missing'), 400);
         }
-        return $this->successResponse(200, $payload = ['token' => $token]);
+        return $this->successResponse($payload = ['token' => $token], 200);
     }
 
     /**
@@ -43,30 +44,43 @@ class ResetPasswordController extends BaseController
      */
     public function store(Request $request)
     {
+
         try {
-             $this->validate($request, [
+            $this->validate($request, [
                 'token' => 'required',
                 'email' => 'required|email',
                 'password' => 'required|confirmed|min:6',
             ]);
 
-             $response = $this->broker()->reset(
-                request(['email', 'password', 'password_confirmation', 'token']), function ($admin, $password) {
+            $response = $this->broker()->reset(
+                $request->only(['email', 'password', 'password_confirmation', 'token']), function ($admin, $password) {
                 $this->resetPassword($admin, $password);
-            }
-            );
-            if ($response == Password::PASSWORD_RESET) {
-                return $this->successResponse(200, null, trans('core::app.users.users.password-reset-success'));
-            }
-            return $this->errorResponse(400, "Invalid token");
+            });
 
-        }catch (ValidationException $exception){
-            return $this->errorResponse(400, $exception->errors());
+            if ($response != Password::PASSWORD_RESET) {
+                throw new TokenGenerationException();
+            }
+            return $this->successResponseWithMessage($payload = null, trans('core::app.users.users.password-reset-success'), 200);
+
+        } catch (ValidationException $exception) {
+            return $this->errorResponse($exception->errors(), 422);
+
+        } catch (TokenGenerationException $exception) {
+            return $this->errorResponse(trans('core::app.users.token-generation-problem'),  500);
+
         } catch (\Exception $e) {
-            return $this->errorResponse(400, $e->getMessage());
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 
+    /**
+     * Get the broker to be used during password reset.
+     * @return \Illuminate\Contracts\Auth\PasswordBroker
+     */
+    protected function broker()
+    {
+        return Password::broker('admins');
+    }
 
     /**
      * Reset the given customer password.
@@ -81,15 +95,6 @@ class ResetPasswordController extends BaseController
         $admin->password = Hash::make($password);
         $admin->setRememberToken(Str::random(60));
         $admin->save();
-    }
-
-    /**
-     * Get the broker to be used during password reset.
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
-     */
-    protected function broker()
-    {
-        return Password::broker('admins');
     }
 
 }
