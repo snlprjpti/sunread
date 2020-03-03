@@ -13,13 +13,13 @@ class Category extends Model
 {
     use NodeTrait;
 
-    protected $fillable = ['position', 'status', 'parent_id','image'];
+    protected $fillable = ['position', 'status', 'parent_id','image', 'slug'];
     protected $with =['translations'];
 
     public static function rules($id=0,$merge = [])
     {
         return  array_merge([
-            'slug' => 'required |unique:category_translations,slug'.($id ? ",$id" : ''),
+            'slug' => 'required |unique:categories,slug'.($id ? ",$id" : ''),
             'name' => 'required',
             'image' => 'base64image',
         ],$merge);
