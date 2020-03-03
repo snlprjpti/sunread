@@ -44,7 +44,7 @@ class RegistrationController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
 
     }
