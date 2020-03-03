@@ -43,7 +43,7 @@ class ForgotPasswordController extends BaseController
                 throw new TokenGenerationException();
             }
 
-            return $this->successResponseWithMessage($customer, "Reset Link sent to your email {$customer->email}" , 200);
+            return $this->successResponse($customer, "Reset Link sent to your email {$customer->email}" );
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors() , 422);
@@ -52,7 +52,7 @@ class ForgotPasswordController extends BaseController
             return $this->errorResponse("Unable to generate token" ,400);
 
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage() , 400);
+            return $this->errorResponse($e->getMessage());
         }
     }
 

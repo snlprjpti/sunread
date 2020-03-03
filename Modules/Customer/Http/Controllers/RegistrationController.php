@@ -38,7 +38,7 @@ class RegistrationController extends BaseController
             //TODO::future => Send email verification for registered user
 
             $customer = Customer::create($request->only(['first_name', 'last-name', 'email', 'password']));
-            return $this->successResponseWithMessage($customer, trans('core::app.response.create-success', ['name' => 'Account']), 200);
+            return $this->successResponse($customer, trans('core::app.response.create-success', ['name' => 'Account']));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);

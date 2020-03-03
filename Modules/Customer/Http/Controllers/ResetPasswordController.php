@@ -32,9 +32,9 @@ class ResetPasswordController extends BaseController
     public function create($token = null)
     {
         if (!$token) {
-            return $this->errorResponse(400, "Missing token");
+            return $this->errorResponse("Missing token", 400);
         }
-        return $this->successResponse(200, $payload = ['token' => $token]);
+        return $this->successResponse($payload = ['token' => $token]);
     }
 
 
@@ -67,19 +67,19 @@ class ResetPasswordController extends BaseController
                 throw  new CustomerNotFoundException();
             }
 
-            return $this->successResponseWithMessage(null, trans('core::app.response.create-success', ['name' => 'Password reset ']), 200);
+            return $this->successResponseWithMessage(trans('core::app.response.create-success', ['name' => 'Password reset ']));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
-        } catch(CustomerNotFoundException $exception){
+        } catch (CustomerNotFoundException $exception) {
             return $this->errorResponse('Customer not found exception', 404);
 
         } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'), 500);
+            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'));
 
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage());
         }
     }
 
