@@ -31,7 +31,6 @@ class CategoryController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        // $this->middleware('admin');
     }
 
     /**
@@ -42,7 +41,7 @@ class CategoryController extends BaseController
     {
 
         try {
-            $categories = $this->successResponse(200, Category::paginate($this->pagination_limit));
+            $categories = Category::paginate($this->pagination_limit);
             return $this->successResponse(200, $payload = $categories);
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
@@ -60,7 +59,8 @@ class CategoryController extends BaseController
     public function show($id)
     {
         try {
-            return $this->successResponse(200, Category::findOrFail($id));
+            $category = Category::findOrFail($id);
+            return $this->successResponse(200, $category);
 
         } catch (QueryException $exception) {
             return $this->errorResponse(400, $exception->getMessage());
@@ -101,7 +101,7 @@ class CategoryController extends BaseController
     private function saveCategory($request)
     {
 
-        $category = Category::create($request->only(['position', 'status', 'parent_id']));
+        $category = Category::create($request->only(['position', 'status', 'parent_id' ,'slug']));
 
         //format data according to locales
         $locale_values = $request->get('locales');
@@ -111,7 +111,6 @@ class CategoryController extends BaseController
                     [
                         'locale' => $key,
                         'category_id' => $category->id,
-                        'slug' => $request->slug
                     ]);
             }
 
@@ -186,7 +185,6 @@ class CategoryController extends BaseController
                     [
                         'locale' => $key,
                         'category_id' => $category->id,
-                        'slug' => $request->slug
                     ]);
                 $category_translation = $category_translations->first(function ($category_translation) use ($key) {
                     return $category_translation->locale = $key;
