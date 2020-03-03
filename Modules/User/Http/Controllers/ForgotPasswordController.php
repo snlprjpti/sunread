@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Exceptions\TokenGenerationException;
 use Modules\User\Entities\Admin;
+use Modules\User\Exceptions\AdminNotFoundException;
 
 /**
  * Forgot Password controller for the Admin
@@ -38,18 +39,23 @@ class ForgotPasswordController extends BaseController
             }
 
             $response = $this->broker()->sendResetLink(['email' => $email]);
-            if ($response != Password::RESET_LINK_SENT) {
-                throw new TokenGenerationException();
+
+            if ($response == Password::INVALID_TOKEN) {
+                throw  new TokenGenerationException();
             }
 
-            return $this->successResponseWithMessage($admin, "Reset Link sent to your email {$admin->email}", 200);
+            if ($response == Password::INVALID_USER) {
+                throw  new AdminNotFoundException();
+            }
+
+            return $this->successResponseWithMessage("Reset Link sent to your email {$admin->email}");
 
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage(), 400);
+            return $this->errorResponse($e->getMessage());
         }
     }
 

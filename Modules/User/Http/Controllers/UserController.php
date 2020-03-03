@@ -38,13 +38,13 @@ class UserController extends BaseController
     {
         try {
             $payload = Admin::paginate($this->pagination_limit);
-            return $this->successResponse($payload, 200);
+            return $this->successResponse($payload);
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
 
     }
@@ -58,7 +58,7 @@ class UserController extends BaseController
     {
         try {
             $payload = Admin::findOrFail($id);
-            return $this->successResponse($payload, 200);
+            return $this->successResponse($payload);
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
@@ -88,7 +88,7 @@ class UserController extends BaseController
                 $request->only('name', 'email', 'password', 'role_id', 'status')
             );
 
-            return $this->successResponseWithMessage($admin, trans('core::app.response.create-success', ['name' => 'Admin']), 201);
+            return $this->successResponse($admin, trans('core::app.response.create-success', ['name' => 'Admin']), 201);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -97,7 +97,7 @@ class UserController extends BaseController
             return $this->errorResponse($exception->errors(), 400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
     }
 
@@ -122,7 +122,7 @@ class UserController extends BaseController
                 $request->only('name', 'email', 'password', 'role_id', 'status')
             );
 
-            return $this->successResponseWithMessage($admin, trans('core::app.response.update-success', ['name' => 'Admin']), 200);
+            return $this->successResponse($admin, trans('core::app.response.update-success', ['name' => 'Admin']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
@@ -131,7 +131,7 @@ class UserController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
 
     }
@@ -147,13 +147,13 @@ class UserController extends BaseController
         try {
             $admin = Admin::findOrFail($id);
             $admin->delete();
-            return $this->successResponseWithMessage(null, trans('core::app.response.delete-success', ['name' => 'Admin']), 400);
+            return $this->successResponse(trans('core::app.response.delete-success', ['name' => 'Admin']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
     }
 

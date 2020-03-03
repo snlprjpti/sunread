@@ -24,13 +24,13 @@ class AccountController extends BaseController
     {
         try {
             $me = auth()->guard('admin')->user();
-            return $this->successResponse($me, 200);
+            return $this->successResponse($me);
 
         } catch (UnauthorizedHttpException $exception) {
             return $this->errorResponse($exception->getMessage(), 401);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
 
     }
@@ -65,13 +65,13 @@ class AccountController extends BaseController
 
             $user->update($request->only('name', 'email', 'password'));
 
-            return $this->successResponseWithMessage(null, trans('core::app.response.update-success', ['name' => 'Customer Account']), 200);
+            return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => 'Customer Account']));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
 
     }

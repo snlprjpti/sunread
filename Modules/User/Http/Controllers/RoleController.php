@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\User\Entities\Admin;
 use Modules\User\Entities\Role;
 
 
@@ -41,13 +40,13 @@ class RoleController extends BaseController
         try {
 
             $payload = Role::paginate($this->pagination_limit);
-            return $this->successResponse($payload, 200);
+            return $this->successResponse($payload);
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(),400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse ($exception->getMessage(),500);
+            return $this->errorResponse ($exception->getMessage());
         }
     }
 
@@ -61,13 +60,13 @@ class RoleController extends BaseController
         try {
 
             $payload = Role::findOrFail($id);
-            return $this->successResponse($payload,200);
+            return $this->successResponse($payload);
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage() ,500);
+            return $this->errorResponse($exception->getMessage());
         }
     }
 
@@ -89,16 +88,16 @@ class RoleController extends BaseController
             $role = Role::create(
                 $request->only('name' ,'description', 'permissions', 'permission_type', 'slug')
             );
-            return $this->successResponseWithMessage($payload = $role,trans('core::app.response.create-success', ['name' => 'Role']),201);
+            return $this->successResponse($payload = $role,trans('core::app.response.create-success', ['name' => 'Role']),201);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
         }catch (SlugCouldNotBeGenerated $exception){
-            return $this->errorResponse("Slugs could not be genereated", 500);
+            return $this->errorResponse("Slugs could not be genereated");
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(),500);
+            return $this->errorResponse($exception->getMessage());
         }
     }
 
@@ -120,7 +119,7 @@ class RoleController extends BaseController
                 $request->only('name' ,'description', 'permissions', 'permission_type')
             );
 
-            return $this->successResponseWithMessage($role,trans('core::app.response.update-success', ['name' => 'Role']),200);
+            return $this->successResponse($role,trans('core::app.response.update-success', ['name' => 'Role']));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -129,7 +128,7 @@ class RoleController extends BaseController
             return $this->errorResponse($exception->getMessage(),400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(),500);
+            return $this->errorResponse($exception->getMessage());
         }
     }
 
@@ -144,13 +143,13 @@ class RoleController extends BaseController
 
             $role = Role::findOrFail($id);
             $role->delete();
-            return $this->successResponse(trans('core::app.response.deleted-success', ['name' => 'Role']),400);
+            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Role']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(),404);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(),500);
+            return $this->errorResponse($exception->getMessage());
         }
 
     }

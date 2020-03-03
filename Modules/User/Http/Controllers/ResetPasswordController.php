@@ -34,7 +34,7 @@ class ResetPasswordController extends BaseController
         if (!$token) {
             return $this->errorResponse(trans('core::app.users.token-missing'), 400);
         }
-        return $this->successResponse($payload = ['token' => $token], 200);
+        return $this->successResponse($payload = ['token' => $token]);
     }
 
     /**
@@ -65,18 +65,18 @@ class ResetPasswordController extends BaseController
             if ($response == Password::INVALID_USER) {
                 throw  new AdminNotFoundException();
             }
-            return $this->successResponseWithMessage($payload = null, trans('core::app.users.users.password-reset-success'), 200);
+            return $this->successResponseWithMessage(trans('core::app.users.users.password-reset-success'));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'), 500);
+            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'));
 
         }catch (AdminNotFoundException $exception){
 
         } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage());
         }
     }
 
