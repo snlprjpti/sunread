@@ -13,7 +13,8 @@ class Category extends Model
 {
     use NodeTrait;
 
-    protected $fillable = ['position', 'status', 'parent_id'];
+    protected $fillable = ['position', 'status', 'parent_id','image'];
+    protected $with =['translations'];
 
     public static function rules($id=0,$merge = [])
     {
@@ -104,6 +105,6 @@ class Category extends Model
 
     public function translations()
     {
-        return $this->hasMany(Category::class, 'category_id');
+        return $this->hasMany(CategoryTranslation::class,'category_id');
     }
 }
