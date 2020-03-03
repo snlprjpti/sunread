@@ -47,7 +47,6 @@ class Category extends Model
     }
 
 
-
     /**
      * Getting the root category of a category
      *
@@ -58,53 +57,31 @@ class Category extends Model
         return Category::where('parent_id', '=', null)->get();
     }
 
-    /**
-     * Returns all categories within the category's path
-     *
-     * @return Category[]
-     */
-    public function getPathCategories(): array
-    {
-        $category = $this->findInTree();
-
-        $categories = [$category];
-
-        while (isset($category->parent)) {
-            $category = $category->parent;
-            $categories[] = $category;
-        }
-
-        return array_reverse($categories);
-    }
-
-    /**
-     * Finds and returns the category within a nested category tree
-     * will search in root category by default
-     * is used to minimize the numbers of sql queries for it only uses the already cached tree
-     *
-     * @param Category[] $categoryTree
-     * @return Category
-     */
-    public function findInTree($categoryTree = null): Category
-    {
-//        if (! $categoryTree) {
-//            $categoryTree = app(CategoryRepository::class)->getVisibleCategoryTree($this->getRootCategory()->id);
-//        }
-
-        $category = $categoryTree->first();
-
-        if (! $category) {
-            throw new NotFoundHttpException('category not found in tree');
-        }
-
-        if ($category->id === $this->id) {
-            return $category;
-        }
-        return $this->findInTree($category->children);
-    }
-
     public function translations()
     {
         return $this->hasMany(CategoryTranslation::class,'category_id');
     }
+
+    public function createTranslation()
+    {
+        //format data according to locales
+        $locale_values = $request->get('locales');
+        if (isset($locale_values) && is_array($locale_values)) {
+            foreach ($locale_values as $key => $item) {
+                $data = array_merge($item,
+                    [
+                        'locale' => $key,
+                        'category_id' => $category->id,
+                    ]);
+            }
+
+            if (is_array($data)) {
+                $category_translation = CategoryTranslation::create($data);
+                $category->translations()->save($category_translation);
+            }
+        }
+
+    }
+
+
 }

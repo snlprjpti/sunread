@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\CategoryTranslation;
-use Modules\Core\Entities\Core;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Entities\Category;
 
@@ -31,6 +30,7 @@ class CategoryController extends BaseController
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('admin');
     }
 
     /**
@@ -39,14 +39,16 @@ class CategoryController extends BaseController
      */
     public function index()
     {
-
         try {
+
             $categories = Category::paginate($this->pagination_limit);
-            return $this->successResponse(200, $payload = $categories);
+            return $this->successResponse($payload = $categories);
+
         } catch (QueryException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 400);
+
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage());
         }
 
     }
@@ -59,14 +61,15 @@ class CategoryController extends BaseController
     public function show($id)
     {
         try {
-            $category = Category::findOrFail($id);
-            return $this->successResponse(200, $category);
 
-        } catch (QueryException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            $category = Category::findOrFail($id);
+            return $this->successResponse($payload = $category);
+
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse($exception->getMessage(), 404);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse(500, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage());
         }
     }
 
@@ -81,19 +84,24 @@ class CategoryController extends BaseController
         try {
             $this->validate($request, Category::rules());
 
-            //store
+            //store category
             $category = $this->saveCategory($request);
+
+            //upload Image
             if ($request->image) {
                 $this->uploadImage($category, $request->image);
             }
 
-            return $this->successResponse(201, $category, trans('core::app.response.create-success', ['name' => 'Category']));
+            return $this->successResponse($category, trans('core::app.response.create-success', ['name' => 'Category']) ,201);
 
         } catch (ValidationException $exception) {
-            return $this->errorResponse(400, $exception->errors());
+            return $this->errorResponse($exception->errors(), 422);
+
+        }catch ( QueryException $exception){
+            return $this->errorResponse($exception->errors(), 400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse(500, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage());
         }
     }
 
@@ -101,7 +109,7 @@ class CategoryController extends BaseController
     private function saveCategory($request)
     {
 
-        $category = Category::create($request->only(['position', 'status', 'parent_id' ,'slug']));
+        $category = Category::create($request->only(['position', 'status', 'parent_id', 'slug']));
 
         //format data according to locales
         $locale_values = $request->get('locales');
