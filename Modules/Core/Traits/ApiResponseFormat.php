@@ -5,7 +5,7 @@ namespace Modules\Core\Traits;
 
 trait ApiResponseFormat
 {
-    public function successResponse($payload, $code)
+    public function successResponse($payload, $code = 200)
     {
         $format = [
             'status' => 'success',
@@ -14,7 +14,7 @@ trait ApiResponseFormat
         return response()->json($format, $code);
     }
 
-    public function errorResponse($message, $code)
+    public function errorResponse($message, $code = 500)
     {
         $format = [
             'status' => 'error',
@@ -23,7 +23,7 @@ trait ApiResponseFormat
         return response()->json($format, $code);
     }
 
-    public function successResponseWithMessage($payload, $message, $code)
+    public function successResponseWithMessage($payload, $message, $code = 200)
     {
         $format = [
             'status' => 'success',
