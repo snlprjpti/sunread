@@ -18,6 +18,7 @@ class CreateCategoriesTable extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('position')->default(0);
+            $table->string('slug')->unique();
             $table->string('image')->nullable();
             $table->boolean('status')->default(0);
             NestedSet::columns($table);
