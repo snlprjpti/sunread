@@ -4,7 +4,6 @@ namespace Modules\User\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
