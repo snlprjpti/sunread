@@ -32,7 +32,7 @@ class JwtMiddleware extends BaseMiddleware
             return $this->errorResponse(trans('core::app.users.token.token-expired'), 400);
 
         } catch (Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
 
         return $next($request);

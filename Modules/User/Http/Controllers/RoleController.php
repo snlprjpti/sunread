@@ -46,7 +46,7 @@ class RoleController extends BaseController
             return $this->errorResponse($exception->getMessage(),400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse ($exception->getMessage());
+            return $this->errorResponse($exception->getMessage());
         }
     }
 

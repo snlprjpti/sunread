@@ -40,7 +40,7 @@ class SessionController extends BaseController
             $jwtToken = null;
             $customer_jwt_ttl = config('jwt.customer_jwt_ttl');
             if (!$jwtToken = Auth::guard('customer')->setTTL($customer_jwt_ttl)->attempt(request()->only('email', 'password'))) {
-                return $this->errorResponse(trans('core::app.users.users.login-error'), 400);
+                return $this->errorResponse(trans('core::app.users.users.login-error'), 401);
             }
 
             $customer = auth()->guard('customer')->user();

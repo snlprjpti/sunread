@@ -26,7 +26,7 @@ class RedirectIfNotCustomer
     public function handle($request, Closure $next, $guard = 'customer')
     {
         if (!Auth::guard($guard)->check()) {
-            return $this->errorResponse("Unauthenticated user", 400);
+            return $this->errorResponse("Unauthenticated user", 401);
         }
 
         if (Auth::guard($guard)->user()->status == 0) {

@@ -64,7 +64,7 @@ class UserController extends BaseController
             return $this->errorResponse($exception->getMessage(), 404);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage(), 500);
+            return $this->errorResponse($exception->getMessage());
         }
     }
 
