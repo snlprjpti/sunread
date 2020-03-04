@@ -129,8 +129,8 @@ class CategoryController extends BaseController
 
         if ($uploadedFile = $request->file('image')) {
 
-            if (isset($category->image) && file_exists(public_path($category->image))) {
-                Storage::disk('public')->delete($category->image);
+            if (isset($category->image) && file_exists(storage_path('/app/public/'.$category->image))) {
+                unlink(storage_path('/app/public/'.$category->image));
             }
 
             $filename = time() . Str::random(15) . ".png";
@@ -219,9 +219,13 @@ class CategoryController extends BaseController
     public function destroy($id)
     {
         try {
-            $admin = Category::findOrFail($id);
-            $admin->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.create-success', ['name' => 'Category']));
+            $category = Category::findOrFail($id);
+
+            if (isset($category->image) && file_exists(storage_path('/app/public/'.$category->image))) {
+                unlink(storage_path('/app/public/'.$category->image));
+            }
+            $category->delete();
+            return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Category']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
