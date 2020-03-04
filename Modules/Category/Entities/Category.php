@@ -62,7 +62,7 @@ class Category extends Model
         return $this->hasMany(CategoryTranslation::class,'category_id');
     }
 
-    public function createTranslation()
+    public function createTranslation($request,$category)
     {
         //format data according to locales
         $locale_values = $request->get('locales');
