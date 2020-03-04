@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Category extends Model
 {
-    use NodeTrait;
+    use NodeTrait,Translatable;
 
     protected $fillable = ['position', 'status', 'parent_id','image', 'slug'];
     protected $with =['translations'];
+    public $translatedAttributes = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords'];
 
     public static function rules($id=0,$merge = [])
     {
@@ -82,6 +82,7 @@ class Category extends Model
         }
 
     }
+
 
 
 }

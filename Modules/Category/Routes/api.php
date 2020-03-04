@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => ['api']], function () {
 
     //ADMIN USER ROUTES
-    Route::group(['prefix'=>'admin/catalog','as' => 'admin.catalog.','middleware' => []],function () {
+    Route::group(['prefix'=>'admin/catalog','as' => 'admin.catalog.','middleware' => ['language']],function () {
         Route::resource('categories' ,'CategoryController');
     });
 });

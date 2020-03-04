@@ -2,24 +2,29 @@
 
 namespace Modules\Core\Providers;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Core\Http\Middleware\Language;
 
 class CoreServiceProvider extends ServiceProvider
 {
     /**
      * Boot the application events.
      *
+     * @param Router $router
      * @return void
      */
-    public function boot()
+    public function boot(Router $router)
     {
+
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
         $this->registerFactories();
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'core');
         $this->loadMigrationsFrom(module_path('Core', 'Database/Migrations'));
+        $router->aliasMiddleware('language', Language::class);
     }
 
     /**

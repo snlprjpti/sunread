@@ -22,7 +22,7 @@ class CategoryController extends BaseController
 {
 
 
-    protected $pagination_limit;
+    protected $pagination_limit,$locale;
 
     /**
      * CategoryController constructor.
@@ -85,6 +85,8 @@ class CategoryController extends BaseController
             $this->validate($request, Category::rules());
 
             //store category
+
+            $category_params = $this->resolveCategoryParameters($request->all());
             $category = $this->saveCategory($request);
 
             //upload Image
@@ -98,7 +100,8 @@ class CategoryController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         }catch ( QueryException $exception){
-            return $this->errorResponse($exception->errors(), 400);
+            dd($exception);
+            return $this->errorResponse($exception->message(), 400);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -106,30 +109,20 @@ class CategoryController extends BaseController
     }
 
 
-    private function saveCategory($request)
-    {
-
-        $category = Category::create($request->only(['position', 'status', 'parent_id', 'slug']));
-
-        //format data according to locales
-        $locale_values = $request->get('locales');
-        if (isset($locale_values) && is_array($locale_values)) {
-            foreach ($locale_values as $key => $item) {
-                $data = array_merge($item,
-                    [
-                        'locale' => $key,
-                        'category_id' => $category->id,
-                    ]);
-            }
-
-            if (is_array($data)) {
-                $category_translation = CategoryTranslation::create($data);
-                $category->translations()->save($category_translation);
-            }
-        }
-
-        return $category;
-    }
+//    private function saveCategory($request)
+//    {
+//        try{
+//
+//            $category = Category::create(
+//                $request->only(['position', 'status', 'parent_id', 'slug'])
+//            );
+//            $category = $category->resolveParameters($request->all(),$this->locale);
+//
+//            $category_translation = CategoryTranslation::create($request->only($translated_attributes));
+//            $category->translations()->save($category_translation);
+//
+//        return $category;
+//    }
 
     public function uploadImage(Category $category, String $base64_image)
     {
@@ -224,4 +217,17 @@ class CategoryController extends BaseController
             return $this->errorResponse(400, $exception->getMessage());
         }
     }
+
+    private function resolveCategoryParameters(array $data)
+    {
+        $category = new Category();
+        
+        $fillable_attributes = $request->only($category->getFillable());
+        $translated_attributes = $category->getTranslationsArray();
+
+
+
+    }
+
+
 }

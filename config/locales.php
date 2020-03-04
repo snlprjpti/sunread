@@ -3,6 +3,5 @@
 
 return
     [
-        'en',
-        'de'
+        'lang'
     ];
