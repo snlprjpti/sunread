@@ -88,6 +88,11 @@ class CategoryController extends BaseController
             //validation
             $this->validate($request, Category::rules());
 
+            //create slug if missing in input
+            if(!$request->get('slug')){
+                $request->merge(['slug' =>  Category::createSlug($request->get('title'))]);
+            }
+
             //save category
             $category = Category::create(
                 $request->only(['position', 'status', 'parent_id', 'slug'])
