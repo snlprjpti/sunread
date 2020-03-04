@@ -2,7 +2,6 @@
 
 namespace Modules\Category\Entities;
 
-use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -10,18 +9,17 @@ use Kalnoy\Nestedset\NodeTrait;
 
 class Category extends Model
 {
-    use NodeTrait,Translatable;
+    use NodeTrait;
 
     protected $fillable = ['position', 'status', 'parent_id','image', 'slug'];
     protected $with =['translations'];
-    public $translatedAttributes = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords'];
 
     public static function rules($id=0,$merge = [])
     {
         return  array_merge([
             'slug' => 'required |unique:categories,slug'.($id ? ",$id" : ''),
             'name' => 'required',
-            'image' => 'base64image',
+            'image' => 'mimes:jpeg,jpg,bmp,png',
         ],$merge);
 
     }
@@ -61,28 +59,5 @@ class Category extends Model
     {
         return $this->hasMany(CategoryTranslation::class,'category_id');
     }
-
-    public function createTranslation($request,$category)
-    {
-        //format data according to locales
-        $locale_values = $request->get('locales');
-        if (isset($locale_values) && is_array($locale_values)) {
-            foreach ($locale_values as $key => $item) {
-                $data = array_merge($item,
-                    [
-                        'locale' => $key,
-                        'category_id' => $category->id,
-                    ]);
-            }
-
-            if (is_array($data)) {
-                $category_translation = CategoryTranslation::create($data);
-                $category->translations()->save($category_translation);
-            }
-        }
-
-    }
-
-
 
 }

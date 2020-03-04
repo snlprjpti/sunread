@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +23,7 @@ class CategoryController extends BaseController
 {
 
 
-    protected $pagination_limit,$locale;
+    protected $pagination_limit, $locale;
 
     /**
      * CategoryController constructor.
@@ -61,7 +62,6 @@ class CategoryController extends BaseController
     public function show($id)
     {
         try {
-
             $category = Category::findOrFail($id);
             return $this->successResponse($payload = $category);
 
@@ -82,61 +82,82 @@ class CategoryController extends BaseController
     {
 
         try {
+
+            DB::beginTransaction();
+
+            //validation
             $this->validate($request, Category::rules());
 
-            //store category
+            //save category
+            $category = Category::create(
+                $request->only(['position', 'status', 'parent_id', 'slug'])
+            );
 
-            $category_params = $this->resolveCategoryParameters($request->all());
-            $category = $this->saveCategory($request);
-
-            //upload Image
+            //upload image
             if ($request->image) {
-                $this->uploadImage($category, $request->image);
+                $this->uploadImage($category, $request);
             }
 
-            return $this->successResponse($category, trans('core::app.response.create-success', ['name' => 'Category']) ,201);
+            //create or update related translation
+            $this->createOrUpdateTranslation($category, $request);
+
+            DB::commit();
+            return $this->successResponse($category, trans('core::app.response.create-success', ['name' => 'Category']), 201);
 
         } catch (ValidationException $exception) {
+            DB::rollBack();
             return $this->errorResponse($exception->errors(), 422);
 
-        }catch ( QueryException $exception){
-            dd($exception);
-            return $this->errorResponse($exception->message(), 400);
+        } catch (QueryException $exception) {
+            DB::rollBack();
+            return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
+            dd($exception);
+            DB::rollBack();
             return $this->errorResponse($exception->getMessage());
         }
     }
 
 
-//    private function saveCategory($request)
-//    {
-//        try{
-//
-//            $category = Category::create(
-//                $request->only(['position', 'status', 'parent_id', 'slug'])
-//            );
-//            $category = $category->resolveParameters($request->all(),$this->locale);
-//
-//            $category_translation = CategoryTranslation::create($request->only($translated_attributes));
-//            $category->translations()->save($category_translation);
-//
-//        return $category;
-//    }
-
-    public function uploadImage(Category $category, String $base64_image)
+    /**
+     * Uploads an image
+     * @param Category $category
+     * @param $request
+     */
+    public function uploadImage(Category $category, $request)
     {
 
-        if ($category->image) {
-            Storage::delete($category->image);
-        }
-        if (preg_match('/^data:image\/(\w+);base64,/', $base64_image)) {
-            $base64_data = substr($base64_image, strpos($base64_image, ',') + 1);
-            $base64_data = base64_decode($base64_data);
-            $valid_path = "category/" . time() . Str::random(15) . ".png";
-            Storage::disk('public')->put($valid_path, $base64_data, 'public');
-            $category->image = $valid_path;
+        if ($uploadedFile = $request->file('image')) {
+
+            if (isset($category->image) && file_exists(public_path($category->image))) {
+                Storage::disk('public')->delete($category->image);
+            }
+
+            $filename = time() . Str::random(15) . ".png";
+            $file_path = Storage::disk('public')->putFileAs(
+                'category',
+                $uploadedFile,
+                $filename
+            );
+            $category->image = $file_path;
             $category->save();
+        };
+
+
+    }
+
+    private function createOrUpdateTranslation(Category $category, Request $request)
+    {
+
+        try {
+            $request->merge(['locale' => $this->locale, 'category_id' => $category->id]);
+            CategoryTranslation::updateOrCreate(
+                ['id' => $category->id, 'locale' => $this->locale],
+                $request->only(['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'locale', 'category_id'])
+            );
+        } catch (QueryException $exception) {
+            throw $exception;
         }
     }
 
@@ -149,53 +170,42 @@ class CategoryController extends BaseController
     public function update(Request $request, $id)
     {
         try {
+            DB::beginTransaction();
 
+            //validate
             $this->validate($request, Category::rules($id));
+
+            //update category
             $category = Category::findOrFail($id);
-            $this->updateCategory($category, $request);
-            if (!$request->image) {
-                $this->uploadImage($category, $request->image);
+
+            //upload image
+            if ($request->image) {
+                $image_path = $this->uploadImage($category, $request);
+                $request->merge(['image' => $image_path]);
             }
+
+            $category->update(
+                $request->only(['position', 'status', 'parent_id', 'slug', 'image'])
+            );
+
+            //create or update translation
+            $this->createOrUpdateTranslation($category, $request);
 
             return $this->successResponse(200, $category, trans('core::app.response.update-success', ['name' => 'Category']));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            DB::rollBack();
+            return $this->errorResponse($exception->getMessage(), 404);
 
         } catch (ValidationException $exception) {
-            return $this->errorResponse(400, $exception->errors());
+            DB::rollBack();
+            return $this->errorResponse($exception->errors(), 400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            DB::rollBack();
+            return $this->errorResponse($exception->getMessage());
         }
 
-    }
-
-    private function updateCategory($category, $request)
-    {
-
-        $category->update($request->only(['position', 'status', 'parent_id']));
-        $category_translations = $category->translations;
-
-        //format data according to locales
-        $locale_values = $request->get('locales');
-
-        if (isset($locale_values) && is_array($locale_values)) {
-            foreach ($locale_values as $key => $item) {
-                $data = array_merge($item,
-                    [
-                        'locale' => $key,
-                        'category_id' => $category->id,
-                    ]);
-                $category_translation = $category_translations->first(function ($category_translation) use ($key) {
-                    return $category_translation->locale = $key;
-                });
-                $category_translation->update($data);
-
-            }
-        }
-
-        return $category;
     }
 
     /**
@@ -208,25 +218,14 @@ class CategoryController extends BaseController
         try {
             $admin = Category::findOrFail($id);
             $admin->delete();
-            return $this->successResponse(400, null, trans('core::app.response.create-success', ['name' => 'Category']));
+            return $this->successResponseWithMessage(trans('core::app.response.create-success', ['name' => 'Category']));
 
         } catch (QueryException $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
-            return $this->errorResponse(400, $exception->getMessage());
+            return $this->errorResponse($exception->getMessage());
         }
-    }
-
-    private function resolveCategoryParameters(array $data)
-    {
-        $category = new Category();
-        
-        $fillable_attributes = $request->only($category->getFillable());
-        $translated_attributes = $category->getTranslationsArray();
-
-
-
     }
 
 

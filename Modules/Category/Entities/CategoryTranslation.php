@@ -8,5 +8,5 @@ class CategoryTranslation extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['name', 'description', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'locale',];
+    protected $fillable = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'locale','category_id'];
 }
