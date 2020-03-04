@@ -190,7 +190,7 @@ class CategoryController extends BaseController
 
             //create or update translation
             $this->createOrUpdateTranslation($category, $request);
-
+            DB::commit();
             return $this->successResponse(200, $category, trans('core::app.response.update-success', ['name' => 'Category']));
 
         } catch (ModelNotFoundException $exception) {
