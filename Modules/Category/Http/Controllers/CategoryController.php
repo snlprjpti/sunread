@@ -113,7 +113,6 @@ class CategoryController extends BaseController
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
-            dd($exception);
             DB::rollBack();
             return $this->errorResponse($exception->getMessage());
         }
@@ -147,20 +146,24 @@ class CategoryController extends BaseController
 
     }
 
+
+    /**
+     * @param Category $category
+     * @param Request $request
+     */
     private function createOrUpdateTranslation(Category $category, Request $request)
     {
+        $check_attributes = ['locale' => $this->locale, 'category_id' => $category->id];
+        $request->merge($check_attributes);
+        $category_translation = CategoryTranslation::firstorNew($check_attributes);
+        $category_translation->fill(
+            $request->only(['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'locale', 'category_id'])
+        );
+        $category_translation->save();
 
-        try {
-            $request->merge(['locale' => $this->locale, 'category_id' => $category->id]);
-            CategoryTranslation::updateOrCreate(
-                ['id' => $category->id, 'locale' => $this->locale],
-                $request->only(['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'locale', 'category_id'])
-            );
-        } catch (QueryException $exception) {
-            throw $exception;
-        }
     }
 
+    /**
     /**
      * Update the category
      * @param Request $request
@@ -191,7 +194,7 @@ class CategoryController extends BaseController
             //create or update translation
             $this->createOrUpdateTranslation($category, $request);
             DB::commit();
-            return $this->successResponse(200, $category, trans('core::app.response.update-success', ['name' => 'Category']));
+            return $this->successResponse($category, trans('core::app.response.update-success', ['name' => 'Category']), 200);
 
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
