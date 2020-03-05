@@ -16,7 +16,8 @@ class CreateAttributeGroupsTable extends Migration
         Schema::create('attribute_groups', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('position');
+            $table->string('slug');
+            $table->integer('position')->nullable();
             $table->boolean('is_user_defined')->default(1);
             $table->integer('attribute_family_id')->unsigned();
             $table->unique(['attribute_family_id', 'name']);

@@ -8,17 +8,18 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeFamily;
+use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
 use Modules\Attribute\Exceptions\DefaultFamilySlugCanNotBeModified;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
 
-class AttributeController extends BaseController
+class AttributeGroupController extends BaseController
 {
     protected $pagination_limit;
 
     /**
-     * Attribute constructor.
+     * AttributeGroup Controller constructor.
      * Admin middleware checks the admin against admins table
      */
 
@@ -29,14 +30,14 @@ class AttributeController extends BaseController
     }
 
     /**
-     * Returns all the attribute_familys
+     * Returns all the attribute_group
      * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
         try {
 
-            $payload = Attribute::paginate($this->pagination_limit);
+            $payload = AttributeGroup::paginate($this->pagination_limit);
             return $this->successResponse($payload);
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -55,7 +56,7 @@ class AttributeController extends BaseController
     {
         try {
 
-            $payload = Attribute::findOrFail($id);
+            $payload = AttributeGroup::findOrFail($id);
             return $this->successResponse($payload);
 
         } catch (ModelNotFoundException $exception) {
@@ -76,17 +77,17 @@ class AttributeController extends BaseController
     {
         try {
 
-            $this->validate($request, Attribute::rules());
+            $this->validate($request, AttributeGroup::rules());
 
             if (!$request->get('slug')) {
-                $request->merge(['slug' => Attribute::createSlug($request->get('name'))]);
+                $request->merge(['slug' => AttributeGroup::createSlug($request->get('name'))]);
             }
 
-            $attribute_family = Attribute::create(
-                $request->only('name', 'slug')
+            $attribute_group = AttributeGroup::create(
+                $request->only('name', 'slug' ,'is_user_defined','attribute_family_id')
             );
 
-            return $this->successResponse($payload = $attribute_family, trans('core::app.response.create-success', ['name' => 'Attribute Family']), 201);
+            return $this->successResponse($payload = $attribute_group, trans('core::app.response.create-success', ['name' => 'Attribute Group']), 201);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -110,20 +111,13 @@ class AttributeController extends BaseController
     public function update(Request $request, $id)
     {
         try {
-            $this->validate($request, Attribute::rules($id));
-            $attribute_family = Attribute::findOrFail($id);
-
-            //custom exception
-            if ($request->slug == 'default') {
-                throw new DefaultFamilySlugCanNotBeModified();
-            }
-            $attribute_family = $attribute_family->update(
-                $request->only('name', 'slug')
+            $this->validate($request, AttributeGroup::rules($id));
+            $attribute_group = AttributeGroup::findOrFail($id);
+            $attribute_group = $attribute_group->update(
+                $request->only('name', 'slug', 'attribute_family_id')
             );
 
-            return $this->successResponse($attribute_family, trans('core::app.response.update-success', ['name' => 'Attribute Family']));
-        } catch (DefaultFamilySlugCanNotBeModified $exception) {
-            return $this->errorResponse($exception->errors(), 400);
+            return $this->successResponse($attribute_group, trans('core::app.response.update-success', ['name' => 'Attribute Group']));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -144,20 +138,14 @@ class AttributeController extends BaseController
     public function destroy($id)
     {
         try {
-            $attribute_family = Attribute::findOrFail($id);
-            if ($attribute_family->slug == 'default') {
-                throw  new DefaultFamilyCanNotBeDeleted;
-            }
-            $attribute_family->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Attribute Family']));
+            $attribute_group = AttributeGroup::findOrFail($id);
+            $attribute_group->delete();
+            return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Attribute Group']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
 
-        } catch (DefaultFamilyCanNotBeDeleted $exception) {
-            return $this->errorResponse("default family cannot be deleted", 400);
-
-        } catch (\Exception $exception) {
+        }catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
         }
 

@@ -20,7 +20,7 @@ class CreateAttributesTable extends Migration
             $table->string('type');
 
             $table->integer('attribute_group_id')->unsigned()->nullable();
-            $table->foreign('attribute_group_id')->references('id')->on('attribute_groups')->onDelete('cascade');
+            $table->foreign('attribute_group_id')->references('id')->on('attribute_groups')->onDelete('set null');
 
             $table->string('validation')->nullable();
             $table->integer('position')->nullable();
