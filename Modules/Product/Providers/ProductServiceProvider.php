@@ -16,7 +16,6 @@ class ProductServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerConfig();
-        $this->registerViews();
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('Product', 'Database/Migrations'));
     }
@@ -46,25 +45,6 @@ class ProductServiceProvider extends ServiceProvider
         );
     }
 
-    /**
-     * Register views.
-     *
-     * @return void
-     */
-    public function registerViews()
-    {
-        $viewPath = resource_path('views/modules/product');
-
-        $sourcePath = module_path('Product', 'Resources/views');
-
-        $this->publishes([
-            $sourcePath => $viewPath
-        ],'views');
-
-        $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/modules/product';
-        }, \Config::get('view.paths')), [$sourcePath]), 'product');
-    }
 
     /**
      * Register translations.
