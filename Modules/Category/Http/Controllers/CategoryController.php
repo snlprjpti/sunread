@@ -7,8 +7,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\CategoryTranslation;
 use Modules\Core\Http\Controllers\BaseController;
@@ -23,7 +21,8 @@ class CategoryController extends BaseController
 {
 
 
-    protected $pagination_limit, $locale;
+    protected $pagination_limit, $locale, $folder_path;
+    private $folder = 'category';
 
     /**
      * CategoryController constructor.
@@ -32,6 +31,7 @@ class CategoryController extends BaseController
     {
         parent::__construct();
         $this->middleware('admin');
+        $this->folder_path =  storage_path('app/public/images/'). $this->folder.DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -90,7 +90,7 @@ class CategoryController extends BaseController
 
             //create slug if missing in input
             if(!$request->get('slug')){
-                $request->merge(['slug' =>  Category::createSlug($request->get('title'))]);
+                $request->merge(['slug' =>  Category::createSlug($request->get('name'))]);
             }
 
             //save category
@@ -126,6 +126,7 @@ class CategoryController extends BaseController
 
     /**
      * Uploads an image
+     * Uploading file with original for better seo
      * @param Category $category
      * @param $request
      */
@@ -133,26 +134,20 @@ class CategoryController extends BaseController
     {
 
         if ($uploadedFile = $request->file('image')) {
-
-            if (isset($category->image) && file_exists(storage_path('/app/public/'.$category->image))) {
-                unlink(storage_path('/app/public/'.$category->image));
+            if (isset($category->image)) {
+                $this->removeFile($this->folder_path.$category->image);
             }
-
-            $filename = time() . Str::random(15) . ".png";
-            $file_path = Storage::disk('public')->putFileAs(
-                'category',
-                $uploadedFile,
-                $filename
-            );
-            $category->image = $file_path;
+            $image = $this->uploadFile($uploadedFile ,$this->folder_path);
+            $category->image = $image;
             $category->save();
         };
-
 
     }
 
 
     /**
+     * Update the translation of category
+     * Caution!!: createOrUpdate(built in laravel core) causes race condition
      * @param Category $category
      * @param Request $request
      */
@@ -183,21 +178,22 @@ class CategoryController extends BaseController
             //validate
             $this->validate($request, Category::rules($id));
 
-            //update category
+
             $category = Category::findOrFail($id);
 
             //upload image
             if ($request->image) {
-                $image_path = $this->uploadImage($category, $request);
-                $request->merge(['image' => $image_path]);
+                $this->uploadImage($category, $request);
             }
 
+            //update a category
             $category->update(
                 $request->only(['position', 'status', 'parent_id', 'slug', 'image'])
             );
 
             //create or update translation
             $this->createOrUpdateTranslation($category, $request);
+
             DB::commit();
             return $this->successResponse($category, trans('core::app.response.update-success', ['name' => 'Category']), 200);
 
@@ -226,10 +222,12 @@ class CategoryController extends BaseController
         try {
             $category = Category::findOrFail($id);
 
-            if (isset($category->image) && file_exists(storage_path('/app/public/'.$category->image))) {
-                unlink(storage_path('/app/public/'.$category->image));
+            //remove associated image file
+            if (isset($category->image)) {
+                $this->removeFile($this->folder_path.$category->image);
             }
             $category->delete();
+
             return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Category']));
 
         } catch (QueryException $exception) {

@@ -18,7 +18,7 @@ class Category extends Model
     public static function rules($id=0,$merge = [])
     {
         return  array_merge([
-            'slug' => 'required |unique:categories,slug'.($id ? ",$id" : ''),
+            'slug' => 'nullable |unique:categories,slug'.($id ? ",$id" : ''),
             'name' => 'required',
             'image' => 'mimes:jpeg,jpg,bmp,png',
         ],$merge);

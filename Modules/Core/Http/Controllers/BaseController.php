@@ -5,11 +5,12 @@ namespace Modules\Core\Http\Controllers;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use Modules\Core\Traits\ApiResponseFormat;
+use Modules\Core\Traits\FileManager;
 
 
 class BaseController extends Controller
 {
-    use ApiResponseFormat ,ValidatesRequests;
+    use ApiResponseFormat ,ValidatesRequests,FileManager;
 
     protected $pagination_limit,$locale;
     public function __construct()
