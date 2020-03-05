@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
-        "crazybooot/base64-validation": "^1.0",
         "fideloper/proxy": "^4.0",
         "kalnoy/nestedset": "^5.0",
         "laravel/framework": "^6.2",
