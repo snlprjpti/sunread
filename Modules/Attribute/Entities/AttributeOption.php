@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AttributeOption extends Model
 {
 
+    public $timestamps = false;
     protected $fillable = ['name','position', 'attribute_id'];
 
     /**

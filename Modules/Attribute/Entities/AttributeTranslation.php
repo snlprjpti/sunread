@@ -8,5 +8,5 @@ class AttributeTranslation extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name','locale','attribute_id'];
 }

@@ -11,7 +11,6 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Attribute\Entities\AttributeOptionTranslation;
 use Modules\Attribute\Entities\AttributeTranslation;
-use Modules\Attribute\Exceptions\DefaultFamilySlugCanNotBeModified;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
 
@@ -37,7 +36,6 @@ class AttributeController extends BaseController
     public function index()
     {
         try {
-
             $payload = Attribute::paginate($this->pagination_limit);
             return $this->successResponse($payload);
         } catch (QueryException $exception) {
@@ -78,15 +76,22 @@ class AttributeController extends BaseController
     {
         try {
 
+            //begin transaction
             DB::beginTransaction();
 
-            //validate request
+            //Validation
             $this->validate($request, Attribute::rules());
+            if (! in_array($request->get('type'), ['select', 'multiselect', 'checkbox'])) {
+                $request->merge([
+                    'is_filterable' => 0
+                ]);
+            }
 
-            //create  slug if missing
+            //create slug if missing
             if (!$request->get('slug')) {
                 $request->merge(['slug' => Attribute::createSlug($request->get('name'))]);
             }
+
 
             //store attribute
             $attribute = Attribute::create(
@@ -95,19 +100,28 @@ class AttributeController extends BaseController
                 )
             );
 
+
             //store translation
             $this->createOrUpdateTranslation($attribute, $request);
 
 
             //store attribute-option and translation
-            $options = $request->get('options');
+            $options = $request->get('attribute_options');
+
             if (is_array($options) && in_array($attribute->type, ['select', 'multiselect', 'checkbox']) && count($options)) {
                 foreach ($options as $optionInputs) {
-                    $attributeOption = AttributeOption::create($optionInputs);
-                    $this->createOrUpdateOptionTranslation($attributeOption, $optionInputs);
+                    $attribute_option = AttributeOption::create(
+                            array_merge(
+                                $optionInputs,
+                                ['attribute_id' => $attribute->id]
+                            )
+                    );
+
+                    $this->createOrUpdateOptionTranslation($attribute_option, $optionInputs);
                 }
             }
 
+            DB::commit();
             return $this->successResponse($payload = $attribute, trans('core::app.response.create-success', ['name' => 'Attribute']), 201);
 
         } catch (ValidationException $exception) {
@@ -123,20 +137,22 @@ class AttributeController extends BaseController
 
     private function createOrUpdateTranslation(Attribute $attribute, Request $request)
     {
-        $check_attributes = ['locale' => $this->locale, 'attribute_id' => $attribute->id];
-        $request->merge($check_attributes);
-        $attribute_translation = AttributeTranslation::firstorNew($check_attributes);
-        $attribute_translation->fill(
-            $request->only(['name', 'locale', 'attribute_id'])
-        );
-        $attribute_translation->save();
+        $translation_attributes = $request->get('translations');
+        if(isset($translation_attributes)){
+            foreach ($translation_attributes as $translation_attribute){
+                $check_attributes = ['locale' => $translation_attribute['locale'], 'attribute_id' => $attribute->id];
+                $attribute_translation = AttributeTranslation::firstorNew($check_attributes);
+                $attribute_translation->fill($translation_attribute);
+                $attribute_translation->save();
+            }
+        }
 
     }
 
     private function createOrUpdateOptionTranslation(AttributeOption $attribute_option, Array $optionInputs)
     {
         $check_attributes = ['locale' => $this->locale, 'attribute_option_id' => $attribute_option->id];
-        $optionInputs = array_merge($optionInputs,$check_attributes);
+        $optionInputs = array_merge($optionInputs, $check_attributes);
         $option_translation = AttributeOptionTranslation::firstorNew($check_attributes);
         $option_translation->fill($optionInputs);
         $option_translation->save();
@@ -167,11 +183,10 @@ class AttributeController extends BaseController
             $options = $request->get('options');
             if (is_array($options) && in_array($attribute->type, ['select', 'multiselect', 'checkbox']) && count($options)) {
                 foreach ($options as $optionInputs) {
-                    if(isset($optionInputs['attribute_option_id'])){
+                    if (isset($optionInputs['attribute_option_id'])) {
                         $attribute_option = AttributeOption::find($optionInputs['attribute_option_id']);
-                    }else{
-
-                        $attribute_option =  new AttributeOption();
+                    } else {
+                        $attribute_option = new AttributeOption();
                     }
                     $attribute_option->fill($optionInputs);
                     $attribute_option->save();
@@ -179,13 +194,8 @@ class AttributeController extends BaseController
 
                 }
             }
-
-
             return $this->successResponse($attribute, trans('core::app.response.update-success', ['name' => 'Attribute Family']));
-        } catch (DefaultFamilySlugCanNotBeModified $exception) {
-            return $this->errorResponse($exception->errors(), 400);
-
-        } catch (ValidationException $exception) {
+        }catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (QueryException $exception) {
@@ -216,6 +226,7 @@ class AttributeController extends BaseController
         }
 
     }
+
 
 
 }

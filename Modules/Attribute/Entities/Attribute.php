@@ -18,4 +18,11 @@ class Attribute extends Model
             'attribute_group_id' => 'nullable|exists:attribute_groups,id'
         ], $merge);
     }
+
+    public function attributeOptions()
+    {
+        return $this->hasMany(AttributeOption::class, 'attribute_option_id');
+
+    }
+
 }
