@@ -21,13 +21,11 @@ class CreateAttributesTable extends Migration
 
             $table->integer('attribute_group_id')->unsigned()->nullable();
             $table->foreign('attribute_group_id')->references('id')->on('attribute_groups')->onDelete('set null');
-
             $table->string('validation')->nullable();
             $table->integer('position')->nullable();
             $table->boolean('is_required')->default(0);
             $table->boolean('is_unique')->default(0);
             $table->boolean('is_filterable')->default(0);
-            $table->boolean('is_configurable')->default(0);
             $table->boolean('is_user_defined')->default(1);
             $table->boolean('is_visible_on_front')->default(0);
             $table->timestamps();

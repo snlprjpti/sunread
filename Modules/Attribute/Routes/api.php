@@ -30,19 +30,17 @@ Route::group(['middleware' => ['api']], function () {
         // Catalog Attribute Group Routes
         Route::get('/attribute-group', 'AttributeGroupController@index')->name('attribute-group.index');
         Route::post('/attribute-group', 'AttributeGroupController@store')->name('attribute-group.store');
-        Route::get('/attribute-group/{family}', 'AttributeGroupController@show')->name('attribute-group.show');
-        Route::post('/attribute-group/{family}', 'AttributeGroupController@update')->name('attribute-group.update');
-        Route::delete('/attribute-group/{family}', 'AttributeGroupController@destroy')->name('attribute-group.delete');
-        Route::get('/attribute-group/{family}/edit', 'AttributeGroupController@edit')->name('attribute-group.edit');
+        Route::get('/attribute-group/{attribute-group}', 'AttributeGroupController@show')->name('attribute-group.show');
+        Route::post('/attribute-group/{attribute-group}', 'AttributeGroupController@update')->name('attribute-group.update');
+        Route::delete('/attribute-group/{attribute-group}', 'AttributeGroupController@destroy')->name('attribute-group.delete');
 
 
         Route::get('/attributes', 'AttributeController@index')->name('attributes.index');
         Route::post('/attributes', 'AttributeController@store')->name('attributes.store');
-        Route::get('/attributes/{id}', 'AttributeController@store')->name('attributes.show');
-        Route::get('/attributes/edit/{id}', 'AttributeController@edit')->name('attributes.edit');
-        Route::put('/attributes/edit/{id}', 'AttributeController@update')->name('attributes.update');
-        Route::post('/attributes/delete/{id}', 'AttributeController@destroy')->name('attributes.delete');
-        Route::post('/attributes/massdelete', 'AttributeController@massDestroy')->name('attributes.massdelete');
+        Route::get('/attributes/{id}', 'AttributeController@show')->name('attributes.show');
+        Route::post('/attributes/{id}', 'AttributeController@update')->name('attributes.update');
+        Route::delete('/attributes/{id}', 'AttributeController@destroy')->name('attributes.delete');
+        Route::post('/attributes/mass-delete', 'AttributeController@massDestroy')->name('attributes.mass-delete');
 
 
     });
