@@ -16,7 +16,7 @@ class AttributeGroup extends Model
             array_merge([
                 'slug' => ['nullable', 'unique:attribute_groups,slug' . ($id ? ",$id" : '')],
                 'name' => 'required',
-                'attribute_family_id' => 'required'
+                'attribute_family_id' => 'required|exists:attribute_families,id'
             ], $merge);
         
     }

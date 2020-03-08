@@ -25,7 +25,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::get('/families/{family}', 'AttributeFamilyController@show')->name('families.show');
         Route::post('/families/{family}', 'AttributeFamilyController@update')->name('families.update');
         Route::delete('/families/{family}', 'AttributeFamilyController@destroy')->name('families.delete');
-        Route::get('/families/{family}/edit', 'AttributeFamilyController@edit')->name('families.edit');
+
 
         // Catalog Attribute Group Routes
         Route::get('/attribute-group', 'AttributeGroupController@index')->name('attribute-group.index');
