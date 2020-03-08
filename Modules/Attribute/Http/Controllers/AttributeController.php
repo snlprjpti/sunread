@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
-use Modules\Attribute\Entities\AttributeOptionTranslation;
-use Modules\Attribute\Entities\AttributeTranslation;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
 
@@ -81,7 +79,7 @@ class AttributeController extends BaseController
 
             //Validation
             $this->validate($request, Attribute::rules());
-            if (! in_array($request->get('type'), ['select', 'multiselect', 'checkbox'])) {
+            if (!in_array($request->get('type'), ['select', 'multiselect', 'checkbox'])) {
                 $request->merge([
                     'is_filterable' => 0
                 ]);
@@ -92,7 +90,6 @@ class AttributeController extends BaseController
                 $request->merge(['slug' => Attribute::createSlug($request->get('name'))]);
             }
 
-
             //store attribute
             $attribute = Attribute::create(
                 $request->only(
@@ -100,24 +97,23 @@ class AttributeController extends BaseController
                 )
             );
 
-
-            //store translation
-            $this->createOrUpdateTranslation($attribute, $request);
-
+            //store attribute translation
+            if (is_array($request->get('translations'))) {
+                $attribute->createUpdateTranslation($request->get('translations'));
+            }
 
             //store attribute-option and translation
             $options = $request->get('attribute_options');
-
             if (is_array($options) && in_array($attribute->type, ['select', 'multiselect', 'checkbox']) && count($options)) {
                 foreach ($options as $optionInputs) {
                     $attribute_option = AttributeOption::create(
-                            array_merge(
-                                $optionInputs,
-                                ['attribute_id' => $attribute->id]
-                            )
+                        array_merge(
+                            $optionInputs,
+                            ['attribute_id' => $attribute->id]
+                        )
                     );
 
-                    $this->createOrUpdateOptionTranslation($attribute_option, $optionInputs);
+                    $attribute_option->createUpdateOptionTranslation($optionInputs);
                 }
             }
 
@@ -131,32 +127,9 @@ class AttributeController extends BaseController
             return $this->errorResponse("Slugs could not be genereated");
 
         } catch (\Exception $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
-    }
-
-    private function createOrUpdateTranslation(Attribute $attribute, Request $request)
-    {
-        $translation_attributes = $request->get('translations');
-        if(isset($translation_attributes)){
-            foreach ($translation_attributes as $translation_attribute){
-                $check_attributes = ['locale' => $translation_attribute['locale'], 'attribute_id' => $attribute->id];
-                $attribute_translation = AttributeTranslation::firstorNew($check_attributes);
-                $attribute_translation->fill($translation_attribute);
-                $attribute_translation->save();
-            }
-        }
-
-    }
-
-    private function createOrUpdateOptionTranslation(AttributeOption $attribute_option, Array $optionInputs)
-    {
-        $check_attributes = ['locale' => $this->locale, 'attribute_option_id' => $attribute_option->id];
-        $optionInputs = array_merge($optionInputs, $check_attributes);
-        $option_translation = AttributeOptionTranslation::firstorNew($check_attributes);
-        $option_translation->fill($optionInputs);
-        $option_translation->save();
-
     }
 
     /**
@@ -169,39 +142,48 @@ class AttributeController extends BaseController
     public function update(Request $request, $id)
     {
         try {
+
+            //validation
             $this->validate($request, Attribute::rules($id));
 
+            //update attribute
             $attribute = Attribute::findOrFail($id);
-            $attribute = $attribute->update(
+            $attribute->update(
                 $request->only(
                     ['slug', 'name', 'type', 'position', 'is_required', 'is_unique', 'validation', 'is_filterable', 'is_visible_on_front', 'is_user_defined', 'swatch_type', 'use_in_flat']
                 )
             );
-            $this->createOrUpdateTranslation($attribute, $request);
+
+            //update attribute translation
+            $attribute->createUpdateTranslation($request->get('translations'));
 
             //store attribute-option and translation
-            $options = $request->get('options');
+            $options = $request->get('attribute_options');
+
             if (is_array($options) && in_array($attribute->type, ['select', 'multiselect', 'checkbox']) && count($options)) {
                 foreach ($options as $optionInputs) {
-                    if (isset($optionInputs['attribute_option_id'])) {
+
+                    if (isset($optionInputs['translation'])) {
                         $attribute_option = AttributeOption::find($optionInputs['attribute_option_id']);
                     } else {
                         $attribute_option = new AttributeOption();
                     }
+                    $optionInputs = array_merge($optionInputs, ['attribute_id' => $attribute->id]);
                     $attribute_option->fill($optionInputs);
                     $attribute_option->save();
-                    $this->createOrUpdateOptionTranslation($attribute_option, $optionInputs);
-
+                    $attribute_option->createUpdateOptionTranslation($optionInputs);
                 }
             }
+
             return $this->successResponse($attribute, trans('core::app.response.update-success', ['name' => 'Attribute Family']));
-        }catch (ValidationException $exception) {
+        } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
     }

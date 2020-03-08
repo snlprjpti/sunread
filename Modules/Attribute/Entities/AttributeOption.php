@@ -18,5 +18,22 @@ class AttributeOption extends Model
         return $this->belongsTo(Attribute::class);
     }
 
+    public function createUpdateOptionTranslation(Array $optionInputs)
+    {
+        if(isset($optionInputs['translations'])){
+            $translated_options = $optionInputs['translations'];
+            foreach ($translated_options as $translated_option){
+                $check_attributes = ['locale' => $translated_option['locale'], 'attribute_option_id' => $this->id];
+                $optionInputs = array_merge($translated_option, $check_attributes);
+                $option_translation = AttributeOptionTranslation::firstOrNew($check_attributes);
+                $option_translation->fill($optionInputs);
+                $option_translation->save();
+
+            }
+
+        }
+    }
+
+
 
 }
