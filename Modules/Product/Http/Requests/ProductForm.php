@@ -82,8 +82,8 @@ class ProductForm extends FormRequest
             'special_price' => ['nullable', 'decimal', 'lt:price']
         ]);
 
-        foreach ($product->getEditableAttributes() as $attribute) {
 
+        foreach ($product->getEditableAttributes() as $attribute) {
             if ($attribute->slug == 'sku' || $attribute->type == 'boolean')
                 continue;
 

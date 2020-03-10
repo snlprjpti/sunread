@@ -23,16 +23,11 @@ class ProductController extends BaseController
      * @param Product $product
      * @param Category $category
      */
-    public function __construct(
-        Product $product,
-        Category $category
-
-    )
+    public function __construct()
     {
         parent::__construct();
         $this->middleware('admin');
-        $this->product = $product;
-        $this->category = $category;
+
     }
 
     /**
@@ -62,8 +57,8 @@ class ProductController extends BaseController
     public function show($id)
     {
         try {
-            $product = $this->product->with(['variants'])->findOrFail($id);
-            $category_tree = $this->category->getCategoryTree();
+            $product = Product::with(['variants'])->findOrFail($id);
+            $category_tree = (new Category())->getCategoryTree();
             $payload = ['product' => $product,'category_tree' => $category_tree];
             return $this->successResponse($payload);
 
@@ -84,6 +79,7 @@ class ProductController extends BaseController
                 'attribute_family_id' => 'required',
                 'sku' => ['required', 'unique:products,sku']
             ]);
+
 
             Event::dispatch('catalog.product.create.before');
 
@@ -109,27 +105,33 @@ class ProductController extends BaseController
 
     public function update(ProductForm $request, $id)
     {
-         $this->product->update(request()->all(), $id);
+        try{
+
+            $product = Product::findOrFail($id);
+            $product->update(request()->all(), $id);
+
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse($exception->getMessage(), 404);
+
+        } catch (\Exception $exception) {
+            return $this->errorResponse($exception->getMessage());
+        }
 
     }
 
     public function destroy($id)
     {
         try {
-            $this->product->findOrFail($id);
-            $this->product->delete($id);
+            $product = Product::findOrFail($id);
+            $product->delete($id);
             return $this->successResponseWithMessage("Product deleted success!!");
         } catch (\Exception $exception) {
-            session()->flash('error', trans('admin::app.response.delete-failed', ['name' => 'Product']));
             return $this->errorResponse($exception->getMessage());
         }
 
 
+
     }
-
-
-
-
 
 }
 
