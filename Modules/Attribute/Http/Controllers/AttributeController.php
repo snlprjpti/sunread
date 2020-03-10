@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
+
+use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
+use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
 
@@ -90,6 +93,8 @@ class AttributeController extends BaseController
                 $request->merge(['slug' => Attribute::createSlug($request->get('name'))]);
             }
 
+            $this->checkCustomCustomValidation($request);
+
             //store attribute
             $attribute = Attribute::create(
                 $request->only(
@@ -112,7 +117,6 @@ class AttributeController extends BaseController
                             ['attribute_id' => $attribute->id]
                         )
                     );
-
                     $attribute_option->createUpdateOptionTranslation($optionInputs);
                 }
             }
@@ -145,6 +149,9 @@ class AttributeController extends BaseController
 
             //validation
             $this->validate($request, Attribute::rules($id));
+
+            // custom validation
+            $this->checkCustomCustomValidation($request);
 
             //update attribute
             $attribute = Attribute::findOrFail($id);
@@ -196,6 +203,7 @@ class AttributeController extends BaseController
     public function destroy($id)
     {
         try {
+
             $attribute = Attribute::findOrFail($id);
             $attribute->delete();
             return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Attribute Family']));
@@ -209,6 +217,44 @@ class AttributeController extends BaseController
 
     }
 
+    public function checkCustomCustomValidation($request)
+    {
+        $translations = $request->get('translations');
+
+        //check attribute translation
+        $isAttributeTranslationExist = $this->checkIfTranslationExist($translations);
+        if (!$isAttributeTranslationExist) {
+            throw new AttributeTranslationDoesNotExist();
+        }
+
+        //check options translations
+        $options = $request->get('attribute_options');
+
+        if (is_array($options) && in_array($request->type, ['select', 'multiselect', 'checkbox'])) {
+            foreach ($options as $option) {
+                if (!isset($option['translations'])) {
+                    throw new AttributeTranslationOptionDoesNotExist();
+                }
+                $isOptionTranslationExist = $this->checkIfTranslationExist($translations);
+                if (!$isOptionTranslationExist) {
+                    throw new  AttributeTranslationOptionDoesNotExist();
+                }
+            }
+        }
+    }
+
+
+    public function checkIfTranslationExist($translations)
+    {
+        $locale_variable_present = true;
+        foreach ($translations as $translation) {
+            if (!array_key_exists('locale', $translation)) {
+                return $locale_variable_present = false;
+            }
+        }
+        return $locale_variable_present;
+
+    }
 
 
 }
