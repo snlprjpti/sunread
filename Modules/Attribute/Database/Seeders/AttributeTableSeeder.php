@@ -76,6 +76,7 @@ class AttributeTableSeeder extends Seeder
             //initialising via constructor to allow only fillable columns
             $attribute = Attribute::firstOrNew(['id' => $array['id']]);
             $attribute->fill($array);
+            $attribute->id = $array['id'];
             $attribute->save();
 
         }
