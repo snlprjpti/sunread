@@ -14,12 +14,12 @@ class CreateAttributesTable extends Migration
     public function up()
     {
         Schema::create('attributes', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('slug')->unique();
             $table->string('name');
             $table->string('type');
 
-            $table->integer('attribute_group_id')->unsigned()->nullable();
+            $table->bigInteger('attribute_group_id')->unsigned()->nullable();
             $table->foreign('attribute_group_id')->references('id')->on('attribute_groups')->onDelete('set null');
             $table->string('validation')->nullable();
             $table->integer('position')->nullable();

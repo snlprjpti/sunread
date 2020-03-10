@@ -14,10 +14,10 @@ class CreateAttributeOptionTranslationsTable extends Migration
     public function up()
     {
         Schema::create('attribute_option_translations', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('locale');
-            $table->text('label')->nullable();
-            $table->integer('attribute_option_id')->unsigned();
+            $table->text('name')->nullable();
+            $table->bigInteger('attribute_option_id')->unsigned();
             $table->unique(['attribute_option_id', 'locale']);
             $table->foreign('attribute_option_id')->references('id')->on('attribute_options')->onDelete('cascade');
         });

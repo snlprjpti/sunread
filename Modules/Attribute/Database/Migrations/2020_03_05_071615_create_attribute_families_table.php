@@ -14,7 +14,7 @@ class CreateAttributeFamiliesTable extends Migration
     public function up()
     {
         Schema::create('attribute_families', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('slug');
             $table->string('name');
             $table->boolean('status')->default(0);

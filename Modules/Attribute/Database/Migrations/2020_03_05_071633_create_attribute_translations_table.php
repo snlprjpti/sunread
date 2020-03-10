@@ -14,10 +14,10 @@ class CreateAttributeTranslationsTable extends Migration
     public function up()
     {
         Schema::create('attribute_translations', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('locale');
             $table->text('name')->nullable();
-            $table->integer('attribute_id')->unsigned();
+            $table->bigInteger('attribute_id')->unsigned();
             $table->unique(['attribute_id', 'locale']);
             $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
         });

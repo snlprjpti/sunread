@@ -14,10 +14,10 @@ class CreateAttributeOptionsTable extends Migration
     public function up()
     {
         Schema::create('attribute_options', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('name')->nullable();
-            $table->integer('sort_order')->nullable();
-            $table->integer('attribute_id')->unsigned();
+            $table->integer('position')->nullable();
+            $table->bigInteger('attribute_id')->unsigned();
             $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
         });
     }
