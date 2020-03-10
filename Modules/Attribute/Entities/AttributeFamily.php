@@ -22,4 +22,13 @@ class AttributeFamily extends Model
     {
         return $this->hasMany(AttributeGroup::class, 'attribute_family_id');
     }
+
+    public function custom_attributes()
+    {
+        return (Attribute::class)
+            ->join('attribute_groups', 'attributes.attribute_group_id', '=', 'attribute_groups.id')
+            ->join('attribute_families', 'attribute_groups.attribute_family_id', '=', 'attribute_families.id')
+            ->where('attribute_families.id', $this->id)
+            ->select('attributes.*');
+    }
 }

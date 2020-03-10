@@ -16,6 +16,9 @@ class AttributeDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call(AttributeFamilyTableSeeder::class);
+        $this->call(AttributeGroupTableSeeder::class);
+        $this->call(AttributeTableSeeder::class);
+        $this->call(AttributeOptionTableSeeder::class);
     }
 }

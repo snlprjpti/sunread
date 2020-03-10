@@ -25,7 +25,7 @@ class CreateProductsTable extends Migration
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->unsignedBigInteger('attribute_family_id')->nullable();
             $table->foreign('parent_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('attribute_family_id')->references('id')->on('attribute_families')->onDelete('set null');
+            $table->foreign('attribute_family_id')->references('id')->on('attribute_families')->onDelete('restrict');
         });
 
         Schema::create('product_categories', function (Blueprint $table) {

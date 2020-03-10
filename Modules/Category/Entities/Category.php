@@ -61,4 +61,17 @@ class Category extends Model
         return $this->hasMany(CategoryTranslation::class,'category_id');
     }
 
+    /**
+     * Specify category tree
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function getCategoryTree()
+    {
+        return $this->id
+            ? $this::orderBy('position', 'ASC')->where('id', '!=', $this->id)->get()->toTree()
+            : $this::orderBy('position', 'ASC')->get()->toTree();
+    }
+
 }
