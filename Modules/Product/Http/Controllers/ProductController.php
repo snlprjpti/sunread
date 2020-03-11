@@ -122,7 +122,7 @@ class ProductController extends BaseController
             //update the product according to type
             $product = $productInstance->update($request->all(), $id);
 
-            //Event Log
+            //Event complete Log
             Event::dispatch('catalog.product.update.after', $product);
 
             return $this->successResponse($product,trans('core::app.response.update-success', ['name' => 'Product']));
@@ -149,8 +149,6 @@ class ProductController extends BaseController
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
         }
-
-
 
     }
 
