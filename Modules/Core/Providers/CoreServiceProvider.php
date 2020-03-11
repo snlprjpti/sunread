@@ -3,6 +3,7 @@
 namespace Modules\Core\Providers;
 
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Core\Http\Middleware\Language;
@@ -25,6 +26,8 @@ class CoreServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'core');
         $this->loadMigrationsFrom(module_path('Core', 'Database/Migrations'));
         $router->aliasMiddleware('language', Language::class);
+
+        Validator::extend('decimal', 'Modules\Core\Contracts\Validations\Decimal@passes');
     }
 
     /**

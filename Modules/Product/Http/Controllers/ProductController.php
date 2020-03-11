@@ -10,7 +10,6 @@ use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\Category;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Entities\Product;
-use Modules\Product\Http\Requests\ProductForm;
 
 class ProductController extends BaseController
 {
@@ -23,10 +22,11 @@ class ProductController extends BaseController
      * @param Product $product
      * @param Category $category
      */
-    public function __construct()
+    public function __construct(Product $product)
     {
         parent::__construct();
         $this->middleware('admin');
+        $this->product = $product;
 
     }
 
@@ -80,40 +80,61 @@ class ProductController extends BaseController
                 'sku' => ['required', 'unique:products,sku']
             ]);
 
-
             Event::dispatch('catalog.product.create.before');
 
-            $typeInstance = app(config('product_types.' . $request->get('type'). '.class'));
+            $typeInstance =  $this->product->getTypeInstance($request->get('type'));
 
             $product = $typeInstance->create($request->all());
 
             Event::dispatch('catalog.product.create.after', $product);
 
-            return $this->successResponse($product, trans('core::app.response.create-success', ['name' => 'Product']), 201);
+            return $this->successResponse($payload = $product, trans('core::app.response.create-success', ['name' => 'Product']), 201);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (QueryException $exception) {
-            return $this->errorResponse($exception->errors(), 400);
+            return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
+
             return $this->errorResponse($exception->getMessage());
         }
     }
 
 
-    public function update(ProductForm $request, $id)
+    public function update(Request $request, $id)
     {
+
         try{
 
-            $product = Product::findOrFail($id);
-            $product->update(request()->all(), $id);
+            $product = $this->product->findOrFail($id);
+
+            //Event start Log
+            Event::dispatch('catalog.product.update.before', $id);
+
+            //validation
+            $this->validate($request,Product::rules($id));
+
+            //Get the type of product to update
+            $productInstance = $product->getTypeInstance();
+
+            //update the product according to type
+            $product = $productInstance->update($request->all(), $id);
+
+            //Event Log
+            Event::dispatch('catalog.product.update.after', $product);
+
+            return $this->successResponse($product,trans('core::app.response.update-success', ['name' => 'Product']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
 
-        } catch (\Exception $exception) {
+        } catch (ValidationException $exception) {
+            return $this->errorResponse($exception->errors(), 422);
+
+        }catch (\Exception $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
 

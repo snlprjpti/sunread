@@ -1,17 +1,18 @@
 <?php
 
-namespace Webkul\Product\Type;
+namespace Modules\Product\Type;
 
-use Webkul\Product\Models\ProductAttributeValue;
-use Webkul\Product\Models\ProductFlat;
+use Modules\Product\Entities\ProductAttributeValue;
+use Modules\Product\Entities\ProductFlat;
 use Illuminate\Support\Str;
 
 /**
  * Class Configurable.
  *
- * @author    Jitendra Singh <jitendra@webkul.com>
- * @copyright 2018 Webkul Software Pvt Ltd (http://www.webkul.com)
+ * @author    Hemant Achhami
+ * @copyright 2020 Hazesoft co
  */
+
 class Configurable extends AbstractType
 {
     /**

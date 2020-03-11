@@ -3,6 +3,7 @@
 namespace Modules\Attribute\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Modules\Core\Traits\SlugAble;
 
 class AttributeFamily extends Model
@@ -25,7 +26,7 @@ class AttributeFamily extends Model
 
     public function custom_attributes()
     {
-        return (Attribute::class)
+        return DB::table('attributes')
             ->join('attribute_groups', 'attributes.attribute_group_id', '=', 'attribute_groups.id')
             ->join('attribute_families', 'attribute_groups.attribute_family_id', '=', 'attribute_families.id')
             ->where('attribute_families.id', $this->id)

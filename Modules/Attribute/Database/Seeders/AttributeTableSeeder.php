@@ -24,39 +24,57 @@ class AttributeTableSeeder extends Seeder
 
             ['id' => '2','slug' => 'name','name' => 'Name','type' => 'text','validation' => NULL,'position' => '2','is_required' => '1','is_unique' => '0','value_per_locale' => '1','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
-            ['id' => '3','slug' => 'url_key','name' => 'URL Key','type' => 'text','validation' => NULL,'position' => '3','is_required' => '1','is_unique' => '1','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
+
+            ['id' => '3','slug' => 'old_price','name' => 'Old Price','type' => 'price','validation' => NULL,'position' => '3','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '1',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
-            ['id' => '4','slug' => 'tax_category_id','name' => 'Tax Category','type' => 'select','validation' => NULL,'position' => '4','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
-            'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
+//            ['id' => '4','slug' => 'tax_category_id','name' => 'Tax Category','type' => 'select','validation' => NULL,'position' => '4','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
+//            'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '5','slug' => 'new','name' => 'New','type' => 'boolean','validation' => NULL,'position' => '5','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '6','slug' => 'featured','name' => 'Featured','type' => 'boolean','validation' => NULL,'position' => '6','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '7','slug' => 'visible_individually','name' => 'Visible Individually','type' => 'boolean','validation' => NULL,'position' => '7','is_required' => '1','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0','created_at' => $now,
             'use_in_flat' => '1','updated_at' => $now],
+
             ['id' => '8','slug' => 'status','name' => 'Status','type' => 'boolean','validation' => NULL,'position' => '8','is_required' => '1','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '9','slug' => 'short_description','name' => 'Short Description','type' => 'textarea','validation' => NULL,'position' => '9','is_required' => '1','is_unique' => '0','value_per_locale' => '1','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0',
             'is_visible_on_front' => '0','use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '10','slug' => 'description','name' => 'Description','type' => 'textarea','validation' => NULL,'position' => '10','is_required' => '1','is_unique' => '0','value_per_locale' => '1','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '11','slug' => 'price','name' => 'Price','type' => 'price','validation' => 'decimal','position' => '11','is_required' => '1','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '1','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '12','slug' => 'cost','name' => 'Cost','type' => 'price','validation' => 'decimal','position' => '12','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '1','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '13','slug' => 'special_price','name' => 'Special Price','type' => 'price','validation' => 'decimal','position' => '13','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0','use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '14','slug' => 'special_price_from','name' => 'Special Price From','type' => 'date','validation' => NULL,'position' => '14','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0','use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '15','slug' => 'special_price_to','name' => 'Special Price To','type' => 'date','validation' => NULL,'position' => '15','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0',
-            'use_in_flat' => '1','is_visible_on_front' => '0','created_at' => $now,'updated_at' => $now],
+                'use_in_flat' => '1','is_visible_on_front' => '0','created_at' => $now,'updated_at' => $now],
+
             ['id' => '16','slug' => 'meta_title','name' => 'Meta Title','type' => 'textarea','validation' => NULL,'position' => '16','is_required' => '0','is_unique' => '0','value_per_locale' => '1','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '17','slug' => 'meta_keywords','name' => 'Meta Keywords','type' => 'textarea','validation' => NULL,'position' => '17','is_required' => '0','is_unique' => '0','value_per_locale' => '1','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
-            'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+                'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
             ['id' => '18','slug' => 'meta_description','name' => 'Meta Description','type' => 'textarea','validation' => NULL,'position' => '18','is_required' => '0','is_unique' => '0','value_per_locale' => '1','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '1','is_visible_on_front' => '0','use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '19','slug' => 'width','name' => 'Width','type' => 'text','validation' => 'decimal','position' => '19','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '1','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '20','slug' => 'height','name' => 'Height','type' => 'text','validation' => 'decimal','position' => '20','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '1','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
             ['id' => '21','slug' => 'depth','name' => 'Depth','type' => 'text','validation' => 'decimal','position' => '21','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '1','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
             ['id' => '22','slug' => 'weight','name' => 'Weight','type' => 'text','validation' => 'decimal','position' => '22','is_required' => '1','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
@@ -85,8 +103,8 @@ class AttributeTableSeeder extends Seeder
         DB::table('attribute_translations')->insert([
            ['id' => '1','locale' => 'en','name' => 'SKU','attribute_id' => '1'],
            ['id' => '2','locale' => 'en','name' => 'Name','attribute_id' => '2'],
-           ['id' => '3','locale' => 'en','name' => 'URL Key','attribute_id' => '3'],
-           ['id' => '4','locale' => 'en','name' => 'Tax Category','attribute_id' => '4'],
+           ['id' => '3','locale' => 'en','name' => 'old_price','attribute_id' => '3'],
+          // ['id' => '4','locale' => 'en','name' => 'Tax Category','attribute_id' => '4'],
            ['id' => '5','locale' => 'en','name' => 'New','attribute_id' => '5'],
            ['id' => '6','locale' => 'en','name' => 'Featured','attribute_id' => '6'],
            ['id' => '7','locale' => 'en','name' => 'Visible Individually','attribute_id' => '7'],
@@ -116,8 +134,8 @@ class AttributeTableSeeder extends Seeder
         $attribute_groups_mapping =   [
             ['attribute_id' => '1','attribute_group_id' => '1','position' => '1'],
             ['attribute_id' => '2','attribute_group_id' => '1','position' => '2'],
-            ['attribute_id' => '3','attribute_group_id' => '1','position' => '3'],
-            ['attribute_id' => '4','attribute_group_id' => '1','position' => '4'],
+         //   ['attribute_id' => '3','attribute_group_id' => '1','position' => '3'],
+           // ['attribute_id' => '4','attribute_group_id' => '1','position' => '4'],
             ['attribute_id' => '5','attribute_group_id' => '1','position' => '5'],
             ['attribute_id' => '6','attribute_group_id' => '1','position' => '6'],
             ['attribute_id' => '7','attribute_group_id' => '1','position' => '7'],

@@ -5,8 +5,8 @@ namespace Modules\Product\Type;
 /**
  * Class Simple.
  *
- * @author    Jitendra Singh <jitendra@webkul.com>
- * @copyright 2018 Webkul Software Pvt Ltd (http://www.webkul.com)
+ * @author  Hemant Achhami
+ * @copyright 2020 Hazesoft co
  */
 class Simple extends AbstractType
 {
@@ -17,18 +17,7 @@ class Simple extends AbstractType
      */
     protected $skipAttributes = [];
 
-    /**
-     * These blade files will be included in product edit page
-     *
-     * @var array
-     */
-    protected $additionalViews = [
-        'admin::catalog.products.accordians.inventories',
-        'admin::catalog.products.accordians.images',
-        'admin::catalog.products.accordians.categories',
-        'admin::catalog.products.accordians.channels',
-        'admin::catalog.products.accordians.product-links',
-    ];
+
 
     /**
      * Show quantity box
@@ -63,4 +52,5 @@ class Simple extends AbstractType
        // $backorders = core()->getConfigData('catalog.inventory.stock_options.backorders');
        // return $qty <= $this->totalQuantity() ? true : $backorders;
     }
+
 }

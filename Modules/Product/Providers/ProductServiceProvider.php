@@ -37,12 +37,14 @@ class ProductServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-        $this->publishes([
-            module_path('Product', 'Config/config.php') => config_path('product.php'),
-        ], 'config');
+        $this->publishes([module_path('Product', 'Config/config.php') => config_path('product.php')], 'config');
+
         $this->mergeConfigFrom(
             module_path('Product', 'Config/config.php'), 'product'
         );
+
+        $this->mergeConfigFrom(module_path('Product', 'Config/product_types.php'), 'product_types');
+
     }
 
 

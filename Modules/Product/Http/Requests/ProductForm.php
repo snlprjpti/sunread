@@ -2,15 +2,13 @@
 
 namespace Modules\Product\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-
-use Illuminate\Validation\Validator;
 use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Product\Entities\Product;
-
 use Modules\Product\Entities\ProductAttributeValue;
 
 
@@ -28,7 +26,7 @@ class ProductForm extends FormRequest
      *
      * @var array
      */
-    protected $product;
+   // protected $product;
 
     /**
      * ProductAttributeValueRepository object
@@ -44,14 +42,14 @@ class ProductForm extends FormRequest
      * @param Product $product
      * @param \Modules\Product\Http\Requests\ProductAttributeValue $productAttributeValue
      */
-    public function __construct(AttributeFamily $attributeFamily, Product $product, ProductAttributeValue $productAttributeValue)
-    {
-        $this->attributeFamily = $attributeFamily;
-
-        $this->product = $product;
-
-       $this->attributeValue = $productAttributeValue;
-    }
+//    public function __construct(AttributeFamily $attributeFamily, Product $product, ProductAttributeValue $productAttributeValue)
+//    {
+//        $this->attributeFamily = $attributeFamily;
+//
+//        $this->product = $product;
+//
+//       $this->attributeValue = $productAttributeValue;
+//    }
 
     protected $rules;
 
@@ -72,14 +70,16 @@ class ProductForm extends FormRequest
      */
     public function rules()
     {
-        $product = $this->product->find($this->id);
-        
+
+        $product = Product::findOrFail($this->id);
+
+
         $this->rules = array_merge($product->getTypeInstance()->getTypeValidationRules(), [
             'sku' => ['required', 'unique:products,sku,' . $this->id],
             'images.*' => 'mimes:jpeg,jpg,bmp,png',
             'special_price_from' => 'nullable|date',
             'special_price_to' => 'nullable|date|after_or_equal:special_price_from',
-            'special_price' => ['nullable', 'decimal', 'lt:price']
+            'special_price' => ['nullable', 'decimal']
         ]);
 
 

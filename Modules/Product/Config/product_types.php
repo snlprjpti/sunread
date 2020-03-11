@@ -13,28 +13,6 @@ return [
         'class' => 'Modules\Product\Type\Configurable',
         'sort' => 2
     ],
-    'virtual' => [
-        'key' => 'virtual',
-        'name' => 'Virtual',
-        'class' => 'Modules\Product\Type\Virtual',
-        'sort' => 3
-    ],
-    'grouped' => [
-        'key' => 'grouped',
-        'name' => 'Grouped',
-        'class' => 'Modules\Product\Type\Grouped',
-        'sort' => 4
-    ],
-    'downloadable' => [
-        'key' => 'downloadable',
-        'name' => 'Downloadable',
-        'class' => 'Modules\Product\Type\Downloadable',
-        'sort' => 5
-    ],
-    'bundle' => [
-        'key' => 'bundle',
-        'name' => 'Bundle',
-        'class' => 'Modules\Product\Type\Bundle',
-        'sort' => 6
-    ]
+
+    //TODO FUTURE:: Add more product types here
 ];
