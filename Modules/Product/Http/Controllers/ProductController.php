@@ -114,7 +114,10 @@ class ProductController extends BaseController
             Event::dispatch('catalog.product.update.before', $id);
 
             //validation
-            $this->validate($request,Product::rules($id));
+            $this->validate($request,Product::rules($id,[
+                'main_image' => 'required|mimes:jpeg,jpg,bmp,png',
+                'gallery_images.*' => 'nullable|mimes:jpeg,jpg,bmp,png',
+                ]));
 
             //Get the type of product to update
             $productInstance = $product->getTypeInstance();

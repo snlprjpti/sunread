@@ -99,9 +99,10 @@ class Product extends Model
 
     /**
      * @param int $id
+     * @param array $merge
      * @return array
      */
-    public static function rules($id = 0)
+    public static function rules($id = 0,$merge = [])
     {
 
         $product = Product::findOrFail($id);
@@ -109,12 +110,11 @@ class Product extends Model
         //static validation
         $rules = array_merge($product->getTypeInstance()->getTypeValidationRules(), [
             'sku' => ['required', 'unique:products,sku' . ($id ? ",$id" : '')],
-            //'images.*' => 'mimes:jpeg,jpg,bmp,png',
             'price' => 'required',
             'special_price_from' => 'nullable|date',
             'special_price_to' => 'nullable|date|after_or_equal:special_price_from',
             'special_price' => ['nullable', 'decimal']
-        ]);
+        ],$merge);
 
         //Dynamic validation based on attribute
         $custom_attributes = $product->getEditableAttributes();

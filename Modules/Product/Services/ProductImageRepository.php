@@ -82,8 +82,6 @@ class ProductImageRepository
         try {
             $gallery_images = [];
             $this->createFolderIfNotExist($this->folder_path);
-
-            //Storing Files
             if ($files = request()->hasFile('gallery_images')) {
                 foreach ($files as $file) {
                     $fileName = $this->getFileName($file);
