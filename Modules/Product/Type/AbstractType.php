@@ -43,8 +43,8 @@ abstract class AbstractType
     /**
      * @param array $data
      * @param $id
-     * @param string $attribute
      * @return Product
+     * @throws \Exception
      */
     public function update(array $data, $id)
     {
@@ -66,7 +66,6 @@ abstract class AbstractType
                 $productAttribute = ProductAttributeValue::firstOrNew([
                     'product_id' => $product->id,
                     'attribute_id' => $attribute->id,
-
                 ]);
 
                 $productAttribute->fill(
@@ -86,10 +85,7 @@ abstract class AbstractType
 
             $this->productImage->uploadProductImages($data, $product);
 
-
-
-            //TODO::future
-            //Update cross-sell, up-sells, related_products, inventories(docs)
+            //TODO::future => Update cross-sell, up-sells, related_products, inventories
 
             return $product;
 
@@ -145,12 +141,9 @@ abstract class AbstractType
         return $this;
     }
 
-//
 
-    public function priceRuleCanBeApplied()
-    {
-        return true;
-    }
+
+
 
     /**
      * Return true if this product type is saleable
