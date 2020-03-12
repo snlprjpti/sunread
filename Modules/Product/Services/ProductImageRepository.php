@@ -106,15 +106,30 @@ class ProductImageRepository
 
     }
 
-    public function removeProductImage($productImageId)
+    public function removeProductImages($product)
     {
-        $productImage = ProductImage::find($productImageId);
+        $productImages = $product->images;
+        if(isset($productImages) && $productImages->count()>0){
+            foreach ($productImages as $productImage){
+                if (file_exists($this->folder_path . $productImage->image)) {
+                    unlink(($this->folder_path . $productImage->image));
+                }
+                $productImage->delete();
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    public function removeParticularProductImage($productImage)
+    {
         if ($productImage) {
             if (file_exists($this->folder_path . $productImage->image)) {
                 unlink(($this->folder_path . $productImage->image));
-            }
             $productImage->delete();
             return true;
+            }
         }
         return false;
     }

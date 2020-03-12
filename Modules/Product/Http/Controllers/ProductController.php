@@ -10,24 +10,24 @@ use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\Category;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Entities\Product;
+use Modules\Product\Services\ProductImageRepository;
 
 class ProductController extends BaseController
 {
 
     protected $pagination_limit;
-    protected $product,$category;
-
+    protected $product,$productImage;
     /**
      * UserController constructor.
      * @param Product $product
      * @param Category $category
      */
-    public function __construct(Product $product)
+    public function __construct(Product $product,ProductImageRepository $productImage)
     {
         parent::__construct();
         $this->middleware('admin');
         $this->product = $product;
-
+        $this->productImage = $productImage;
     }
 
     /**
@@ -145,15 +145,22 @@ class ProductController extends BaseController
     {
         try {
             $product = Product::findOrFail($id);
+
+            //categories,attributes deleted at database level
+            //removing image only
+            $this->productImage->removeProductImages($product);
+
             $product->delete($id);
+
             return $this->successResponseWithMessage("Product deleted success!!");
-        } catch (\Exception $exception) {
+        } catch (ModelNotFoundException $exception){
+            return $this->errorResponse($exception->getMessage(), 404);
+
+        }catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
         }
 
     }
-
-
 
 }
 

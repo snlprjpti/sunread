@@ -29,15 +29,15 @@ class ProductImageController extends BaseController
     public function removeFile($productImageId)
     {
         try {
-
-            $isProductImageRemoved = $this->productImage->removeProductImage($productImageId);
+            $productImage =  ProductImage::findOrFail($productImageId);
+            $isProductImageRemoved = $this->productImage->removeParticularProductImage($productImage);
             if(!$isProductImageRemoved){
                 throw new ProductImageDeleteException();
             }
             return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Product Image']));
 
         } catch (ProductImageDeleteException $exception) {
-            return $this->errorResponse($exception->getMessage(),404);
+            return $this->errorResponse("Image Could not be deleted", 500);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
