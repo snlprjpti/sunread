@@ -27,6 +27,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(module_path('Core', 'Database/Migrations'));
         $router->aliasMiddleware('language', Language::class);
 
+        include __DIR__ . '/../Helpers/helpers.php';
         Validator::extend('decimal', 'Modules\Core\Contracts\Validations\Decimal@passes');
     }
 

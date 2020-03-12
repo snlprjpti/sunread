@@ -4,6 +4,7 @@ namespace Modules\Product\Entities;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Category\Entities\Category;
 
@@ -154,6 +155,14 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class, 'product_id');
+    }
+
+    /**
+     * The super attributes that belong to the product.
+     */
+    public function super_attributes()
+    {
+        return $this->belongsToMany(Attribute::class, 'product_super_attributes');
     }
 
 

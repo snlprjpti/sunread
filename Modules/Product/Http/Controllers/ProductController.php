@@ -72,6 +72,7 @@ class ProductController extends BaseController
 
     public function store(Request $request)
     {
+
         try {
 
             $this->validate($request, [
@@ -97,7 +98,7 @@ class ProductController extends BaseController
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
-
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
     }
