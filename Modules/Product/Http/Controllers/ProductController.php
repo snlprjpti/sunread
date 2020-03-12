@@ -122,6 +122,7 @@ class ProductController extends BaseController
             //update the product according to type
             $product = $productInstance->update($request->all(), $id);
 
+
             //Event complete Log
             Event::dispatch('catalog.product.update.after', $product);
 

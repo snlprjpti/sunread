@@ -148,5 +148,13 @@ class Product extends Model
 
     }
 
+    /**
+     * The images that belong to the product.
+     */
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id');
+    }
+
 
 }

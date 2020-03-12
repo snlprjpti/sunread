@@ -35,6 +35,7 @@ trait FileManager
 
     private function createFolderIfNotExist($path)
     {
+        //linux assumes dir and file as same
         if (!file_exists($path)) {
             File::makeDirectory($path, $mode = 0755, true, true);
         }
@@ -45,6 +46,23 @@ trait FileManager
         if (file_exists($path)) {
             unlink($path);
         }
+    }
+
+    public function getFileName(UploadedFile $file)
+    {
+
+        //Saving a file with original for better SEO
+        $filenameWithExt = $file->getClientOriginalName();
+
+        // Get just filename
+        $filenameWithoutExt = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+
+        // Get just extension
+        $extension = $file->getClientOriginalExtension();
+
+        //Filename to store
+        return $filenameWithoutExt . '_' . time() . Str::random(5) . '.' . $extension;
+
     }
 
 

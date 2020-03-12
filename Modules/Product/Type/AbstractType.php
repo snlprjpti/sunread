@@ -6,6 +6,8 @@ use Illuminate\Database\QueryException;
 use Modules\Core\Traits\FileManager;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttributeValue;
+use Modules\Product\Entities\ProductImage;
+use Modules\Product\Services\ProductImageRepository;
 
 
 /**
@@ -16,17 +18,16 @@ use Modules\Product\Entities\ProductAttributeValue;
  */
 abstract class AbstractType
 {
-
     use FileManager;
 
-    protected $product, $folder_path;
+    protected $product, $folder_path,$productImage;
     private $folder = 'product';
 
-    public function __construct(Product $product)
+    public function __construct(Product $product,ProductImageRepository $productImage)
     {
         $this->product = $product;
         $this->folder_path = storage_path('app/public/images/') . $this->folder . DIRECTORY_SEPARATOR;
-
+        $this->productImage =  $productImage;
     }
 
     /**
@@ -83,6 +84,7 @@ abstract class AbstractType
                 $product->categories()->sync($data['categories']);
             }
 
+            $this->productImage->uploadProductImages($data, $product);
 
 
 
@@ -183,5 +185,7 @@ abstract class AbstractType
     {
         return [];
     }
+
+
 
 }
