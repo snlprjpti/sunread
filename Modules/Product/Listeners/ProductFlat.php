@@ -165,7 +165,7 @@ class ProductFlat
             $productAttributeValue = $product->attribute_values()->where('attribute_id', $attribute->id)->first();
 
 
-            $productFlat->{$attribute->slug} = $productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]] ?? null;
+            $productFlat->{$attribute->slug} = isset($productAttributeValue)?$productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]] ?? null:null;
 
             if ($attribute->type == 'select') {
                 $attributeOption = AttributeOption::find($product->{$attribute->slug});
