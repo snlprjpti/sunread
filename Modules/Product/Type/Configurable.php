@@ -17,14 +17,7 @@ use Modules\Product\Repositories\ProductAttributeValueRepository;
 
 class Configurable extends AbstractType
 {
-    protected $product,$attribute_model,$product_attribute_model, $attributeValueRepository;
 
-    public function __construct(Product $product,Attribute $attribute_model,ProductAttributeValueRepository $attributeValueRepository)
-    {
-        $this->product = $product;
-        $this->attribute_model = $attribute_model;
-        $this->attributeValueRepository = $attributeValueRepository;
-    }
 
     /**
      * Skip attribute for downloadable product type
@@ -39,7 +32,7 @@ class Configurable extends AbstractType
      * @param array $data
      * @return Product
      */
-    public function create(array $data)
+    public function create(array $data):Product
     {
         //create parent configurable product item
         $product = $this->product->create($data);
@@ -72,35 +65,35 @@ class Configurable extends AbstractType
      * @param string $attribute
      * @return Product
      */
-    public function update(array $data, $id, $attribute = "id")
+    public function update(array $data, $id, $attribute = "id"):Product
     {
         $product = parent::update($data, $id, $attribute);
 
-        if (request()->route()->getName() != 'admin.catalog.products.massupdate') {
-            $previousVariantIds = $product->variants->pluck('id');
 
-            if (isset($data['variants'])) {
-                foreach ($data['variants'] as $variantId => $variantData) {
-                    if (Str::contains($variantId, 'variant_')) {
-                        $permutation = [];
+        $previousVariantIds = $product->variants->pluck('id');
 
-                        foreach ($product->super_attributes as $superAttribute) {
-                            $permutation[$superAttribute->id] = $variantData[$superAttribute->slug];
-                        }
-                        $this->createVariant($product, $permutation, $variantData);
-                    } else {
-                        if (is_numeric($index = $previousVariantIds->search($variantId)))
-                            $previousVariantIds->forget($index);
+        if (isset($data['variants'])) {
+            foreach ($data['variants'] as $variantId => $variantData) {
+                if (Str::contains($variantId, 'variant_')) {
+                    $permutation = [];
 
-                        $this->updateVariant($variantData, $variantId);
+                    foreach ($product->super_attributes as $superAttribute) {
+                        $permutation[$superAttribute->id] = $variantData[$superAttribute->slug];
                     }
+                    $this->createVariant($product, $permutation, $variantData);
+                } else {
+                    if (is_numeric($index = $previousVariantIds->search($variantId)))
+                        $previousVariantIds->forget($index);
+
+                    $this->updateVariant($variantData, $variantId);
                 }
             }
-
-            foreach ($previousVariantIds as $variantId) {
-                $this->product->delete($variantId);
-            }
         }
+
+        foreach ($previousVariantIds as $variantId) {
+            $this->product->delete($variantId);
+        }
+
 
         return $product;
     }
@@ -212,6 +205,7 @@ class Configurable extends AbstractType
     public function getTypeValidationRules()
     {
         return [
+
             'variants.*.name' => 'required',
             'variants.*.sku' => 'required',
             'variants.*.price' => 'required',

@@ -4,6 +4,7 @@ namespace Modules\Product\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Product\Providers\EventServiceProvider;
 
 class ProductServiceProvider extends ServiceProvider
 {
@@ -18,6 +19,7 @@ class ProductServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('Product', 'Database/Migrations'));
+        $this->app->register(EventServiceProvider::class);
     }
 
     /**

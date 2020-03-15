@@ -14,6 +14,7 @@ class ProductImageRepository
 
     public function __construct()
     {
+
         $this->main_image_dimensions = config('sunread.image_dimensions.product.main_image');
         $this->folder_path = storage_path('app/public/images/') . $this->folder . DIRECTORY_SEPARATOR;
     }
@@ -82,7 +83,8 @@ class ProductImageRepository
         try {
             $gallery_images = [];
             $this->createFolderIfNotExist($this->folder_path);
-            if ($files = request()->hasFile('gallery_images')) {
+            if (request()->hasFile('gallery_images')) {
+                $files = request()->file('gallery_images');
                 foreach ($files as $file) {
                     $fileName = $this->getFileName($file);
                     $file->move($this->folder_path, $fileName);
@@ -91,7 +93,6 @@ class ProductImageRepository
                         'type' => 'gallery_image',
                         'image' => $fileName
                     ];
-
                 }
 
             }

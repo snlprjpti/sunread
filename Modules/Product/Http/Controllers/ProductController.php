@@ -75,19 +75,16 @@ class ProductController extends BaseController
     {
 
         try {
-
             $this->validate($request, [
                 'type' => 'required',
                 'attribute_family_id' => 'required',
-                'sku' => ['required', 'unique:products,sku']
+                'sku' => ['required', 'unique:products,sku'],
+                'slug' => ['required','unique:products,slug']
             ]);
 
             Event::dispatch('catalog.product.create.before');
-
             $typeInstance =  $this->product->getTypeInstance($request->get('type'));
-
             $product = $typeInstance->create($request->all());
-
             Event::dispatch('catalog.product.create.after', $product);
 
             return $this->successResponse($payload = $product, trans('core::app.response.create-success', ['name' => 'Product']), 201);
@@ -140,7 +137,6 @@ class ProductController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         }catch (\Exception $exception) {
-            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
 
@@ -151,13 +147,12 @@ class ProductController extends BaseController
         try {
             $product = Product::findOrFail($id);
 
-            //categories,attributes deleted at database level
             //removing image only
             $this->productImage->removeProductImages($product);
 
             $product->delete($id);
-
             return $this->successResponseWithMessage("Product deleted success!!");
+
         } catch (ModelNotFoundException $exception){
             return $this->errorResponse($exception->getMessage(), 404);
 

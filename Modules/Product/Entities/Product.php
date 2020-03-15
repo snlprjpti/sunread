@@ -117,6 +117,7 @@ class Product extends Model
             'special_price' => ['nullable', 'decimal']
         ],$merge);
 
+
         //Dynamic validation based on attribute
         $custom_attributes = $product->getEditableAttributes();
         foreach ($custom_attributes as $attribute) {
@@ -125,6 +126,7 @@ class Product extends Model
             $validations = self::fetchValidation($attribute,$id);
             $rules[$attribute->slug] = $validations;
         }
+
 
         return $rules;
     }
