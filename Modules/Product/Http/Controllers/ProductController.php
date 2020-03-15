@@ -17,14 +17,15 @@ class ProductController extends BaseController
 
     protected $pagination_limit;
     protected $product,$productImage;
+
     /**
      * UserController constructor.
      * @param Product $product
-     * @param Category $category
+     * @param ProductImageRepository $productImage
      */
     public function __construct(Product $product,ProductImageRepository $productImage)
     {
-        parent::__construct();
+        parent::__construct();  
         $this->middleware('admin');
         $this->product = $product;
         $this->productImage = $productImage;
