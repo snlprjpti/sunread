@@ -17,7 +17,6 @@ class CreateProductFlatTable extends Migration
         $table->boolean('featured')->nullable();
         $table->boolean('status')->nullable();
         $table->text('thumbnail')->nullable();
-
         $table->decimal('price', 18, 4)->nullable();
         $table->decimal('cost', 18, 4)->nullable();
 
