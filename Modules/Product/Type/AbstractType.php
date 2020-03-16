@@ -2,8 +2,6 @@
 
 namespace Modules\Product\Type;
 
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
 use Modules\Core\Traits\FileManager;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttributeValue;
@@ -33,7 +31,13 @@ abstract class AbstractType
     protected $product, $folder_path,$productImage,$attributeValueRepository;
     private $folder = 'product';
 
-    public function __construct(Product $product,ProductImageRepository $productImage,ProductAttributeValueRepository $attributeValueRepository)
+    /**
+     * AbstractType constructor.
+     * @param Product $product
+     * @param ProductImageRepository $productImage
+     * @param ProductAttributeValueRepository $attributeValueRepository
+     */
+    public function __construct(Product $product, ProductImageRepository $productImage ,ProductAttributeValueRepository $attributeValueRepository)
     {
         $this->product = $product;
         $this->folder_path = storage_path('app/public/images/') . $this->folder . DIRECTORY_SEPARATOR;
@@ -42,26 +46,19 @@ abstract class AbstractType
     }
 
     /**
+     * create a simple product
      * @param array $data
      * @return Product
      */
     public function create(array $data):Product
     {
-        try{
-
-            DB::beginTransaction();
-            $product = $this->product->create($data);
-            DB::commit();
-            return  $product;
-        }catch (QueryException $exception){
-            DB::rollBack();
-            throw $exception;
-        }
-
+        return $this->product->create($data);
     }
 
 
     /**
+     * Update products table
+     *
      * @param array $data
      * @param $id
      * @return Product
@@ -69,49 +66,36 @@ abstract class AbstractType
      */
     public function update(array $data, $id):Product
     {
+        $product = $this->product->findOrFail($id);
 
-        try {
-            DB::beginTransaction();
+        //updating product-table
+        $product->update($data);
 
-            //Get the product
-            $product = $this->product->findOrFail($id);
+        //we fetch only the associated attributes of particular product family
+        $associated_attributes = $product->associatedAttributes();
 
-            //updating product-table
-            $product->update($data);
+        //update the associated attributed
+        $this->updateAttributes($associated_attributes ,$product,$data);
 
-            //Update Attributes
-
-
-            //we fetch only the associated attributes of particular product type
-            $associated_attributes = $product->associatedAttributes();
-
-            $this->updateAttributes($associated_attributes ,$product,$data);
-
-            //updating product-categories data
-            if (isset($data['categories'])) {
-                $product->categories()->sync($data['categories']);
-            }
-
-
-            //Upload ProductImage
-            $this->productImage->uploadProductImages($data, $product);
-
-            //TODO::future => Update cross-sell, up-sells, related_products, inventories
-
-            DB::commit();
-            return $product;
-
-        } catch (QueryException $exception) {
-            DB::rollBack();
-            throw $exception;
-
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            throw $exception;
+        //updating product-categories data
+        if (isset($data['categories'])) {
+            $product->categories()->sync($data['categories']);
         }
 
+        //Upload ProductImage
+        $this->productImage->uploadProductImages($data, $product);
+
+        //TODO::future => Update cross-sell, up-sells, inventories
+
+        return $product;
     }
 
+    /**
+     * Fetch the attribute value from request dynamically
+     * @param array $data
+     * @param $attribute
+     * @return int|mixed|null|string
+     */
     private function fetchAttributeValue(array $data, $attribute)
     {
 
@@ -190,16 +174,26 @@ abstract class AbstractType
         return [];
     }
 
+    /**
+     * @param $associated_attributes
+     * @param $product
+     * @param $data
+     */
     private function updateAttributes($associated_attributes,$product ,$data)
     {
 
         //Updating each product-attribute table
         foreach ($associated_attributes as $attribute) {
+
+            //ignore the attribute with missing slug
             if (!isset($data[$attribute->slug])) {
                 continue;
             }
+
+            //fetch the attribute value from request data
             $attribute_value = $this->fetchAttributeValue($data, $attribute);
 
+            //create or update attribute value
             $productAttribute = ProductAttributeValue::firstOrNew([
                 'product_id' => $product->id,
                 'attribute_id' => $attribute->id,
@@ -212,7 +206,6 @@ abstract class AbstractType
                 ]
             );
             $productAttribute->save();
-
         }
     }
 

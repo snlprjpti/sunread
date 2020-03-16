@@ -63,8 +63,8 @@ class Product extends Model
     }
 
     /**
-     * Retrieve type instance
      *
+     * Retrieve type instance
      * @param $type
      * @return AbstractType
      */
@@ -127,7 +127,6 @@ class Product extends Model
             $validations = self::fetchValidation($attribute,$id);
             $rules[$attribute->slug] = $validations;
         }
-
 
         return $rules;
     }

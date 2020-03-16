@@ -166,7 +166,6 @@ class ProductFlat
 
             $productAttributeValue = $product->attribute_values()->where('attribute_id', $attribute->id)->first();
 
-
             $productFlat->{$attribute->slug} = isset($productAttributeValue)?$productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]] ?? null:null;
 
             if ($attribute->type == 'select') {
@@ -214,6 +213,7 @@ class ProductFlat
         if($thumbnail){
             $productFlat->thumbnail = $thumbnail;
         }
+        dd($productFlat);
 
         if ($parentProduct) {
             $parentProductFlat = ProductFlatModel::where('product_id', $parentProduct->id)->first();
