@@ -207,6 +207,13 @@ class ProductFlat
 
         $productFlat->max_price = $product->max_price;
 
+
+        //upload image
+        $thumbnail = $product->images->where('type', 'thumbnail')->first();
+        if($thumbnail){
+            $productFlat->thumbnail = $thumbnail;
+        }
+
         if ($parentProduct) {
             $parentProductFlat = $this->productFlatRepository->where([
                 'product_id' => $parentProduct->id,
