@@ -14,15 +14,15 @@ class AttributeOptionTableSeeder extends Seeder
         DB::table('attribute_option_translations')->delete();
 
         DB::table('attribute_options')->insert([
-            ['id' => '1', 'name' => 'Red', 'position' => '1', 'attribute_id' => '23'],
-            ['id' => '2', 'name' => 'Green', 'position' => '2', 'attribute_id' => '23'],
-            ['id' => '3', 'name' => 'Yellow', 'position' => '3', 'attribute_id' => '23'],
-            ['id' => '4', 'name' => 'Black', 'position' => '4', 'attribute_id' => '23'],
-            ['id' => '5', 'name' => 'White', 'position' => '5', 'attribute_id' => '23'],
-            ['id' => '6', 'name' => 'S', 'position' => '1', 'attribute_id' => '24'],
-            ['id' => '7', 'name' => 'M', 'position' => '2', 'attribute_id' => '24'],
-            ['id' => '8', 'name' => 'L', 'position' => '3', 'attribute_id' => '24'],
-            ['id' => '9', 'name' => 'XL', 'position' => '4', 'attribute_id' => '24']
+            ['id' => '1', 'name' => 'Red', 'position' => '1', 'attribute_id' => '21'],
+            ['id' => '2', 'name' => 'Green', 'position' => '2', 'attribute_id' => '21'],
+            ['id' => '3', 'name' => 'Yellow', 'position' => '3', 'attribute_id' => '21'],
+            ['id' => '4', 'name' => 'Black', 'position' => '4', 'attribute_id' => '21'],
+            ['id' => '5', 'name' => 'White', 'position' => '5', 'attribute_id' => '21'],
+            ['id' => '6', 'name' => 'S', 'position' => '1', 'attribute_id' => '22'],
+            ['id' => '7', 'name' => 'M', 'position' => '2', 'attribute_id' => '22'],
+            ['id' => '8', 'name' => 'L', 'position' => '3', 'attribute_id' => '22'],
+            ['id' => '9', 'name' => 'XL', 'position' => '4', 'attribute_id' => '22']
         ]);
 
         DB::table('attribute_option_translations')->insert([
