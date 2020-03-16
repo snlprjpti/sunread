@@ -165,7 +165,7 @@ class ProductFlat
 
 
             $productAttributeValue = $product->attribute_values()->where('attribute_id', $attribute->id)->first();
-      
+
 
             $productFlat->{$attribute->slug} = isset($productAttributeValue)?$productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]] ?? null:null;
 
@@ -216,9 +216,7 @@ class ProductFlat
         }
 
         if ($parentProduct) {
-            $parentProductFlat = $this->productFlatRepository->where([
-                'product_id' => $parentProduct->id,
-            ]);
+            $parentProductFlat = ProductFlatModel::where('product_id', $parentProduct->id)->first();
 
             if ($parentProductFlat)
                 $productFlat->parent_id = $parentProductFlat->id;
