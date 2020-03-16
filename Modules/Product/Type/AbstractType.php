@@ -21,6 +21,15 @@ abstract class AbstractType
 {
     use FileManager;
 
+    /**
+     * Has child products aka variants
+     *
+     * @var boolean
+     */
+
+    protected $hasVariants = false;
+
+
     protected $product, $folder_path,$productImage,$attributeValueRepository;
     private $folder = 'product';
 
@@ -89,12 +98,15 @@ abstract class AbstractType
 
             //TODO::future => Update cross-sell, up-sells, related_products, inventories
 
+            DB::commit();
             return $product;
 
         } catch (QueryException $exception) {
+            DB::rollBack();
             throw $exception;
 
         } catch (\Exception $exception) {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -187,6 +199,7 @@ abstract class AbstractType
                 continue;
             }
             $attribute_value = $this->fetchAttributeValue($data, $attribute);
+
             $productAttribute = ProductAttributeValue::firstOrNew([
                 'product_id' => $product->id,
                 'attribute_id' => $attribute->id,
@@ -199,6 +212,7 @@ abstract class AbstractType
                 ]
             );
             $productAttribute->save();
+
         }
     }
 

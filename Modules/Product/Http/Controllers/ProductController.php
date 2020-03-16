@@ -113,6 +113,12 @@ class ProductController extends BaseController
             Event::dispatch('catalog.product.update.before', $id);
 
             //validation
+
+            $d =  Product::rules($id,[
+                'main_image' => 'required|mimes:jpeg,jpg,bmp,png',
+                'gallery_images.*' => 'nullable|mimes:jpeg,jpg,bmp,png',
+            ]);
+           // dd($d);
             $this->validate($request,Product::rules($id,[
                 'main_image' => 'required|mimes:jpeg,jpg,bmp,png',
                 'gallery_images.*' => 'nullable|mimes:jpeg,jpg,bmp,png',
@@ -134,9 +140,11 @@ class ProductController extends BaseController
             return $this->errorResponse($exception->getMessage(), 404);
 
         } catch (ValidationException $exception) {
+           // dd($exception);
             return $this->errorResponse($exception->errors(), 422);
 
         }catch (\Exception $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
 

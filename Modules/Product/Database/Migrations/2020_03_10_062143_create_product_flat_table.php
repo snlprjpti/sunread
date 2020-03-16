@@ -9,8 +9,8 @@ class CreateProductFlatTable extends Migration
 {
     Schema::create('product_flat', function (Blueprint $table) {
         $table->bigIncrements('id');
-        $table->string('sku');
-        $table->string('slug');
+        $table->string('sku')->nullable();
+        $table->string('slug')->nullable();
         $table->string('name')->nullable();
         $table->string('description')->nullable();
         $table->boolean('new')->nullable();

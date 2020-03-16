@@ -8,6 +8,7 @@ use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Locale;
 use Modules\Product\Entities\ProductAttributeValue;
 use Modules\Product\Entities\ProductFlat as ProductFlatModel;
+use Modules\Product\Helpers\ProductType;
 
 
 /**
@@ -145,6 +146,7 @@ class ProductFlat
         ]);
 
 
+
         if (!array_key_exists($product->attribute_family->id, $familyAttributes))
             $familyAttributes[$product->attribute_family->id] = $product->associatedAttributes();
 
@@ -159,7 +161,6 @@ class ProductFlat
 
             if (!Schema::hasColumn('product_flat', $attribute->slug))
                 continue;
-
 
 
             $productAttributeValue = $product->attribute_values()->where('attribute_id', $attribute->id)->first();

@@ -162,11 +162,9 @@ class AttributeTableSeeder extends Seeder
 
         foreach ($attribute_groups_mapping as $map){
             $attribute = Attribute::find($map['attribute_id']);
-
             if(isset($attribute))
                 $attribute->update($map);
-            else
-                dd($map);
+
         }
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');

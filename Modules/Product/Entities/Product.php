@@ -120,6 +120,7 @@ class Product extends Model
 
         //Dynamic validation based on attribute
         $custom_attributes = $product->getEditableAttributes();
+
         foreach ($custom_attributes as $attribute) {
             if ($attribute->slug == 'sku' || $attribute->type == 'boolean')
                 continue;

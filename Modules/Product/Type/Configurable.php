@@ -17,15 +17,6 @@ use Modules\Product\Repositories\ProductAttributeValueRepository;
 
 class Configurable extends AbstractType
 {
-
-
-    /**
-     * Skip attribute for downloadable product type
-     *
-     * @var array
-     */
-    protected $skipAttributes = ['price', 'cost', 'special_price', 'special_price_from', 'special_price_to', 'width', 'height', 'depth', 'weight'];
-
     protected $hasVariants = true;
 
     /**

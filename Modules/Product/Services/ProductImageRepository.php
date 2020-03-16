@@ -41,7 +41,7 @@ class ProductImageRepository
             $main_images = array([
                 'product_id' => $product->id,
                 'type' => 'main_image',
-                'image' => $fileName
+                'filename' => $fileName
             ]);
 
             //Store small and thumbnail image
@@ -56,7 +56,7 @@ class ProductImageRepository
                 $main_images[] = [
                     'product_id' => $product->id,
                     'type' => $key,
-                    'image' => $updated_file_name
+                    'filename' => $updated_file_name
                 ];
             }
 
@@ -91,7 +91,7 @@ class ProductImageRepository
                     $gallery_images[] = [
                         'product_id' => $product->id,
                         'type' => 'gallery_image',
-                        'image' => $fileName
+                        'filename' => $fileName
                     ];
                 }
 
