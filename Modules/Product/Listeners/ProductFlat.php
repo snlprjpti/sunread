@@ -4,6 +4,7 @@ namespace Modules\Product\Listeners;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Locale;
 use Modules\Product\Entities\ProductAttributeValue;
@@ -33,41 +34,13 @@ class ProductFlat
         'image' => 'text',
         'checkbox' => 'text'
     ];
-    /**
-     * AttributeRepository Repository Object
-     *
-     * @var object
-     */
-    protected $attributeRepository;
-    /**
-     * AttributeOptionRepository Repository Object
-     *
-     * @var object
-     */
-    protected $attributeOptionRepository;
-    /**
-     * ProductFlatRepository Repository Object
-     *
-     * @var object
-     */
-    protected $productFlatRepository;
-    /**
-     * ProductAttributeValueRepository Repository Object
-     *
-     * @var object
-     */
-    protected $productAttributeValueRepository;
-    /**
-     * Attribute Object
-     *
-     * @var object
-     */
-    protected $attribute;
+
 
     /**
      * After the attribute is created
      *
-     * @return void
+     * @param $attribute
+     * @return bool
      */
     public function afterAttributeCreatedUpdated($attribute)
     {
@@ -93,7 +66,7 @@ class ProductFlat
 
     public function afterAttributeDeleted($attributeId)
     {
-        $attribute = $this->attributeRepository->find($attributeId);
+        $attribute = Attribute::findOrFail($attributeId);
 
         if (Schema::hasColumn('product_flat', strtolower($attribute->slug))) {
             Schema::table('product_flat', function (Blueprint $table) use ($attribute) {
@@ -169,7 +142,7 @@ class ProductFlat
             $productFlat->{$attribute->slug} = isset($productAttributeValue)?$productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]] ?? null:null;
 
             if ($attribute->type == 'select') {
-                $attributeOption = AttributeOption::find($product->{$attribute->slug});
+                $attributeOption = AttributeOption::findOrFail($product->{$attribute->slug});
 
                 if ($attributeOption) {
                     if ($attributeOptionTranslation = $attributeOption->translate($locale->code)) {
@@ -182,7 +155,7 @@ class ProductFlat
                 $attributeOptionIds = explode(',', $product->{$attribute->slug});
 
                 if (count($attributeOptionIds)) {
-                    $attributeOptions = $this->attributeOptionRepository->findWhereIn('id', $attributeOptionIds);
+                    $attributeOptions = AttributeOption::whereIn('id', $attributeOptionIds)->first();
 
                     $optionLabels = [];
 
