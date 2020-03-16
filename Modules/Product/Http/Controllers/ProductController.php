@@ -157,6 +157,7 @@ class ProductController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         }catch (\Exception $exception) {
+            dd($exception);
             DB::rollBack();
             return $this->errorResponse($exception->getMessage());
         }

@@ -25,7 +25,7 @@ class AttributeTableSeeder extends Seeder
             ['id' => '2','slug' => 'name','name' => 'Name','type' => 'text','validation' => NULL,'position' => '2','is_required' => '1','is_unique' => '0','value_per_locale' => '1','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
 
-            ['id' => '3','slug' => 'old_price','name' => 'Old Price','type' => 'price','validation' => NULL,'position' => '3','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '1',
+           // ['id' => '3','slug' => 'old_price','name' => 'Old Price','type' => 'price','validation' => NULL,'position' => '3','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '1',
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
 
 //            ['id' => '4','slug' => 'tax_category_id','name' => 'Tax Category','type' => 'select','validation' => NULL,'position' => '4','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '1','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
@@ -103,7 +103,7 @@ class AttributeTableSeeder extends Seeder
         DB::table('attribute_translations')->insert([
            ['id' => '1','locale' => 'en','name' => 'SKU','attribute_id' => '1'],
            ['id' => '2','locale' => 'en','name' => 'Name','attribute_id' => '2'],
-           ['id' => '3','locale' => 'en','name' => 'old_price','attribute_id' => '3'],
+          // ['id' => '3','locale' => 'en','name' => 'old_price','attribute_id' => '3'],
           // ['id' => '4','locale' => 'en','name' => 'Tax Category','attribute_id' => '4'],
            ['id' => '5','locale' => 'en','name' => 'New','attribute_id' => '5'],
            ['id' => '6','locale' => 'en','name' => 'Featured','attribute_id' => '6'],
@@ -126,7 +126,7 @@ class AttributeTableSeeder extends Seeder
            ['id' => '23','locale' => 'en','name' => 'Color','attribute_id' => '23'],
            ['id' => '24','locale' => 'en','name' => 'Size','attribute_id' => '24'],
            ['id' => '25','locale' => 'en','name' => 'Brand','attribute_id' => '25'],
-           ['id' => '26','locale' => 'en','name' => 'Allow Guest Checkout','attribute_id' => '26']
+
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
@@ -157,7 +157,7 @@ class AttributeTableSeeder extends Seeder
             ['attribute_id' => '23','attribute_group_id' => '1','position' => '10'],
             ['attribute_id' => '24','attribute_group_id' => '1','position' => '11'],
             ['attribute_id' => '25','attribute_group_id' => '1','position' => '12'],
-            ['attribute_id' => '26','attribute_group_id' => '1','position' => '9']
+
         ];
 
         foreach ($attribute_groups_mapping as $map){

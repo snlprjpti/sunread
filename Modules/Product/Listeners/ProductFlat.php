@@ -199,21 +199,17 @@ class ProductFlat
             }
         }
 
+
         $productFlat->created_at = $product->created_at;
 
         $productFlat->updated_at = $product->updated_at;
 
-        $productFlat->min_price = $product->min_price;
-
-        $productFlat->max_price = $product->max_price;
-
-
         //upload image
         $thumbnail = $product->images->where('type', 'thumbnail')->first();
         if($thumbnail){
-            $productFlat->thumbnail = $thumbnail;
+            $productFlat->thumbnail = $thumbnail->image;
         }
-        dd($productFlat);
+
 
         if ($parentProduct) {
             $parentProductFlat = ProductFlatModel::where('product_id', $parentProduct->id)->first();

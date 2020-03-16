@@ -3,6 +3,7 @@
 namespace Modules\Product\Entities;
 
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeFamily;
@@ -12,7 +13,7 @@ class Product extends Model
 {
 
     protected $fillable = ['type', 'attribute_family_id', 'sku', 'parent_id', 'slug'];
-
+    protected $typeInstance;
 
     /**
      * Retrieve product attributes
@@ -114,12 +115,13 @@ class Product extends Model
             'price' => 'required',
             'special_price_from' => 'nullable|date',
             'special_price_to' => 'nullable|date|after_or_equal:special_price_from',
-            'special_price' => ['nullable', 'decimal']
+            'special_price' => ['nullable', 'decimal'],
+            'old_price' => ['nullable', 'decimal']
         ],$merge);
 
 
         //Dynamic validation based on attribute
-        $custom_attributes = $product->getEditableAttributes();
+        $custom_attributes = $product->getTypeInstance()->getEditableAttributes();
 
         foreach ($custom_attributes as $attribute) {
             if ($attribute->slug == 'sku' || $attribute->type == 'boolean')

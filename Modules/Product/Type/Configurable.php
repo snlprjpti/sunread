@@ -2,10 +2,12 @@
 
 namespace Modules\Product\Type;
 
+use Carbon\Carbon;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttributeValue;
 use Illuminate\Support\Str;
+use Modules\Product\Entities\ProductFlat;
 
 /**
  * Class Configurable.
@@ -215,7 +217,5 @@ class Configurable extends AbstractType
             'variants.*.weight' => 'required',
         ];
     }
-
-
 
 }

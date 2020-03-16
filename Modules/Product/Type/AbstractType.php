@@ -2,6 +2,7 @@
 
 namespace Modules\Product\Type;
 
+use Carbon\Carbon;
 use Modules\Core\Traits\FileManager;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttributeValue;
@@ -28,7 +29,7 @@ abstract class AbstractType
     protected $hasVariants = false;
 
 
-    protected $product, $folder_path,$productImage,$attributeValueRepository;
+    protected $product, $folder_path,$productImage,$attributeValueRepository,$productItem;
     private $folder = 'product';
 
     /**
@@ -134,6 +135,7 @@ abstract class AbstractType
      */
     public function setProduct($product)
     {
+
         $this->product = $product;
 
         return $this;
@@ -219,6 +221,8 @@ abstract class AbstractType
     {
         return $this->hasVariants;
     }
+
+
 
 
 }

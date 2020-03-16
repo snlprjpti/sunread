@@ -18,10 +18,11 @@ class CreateProductFlatTable extends Migration
         $table->boolean('status')->nullable();
         $table->text('thumbnail')->nullable();
 
-        $table->decimal('old_price', 18, 4)->nullable();
         $table->decimal('price', 18, 4)->nullable();
         $table->decimal('cost', 18, 4)->nullable();
 
+
+        $table->decimal('special_price',18,4)->nullable();
         $table->date('special_price_from')->nullable();
         $table->date('special_price_to')->nullable();
 
@@ -40,9 +41,6 @@ class CreateProductFlatTable extends Migration
 
         $table->foreign('parent_id')->references('id')->on('product_flat')->onDelete('cascade');
 
-        $table->decimal('min_price', 18, 4)->nullable();
-        $table->decimal('max_price', 18, 4)->nullable();
-        $table->decimal('special_price', 18, 4)->nullable();
 
         $table->text('short_description')->nullable();
         $table->text('meta_title')->nullable();
