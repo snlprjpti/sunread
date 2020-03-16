@@ -82,6 +82,8 @@ class ProductController extends BaseController
                 'slug' => ['required','unique:products,slug']
             ]);
 
+
+
             Event::dispatch('catalog.product.create.before');
             $typeInstance =  $this->product->getTypeInstance($request->get('type'));
             $product = $typeInstance->create($request->all());
@@ -113,12 +115,6 @@ class ProductController extends BaseController
             Event::dispatch('catalog.product.update.before', $id);
 
             //validation
-
-            $d =  Product::rules($id,[
-                'main_image' => 'required|mimes:jpeg,jpg,bmp,png',
-                'gallery_images.*' => 'nullable|mimes:jpeg,jpg,bmp,png',
-            ]);
-           // dd($d);
             $this->validate($request,Product::rules($id,[
                 'main_image' => 'required|mimes:jpeg,jpg,bmp,png',
                 'gallery_images.*' => 'nullable|mimes:jpeg,jpg,bmp,png',

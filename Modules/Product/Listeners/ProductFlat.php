@@ -156,6 +156,7 @@ class ProductFlat
 
 
         foreach ($familyAttributes[$product->attribute_family->id] as $attribute) {
+
             if ($parentProduct && !in_array($attribute->slug, array_merge($superAttributes[$parentProduct->id], ['sku', 'name', 'price', 'weight', 'status'])))
                 continue;
 
@@ -164,7 +165,7 @@ class ProductFlat
 
 
             $productAttributeValue = $product->attribute_values()->where('attribute_id', $attribute->id)->first();
-
+      
 
             $productFlat->{$attribute->slug} = isset($productAttributeValue)?$productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]] ?? null:null;
 
@@ -175,7 +176,7 @@ class ProductFlat
                     if ($attributeOptionTranslation = $attributeOption->translate($locale->code)) {
                         $productFlat->{$attribute->slug . '_label'} = $attributeOptionTranslation->label;
                     } else {
-                        $productFlat->{$attribute->slug . '_label'} = $attributeOption->admin_name;
+                        $productFlat->{$attribute->slug . '_label'} = $attributeOption->name;
                     }
                 }
             } elseif ($attribute->type == 'multiselect') {
@@ -222,6 +223,7 @@ class ProductFlat
             if ($parentProductFlat)
                 $productFlat->parent_id = $parentProductFlat->id;
         }
+        $productFlat->slug = $product->slug;
 
         $productFlat->save();
     }
