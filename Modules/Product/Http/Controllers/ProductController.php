@@ -4,6 +4,7 @@ namespace Modules\Product\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -34,7 +35,7 @@ class ProductController extends BaseController
 
     /**
      * returns all the products
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index()
     {
@@ -54,7 +55,7 @@ class ProductController extends BaseController
     /**
      * Get the particular product
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {
@@ -115,7 +116,7 @@ class ProductController extends BaseController
     /**Update the products and variats
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
@@ -125,11 +126,7 @@ class ProductController extends BaseController
             $product = $this->product->findOrFail($id);
 
             //validation
-            $this->validate($request,Product::rules($id,[
-                'main_image' => 'required|mimes:jpeg,jpg,bmp,png',
-                'gallery_images.*' => 'nullable|mimes:jpeg,jpg,bmp,png',
-                ]));
-
+            $this->validate($request,Product::rules($id));
 
             DB::beginTransaction();
 

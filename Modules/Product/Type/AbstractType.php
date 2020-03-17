@@ -2,7 +2,7 @@
 
 namespace Modules\Product\Type;
 
-use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Modules\Core\Traits\FileManager;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttributeValue;

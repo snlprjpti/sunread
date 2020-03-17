@@ -27,6 +27,10 @@ Route::group(['middleware' => ['api']], function () {
         Route::delete('/products/{product}', 'ProductController@destroy')->name('products.delete');
         Route::get('/products/{product}/edit', 'ProductController@edit')->name('products.edit');
 
+        //deletes the images table
+        Route::post('/products/upload-file', 'ProductImageController@uploadFile')->name('products.upload-image');
+
         Route::post('/products/remove-file/{productImageId}', 'ProductImageController@removeFile')->name('products.remove-image');
+
     });
 });

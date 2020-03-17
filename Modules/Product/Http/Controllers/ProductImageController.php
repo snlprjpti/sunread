@@ -44,5 +44,30 @@ class ProductImageController extends BaseController
         }
     }
 
+    public function uploadFile(Request $request)
+    {
+        try{
+            $this->validate($request,[
+                'product_id' => 'required|exists:products,id',
+                'images.*' => 'nullable|mimes:jpeg,jpg,bmp,png',
+            ]);
+            $product = Product::findOrFail($request->get('product_id'));
+
+            //check validation of image type
+            //upload files here
+            $this->productImage->uploadProductImages($product);
+            $this->successResponse("Image changed success");
+
+        }catch (ValidationException $exception){
+            return $this->errorResponse($exception->getMessage(), 422);
+        } catch (ProductImageDeleteException $exception) {
+            return $this->errorResponse("Image Could not be deleted", 500);
+
+        } catch (\Exception $exception) {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+    }
+    
 }
 
