@@ -144,12 +144,12 @@ class ProductFlatTable
 
             if(isset($productAttributeValue)){
                 if ($attribute->type == 'select') {
-
-                    $attributeOption = AttributeOption::findOrFail($productFlat->{$attribute->slug});
-
+                    $attribute_value = $productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]];
+                    $attributeOption = AttributeOption::findOrFail($attribute_value);
+                    
                     if ($attributeOption) {
                         if ($attributeOptionTranslation = $attributeOption->translate($locale->code)) {
-                            $productFlat->{$attribute->slug . '_label'} = $attributeOptionTranslation->label;
+                            $productFlat->{$attribute->slug . '_label'} = $attributeOptionTranslation->name;
                         } else {
                             $productFlat->{$attribute->slug . '_label'} = $attributeOption->name;
                         }
@@ -157,6 +157,7 @@ class ProductFlatTable
 
 
                 } elseif ($attribute->type == 'multiselect') {
+
                     $attributeOptionIds = explode(',', $product->{$attribute->slug});
 
                     if (count($attributeOptionIds)) {
@@ -199,9 +200,7 @@ class ProductFlatTable
             if ($parentProductFlat)
                 $productFlat->parent_id = $parentProductFlat->id;
         }
-       // $productFlat->slug = $product->slug;
-       // dd($productFlat);
-
+        $productFlat->slug = $product->slug;
         $productFlat->save();
     }
 
