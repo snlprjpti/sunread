@@ -102,12 +102,10 @@ class ProductController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (QueryException $exception) {
-            dd($exception);
             DB::rollBack();
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
-            dd($exception);
             DB::rollBack();
             return $this->errorResponse($exception->getMessage());
         }
@@ -133,7 +131,7 @@ class ProductController extends BaseController
                 ]));
 
 
-           // DB::beginTransaction();
+            DB::beginTransaction();
 
             //Event start Log
             Event::dispatch('catalog.product.update.before', $id);
@@ -147,20 +145,18 @@ class ProductController extends BaseController
             //Event complete Log
             Event::dispatch('catalog.product.update.after', $product);
 
-            //DB::commit();
+            DB::commit();
             return $this->successResponse($product,trans('core::app.response.update-success', ['name' => 'Product']));
 
         } catch (ModelNotFoundException $exception) {
-            //DB::rollBack();
+            DB::rollBack();
             return $this->errorResponse($exception->getMessage(), 404);
 
         } catch (ValidationException $exception) {
-
-           // DB::rollBack();
+             DB::rollBack();
             return $this->errorResponse($exception->errors(), 422);
 
         }catch (\Exception $exception) {
-            dd($exception);
             DB::rollBack();
             return $this->errorResponse($exception->getMessage());
         }
