@@ -146,7 +146,7 @@ class ProductFlatTable
                 if ($attribute->type == 'select') {
                     $attribute_value = $productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]];
                     $attributeOption = AttributeOption::findOrFail($attribute_value);
-                    
+
                     if ($attributeOption) {
                         if ($attributeOptionTranslation = $attributeOption->translate($locale->code)) {
                             $productFlat->{$attribute->slug . '_label'} = $attributeOptionTranslation->name;
@@ -154,37 +154,12 @@ class ProductFlatTable
                             $productFlat->{$attribute->slug . '_label'} = $attributeOption->name;
                         }
                     }
-
-
-                } elseif ($attribute->type == 'multiselect') {
-
-                    $attributeOptionIds = explode(',', $product->{$attribute->slug});
-
-                    if (count($attributeOptionIds)) {
-                        $attributeOptions = AttributeOption::whereIn('id', $attributeOptionIds)->first();
-
-                        $optionLabels = [];
-
-                        foreach ($attributeOptions as $attributeOption) {
-                            if ($attributeOptionTranslation = $attributeOption->translate($locale->code)) {
-                                $optionLabels[] = $attributeOptionTranslation->label;
-                            } else {
-                                $optionLabels[] = $attributeOption->name;
-                            }
-                        }
-
-                        $productFlat->{$attribute->code . '_label'} = implode(', ', $optionLabels);
-                    }
+                    
                 }
             }
-
-
-
         }
 
-
         $productFlat->created_at = $product->created_at;
-
         $productFlat->updated_at = $product->updated_at;
 
         //upload image
