@@ -7,8 +7,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Locale;
+use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttributeValue;
-use Modules\Product\Entities\ProductFlat as ProductFlatModel;
+use Modules\Product\Entities\ProductFlat;
 use Modules\Product\Helpers\ProductType;
 
 
@@ -16,7 +17,7 @@ use Modules\Product\Helpers\ProductType;
  * Product Flat Event handler
  *
  */
-class ProductFlat
+class ProductFlatTable
 {
     /**
      * @var object
@@ -91,6 +92,7 @@ class ProductFlat
 
         if (ProductType::hasVariants($product->type)) {
             foreach ($product->variants()->get() as $variant) {
+
                 $this->createFlat($variant, $product);
             }
         }
@@ -113,11 +115,10 @@ class ProductFlat
         $locale = config('locales.lang')? config('locales.lang'):config('app.locale');
         $locale = Locale::where('code', $locale)->first();
 
-        $productFlat = ProductFlatModel::firstOrNew([
+        $productFlat = ProductFlat::firstOrNew([
             'product_id' => $product->id,
             'locale' => $locale->code
         ]);
-
 
 
         if (!array_key_exists($product->attribute_family->id, $familyAttributes))
@@ -139,37 +140,45 @@ class ProductFlat
 
             $productAttributeValue = $product->attribute_values()->where('attribute_id', $attribute->id)->first();
 
-            $productFlat->{$attribute->slug} = isset($productAttributeValue)?$productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]] ?? null:null;
+            $productFlat->{$attribute->slug} = isset($productAttributeValue)? $productAttributeValue[ProductAttributeValue::$attributeTypeFields[$attribute->type]] ?? null:null;
 
-            if ($attribute->type == 'select') {
-                $attributeOption = AttributeOption::findOrFail($product->{$attribute->slug});
+            if(isset($productAttributeValue)){
+                if ($attribute->type == 'select') {
 
-                if ($attributeOption) {
-                    if ($attributeOptionTranslation = $attributeOption->translate($locale->code)) {
-                        $productFlat->{$attribute->slug . '_label'} = $attributeOptionTranslation->label;
-                    } else {
-                        $productFlat->{$attribute->slug . '_label'} = $attributeOption->name;
-                    }
-                }
-            } elseif ($attribute->type == 'multiselect') {
-                $attributeOptionIds = explode(',', $product->{$attribute->slug});
+                    $attributeOption = AttributeOption::findOrFail($productFlat->{$attribute->slug});
 
-                if (count($attributeOptionIds)) {
-                    $attributeOptions = AttributeOption::whereIn('id', $attributeOptionIds)->first();
-
-                    $optionLabels = [];
-
-                    foreach ($attributeOptions as $attributeOption) {
+                    if ($attributeOption) {
                         if ($attributeOptionTranslation = $attributeOption->translate($locale->code)) {
-                            $optionLabels[] = $attributeOptionTranslation->label;
+                            $productFlat->{$attribute->slug . '_label'} = $attributeOptionTranslation->label;
                         } else {
-                            $optionLabels[] = $attributeOption->name;
+                            $productFlat->{$attribute->slug . '_label'} = $attributeOption->name;
                         }
                     }
 
-                    $productFlat->{$attribute->code . '_label'} = implode(', ', $optionLabels);
+
+                } elseif ($attribute->type == 'multiselect') {
+                    $attributeOptionIds = explode(',', $product->{$attribute->slug});
+
+                    if (count($attributeOptionIds)) {
+                        $attributeOptions = AttributeOption::whereIn('id', $attributeOptionIds)->first();
+
+                        $optionLabels = [];
+
+                        foreach ($attributeOptions as $attributeOption) {
+                            if ($attributeOptionTranslation = $attributeOption->translate($locale->code)) {
+                                $optionLabels[] = $attributeOptionTranslation->label;
+                            } else {
+                                $optionLabels[] = $attributeOption->name;
+                            }
+                        }
+
+                        $productFlat->{$attribute->code . '_label'} = implode(', ', $optionLabels);
+                    }
                 }
             }
+
+
+
         }
 
 
@@ -185,12 +194,13 @@ class ProductFlat
 
 
         if ($parentProduct) {
-            $parentProductFlat = ProductFlatModel::where('product_id', $parentProduct->id)->first();
+            $parentProductFlat = ProductFlat::where('product_id', $parentProduct->id)->first();
 
             if ($parentProductFlat)
                 $productFlat->parent_id = $parentProductFlat->id;
         }
-        $productFlat->slug = $product->slug;
+       // $productFlat->slug = $product->slug;
+       // dd($productFlat);
 
         $productFlat->save();
     }

@@ -2,12 +2,11 @@
 
 namespace Modules\Product\Type;
 
-use Carbon\Carbon;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttributeValue;
 use Illuminate\Support\Str;
-use Modules\Product\Entities\ProductFlat;
+
 
 /**
  * Class Configurable.
@@ -64,11 +63,12 @@ class Configurable extends AbstractType
      * @return Product
      * @throws \Exception
      */
-    public function update(array $data, $id, $attribute = "id"):Product
+    public function update(array $data, $id):Product
     {
 
         //Update main parent product like simple product
-        $product = parent::update($data, $id, $attribute);
+        $product = parent::update($data, $id);
+
 
         //get previous keys
         $previousVariantIds = $product->variants->pluck('id');
@@ -84,21 +84,17 @@ class Configurable extends AbstractType
                     }
                     $this->createVariant($product, $permutation, $variantData);
                 } else {
-
-
                     if (is_numeric($index = $previousVariantIds->search($variantId)))
                         $previousVariantIds->forget($index);
-
                     $this->updateVariant($variantData, $variantId);
                 }
             }
         }
 
         foreach ($previousVariantIds as $variantId) {
-            $this->product->delete($variantId);
+            $variant = Product::find($variantId);
+            $variant->delete();
         }
-
-
         return $product;
     }
 
@@ -174,23 +170,23 @@ class Configurable extends AbstractType
         $variant->update(['sku' => $data['sku']]);
 
         foreach (['sku', 'name', 'price', 'weight', 'status'] as $attributeCode) {
-            $attribute = $this->attributeValueRepository->where('slug', $attributeCode);
+            $attribute = Attribute::where('slug', $attributeCode)->first();
 
-            $attributeValue = $this->attributeValueRepository->where([
+            $attributeValue = ProductAttributeValue::where([
                 'product_id' => $id,
                 'attribute_id' => $attribute->id,
-            ]);
+            ])->first();
 
             if (!$attributeValue) {
-                $this->attributeValueRepository->create([
+                ProductAttributeValue::create([
                     'product_id' => $id,
                     'attribute_id' => $attribute->id,
                     'value' => $data[$attribute->slug],
                 ]);
             } else {
-                $this->attributeValueRepository->update([
+                $attributeValue->update([
                     ProductAttributeValue::$attributeTypeFields[$attribute->type] => $data[$attribute->slug]
-                ], $attributeValue->id);
+                ]);
             }
         }
 

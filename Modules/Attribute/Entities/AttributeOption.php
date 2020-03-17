@@ -35,5 +35,15 @@ class AttributeOption extends Model
     }
 
 
+    public function translations()
+    {
+        return $this->hasMany(AttributeOptionTranslation::class,'attribute_option_id');
+    }
+
+    public function translate($locale)
+    {
+        return $this->translations()->where('locale', $locale)->first();
+    }
+
 
 }
