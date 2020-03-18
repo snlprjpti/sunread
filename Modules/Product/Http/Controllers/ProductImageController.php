@@ -75,7 +75,7 @@ class ProductImageController extends BaseController
             $productImage = ProductImage::findOrFail($productImageId);
             $types = $request->get('types');
 
-            //image type validation 
+            //image type validation
             foreach ($types as $type => $item){
                 if (!in_array($type, ['main_image', 'small_image','thumbnail', 'normal_image'])) {
                     throw new ProductImageTypeNotFound();
@@ -88,9 +88,7 @@ class ProductImageController extends BaseController
                 if($value){
                     ProductImage::where('product_id', $product->id)->where('id', '!=' ,$productImage->id)->update([$type => 0]);
                     $productImage->update([$type => $value]);
-
                 }else{
-
                     $otherImage = ProductImage::where('product_id' ,$product->id)->where($type,1)->first();
                     if(!$otherImage){
                         $firstProductImage = ProductImage::where('product_id', $product->id)->first();
