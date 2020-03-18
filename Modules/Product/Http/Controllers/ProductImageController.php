@@ -27,7 +27,7 @@ class ProductImageController extends BaseController
         $this->productImage = $productImage;
     }
 
-    public function removeFile($productImageId)
+    public function remove($productImageId)
     {
         try {
             $productImage = ProductImage::findOrFail($productImageId);
@@ -35,8 +35,7 @@ class ProductImageController extends BaseController
             if (!$isProductImageRemoved) {
                 throw new ProductImageDeleteException();
             }
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Product Image']));
-
+            return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Product Image']));
         } catch (ProductImageDeleteException $exception) {
             return $this->errorResponse("Image Could not be deleted", 500);
 
@@ -54,11 +53,8 @@ class ProductImageController extends BaseController
                 'images.*' => 'required|mimes:jpeg,jpg,bmp,png',
             ]);
             $product = Product::findOrFail($request->get('product_id'));
-
-            //check validation of image type
-            //upload files here
             $this->productImage->uploadProductImages($product);
-            return $this->successResponse("Image changed success");
+            return $this->successResponseWithMessage("Image uploaded successfully");
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->getMessage(), 422);

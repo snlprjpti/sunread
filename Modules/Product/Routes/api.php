@@ -22,7 +22,7 @@ Route::group(['middleware' => ['api']], function () {
         //productImage
         Route::post('/product-image/upload', 'ProductImageController@upload')->name('products.upload-image');
         Route::post('/product-image/change/{productImageId}', 'ProductImageController@changeImageType')->name('products.change-image');
-        Route::post('/product-image/remove/{productImageId}', 'ProductImageController@removeFile')->name('products.remove-image');
+        Route::post('/product-image/remove/{productImageId}', 'ProductImageController@remove')->name('products.remove-image');
 
 
         Route::get('/products', 'ProductController@index')->name('products.index');
