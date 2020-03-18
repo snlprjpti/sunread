@@ -2,8 +2,6 @@
 
 namespace Modules\Product\Services;
 
-use Illuminate\Support\Facades\DB;
-use Intervention\Image\Facades\Image;
 use Modules\Core\Traits\FileManager;
 use Modules\Product\Entities\ProductImage;
 
@@ -53,7 +51,6 @@ class ProductImageRepository
 
             }
 
-            //Bulk insertion
             return $productImageIds;
         } catch (\Exception $exception) {
             throw  $exception;
