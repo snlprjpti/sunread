@@ -57,6 +57,7 @@ class ProductImageController extends BaseController
             return $this->successResponseWithMessage("Image uploaded successfully");
 
         } catch (ValidationException $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage(), 422);
         } catch (ProductImageDeleteException $exception) {
             return $this->errorResponse("Image Could not be deleted", 500);
@@ -72,24 +73,45 @@ class ProductImageController extends BaseController
         try {
             //check type validation
             $productImage = ProductImage::findOrFail($productImageId);
-            $type = $request->get('type');
-            if (in_array($type, config('image_type'))) {
-                throw new ProductImageTypeNotFound();
+            $types = $request->get('types');
+
+            //image type validation 
+            foreach ($types as $type => $item){
+                if (!in_array($type, ['main_image', 'small_image','thumbnail', 'normal_image'])) {
+                    throw new ProductImageTypeNotFound();
+                }
             }
-            $product = $productImage->product;
-            if ($product) {
-                $previousImage = ProductImage::where('product_id', $product->id)->where('type', $type)->first();
-                if ($previousImage)
-                    $previousImage->update([$type => 0]);
-                $productImage->update([$type => 1]);
+
+            //Change image type
+            foreach ($types as $type => $value){
+                $product = $productImage->product;
+                if($value){
+                    ProductImage::where('product_id', $product->id)->where('id', '!=' ,$productImage->id)->update([$type => 0]);
+                    $productImage->update([$type => $value]);
+
+                }else{
+
+                    $otherImage = ProductImage::where('product_id' ,$product->id)->where($type,1)->first();
+                    if(!$otherImage){
+                        $firstProductImage = ProductImage::where('product_id', $product->id)->first();
+                        $firstProductImage->update([$type => 1]);
+                    }
+                    $productImage->update([$type => $value]);
+                }
+
             }
+
+            return $this->successResponse("Image Updated success");
+
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->getMessage(), 422);
 
         } catch (ProductImageTypeNotFound $exception) {
+
             return $this->errorResponse($exception->getMessage(), 422);
 
         } catch (\Exception $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
     }

@@ -26,11 +26,10 @@ class ProductImageRepository
                 foreach ($files as $file) {
                     $fileName = $this->getFileName($file);
                     $file->move($this->folder_path.$this->product_image_path, $fileName);
-                    $image_type_array = $this->getImageType($product);
                     $productImage = ProductImage::create(array_merge([
                             'product_id' => $product->id,
                             'path' => $this->product_image_path.$fileName
-                    ],$image_type_array));
+                    ]));
                     $productImageIds[] = $productImage->id;
                 }
             }
@@ -69,18 +68,5 @@ class ProductImageRepository
         return false;
     }
 
-    private function getImageType(Product $product):array
-    {
-        $image_type_array= [];
-        $productImagesCount = ProductImage::where('product_id',$product->id)->count();
-        if($productImagesCount == 0) {
-            return $image_type_array = [
-                'main_image' => 1,
-                'small_image' => 1,
-                'thumbnail' => 1,
-            ];
 
-        }
-        return $image_type_array;
-    }
 }

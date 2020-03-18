@@ -4,6 +4,8 @@ namespace Modules\Product\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Product\Entities\ProductImage;
+use Modules\Product\Observer\ProductImageObserver;
 use Modules\Product\Providers\EventServiceProvider;
 
 class ProductServiceProvider extends ServiceProvider
@@ -20,6 +22,7 @@ class ProductServiceProvider extends ServiceProvider
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('Product', 'Database/Migrations'));
         $this->app->register(EventServiceProvider::class);
+        ProductImage::observe(ProductImageObserver::class);
     }
 
     /**
@@ -46,6 +49,7 @@ class ProductServiceProvider extends ServiceProvider
         );
 
         $this->mergeConfigFrom(module_path('Product', 'Config/product_types.php'), 'product_types');
+        $this->mergeConfigFrom(module_path('Product', 'Config/image_types.php'), 'image _types');
 
     }
 
