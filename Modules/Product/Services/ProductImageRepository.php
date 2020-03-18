@@ -2,7 +2,9 @@
 
 namespace Modules\Product\Services;
 
+use Illuminate\Support\Facades\DB;
 use Modules\Core\Traits\FileManager;
+use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductImage;
 
 class ProductImageRepository
@@ -23,30 +25,21 @@ class ProductImageRepository
         try {
             $productImageIds = [];
             $this->createFolderIfNotExist($this->folder_path);
-            $firstImageExists = false;
-            $productImages = $product->images;
-            if(isset($productImages) && $productImages->count()>0){
-                $firstImageExists = true;
-            }
-            $image_type_array = [];
             if (request()->hasFile('images')) {
                 $files = request()->file('images');
                 foreach ($files as $file) {
                     $fileName = $this->getFileName($file);
-                    $path = 'images/'.$this->folder.$fileName;
+                    $path = 'images/'.$this->folder.'/'.$fileName;
                     $file->move($this->folder_path, $fileName);
-                    if(!$firstImageExists){
-                         $image_type_array = [
-                            'main_image' => 1,
-                            'small_image' => 1,
-                            'thumbnail' => 1,
-                        ];
-                    }
+                    $image_type_array = $this->getImageType($product);
+
+
                     $productImage = ProductImage::create(array_merge([
                             'product_id' => $product->id,
                             'path' => $path
                     ],$image_type_array));
                     $productImageIds[] = $productImage->id;
+
                 }
 
             }
@@ -74,7 +67,7 @@ class ProductImageRepository
         return false;
     }
 
-    public function removeParticularProductImage($productImage)
+    public function removeParticularProductImage($productImage):bool
     {
         if ($productImage) {
             if (file_exists($this->folder_path . $productImage->image)) {
@@ -86,4 +79,19 @@ class ProductImageRepository
         return false;
     }
 
+    private function getImageType(Product $product):array
+    {
+        $image_type_array= [];
+        $firstImageExist =  true;
+        $productImagesCount = ProductImage::where('product_id',$product->id)->count();
+        if($productImagesCount == 0) {
+            return $image_type_array = [
+                'main_image' => 1,
+                'small_image' => 1,
+                'thumbnail' => 1,
+            ];
+
+        }
+        return $image_type_array;
+    }
 }

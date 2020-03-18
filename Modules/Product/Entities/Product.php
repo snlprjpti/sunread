@@ -5,6 +5,7 @@ namespace Modules\Product\Entities;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Category\Entities\Category;
@@ -18,7 +19,7 @@ class Product extends Model
     /**
      * Retrieve product attributes
      *
-     * @param Group $group
+     *
      * @param bool  $skipSuperAttribute
      * @return Collection
      */

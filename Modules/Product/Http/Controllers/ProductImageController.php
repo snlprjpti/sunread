@@ -12,12 +12,13 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductImage;
 use Modules\Product\Exceptions\ProductImageDeleteException;
+use Modules\Product\Exceptions\ProductImageTypeNotFound;
 use Modules\Product\Services\ProductImageRepository;
 
 class ProductImageController extends BaseController
 {
 
-    protected $pagination_limit ,$productImage;
+    protected $pagination_limit, $productImage;
 
     public function __construct(ProductImageRepository $productImage)
     {
@@ -29,9 +30,9 @@ class ProductImageController extends BaseController
     public function removeFile($productImageId)
     {
         try {
-            $productImage =  ProductImage::findOrFail($productImageId);
+            $productImage = ProductImage::findOrFail($productImageId);
             $isProductImageRemoved = $this->productImage->removeParticularProductImage($productImage);
-            if(!$isProductImageRemoved){
+            if (!$isProductImageRemoved) {
                 throw new ProductImageDeleteException();
             }
             return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Product Image']));
@@ -44,21 +45,22 @@ class ProductImageController extends BaseController
         }
     }
 
-    public function uploadFile(Request $request)
+    public function upload(Request $request)
     {
-        try{
-            $this->validate($request,[
+        try {
+
+            $this->validate($request, [
                 'product_id' => 'required|exists:products,id',
-                'images.*' => 'nullable|mimes:jpeg,jpg,bmp,png',
+                'images.*' => 'required|mimes:jpeg,jpg,bmp,png',
             ]);
             $product = Product::findOrFail($request->get('product_id'));
 
             //check validation of image type
             //upload files here
             $this->productImage->uploadProductImages($product);
-            $this->successResponse("Image changed success");
+            return $this->successResponse("Image changed success");
 
-        }catch (ValidationException $exception){
+        } catch (ValidationException $exception) {
             return $this->errorResponse($exception->getMessage(), 422);
         } catch (ProductImageDeleteException $exception) {
             return $this->errorResponse("Image Could not be deleted", 500);
@@ -68,6 +70,33 @@ class ProductImageController extends BaseController
         }
 
     }
-    
+
+    public function changeImageType(Request $request, $productImageId)
+    {
+        try {
+            //check type validation
+            $productImage = ProductImage::findOrFail($productImageId);
+            $type = $request->get('type');
+            if (in_array($type, config('image_type'))) {
+                throw new ProductImageTypeNotFound();
+            }
+            $product = $productImage->product;
+            if ($product) {
+                $previousImage = ProductImage::where('product_id', $product->id)->where('type', $type)->first();
+                if ($previousImage)
+                    $previousImage->update([$type => 0]);
+                $productImage->update([$type => 1]);
+            }
+        } catch (ValidationException $exception) {
+            return $this->errorResponse($exception->getMessage(), 422);
+
+        } catch (ProductImageTypeNotFound $exception) {
+            return $this->errorResponse($exception->getMessage(), 422);
+
+        } catch (\Exception $exception) {
+            return $this->errorResponse($exception->getMessage());
+        }
+    }
+
 }
 
