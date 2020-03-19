@@ -20,10 +20,16 @@ class AttributeOptionRepository  extends Repository implements AttributeOptionIn
         return AttributeOption::class;
     }
 
-    public function createAttributeOption(array $data)
+    public function createOrUpdateAttributeOption(array $data)
     {
-        $attributeOption = $this->model->create($data);
-        $attributeOption = $this->createUpdateOptionTranslation($data,$attributeOption);
+        if (isset($data['attribute_option_id'])) {
+            $attributeOption = $this->model->findOrFail($data['attribute_option_id']);
+        }else{
+            $attributeOption =  new AttributeOption();
+        }
+        $attributeOption->fill($data);
+        $attributeOption->save();
+        $this->createUpdateOptionTranslation($data,$attributeOption);
         return $attributeOption;
     }
 
@@ -32,6 +38,7 @@ class AttributeOptionRepository  extends Repository implements AttributeOptionIn
     {
         if(isset($optionInputs['translations'])){
             $translated_options = $optionInputs['translations'];
+
             foreach ($translated_options as $translated_option){
                 $check_attributes = ['locale' => $translated_option['locale'], 'attribute_option_id' => $attributeOption->id];
                 $optionInputs = array_merge($translated_option, $check_attributes);

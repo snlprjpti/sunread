@@ -15,16 +15,4 @@ class Attribute extends Model
 
     }
 
-//    public function createUpdateTranslation(Array $translation_attributes)
-//    {
-//        foreach ($translation_attributes as $translation_attribute){
-//            $check_attributes = ['locale' => $translation_attribute['locale'], 'attribute_id' => $this->id];
-//            $attribute_translation = AttributeTranslation::firstorNew($check_attributes);
-//            $attribute_translation->fill($translation_attribute);
-//            $attribute_translation->save();
-//        }
-//
-//    }
-
-
 }

@@ -128,21 +128,22 @@ class ProductController extends BaseController
             //validation
             $this->validate($request,Product::rules($id));
 
-            DB::beginTransaction();
 
             //Event start Log
             Event::dispatch('catalog.product.update.before', $id);
 
+            DB::beginTransaction();
             //Get the type of product to update
             $productInstance = $product->getTypeInstance();
 
             //update the product according to type
             $product = $productInstance->update($request->all(), $id);
 
+            DB::commit();
+
             //Event complete Log
             Event::dispatch('catalog.product.update.after', $product);
 
-            DB::commit();
             return $this->successResponse($product,trans('core::app.response.update-success', ['name' => 'Product']));
 
         } catch (ModelNotFoundException $exception) {

@@ -47,7 +47,7 @@ class AttributeRepository extends Repository implements AttributeInterface
         $options = $request->get('attribute_options');
         if (is_array($options) && in_array($attribute->type, ['select', 'multiselect', 'checkbox']) && count($options)) {
             foreach ($options as $optionInputs) {
-                $this->attributeOptionRepository->createAttributeOption(
+                $this->attributeOptionRepository->createOrUpdateAttributeOption(
                     array_merge(
                         $optionInputs,
                         ['attribute_id' => $attribute->id]
@@ -83,14 +83,19 @@ class AttributeRepository extends Repository implements AttributeInterface
         );
 
         //update attribute translation
-        $attribute->createUpdateTranslation($request->get('translations'));
+        $this->createUpdateTranslation($request->get('translations'),$attribute);
 
         //store attribute-option and translation
         $options = $request->get('attribute_options');
 
         if (is_array($options) && in_array($attribute->type, ['select', 'multiselect', 'checkbox']) && count($options)) {
             foreach ($options as $optionInputs) {
-                 $this->attributeOptionRepository->createOrUpdateAttributeOption($optionInputs,$attribute);
+                 $this->attributeOptionRepository->createOrUpdateAttributeOption(
+                     array_merge(
+                         $optionInputs,
+                         ['attribute_id' => $attribute->id]
+                     )
+                 );
             }
         }
 

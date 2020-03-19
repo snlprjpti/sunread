@@ -26,8 +26,8 @@ class AttributeController extends BaseController
 
     public function __construct(AttributeRepository $attributeRepository)
     {
-      //  $this->middleware('admin');
         parent::__construct();
+        $this->middleware('admin');
         $this->attributeRepository =  $attributeRepository;
     }
 
@@ -143,6 +143,7 @@ class AttributeController extends BaseController
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
+
             DB::rollBack();
             return $this->errorResponse($exception->getMessage());
         }
