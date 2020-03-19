@@ -4,39 +4,44 @@ namespace Modules\Attribute\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
 use Modules\Attribute\Exceptions\DefaultFamilySlugCanNotBeModified;
+use Modules\Attribute\Repositories\AttributeFamilyRepository;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
 
 class AttributeFamilyController extends BaseController
 {
+    //set custom pagination list
     protected $pagination_limit;
 
+    private $attributeFamilyRepository;
     /**
-     * AtttributeFamily constructor.
-     * Admin middleware checks the admin against admins table
+     * Attribute Family constructor.
+     * @param AttributeFamilyRepository $attributeFamilyRepository
      */
 
-    public function __construct()
+    public function __construct(AttributeFamilyRepository $attributeFamilyRepository)
     {
         $this->middleware('admin');
         parent::__construct();
+        $this->attributeFamilyRepository = $attributeFamilyRepository;
     }
 
     /**
-     * Returns all the attribute_familys
-     * @return \Illuminate\Http\JsonResponse
+     * Returns all the attribute family
+     * @return JsonResponse
      */
     public function index()
     {
         try {
 
-            $payload = AttributeFamily::paginate($this->pagination_limit);
+            $payload = $this->attributeFamilyRepository->paginate($this->pagination_limit);
             return $this->successResponse($payload);
+
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
 
@@ -48,13 +53,13 @@ class AttributeFamilyController extends BaseController
     /**
      * Get the particular attribute_family
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {
         try {
 
-            $payload = AttributeFamily::findOrFail($id);
+            $payload = $this->attributeFamilyRepository->findOrFail($id);
             return $this->successResponse($payload);
 
         } catch (ModelNotFoundException $exception) {
@@ -69,20 +74,21 @@ class AttributeFamilyController extends BaseController
     /**
      * Stores new attribute_family
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
         try {
 
-            $this->validate($request, AttributeFamily::rules());
+            //validation
+            $this->validate($request, $this->attributeFamilyRepository->rules());
 
+            //create slug
             if (!$request->get('slug')) {
-                $request->merge(['slug' => AttributeFamily::createSlug($request->get('name'))]);
+                $request->merge(['slug' => $this->attributeFamilyRepository->createSlug($request->get('name'))]);
             }
-            $attribute_family = AttributeFamily::create(
-                $request->only('name', 'slug')
-            );
+
+            $attribute_family = $this->attributeFamilyRepository->create($request->only('name', 'slug'));
 
             return $this->successResponse($payload = $attribute_family, trans('core::app.response.create-success', ['name' => 'Attribute Family']), 201);
 
@@ -102,24 +108,21 @@ class AttributeFamilyController extends BaseController
      * Updates the attribute_family details
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
-     * @throws ValidationException
+     * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
         try {
-            $this->validate($request, AttributeFamily::rules($id));
-            $attribute_family = AttributeFamily::findOrFail($id);
+            $this->validate($request, $this->attributeFamilyRepository->rules($id));
 
-            //custom exception
+            //custom exception default attribute family slug not allowed
             if ($request->slug == 'default') {
                 throw new DefaultFamilySlugCanNotBeModified();
             }
-            $attribute_family = $attribute_family->update(
-                $request->only('name', 'slug')
-            );
 
-            return $this->successResponse($attribute_family, trans('core::app.response.update-success', ['name' => 'Attribute Family']));
+            $this->attributeFamilyRepository->update($request->only('name', 'slug'),$id);
+            return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => 'Attribute Family']));
+
         } catch (DefaultFamilySlugCanNotBeModified $exception) {
             return $this->errorResponse($exception->errors(), 400);
 
@@ -137,16 +140,17 @@ class AttributeFamilyController extends BaseController
     /**
      * Destroys the particular attribute_family
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy($id)
     {
         try {
-            $attribute_family = AttributeFamily::findOrFail($id);
+
+            $attribute_family = $this->attributeFamilyRepository->findOrFail($id);
             if ($attribute_family->slug == 'default') {
                 throw  new DefaultFamilyCanNotBeDeleted;
             }
-            $attribute_family->delete();
+            $this->attributeFamilyRepository->delete($attribute_family->id);
             return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Attribute Family']));
 
         } catch (ModelNotFoundException $exception) {

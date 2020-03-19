@@ -11,11 +11,11 @@ use Illuminate\Container\Container as App;
 use Modules\Core\Contracts\CriteriaInterface;
 use Modules\Core\Contracts\RepositoryInterface;
 use Modules\Core\Repositories\Criteria\Criteria;
+use Modules\Core\Traits\SlugAble;
 
 
 /**
  * Class Repository
-
  */
 abstract class Repository implements RepositoryInterface, CriteriaInterface
 {
@@ -51,6 +51,7 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
     /**
      * @param App $app
      * @throws
+     *
      */
     public function __construct(App $app)
     {
@@ -144,7 +145,8 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
      */
     public function update(array $data, $id, $attribute = "id")
     {
-        return $this->model->where($attribute, '=', $id)->update($data);
+        $this->model = $this->findOrFail($id);
+        return $this->model->update($data);
     }
 
     /**
@@ -347,4 +349,17 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
 
         return $this;
     }
+
+    /**
+     * @param $id
+     * @param array $columns
+     * @return mixed
+     */
+    public function findOrFail($id, $columns = array('*'))
+    {
+        $this->applyCriteria();
+        return $this->model->findOrFail($id, $columns);
+    }
+
+
 }

@@ -6,8 +6,8 @@ namespace Modules\Core\Traits;
 use Illuminate\Support\Str;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 
-
-trait SlugAble
+//generates slugs for repositories
+trait Sluggable
 {
 
     /**
@@ -48,18 +48,17 @@ trait SlugAble
 
     private function getRelatedSlugs($slug, $id = 0)
     {
-        return $this->whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")
+        return $this->model()->whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")
             ->where('id', '<>', $id)
             ->get();
     }
 
     private  function checkIfSlugExist($slug, $id = 0)
     {
-        return $this->select('slug')->where('slug', $slug)
+        return $this->model()->select('slug')->where('slug', $slug)
             ->where('id', '<>', $id)
             ->exists();
 
     }
-
 
 }
