@@ -45,16 +45,16 @@ class ProductFlatTable
      */
     public function afterAttributeCreatedUpdated($attribute)
     {
-        if (!$attribute->is_user_defined) {
-            return false;
-        }
+//        if (!$attribute->is_user_defined) {
+//            return false;
+//        }
 
         if (!$attribute->use_in_flat) {
             $this->afterAttributeDeleted($attribute->id);
             return false;
         }
 
-        if (!Schema::hasColumn('product_flat', $attribute->code)) {
+        if (!Schema::hasColumn('product_flat', $attribute->slug)) {
             Schema::table('product_flat', function (Blueprint $table) use ($attribute) {
                 $table->{$this->attributeTypeFields[$attribute->type]}($attribute->slug)->nullable();
 
@@ -154,7 +154,7 @@ class ProductFlatTable
                             $productFlat->{$attribute->slug . '_label'} = $attributeOption->name;
                         }
                     }
-                    
+
                 }
             }
         }

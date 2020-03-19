@@ -56,7 +56,7 @@ class AttributeRepository extends Repository implements AttributeInterface
             }
         }
 
-        Event::dispatch('catalog.attribute.create.after');
+        Event::dispatch('catalog.attribute.create.after',$attribute);
 
         return $attribute;
     }
@@ -104,5 +104,15 @@ class AttributeRepository extends Repository implements AttributeInterface
             'type' => 'required',
             'attribute_group_id' => 'nullable|exists:attribute_groups,id'
         ], $merge);
+    }
+
+    public function delete($id)
+    {
+        Event::dispatch('catalog.attribute.delete.before', $id);
+
+        parent::delete($id);
+
+        Event::dispatch('catalog.attribute.delete.after', $id);
+
     }
 }

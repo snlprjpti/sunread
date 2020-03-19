@@ -14,11 +14,11 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-      //  Event::listen('catalog.attribute.create.after', 'Modules\Product\Listeners\ProductFlatTable@afterAttributeCreatedUpdated');
+        Event::listen('catalog.attribute.create.after', 'Modules\Product\Listeners\ProductFlatTable@afterAttributeCreatedUpdated');
 
-        //Event::listen('catalog.attribute.update.after', 'Modules\Product\Listeners\ProductFlatTable@afterAttributeCreatedUpdated');
+        Event::listen('catalog.attribute.update.after', 'Modules\Product\Listeners\ProductFlatTable@afterAttributeCreatedUpdated');
 
-        //Event::listen('catalog.attribute.delete.before', 'Modules\Product\Listeners\ProductFlatTable@afterAttributeDeleted');
+        Event::listen('catalog.attribute.delete.before', 'Modules\Product\Listeners\ProductFlatTable@afterAttributeDeleted');
 
         Event::listen('catalog.product.create.after', 'Modules\Product\Listeners\ProductFlatTable@afterProductCreatedUpdated');
 

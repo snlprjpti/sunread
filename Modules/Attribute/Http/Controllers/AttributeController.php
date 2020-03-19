@@ -159,8 +159,8 @@ class AttributeController extends BaseController
     {
         try {
 
-            $attribute = $this->attributeRepository->findOrFail($id);
-            $attribute->delete();
+            $this->attributeRepository->findOrFail($id);
+            $this->attributeRepository->delete($id);
             return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Attribute ']));
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
