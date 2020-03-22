@@ -173,6 +173,9 @@ class AttributeController extends BaseController
 
     public function checkIfTranslationExist($translations)
     {
+        if(empty($translations)){
+            return false;
+        }
         $locale_variable_present = true;
         foreach ($translations as $translation) {
             if (!array_key_exists('locale', $translation)) {
@@ -196,7 +199,7 @@ class AttributeController extends BaseController
         //check attribute translation
         $isAttributeTranslationExist = $this->checkIfTranslationExist($translations);
         if (!$isAttributeTranslationExist) {
-            throw new AttributeTranslationDoesNotExist();
+            throw new AttributeTranslationDoesNotExist("Missing attribute translation");
         }
 
         //check options translations
@@ -206,11 +209,11 @@ class AttributeController extends BaseController
         if (is_array($options) && in_array($request->type, ['select', 'multiselect', 'checkbox'])) {
             foreach ($options as $option) {
                 if (!isset($option['translations'])) {
-                    throw new AttributeTranslationOptionDoesNotExist();
+                    throw new AttributeTranslationOptionDoesNotExist("Missing Attribute Option Translation");
                 }
                 $isOptionTranslationExist = $this->checkIfTranslationExist($translations);
                 if (!$isOptionTranslationExist) {
-                    throw new  AttributeTranslationOptionDoesNotExist();
+                    throw new  AttributeTranslationOptionDoesNotExist("Missing Attribute Option Translation");
                 }
             }
         }

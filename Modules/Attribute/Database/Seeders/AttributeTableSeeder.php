@@ -80,10 +80,7 @@ class AttributeTableSeeder extends Seeder
             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
             ['id' => '22','slug' => 'size','name' => 'Size','type' => 'select','validation' => NULL,'position' => '24','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '1','is_configurable' => '1','is_user_defined' => '1','is_visible_on_front' => '0',
              'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
-            ['id' => '23','slug' => 'brand','name' => 'Brand','type' => 'select','validation' => NULL,'position' => '25','is_required' => '0','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '1','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '1',
-             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
-            ['id' => '24','slug' => 'guest_checkout','name' => 'Guest Checkout','type' => 'boolean','validation' => NULL,'position' => '8','is_required' => '1','is_unique' => '0','value_per_locale' => '0','value_per_channel' => '0','is_filterable' => '0','is_configurable' => '0','is_user_defined' => '0','is_visible_on_front' => '0',
-             'use_in_flat' => '1','created_at' => $now,'updated_at' => $now],
+
         ];
 
 

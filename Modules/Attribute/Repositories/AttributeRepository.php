@@ -34,7 +34,7 @@ class AttributeRepository extends Repository implements AttributeInterface
         //storing attribute
         $attribute = $this->model->create(
             $request->only(
-                ['slug', 'name', 'type', 'position', 'is_required', 'is_unique', 'validation', 'is_filterable', 'is_visible_on_front', 'is_user_defined', 'use_in_flat']
+                ['slug', 'name', 'type', 'position', 'is_required', 'is_unique', 'validation', 'is_filterable', 'is_visible_on_front', 'is_user_defined', 'use_in_flat', 'attribute_group_id']
             )
         );
 
