@@ -143,7 +143,7 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
      * @param string $attribute
      * @return mixed
      */
-    public function update(array $data, $id, $attribute = "id")
+    public function update(array $data, $id)
     {
         $this->model = $this->findOrFail($id);
         return $this->model->update($data);

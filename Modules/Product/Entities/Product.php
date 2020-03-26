@@ -100,39 +100,7 @@ class Product extends Model
         return $this->attribute_family->custom_attributes()->get();
     }
 
-    /**
-     * @param int $id
-     * @param array $merge
-     * @return array
-     */
-    public static function rules($id = 0,$merge = [])
-    {
 
-        $product = Product::findOrFail($id);
-
-        //static validation
-        $rules = array_merge($product->getTypeInstance()->getTypeValidationRules(), [
-            'sku' => ['required', 'unique:products,sku' . ($id ? ",$id" : '')],
-            'price' => 'required',
-            'special_price_from' => 'nullable|date',
-            'special_price_to' => 'nullable|date|after_or_equal:special_price_from',
-            'special_price' => ['nullable', 'decimal'],
-            'old_price' => ['nullable', 'decimal']
-        ],$merge);
-
-
-        //Dynamic validation based on attribute
-        $custom_attributes = $product->getTypeInstance()->getEditableAttributes();
-
-        foreach ($custom_attributes as $attribute) {
-            if ($attribute->slug == 'sku' || $attribute->type == 'boolean')
-                continue;
-            $validations = self::fetchValidation($attribute,$id);
-            $rules[$attribute->slug] = $validations;
-        }
-
-        return $rules;
-    }
 
     private static function fetchValidation($attribute,$id)
     {
