@@ -2,16 +2,18 @@
 
 namespace Modules\Attribute\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Modules\Attribute\Contracts\AttributeInterface;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeTranslation;
 use Modules\Core\Eloquent\Repository;
 use Illuminate\Container\Container as App;
+use Modules\Core\Traits\Sluggable;
 
 class AttributeRepository extends Repository implements AttributeInterface
 {
-
+    use Sluggable;
     protected $attributeOptionRepository;
     public function __construct(AttributeOptionRepository $attributeOptionRepository, App $app)
     {
@@ -31,37 +33,51 @@ class AttributeRepository extends Repository implements AttributeInterface
     {
         Event::dispatch('catalog.attribute.create.before');
 
-        //storing attribute
-        $attribute = $this->model->create(
-            $request->only(
-                ['slug', 'name', 'type', 'position', 'is_required', 'is_unique', 'validation', 'is_filterable', 'is_visible_on_front', 'is_user_defined', 'use_in_flat', 'attribute_group_id']
-            )
-        );
+        try {
+            DB::beginTransaction();
 
-        //storing attributes-translation
-        if (is_array($request->get('translations'))) {
-            $this->createUpdateTranslation($request->get('translations'),$attribute);
-        }
+            //storing attribute
+            $attribute = $this->model->create(
+                $request->only(
+                    ['slug', 'name', 'type', 'position', 'is_required', 'is_unique', 'validation', 'is_filterable', 'is_visible_on_front', 'is_user_defined', 'use_in_flat', 'attribute_group_id']
+                )
+            );
 
-        //store attribute-option
-        $options = $request->get('attribute_options');
-        if (is_array($options) && in_array($attribute->type, ['select', 'multiselect', 'checkbox']) && count($options)) {
-            foreach ($options as $optionInputs) {
-                $this->attributeOptionRepository->createOrUpdateAttributeOption(
-                    array_merge(
-                        $optionInputs,
-                        ['attribute_id' => $attribute->id]
-                    )
-                );
+            //storing attributes-translation
+            if (is_array($request->get('translations'))) {
+                $this->createUpdateTranslation($request->get('translations'),$attribute);
             }
+
+            //store attribute-option for super attributes
+            $options = $request->get('attribute_options');
+            if (is_array($options) && in_array($attribute->type, ['select', 'multiselect', 'checkbox']) && count($options)) {
+                foreach ($options as $optionInputs) {
+                    $this->attributeOptionRepository->createOrUpdateAttributeOption(
+                        array_merge(
+                            $optionInputs,
+                            ['attribute_id' => $attribute->id]
+                        )
+                    );
+                }
+            }
+
+            DB::commit();
+
+        }catch (\Exception $exception){
+            DB::rollBack();
+            throw  $exception;
         }
 
         Event::dispatch('catalog.attribute.create.after',$attribute);
-
         return $attribute;
     }
 
-    public function createUpdateTranslation(Array $translation_attributes,$attribute)
+
+    /** Creates or Updates Translation of attributes
+     * @param array $translation_attributes
+     * @param $attribute
+     */
+    public function createUpdateTranslation(Array $translation_attributes, $attribute)
     {
         foreach ($translation_attributes as $translation_attribute){
             $check_attributes = ['locale' => $translation_attribute['locale'], 'attribute_id' => $attribute->id];
@@ -75,8 +91,14 @@ class AttributeRepository extends Repository implements AttributeInterface
     //updates attributes and translation
     public function updateAttributes($request ,$id)
     {
-        $attribute = $this->model->findOrFail($id);
-        $attribute->update(
+        Event::dispatch('catalog.attribute.update.before');
+        try {
+
+            DB::beginTransaction();
+
+            $attribute = $this->model->findOrFail($id);
+
+            $attribute->update(
             $request->only(
                 ['slug', 'name', 'type', 'position', 'is_required', 'is_unique', 'validation', 'is_filterable', 'is_visible_on_front', 'is_user_defined', 'swatch_type', 'use_in_flat']
             )
@@ -98,6 +120,13 @@ class AttributeRepository extends Repository implements AttributeInterface
                  );
             }
         }
+        DB::commit();
+        }catch ( \Exception $exception){
+            DB::rollBack();
+            throw $exception;
+
+        }
+        Event::dispatch('catalog.attribute.update.after' ,$attribute);
 
     }
 

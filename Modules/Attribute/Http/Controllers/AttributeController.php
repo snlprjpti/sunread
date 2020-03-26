@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
 use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
@@ -76,12 +75,12 @@ class AttributeController extends BaseController
     public function store(Request $request)
     {
         try {
+
             //Validation
             $this->validate($request, $this->attributeRepository->rules());
 
             //custom validation to for translation
             $this->checkCustomCustomValidation($request);
-
             if (!in_array($request->get('type'), ['select', 'multiselect', 'checkbox'])) {
                 $request->merge([
                     'is_filterable' => 0
@@ -94,10 +93,7 @@ class AttributeController extends BaseController
             }
 
             //Store Attributes
-            DB::beginTransaction();
             $attribute =  $this->attributeRepository->createAttribute($request);
-            DB::commit();
-
             return $this->successResponse($payload = $attribute, trans('core::app.response.create-success', ['name' => 'Attribute']), 201);
 
         } catch (ValidationException $exception) {
@@ -128,23 +124,18 @@ class AttributeController extends BaseController
             $this->checkCustomCustomValidation($request);
 
             //update attribute
-            DB::beginTransaction();
             $this->attributeRepository->updateAttributes($request ,$id);
-            DB::commit();
 
             return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => 'Attribute']));
 
         } catch (ValidationException $exception) {
-            DB::rollBack();
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (QueryException $exception) {
-            DB::rollBack();
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
 
-            DB::rollBack();
             return $this->errorResponse($exception->getMessage());
         }
     }
@@ -171,23 +162,28 @@ class AttributeController extends BaseController
     }
 
 
+    /** Checks if locale is present in translation
+     * @param $translations
+     * @return bool
+     */
     public function checkIfTranslationExist($translations)
     {
         if(empty($translations)){
             return false;
         }
-        $locale_variable_present = true;
+        $locale_key_present = true;
         foreach ($translations as $translation) {
             if (!array_key_exists('locale', $translation)) {
-                return $locale_variable_present = false;
+                return $locale_key_present = false;
             }
         }
-        return $locale_variable_present;
+        return $locale_key_present;
 
     }
 
     /**
-     * Checks if translation exist
+     * Checks if translation exist for attributes and attribute options
+     * At least one translation is needed
      * @param $request
      * @throws AttributeTranslationDoesNotExist
      * @throws AttributeTranslationOptionDoesNotExist
@@ -204,7 +200,6 @@ class AttributeController extends BaseController
 
         //check options translations
         $options = $request->get('attribute_options');
-
 
         if (is_array($options) && in_array($request->type, ['select', 'multiselect', 'checkbox'])) {
             foreach ($options as $option) {
