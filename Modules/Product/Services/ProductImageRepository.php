@@ -16,7 +16,7 @@ class ProductImageRepository
         $this->folder_path = storage_path('app/public/');
         $this->product_image_path = 'images/product/';
     }
-    public function uploadProductImages($product)
+    public function uploadProductImages(Product $product):array
     {
         try {
             $productImageIds = [];
@@ -35,6 +35,7 @@ class ProductImageRepository
             }
             return $productImageIds;
         } catch (\Exception $exception) {
+            dd($exception);
             throw  $exception;
         }
 

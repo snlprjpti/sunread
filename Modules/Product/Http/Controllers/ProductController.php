@@ -10,17 +10,18 @@ use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\Category;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Repositories\ProductRepository;
-;
 
 class ProductController extends BaseController
 {
 
+    /**
+     * AttributeRepository object
+     */
     protected $pagination_limit,$productRepository;
 
 
     /**
      * ProductController constructor.
-     *
      * @param ProductRepository $productRepository
      */
     public function __construct(ProductRepository $productRepository)
@@ -31,7 +32,7 @@ class ProductController extends BaseController
     }
 
     /**
-     * returns all the products
+     * Returns all the products
      * @return JsonResponse
      */
     public function index()
@@ -58,6 +59,7 @@ class ProductController extends BaseController
     public function show($id)
     {
         try {
+
             $product = $this->productRepository->findOrFail($id);
             $category_tree = (new Category())->getCategoryTree();
             $payload = ['product' => $product,'category_tree' => $category_tree];
@@ -72,19 +74,21 @@ class ProductController extends BaseController
 
     }
 
-    //store the particular resource
+
+    /**
+     * store the particular resource
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function store(Request $request)
     {
 
         try {
 
-            //Fetching validation rules
-            $rules =  $this->productRepository->rules();
-
             //validation
             $this->validate($request, [
                 'type' => 'required',
-                'attribute_family_id' => 'required',
+                'attribute_family_id' => 'required|exists:attribute_families,id',
                 'sku' => ['required', 'unique:products,sku'],
                 'slug' => ['required','unique:products,slug']
             ]);
@@ -106,7 +110,8 @@ class ProductController extends BaseController
     }
 
 
-    /**Update the products and variats
+    /**
+     * Update the products and variats
      * @param Request $request
      * @param $id
      * @return JsonResponse
@@ -115,14 +120,14 @@ class ProductController extends BaseController
     {
 
         try{
-                $product = $this->productRepository->findOrFail($id);
+            //fetch rules
             $rules = $this->productRepository->rules($id);
 
-            //validation
+            //validate
             $this->validate($request,$rules);
 
             //update
-            $this->productRepository->update($request->all(),$id);
+            $product = $this->productRepository->update($request->all(),$id);
 
             return $this->successResponse($product,trans('core::app.response.update-success', ['name' => 'Product']));
 
@@ -138,9 +143,15 @@ class ProductController extends BaseController
 
     }
 
+    /**
+     * Delete a product item
+     * @param $id
+     * @return JsonResponse
+     */
     public function destroy($id)
     {
         try {
+
             $this->productRepository->delete($id);
             return $this->successResponseWithMessage("Product deleted success!!");
 

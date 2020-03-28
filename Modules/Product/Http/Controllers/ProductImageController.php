@@ -2,12 +2,9 @@
 
 namespace Modules\Product\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
-use Modules\Category\Entities\Category;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductImage;

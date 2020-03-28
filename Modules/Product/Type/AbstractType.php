@@ -84,7 +84,7 @@ abstract class AbstractType
         }
 
         //Upload ProductImage
-        $this->productImage->uploadProductImages($data, $product);
+        $this->productImage->uploadProductImages($product);
 
         //TODO::future => Update cross-sell, up-sells, inventories
 

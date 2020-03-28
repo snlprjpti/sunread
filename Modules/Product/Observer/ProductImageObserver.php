@@ -3,8 +3,6 @@
 
 namespace Modules\Product\Observer;
 
-
-use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductImage;
 
 class ProductImageObserver

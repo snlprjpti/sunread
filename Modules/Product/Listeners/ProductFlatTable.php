@@ -45,9 +45,6 @@ class ProductFlatTable
      */
     public function afterAttributeCreatedUpdated($attribute)
     {
-//        if (!$attribute->is_user_defined) {
-//            return false;
-//        }
 
         if (!$attribute->use_in_flat) {
             $this->afterAttributeDeleted($attribute->id);
@@ -163,9 +160,10 @@ class ProductFlatTable
         $productFlat->updated_at = $product->updated_at;
 
         //upload image
-        $thumbnail = $product->images->where('type', 'thumbnail')->first();
-        if($thumbnail){
-            $productFlat->thumbnail = $thumbnail->image;
+        $images = $product->images;
+        if($images){
+            $thumbnail = $images->where( 'thumbnail', 1)->first();
+            $productFlat->thumbnail = $thumbnail->path;
         }
 
 

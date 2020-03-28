@@ -114,9 +114,10 @@ class ProductRepository extends Repository
         //static validation
         $rules = array_merge($product->getTypeInstance()->getTypeValidationRules(), [
             'sku' => ['required', 'unique:products,sku' . ($id ? ",$id" : '')],
+            'slug' => ['required','unique:products,slug'. ($id ? ",$id" : '')],
             'price' => 'required',
             'special_price_from' => 'nullable|date',
-            'special_price_to' => 'nullable|date|after_or_equal:special_price_from',
+            'special_price_to' => 'nullable|date|after_or_equal:special_prices_from',
             'special_price' => ['nullable', 'decimal'],
             'old_price' => ['nullable', 'decimal']
         ],$merge);
@@ -133,6 +134,26 @@ class ProductRepository extends Repository
         }
 
         return $rules;
+    }
+
+    private static function fetchValidation($attribute,$id)
+    {
+        $validations = [];
+
+        array_push($validations, $attribute->is_required ? 'required' : 'nullable');
+
+        if ($attribute->validation) {
+            array_push($validations, $attribute->validation);
+        }
+
+        if ($attribute->type == 'price')
+            array_push($validations, 'decimal');
+
+        if ($attribute->is_unique) {
+            array_push($validations,'unique:'.$attribute->slug.($id ? ",$id" : ''));
+        }
+        return $validations;
+
     }
 
 

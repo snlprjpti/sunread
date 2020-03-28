@@ -102,26 +102,6 @@ class Product extends Model
 
 
 
-    private static function fetchValidation($attribute,$id)
-    {
-        $validations = [];
-
-        array_push($validations, $attribute->is_required ? 'required' : 'nullable');
-
-        if ($attribute->validation) {
-            array_push($validations, $attribute->validation);
-        }
-
-        if ($attribute->type == 'price')
-            array_push($validations, 'decimal');
-
-        if ($attribute->is_unique) {
-            array_push($validations,'unique:'.$attribute->slug.($id ? ",$id" : ''));
-        }
-        return $validations;
-
-    }
-
     /**
      * The images that belong to the product.
      */
