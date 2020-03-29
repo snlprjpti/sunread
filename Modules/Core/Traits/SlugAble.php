@@ -16,7 +16,7 @@ trait SlugAble
      * @return string
      * @throws \Exception
      */
-    public static function createSlug($title, $id = 0)
+    public function createSlug($title, $id = 0)
     {
 
         // Normalize the title attribute
@@ -46,16 +46,16 @@ trait SlugAble
         return $slug;
     }
 
-    protected static function getRelatedSlugs($slug, $id = 0)
+    private function getRelatedSlugs($slug, $id = 0)
     {
-        return static::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")
+        return $this->whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")
             ->where('id', '<>', $id)
             ->get();
     }
 
-    protected static function checkIfSlugExist($slug, $id = 0)
+    private  function checkIfSlugExist($slug, $id = 0)
     {
-        return static::select('slug')->where('slug', $slug)
+        return $this->select('slug')->where('slug', $slug)
             ->where('id', '<>', $id)
             ->exists();
 
