@@ -163,7 +163,9 @@ class ProductFlatTable
         $images = $product->images;
         if($images){
             $thumbnail = $images->where( 'thumbnail', 1)->first();
-            $productFlat->thumbnail = $thumbnail->path;
+            if($thumbnail){
+                $productFlat->thumbnail = $thumbnail->path;
+            }
         }
 
 

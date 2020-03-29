@@ -50,19 +50,23 @@ class ProductRepository extends Repository
 
     public function store(array $data)
     {
-        Event::dispatch('catalog.product.create.before');
 
         try {
             DB::beginTransaction();
+
+            Event::dispatch('catalog.product.create.before');
+
             $typeInstance = app(config('product_types.' . $data['type'] . '.class'));
             $product = $typeInstance->create($data);
+
+            Event::dispatch('catalog.product.create.after', $product);
+
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollBack();
             throw  $exception;
         }
 
-        Event::dispatch('catalog.product.create.after', $product);
         return $product;
     }
 
@@ -75,12 +79,16 @@ class ProductRepository extends Repository
      */
     public function update(array $data, $id)
     {
-        Event::dispatch('catalog.product.update.before', $id);
         try {
-
             DB::beginTransaction();
+
+            Event::dispatch('catalog.product.update.before', $id);
+
             $product = $this->find($id);
             $product = $product->getTypeInstance()->update($data, $id);
+
+            Event::dispatch('catalog.product.update.after', $product);
+
             DB::commit();
 
         } catch (\Exception $exception) {
@@ -88,7 +96,6 @@ class ProductRepository extends Repository
             throw  $exception;
         }
 
-        Event::dispatch('catalog.product.update.after', $product);
         return $product;
     }
 
