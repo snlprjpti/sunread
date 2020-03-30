@@ -8,7 +8,6 @@ use Modules\Core\Entities\Locale;
 class LocaleRepository extends Repository
 {
     /**
-     * Specify Model class name
      *
      * @return mixed
      */

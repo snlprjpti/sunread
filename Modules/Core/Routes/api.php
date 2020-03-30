@@ -26,8 +26,5 @@ Route::group(['middleware' => ['api']], function () {
         Route::put('/locales/{locale}', 'LocaleController@update')->name('admin.locales.update');
         Route::delete('/locales/{locale}', 'LocaleController@destroy')->name('admin.locales.delete');
 
-
-
-
     });
 });
