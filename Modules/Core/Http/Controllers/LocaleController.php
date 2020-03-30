@@ -49,7 +49,7 @@ class LocaleController extends BaseController
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
-        };
+        }
     }
 
     /**

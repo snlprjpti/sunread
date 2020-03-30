@@ -26,5 +26,11 @@ Route::group(['middleware' => ['api']], function () {
         Route::put('/locales/{locale}', 'LocaleController@update')->name('admin.locales.update');
         Route::delete('/locales/{locale}', 'LocaleController@destroy')->name('admin.locales.delete');
 
+        // Currency Routes
+        Route::get('/currencies', 'CurrencyController@index')->name('admin.currencies.index');
+        Route::post('/currencies', 'CurrencyController@store')->name('admin.currencies.store');
+        Route::get('/currencies/{currency}', 'CurrencyController@show')->name('admin.currencies.show');
+        Route::put('/currencies/{currency}', 'CurrencyController@update')->name('admin.currencies.update');
+        Route::delete('/currencies/{currency}', 'CurrencyController@destroy')->name('admin.currencies.delete');
     });
 });

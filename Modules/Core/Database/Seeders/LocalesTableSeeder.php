@@ -13,7 +13,8 @@ class LocalesTableSeeder extends Seeder
 
         DB::table('locales')->delete();
 
-        DB::table('locales')->insert([
+        DB::table('locales')->insert(
+            [[
                 'id' => 1,
                 'code' => 'en',
                 'name' => 'English',
@@ -21,6 +22,6 @@ class LocalesTableSeeder extends Seeder
                 'id' => 2,
                 'code' => 'fr',
                 'name' => 'French',
-            ]);
+            ]]);
     }
 }

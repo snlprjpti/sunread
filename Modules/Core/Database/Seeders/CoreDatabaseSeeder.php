@@ -16,5 +16,6 @@ class CoreDatabaseSeeder extends Seeder
     {
         Model::unguard();
         $this->call(LocalesTableSeeder::class);
+        $this->call(CurrencyTableSeeder::class);
     }
 }
