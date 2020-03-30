@@ -88,12 +88,18 @@ return [
             'submit-btn-title' => 'Sign In'
         ],
 
-        'token' =>[
+        'token' => [
             'token-missing' => 'Missing token',
             'token-invalid' => 'Invalid token',
             'token-expired' => 'Token is expired',
             'token-generation-problem' => 'Unable to generate token'
 
-        ]
+        ],
+    ],
+    'settings' => [
+        'locales' => [
+            'title' => 'Locales',
+            'last-delete-error' => 'At least one Locale is required.',
+        ],
     ],
 ];
