@@ -361,5 +361,11 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
         return $this->model->findOrFail($id, $columns);
     }
 
+    public function count()
+    {
+        $this->applyCriteria();
+        return $this->model->count();
+    }
+
 
 }
