@@ -7,9 +7,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
-
 use Modules\Core\Repositories\LocaleRepository;
-use Modules\User\Entities\Role;
 
 
 class LocaleController extends BaseController
@@ -47,7 +45,7 @@ class LocaleController extends BaseController
             return $this->successResponse($payload);
 
         } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(),400);
+            return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -56,22 +54,22 @@ class LocaleController extends BaseController
 
     /**
      * Store a newly created resource in storage.
-    * @return JsonResponse
+     * @return JsonResponse
      */
     public function store()
     {
-        try{
-        Event::dispatch('core.locale.create.before');
+        try {
+            Event::dispatch('core.locale.create.before');
 
-        $this->validate(request(), [
-            'code'      => ['required', 'unique:locales,code'],
-            'name'      => 'required',
-             ]);
+            $this->validate(request(), [
+                'code' => ['required', 'unique:locales,code'],
+                'name' => 'required',
+            ]);
 
-        $locale = $this->localeRepository->create(request()->all());
+            $locale = $this->localeRepository->create(request()->all());
 
-        Event::dispatch('core.locale.create.after', $locale);
-        return  $this->successResponseWithMessage(trans('core::app.response.create-success', ['name' => 'Locale']),201);
+            Event::dispatch('core.locale.create.after', $locale);
+            return $this->successResponseWithMessage(trans('core::app.response.create-success', ['name' => 'Locale']), 201);
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
         } catch (\Exception $exception) {
@@ -82,7 +80,7 @@ class LocaleController extends BaseController
 
     /**
      * Show the form for editing the specified resource.
-     * @param  int  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function show($id)
@@ -100,7 +98,6 @@ class LocaleController extends BaseController
         }
 
 
-
     }
 
     /**
@@ -111,10 +108,10 @@ class LocaleController extends BaseController
      */
     public function update($id)
     {
-        try{
+        try {
             $this->validate(request(), [
-                'code'      => ['required', 'unique:locales,code,' . $id],
-                'name'      => 'required',
+                'code' => ['required', 'unique:locales,code,' . $id],
+                'name' => 'required',
                 'direction' => 'in:ltr,rtl',
             ]);
 
@@ -145,25 +142,27 @@ class LocaleController extends BaseController
      */
     public function destroy($id)
     {
-        if ($this->localeRepository->count()) {
-            return $this->errorResponse(trans('admin::app.settings.locales.last-delete-error'),400);
-        } else {
-            try {
-                $locale = $this->localeRepository->findOrFail($id);
 
-                Event::dispatch('core.locale.delete.before', $id);
+        try {
 
-                $this->localeRepository->delete($id);
+            $locale = $this->localeRepository->findOrFail($id);
 
-                Event::dispatch('core.locale.delete.after', $id);
-
-                return $this->successResponseWithMessage(trans('core::app.settings.locales.delete-success'));
-
-            } catch(\Exception $e) {
-                return $this->errorResponse(trans('core::app.response.delete-failed', ['name' => 'Locale']));
+            if ($this->localeRepository->count() == 1) {
+                return $this->errorResponse(trans('core::app.settings.locales.last-delete-error'), 400);
             }
+
+            Event::dispatch('core.locale.delete.before', $id);
+
+            $this->localeRepository->delete($id);
+
+            Event::dispatch('core.locale.delete.after', $id);
+
+            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Locale']));
+
+        } catch (\Exception $e) {
+            return $this->errorResponse(trans('core::app.response.delete-failed', ['name' => 'Locale']));
         }
-
-
     }
+
+
 }
