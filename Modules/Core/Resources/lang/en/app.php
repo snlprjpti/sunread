@@ -6,7 +6,7 @@ return [
         'cannot-delete-default' => 'Cannot delete the default channel',
         'create-success' => ':name created successfully.',
         'update-success' => ':name updated successfully.',
-        'delete-success' => ':name deleted successfully.',
+        'deleted-success' => ':name deleted successfully.',
         'delete-failed' => 'Error encountered while deleting :name.',
         'last-delete-error' => 'At least one :name is required.',
         'user-define-error' => 'Can not delete system :name',
@@ -100,6 +100,10 @@ return [
         'locales' => [
             'title' => 'Locales',
             'last-delete-error' => 'At least one Locale is required.',
+        ],
+        'currencies' => [
+            'title' => 'Currency',
+            'last-delete-error' => 'At least one Currency is required.',
         ],
     ],
 ];

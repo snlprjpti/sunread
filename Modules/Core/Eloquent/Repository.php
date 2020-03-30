@@ -146,7 +146,8 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
     public function update(array $data, $id)
     {
         $this->model = $this->findOrFail($id);
-        return $this->model->update($data);
+        $this->model->update($data);
+        return $this->model;
     }
 
     /**
