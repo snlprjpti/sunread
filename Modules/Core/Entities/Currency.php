@@ -3,6 +3,8 @@
 namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Models\CurrencyExchangeRate;
+
 
 class Currency extends Model
 {
@@ -19,5 +21,15 @@ class Currency extends Model
     public function setCodeAttribute($code)
     {
         $this->attributes['code'] = strtoupper($code);
+    }
+
+
+
+    /**
+     * Get the currency_exchange associated with the currency.
+     */
+    public function CurrencyExchangeRate()
+    {
+        return $this->hasOne(CurrencyExchangeRate::class, 'target_currency');
     }
 }
