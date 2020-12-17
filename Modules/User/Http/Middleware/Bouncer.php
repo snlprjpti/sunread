@@ -27,14 +27,16 @@ class Bouncer
     */
     public function handle($request, Closure $next, $guard = 'admin')
     {
+
         if (! Auth::guard($guard)->check()) {
-            return $this->errorResponse("UnAuthenticated User" , 401);
+            return $this->errorResponse("Unauthenticated User" , 401);
         }
         $isAuthorised = $this->checkIfAuthorized($request);
 
         if(!$isAuthorised){
-            return $this->errorResponse("Unauthorised access" , 403);
+            return $this->errorResponse("Unauthorised access." , 403);
         }
+
         return $next($request);
     }
 

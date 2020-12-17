@@ -41,7 +41,7 @@ class ResetPasswordController extends BaseController
      *
      * Store new password of the admin
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -71,7 +71,7 @@ class ResetPasswordController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'));
+            return $this->errorResponse(trans('core::app.users.token.token-generation-problem') ,400);
 
         }catch (AdminNotFoundException $exception){
 

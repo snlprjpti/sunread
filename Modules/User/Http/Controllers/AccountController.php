@@ -2,6 +2,7 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -17,13 +18,13 @@ class AccountController extends BaseController
 {
     /**
      * Show the form for creating a new resource
-     * @return \Illuminate\View\View
+     * @return JsonResponse
      */
     public function edit()
     {
         try {
             $me = auth()->guard('admin')->user();
-            return $this->successResponse($me);
+            return $this->successResponse($me,"Admin User  fetched successfully.");
 
         } catch (UnauthorizedHttpException $exception) {
             return $this->errorResponse($exception->getMessage(), 401);
@@ -38,7 +39,7 @@ class AccountController extends BaseController
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function update(Request $request)
     {

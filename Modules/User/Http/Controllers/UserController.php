@@ -38,7 +38,7 @@ class UserController extends BaseController
     {
         try {
             $payload = Admin::paginate($this->pagination_limit);
-            return $this->successResponse($payload);
+            return $this->successResponse($payload, "Admin fetched successfully.");
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);

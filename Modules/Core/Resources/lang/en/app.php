@@ -73,7 +73,7 @@ return [
             'account-save' => 'Account changes saved successfully.',
             'password-reset-success' => 'Password reset successfully',
 
-            'login-error' => 'Please check your credentials and try again.',
+            'login-error' => 'Invalid credentials.',
             'login-success' => 'Logged in successfully',
             'logout-success' => 'Logged out successfully',
             'activate-warning' => 'Your account is yet to be activated, please contact administrator.'
