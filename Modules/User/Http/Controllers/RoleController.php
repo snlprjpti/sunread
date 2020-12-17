@@ -83,7 +83,7 @@ class RoleController extends BaseController
             $this->validate($request, Role::rules());
 
             if(!$request->get('slug')){
-                $request->merge(['slug' =>  Role::createSlug($request->get('name'))]);
+                $request->merge(['slug' =>  (new Role())->createSlug($request->get('name'))]);
             }
             $role = Role::create(
                 $request->only('name' ,'description', 'permissions', 'permission_type', 'slug')
