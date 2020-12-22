@@ -14,7 +14,10 @@ class Category extends Model
 
     protected $fillable = ['position', 'status', 'parent_id','image', 'slug'];
     protected $with =['translations'];
-    public static $SEARCHABLE = ['image','slug'];
+
+
+    public static $SEARCHABLE = ['translations.name','slug'];
+
     public static function rules($id=0,$merge = [])
     {
         return  array_merge([
