@@ -32,6 +32,7 @@ class SessionController extends BaseController
      */
     public function login(Request $request)
     {
+
         try {
             $this->validate($request, [
                 'email' => 'required|email',

@@ -33,6 +33,7 @@ return [
             'confirm-password' => 'Confirm Password',
             'back-link-title' => 'Back to Sign In',
             'submit-btn-title' => 'Reset Password',
+            'password-reset-success' => 'Password reset successfully.',
         ],
 
         'roles' => [
@@ -71,11 +72,9 @@ return [
             'incorrect-password' => 'The password you entered is incorrect',
             'password-match' => 'Current password does not match.',
             'account-save' => 'Account changes saved successfully.',
-            'password-reset-success' => 'Password reset successfully',
-
             'login-error' => 'Invalid credentials.',
-            'login-success' => 'Logged in successfully',
-            'logout-success' => 'Logged out successfully',
+            'login-success' => 'Logged in successfully.',
+            'logout-success' => 'Logged out successfully.',
             'activate-warning' => 'Your account is yet to be activated, please contact administrator.'
         ],
 

@@ -56,7 +56,7 @@ class AccountController extends BaseController
 
             $current_password = request()->get('current_password');
             if (!Hash::check($current_password, auth()->guard('admin')->user()->password)) {
-                return $this->errorResponse(trans('core::app.users.incorrect-password'), 401);
+                return $this->errorResponse(trans('core::app.users.users.incorrect-password'), 401);
             }
 
             if ($request->get('password')) {
@@ -65,7 +65,7 @@ class AccountController extends BaseController
 
             $user->update($request->only('name', 'email', 'password'));
 
-            return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => 'Customer Account']));
+            return $this->successResponseWithMessage(trans('core::app.users.reset-password.password-reset-success', ['name' => 'Admin account']));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
