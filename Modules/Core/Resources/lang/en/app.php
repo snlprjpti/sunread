@@ -92,8 +92,12 @@ return [
             'token-invalid' => 'Invalid token',
             'token-expired' => 'Token is expired',
             'token-generation-problem' => 'Unable to generate token'
-
         ],
+
+        'auth' => [
+            'unauthorised' => 'Unauthorised.',
+            'unauthenticated' => 'Unauthenticated.'
+        ]
     ],
     'settings' => [
         'locales' => [
