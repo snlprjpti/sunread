@@ -24,11 +24,9 @@ class AdminAuthTest extends AuthTestCase
         ]);
         $data = [
             'email' => $admin->email,
-            'password' => 'password1'
+            'password' => 'password'
         ];
-        $response = $this->post('api/admin/login' ,$data);
-        dd($response);
-
+        $response = $this->post('/api/admin/login' ,$data);
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",

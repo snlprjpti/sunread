@@ -32,6 +32,7 @@ class SessionController extends BaseController
      */
     public function login(Request $request)
     {
+
         try {
             $this->validate($request, [
                 'email' => 'required|email',
@@ -48,7 +49,6 @@ class SessionController extends BaseController
                 'token' => $jwtToken,
                 'user' => $admin
             ];
-
             return $this->successResponse($payload, trans('core::app.users.users.login-success'));
 
         } catch (ValidationException $exception) {
