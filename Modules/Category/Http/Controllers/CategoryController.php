@@ -71,11 +71,11 @@ class CategoryController extends BaseController
     public function show($id)
     {
         try {
-            $category = Category::findOrFail($id);
+            $category = Category::with('translations')->findOrFail($id);
             return $this->successResponse($payload = $category);
-
+            
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
