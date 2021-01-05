@@ -17,3 +17,7 @@ Route::get('/', function () {
         'message' => 'App is running!!',
     ]);
 });
+
+Route::get('/check', function (\Illuminate\Http\Request $request) {
+    return view('check');
+});

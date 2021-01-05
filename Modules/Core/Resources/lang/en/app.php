@@ -13,6 +13,7 @@ return [
         'cancel-success' => ':name canceled successfully.',
         'cancel-error' => ':name can not be canceled.',
         'already-taken' => 'The :name has already been taken.',
+        'not-found' => ':name not found.'
 
     ],
     'users' => [
