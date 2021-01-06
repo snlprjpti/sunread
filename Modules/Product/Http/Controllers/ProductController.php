@@ -38,7 +38,6 @@ class ProductController extends BaseController
     public function index()
     {
         try {
-
             $payload = $this->productRepository->paginate($this->pagination_limit);
             return $this->successResponse($payload);
 

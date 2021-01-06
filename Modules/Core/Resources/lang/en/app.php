@@ -13,6 +13,7 @@ return [
         'cancel-success' => ':name canceled successfully.',
         'cancel-error' => ':name can not be canceled.',
         'already-taken' => 'The :name has already been taken.',
+        'not-found' => ':name not found.'
 
     ],
     'users' => [
@@ -33,6 +34,7 @@ return [
             'confirm-password' => 'Confirm Password',
             'back-link-title' => 'Back to Sign In',
             'submit-btn-title' => 'Reset Password',
+            'password-reset-success' => 'Password reset successfully.',
         ],
 
         'roles' => [
@@ -71,11 +73,9 @@ return [
             'incorrect-password' => 'The password you entered is incorrect',
             'password-match' => 'Current password does not match.',
             'account-save' => 'Account changes saved successfully.',
-            'password-reset-success' => 'Password reset successfully',
-
-            'login-error' => 'Please check your credentials and try again.',
-            'login-success' => 'Logged in successfully',
-            'logout-success' => 'Logged out successfully',
+            'login-error' => 'Invalid credentials.',
+            'login-success' => 'Logged in successfully.',
+            'logout-success' => 'Logged out successfully.',
             'activate-warning' => 'Your account is yet to be activated, please contact administrator.'
         ],
 
@@ -93,8 +93,12 @@ return [
             'token-invalid' => 'Invalid token',
             'token-expired' => 'Token is expired',
             'token-generation-problem' => 'Unable to generate token'
-
         ],
+
+        'auth' => [
+            'unauthorised' => 'Unauthorised.',
+            'unauthenticated' => 'Unauthenticated.'
+        ]
     ],
     'settings' => [
         'locales' => [

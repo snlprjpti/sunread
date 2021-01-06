@@ -32,6 +32,7 @@ class SessionController extends BaseController
      */
     public function login(Request $request)
     {
+
         try {
             $this->validate($request, [
                 'email' => 'required|email',
@@ -41,7 +42,7 @@ class SessionController extends BaseController
             $jwtToken = null;
             $admin_jwt_ttl = config('jwt.admin_jwt_ttl');
             if (!$jwtToken = Auth::guard('admin')->setTTl($admin_jwt_ttl)->attempt(request()->only('email', 'password'))) {
-                return $this->errorResponse(trans('core::app.users.users.login-error'), 400);
+                return $this->errorResponse(trans('core::app.users.users.login-error'), 401);
             }
             $admin = auth()->guard('admin')->user();
             $payload = [

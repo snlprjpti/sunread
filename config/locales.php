@@ -3,5 +3,5 @@
 
 return
     [
-        'lang'
+        'lang' => 'en'
     ];

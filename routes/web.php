@@ -11,13 +11,13 @@
 |
 */
 
-use Illuminate\Encryption\Encrypter;
-
 Route::get('/', function () {
+    return response()->json([
+        'status' => 'success',
+        'message' => 'App is running!!',
+    ]);
+});
 
-        $key = 'H75fvPyuqHKKLxdXtphAtu3d6riRgh5a';
-        $crypt = new Encrypter($key, 'AES-128-CBC');
-        $test_string = 'eyJpdiI6IlJaRVpCU1N0VjZVellJQnJHcjlGd3c9PSIsInZhbHVlIjoibDdwODFVejNmUGRxeVZQYkpNR2RPWGFqTDBkaDBhVldSaHkxb2dDYmpadz0iLCJtYWMiOiI2NzUzZTg1ZTcyMDgxYmRlMGIzZmRkZDFlN2E4ZmNlZmU0YmZiNmFmNmRlYzEwMzE1NTEzNzcxODdiNmRiMzU0In0=';
-        dd($crypt->decrypt($test_string));
-
+Route::get('/check', function (\Illuminate\Http\Request $request) {
+    return view('check');
 });

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\CategoryTranslation;
@@ -37,13 +36,22 @@ class CategoryController extends BaseController
 
     /**
      * returns all the category
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
+            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
+            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
 
-            $categories = Category::paginate($this->pagination_limit);
+            $categories =  Category::with('translations');
+            if ($request->has('q')) {
+                $categories->whereLike(Category::$SEARCHABLE,$request->get('q'));
+            }
+            $categories->orderBy($sort_by, $sort_order);
+            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
+            $categories = $categories->paginate($limit);
             return $this->successResponse($payload = $categories);
 
         } catch (QueryException $exception) {
@@ -63,11 +71,11 @@ class CategoryController extends BaseController
     public function show($id)
     {
         try {
-            $category = Category::findOrFail($id);
-            return $this->successResponse($category);
+            $category = Category::with('translations')->findOrFail($id);
+            return $this->successResponse($payload = $category);
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -81,7 +89,6 @@ class CategoryController extends BaseController
      */
     public function store(Request $request)
     {
-
         try {
 
             DB::beginTransaction();
@@ -101,9 +108,9 @@ class CategoryController extends BaseController
 
             //upload image
             if ($request->image) {
-                $this->uploadImage($category, $request);
+                $category->image = $this->uploadImage($category, $request);
+                $category->save();
             }
-
             //create or update related translation
             $this->createOrUpdateTranslation($category, $request);
 
@@ -138,9 +145,8 @@ class CategoryController extends BaseController
             if (isset($category->image)) {
                 $this->removeFile($this->folder_path.$category->image);
             }
-            $image = $this->uploadFile($uploadedFile ,$this->folder_path);
-            $category->image = $image;
-            $category->save();
+             return $this->uploadFile($uploadedFile ,$this->folder_path);
+
         };
 
     }
@@ -183,13 +189,14 @@ class CategoryController extends BaseController
             $category = Category::findOrFail($id);
 
             //upload image
-            if ($request->image) {
-                $this->uploadImage($category, $request);
+            if ($request->file('image')) {
+                $category->image = $this->uploadImage($category, $request);
+                $category->save();
             }
 
             //update a category
             $category->update(
-                $request->only(['position', 'status', 'parent_id', 'slug', 'image'])
+                $request->only(['position', 'status', 'parent_id', 'slug'])
             );
 
             //create or update translation
@@ -200,7 +207,7 @@ class CategoryController extends BaseController
 
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
 
         } catch (ValidationException $exception) {
             DB::rollBack();
@@ -225,11 +232,13 @@ class CategoryController extends BaseController
 
             //remove associated image file
             if (isset($category->image)) {
-                $this->removeFile($this->folder_path.$category->image);
+                $this->removeFile($this->folder_path . $category->image);
             }
             $category->delete();
 
-            return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Category']));
+            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Category']));
+        }catch (ModelNotFoundException $exception){
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
