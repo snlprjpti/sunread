@@ -1,10 +1,11 @@
 <?php
 
+
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCurrencyExchangeRatesTable extends Migration
+class CreateExchangeRatesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +14,12 @@ class CreateCurrencyExchangeRatesTable extends Migration
      */
     public function up()
     {
-        Schema::create('currency_exchange_rates', function (Blueprint $table) {
+        Schema::create('exchange_rates', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->decimal('rate', 10, 5);
-            $table->integer('target_currency')->unique()->unsigned();
+            $table->unsignedBigInteger('source_currency');
+            $table->foreign('source_currency')->references('id')->on('currencies')->onDelete('cascade');
+            $table->unsignedBigInteger('target_currency');
             $table->foreign('target_currency')->references('id')->on('currencies')->onDelete('cascade');
             $table->timestamps();
         });

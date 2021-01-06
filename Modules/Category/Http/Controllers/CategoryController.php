@@ -4,6 +4,7 @@ namespace Modules\Category\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +37,7 @@ class CategoryController extends BaseController
 
     /**
      * returns all the category
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index()
     {
@@ -57,13 +58,13 @@ class CategoryController extends BaseController
     /**
      * Get the particular category
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {
         try {
             $category = Category::findOrFail($id);
-            return $this->successResponse($payload = $category);
+            return $this->successResponse($category);
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
@@ -76,7 +77,7 @@ class CategoryController extends BaseController
     /**
      * store the new category
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
@@ -168,7 +169,7 @@ class CategoryController extends BaseController
      * Update the category
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
@@ -215,7 +216,7 @@ class CategoryController extends BaseController
     /**
      * Remove the specified  admin resource from storage.
      * @param int $id
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy($id)
     {
