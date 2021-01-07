@@ -31,4 +31,12 @@ Route::group(['middleware' => ['api']], function () {
 
     });
 
+    //ADMIN CATEGORY ROUTES
+    Route::group(['prefix'=>'admin','as' => 'admin.catalog.','middleware' => ['language']],function () {
+        Route::get('/customers' ,'CustomerController@index')->name('customers.index');
+        Route::post('/customers' ,'CustomerController@store')->name('customers.store');
+        Route::get('/customers/{customer}' ,'CustomerController@show')->name('customers.show');
+        Route::put('/customers/{customer}' ,'CustomerController@update')->name('customers.update');
+        Route::delete('/customers/{customer}' ,'CustomerController@destroy')->name('customers.delete' );
+    });
 });
