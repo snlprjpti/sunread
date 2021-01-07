@@ -66,16 +66,18 @@ class CustomerController extends BaseController
                 'gender' => 'required',
                 'email' => 'required|email|unique:customers,email',
                 'date_of_birth' => 'date|before:today',
-                'password' => 'required|min:6|max:12',
-                'status' => 'required|boolean'
+                'password' => 'required|min:6|max:100|confirmed',
+                'status' => 'required|boolean',
+                'customer_group_id' => 'sometimes|exists:customer_groups,id',
+                'subscribed_to_news_letter' => 'sometimes|boolean'
             ]);
 
-            $data = request()->all();
+            Event::dispatch('customer.registration.before');
+
             $password = $request->get('password');
             $request->merge([
                'password' => bcrypt($password)
-            ])  ;
-            Event::dispatch('customer.registration.before');
+            ]);
 
             $customer = Customer::create(
                 $request->only(['first_name', 'last_name', 'gender', 'email', 'date_of_birth', 'status', 'password', 'customer_group_id', 'subscribed_to_news_letter'])
@@ -142,12 +144,20 @@ class CustomerController extends BaseController
                 'gender' => 'sometimes|required|in:male,female',
                 'email' => 'sometimes|required|unique:customers,email,' . $id,
                 'date_of_birth' => 'sometimes|date|before:today',
-
+                'customer_group_id' => 'sometimes|exists:customer_groups,id',
+                'subscribed_to_news_letter' => 'sometimes|boolean',
+                'status' => 'required|boolean',
+                'password' => 'sometimes|min:6|max:12|confirmed',
             ]);
 
             Event::dispatch('customer.update.before');
 
             $customer = Customer::findOrFail($id);
+
+            $password = $request->get('password');
+            $request->merge([
+                'password' => bcrypt($password)
+            ]);
 
             $customer = $customer->fill(
                 $request->only(['first_name', 'last_name', 'gender', 'email', 'date_of_birth', 'status', 'password', 'customer_group_id', 'subscribed_to_news_letter'])
