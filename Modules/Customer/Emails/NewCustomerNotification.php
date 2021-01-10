@@ -40,7 +40,7 @@ class NewCustomerNotification extends Mailable
         return $this->from(getenv('MAIL_FROM_ADDRESS') ,getenv('MAIL_FROM_ADDRESS'))
             ->to($this->customer->email)
             ->subject("New Customer Registration")
-            ->view('customer::emails.customer.new-customer')
+            ->markdown('customer::emails.new-customer')
             ->with(['customer' => $this->customer, 'password' => $this->password]);
     }
 }

@@ -56,7 +56,6 @@ class CategoryServiceProvider extends ServiceProvider
         $viewPath = resource_path('views/modules/category');
 
         $sourcePath = module_path('Category', 'Resources/views');
-
         $this->publishes([
             $sourcePath => $viewPath
         ],'views');

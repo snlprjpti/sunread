@@ -1,12 +1,9 @@
 @component('mail::message')
-    # Order Shipped
+# Customer Registration
 
-    Your order has been shipped!
+Your email has been registered
 
-    @component('mail::button', ['url' => $url])
-        View Order
-    @endcomponent
+Thanks,<br>
+{{ config('app.name') }}
 
-    Thanks,<br>
-    {{ config('app.name') }}
 @endcomponent

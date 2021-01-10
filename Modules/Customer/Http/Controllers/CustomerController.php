@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Emails\NewCustomerNotification;
 use Modules\Customer\Entities\Customer;
+use Modules\Customer\Entities\CustomerGroup;
 
 class CustomerController extends BaseController
 {
@@ -59,11 +60,12 @@ class CustomerController extends BaseController
     public function store(Request $request)
     {
         try {
+
             DB::beginTransaction();
             $this->validate(request(), [
                 'first_name' => 'string|required',
                 'last_name' => 'string|required',
-                'gender' => 'required',
+                'gender' => 'required||in:male,female',
                 'email' => 'required|email|unique:customers,email',
                 'date_of_birth' => 'date|before:today',
                 'password' => 'required|min:6|max:100|confirmed',
@@ -74,9 +76,19 @@ class CustomerController extends BaseController
 
             Event::dispatch('customer.registration.before');
 
+            //Hashing password
             $password = $request->get('password');
             $request->merge([
                'password' => bcrypt($password)
+            ]);
+
+
+            //Assigning customer groups
+            $customer_group = CustomerGroup::where('customer_group_id' ,$request->get('customer_group_id'))->first();
+            if(is_null($customer_group))
+                $customer_group = CustomerGroup::where('slug' ,'guest')->first();
+            $request->merge([
+                'customer_group_id' => $customer_group->id
             ]);
 
             $customer = Customer::create(
@@ -138,6 +150,7 @@ class CustomerController extends BaseController
     {
         try {
             DB::beginTransaction();
+
             $this->validate(request(), [
                 'first_name' => 'sometimes|string|required',
                 'last_name' => 'sometimes|string|required',
@@ -146,7 +159,7 @@ class CustomerController extends BaseController
                 'date_of_birth' => 'sometimes|date|before:today',
                 'customer_group_id' => 'sometimes|exists:customer_groups,id',
                 'subscribed_to_news_letter' => 'sometimes|boolean',
-                'status' => 'required|boolean',
+                'status' => 'sometimes|boolean',
                 'password' => 'sometimes|min:6|max:12|confirmed',
             ]);
 
@@ -154,10 +167,23 @@ class CustomerController extends BaseController
 
             $customer = Customer::findOrFail($id);
 
-            $password = $request->get('password');
+            //Hashing password
+
+            if($password = $request->get('password')){
+                $request->merge([
+                    'password' => bcrypt($password)
+                ]);
+            }
+
+
+            //Assigning customer groups
+            $customer_group = CustomerGroup::where('customer_group_id' ,$request->get('customer_group_id'))->first();
+            if(is_null($customer_group))
+                $customer_group = CustomerGroup::where('slug' ,'guest')->first();
             $request->merge([
-                'password' => bcrypt($password)
+                'customer_group_id' => $customer_group->id
             ]);
+
 
             $customer = $customer->fill(
                 $request->only(['first_name', 'last_name', 'gender', 'email', 'date_of_birth', 'status', 'password', 'customer_group_id', 'subscribed_to_news_letter'])
