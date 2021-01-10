@@ -40,7 +40,7 @@ class CustomerController extends BaseController
             $customers->orderBy($sort_by, $sort_order);
             $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
             $customers = $customers->paginate($limit);
-            return $this->successResponse($payload = $customers);
+            return $this->successResponse($customers, trans('core::app.response.fetch-list-success', ['name' => 'Customers']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -70,7 +70,7 @@ class CustomerController extends BaseController
                 'date_of_birth' => 'date|before:today',
                 'password' => 'required|min:6|max:100|confirmed',
                 'status' => 'required|boolean',
-                'customer_group_id' => 'sometimes|exists:customer_groups,id',
+                'customer_group_id' => 'nullable|exists:customer_groups,id',
                 'subscribed_to_news_letter' => 'sometimes|boolean'
             ]);
 
@@ -84,12 +84,14 @@ class CustomerController extends BaseController
 
 
             //Assigning customer groups
-            $customer_group = CustomerGroup::where('customer_group_id' ,$request->get('customer_group_id'))->first();
+            $customer_group = CustomerGroup::find($request->get('customer_group_id'));
             if(is_null($customer_group))
                 $customer_group = CustomerGroup::where('slug' ,'guest')->first();
+
             $request->merge([
                 'customer_group_id' => $customer_group->id
             ]);
+
 
             $customer = Customer::create(
                 $request->only(['first_name', 'last_name', 'gender', 'email', 'date_of_birth', 'status', 'password', 'customer_group_id', 'subscribed_to_news_letter'])
@@ -128,8 +130,8 @@ class CustomerController extends BaseController
     public function show($id)
     {
         try {
-            $category = Customer::with('group')->findOrFail($id);
-            return $this->successResponse($category);
+            $customer = Customer::with('group')->findOrFail($id);
+            return $this->successResponse($customer, trans('core::app.response.fetch-success', ['name' => 'Customer']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Customer']), 404);
@@ -168,22 +170,21 @@ class CustomerController extends BaseController
             $customer = Customer::findOrFail($id);
 
             //Hashing password
-
             if($password = $request->get('password')){
                 $request->merge([
                     'password' => bcrypt($password)
                 ]);
             }
 
-
             //Assigning customer groups
-            $customer_group = CustomerGroup::where('customer_group_id' ,$request->get('customer_group_id'))->first();
-            if(is_null($customer_group))
-                $customer_group = CustomerGroup::where('slug' ,'guest')->first();
-            $request->merge([
-                'customer_group_id' => $customer_group->id
-            ]);
-
+            if($request->get('customer_group_id')){
+                $customer_group = CustomerGroup::find($request->get('customer_group_id'));
+                if(is_null($customer_group))
+                    $customer_group = CustomerGroup::where('slug' ,'guest')->first();
+                $request->merge([
+                    'customer_group_id' => $customer_group->id
+                ]);
+            }
 
             $customer = $customer->fill(
                 $request->only(['first_name', 'last_name', 'gender', 'email', 'date_of_birth', 'status', 'password', 'customer_group_id', 'subscribed_to_news_letter'])
