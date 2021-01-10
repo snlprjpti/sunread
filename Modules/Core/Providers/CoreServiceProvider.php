@@ -63,7 +63,17 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function registerViews()
     {
-        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'core');
+        $viewPath = resource_path('views/modules/core');
+
+        $sourcePath = module_path('Core', 'Resources/views');
+
+        $this->publishes([
+            $sourcePath => $viewPath
+        ],'views');
+
+        $this->loadViewsFrom(array_merge(array_map(function ($path) {
+            return $path . '/modules/core';
+        }, \Config::get('view.paths')), [$sourcePath]), 'core');
     }
 
     /**
