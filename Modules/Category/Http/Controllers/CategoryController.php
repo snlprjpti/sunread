@@ -172,6 +172,8 @@ class CategoryController extends BaseController
 
     /**
     /**
+
+
      * Update the category
      * @param Request $request
      * @param $id

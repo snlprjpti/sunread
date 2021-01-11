@@ -19,6 +19,7 @@ class CustomerServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerConfig();
+        $this->registerViews();
         $router->aliasMiddleware('customer', RedirectIfNotCustomer::class);
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('Customer', 'Database/Migrations'));
@@ -85,5 +86,26 @@ class CustomerServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    /**
+     * Register views.
+     *
+     * @return void
+     */
+    public function registerViews()
+    {
+        $viewPath = resource_path('views/modules/customer');
+
+        $sourcePath = module_path('Customer', 'Resources/views');
+
+        $this->publishes([
+            $sourcePath => $viewPath
+        ],'views');
+
+
+        $this->loadViewsFrom(array_merge(array_map(function ($path) {
+            return $path . '/modules/customer';
+        }, \Config::get('view.paths')), [$sourcePath]), 'customer');
     }
 }

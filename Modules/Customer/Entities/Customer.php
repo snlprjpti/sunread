@@ -11,6 +11,7 @@ class Customer extends Authenticatable implements  JWTSubject
 {
     use Notifiable;
 
+    public static $SEARCHABLE =  ['first_name', 'last_name', 'gender', 'date_of_birth', 'email', 'password', 'customer_group_id', 'subscribed_to_news_letter',  'status'];
     protected $table = 'customers';
 
     protected $fillable = ['first_name', 'last_name', 'gender', 'date_of_birth', 'email', 'phone', 'password', 'api_token', 'customer_group_id', 'subscribed_to_news_letter', 'is_verified',  'status'];
