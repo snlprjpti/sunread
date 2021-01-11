@@ -5,6 +5,7 @@ namespace Modules\Core\Http\Controllers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Repositories\CurrencyRepository;
@@ -12,8 +13,6 @@ use Modules\Core\Repositories\CurrencyRepository;
 
 class CurrencyController extends BaseController
 {
-
-
     /**
      * CurrencyRepository object
      */
@@ -35,14 +34,37 @@ class CurrencyController extends BaseController
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
+            // validating data.
+            $this->validate($request, [
+                'limit' => 'sometimes|numeric',
+                'page' => 'sometimes|numeric',
+                'sort_by' => 'sometimes',
+                'sort_order' => 'sometimes|in:asc,desc',
+                'q' => 'sometimes|string|min:1'
+            ]);
 
-            $payload = $this->currencyRepository->paginate($this->pagination_limit);
-            return $this->successResponse($payload);
+            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
+            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
+            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
+
+
+            $currency_model = $this->currencyRepository->makeModel();
+            $currencies = $currency_model->query();
+
+            if ($request->has('q')) {
+                $currencies->whereLike($currency_model->SEARCHABLE, $request->get('q'));
+            }
+
+            $currencies->orderBy($sort_by, $sort_order);
+            $currencies = $currencies->paginate($limit);
+
+            return $this->successResponse($currencies, trans('core::app.response.fetch-list-success', ['name' => 'Currency']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -61,6 +83,7 @@ class CurrencyController extends BaseController
     {
 
         try {
+
             Event::dispatch('core.currency.create.before');
 
             $this->validate(request(), [
@@ -87,14 +110,15 @@ class CurrencyController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param int $id
+     * @param Request $request
+     * @param $id
      * @return JsonResponse
      */
-    public function update($id)
+    public function update(Request $request, $id)
     {
         try {
 
-            $this->validate(request(), [
+            $this->validate($request, [
                 'code' => ['required', 'unique:currencies,code,' . $id],
                 'name' => 'required',
             ]);
@@ -105,10 +129,12 @@ class CurrencyController extends BaseController
 
             Event::dispatch('core.currency.update.after', $currency);
 
-            return $this->successResponse($currency, trans('core::app.response.update-success', ['name' => 'Locale']));
+            return $this->successResponse($currency, trans('core::app.response.update-success', ['name' => 'Currency']));
+
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Currency']), 404);
 
         } catch (ValidationException $exception) {
-
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (QueryException $exception) {
@@ -144,6 +170,9 @@ class CurrencyController extends BaseController
 
             return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Currency']));
 
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Currency']), 404);
+
         } catch (\Exception $e) {
             return $this->errorResponse(trans('core::app.response.delete-failed', ['name' => 'Currency']));
         }
@@ -161,10 +190,10 @@ class CurrencyController extends BaseController
         try {
 
             $currency = $this->currencyRepository->findOrFail($id);
-            return $this->successResponse($currency);
+            return $this->successResponse($currency, trans('core::app.response.fetch-success', ['name' => 'Currency']));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Currency']), 404);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());

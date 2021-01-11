@@ -121,8 +121,8 @@ class LocaleController extends BaseController
             $locale = $this->localeRepository->findOrFail($id);
             return $this->successResponse($locale, trans('core::app.response.fetch-success', ['name' => 'Locale']));
 
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+        }catch (ModelNotFoundException $exception){
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Locale']), 404);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
