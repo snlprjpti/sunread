@@ -4,7 +4,7 @@ return [
     'response' => [
         'being-used' => 'This resource :name is getting used in :source',
         'cannot-delete-default' => 'Cannot delete the default channel',
-        'fetch-list-success' => ':name fetched successfully.',
+        'fetch-list-success' => ':name list fetched successfully.',
         'fetch-success' => ':name fetched successfully.',
         'create-success' => ':name created successfully.',
         'update-success' => ':name updated successfully.',

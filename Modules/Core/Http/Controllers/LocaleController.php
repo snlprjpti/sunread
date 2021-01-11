@@ -5,6 +5,7 @@ namespace Modules\Core\Http\Controllers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Repositories\LocaleRepository;
@@ -12,7 +13,6 @@ use Modules\Core\Repositories\LocaleRepository;
 
 class LocaleController extends BaseController
 {
-
 
     /**
      * LocaleRepository object
@@ -36,13 +36,41 @@ class LocaleController extends BaseController
 
     /**
      * Display a listing of the resource.
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
 
-            $payload = $this->localeRepository->paginate($this->pagination_limit);
-            return $this->successResponse($payload);
+            // validating data.
+            $this->validate($request, [
+                'limit' => 'sometimes|numeric',
+                'page' => 'sometimes|numeric',
+                'sort_by' => 'sometimes',
+                'sort_order' => 'sometimes|in:asc,desc',
+                'q' => 'sometimes|string|min:1'
+            ]);
+
+            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
+            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
+            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
+
+
+            $locale_model = $this->localeRepository->makeModel();
+            $locales = $locale_model->query();
+
+            if ($request->has('q')) {
+                $locales->whereLike($locale_model->SEARCHABLE, $request->get('q'));
+            }
+
+            $locales->orderBy($sort_by, $sort_order);
+            $locales = $locales->paginate($limit);
+
+            return $this->successResponse($locales, trans('core::app.response.fetch-list-success', ['name' => 'Locale']));
+
+        } catch (ValidationException $exception) {
+            return $this->errorResponse($exception->errors(), 422);
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -69,9 +97,12 @@ class LocaleController extends BaseController
             $locale = $this->localeRepository->create(request()->all());
 
             Event::dispatch('core.locale.create.after', $locale);
-            return $this->successResponseWithMessage(trans('core::app.response.create-success', ['name' => 'Locale']), 201);
+
+            return $this->successResponse($locale, trans('core::app.response.create-success', ['name' => 'Locale']), 201);
+
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
+
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
         }
@@ -88,7 +119,7 @@ class LocaleController extends BaseController
         try {
 
             $locale = $this->localeRepository->findOrFail($id);
-            return $this->successResponse($locale);
+            return $this->successResponse($locale, trans('core::app.response.fetch-success', ['name' => 'Locale']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
@@ -122,6 +153,9 @@ class LocaleController extends BaseController
             Event::dispatch('core.locale.update.after');
 
             return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => 'Locale']));
+
+        }catch (ModelNotFoundException $exception){
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Locale']), 404);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -158,6 +192,9 @@ class LocaleController extends BaseController
             Event::dispatch('core.locale.delete.after', $id);
 
             return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Locale']));
+
+        }catch (ModelNotFoundException $exception){
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Locale']), 404);
 
         } catch (\Exception $e) {
             return $this->errorResponse(trans('core::app.response.delete-failed', ['name' => 'Locale']));

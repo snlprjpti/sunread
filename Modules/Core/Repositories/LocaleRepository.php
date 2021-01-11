@@ -15,4 +15,7 @@ class LocaleRepository extends Repository
     {
         return Locale::class;
     }
+
+
+
 }
