@@ -157,10 +157,10 @@ class ExchangeRateController extends BaseController
         try {
 
             $exchange_rate = ExchangeRate::findOrFail($id);
-            return $this->successResponse(new ExchangeRateResource($exchange_rate));
+            return $this->successResponse(new ExchangeRateResource($exchange_rate), trans('core::app.response.fetch-success', ['name' => 'Exchange rate']));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Exchange Rate']), 404);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
