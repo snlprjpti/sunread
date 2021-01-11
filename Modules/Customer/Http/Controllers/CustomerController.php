@@ -40,7 +40,7 @@ class CustomerController extends BaseController
             $customers->orderBy($sort_by, $sort_order);
             $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
             $customers = $customers->paginate($limit);
-            return $this->successResponse($customers, trans('core::app.response.fetch-list-success', ['name' => 'Customers']));
+            return $this->successResponse($customers, trans('core::app.response.fetch-list-success', ['name' => 'Customer']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);

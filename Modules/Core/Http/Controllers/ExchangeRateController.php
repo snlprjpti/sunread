@@ -25,6 +25,7 @@ class ExchangeRateController extends BaseController
     public function index(Request $request)
     {
         try {
+
             $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
             $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
             $exchange_rates = ExchangeRate::with(['source','target']);
@@ -34,7 +35,7 @@ class ExchangeRateController extends BaseController
             $exchange_rates->orderBy($sort_by, $sort_order);
             $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
             $exchange_rates = $exchange_rates->paginate($limit);
-            return $this->successResponse($exchange_rates);
+            return $this->successResponse(ExchangeRateResource::collection($exchange_rates), trans('core::app.response.fetch-list-success', ['name' => 'Exchange Rate']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -156,10 +157,10 @@ class ExchangeRateController extends BaseController
         try {
 
             $exchange_rate = ExchangeRate::findOrFail($id);
-            return $this->successResponse(new ExchangeRateResource($exchange_rate));
+            return $this->successResponse(new ExchangeRateResource($exchange_rate), trans('core::app.response.fetch-success', ['name' => 'Exchange rate']));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Exchange Rate']), 404);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());

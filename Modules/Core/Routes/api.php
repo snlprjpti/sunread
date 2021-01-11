@@ -38,7 +38,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::post('/exchange_rates', 'ExchangeRateController@store')->name('admin.exchange_rates.store');
         Route::get('/exchange_rates/{id}', 'ExchangeRateController@show')->name('admin.exchange_rates.show');
         Route::post('/exchange_rates/{id}', 'ExchangeRateController@update')->name('admin.exchange_rates.update-rates');
-        Route::delete('/exchange_rate/{id}', 'ExchangeRateController@destroy')->name('admin.exchange_rates.delete');
+        Route::delete('/exchange_rates/{id}', 'ExchangeRateController@destroy')->name('admin.exchange_rates.delete');
 
 
 

@@ -9,4 +9,5 @@ class Locale extends Model
     protected $fillable = [
         'code', 'name', 'direction'
     ];
+    public $SEARCHABLE = ['code', 'name'];
 }
