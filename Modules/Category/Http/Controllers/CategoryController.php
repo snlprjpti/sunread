@@ -52,7 +52,7 @@ class CategoryController extends BaseController
             $categories->orderBy($sort_by, $sort_order);
             $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
             $categories = $categories->paginate($limit);
-            return $this->successResponse($payload = $categories);
+            return $this->successResponse($categories, trans('core::app.response.fetch-list-success', ['name' => 'Category']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -72,7 +72,7 @@ class CategoryController extends BaseController
     {
         try {
             $category = Category::with('translations')->findOrFail($id);
-            return $this->successResponse($payload = $category);
+            return $this->successResponse($category, trans('core::app.response.fetch-success', ['name' => 'Category']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
