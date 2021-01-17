@@ -25,6 +25,7 @@ class Decimal implements Rule
      */
     public function message()
     {
+        dd("Sd");
         return trans('core::validation.decimal');
     }
 }

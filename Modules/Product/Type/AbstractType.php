@@ -9,7 +9,6 @@ use Modules\Product\Entities\ProductAttributeValue;
 use Modules\Product\Repositories\ProductAttributeValueRepository;
 use Modules\Product\Services\ProductImageRepository;
 
-
 /**
  * Abstract class Type
  *
@@ -183,7 +182,6 @@ abstract class AbstractType
      */
     private function updateAttributes($associated_attributes,$product ,$data)
     {
-
         //Updating each product-attribute table
         foreach ($associated_attributes as $attribute) {
 
@@ -221,8 +219,6 @@ abstract class AbstractType
     {
         return $this->hasVariants;
     }
-
-
 
 
 }
