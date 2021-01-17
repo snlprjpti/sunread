@@ -15,10 +15,14 @@ class ProductController extends BaseController
 {
 
     /**
-     * AttributeRepository object
+     * ProductRepository object
      */
-    protected $pagination_limit,$productRepository;
+    protected  $productRepository;
 
+    /**
+     * Pagination limit for resource
+     */
+    protected $pagination_limit;
 
     /**
      * ProductController constructor.
@@ -33,13 +37,34 @@ class ProductController extends BaseController
 
     /**
      * Returns all the products
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $payload = $this->productRepository->paginate($this->pagination_limit);
-            return $this->successResponse($payload);
+
+            // validating data.
+            $this->validate($request, [
+                'limit' => 'sometimes|numeric',
+                'page' => 'sometimes|numeric',
+                'sort_by' => 'sometimes',
+                'sort_order' => 'sometimes|in:asc,desc',
+                'q' => 'sometimes|string|min:1'
+            ]);
+
+            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
+            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
+            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
+
+            $product_model = $this->productRepository->makeModel();
+            $products = $product_model->query();
+            if ($request->has('q')) {
+                $products->whereLike($product_model->SEARCHABLE, $request->get('q'));
+            }
+            $products->orderBy($sort_by, $sort_order);
+            $products = $products->paginate($limit);
+            return $this->successResponse($products, trans('core::app.response.fetch-list-success', ['name' => 'Product']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -83,19 +108,18 @@ class ProductController extends BaseController
     {
 
         try {
-
             //validation
             $this->validate($request, [
-                'type' => 'required',
+                'type' => 'required|in:simple,configurable',
                 'attribute_family_id' => 'required|exists:attribute_families,id',
                 'sku' => ['required', 'unique:products,sku'],
-                'slug' => ['required','unique:products,slug']
+                'slug' => ['required','unique:products,slug'],
             ]);
 
             //store product
             $product = $this->productRepository->store($request->all());
 
-            return $this->successResponse($payload = $product, trans('core::app.response.create-success', ['name' => 'Product']), 201);
+            return $this->successResponse($product, trans('core::app.response.create-success', ['name' => 'Product']), 201);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -117,7 +141,6 @@ class ProductController extends BaseController
      */
     public function update(Request $request, $id)
     {
-
         try{
             //fetch rules
             $rules = $this->productRepository->rules($id);

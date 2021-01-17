@@ -125,7 +125,6 @@ class ProductFlatTable
         if ($parentProduct && !array_key_exists($parentProduct->id, $superAttributes))
             $superAttributes[$parentProduct->id] = $parentProduct->super_attributes()->pluck('slug')->toArray();
 
-
         foreach ($familyAttributes[$product->attribute_family->id] as $attribute) {
 
             if ($parentProduct && !in_array($attribute->slug, array_merge($superAttributes[$parentProduct->id], ['sku', 'name', 'price', 'weight', 'status'])))

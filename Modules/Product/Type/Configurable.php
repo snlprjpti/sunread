@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 class Configurable extends AbstractType
 {
     protected $hasVariants = true;
+    protected $isComposite =  true;
 
 
     /**

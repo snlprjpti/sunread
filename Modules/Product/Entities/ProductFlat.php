@@ -36,7 +36,7 @@ class ProductFlat extends Model
      */
     public function product()
     {
-        return $this->belongsTo(ProductProxy::modelClass());
+        return $this->belongsTo(Product::class);
     }
 
     /**

@@ -57,6 +57,7 @@ class ProductRepository extends Repository
             Event::dispatch('catalog.product.create.before');
 
             $typeInstance = app(config('product_types.' . $data['type'] . '.class'));
+
             $product = $typeInstance->create($data);
 
             Event::dispatch('catalog.product.create.after', $product);
