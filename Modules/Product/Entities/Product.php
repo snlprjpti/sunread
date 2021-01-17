@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Category\Entities\Category;
+use Webkul\Product\Models\ProductFlatProxy;
 
 class Product extends Model
 {
@@ -27,8 +28,6 @@ class Product extends Model
     {
         return $this->getTypeInstance()->getEditableAttributes($group, $skipSuperAttribute);
     }
-
-
 
     /**
      * Get the product variants that owns the product.
@@ -100,8 +99,6 @@ class Product extends Model
         return $this->attribute_family->custom_attributes()->get();
     }
 
-
-
     /**
      * The images that belong to the product.
      */
@@ -118,5 +115,13 @@ class Product extends Model
         return $this->belongsToMany(Attribute::class, 'product_super_attributes');
     }
 
+    /**
+     * Get the product flat entries that are associated with product.
+     * May be one for each locale and each channel.
+     */
+    public function product_flats()
+    {
+        return $this->hasMany(ProductFlat::class, 'product_id');
+    }
 
 }

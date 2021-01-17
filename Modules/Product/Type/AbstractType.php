@@ -2,6 +2,7 @@
 
 namespace Modules\Product\Type;
 
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Modules\Core\Traits\FileManager;
 use Modules\Product\Entities\Product;
@@ -24,6 +25,8 @@ abstract class AbstractType
      *
      * @var boolean
      */
+
+    protected $isComposite = false;
 
     protected $hasVariants = false;
 
@@ -218,6 +221,79 @@ abstract class AbstractType
     public function hasVariants()
     {
         return $this->hasVariants;
+    }
+
+    /**
+     * Return true if this product can be composite
+     *
+     * @return bool
+     */
+    public function isComposite()
+    {
+        return $this->isComposite;
+    }
+
+    /**
+     * Get product minimal price
+     *
+     * @param int $qty
+     *
+     * @return float
+     */
+    public function getFinalPrice($qty = null)
+    {
+        return $this->getMinimalPrice($qty);
+    }
+
+    /**
+     * Returns the product's minimal price
+     *
+     * @param int $qty
+     *
+     * @return float
+     */
+    public function getSpecialPrice($qty = null)
+    {
+        return $this->haveSpecialPrice($qty) ? $this->product->special_price : $this->product->price;
+    }
+
+    /**
+     * @param int $qty
+     *
+     * @return bool
+     */
+    public function haveSpecialPrice($qty = null)
+    {
+
+        //customer group price
+        //$customerGroupPrice = $this->getCustomerGroupPrice($this->product, $qty);
+
+        $haveSpecialPrice = false;
+        if ((is_null($this->product->special_price) || ! (float)$this->product->special_price)) {
+            return false;
+        }
+
+        if($this->product->price >= $this->product->special_price){
+            return false;
+        }
+
+        if(isset($this->product->special_price_from) && isset($this->product->special_price_to)){
+            if(Carbon::now()->between($this->product->special_price_from,$this->product->special_price_to)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getMinimalPrice($qty = null)
+    {
+
+        if ($this->haveSpecialPrice($qty)) {
+            return $this->product->special_price;
+        }
+
+        return $this->product->price;
     }
 
 
