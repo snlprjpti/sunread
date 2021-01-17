@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\Category;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Product\Entities\ProductFlat;
 use Modules\Product\Repositories\ProductRepository;
+use Modules\Product\Transformers\ProductResource;
 
 class ProductController extends BaseController
 {
@@ -56,11 +58,9 @@ class ProductController extends BaseController
             $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
             $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
             $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-
-            $product_model = $this->productRepository->makeModel();
-            $products = $product_model->query();
+            $products = ProductFlat::query();
             if ($request->has('q')) {
-                $products->whereLike($product_model->SEARCHABLE, $request->get('q'));
+                $products->whereLike(ProductFlat::SEARCHABLE, $request->get('q'));
             }
             $products->orderBy($sort_by, $sort_order);
             $products = $products->paginate($limit);
@@ -85,8 +85,9 @@ class ProductController extends BaseController
         try {
 
             $product = $this->productRepository->findOrFail($id);
+            $product = $product->product_flats->first();
             $category_tree = (new Category())->getCategoryTree();
-            $payload = ['product' => $product,'category_tree' => $category_tree];
+            $payload = ['product' => new ProductResource($product),'category_tree' => $category_tree];
             return $this->successResponse($payload);
 
         } catch (ModelNotFoundException $exception) {
