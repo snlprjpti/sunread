@@ -32,7 +32,7 @@ class ProductResource extends Resource
     public function toArray($request)
     {
         $product = $this->product ? $this->product : $this;
-       
+
         return [
             'id' => $product->id,
             'type' => $product->type,
@@ -65,9 +65,7 @@ class ProductResource extends Resource
             "meta_description" => $this->descripion,
             "width" => $this->width,
             "height" => $this->heigt,
-            "depth" => $this->depth,
-
-
+            "depth" => $this->depth
         ];
     }
 }
