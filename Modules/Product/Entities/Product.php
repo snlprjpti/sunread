@@ -3,19 +3,18 @@
 namespace Modules\Product\Entities;
 
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Category\Entities\Category;
-use Webkul\Product\Models\ProductFlatProxy;
 
 class Product extends Model
 {
 
     protected $fillable = ['type', 'attribute_family_id', 'sku', 'parent_id', 'slug'];
     protected $typeInstance;
+    public static $SEARCHABLE = ['type', 'attribute_family_id', 'sku', 'parent_id', 'slug' ,'name'];
 
     /**
      * Retrieve product attributes
