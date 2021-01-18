@@ -12,5 +12,12 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+        'status' => 'success',
+        'message' => 'App is running!!',
+    ]);
+});
+
+Route::get('/check', function (\Illuminate\Http\Request $request) {
+    return view('check');
 });
