@@ -41,5 +41,5 @@ task :reload_supervisor do
     end
 end
 
-#after "deploy:published", "update_composer"
+after "deploy:published", "update_composer"
 # after "deploy:published", "reload_supervisor"
