@@ -60,7 +60,7 @@ class AddressController extends BaseController
     {
         try {
             $customer_address = CustomerAddress::with('customer')->findOrFail($address_id);
-            return $this->successResponse($customer_address);
+            return $this->successResponse($customer_address, trans('core::app.response.fetch-success', ['name' => 'Customer Address']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponseForMissingModel($exception);
