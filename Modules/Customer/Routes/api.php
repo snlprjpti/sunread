@@ -30,8 +30,8 @@ Route::group(['middleware' => ['api']], function () {
 
     });
 
-    //ADMIN CUSTOMES ROUTES
-    Route::group(['prefix'=>'admin','as' => 'admin.','middleware' => ['language']],function () {
+    //ADMIN CUSTOMERS ROUTES
+    Route::group(['prefix'=>'admin','as' => 'admin.','middleware' => ['language', 'admin']],function () {
 
         //Customer Address
         Route::get('customers/{customer_id}/addresses', 'AddressController@index')->name('customer.addresses.index');
@@ -48,4 +48,15 @@ Route::group(['middleware' => ['api']], function () {
         Route::delete('/customers/{customer}' ,'CustomerController@destroy')->name('customers.delete' );
     });
 
+    Route::group(['prefix'=>'admin','as' => 'admin.','middleware' => ['language', 'admin']],function () {
+        Route::get('groups', 'CustomerGroupController@index')->name('admin.groups.index');
+        Route::post('groups', 'CustomerGroupController@store')->name('admin.groups.store');
+        Route::get('groups/{group_id}', 'CustomerGroupController@show')->name('admin.groups.show');
+        Route::post('groups/{group_id}', 'CustomerGroupController@update')->name('admin.groups.update');
+        Route::delete('groups/{group_id}', 'CustomerGroupController@destroy')->name('admin.groups.delete');
+    });
 });
+
+
+
+
