@@ -30,22 +30,22 @@ Route::group(['middleware' => ['api']], function () {
 
     });
 
-    //ADMIN CATEGORY ROUTES
-    Route::group(['prefix'=>'admin','as' => 'admin.catalog.','middleware' => ['language']],function () {
+    //ADMIN CUSTOMES ROUTES
+    Route::group(['prefix'=>'admin','as' => 'admin.','middleware' => ['language']],function () {
+
+        //Customer Address
+        Route::get('customers/{customer_id}/addresses', 'AddressController@index')->name('customer.addresses.index');
+        Route::post('customers/{customer_id}/addresses', 'AddressController@store')->name('customer.addresses.store');
+        Route::get('customers/{customer_id}/addresses/{address_id}', 'AddressController@show')->name('customer.addresses.show');
+        Route::post('customers/{customer_id}/addresses/{address_id}', 'AddressController@update')->name('customer.addresses.update');
+        Route::delete('customers/{customer_id}/addresses/{address_id}', 'AddressController@destroy')->name('customer.addresses.delete');
+
+        //Customer Routes
         Route::get('/customers' ,'CustomerController@index')->name('customers.index');
         Route::post('/customers' ,'CustomerController@store')->name('customers.store');
         Route::get('/customers/{customer}' ,'CustomerController@show')->name('customers.show');
         Route::put('/customers/{customer}' ,'CustomerController@update')->name('customers.update');
         Route::delete('/customers/{customer}' ,'CustomerController@destroy')->name('customers.delete' );
     });
-
-
-    //Customer's addresses routes
-    Route::get('customers/{customer_id}/addresses', 'AddressController@index')->name('admin.customer.addresses.index');
-    Route::post('customers/{customer_id}/addresses', 'AddressController@store')->name('admin.customer.addresses.store');
-    Route::get('customers/{customer_id}/addresses/{address_id}', 'AddressController@show')->name('admin.customer.addresses.show');
-    Route::post('customers/{customer_id}/addresses/{address_id}', 'AddressController@update')->name('admin.customer.addresses.update');
-    Route::delete('customers/{customer_id}/addresses/{address_id}', 'AddressController@destroy')->name('admin.customer.addresses.delete');
-    Route::post('customers/{id}/addresses', 'AddressController@massDestroy')->name('admin.customer.addresses.massdelete');
 
 });

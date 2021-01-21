@@ -5,7 +5,6 @@ namespace Modules\Customer\Http\Controllers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
@@ -39,7 +38,7 @@ class AddressController extends BaseController
     public function index($customer_id)
     {
         try {
-            $customer = Customer::findorFail($customer_id);
+            $customer = Customer::with('addresses')->findorFail($customer_id);
             $customer_address = $customer->addresses;
             return $this->successResponse($customer_address, trans('core::app.response.fetch-list-success', ['name' => 'Customer Address']));
 
@@ -98,6 +97,7 @@ class AddressController extends BaseController
             ]);
             $customer_address = CustomerAddress::create($request->only('customer_id', 'address1', 'address2', 'country', 'state', 'city', 'postcode', 'phone', 'default_address'));
             return $this->successResponse($customer_address, trans('core::app.response.create-success', ['name' => 'Customer Address']), 201);
+
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponseForMissingModel($exception);
         } catch (ValidationException $exception) {
@@ -158,7 +158,6 @@ class AddressController extends BaseController
     public function destroy($customer_id, $address_id)
     {
         try {
-            $customer = Customer::findOrFail($customer_id);
             $address = CustomerAddress::findOrFail($address_id);
             $address->delete();
             return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Customer Address']));
