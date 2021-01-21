@@ -64,5 +64,9 @@ class Customer extends Authenticatable implements  JWTSubject
         $this->notify(new CustomerResetPassword($token));
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(CustomerAddress::class ,'customer_id');
+    }
 
 }

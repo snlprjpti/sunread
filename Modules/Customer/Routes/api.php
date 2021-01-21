@@ -19,7 +19,6 @@ Route::group(['middleware' => ['api']], function () {
 
     Route::group(['prefix'=>'customer','as' => 'customer.'],function () {
 
-
         Route::post('/register', 'RegistrationController@register')->name('register');
 
         // Session Routes
@@ -39,4 +38,14 @@ Route::group(['middleware' => ['api']], function () {
         Route::put('/customers/{customer}' ,'CustomerController@update')->name('customers.update');
         Route::delete('/customers/{customer}' ,'CustomerController@destroy')->name('customers.delete' );
     });
+
+
+    //Customer's addresses routes
+    Route::get('customers/{customer_id}/addresses', 'AddressController@index')->name('admin.customer.addresses.index');
+    Route::post('customers/{customer_id}/addresses', 'AddressController@store')->name('admin.customer.addresses.store');
+    Route::get('customers/{customer_id}/addresses/{address_id}', 'AddressController@show')->name('admin.customer.addresses.show');
+    Route::post('customers/{customer_id}/addresses/{address_id}', 'AddressController@update')->name('admin.customer.addresses.update');
+    Route::delete('customers/{customer_id}/addresses/{address_id}', 'AddressController@destroy')->name('admin.customer.addresses.delete');
+    Route::post('customers/{id}/addresses', 'AddressController@massDestroy')->name('admin.customer.addresses.massdelete');
+
 });
