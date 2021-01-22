@@ -3,6 +3,8 @@
 namespace Modules\Core\Traits;
 
 
+use Illuminate\Support\Str;
+
 trait ApiResponseFormat
 {
     public function successResponse($payload, $message = null, $code = 200)
@@ -33,5 +35,12 @@ trait ApiResponseFormat
         return response()->json($format, $code);
     }
 
+    public function errorResponseForMissingModel($exception)
+    {
+        $model = Str::kebab( class_basename($exception->getModel()));
+        $message = $model ? str_replace('-', ' ', $model) . " not found" : $exception->getMessage();
+        return $this->errorResponse($message , 404);
+
+    }
 
 }
