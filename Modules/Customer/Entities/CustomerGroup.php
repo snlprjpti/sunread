@@ -13,7 +13,7 @@ class CustomerGroup extends Model
     /**
      * Get the customer for this group.
      */
-    public function customer()
+    public function customers()
     {
         return $this->hasMany(Customer::class);
     }
