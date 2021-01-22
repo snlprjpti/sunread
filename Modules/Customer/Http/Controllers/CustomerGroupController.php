@@ -68,7 +68,7 @@ class CustomerGroupController extends BaseController
 
 
     /**
-     * Stores new customer address
+     * Stores new customer group
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -98,7 +98,7 @@ class CustomerGroupController extends BaseController
 
 
     /**
-     * Updates the customer address
+     * Updates the customer group
      * @param Request $request
      * @param $group_id
      * @return \Illuminate\Http\JsonResponse
@@ -128,16 +128,19 @@ class CustomerGroupController extends BaseController
     }
 
     /**
-     * Destroys the particular customer address
+     * Destroys the particular customer group
      * @param $group_id
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($group_id)
     {
         try {
-            $address = CustomerGroup::findOrFail($group_id);
-            $address->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Customer Group']));
+            $group = CustomerGroup::findOrFail($group_id);
+            if($group->customers->count() == 0){
+                $group->delete();
+                return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Customer Group']));
+            }
+            return $this->errorResponse("Customer still present in group");
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponseForMissingModel($exception);
