@@ -3,10 +3,12 @@
 namespace Modules\Core\Providers;
 
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Core\Http\Middleware\Language;
+use Modules\Core\Services\ActivityLogHelper;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'core');
         $this->loadMigrationsFrom(module_path('Core', 'Database/Migrations'));
         $router->aliasMiddleware('language', Language::class);
+        $this->registerFacades();
 
         include __DIR__ . '/../Helpers/helpers.php';
         Validator::extend('decimal', 'Modules\Core\Contracts\Validations\Decimal@passes');
@@ -112,5 +115,13 @@ class CoreServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    private function registerFacades()
+    {
+        App::bind('audit', function()
+        {
+            return new  ActivityLogHelper();
+        });
     }
 }
