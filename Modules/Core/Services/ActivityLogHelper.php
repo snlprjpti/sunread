@@ -14,8 +14,7 @@ class ActivityLogHelper {
     public function __construct(ActivityLog $activityLog)
     {
         $this->activityLog = $activityLog;
-
-        $this->user = Auth::guard('admin')->user() ? Auth::guard('admin')->user() : null;
+        $this->user = Auth::user() ? Auth::user() : null;
 
         if($this->user != null) {
             $this->log['causer_id'] = $this->user->id;
