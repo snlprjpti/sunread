@@ -4,6 +4,7 @@ namespace Modules\User\Http\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -32,7 +33,7 @@ class UserController extends BaseController
 
     /**
      * returns all the admins
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index()
     {
@@ -52,7 +53,7 @@ class UserController extends BaseController
     /**
      * Get the particular admin
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {
@@ -71,7 +72,7 @@ class UserController extends BaseController
     /**
      * store the new admin resource
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
@@ -105,18 +106,23 @@ class UserController extends BaseController
      * Update the admin details
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
         try {
 
-            $this->validate($request, Admin::rules($id));
+            $this->validate($request, [
+                'name' => 'sometimes',
+                'email' => 'sometimes|unique:admins,email,'.$id,
+                'password' => 'sometimes|confirmed',
+                'status' => 'sometimes|boolean',
+                'role_id' => 'sometimes|integer'
+            ]);
             $password = $request->get('password');
             if (isset($password)) {
                 $request->merge(['password' => bcrypt($password)]);
             }
-
             $admin = Admin::findOrFail($id);
             $admin->update(
                 $request->only('name', 'email', 'password', 'role_id', 'status')
@@ -140,14 +146,14 @@ class UserController extends BaseController
     /**
      * Remove the specified  admin resource from storage.
      * @param int $id
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy($id)
     {
         try {
             $admin = Admin::findOrFail($id);
             $admin->delete();
-            return $this->successResponse(trans('core::app.response.delete-success', ['name' => 'Admin']));
+            return $this->successResponse(trans('core::app.response.deleted-success', ['name' => 'Admin']));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
