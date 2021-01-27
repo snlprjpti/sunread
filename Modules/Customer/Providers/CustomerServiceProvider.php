@@ -23,6 +23,7 @@ class CustomerServiceProvider extends ServiceProvider
         $router->aliasMiddleware('customer', RedirectIfNotCustomer::class);
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('Customer', 'Database/Migrations'));
+        $this->registerObservers();
     }
 
     /**
@@ -92,6 +93,8 @@ class CustomerServiceProvider extends ServiceProvider
      * Register views.
      *
      * @return void
+     *
+     *
      */
     public function registerViews()
     {
@@ -107,5 +110,10 @@ class CustomerServiceProvider extends ServiceProvider
         $this->loadViewsFrom(array_merge(array_map(function ($path) {
             return $path . '/modules/customer';
         }, \Config::get('view.paths')), [$sourcePath]), 'customer');
+    }
+
+    private function registerObservers()
+    {
+        //CUstomer::observe(CustomerObserver::class);
     }
 }

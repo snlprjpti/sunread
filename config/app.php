@@ -1,5 +1,7 @@
 <?php
 
+use Modules\Core\Facades\Audit;
+
 return [
 
     /*
@@ -229,7 +231,8 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
         //Package Aliases
-        'Image' => Intervention\Image\Facades\Image::class
+        'Image' => Intervention\Image\Facades\Image::class,
+        'audit' => Audit::class,
 
         //Custom Aliases
 
