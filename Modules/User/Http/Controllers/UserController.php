@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
@@ -22,6 +22,7 @@ class UserController extends BaseController
 
     protected $pagination_limit;
 
+    protected $model_name = 'Admin';
     /**
      * UserController constructor.
      */
@@ -33,13 +34,31 @@ class UserController extends BaseController
 
     /**
      * returns all the admins
-     * @return JsonResponse
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request  $request)
     {
         try {
-            $payload = Admin::paginate($this->pagination_limit);
-            return $this->successResponse($payload, "Admin fetched successfully.");
+            $this->validate($request, [
+                'limit' => 'sometimes|numeric',
+                'page' => 'sometimes|numeric',
+                'sort_by' => 'sometimes',
+                'sort_order' => 'sometimes|in:asc,desc',
+                'q' => 'sometimes|string|min:1'
+            ]);
+
+            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
+            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
+
+            $admins =  Admin::query();
+            if ($request->has('q')) {
+                $admins->whereLike(Admin::$SEARCHABLE,$request->get('q'));
+            }
+            $admins = $admins->orderBy($sort_by, $sort_order);
+            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
+            $admins = $admins->paginate($limit);
+            return $this->successResponse($admins, trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -53,16 +72,16 @@ class UserController extends BaseController
     /**
      * Get the particular admin
      * @param $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
         try {
-            $payload = Admin::findOrFail($id);
-            return $this->successResponse($payload);
+            $admin = Admin::findOrFail($id);
+            return $this->successResponse($admin, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -72,7 +91,7 @@ class UserController extends BaseController
     /**
      * store the new admin resource
      * @param Request $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -89,7 +108,7 @@ class UserController extends BaseController
                 $request->only('name', 'email', 'password', 'role_id', 'status')
             );
 
-            return $this->successResponse($admin, trans('core::app.response.create-success', ['name' => 'Admin']), 201);
+            return $this->successResponse($admin, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -111,7 +130,6 @@ class UserController extends BaseController
     public function update(Request $request, $id)
     {
         try {
-
             $this->validate($request, [
                 'name' => 'sometimes',
                 'email' => 'sometimes|unique:admins,email,'.$id,
@@ -124,14 +142,14 @@ class UserController extends BaseController
                 $request->merge(['password' => bcrypt($password)]);
             }
             $admin = Admin::findOrFail($id);
-            $admin->update(
+            $admin->forceFill(
                 $request->only('name', 'email', 'password', 'role_id', 'status')
             );
-
-            return $this->successResponse($admin, trans('core::app.response.update-success', ['name' => 'Admin']));
+            $admin->save();
+            return $this->successResponse($admin, trans('core::app.response.update-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -152,8 +170,19 @@ class UserController extends BaseController
     {
         try {
             $admin = Admin::findOrFail($id);
+            $current_user = Auth::guard('admin')->user();
+
+            if($admin->id === $current_user->id){
+                return $this->errorResponse("Admin cannot delete itself.");
+            }
+            if($admin->hasRole('super-admin')){
+                return $this->errorResponse("Super Admin cannot be deleted.");
+            }
             $admin->delete();
-            return $this->successResponse(trans('core::app.response.deleted-success', ['name' => 'Admin']));
+            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
+
+        }catch (ModelNotFoundException $exception){
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);

@@ -9,6 +9,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Admin extends Authenticatable implements JWTSubject
 {
+    public static  $SEARCHABLE = ['name', 'email'];
     use Notifiable;
 
     /**
@@ -88,6 +89,19 @@ class Admin extends Authenticatable implements JWTSubject
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function hasRole($roleSlug): bool
+    {
+        if (empty($roleSlug) || empty($this->role)){
+            return false;
+        }
+
+        if ($this->role->slug ==  $roleSlug) {
+            return true;
+        }
+
+        return false;
     }
 
 }
