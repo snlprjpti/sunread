@@ -173,10 +173,10 @@ class UserController extends BaseController
             $current_user = Auth::guard('admin')->user();
 
             if($admin->id === $current_user->id){
-                return $this->errorResponse("Admin cannot delete itself.");
+                return $this->errorResponse("Admin cannot delete itself.",403);
             }
             if($admin->hasRole('super-admin')){
-                return $this->errorResponse("Super Admin cannot be deleted.");
+                return $this->errorResponse("Super Admin cannot be deleted." ,403);
             }
             $admin->delete();
             return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
