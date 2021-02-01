@@ -48,10 +48,13 @@ class AccountController extends BaseController
             $user = auth()->guard('admin')->user();
 
             $this->validate($request, [
-                'name' => 'required',
+                'first_name' => 'sometimes|min:2|max:200',
+                'last_name' => 'sometimes|min:2|max:200',
                 'email' => 'email|unique:admins,email,' . $user->id,
                 'password' => 'sometimes|min:6|confirmed|max:200',
-                'current_password' => 'sometimes|min:6|max:200'
+                'current_password' => 'sometimes|min:6|max:200',
+                'company' =>'sometimes|min:3|max:200',
+                'address' =>'sometimes|min:3|max:200',
             ]);
 
             if ($request->get('password')) {
@@ -66,8 +69,7 @@ class AccountController extends BaseController
                 }
                 $request->merge(['password' => bcrypt($request->get('password'))]);
             }
-
-            $user->fill($request->only('name', 'email', 'password'));
+            $user->fill($request->only('first_name','last_name','address','company', 'email', 'password'));
             $user->save();
             return $this->successResponse($user,trans('core::app.response.update-success', ['name' => 'Admin account']));
 

@@ -96,8 +96,16 @@ class UserController extends BaseController
     public function store(Request $request)
     {
         try {
-
-            $this->validate($request, Admin::rules());
+            $this->validate($request, [
+                'first_name' => 'required|min:2|max:200',
+                'last_name' => 'required|min:2|max:200',
+                'company' =>'required|min:3|max:200',
+                'address' =>'required|min:3|max:200',
+                'email' => 'required|unique:admins,email',
+                'password' => 'required|confirmed',
+                'status' => 'required|boolean',
+                'role_id' => 'required|integer'
+            ]);
 
             $password = $request->get('password');
             if (isset($password)) {
@@ -105,7 +113,7 @@ class UserController extends BaseController
             }
 
             $admin = Admin::create(
-                $request->only('name', 'email', 'password', 'role_id', 'status')
+                $request->only('first_name','last_name','address','company', 'email', 'password', 'role_id', 'status')
             );
 
             return $this->successResponse($admin, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
@@ -131,11 +139,14 @@ class UserController extends BaseController
     {
         try {
             $this->validate($request, [
-                'name' => 'sometimes',
+                'first_name' => 'sometimes|min:2|max:200',
+                'last_name' => 'sometimes|min:2|max:200',
+                'company' =>'sometimes|min:3|max:200',
+                'address' =>'sometimes|min:3|max:200',
                 'email' => 'sometimes|unique:admins,email,'.$id,
                 'password' => 'sometimes|confirmed',
                 'status' => 'sometimes|boolean',
-                'role_id' => 'sometimes|integer'
+                'role_id' => 'sometimes|integer',
             ]);
             $password = $request->get('password');
             if (isset($password)) {
@@ -143,7 +154,7 @@ class UserController extends BaseController
             }
             $admin = Admin::findOrFail($id);
             $admin->forceFill(
-                $request->only('name', 'email', 'password', 'role_id', 'status')
+                $request->only('first_name','last_name','address','company', 'email', 'password', 'role_id', 'status')
             );
             $admin->save();
             return $this->successResponse($admin, trans('core::app.response.update-success', ['name' => $this->model_name]));
