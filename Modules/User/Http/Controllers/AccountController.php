@@ -50,22 +50,26 @@ class AccountController extends BaseController
             $this->validate($request, [
                 'name' => 'required',
                 'email' => 'email|unique:admins,email,' . $user->id,
-                'password' => 'nullable|min:6|confirmed',
-                'current_password' => 'required|min:6'
+                'password' => 'sometimes|min:6|confirmed|max:200',
+                'current_password' => 'sometimes|min:6|max:200'
             ]);
 
-            $current_password = request()->get('current_password');
-            if (!Hash::check($current_password, auth()->guard('admin')->user()->password)) {
-                return $this->errorResponse(trans('core::app.users.users.incorrect-password'), 401);
-            }
-
             if ($request->get('password')) {
+                $current_password = request()->get('current_password');
+                if(is_null($current_password) || empty($current_password)){
+                    throw ValidationException::withMessages([
+                        "current_password" => "current password field is required"
+                    ]);
+                }
+                if (!Hash::check($current_password, auth()->guard('admin')->user()->password)) {
+                    return $this->errorResponse(trans('core::app.users.users.incorrect-password'), 401);
+                }
                 $request->merge(['password' => bcrypt($request->get('password'))]);
             }
 
-            $user->update($request->only('name', 'email', 'password'));
-
-            return $this->successResponseWithMessage(trans('core::app.users.reset-password.password-reset-success', ['name' => 'Admin account']));
+            $user->fill($request->only('name', 'email', 'password'));
+            $user->save();
+            return $this->successResponse($user,trans('core::app.response.update-success', ['name' => 'Admin account']));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
