@@ -17,6 +17,8 @@ class Role extends Model
         'name', 'description', 'permission_type', 'permissions','slug'
     ];
 
+    public static $SEARCHABLE = ['name' ,'description', 'permissions', 'permission_type', 'slug'];
+
     protected $casts = [
         'permissions' => 'array'
     ];
@@ -29,14 +31,6 @@ class Role extends Model
         return $this->hasMany(Admin::class);
     }
 
-    public static function rules ($id = 0, $merge=[]) {
-        return array_merge([
-            'name' => 'required',
-            'permission_type' => 'required',
-            'permissions' => 'nullable'
-        ], $merge);
-
-    }
 
 }
 
