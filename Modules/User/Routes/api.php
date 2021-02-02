@@ -31,6 +31,8 @@ Route::group(['middleware' => ['api']], function () {
         Route::group(['middleware' => 'jwt.verify'],function(){
             Route::resource('roles' ,'RoleController');
             Route::resource('users' ,'UserController');
+            Route::post('/account/image', 'AccountController@uploadProfileImage')->name('image.update');
+            Route::delete('/account/image', 'AccountController@deleteProfileImage')->name('image.delete');
             Route::get('/account', 'AccountController@edit')->name('account.edit');
             Route::put('/account', 'AccountController@update')->name('account.update');
         });
