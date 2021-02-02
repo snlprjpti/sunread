@@ -51,13 +51,13 @@ class AccountController extends BaseController
                 'first_name' => 'sometimes|min:2|max:200',
                 'last_name' => 'sometimes|min:2|max:200',
                 'email' => 'email|unique:admins,email,' . $user->id,
-                'password' => 'sometimes|min:6|confirmed|max:200',
+                'password' => 'sometimes|required|min:6|confirmed|max:200',
                 'current_password' => 'sometimes|min:6|max:200',
                 'company' =>'sometimes|min:3|max:200',
                 'address' =>'sometimes|min:3|max:200',
             ]);
 
-            if ($request->get('password')) {
+            if ($request->has('password')) {
                 $current_password = request()->get('current_password');
                 if(is_null($current_password) || empty($current_password)){
                     throw ValidationException::withMessages([
