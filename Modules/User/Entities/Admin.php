@@ -18,7 +18,7 @@ class Admin extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'api_token', 'role_id', 'status',"first_name", "last_name", "company", "address"
+        'name', 'email', 'password', 'api_token', 'role_id', 'status',"first_name", "last_name", "company", "address","profile_image"
     ];
 
     /**
@@ -112,24 +112,27 @@ class Admin extends Authenticatable implements JWTSubject
 
     public function getImage($image_type = 'main_image')
     {
-        $main_image_dimension = config('deltanet.image_dimensions.user.main_image')[0];
-        $gallery_image_dimension = config('deltanet.image_dimensions.user.gallery_images')[0];
+        $main_image_dimension = config('user_image.image_dimensions.user.main_image')[0];
+        $gallery_image_dimension = config('user_image.image_dimensions.user.gallery_images')[0];
+
         switch ($image_type){
 
             case 'main_image':
                 $d = $main_image_dimension['width'] . '_' . $main_image_dimension['height'] . '_';
+
                 if(isset($this->profile_image)){
-                    return asset('storage/images/'.$d.$this->profile_image);
+                    return asset('storage/images/admin/'.$d.$this->profile_image);
                 }
                 break;
 
             case 'gallery_image':
                 $d = $gallery_image_dimension['width'] . '_' . $gallery_image_dimension['height'] . '_';
                 if(isset($this->profile_image)){
-                    return asset('storage/images/'.$d . $this->profile_image);
+                    return asset('storage/images/admin/'.$d . $this->profile_image);
                 }
                 break;
         }
+        return 1;
 
     }
 

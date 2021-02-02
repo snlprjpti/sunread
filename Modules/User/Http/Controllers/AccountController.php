@@ -25,9 +25,9 @@ class AccountController extends BaseController
 
     public function __construct()
     {
-        $this->folder_path = storage_path() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
-        $this->main_image_dimensions = Config::get('user.image');
-        $this->gallery_image_dimensions = config('image.image_dimensions.user.gallery_images');
+        $this->folder_path = storage_path() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR.'admin'.DIRECTORY_SEPARATOR;
+        $this->main_image_dimensions = config('user_image.image_dimensions.user.main_image');
+        $this->gallery_image_dimensions = config('user_image.image_dimensions.user.gallery_images');
     }
 
     /**
@@ -98,9 +98,7 @@ class AccountController extends BaseController
 
     public function uploadProfileImage(Request $request)
     {
-
         try {
-            dd($this->main_image_dimensions);
             $user = Auth::user();
 
             $this->validate($request, [
@@ -129,10 +127,8 @@ class AccountController extends BaseController
             $user->update([
                 'profile_image' => $file_name
             ]);
-
             return $this->successResponse([
                 'profile_image' => $user->getImage()
-
             ], "Profile image updated successfully");
 
         } catch (ValidationException $exception) {
