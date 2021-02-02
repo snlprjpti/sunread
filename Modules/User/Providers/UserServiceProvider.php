@@ -50,6 +50,10 @@ class UserServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path('User', 'Config/config.php'), 'user'
         );
+        $this->mergeConfigFrom(
+            module_path('User', 'Config/user_image.php'), 'user_image'
+        );
+
     }
 
     /**
