@@ -47,8 +47,9 @@ class UserServiceProvider extends ServiceProvider
         $this->publishes([
             module_path('User', 'Config/config.php') => config_path('user.php'),
         ], 'config');
+
         $this->mergeConfigFrom(
-            module_path('User', 'Config/config.php'), 'user'
+            module_path('User', 'Config/config.php'), 'user',
         );
     }
 

@@ -30,6 +30,7 @@ class Admin extends Authenticatable implements JWTSubject
         'password', 'api_token', 'remember_token',
     ];
 
+    protected $appends = ['avatar'];
     /**
      * Get the role that owns the admin.
      */
@@ -102,6 +103,34 @@ class Admin extends Authenticatable implements JWTSubject
         }
 
         return false;
+    }
+
+    public function getAvatarAttribute()
+    {
+        return $this->getImage();
+    }
+
+    public function getImage($image_type = 'main_image')
+    {
+        $main_image_dimension = config('deltanet.image_dimensions.user.main_image')[0];
+        $gallery_image_dimension = config('deltanet.image_dimensions.user.gallery_images')[0];
+        switch ($image_type){
+
+            case 'main_image':
+                $d = $main_image_dimension['width'] . '_' . $main_image_dimension['height'] . '_';
+                if(isset($this->profile_image)){
+                    return asset('storage/images/'.$d.$this->profile_image);
+                }
+                break;
+
+            case 'gallery_image':
+                $d = $gallery_image_dimension['width'] . '_' . $gallery_image_dimension['height'] . '_';
+                if(isset($this->profile_image)){
+                    return asset('storage/images/'.$d . $this->profile_image);
+                }
+                break;
+        }
+
     }
 
 }
