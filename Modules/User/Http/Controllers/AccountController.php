@@ -151,8 +151,7 @@ class AccountController extends BaseController
     {
         $user = Auth::user();
         if (isset($user) && isset($user->profile_image)) {
-            if (file_exists($this->folder_path . $user->profile_image))
-                unlink($this->folder_path . $user->profile_image);
+            $this->removeOldImage($user);
             $user->profile_image = null;
             $user->save();
             return $this->successResponseWithMessage("Image deleted successfully.");
