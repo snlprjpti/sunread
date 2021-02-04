@@ -196,20 +196,4 @@ class RoleController extends BaseController
 
     }
 
-
-    public function fetchPermission(Request $request)
-    {
-        try{
-            $permissions = config('acl');
-            dd($permissions);
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);;
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-
-    }
-
 }
