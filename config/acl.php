@@ -270,17 +270,17 @@ return [
         'sort'  => 3,
     ],
     [
-        'key'   => 'admin.customers.update',
+        'key'   => 'customers.address.update',
         'name'  => 'Update Customer address',
         'route' => 'admin.customer.address.update',
         'sort'  => 4,
     ],
     [
-        'key'   => 'admin.customers.delete',
+        'key'   => 'customers.address.delete',
         'name'  => 'Delete Customer address',
         'route' => 'admin.customer.address.delete',
         'sort'  => 5,
     ],
-    
+
 ];
 
