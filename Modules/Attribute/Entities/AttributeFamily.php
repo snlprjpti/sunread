@@ -11,7 +11,7 @@ class AttributeFamily extends Model
     use SlugAble;
     protected $fillable = ['name', 'slug'];
     public $timestamps= false;
-
+    public static $SEARCHABLE = ['name'];
     public function attributeGroups()
     {
         return $this->hasMany(AttributeGroup::class, 'attribute_family_id');

@@ -23,7 +23,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::get('/families', 'AttributeFamilyController@index')->name('families.index');
         Route::post('/families', 'AttributeFamilyController@store')->name('families.store');
         Route::get('/families/{family}', 'AttributeFamilyController@show')->name('families.show');
-        Route::post('/families/{family}', 'AttributeFamilyController@update')->name('families.update');
+        Route::put('/families/{family}', 'AttributeFamilyController@update')->name('families.update');
         Route::delete('/families/{family}', 'AttributeFamilyController@destroy')->name('families.delete');
 
 
@@ -31,14 +31,14 @@ Route::group(['middleware' => ['api']], function () {
         Route::get('/attribute-group', 'AttributeGroupController@index')->name('attribute-groups.index');
         Route::post('/attribute-group', 'AttributeGroupController@store')->name('attribute-groups.store');
         Route::get('/attribute-group/{id}', 'AttributeGroupController@show')->name('attribute-groups.show');
-        Route::post('/attribute-group/{id}', 'AttributeGroupController@update')->name('attribute-groups.update');
+        Route::put('/attribute-group/{id}', 'AttributeGroupController@update')->name('attribute-groups.update');
         Route::delete('/attribute-group/{id}', 'AttributeGroupController@destroy')->name('attribute-groups.delete');
 
 
         Route::get('/attributes', 'AttributeController@index')->name('attributes.index');
         Route::post('/attributes', 'AttributeController@store')->name('attributes.store');
         Route::get('/attributes/{id}', 'AttributeController@show')->name('attributes.show');
-        Route::post('/attributes/{id}', 'AttributeController@update')->name('attributes.update');
+        Route::put('/attributes/{id}', 'AttributeController@update')->name('attributes.update');
         Route::delete('/attributes/{id}', 'AttributeController@destroy')->name('attributes.delete');
         Route::post('/attributes/mass-delete', 'AttributeController@massDestroy')->name('attributes.mass-delete');
 

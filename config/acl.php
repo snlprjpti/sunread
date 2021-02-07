@@ -137,7 +137,7 @@ return [
     [
         'key'   => 'catalog.families.show',
         'name'  => 'Show Attribute Family',
-        'route' => 'admin.catalog.families.create',
+        'route' => 'admin.catalog.families.show',
         'sort'  => 3,
     ],
     [
@@ -170,7 +170,7 @@ return [
     [
         'key'   => 'catalog.attribute-groups.show',
         'name'  => 'Show Attribute Group',
-        'route' => 'admin.catalog.attribute-groups.create',
+        'route' => 'admin.catalog.attribute-groups.show',
         'sort'  => 3,
     ],
     [
@@ -281,6 +281,6 @@ return [
         'route' => 'admin.customer.address.delete',
         'sort'  => 5,
     ],
-    
+
 ];
 
