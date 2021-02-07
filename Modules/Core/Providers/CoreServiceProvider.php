@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Providers;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +13,7 @@ use Modules\Core\Http\Middleware\Language;
 use Modules\Core\Services\ActivityLogHelper;
 use Modules\Customer\Entities\CustomerGroup;
 use Modules\Customer\Observers\CustomerGroupObserver;
+use Modules\Core\Facades\Audit as ActivityLoggerFacade;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -31,7 +33,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'core');
         $this->loadMigrationsFrom(module_path('Core', 'Database/Migrations'));
         $router->aliasMiddleware('language', Language::class);
-        $this->registerFacades();
+        $this->registerActivityLogger();
         $this->registerObsever();
 
         include __DIR__ . '/../Helpers/helpers.php';
@@ -121,17 +123,20 @@ class CoreServiceProvider extends ServiceProvider
         return [];
     }
 
-    private function registerFacades()
-    {
-        App::bind('audit', function()
-        {
-            return new  ActivityLogHelper(new ActivityLog());
-        });
-    }
 
     private function registerObsever()
     {
         CustomerGroup::observe(CustomerGroupObserver::class);
 
+    }
+
+    protected function registerActivityLogger()
+    {
+        $loader = AliasLoader::getInstance();
+        $loader->alias('Audit', ActivityLoggerFacade::class);
+
+        $this->app->singleton('audit', function () {
+            return new ActivityLogHelper(new ActivityLog());
+        });
     }
 }
