@@ -4,6 +4,12 @@ namespace Modules\Attribute\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeFamily;
+use Modules\Attribute\Entities\AttributeGroup;
+use Modules\Attribute\Observers\AttributeFamilyObserver;
+use Modules\Attribute\Observers\AttributeGroupObserver;
+use Modules\Attribute\Observers\AttributeObserver;
 
 class AttributeServiceProvider extends ServiceProvider
 {
@@ -19,6 +25,7 @@ class AttributeServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('Attribute', 'Database/Migrations'));
+        $this->registerObservers();
     }
 
     /**
@@ -102,5 +109,12 @@ class AttributeServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    private function registerObservers()
+    {
+        AttributeGroup::observe(AttributeGroupObserver::class);
+        AttributeFamily::observe(AttributeFamilyObserver::class);
+        Attribute::observe(AttributeObserver::class);
     }
 }
