@@ -25,15 +25,20 @@ class  Bouncer
     /**
      * Checks if admin is  allowed or not for certain action
      *
-     * @param  String $permission
+     * @param $route
      * @return bool
      */
-    public static function allow($permission)
+    public static function allow($route)
     {
         if (!auth()->guard('admin')->check())
             return false;
-        if( auth()->guard('admin')->user()->hasPermission($permission))
-            return true;
-        return false;
+        $acl = config('acl');
+        $key_for_route = array_search($route, array_column($acl, 'route'),true);
+        if($key_for_route === false){
+            return  false;
+        }
+        $permission = $acl[$key_for_route]['key'];
+        return auth()->guard('admin')->user()->hasPermission($permission);
+
     }
 }

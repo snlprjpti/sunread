@@ -19,12 +19,4 @@ class AttributeFamilyRepository extends Repository implements AttributeFamilyInt
         return AttributeFamily::class;
     }
 
-    public static function rules($id = 0, $merge = [])
-    {
-        return array_merge([
-            'slug' => ['nullable', 'unique:attribute_families,slug' . ($id ? ",$id" : '')],
-            'name' => 'required'
-        ], $merge);
-    }
-
 }
