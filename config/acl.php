@@ -88,102 +88,199 @@ return [
 
 
 
-    /*[
-        'key'   => 'catalog.attributes',
-        'name'  => 'attributes',
-        'route' => 'admin.catalog.attributes.index',
-        'sort'  => 5,
-    ],
     [
-        'key'   => 'catalog.attributes.create',
-        'name'  => 'create',
-        'route' => 'admin.catalog.attributes.create',
+        'key'   => 'catalog.attributes.index',
+        'name'  => 'List Attributes',
+        'route' => 'admin.catalog.attributes.index',
         'sort'  => 1,
     ],
+    [
+        'key'   => 'catalog.attributes.store',
+        'name'  => 'Create Attributes',
+        'route' => 'admin.catalog.attributes.store',
+        'sort'  => 2,
+    ],
+    [
+        'key'   => 'catalog.attributes.show',
+        'name'  => 'Show Attributes',
+        'route' => 'admin.catalog.attributes.show',
+        'sort'  => 2,
+    ],
+
     [
         'key'   => 'catalog.attributes.update',
-        'name'  => 'update',
+        'name'  => 'Update Attributes',
         'route' => 'admin.catalog.attributes.update',
-        'sort'  => 2,
-    ], [
+        'sort'  => 4,
+    ],
+    [
         'key'   => 'catalog.attributes.delete',
-        'name'  => 'delete',
+        'name'  => 'Delete Attributes',
         'route' => 'admin.catalog.attributes.delete',
-        'sort'  => 3,
-    ], [
-        'key'   => 'catalog.families',
-        'name'  => 'attribute-families',
+        'sort'  => 5,
+    ],
+
+    //ATTRIBUTE FAMILIES
+    [
+        'key'   => 'catalog.families.index',
+        'name'  => 'List Attribute Family',
         'route' => 'admin.catalog.families.index',
-        'sort'  => 4,
-    ], [
-        'key'   => 'catalog.families.create',
-        'name'  => 'create',
-        'route' => 'admin.catalog.families.create',
         'sort'  => 1,
-    ], [
-        'key'   => 'catalog.families.update',
-        'name'  => 'update',
-        'route' => 'admin.catalog.families.update',
+    ],
+    [
+        'key'   => 'catalog.families.store',
+        'name'  => 'Create Attribute Family',
+        'route' => 'admin.catalog.families.store',
         'sort'  => 2,
-    ], [
-        'key'   => 'catalog.families.delete',
-        'name'  => 'delete',
-        'route' => 'admin.catalog.families.delete',
+    ],
+
+    [
+        'key'   => 'catalog.families.show',
+        'name'  => 'Show Attribute Family',
+        'route' => 'admin.catalog.families.create',
         'sort'  => 3,
     ],
     [
-        'key'   => 'customers',
-        'name'  => 'customers',
-        'route' => 'admin.customer.index',
+        'key'   => 'catalog.families.update',
+        'name'  => 'Update Attribute Family',
+        'route' => 'admin.catalog.families.update',
         'sort'  => 4,
     ],
     [
-        'key'   => 'customers.customers',
-        'name'  => 'customers',
-        'route' => 'admin.customer.index',
+        'key'   => 'catalog.families.delete',
+        'name'  => 'Delete Attribute Family',
+        'route' => 'admin.catalog.families.delete',
+        'sort'  => 5,
+    ],
+
+    //ATTRIBUTE GROUPS
+    [
+        'key'   => 'catalog.attribute-groups.index',
+        'name'  => 'List Attribute Group',
+        'route' => 'admin.catalog.attribute-groups.index',
         'sort'  => 1,
     ],
     [
-        'key'   => 'customers.customers.create',
-        'name'  => 'create',
-        'route' => 'admin.customer.create',
+        'key'   => 'catalog.attribute-groups.store',
+        'name'  => 'Create Attribute Group',
+        'route' => 'admin.catalog.attribute-groups.create',
+        'sort'  => 2,
+    ],
+
+    [
+        'key'   => 'catalog.attribute-groups.show',
+        'name'  => 'Show Attribute Group',
+        'route' => 'admin.catalog.attribute-groups.create',
+        'sort'  => 3,
+    ],
+    [
+        'key'   => 'catalog.attribute-groups.update',
+        'name'  => 'Update Attribute Group',
+        'route' => 'admin.catalog.attribute-groups.update',
+        'sort'  => 4,
+    ],
+    [
+        'key'   => 'catalog.attribute-groups.delete',
+        'name'  => 'Delete Attribute Group',
+        'route' => 'admin.catalog.attribute-groups.delete',
+        'sort'  => 5,
+    ],
+
+    //CUSTOMERS
+    [
+        'key'   => 'customers.customers.list',
+        'name'  => 'List customers',
+        'route' => 'admin.customers.index',
         'sort'  => 1,
+    ],
+    [
+        'key'   => 'customers.customers.store',
+        'name'  => 'Create customers',
+        'route' => 'admin.customers.store',
+        'sort'  => 2,
+    ],
+    [
+        'key'   => 'customer.customers.show',
+        'name'  => 'Show Customer Detail',
+        'route' => 'admin.customers.show',
+        'sort'  => 3,
+    ],
+    [
+        'key'   => 'customer.customers.update',
+        'name'  => 'Update Customer Detail',
+        'route' => 'admin.customers.update',
+        'sort'  => 4,
+    ],
+    [
+        'key'   => 'customer.customers.delete',
+        'name'  => 'Delete Customer Detail',
+        'route' => 'admin.customers.delete',
+        'sort'  => 5,
+    ],
+
+    //CUSTOMER-GROUP
+    [
+        'key'   => 'customers.groups.list',
+        'name'  => 'List customers groups',
+        'route' => 'admin.groups.index',
+        'sort'  => 1,
+    ],
+    [
+        'key'   => 'customers.customers.store',
+        'name'  => 'Create customer group',
+        'route' => 'admin.groups.store',
+        'sort'  => 2,
+    ],
+    [
+        'key'   => 'customers.customers.show',
+        'name'  => 'Show Customer Group',
+        'route' => 'admin.groups.show',
+        'sort'  => 3,
     ],
     [
         'key'   => 'customers.customers.update',
-        'name'  => 'update',
-        'route' => 'admin.customer.update',
-        'sort'  => 2,
+        'name'  => 'Update Customer Group',
+        'route' => 'admin.groups.update',
+        'sort'  => 4,
     ],
     [
         'key'   => 'customers.customers.delete',
-        'name'  => 'delete',
-        'route' => 'admin.customer.delete',
-        'sort'  => 3,
+        'name'  => 'Delete Customer Group',
+        'route' => 'admin.groups.delete',
+        'sort'  => 5,
     ],
+
+    //CUSTOMER-ADDRESS
     [
-        'key'   => 'customers.groups',
-        'name'  => 'groups',
-        'route' => 'admin.groups.index',
-        'sort'  => 2,
-    ],
-    [
-        'key'   => 'customers.groups.create',
-        'name'  => 'create',
-        'route' => 'admin.groups.create',
+        'key'   => 'customers.address.list',
+        'name'  => 'List customers address',
+        'route' => 'admin.customer.address.index',
         'sort'  => 1,
     ],
     [
-        'key'   => 'customers.groups.update',
-        'name'  => 'update',
-        'route' => 'admin.groups.update',
+        'key'   => 'customers.address.store',
+        'name'  => 'Create customer address',
+        'route' => 'admin.customer.address.store',
         'sort'  => 2,
     ],
     [
-        'key'   => 'customers.groups.delete',
-        'name'  => 'delete',
-        'route' => 'admin.groups.delete',
+        'key'   => 'customers.address.show',
+        'name'  => 'Show Customer address',
+        'route' => 'admin.customer.address.show',
         'sort'  => 3,
-    ]*/
+    ],
+    [
+        'key'   => 'admin.customers.update',
+        'name'  => 'Update Customer address',
+        'route' => 'admin.customer.address.update',
+        'sort'  => 4,
+    ],
+    [
+        'key'   => 'admin.customers.delete',
+        'name'  => 'Delete Customer address',
+        'route' => 'admin.customer.address.delete',
+        'sort'  => 5,
+    ],
+    
 ];
 

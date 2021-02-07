@@ -34,8 +34,6 @@ class  Bouncer
             return false;
         $acl = config('acl');
         $key_for_route = array_search($route, array_column($acl, 'route'),true);
-
-        //can return 0 index which can be considered false so had to check
         if($key_for_route === false){
             return  false;
         }
