@@ -163,7 +163,7 @@ return [
     [
         'key'   => 'catalog.attribute-groups.store',
         'name'  => 'Create Attribute Group',
-        'route' => 'admin.catalog.attribute-groups.create',
+        'route' => 'admin.catalog.attribute-groups.store',
         'sort'  => 2,
     ],
 

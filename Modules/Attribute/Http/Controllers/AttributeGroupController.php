@@ -11,11 +11,13 @@ use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Attribute\Repositories\AttributeGroupRepository;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\User\Entities\Role;
 
 class AttributeGroupController extends BaseController
 {
     protected $pagination_limit;
 
+    protected $model_name = "Attribute Group";
     /**
      * AttributeGroup Controller constructor.
      * Admin middleware checks the admin against admins table
@@ -31,13 +33,33 @@ class AttributeGroupController extends BaseController
 
     /**
      * Returns all the attribute_group
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $payload = $this->attributeGroupRepository->all();
-            return $this->successResponse($payload);
+
+            $this->validate($request, [
+                'limit' => 'sometimes|numeric',
+                'page' => 'sometimes|numeric',
+                'sort_by' => 'sometimes',
+                'sort_order' => 'sometimes|in:asc,desc',
+                'q' => 'sometimes|string|min:1'
+            ]);
+
+            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
+            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
+
+            $attribute_groups = AttributeGroup::query();
+            if ($request->has('q')) {
+                $attribute_groups->whereLike(AttributeGroup::$SEARCHABLE, $request->get('q'));
+            }
+            $attribute_groups = $attribute_groups->orderBy($sort_by, $sort_order);
+            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
+            $attribute_groups = $attribute_groups->paginate($limit);
+            return $this->successResponse($attribute_groups, trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
+
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
 
@@ -54,11 +76,11 @@ class AttributeGroupController extends BaseController
     public function show($id)
     {
         try {
-            $payload = $this->attributeGroupRepository->findOrFail($id);
-            return $this->successResponse($payload);
+            $attribute_group = AttributeGroup::findOrFail($id);
+            return $this->successResponse($attribute_group, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -75,11 +97,14 @@ class AttributeGroupController extends BaseController
     {
         try {
 
-            $this->validate($request, $this->attributeGroupRepository->rules());
-
-            if (!$request->get('slug')) {
-                $request->merge(['slug' => $this->attributeGroupRepository->createSlug($request->get('name'))]);
-            }
+            $this->validate($request, [
+                'slug' => ['nullable', 'unique:attribute_groups,slug'],
+                'name' => 'required',
+                'attribute_family_id' => 'required|exists:attribute_families,id'
+            ]);
+            $request->merge([
+                'is_user_defined' => 1
+            ]);
 
             $attribute_group = $this->attributeGroupRepository->create(
                 $request->only('name', 'slug' ,'is_user_defined','attribute_family_id')
@@ -108,9 +133,15 @@ class AttributeGroupController extends BaseController
     public function update(Request $request, $id)
     {
         try {
-            $this->validate($request, $this->attributeGroupRepository->rules($id));
-            $this->attributeGroupRepository->update($request->only('name', 'slug'),$id);
-            return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => 'Attribute Group']));
+            $attribute_group = AttributeGroup::findOrFail($id);
+            $this->validate($request, [
+                'slug' => 'sometimes|required|unique:attribute_groups,slug,'.$id,
+                'name' => 'sometimes|min:2|max:200',
+                'attribute_family_id' => 'sometimes|required|exists:attribute_families,id'
+            ]);
+            $attribute_group = $attribute_group->forceFill($request->only('name', 'slug'));
+            $attribute_group->save();
+            return $this->successResponse($attribute_group,trans('core::app.response.update-success', ['name' => $this->model_name]));
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -132,8 +163,12 @@ class AttributeGroupController extends BaseController
     {
         try {
             $attribute_group = AttributeGroup::findOrFail($id);
+            $attributes = $attribute_group->attributes;
+            if(isset($attributes) && $attributes->count()>0){
+                return $this->errorResponse("Attributes present in attribute groups", 403);
+            }
             $attribute_group->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Attribute Group']));
+            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Attribute Group']));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);

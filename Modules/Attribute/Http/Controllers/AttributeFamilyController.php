@@ -6,11 +6,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
-use Modules\Attribute\Exceptions\DefaultFamilySlugCanNotBeModified;
 use Modules\Attribute\Repositories\AttributeFamilyRepository;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
@@ -84,7 +82,7 @@ class AttributeFamilyController extends BaseController
             return $this->successResponse($attribute_family, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponseForMissingModel(trans('core::app.response.not-found', ['name' => $this->model_name]));
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -101,16 +99,11 @@ class AttributeFamilyController extends BaseController
     {
         try {
 
-            if($request->has('slug')){
-                $request->merge(['slug' => Str::slug($request->get('slug')),]);
-            }
-
             //validation
             $this->validate($request, [
                 'slug' => 'required|unique:attribute_families',
                 'name' => 'required'
             ]);
-
             $attribute_family = AttributeFamily::create($request->only('name', 'slug'));
             return $this->successResponse($payload = $attribute_family, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
 
@@ -141,7 +134,7 @@ class AttributeFamilyController extends BaseController
             ]);
 
             $attribute_family =  AttributeFamily::findOrFail($id);
-            $attribute_family->fill($request->only('name', 'slug'),$id);
+            $attribute_family->fill($request->only('name', 'slug'));
             $attribute_family->save();
             return $this->successResponse($attribute_family, trans('core::app.response.update-success', ['name' => 'Attribute Family']));
 

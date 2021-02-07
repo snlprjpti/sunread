@@ -10,5 +10,11 @@ class AttributeGroup extends Model
     use SlugAble;
     protected $fillable = ['name', 'position', 'is_user_defined' ,'slug','attribute_family_id'];
     public $timestamps = false;
+    public static  $SEARCHABLE = ['name','slug'];
+
+    public function attributes()
+    {
+        return $this->hasMany(Attribute::class);
+    }
 
 }

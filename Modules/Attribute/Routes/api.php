@@ -28,11 +28,11 @@ Route::group(['middleware' => ['api']], function () {
 
 
         // Catalog Attribute Group Routes
-        Route::get('/attribute-group', 'AttributeGroupController@index')->name('attribute-groups.index');
-        Route::post('/attribute-group', 'AttributeGroupController@store')->name('attribute-groups.store');
-        Route::get('/attribute-group/{id}', 'AttributeGroupController@show')->name('attribute-groups.show');
-        Route::put('/attribute-group/{id}', 'AttributeGroupController@update')->name('attribute-groups.update');
-        Route::delete('/attribute-group/{id}', 'AttributeGroupController@destroy')->name('attribute-groups.delete');
+        Route::get('/attribute-groups', 'AttributeGroupController@index')->name('attribute-groups.index');
+        Route::post('/attribute-groups', 'AttributeGroupController@store')->name('attribute-groups.store');
+        Route::get('/attribute-groups/{id}', 'AttributeGroupController@show')->name('attribute-groups.show');
+        Route::put('/attribute-groups/{id}', 'AttributeGroupController@update')->name('attribute-groups.update');
+        Route::delete('/attribute-groups/{id}', 'AttributeGroupController@destroy')->name('attribute-groups.delete');
 
 
         Route::get('/attributes', 'AttributeController@index')->name('attributes.index');

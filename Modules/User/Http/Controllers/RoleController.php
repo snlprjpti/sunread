@@ -157,7 +157,7 @@ class RoleController extends BaseController
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
