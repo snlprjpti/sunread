@@ -232,7 +232,7 @@ return [
 
         //Package Aliases
         'Image' => Intervention\Image\Facades\Image::class,
-        'audit' => Audit::class,
+
 
         //Custom Aliases
 

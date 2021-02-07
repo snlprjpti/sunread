@@ -189,7 +189,6 @@ class CustomerController extends BaseController
             $customer = $customer->fill(
                 $request->only(['first_name', 'last_name', 'gender', 'email', 'date_of_birth', 'status', 'password', 'customer_group_id', 'subscribed_to_news_letter'])
             );
-
             $customer->save();
 
             Event::dispatch('customer.update.after', $customer);

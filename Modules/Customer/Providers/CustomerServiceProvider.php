@@ -5,7 +5,12 @@ namespace Modules\Customer\Providers;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Customer\Entities\Customer;
+use Modules\Customer\Entities\CustomerAddress;
+use Modules\Customer\Entities\CustomerGroup;
 use Modules\Customer\Http\Middleware\RedirectIfNotCustomer;
+use Modules\Customer\Observers\CustomerGroupObserver;
+use Modules\Customer\Observers\CustomerObserver;
 
 class CustomerServiceProvider extends ServiceProvider
 {
@@ -114,6 +119,8 @@ class CustomerServiceProvider extends ServiceProvider
 
     private function registerObservers()
     {
-        //CUstomer::observe(CustomerObserver::class);
+        CustomerGroup::observe(CustomerGroupObserver::class);
+        CustomerAddress::observe(CustomerGroupObserver::class);
+        Customer::observe(CustomerObserver::class);
     }
 }
