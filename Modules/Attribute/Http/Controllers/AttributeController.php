@@ -97,7 +97,6 @@ class AttributeController extends BaseController
     public function store(Request $request)
     {
         try {
-
             //Validation
             $this->validate($request, $this->attributeRepository->rules());
 
@@ -173,9 +172,9 @@ class AttributeController extends BaseController
 
             $this->attributeRepository->findOrFail($id);
             $this->attributeRepository->delete($id);
-            return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Attribute ']));
+            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Attribute ']));
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -195,8 +194,8 @@ class AttributeController extends BaseController
         }
         $locale_key_present = true;
         foreach ($translations as $translation) {
-            if (!array_key_exists('locale', $translation)) {
-                return $locale_key_present = false;
+            if (!array_key_exists('locale', $translation) || !array_key_exists('name', $translation)) {
+                return false;
             }
         }
         return $locale_key_present;
