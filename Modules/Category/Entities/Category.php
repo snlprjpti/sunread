@@ -24,6 +24,9 @@ class Category extends Model
             'slug' => 'nullable |unique:categories,slug'.($id ? ",$id" : ''),
             'name' => 'required',
             'image' => 'mimes:jpeg,jpg,bmp,png',
+            'position'=>'sometimes|numeric',
+            'status'=> 'sometimes|boolean',
+
         ],$merge);
 
     }
