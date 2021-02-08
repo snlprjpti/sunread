@@ -103,13 +103,22 @@ class RoleController extends BaseController
 
             $this->validate($request, [
                 'name' => 'required',
-                'permission_type' => 'required',
-                'permissions' => 'nullable'
+                'permission_type' => 'required|in:all,custom',
+                'permissions' => 'sometimes'
             ]);
 
             if (!$request->get('slug')) {
                 $request->merge(['slug' => (new Role())->createSlug($request->get('name'))]);
             }
+
+            if($request->get('permission_type') === 'custom'){
+                $this->checkPermissionExists($request->get('permissions'));
+            }else{
+                $request->merge([
+                    'permissions' =>[]
+                ]);
+            }
+
             $role = Role::create(
                 $request->only('name', 'description', 'permissions', 'permission_type', 'slug')
             );
@@ -141,11 +150,20 @@ class RoleController extends BaseController
         try {
             $this->validate($request, [
                 'name' => 'sometimes',
-                'permission_type' => 'required',
-                'permissions' => 'required'
+                'permission_type' => 'required|in:all,custom',
+                'permissions' => 'sometimes'
             ]);
 
             $role = Role::findOrFail($id);
+
+            if($request->get('permission_type') === 'custom'){
+                $this->checkPermissionExists($request->get('permissions'));
+            }else{
+                $request->merge([
+                    'permissions' =>[]
+                ]);
+            }
+
             $role = $role->forceFill(
                 $request->only('name', 'description', 'permissions', 'permission_type')
             );
@@ -208,6 +226,17 @@ class RoleController extends BaseController
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
         }
+
+    }
+
+    private function checkPermissionExists($permissions)
+    {
+        $all_permissions = array_column(config('acl'),'key');
+        if(array_diff($permissions, $all_permissions)){
+            throw ValidationException::withMessages([
+               "permissions" => 'Invalids permissions'
+            ]);
+        };
 
     }
 
