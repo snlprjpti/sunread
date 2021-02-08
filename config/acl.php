@@ -87,51 +87,20 @@ return [
     ],
 
 
-
-    [
-        'key'   => 'catalog.attributes.index',
-        'name'  => 'List Attributes',
-        'route' => 'admin.catalog.attributes.index',
-        'sort'  => 1,
-    ],
-    [
-        'key'   => 'catalog.attributes.store',
-        'name'  => 'Create Attributes',
-        'route' => 'admin.catalog.attributes.store',
-        'sort'  => 2,
-    ],
-    [
-        'key'   => 'catalog.attributes.show',
-        'name'  => 'Show Attributes',
-        'route' => 'admin.catalog.attributes.show',
-        'sort'  => 2,
-    ],
-
-    [
-        'key'   => 'catalog.attributes.update',
-        'name'  => 'Update Attributes',
-        'route' => 'admin.catalog.attributes.update',
-        'sort'  => 4,
-    ],
-    [
-        'key'   => 'catalog.attributes.delete',
-        'name'  => 'Delete Attributes',
-        'route' => 'admin.catalog.attributes.delete',
-        'sort'  => 5,
-    ],
-
     //ATTRIBUTE FAMILIES
     [
         'key'   => 'catalog.families.index',
         'name'  => 'List Attribute Family',
         'route' => 'admin.catalog.families.index',
         'sort'  => 1,
+        'module' => 'Attribute'
     ],
     [
         'key'   => 'catalog.families.store',
         'name'  => 'Create Attribute Family',
         'route' => 'admin.catalog.families.store',
         'sort'  => 2,
+        'module' => 'Attribute'
     ],
 
     [
@@ -139,18 +108,21 @@ return [
         'name'  => 'Show Attribute Family',
         'route' => 'admin.catalog.families.show',
         'sort'  => 3,
+        'module' => 'Attribute'
     ],
     [
         'key'   => 'catalog.families.update',
         'name'  => 'Update Attribute Family',
         'route' => 'admin.catalog.families.update',
         'sort'  => 4,
+        'module' => 'Attribute'
     ],
     [
         'key'   => 'catalog.families.delete',
         'name'  => 'Delete Attribute Family',
         'route' => 'admin.catalog.families.delete',
         'sort'  => 5,
+        'module' => 'Attribute'
     ],
 
     //ATTRIBUTE GROUPS
@@ -159,12 +131,14 @@ return [
         'name'  => 'List Attribute Group',
         'route' => 'admin.catalog.attribute-groups.index',
         'sort'  => 1,
+        'module' => 'Attribute'
     ],
     [
         'key'   => 'catalog.attribute-groups.store',
         'name'  => 'Create Attribute Group',
         'route' => 'admin.catalog.attribute-groups.store',
         'sort'  => 2,
+        'module' => 'Attribute'
     ],
 
     [
@@ -172,19 +146,60 @@ return [
         'name'  => 'Show Attribute Group',
         'route' => 'admin.catalog.attribute-groups.show',
         'sort'  => 3,
+        'module' => 'Attribute'
     ],
     [
         'key'   => 'catalog.attribute-groups.update',
         'name'  => 'Update Attribute Group',
         'route' => 'admin.catalog.attribute-groups.update',
         'sort'  => 4,
+        'module' => 'Attribute'
     ],
     [
         'key'   => 'catalog.attribute-groups.delete',
         'name'  => 'Delete Attribute Group',
         'route' => 'admin.catalog.attribute-groups.delete',
         'sort'  => 5,
+        'module' => 'Attribute'
     ],
+    //Attribute
+    [
+        'key'   => 'catalog.attributes.index',
+        'name'  => 'List Attributes',
+        'route' => 'admin.catalog.attributes.index',
+        'sort'  => 1,
+        'module' => 'Attribute'
+    ],
+    [
+        'key'   => 'catalog.attributes.store',
+        'name'  => 'Create Attributes',
+        'route' => 'admin.catalog.attributes.store',
+        'sort'  => 2,
+        'module' => 'Attribute'
+    ],
+    [
+        'key'   => 'catalog.attributes.show',
+        'name'  => 'Show Attributes',
+        'route' => 'admin.catalog.attributes.show',
+        'sort'  => 3,
+        'module' => 'Attribute'
+    ],
+
+    [
+        'key'   => 'catalog.attributes.update',
+        'name'  => 'Update Attributes',
+        'route' => 'admin.catalog.attributes.update',
+        'sort'  => 4,
+        'module' => 'Attribute'
+    ],
+    [
+        'key'   => 'catalog.attributes.delete',
+        'name'  => 'Delete Attributes',
+        'route' => 'admin.catalog.attributes.delete',
+        'sort'  => 5,
+        'module' => 'Attribute'
+    ],
+
 
     //CUSTOMERS
     [
@@ -192,31 +207,37 @@ return [
         'name'  => 'List customers',
         'route' => 'admin.customers.index',
         'sort'  => 1,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.customers.store',
         'name'  => 'Create customers',
         'route' => 'admin.customers.store',
         'sort'  => 2,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customer.customers.show',
         'name'  => 'Show Customer Detail',
         'route' => 'admin.customers.show',
         'sort'  => 3,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customer.customers.update',
         'name'  => 'Update Customer Detail',
         'route' => 'admin.customers.update',
         'sort'  => 4,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customer.customers.delete',
         'name'  => 'Delete Customer Detail',
         'route' => 'admin.customers.delete',
         'sort'  => 5,
+        'module' => 'Customers'
     ],
+
 
     //CUSTOMER-GROUP
     [
@@ -224,30 +245,35 @@ return [
         'name'  => 'List customers groups',
         'route' => 'admin.groups.index',
         'sort'  => 1,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.customers.store',
         'name'  => 'Create customer group',
         'route' => 'admin.groups.store',
         'sort'  => 2,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.customers.show',
         'name'  => 'Show Customer Group',
         'route' => 'admin.groups.show',
         'sort'  => 3,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.customers.update',
         'name'  => 'Update Customer Group',
         'route' => 'admin.groups.update',
         'sort'  => 4,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.customers.delete',
         'name'  => 'Delete Customer Group',
         'route' => 'admin.groups.delete',
         'sort'  => 5,
+        'module' => 'Customers'
     ],
 
     //CUSTOMER-ADDRESS
@@ -256,30 +282,110 @@ return [
         'name'  => 'List customers address',
         'route' => 'admin.customer.address.index',
         'sort'  => 1,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.address.store',
         'name'  => 'Create customer address',
         'route' => 'admin.customer.address.store',
         'sort'  => 2,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.address.show',
         'name'  => 'Show Customer address',
         'route' => 'admin.customer.address.show',
         'sort'  => 3,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.address.update',
         'name'  => 'Update Customer address',
         'route' => 'admin.customer.address.update',
         'sort'  => 4,
+        'module' => 'Customers'
     ],
     [
         'key'   => 'customers.address.delete',
         'name'  => 'Delete Customer address',
         'route' => 'admin.customer.address.delete',
         'sort'  => 5,
+        'module' => 'Customers'
+    ],
+
+
+
+    //USER
+    [
+        'key'   => 'admin.roles.list',
+        'name'  => 'List roles',
+        'route' => 'admin.roles.index',
+        'sort'  => 1,
+        'module' => 'User'
+    ],
+    [
+        'key'   => 'admin.roles.store',
+        'name'  => 'Create role',
+        'route' => 'admin.roles.store',
+        'sort'  => 2,
+        'module' => 'User'
+    ],
+    [
+        'key'   => 'admin.roles.show',
+        'name'  => 'Show role',
+        'route' => 'admin.roles.show',
+        'sort'  => 3,
+        'module' => 'User'
+    ],
+    [
+        'key'   => 'admin.roles.update',
+        'name'  => 'Update a role',
+        'route' => 'admin.roles.update',
+        'sort'  => 4,
+        'module' => 'User'
+    ],
+    [
+        'key'   => 'admin.roles.delete',
+        'name'  => 'Delete a role',
+        'route' => 'admin.roles.delete',
+        'sort'  => 5,
+        'module' => 'User'
+    ],
+
+    [
+        'key'   => 'admin.users.list',
+        'name'  => 'List  admins',
+        'route' => 'admin.users.index',
+        'sort'  => 1,
+        'module' => 'User'
+    ],
+    [
+        'key'   => 'admin.users.store',
+        'name'  => 'Create user',
+        'route' => 'admin.users.store',
+        'sort'  => 2,
+        'module' => 'User'
+    ],
+    [
+        'key'   => 'admin.users.show',
+        'name'  => 'Show user',
+        'route' => 'admin.users.show',
+        'sort'  => 3,
+        'module' => 'User'
+    ],
+    [
+        'key'   => 'admin.users.update',
+        'name'  => 'Update user',
+        'route' => 'admin.users.update',
+        'sort'  => 4,
+        'module' => 'User'
+    ],
+    [
+        'key'   => 'admin.users.delete',
+        'name'  => 'Delete user',
+        'route' => 'admin.users.delete',
+        'sort'  => 5,
+        'module' => 'User'
     ],
 
 ];
