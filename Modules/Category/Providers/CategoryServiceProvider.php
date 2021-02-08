@@ -4,6 +4,8 @@ namespace Modules\Category\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Category\Entities\Category;
+use Modules\Category\Observers\CategoryObserver;
 
 class CategoryServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ class CategoryServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->registerFactories();
         $this->loadMigrationsFrom(module_path('Category', 'Database/Migrations'));
+        $this->registerObserver();
     }
 
     /**
@@ -101,5 +104,10 @@ class CategoryServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    private function registerObserver()
+    {
+        Category::observe(CategoryObserver::class);
     }
 }

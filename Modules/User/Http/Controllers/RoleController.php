@@ -84,7 +84,7 @@ class RoleController extends BaseController
             return $this->successResponse($role, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponseForMissingModel(trans('core::app.response.not-found', ['name' => $this->model_name]));
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -189,6 +189,21 @@ class RoleController extends BaseController
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);;
+
+        } catch (\Exception $exception) {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+    }
+
+    public function fetchPermission()
+    {
+        try{
+            $acl = config('acl');
+            return $this->successResponse($acl, trans('core::app.response.fetch-success', ['name' => "Permissions"]));
+
+        } catch (QueryException $exception) {
+            return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
