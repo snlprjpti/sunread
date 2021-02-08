@@ -196,4 +196,19 @@ class RoleController extends BaseController
 
     }
 
+    public function fetchPermission()
+    {
+        try{
+            $acl = config('acl');
+            return $this->successResponse($acl, trans('core::app.response.fetch-success', ['name' => "Permissions"]));
+
+        } catch (QueryException $exception) {
+            return $this->errorResponse($exception->getMessage(), 400);
+
+        } catch (\Exception $exception) {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+    }
+
 }
