@@ -7,15 +7,18 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
 use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\User\Entities\Role;
 
 class AttributeController extends BaseController
 {
     protected $pagination_limit, $attributeRepository;
+    protected $model_name = 'Attribute';
 
     /**
      * Attribute constructor.
@@ -32,13 +35,31 @@ class AttributeController extends BaseController
 
     /**
      * Returns all the attribute_familys
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $payload = $this->attributeRepository->paginate($this->pagination_limit);
-            return $this->successResponse($payload);
+            $this->validate($request, [
+                'limit' => 'sometimes|numeric',
+                'page' => 'sometimes|numeric',
+                'sort_by' => 'sometimes',
+                'sort_order' => 'sometimes|in:asc,desc',
+                'q' => 'sometimes|string|min:1'
+            ]);
+
+            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
+            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
+            $attributes = Attribute::query();
+            if ($request->has('q')) {
+                $attributes->whereLike(Attribute::$SEARCHABLE, $request->get('q'));
+            }
+            $attributes = $attributes->orderBy($sort_by, $sort_order);
+            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
+            $attributes = $attributes->paginate($limit);
+            return $this->successResponse($attributes, trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
+
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
 
@@ -56,10 +77,11 @@ class AttributeController extends BaseController
     {
         try {
 
-            $payload = $this->attributeRepository->findOrFail($id);
-            return $this->successResponse($payload);
+            $attribute = $this->attributeRepository->findOrFail($id);
+            return $this->successResponse($attribute, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
+
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -75,7 +97,6 @@ class AttributeController extends BaseController
     public function store(Request $request)
     {
         try {
-
             //Validation
             $this->validate($request, $this->attributeRepository->rules());
 
@@ -151,9 +172,9 @@ class AttributeController extends BaseController
 
             $this->attributeRepository->findOrFail($id);
             $this->attributeRepository->delete($id);
-            return $this->successResponseWithMessage(trans('core::app.response.delete-success', ['name' => 'Attribute ']));
+            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Attribute ']));
         } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
 
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage());
@@ -173,8 +194,8 @@ class AttributeController extends BaseController
         }
         $locale_key_present = true;
         foreach ($translations as $translation) {
-            if (!array_key_exists('locale', $translation)) {
-                return $locale_key_present = false;
+            if (!array_key_exists('locale', $translation) || !array_key_exists('name', $translation)) {
+                return false;
             }
         }
         return $locale_key_present;
