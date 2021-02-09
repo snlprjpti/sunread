@@ -16,6 +16,8 @@ use Modules\Product\Transformers\ProductResource;
 class ProductController extends BaseController
 {
 
+    protected $model_name = 'Product';
+
     /**
      * ProductRepository object
      */
@@ -82,12 +84,15 @@ class ProductController extends BaseController
     public function show($id)
     {
         try {
-
             $product = $this->productRepository->findOrFail($id);
-            $product = $product->product_flats->first();
-            $category_tree = (new Category())->getCategoryTree();
-            $payload = ['product' => new ProductResource($product),'category_tree' => $category_tree];
-            return $this->successResponse($payload);
+            $product_flats = $product->product_flats;
+            $is_product_with_locale_present = $product_flats->contains('locale', $this->locale);
+            if($is_product_with_locale_present)
+                $product = $product_flats->where('locale',$this->locale)->first();
+            else
+                $product = $product_flats->first();
+
+            return $this->successResponse($product, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
