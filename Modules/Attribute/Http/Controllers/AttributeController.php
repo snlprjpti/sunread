@@ -124,6 +124,7 @@ class AttributeController extends BaseController
             return $this->errorResponse("Slugs could not be generated");
 
         } catch (\Exception $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
     }

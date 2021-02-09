@@ -47,7 +47,7 @@ class ProductFlatTable
     {
 
         if (!$attribute->use_in_flat) {
-            $this->afterAttributeDeleted($attribute->id);
+            $this->afterAttributeDeleted($attribute);
             return false;
         }
 
@@ -64,7 +64,6 @@ class ProductFlatTable
 
     public function afterAttributeDeleted($attribute)
     {
-
         if (Schema::hasColumn('product_flat', $attribute->slug)) {
             Schema::table('product_flat', function (Blueprint $table) use ($attribute) {
                 $table->dropColumn($attribute->slug);
