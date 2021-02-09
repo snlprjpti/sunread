@@ -13,7 +13,6 @@ use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\User\Entities\Role;
 
 class AttributeController extends BaseController
 {
@@ -30,11 +29,11 @@ class AttributeController extends BaseController
     {
         parent::__construct();
         $this->middleware('admin');
-        $this->attributeRepository =  $attributeRepository;
+        $this->attributeRepository = $attributeRepository;
     }
 
     /**
-     * Returns all the attribute_familys
+     * Returns all the attributes
      * @param Request $request
      * @return JsonResponse
      */
@@ -69,7 +68,7 @@ class AttributeController extends BaseController
     }
 
     /**
-     * Get the particular attribute_family
+     * Get the particular attribute
      * @param $id
      * @return JsonResponse
      */
@@ -90,7 +89,7 @@ class AttributeController extends BaseController
 
 
     /**
-     * Stores new attribute_family
+     * Stores new attribute
      * @param Request $request
      * @return JsonResponse
      */
@@ -103,9 +102,7 @@ class AttributeController extends BaseController
             //custom validation to for translation
             $this->checkCustomCustomValidation($request);
             if (!in_array($request->get('type'), ['select', 'multiselect', 'checkbox'])) {
-                $request->merge([
-                    'is_filterable' => 0
-                ]);
+                $request->merge(['is_filterable' => 0]);
             }
 
             //create slug if missing
@@ -113,23 +110,27 @@ class AttributeController extends BaseController
                 $request->merge(['slug' => $this->attributeRepository->createSlug($request->get('name'))]);
             }
 
+            //TODO::future , available for development only
+            $request->merge(["use_in_flat" => 0]);
+
             //Store Attributes
-            $attribute =  $this->attributeRepository->createAttribute($request);
-            return $this->successResponse($payload = $attribute, trans('core::app.response.create-success', ['name' => 'Attribute']), 201);
+            $attribute = $this->attributeRepository->createAttribute($request);
+            return $this->successResponse($payload = $attribute, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
         } catch (SlugCouldNotBeGenerated $exception) {
-            return $this->errorResponse("Slugs could not be genereated");
+            return $this->errorResponse("Slugs could not be generated");
 
         } catch (\Exception $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
     }
 
     /**
-     * Updates the attribute details
+     * Updates the attribute
      * @param Request $request
      * @param $id
      * @return JsonResponse
@@ -144,11 +145,15 @@ class AttributeController extends BaseController
             // custom validation for translation and options
             $this->checkCustomCustomValidation($request);
 
+            //TODO::future , available for development only
+            $request->merge(["use_in_flat" => 0]);
+
             //update attribute
-            $this->attributeRepository->updateAttributes($request ,$id);
+            $this->attributeRepository->updateAttributes($request, $id);
 
-            return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => 'Attribute']));
-
+            return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => $this->model_name]));
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
@@ -169,10 +174,9 @@ class AttributeController extends BaseController
     public function destroy($id)
     {
         try {
-
-            $this->attributeRepository->findOrFail($id);
             $this->attributeRepository->delete($id);
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Attribute ']));
+            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
+
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
 
@@ -189,7 +193,7 @@ class AttributeController extends BaseController
      */
     public function checkIfTranslationExist($translations)
     {
-        if(empty($translations)){
+        if (empty($translations)) {
             return false;
         }
         $locale_key_present = true;
@@ -216,7 +220,7 @@ class AttributeController extends BaseController
         //check attribute translation
         $isAttributeTranslationExist = $this->checkIfTranslationExist($translations);
         if (!$isAttributeTranslationExist) {
-            throw new AttributeTranslationDoesNotExist("Missing attribute translation");
+            throw new AttributeTranslationDoesNotExist("Missing attribute translation.");
         }
 
         //check options translations
@@ -225,11 +229,11 @@ class AttributeController extends BaseController
         if (is_array($options) && in_array($request->type, ['select', 'multiselect', 'checkbox'])) {
             foreach ($options as $option) {
                 if (!isset($option['translations'])) {
-                    throw new AttributeTranslationOptionDoesNotExist("Missing Attribute Option Translation");
+                    throw new AttributeTranslationOptionDoesNotExist("Missing Attribute Option translation.");
                 }
                 $isOptionTranslationExist = $this->checkIfTranslationExist($translations);
                 if (!$isOptionTranslationExist) {
-                    throw new  AttributeTranslationOptionDoesNotExist("Missing Attribute Option Translation");
+                    throw new  AttributeTranslationOptionDoesNotExist("Missing Attribute Option translation.");
                 }
             }
         }
