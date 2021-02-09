@@ -47,7 +47,7 @@ class ProductFlatTable
     {
 
         if (!$attribute->use_in_flat) {
-            $this->afterAttributeDeleted($attribute->id);
+            $this->afterAttributeDeleted($attribute);
             return false;
         }
 
@@ -62,16 +62,16 @@ class ProductFlatTable
         }
     }
 
-    public function afterAttributeDeleted($attributeId)
+    public function afterAttributeDeleted($attribute)
     {
-        $attribute = Attribute::findOrFail($attributeId);
-
-        if (Schema::hasColumn('product_flat', strtolower($attribute->slug))) {
+        if (Schema::hasColumn('product_flat', $attribute->slug)) {
             Schema::table('product_flat', function (Blueprint $table) use ($attribute) {
                 $table->dropColumn($attribute->slug);
 
                 if ($attribute->type == 'select' || $attribute->type == 'multiselect') {
-                    $table->dropColumn($attribute->slug . '_label');
+                    if(Schema::hasColumn('product_flat', $attribute->slug.'_label'))
+                        $table->dropColumn($attribute->slug . '_label');
+
                 }
             });
         }

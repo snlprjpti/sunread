@@ -16,6 +16,8 @@ use Modules\Product\Transformers\ProductResource;
 class ProductController extends BaseController
 {
 
+    protected $model_name = 'Product';
+
     /**
      * ProductRepository object
      */
@@ -45,7 +47,6 @@ class ProductController extends BaseController
     public function index(Request $request)
     {
         try {
-
             // validating data.
             $this->validate($request, [
                 'limit' => 'sometimes|numeric',
@@ -58,9 +59,9 @@ class ProductController extends BaseController
             $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
             $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
             $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-            $products = ProductFlat::query();
+            $products = ProductFlat::where('locale', $this->locale);
             if ($request->has('q')) {
-                $products->whereLike(ProductFlat::SEARCHABLE, $request->get('q'));
+                $products->whereLike(ProductFlat::$SEARCHABLE, $request->get('q'));
             }
             $products->orderBy($sort_by, $sort_order);
             $products = $products->paginate($limit);
@@ -83,12 +84,15 @@ class ProductController extends BaseController
     public function show($id)
     {
         try {
-
             $product = $this->productRepository->findOrFail($id);
-            $product = $product->product_flats->first();
-            $category_tree = (new Category())->getCategoryTree();
-            $payload = ['product' => new ProductResource($product),'category_tree' => $category_tree];
-            return $this->successResponse($payload);
+            $product_flats = $product->product_flats;
+            $is_product_with_locale_present = $product_flats->contains('locale', $this->locale);
+            if($is_product_with_locale_present)
+                $product = $product_flats->where('locale',$this->locale)->first();
+            else
+                $product = $product_flats->first();
+
+            return $this->successResponse($product, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse($exception->getMessage(), 404);
