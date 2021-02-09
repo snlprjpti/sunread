@@ -57,7 +57,6 @@ class ProductController extends BaseController
             $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
             $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
             $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-
             $products = ProductFlat::where('locale', $this->locale);
             if ($request->has('q')) {
                 $products->whereLike(ProductFlat::$SEARCHABLE, $request->get('q'));
