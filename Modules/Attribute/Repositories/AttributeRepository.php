@@ -92,6 +92,7 @@ class AttributeRepository extends Repository implements AttributeInterface
     public function updateAttributes($request ,$id)
     {
         Event::dispatch('catalog.attribute.update.before');
+
         try {
 
             DB::beginTransaction();
@@ -135,18 +136,39 @@ class AttributeRepository extends Repository implements AttributeInterface
         return array_merge([
             'slug' => ['nullable', 'unique:attributes,slug' . ($id ? ",$id" : '')],
             'name' => 'required',
-            'type' => 'required',
-            'attribute_group_id' => 'nullable|exists:attribute_groups,id'
+            'type' => 'required|in:'.implode(array_keys($this->attribute_types()) ,','),
+            "is_required"=>"sometimes|boolean",
+            "is_unique"=>"sometimes|boolean",
+            "use_in_flat"=>"sometimes|boolean",
+            'attribute_group_id' =>  'nullable|exists:attribute_groups,id'
         ], $merge);
     }
 
     public function delete($id)
     {
-        Event::dispatch('catalog.attribute.delete.before', $id);
+        $attribute = $this->findOrFail($id);
+
+        Event::dispatch('catalog.attribute.delete.before', $attribute);
 
         parent::delete($id);
 
-        Event::dispatch('catalog.attribute.delete.after', $id);
+        Event::dispatch('catalog.attribute.delete.after', $attribute);
+    }
 
+    public function attribute_types()
+    {
+        return [
+            'text' => 'Text',
+            'textarea' => 'Textarea',
+            'price' => 'Price',
+            'boolean' => 'Boolean',
+            'select' => 'Select',
+            'multiselect' => 'Multiselect',
+            'datetime' => 'Datetime',
+            'date' => 'Date',
+            'image' => 'Image',
+            'file' => 'File',
+            'checkbox' => 'Checkbox',
+        ];
     }
 }
