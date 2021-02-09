@@ -45,7 +45,6 @@ class ProductController extends BaseController
     public function index(Request $request)
     {
         try {
-
             // validating data.
             $this->validate($request, [
                 'limit' => 'sometimes|numeric',
@@ -58,9 +57,10 @@ class ProductController extends BaseController
             $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
             $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
             $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-            $products = ProductFlat::query();
+
+            $products = ProductFlat::where('locale', $this->locale);
             if ($request->has('q')) {
-                $products->whereLike(ProductFlat::SEARCHABLE, $request->get('q'));
+                $products->whereLike(ProductFlat::$SEARCHABLE, $request->get('q'));
             }
             $products->orderBy($sort_by, $sort_order);
             $products = $products->paginate($limit);
