@@ -4,15 +4,11 @@ namespace Modules\Core\Providers;
 
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Core\Entities\ActivityLog;
-use Modules\Core\Http\Middleware\Language;
 use Modules\Core\Services\ActivityLogHelper;
-use Modules\Customer\Entities\CustomerGroup;
-use Modules\Customer\Observers\CustomerGroupObserver;
 use Modules\Core\Facades\Audit as ActivityLoggerFacade;
 
 class CoreServiceProvider extends ServiceProvider
@@ -32,9 +28,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerFactories();
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'core');
         $this->loadMigrationsFrom(module_path('Core', 'Database/Migrations'));
-        $router->aliasMiddleware('language', Language::class);
         $this->registerActivityLogger();
-       // $this->registerObsever();
 
         include __DIR__ . '/../Helpers/helpers.php';
         Validator::extend('decimal', 'Modules\Core\Contracts\Validations\Decimal@passes');

@@ -1,4 +1,4 @@
-    server '94.237.40.213',
+server '94.237.40.213',
 user: 'deployer',
 roles: %w{web app},
 port:22,
