@@ -76,7 +76,7 @@ class AttributeController extends BaseController
     {
         try {
 
-            $attribute = $this->attributeRepository->findOrFail($id);
+            $attribute = Attribute::with('attributeOptions')->findOrFail($id);
             return $this->successResponse($attribute, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
@@ -110,12 +110,12 @@ class AttributeController extends BaseController
                 $request->merge(['slug' => $this->attributeRepository->createSlug($request->get('name'))]);
             }
 
-            //TODO::future , available for development only
+            //TODO::future ,available for development only
             $request->merge(["use_in_flat" => 0]);
 
             //Store Attributes
             $attribute = $this->attributeRepository->createAttribute($request);
-            return $this->successResponse($payload = $attribute, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
+            return $this->successResponse($attribute, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
 
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
@@ -124,7 +124,6 @@ class AttributeController extends BaseController
             return $this->errorResponse("Slugs could not be generated");
 
         } catch (\Exception $exception) {
-            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
     }
@@ -152,8 +151,10 @@ class AttributeController extends BaseController
             $this->attributeRepository->updateAttributes($request, $id);
 
             return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => $this->model_name]));
+
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
+
         } catch (ValidationException $exception) {
             return $this->errorResponse($exception->errors(), 422);
 
@@ -161,7 +162,6 @@ class AttributeController extends BaseController
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
-
             return $this->errorResponse($exception->getMessage());
         }
     }
