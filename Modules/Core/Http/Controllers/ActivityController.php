@@ -23,9 +23,7 @@ class ActivityController extends BaseController
     public function index(Request $request)
     {
         try {
-
             $activity_log = ActivityLog::first();
-            dd(class_basename($activity_log->causer));
             $this->validate($request, [
                 'limit' => 'sometimes|numeric',
                 'page' => 'sometimes|numeric',

@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Transformers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\Resource;
 
 class ActivityResource extends Resource
@@ -18,11 +19,10 @@ class ActivityResource extends Resource
             "id" => $this->id,
             "log_name" => $this->log_name,
             "description" => $this->description,
-
-            "subject" => isset($this->subject)? $this->subject->toArray():null,
+            "action" => $this->action,
+            "activity" => $this->activity,
             "causer" =>  isset($this->causer)? $this->causer->toArray():null,
-            "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at
+            "created_at" =>  Carbon::parse($this->created_at)->format('M j\\,Y H:i A'),
         ];
     }
 

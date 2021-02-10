@@ -43,7 +43,7 @@ class ActivityLogHelper {
                 'from' => $oldValues,
                 'to' => $newValues
             ];
-            $this->log['activity'] = $action. " for properties:". implode(',', array_keys($oldValues));
+            $this->log['activity'] = $action. " for properties: ". implode(',', array_keys($oldValues));
         }
         elseif($event == 'created') {
             $newValues = $model->toArray();
