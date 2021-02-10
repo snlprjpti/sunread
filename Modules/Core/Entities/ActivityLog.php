@@ -14,6 +14,8 @@ class ActivityLog extends Model
         'causer_type', 'properties'
     ];
 
+    protected static $SEARCHABLE = ['log_name', 'description'];
+
     protected $casts = [
         'properties' => 'array'
     ];
