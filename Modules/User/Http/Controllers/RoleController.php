@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Core\Tree;
 use Modules\User\Entities\Admin;
 use Modules\User\Entities\Role;
 
@@ -217,8 +218,8 @@ class RoleController extends BaseController
     public function fetchPermission()
     {
         try{
-            $acl = config('acl');
-            return $this->successResponse($acl, trans('core::app.response.fetch-success', ['name' => "Permissions"]));
+            $acl = $this->createACL();
+            return $this->successResponse($acl->items, trans('core::app.response.fetch-success', ['name' => "Permissions"]));
 
         } catch (QueryException $exception) {
             return $this->errorResponse($exception->getMessage(), 400);
@@ -239,5 +240,12 @@ class RoleController extends BaseController
         };
 
     }
-
+    public function createACL()
+    {
+        $tree = Tree::create();
+        foreach (config('acl') as $item) {
+            $tree->add($item, 'acl');
+        }
+        return $tree;
+    }
 }

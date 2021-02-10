@@ -217,21 +217,21 @@ return [
         'module' => 'Customers'
     ],
     [
-        'key'   => 'customer.customers.show',
+        'key'   => 'customers.customers.show',
         'name'  => 'Show Customer Detail',
         'route' => 'admin.customers.show',
         'sort'  => 3,
         'module' => 'Customers'
     ],
     [
-        'key'   => 'customer.customers.update',
+        'key'   => 'customers.customers.update',
         'name'  => 'Update Customer Detail',
         'route' => 'admin.customers.update',
         'sort'  => 4,
         'module' => 'Customers'
     ],
     [
-        'key'   => 'customer.customers.delete',
+        'key'   => 'customers.customers.delete',
         'name'  => 'Delete Customer Detail',
         'route' => 'admin.customers.delete',
         'sort'  => 5,
