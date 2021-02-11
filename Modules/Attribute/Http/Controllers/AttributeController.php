@@ -50,7 +50,7 @@ class AttributeController extends BaseController
 
             $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
             $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-            $attributes = Attribute::query();
+            $attributes = Attribute::with('translations');
             if ($request->has('q')) {
                 $attributes->whereLike(Attribute::$SEARCHABLE, $request->get('q'));
             }
@@ -76,7 +76,7 @@ class AttributeController extends BaseController
     {
         try {
 
-            $attribute = Attribute::with('attributeOptions')->findOrFail($id);
+            $attribute = Attribute::with(['attributeOptions' ,'translations'])->findOrFail($id);
             return $this->successResponse($attribute, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
