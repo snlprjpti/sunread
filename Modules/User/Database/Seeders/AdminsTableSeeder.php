@@ -14,7 +14,8 @@ class AdminsTableSeeder extends Seeder
 
         DB::table('admins')->insert([
                 'id' => 1,
-                'name' => 'Example',
+                'first_name' => 'Admin',
+                'last_name' => 'example',
                 'email' => 'admin@example.com',
                 'password' => bcrypt('admin123'),
                 'api_token' => Str::random(80),
@@ -22,6 +23,8 @@ class AdminsTableSeeder extends Seeder
                 'updated_at' => date('Y-m-d H:i:s'),
                 'status' => 1,
                 'role_id' => 1,
+                'company' => 'abc.co',
+                'address' => 'sweden'
             ]);
     }
 }
