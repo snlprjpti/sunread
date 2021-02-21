@@ -7,11 +7,9 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Modules\Category\Entities\Category;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Entities\ProductFlat;
 use Modules\Product\Repositories\ProductRepository;
-use Modules\Product\Transformers\ProductResource;
 
 class ProductController extends BaseController
 {
@@ -59,6 +57,7 @@ class ProductController extends BaseController
             $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
             $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
             $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
+            $products = $this->productRepository->getAll();
             $products = ProductFlat::where('locale', $this->locale);
             if ($request->has('q')) {
                 $products->whereLike(ProductFlat::$SEARCHABLE, $request->get('q'));
@@ -68,9 +67,11 @@ class ProductController extends BaseController
             return $this->successResponse($products, trans('core::app.response.fetch-list-success', ['name' => 'Product']));
 
         } catch (QueryException $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
+            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
 
