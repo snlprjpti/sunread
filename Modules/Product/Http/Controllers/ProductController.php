@@ -53,25 +53,13 @@ class ProductController extends BaseController
                 'sort_order' => 'sometimes|in:asc,desc',
                 'q' => 'sometimes|string|min:1'
             ]);
-
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
             $products = $this->productRepository->getAll();
-            $products = ProductFlat::where('locale', $this->locale);
-            if ($request->has('q')) {
-                $products->whereLike(ProductFlat::$SEARCHABLE, $request->get('q'));
-            }
-            $products->orderBy($sort_by, $sort_order);
-            $products = $products->paginate($limit);
             return $this->successResponse($products, trans('core::app.response.fetch-list-success', ['name' => 'Product']));
 
         } catch (QueryException $exception) {
-            dd($exception);
             return $this->errorResponse($exception->getMessage(), 400);
 
         } catch (\Exception $exception) {
-            dd($exception);
             return $this->errorResponse($exception->getMessage());
         }
 

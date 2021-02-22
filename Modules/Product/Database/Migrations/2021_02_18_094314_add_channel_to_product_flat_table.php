@@ -15,7 +15,6 @@ class AddChannelToProductFlatTable extends Migration
     {
         Schema::table('product_flat', function (Blueprint $table) {
             $table->string('channel')->after('locale')->nullable();
-            $table->string('channel')->after('locale')->nullable();
         });
     }
 
@@ -31,3 +30,4 @@ class AddChannelToProductFlatTable extends Migration
         });
     }
 }
+
