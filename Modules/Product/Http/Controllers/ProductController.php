@@ -73,14 +73,14 @@ class ProductController extends BaseController
     public function show($id)
     {
         try {
+            $locale = request()->get('locale')?: app()->getLocale();
             $product = $this->productRepository->findOrFail($id);
             $product_flats = $product->product_flats;
-            $is_product_with_locale_present = $product_flats->contains('locale', $this->locale);
+            $is_product_with_locale_present = $product_flats->contains('locale', $locale);
             if($is_product_with_locale_present)
                 $product = $product_flats->where('locale',$this->locale)->first();
             else
                 $product = $product_flats->first();
-
             return $this->successResponse($product, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {

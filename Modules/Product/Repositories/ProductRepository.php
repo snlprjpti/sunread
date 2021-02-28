@@ -5,18 +5,14 @@ namespace Modules\Product\Repositories;
 
 
 use Illuminate\Container\Container as App;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Core\Eloquent\Repository;
 use Modules\Product\Entities\Product;
-use Modules\Product\Entities\ProductAttributeValue;
 use Modules\Product\Entities\ProductFlat;
 use Modules\Product\Services\ProductImageRepository;
-//use Webkul\Product\Models\ProductAttributeValueProxy;
-//use Webkul\Product\Repositories\ProductFlatRepository;
+
 
 
 class ProductRepository extends Repository
@@ -69,6 +65,7 @@ class ProductRepository extends Repository
             Event::dispatch('catalog.product.create.after', $product);
 
             DB::commit();
+
         } catch (\Exception $exception) {
             DB::rollBack();
             throw  $exception;
@@ -112,6 +109,10 @@ class ProductRepository extends Repository
             $product = $this->findOrFail($id);
             //removing image only
             $this->productImageRepository->removeProductImages($product);
+
+            //delete product flat
+            $product->product_flats()->delete();
+
             $product->delete($id);
 
         }catch (\Exception $exception){
