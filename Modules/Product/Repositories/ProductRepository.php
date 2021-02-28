@@ -174,34 +174,42 @@ class ProductRepository extends Repository
     {
         $params = request()->input();
         $limit = isset($params['limit']) && ! empty($params['limit']) ? $params['limit'] : 25;
-        $query = ProductFlat::query();
         $channel = request()->get('channel') ?: (core()->getCurrentChannelCode() ?: core()->getDefaultChannelCode());
         $locale = request()->get('locale') ?: app()->getLocale();
-        $qb = $query->distinct()
-            ->select('product_flat.*')
-            ->join('product_flat as variants', 'product_flat.id', '=', DB::raw('COALESCE(' . DB::getTablePrefix() . 'variants.parent_id, ' . DB::getTablePrefix() . 'variants.id)'))
-            ->leftJoin('product_categories', 'product_categories.product_id', '=', 'product_flat.product_id')
-            ->leftJoin('product_attribute_values', 'product_attribute_values.product_id', '=', 'variants.product_id')
-            ->where('product_flat.channel', $channel)
-            ->where('product_flat.locale', $locale)
-            ->whereNotNull('product_flat.slug');
-        $qb->get();
-        return 1;
-
+        /* query builder */
+        $queryBuilder = DB::table('product_flat')
+            ->leftJoin('products', 'product_flat.product_id', '=', 'products.id')
+            ->leftJoin('attribute_families', 'products.attribute_family_id', '=', 'attribute_families.id')
+           // ->leftJoin('product_inventories', 'product_flat.product_id', '=', 'product_inventories.product_id')
+            ->select(
+                'product_flat.locale',
+                'product_flat.channel',
+                'product_flat.product_id',
+                'products.sku as product_sku',
+                'product_flat.name as product_name',
+                'products.type as product_type',
+                'product_flat.status',
+                'product_flat.price',
+                'attribute_families.name as attribute_family',
+                //DB::raw('SUM(DISTINCT ' . DB::getTablePrefix() . 'product_inventories.qty) as quantity')
+            );
+        //$queryBuilder->groupBy('product_flat.product_id', 'product_flat.locale', 'product_flat.channel');
+        $queryBuilder->whereIn('product_flat.locale', [$locale]);
+        $queryBuilder->whereIn('product_flat.channel', [$channel]);
         if ($categoryId) {
-            $qb->where('product_categories.category_id', $categoryId);
+            $queryBuilder->where('product_categories.category_id', $categoryId);
         }
 
         if (is_null(request()->input('status'))) {
-            $qb->where('product_flat.status', 1);
+            $queryBuilder->where('product_flat.status', 1);
         }
-
         if (isset($params['q'])) {
-            $qb->whereLike(ProductFlat::$SEARCHABLE,$params['q']);
+            $queryBuilder->whereLike(ProductFlat::$SEARCHABLE,$params['q']);
         }
-        $sort_by = isset($params['sort_by']) ? $params['sort_by'] : 'id';
+        $sort_by = isset($params['sort_by']) ? $params['sort_by'] : 'products.id';
         $sort_order = isset($params['sort_order']) ? $params['sort_order'] : 'desc';
-        return $qb->orderBy($sort_by,$sort_order);
+        $queryBuilder =  $queryBuilder->orderBy($sort_by,$sort_order);
+        return  $queryBuilder->paginate($limit);
 
     }
 
