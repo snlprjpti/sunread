@@ -7,11 +7,9 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Modules\Category\Entities\Category;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Entities\ProductFlat;
 use Modules\Product\Repositories\ProductRepository;
-use Modules\Product\Transformers\ProductResource;
 
 class ProductController extends BaseController
 {
@@ -55,16 +53,7 @@ class ProductController extends BaseController
                 'sort_order' => 'sometimes|in:asc,desc',
                 'q' => 'sometimes|string|min:1'
             ]);
-
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-            $products = ProductFlat::where('locale', $this->locale);
-            if ($request->has('q')) {
-                $products->whereLike(ProductFlat::$SEARCHABLE, $request->get('q'));
-            }
-            $products->orderBy($sort_by, $sort_order);
-            $products = $products->paginate($limit);
+            $products = $this->productRepository->getAll();
             return $this->successResponse($products, trans('core::app.response.fetch-list-success', ['name' => 'Product']));
 
         } catch (QueryException $exception) {
@@ -84,14 +73,14 @@ class ProductController extends BaseController
     public function show($id)
     {
         try {
+            $locale = request()->get('locale')?: app()->getLocale();
             $product = $this->productRepository->findOrFail($id);
             $product_flats = $product->product_flats;
-            $is_product_with_locale_present = $product_flats->contains('locale', $this->locale);
+            $is_product_with_locale_present = $product_flats->contains('locale', $locale);
             if($is_product_with_locale_present)
                 $product = $product_flats->where('locale',$this->locale)->first();
             else
                 $product = $product_flats->first();
-
             return $this->successResponse($product, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {

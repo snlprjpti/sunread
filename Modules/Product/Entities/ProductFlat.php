@@ -8,7 +8,7 @@ use Modules\Product\Entities\ProductImage;
 class ProductFlat extends Model
 {
     protected $table = 'product_flat';
-    public static $SEARCHABLE = ['name', 'description', 'slug' ,'description','short_description' ,'sku'];
+    public static $SEARCHABLE = ['name', 'slug' ,'sku'];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 

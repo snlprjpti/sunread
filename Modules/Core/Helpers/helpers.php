@@ -1,6 +1,8 @@
 <?php
 
 
+use Modules\Core\Entities\Core;
+
 if (! function_exists('array_permutation')) {
     function array_permutation($input)
     {
@@ -36,6 +38,13 @@ if (! function_exists('array_permutation')) {
         }
 
         return $results;
+    }
+
+    if (! function_exists('core')) {
+        function core()
+        {
+            return app()->make(Core::class);
+        }
     }
 }
 ?>

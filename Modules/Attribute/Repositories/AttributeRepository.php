@@ -171,4 +171,33 @@ class AttributeRepository extends Repository implements AttributeInterface
             'checkbox' => 'Checkbox',
         ];
     }
+
+    /**
+     *
+     * @param  array  $codes
+     * @return array
+     */
+    public function getProductDefaultAttributes($codes = null)
+    {
+        $attributeColumns  = ['id', 'code', 'value_per_channel', 'value_per_locale', 'type', 'is_filterable'];
+
+        if (! is_array($codes) && ! $codes)
+            return $this->findWhereIn('code', [
+                'name',
+                'description',
+                'short_description',
+                'slug',
+                'price',
+                'special_price',
+                'special_price_from',
+                'special_price_to',
+                'status',
+            ], $attributeColumns);
+
+        if (in_array('*', $codes)) {
+            return $this->all($attributeColumns);
+        }
+        dd($codes,$attributeColumns);
+        return $this->findWhereIn('code', $codes, $attributeColumns);
+    }
 }

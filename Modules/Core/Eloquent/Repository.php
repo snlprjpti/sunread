@@ -12,6 +12,7 @@ use Modules\Core\Contracts\CriteriaInterface;
 use Modules\Core\Contracts\RepositoryInterface;
 use Modules\Core\Repositories\Criteria\Criteria;
 use Modules\Core\Traits\SlugAble;
+use Prettus\Repository\Exceptions\RepositoryException;
 
 
 /**
@@ -251,7 +252,7 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
 
     /**
      * Resolving model via container
-     * @return Builder
+     * @return Model
      * @throws BindingResolutionException
      */
     public function makeModel()
@@ -368,5 +369,103 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
         return $this->model->count();
     }
 
+    public function findWhereIn($field, array $values, $columns = ['*'])
+    {
+        $this->applyCriteria();
+        $this->applyScope();
+        $model = $this->model->whereIn($field, $values)->get($columns);
+        $this->resetModel();
 
+        return $this->parserResult($model);
+    }
+
+    /**
+     * Find data by excluding multiple values in one field
+     *
+     * @param       $field
+     * @param array $values
+     * @param array $columns
+     *
+     * @return mixed
+     */
+    public function findWhereNotIn($field, array $values, $columns = ['*'])
+    {
+        $this->applyCriteria();
+        $this->applyScope();
+        $model = $this->model->whereNotIn($field, $values)->get($columns);
+        $this->resetModel();
+
+        return $this->parserResult($model);
+    }
+
+    /**
+     */
+    public function resetModel()
+    {
+        $this->makeModel();
+    }
+
+    /**
+     * Apply scope in current Query
+     *
+     * @return $this
+     */
+    public function applyScope()
+    {
+        if (isset($this->scopeQuery) && is_callable($this->scopeQuery)) {
+            $callback = $this->scopeQuery;
+            $this->model = $callback($this->model);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Wrapper result data
+     *
+     * @param mixed $result
+     *
+     * @return mixed
+     */
+    public function parserResult($result)
+    {
+
+        return $result;
+    }
+
+    /**
+     * Retrieve first data of repository
+     *
+     * @param array $columns
+     *
+     * @return mixed
+     */
+    public function first($columns = ['*'])
+    {
+        $this->applyCriteria();
+        $this->applyScope();
+
+        $results = $this->model->first($columns);
+
+        $this->resetModel();
+
+        return $this->parserResult($results);
+    }
+
+    public function findOneByField($field, $value = null, $columns = ['*'])
+    {
+        $model = $this->findByField($field, $value, $columns = ['*']);
+
+        return $model->first();
+    }
+
+    public function findByField($field, $value = null, $columns = ['*'])
+    {
+        $this->applyCriteria();
+        $this->applyScope();
+        $model = $this->model->where($field, '=', $value)->get($columns);
+        $this->resetModel();
+
+        return $this->parserResult($model);
+    }
 }
