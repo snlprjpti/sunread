@@ -173,14 +173,14 @@ class ProductRepository extends Repository
     public function getAll($categoryId = null)
     {
         $params = request()->input();
-        $limit = isset($params['limit']) && ! empty($params['limit']) ? $params['limit'] : 25;
+        $limit = isset($params['limit']) && !empty($params['limit']) ? $params['limit'] : 25;
         $channel = request()->get('channel') ?: (core()->getCurrentChannelCode() ?: core()->getDefaultChannelCode());
         $locale = request()->get('locale') ?: app()->getLocale();
         /* query builder */
         $queryBuilder = DB::table('product_flat')
             ->leftJoin('products', 'product_flat.product_id', '=', 'products.id')
             ->leftJoin('attribute_families', 'products.attribute_family_id', '=', 'attribute_families.id')
-           // ->leftJoin('product_inventories', 'product_flat.product_id', '=', 'product_inventories.product_id')
+            // ->leftJoin('product_inventories', 'product_flat.product_id', '=', 'product_inventories.product_id')
             ->select(
                 'product_flat.locale',
                 'product_flat.channel',
@@ -191,7 +191,7 @@ class ProductRepository extends Repository
                 'product_flat.status',
                 'product_flat.price',
                 'attribute_families.name as attribute_family',
-                //DB::raw('SUM(DISTINCT ' . DB::getTablePrefix() . 'product_inventories.qty) as quantity')
+            //DB::raw('SUM(DISTINCT ' . DB::getTablePrefix() . 'product_inventories.qty) as quantity')
             );
         //$queryBuilder->groupBy('product_flat.product_id', 'product_flat.locale', 'product_flat.channel');
         $queryBuilder->whereIn('product_flat.locale', [$locale]);
@@ -204,48 +204,12 @@ class ProductRepository extends Repository
             $queryBuilder->where('product_flat.status', 1);
         }
         if (isset($params['q'])) {
-            $queryBuilder->whereLike(ProductFlat::$SEARCHABLE,$params['q']);
+            $queryBuilder->whereLike(ProductFlat::$SEARCHABLE, $params['q']);
         }
         $sort_by = isset($params['sort_by']) ? $params['sort_by'] : 'products.id';
         $sort_order = isset($params['sort_order']) ? $params['sort_order'] : 'desc';
-        $queryBuilder =  $queryBuilder->orderBy($sort_by,$sort_order);
-        return  $queryBuilder->paginate($limit);
+        $queryBuilder = $queryBuilder->orderBy($sort_by, $sort_order);
+        return $queryBuilder->paginate($limit);
 
     }
-
-    private function getDefaultSortByOption()
-    {
-        return 'asc';
-    }
-
-    /**
-     * Check sort attribute and generate query
-     *
-     * @param object $query
-     * @param string $sort
-     * @param string $direction
-     *
-     * @return object
-     */
-    private function checkSortAttributeAndGenerateQuery($query, $sort, $direction)
-    {
-        $attribute = $this->attributeRepository->findOneByField('code', $sort);
-
-        if ($attribute) {
-            if ($attribute->code === 'price') {
-                $query->orderBy('min_price', $direction);
-            } else {
-                $query->orderBy($attribute->code, $direction);
-            }
-        } else {
-            /* `created_at` is not an attribute so it will be in else case */
-            $query->orderBy('product_flat.created_at', $direction);
-        }
-
-        return $query;
-    }
-
-
-
-
 }
