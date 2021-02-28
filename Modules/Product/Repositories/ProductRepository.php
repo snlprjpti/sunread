@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Event;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Core\Eloquent\Repository;
 use Modules\Product\Entities\Product;
+use Modules\Product\Entities\ProductFlat;
 use Modules\Product\Services\ProductImageRepository;
+
 
 
 class ProductRepository extends Repository
@@ -63,6 +65,7 @@ class ProductRepository extends Repository
             Event::dispatch('catalog.product.create.after', $product);
 
             DB::commit();
+
         } catch (\Exception $exception) {
             DB::rollBack();
             throw  $exception;
@@ -106,6 +109,10 @@ class ProductRepository extends Repository
             $product = $this->findOrFail($id);
             //removing image only
             $this->productImageRepository->removeProductImages($product);
+
+            //delete product flat
+            $product->product_flats()->delete();
+
             $product->delete($id);
 
         }catch (\Exception $exception){
@@ -164,5 +171,46 @@ class ProductRepository extends Repository
 
     }
 
+    public function getAll($categoryId = null)
+    {
+        $params = request()->input();
+        $limit = isset($params['limit']) && !empty($params['limit']) ? $params['limit'] : 25;
+        $channel = request()->get('channel') ?: (core()->getCurrentChannelCode() ?: core()->getDefaultChannelCode());
+        $locale = request()->get('locale') ?: app()->getLocale();
+        /* query builder */
+        $queryBuilder = DB::table('product_flat')
+            ->leftJoin('products', 'product_flat.product_id', '=', 'products.id')
+            ->leftJoin('attribute_families', 'products.attribute_family_id', '=', 'attribute_families.id')
+            // ->leftJoin('product_inventories', 'product_flat.product_id', '=', 'product_inventories.product_id')
+            ->select(
+                'product_flat.locale',
+                'product_flat.channel',
+                'product_flat.product_id',
+                'products.sku as product_sku',
+                'product_flat.name as product_name',
+                'products.type as product_type',
+                'product_flat.status',
+                'product_flat.price',
+                'attribute_families.name as attribute_family',
+            //DB::raw('SUM(DISTINCT ' . DB::getTablePrefix() . 'product_inventories.qty) as quantity')
+            );
+        //$queryBuilder->groupBy('product_flat.product_id', 'product_flat.locale', 'product_flat.channel');
+        $queryBuilder->whereIn('product_flat.locale', [$locale]);
+        $queryBuilder->whereIn('product_flat.channel', [$channel]);
+        if ($categoryId) {
+            $queryBuilder->where('product_categories.category_id', $categoryId);
+        }
 
+        if (is_null(request()->input('status'))) {
+            $queryBuilder->where('product_flat.status', 1);
+        }
+        if (isset($params['q'])) {
+            $queryBuilder->whereLike(ProductFlat::$SEARCHABLE, $params['q']);
+        }
+        $sort_by = isset($params['sort_by']) ? $params['sort_by'] : 'products.id';
+        $sort_order = isset($params['sort_order']) ? $params['sort_order'] : 'desc';
+        $queryBuilder = $queryBuilder->orderBy($sort_by, $sort_order);
+        return $queryBuilder->paginate($limit);
+
+    }
 }

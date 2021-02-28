@@ -148,6 +148,7 @@ class UserController extends BaseController
                 'status' => 'sometimes|boolean',
                 'role_id' => 'sometimes|integer',
             ]);
+
             $password = $request->get('password');
             if (isset($password)) {
                 $request->merge(['password' => bcrypt($password)]);

@@ -24,6 +24,7 @@ class UserServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(module_path('User', 'Database/Migrations'));
         $router->aliasMiddleware('admin', BouncerMiddleware::class);
         include __DIR__ . '/../Http/helpers.php';
+        $this->app->register(EventServiceProvider::class);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 
@@ -66,6 +67,7 @@ class SessionController extends BaseController
     public function logout()
     {
         try {
+
             auth()->guard('customer')->logout();
             return $this->successResponseWithMessage(trans('core::app.users.users.logout-success'));
 

@@ -23,12 +23,15 @@ class ActivityLogHelper {
 
     }
 
-    public function log($model, $event) {
-
+    public function log($model, $event, $action = null, $activity = null) {
+        $model_name = class_basename($model);
+        $default_action = $model_name." ". $event;
         $this->log['log_name'] = 'default';
         $this->log['description'] = $event;
         $this->log['subject_id'] = $model->id;
         $this->log['subject_type'] = get_class($model);
+        $this->log['action'] = isset($action)? $action: $default_action;
+        $this->log['activity'] = isset($activity)? $activity:$default_action;
 
         if($event == 'updated') {
             $newValues = $model->getChanges();
@@ -40,12 +43,12 @@ class ActivityLogHelper {
                 'from' => $oldValues,
                 'to' => $newValues
             ];
+            $this->log['activity'] = $default_action. " for properties: ". implode(',', array_keys($oldValues));
         }
         elseif($event == 'created') {
             $newValues = $model->toArray();
             $this->log['properties'] = $newValues;
         }
-
         $this->activityLog->create($this->log);
 
     }
