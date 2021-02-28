@@ -4,6 +4,7 @@ namespace Modules\User\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
@@ -32,8 +33,10 @@ class SessionController extends BaseController
      */
     public function login(Request $request)
     {
-
         try {
+
+            Event::dispatch('admin.session.login.before');
+
             $this->validate($request, [
                 'email' => 'required|email',
                 'password' => 'required'
@@ -49,6 +52,9 @@ class SessionController extends BaseController
                 'token' => $jwtToken,
                 'user' => $admin
             ];
+
+            Event::dispatch('admin.session.login.after',$admin);
+
             return $this->successResponse($payload, trans('core::app.users.users.login-success'));
 
         } catch (ValidationException $exception) {
@@ -66,7 +72,10 @@ class SessionController extends BaseController
     public function logout()
     {
         try {
+            Event::dispatch('admin.session.logout.before');
+            $admin = auth()->guard('admin')->user();
             auth()->guard('admin')->logout();
+            Event::dispatch('admin.session.logout.after' , $admin);
             return $this->successResponseWithMessage(trans('core::app.users.users.logout-success'));
 
         } catch (\Exception $exception) {

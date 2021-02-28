@@ -18,7 +18,7 @@ class Admin extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'api_token', 'role_id', 'status',"first_name", "last_name", "company", "address","profile_image"
+         'email', 'password', 'api_token', 'role_id', 'status',"first_name", "last_name", "company", "address","profile_image"
     ];
 
     /**
@@ -135,6 +135,11 @@ class Admin extends Authenticatable implements JWTSubject
         }
         return 1;
 
+    }
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
     }
 
 }
