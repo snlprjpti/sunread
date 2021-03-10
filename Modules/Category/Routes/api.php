@@ -22,7 +22,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::get('/categories' ,'CategoryController@index')->name('categories.index');
         Route::post('/categories' ,'CategoryController@store')->name('categories.store');
         Route::get('/categories/{category}' ,'CategoryController@show')->name('categories.show');
-        Route::post('/categories/{category}' ,'CategoryController@update')->name('categories.update');
+        Route::put('/categories/{category}' ,'CategoryController@update')->name('categories.update');
         Route::delete('/categories/{category}' ,'CategoryController@destroy')->name('categories.delete' );
     });
 });

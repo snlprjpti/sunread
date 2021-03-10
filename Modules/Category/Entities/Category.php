@@ -23,7 +23,7 @@ class Category extends Model
         return  array_merge([
             'slug' => 'nullable |unique:categories,slug'.($id ? ",$id" : ''),
             'name' => 'required',
-            'image' => 'mimes:jpeg,jpg,bmp,png',
+            'image' => 'sometimes|mimes:jpeg,jpg,bmp,png',
             'position'=>'sometimes|numeric',
             'status'=> 'sometimes|boolean',
 
