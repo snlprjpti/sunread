@@ -21,8 +21,10 @@ class ChannelResource extends Resource
             "name"=> $this->name,
             "description"=> $this->description,
             "hostname"=> $this->hostname,
-            "default_locale_id"=> "1",
-            "base_currency_id"=> "1",
+            "default_locale"=> $this->default_locale,
+            "base_currency"=> $this->base_currency,
+            "logo_url" => $this->logo_url,
+            "favicon_url" => $this->favicon_url
 
         ];
     }
