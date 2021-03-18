@@ -181,7 +181,7 @@ class ChannelController extends BaseController
             $channel = Channel::findOrFail($id);
 
             $this->validate(request(), [
-                'code' => 'sometimes|required|unique:channels,code,'.$id,
+                'code' => 'sometimes|required|unique:channels,code,' . $id,
                 'name' => 'sometimes|required',
                 'description' => 'sometimes|required',
                 'hostname' => 'sometimes|required|unique:channels,hostname',
@@ -213,7 +213,7 @@ class ChannelController extends BaseController
 
             //upload favicon image
             if (isset($data['favicon'])) {
-                $channel->logo = $this->uploadImages($data, $channel ,'favicon');
+                $channel->logo = $this->uploadImages($data, $channel, 'favicon');
                 $channel->save();
             }
 
@@ -242,21 +242,16 @@ class ChannelController extends BaseController
      */
     public function destroy($id)
     {
-        $channel = Channel::findOrFail($id);
-
-        if ($channel->code == config('app.channel')) {
-            return $this->errorResponse(trans('admin::app.response.last-delete-error', ['name' => $this->model_name]));
-        }
-
         try {
 
-            Event::dispatch('core.channel.delete.before', $id);
+            $channel = Channel::findOrFail($id);
+
+            if ($channel->code == config('app.channel')) {
+                return $this->errorResponse(trans('admin::app.response.last-delete-error', ['name' => $this->model_name]));
+            }
 
             $channel = Channel::findOrFail($id);
             $channel->delete($id);
-
-            Event::dispatch('core.channel.delete.after', $id);
-
             return $this->errorResponse(trans('admin::app.response.deleted-failed', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
