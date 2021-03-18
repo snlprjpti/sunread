@@ -252,7 +252,7 @@ class ChannelController extends BaseController
 
             $channel = Channel::findOrFail($id);
             $channel->delete($id);
-            return $this->errorResponse(trans('admin::app.response.deleted-failed', ['name' => $this->model_name]));
+            return $this->errorResponse(trans('admin::app.response.deleted-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
