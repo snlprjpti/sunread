@@ -93,7 +93,6 @@ class Core extends Model
     /**
      * Returns default channel models
      *
-     * @return \Webkul\Core\Contracts\Channel
      */
     public function getDefaultChannel(): ?Channel
     {
@@ -128,5 +127,20 @@ class Core extends Model
         return ($channel = $this->getDefaultChannel()) ? $channelCode = $channel->code : '';
     }
 
+    /**
+     * Returns all locales
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAllLocales()
+    {
+        static $locales;
+
+        if ($locales) {
+            return $locales;
+        }
+
+        return $locales = $this->localeRepository->all();
+    }
 
 }
