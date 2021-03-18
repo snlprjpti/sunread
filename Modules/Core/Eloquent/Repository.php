@@ -59,8 +59,8 @@ abstract class Repository implements RepositoryInterface, CriteriaInterface
         $this->app = $app;
         $this->criteria = new Collection();
         $this->resetScope();
-        $a = $this->makeModel();
-        dd($a);
+        $this->makeModel();
+
     }
 
     /**
