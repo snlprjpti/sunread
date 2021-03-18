@@ -18,6 +18,8 @@ class Channel extends Model
         'base_currency_id',
     ];
 
+    public static $SEARCHABLE = ['code', 'name', 'description', 'theme', 'hostname'];
+
     /**
      * Get the channel locales.
      */
