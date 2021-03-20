@@ -89,6 +89,7 @@ class ChannelController extends BaseController
 
                 'logo' => 'nullable|mimes:bmp,jpeg,jpg,png,webp',
                 'favicon' => 'nullable|mimes:bmp,jpeg,jpg,png,webp',
+                'theme' => 'required|in:default'
             ]);
 
             //Event::dispatch('core.channel.create.before');
@@ -184,7 +185,7 @@ class ChannelController extends BaseController
                 'code' => 'sometimes|required|unique:channels,code,' . $id,
                 'name' => 'sometimes|required',
                 'description' => 'sometimes|required',
-                'hostname' => 'sometimes|required|unique:channels,hostname',
+                'hostname' => 'sometimes|required|unique:channels,hostname,'.$id,
 
                 /* currencies and locales */
                 'locales' => 'sometimes|required|array|min:1|exists:locales,id',
@@ -194,16 +195,17 @@ class ChannelController extends BaseController
 
                 'logo' => 'sometimes|required|mimes:bmp,jpeg,jpg,png,webp',
                 'favicon' => 'sometimes|required|mimes:bmp,jpeg,jpg,png,webp',
+                'theme' => 'sometimes|required|in:default'
             ]);
 
             $channel = $channel->fill($request->only(['code', 'name', 'description', 'theme', 'hostname']));
             $channel->save();
 
             if ($request->has('locales'))
-                $channel->locales()->sync($request->only('locales'));
+                $channel->locales()->sync($request->get('locales'));
 
             if ($request->has('currencies'))
-                $channel->locales()->sync($request->only('currencies'));
+                $channel->locales()->sync($request->get('currencies'));
 
             //upload logo image
             if (isset($data['logo'])) {
@@ -217,7 +219,7 @@ class ChannelController extends BaseController
                 $channel->save();
             }
 
-            return $this->successResponse(new ChannelResource($channel), trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
+            return $this->successResponse(new ChannelResource($channel), trans('core::app.response.update-success', ['name' => $this->model_name]), 201);
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
@@ -252,7 +254,7 @@ class ChannelController extends BaseController
 
             $channel = Channel::findOrFail($id);
             $channel->delete($id);
-            return $this->errorResponse(trans('admin::app.response.deleted-success', ['name' => $this->model_name]));
+            return $this->errorResponse(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
 
         } catch (ModelNotFoundException $exception) {
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
