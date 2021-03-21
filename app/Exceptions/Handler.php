@@ -97,7 +97,7 @@ class Handler extends ExceptionHandler
             return $this->errorResponse($message, 401);
         }
 
-        if(env('APP_DEBUG', false)) {
+        if(env('APP_DEBUG', true)) {
             return parent::render($request, $exception);
         }
 

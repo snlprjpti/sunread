@@ -1,7 +1,7 @@
 <?php
 
 
-use Modules\Core\Entities\Core;
+use Modules\Core\Services\Core;
 
 if (! function_exists('array_permutation')) {
     function array_permutation($input)
