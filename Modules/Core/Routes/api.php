@@ -42,9 +42,7 @@ Route::group(['middleware' => ['api']], function () {
 
 
         Route::get('/activities', 'ActivityController@index')->name('admin.activities.index');
-        Route::post('/activities', 'ActivityController@store')->name('admin.activities.store');
         Route::get('/activities/{activity}', 'ActivityController@show')->name('admin.activities.show');
-        Route::put('/activities/{activity}', 'ActivityController@update')->name('admin.activities.update');
         Route::delete('/activities/{activity}', 'ActivityController@destroy')->name('admin.activities.delete');
         Route::delete('/activities/bulk', 'ActivityController@bulkDelete')->name('admin.activities.bulk.delete');
 

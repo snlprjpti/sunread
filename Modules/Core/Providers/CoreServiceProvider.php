@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Core\Entities\ActivityLog;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Currency;
+use Modules\Core\Entities\Locale;
+use Modules\Core\Observers\ChannelObserver;
+use Modules\Core\Observers\CurrencyObserver;
+use Modules\Core\Observers\LocaleObserver;
 use Modules\Core\Services\ActivityLogHelper;
 use Modules\Core\Facades\Audit as ActivityLoggerFacade;
 
@@ -29,6 +35,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'core');
         $this->loadMigrationsFrom(module_path('Core', 'Database/Migrations'));
         $this->registerActivityLogger();
+        $this->registerObserver();
 
         include __DIR__ . '/../Helpers/helpers.php';
         Validator::extend('decimal', 'Modules\Core\Contracts\Validations\Decimal@passes');
@@ -126,5 +133,12 @@ class CoreServiceProvider extends ServiceProvider
         $this->app->singleton('audit', function () {
             return new ActivityLogHelper(new ActivityLog());
         });
+    }
+
+    private function registerObserver()
+    {
+        Channel::observe(ChannelObserver::class);
+        Locale::observe(LocaleObserver::class);
+        Currency::observe(CurrencyObserver::class);
     }
 }
