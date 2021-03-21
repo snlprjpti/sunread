@@ -141,18 +141,17 @@ class LocaleController extends BaseController
     {
         try {
             $this->validate(request(), [
-                'code' => ['required', 'unique:locales,code,' . $id],
-                'name' => 'required',
-                'direction' => 'in:ltr,rtl',
+                'code' => 'sometimes|required|unique:locales,code,' . $id,
+                'name' => 'sometimes|required',
             ]);
 
             Event::dispatch('core.locale.update.before', $id);
 
-            $this->localeRepository->update(request()->all(), $id);
+            $locale = $this->localeRepository->update(request()->all(), $id);
 
             Event::dispatch('core.locale.update.after');
 
-            return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => 'Locale']));
+            return $this->successResponse($locale,trans('core::app.response.update-success', ['name' => 'Locale']));
 
         }catch (ModelNotFoundException $exception){
             return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Locale']), 404);
