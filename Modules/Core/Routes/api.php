@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => ['api']], function () {
 
     //ADMIN ATTRIBUTE ROUTES
-    Route::group(['prefix' => 'admin', 'middleware' => ['language']], function () {
+    Route::group(['prefix' => 'admin', 'middleware' => ['admin','language']], function () {
 
         // Locale Routes
         Route::get('/locales', 'LocaleController@index')->name('admin.locales.index');
@@ -50,9 +50,9 @@ Route::group(['middleware' => ['api']], function () {
 
         Route::get('/channels', 'ChannelController@index')->name('admin.channels.index');
         Route::post('/channels', 'ChannelController@store')->name('admin.channels.store');
-        Route::get('/channels/{currency}', 'ChannelController@show')->name('admin.channels.show');
-        Route::put('/channels/{currency}', 'ChannelController@update')->name('admin.channels.update');
-        Route::delete('/channels/{currency}', 'ChannelController@destroy')->name('admin.channels.delete');
+        Route::get('/channels/{channel}', 'ChannelController@show')->name('admin.channels.show');
+        Route::put('/channels/{channel}', 'ChannelController@update')->name('admin.channels.update');
+        Route::delete('/channels/{channel}', 'ChannelController@destroy')->name('admin.channels.delete');
 
     });
 });

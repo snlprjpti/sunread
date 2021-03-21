@@ -78,8 +78,8 @@ class ChannelController extends BaseController
                 /* general */
                 'code' => ['required', 'unique:channels,code'],
                 'name' => 'required',
-                'description' => 'nullable',
-                'hostname' => 'unique:channels,hostname',
+                'description' => 'sometimes|required',
+                'hostname' => 'sometimes|required|unique:channels,hostname',
 
                 /* currencies and locales */
                 'locales' => 'required|array|min:1|exists:locales,id',

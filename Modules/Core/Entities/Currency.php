@@ -5,7 +5,6 @@ namespace Modules\Core\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Models\CurrencyExchangeRate;
 
-
 class Currency extends Model
 {
     protected $fillable = [
