@@ -7,7 +7,10 @@ use Illuminate\Support\Str;
 
 $factory->define(\Modules\User\Entities\Admin::class, function (Faker $faker) {
     return [
-        'name' => $faker->name,
+        'first_name' => $faker->firstName,
+        'last_name' => $faker->lastName,
+        'company' => $faker->company,
+        'address' => $faker->address,
         'email' => $faker->unique()->safeEmail,
         'password' => \Illuminate\Support\Facades\Hash::make('password'),
         'remember_token' => Str::random(10),
