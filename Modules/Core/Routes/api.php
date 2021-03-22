@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => ['api']], function () {
 
     //ADMIN ATTRIBUTE ROUTES
-    Route::group(['prefix' => 'admin', 'middleware' => ['language']], function () {
+    Route::group(['prefix' => 'admin', 'middleware' => ['admin','language']], function () {
 
         // Locale Routes
         Route::get('/locales', 'LocaleController@index')->name('admin.locales.index');
@@ -42,11 +42,15 @@ Route::group(['middleware' => ['api']], function () {
 
 
         Route::get('/activities', 'ActivityController@index')->name('admin.activities.index');
-        Route::post('/activities', 'ActivityController@store')->name('admin.activities.store');
         Route::get('/activities/{activity}', 'ActivityController@show')->name('admin.activities.show');
-        Route::put('/activities/{activity}', 'ActivityController@update')->name('admin.activities.update');
         Route::delete('/activities/{activity}', 'ActivityController@destroy')->name('admin.activities.delete');
         Route::delete('/activities/bulk', 'ActivityController@bulkDelete')->name('admin.activities.bulk.delete');
+
+        Route::get('/channels', 'ChannelController@index')->name('admin.channels.index');
+        Route::post('/channels', 'ChannelController@store')->name('admin.channels.store');
+        Route::get('/channels/{channel}', 'ChannelController@show')->name('admin.channels.show');
+        Route::put('/channels/{channel}', 'ChannelController@update')->name('admin.channels.update');
+        Route::delete('/channels/{channel}', 'ChannelController@destroy')->name('admin.channels.delete');
 
     });
 });

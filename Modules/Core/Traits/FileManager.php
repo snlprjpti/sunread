@@ -13,6 +13,7 @@ trait FileManager
 
     protected function uploadFile(UploadedFile $file, $upload_path)
     {
+
         //Saving a file with original for better seo
         $filenameWithExt = $file->getClientOriginalName();
 
@@ -33,7 +34,7 @@ trait FileManager
         return $fileNameToStore;
     }
 
-    private function createFolderIfNotExist($path)
+    public function createFolderIfNotExist($path)
     {
         //linux assumes dir and file as same
         if (!file_exists($path)) {

@@ -20,7 +20,7 @@ class AdminAuthTest extends AuthTestCase
     public function test_admin_login()
     {
         $admin  = $this->createAdmin([
-            'password' => 'password'
+            'password' => 'password',
         ]);
         $data = [
             'email' => $admin->email,

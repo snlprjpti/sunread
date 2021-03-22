@@ -121,6 +121,29 @@ return [
     |
     */
 
+    /*
+   |--------------------------------------------------------------------------
+   | Base Currency Code
+   |--------------------------------------------------------------------------
+   |
+   | Here you may specify the base currency code for your application.
+   |
+   */
+
+    'currency' => env('APP_CURRENCY', 'USD'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default channel Code
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the default channel code for your application.
+    |
+    */
+
+    'channel' => 'default',
+
+
     'key' => env('APP_KEY'),
 
     'cipher' => 'AES-256-CBC',

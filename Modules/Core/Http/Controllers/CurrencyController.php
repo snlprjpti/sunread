@@ -119,7 +119,7 @@ class CurrencyController extends BaseController
         try {
 
             $this->validate($request, [
-                'code' => ['required', 'unique:currencies,code,' . $id],
+                'code' => ['sometimes','required', 'unique:currencies,code,' . $id],
                 'name' => 'required',
             ]);
 
