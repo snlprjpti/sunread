@@ -140,12 +140,6 @@ class AccountController extends BaseController
 
     }
 
-    protected function createFolderIfNotExist($path)
-    {
-        if (!file_exists($path)) {
-            File::makeDirectory($path, $mode = 0755, true, true);
-        }
-    }
 
     public function deleteProfileImage()
     {

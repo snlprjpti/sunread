@@ -24,6 +24,7 @@ class AuthTestCase extends TestCase
 
     public function createAdmin($attributes = [])
     {
+
         $password = isset($attributes['password'])? $attributes['password']: 'password';
         $admin_slug = isset($attributes['slug'])? $attributes['slug']: 'super-admin';
         $role = Role::where('slug', $admin_slug)->first();
