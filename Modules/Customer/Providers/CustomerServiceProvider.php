@@ -10,6 +10,7 @@ use Modules\Customer\Entities\CustomerAddress;
 use Modules\Customer\Entities\CustomerGroup;
 use Modules\Customer\Http\Middleware\RedirectIfNotCustomer;
 use Modules\Customer\Observers\CustomerGroupObserver;
+use Modules\Customer\Observers\CustomerAddressObserver;
 use Modules\Customer\Observers\CustomerObserver;
 
 class CustomerServiceProvider extends ServiceProvider
@@ -120,7 +121,7 @@ class CustomerServiceProvider extends ServiceProvider
     private function registerObservers()
     {
         CustomerGroup::observe(CustomerGroupObserver::class);
-        CustomerAddress::observe(CustomerGroupObserver::class);
+        CustomerAddress::observe(CustomerAddressObserver::class);
         Customer::observe(CustomerObserver::class);
     }
 }
