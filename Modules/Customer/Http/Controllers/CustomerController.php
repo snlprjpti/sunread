@@ -106,7 +106,7 @@ class CustomerController extends BaseController
             }
             DB::commit();
 
-            return $this->successResponse($customer, trans('core::app.response.create-success', ['name' => 'Customer']));
+            return $this->successResponse($customer, trans('core::app.response.create-success', ['name' => 'Customer']), 201);
 
         } catch (ValidationException $exception) {
             DB::rollBack();
