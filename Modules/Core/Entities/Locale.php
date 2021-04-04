@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Locale extends Model
 {
-    protected $fillable = [
-        'code', 'name', 'direction'
-    ];
-    public $SEARCHABLE = ['code', 'name'];
+    public static $SEARCHABLE = [ 'code', 'name' ];
+    protected $fillable = [ 'code', 'name', 'direction' ];
 }
