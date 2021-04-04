@@ -136,7 +136,7 @@ class AttributeRepository extends Repository implements AttributeInterface
         return array_merge([
             'slug' => ['nullable', 'unique:attributes,slug' . ($id ? ",$id" : '')],
             'name' => 'required',
-            'type' => 'required|in:'.implode(array_keys($this->attribute_types()) ,','),
+            'type' => 'required|in:'.implode(',', array_keys($this->attribute_types())),
             "is_required"=>"sometimes|boolean",
             "is_unique"=>"sometimes|boolean",
             "use_in_flat"=>"sometimes|boolean",
