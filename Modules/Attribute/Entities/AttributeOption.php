@@ -6,30 +6,36 @@ use Illuminate\Database\Eloquent\Model;
 
 class AttributeOption extends Model
 {
-
     public $timestamps = false;
-    protected $fillable = ['name','position', 'attribute_id'];
+    protected $fillable = [ "name", "position", "attribute_id" ];
 
     /**
-     * Get the attribute that owns the attribute option.
+     * Attribute relationship
+     * 
+     * @return Attribute
      */
     public function attribute()
     {
         return $this->belongsTo(Attribute::class);
     }
-
-
-
-
+    
+    /**
+     * Translations relationship
+     * 
+     * @return AttributeOptionTranslation
+     */
     public function translations()
     {
-        return $this->hasMany(AttributeOptionTranslation::class,'attribute_option_id');
+        return $this->hasMany(AttributeOptionTranslation::class, "attribute_option_id");
     }
 
+    /**
+     * Get Translated data
+     * 
+     * @return AttributeOptionTranslation
+     */
     public function translate($locale)
     {
-        return $this->translations()->where('locale', $locale)->first();
+        return $this->translations()->where("locale", $locale)->first();
     }
-
-
 }
