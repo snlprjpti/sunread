@@ -2,33 +2,23 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Modules\Core\Entities\Currency;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
-use Modules\Core\Repositories\CurrencyRepository;
+use Modules\Core\Transformers\CurrencyResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
 class CurrencyController extends BaseController
 {
-    /**
-     * CurrencyRepository object
-     */
-    protected $currencyRepository;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @param CurrencyRepository $currencyRepository
-     * @return void
-     */
-    public function __construct(CurrencyRepository $currencyRepository)
+    public function __construct(Currency $currency)
     {
-        parent::__construct();
-        $this->currencyRepository = $currencyRepository;
-        $this->middleware('admin');
+        $this->model = $currency;
+        $this->model_name = "Currency";
+        parent::__construct($this->model, $this->model_name);
     }
 
     /**
@@ -39,72 +29,82 @@ class CurrencyController extends BaseController
      */
     public function index(Request $request)
     {
-        try {
-            // validating data.
-            $this->validate($request, [
-                'limit' => 'sometimes|numeric',
-                'page' => 'sometimes|numeric',
-                'sort_by' => 'sometimes',
-                'sort_order' => 'sometimes|in:asc,desc',
-                'q' => 'sometimes|string|min:1'
-            ]);
-
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-
-
-            $currency_model = $this->currencyRepository->makeModel();
-            $currencies = $currency_model->query();
-
-            if ($request->has('q')) {
-                $currencies->whereLike($currency_model->SEARCHABLE, $request->get('q'));
-            }
-
-            $currencies->orderBy($sort_by, $sort_order);
-            $currencies = $currencies->paginate($limit);
-
-            return $this->successResponse($currencies, trans('core::app.response.fetch-list-success', ['name' => 'Currency']));
-
-        } catch (QueryException $exception) {
+        try
+        {
+            $this->validateListFiltering($request);
+            $currencies = $this->getFilteredList($request);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(CurrencyResource::collection($currencies), $this->lang('fetch-list-success'));
     }
 
 
     /**
      * Store a newly created resource in storage.
+     * 
+     * @param Request $request
      * @return JsonResponse
      */
-    public function store()
+    public function store(Request $request)
     {
-
-        try {
+        try
+        {
+            $data = $this->validateData($request);
 
             Event::dispatch('core.currency.create.before');
-
-            $this->validate(request(), [
-                'code' => 'required|min:3|max:3|unique:currencies,code',
-                'name' => 'required',
-            ]);
-
-            $currency = $this->currencyRepository->create(request()->all());
-
+            $currency = $this->model->create($data);
             Event::dispatch('core.currency.create.after', $currency);
-
-            return $this->successResponse($currency, trans('core::app.response.create-success', ['name' => 'Currency']), 201);
-
-        } catch (ValidationException $exception) {
+        }
+        catch (QueryException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch(ValidationException $exception)
+        {
             return $this->errorResponse($exception->errors(), 422);
-
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(new CurrencyResource($currency), $this->lang('create-success'), 201);
+    }
 
+    /**
+     * Show the form for editing the specified resource.
+     * 
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show($id)
+    {
+        try
+        {
+            $currency = $this->model->findOrFail($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponse(new CurrencyResource($currency), $this->lang('fetch-success'));
     }
 
     /**
@@ -116,89 +116,81 @@ class CurrencyController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        try {
-
-            $this->validate($request, [
-                'code' => ['sometimes','required', 'unique:currencies,code,' . $id],
-                'name' => 'required',
-            ]);
+        try
+        {
+            $data = $this->validateData($request, $id);
+            $currency = $this->model->findOrFail($id);
 
             Event::dispatch('core.currency.update.before', $id);
-
-            $currency = $this->currencyRepository->update(request()->all(), $id);
-
+            $currency = $currency->fill($data);
+            $currency->save();
             Event::dispatch('core.currency.update.after', $currency);
-
-            return $this->successResponse($currency, trans('core::app.response.update-success', ['name' => 'Currency']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Currency']), 404);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(new CurrencyResource($currency), $this->lang('update-success'));
     }
 
     /**
      * Remove the specified resource from storage.
+     * 
      * @param int $id
      * @return JsonResponse
      */
     public function destroy($id)
     {
-        try {
-
-            $currency = $this->currencyRepository->findOrFail($id);
+        try
+        {
+            $currency = $this->model->findOrFail($id);
+            // Cannot Delete if only one currency
+            if ($this->model->count() == 1) return $this->errorResponse($this->lang('last-delete-error'));
 
             Event::dispatch('core.currency.delete.before', $currency);
-
-            if ($this->currencyRepository->count() == 1) {
-                return $this->errorResponse(trans('core::app.settings.currencies.last-delete-error'), 400);
-            }
-
-            $this->currencyRepository->delete($id);
-
+            $currency->delete();
             Event::dispatch('core.currency.delete.after', $id);
-
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Currency']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Currency']), 404);
-
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('core::app.response.delete-failed', ['name' => 'Currency']));
         }
-
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function show($id)
-    {
-        try {
-
-            $currency = $this->currencyRepository->findOrFail($id);
-            return $this->successResponse($currency, trans('core::app.response.fetch-success', ['name' => 'Currency']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Currency']), 404);
-
-        } catch (\Exception $exception) {
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponseWithMessage($this->lang('delete-success'));
+    }
 
+    /**
+     * Custom Validation for Store/Update
+     * 
+     * @param Request $request
+     * @param int $id
+     * @return Array
+     */
+    private function validateData($request, $id=null)
+    {
+        $id = $id ? ",{$id}" : null;
+
+        return $this->validate($request, [
+            "code" => "required|min:3|max:3|unique:currencies,code{$id}",
+            "name" => "required",
+            "symbol" => "required"
+        ]);
     }
 }
