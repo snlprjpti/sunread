@@ -2,170 +2,147 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Modules\Core\Entities\Locale;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Repositories\LocaleRepository;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Modules\Core\Transformers\LocaleResource;
 
 class LocaleController extends BaseController
 {
-
-    /**
-     * LocaleRepository object
-     *
-     * @var \Modules\Core\Repositories\LocaleRepository
-     */
-    protected $localeRepository;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @param LocaleRepository $localeRepository
-     */
-    public function __construct(LocaleRepository $localeRepository)
+    public function __construct(Locale $locale)
     {
-        $this->middleware('admin');
-        $this->localeRepository = $localeRepository;
-        parent::__construct();
+        $this->model = $locale;
+        $this->model_name = "Locale";
+        parent::__construct($this->model, $this->model_name);
     }
-
 
     /**
      * Display a listing of the resource.
+     * 
      * @param Request $request
      * @return JsonResponse
      */
     public function index(Request $request)
     {
-        try {
-
-            // validating data.
-            $this->validate($request, [
-                'limit' => 'sometimes|numeric',
-                'page' => 'sometimes|numeric',
-                'sort_by' => 'sometimes',
-                'sort_order' => 'sometimes|in:asc,desc',
-                'q' => 'sometimes|string|min:1'
-            ]);
-
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-
-
-            $locale_model = $this->localeRepository->makeModel();
-            $locales = $locale_model->query();
-
-            if ($request->has('q')) {
-                $locales->whereLike($locale_model->SEARCHABLE, $request->get('q'));
-            }
-
-            $locales->orderBy($sort_by, $sort_order);
-            $locales = $locales->paginate($limit);
-
-            return $this->successResponse($locales, trans('core::app.response.fetch-list-success', ['name' => 'Locale']));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
+        try
+        {
+            $this->validateListFiltering($request);
+            $locales = $this->getFilteredList($request);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(LocaleResource::collection($locales), $this->lang('fetch-list-success'));
     }
 
     /**
      * Store a newly created resource in storage.
+     * 
+     * @param Request $request
      * @return JsonResponse
      */
-    public function store()
+    public function store(Request $request)
     {
-        try {
+        try
+        {
+            $data = $this->validateData($request);
+
             Event::dispatch('core.locale.create.before');
-
-            $this->validate(request(), [
-                'code' => ['required', 'unique:locales,code'],
-                'name' => 'required',
-            ]);
-
-            $locale = $this->localeRepository->create(request()->all());
-
+            $locale = $this->model->create($data);
             Event::dispatch('core.locale.create.after', $locale);
-
-            return $this->successResponse($locale, trans('core::app.response.create-success', ['name' => 'Locale']), 201);
-
-        } catch (ValidationException $exception) {
+        }
+        catch (QueryException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch(ValidationException $exception)
+        {
             return $this->errorResponse($exception->errors(), 422);
-
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(new LocaleResource($locale), $this->lang('create-success'), 201);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Get the particular resource
+     * 
      * @param int $id
      * @return JsonResponse
      */
     public function show($id)
     {
-        try {
-
-            $locale = $this->localeRepository->findOrFail($id);
-            return $this->successResponse($locale, trans('core::app.response.fetch-success', ['name' => 'Locale']));
-
-        }catch (ModelNotFoundException $exception){
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Locale']), 404);
-
-        } catch (\Exception $exception) {
+        try
+        {
+            $locale = $this->model->findOrFail($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
-
+        return $this->successResponse(new LocaleResource($locale), $this->lang('fetch-success'));
     }
 
     /**
      * Update the specified resource in storage.
      *
+     * @param Request $request
      * @param int $id
      * @return JsonResponse
      */
-    public function update($id)
+    public function update(Request $request, $id)
     {
-        try {
-            $this->validate(request(), [
-                'code' => 'sometimes|required|unique:locales,code,' . $id,
-                'name' => 'sometimes|required',
-            ]);
+        try
+        {
+            $data = $this->validateData($request, $id);
+            $locale = $this->model->findOrFail($id);
 
             Event::dispatch('core.locale.update.before', $id);
-
-            $locale = $this->localeRepository->update(request()->all(), $id);
-
-            Event::dispatch('core.locale.update.after');
-
-            return $this->successResponse($locale,trans('core::app.response.update-success', ['name' => 'Locale']));
-
-        }catch (ModelNotFoundException $exception){
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Locale']), 404);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
+            $locale = $locale->fill($data);
+            $locale->save();
+            Event::dispatch('core.locale.update.after', $locale);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(new LocaleResource($locale), $this->lang('update-success'));
     }
 
     /**
@@ -175,30 +152,42 @@ class LocaleController extends BaseController
      */
     public function destroy($id)
     {
+        try
+        {
+            $locale = $this->model->findOrFail($id);
+            // Cannot Delete if only one locale
+            if ($this->model->count() == 1) return $this->errorResponse($this->lang('last-delete-error'));
 
-        try {
-
-            $locale = $this->localeRepository->findOrFail($id);
-
-            if ($this->localeRepository->count() == 1) {
-                return $this->errorResponse(trans('core::app.settings.locales.last-delete-error'), 400);
-            }
-
-            Event::dispatch('core.locale.delete.before', $id);
-
-            $this->localeRepository->delete($id);
-
+            Event::dispatch('core.locale.delete.before', $locale);
+            $locale->delete();
             Event::dispatch('core.locale.delete.after', $id);
-
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Locale']));
-
-        }catch (ModelNotFoundException $exception){
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Locale']), 404);
-
-        } catch (\Exception $e) {
-            return $this->errorResponse(trans('core::app.response.delete-failed', ['name' => 'Locale']));
         }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
+    /**
+     * Custom Validation for Store/Update
+     * 
+     * @param Request $request
+     * @param int $id
+     * @return Array
+     */
+    private function validateData($request, $id=null)
+    {
+        $id = $id ? ",{$id}" : null;
 
+        return $this->validate($request, [
+            "code" => "required|unique:locales,code{$id}",
+            "name" => "required"
+        ]);
+    }
 }
