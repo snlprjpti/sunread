@@ -14,11 +14,21 @@ class Attribute extends Model
     protected $fillable = [ "slug", "name", "type", "position", "is_required", "is_unique", "validation", "is_filterable", "is_visible_on_front", "is_user_defined", "use_in_flat", "create_at", "updated_at", "attribute_group_id" ];
 
     /**
+     * Attribute group relationship
+     * 
+     * @return AttributeGroup
+     */
+    public function attribute_group()
+    {
+        return $this->belongsTo(AttributeGroup::class, "attribute_group_id");
+    }
+
+    /**
      * Attribute options relationship
      * 
      * @return AttributeOption
      */
-    public function attributeOptions()
+    public function attribute_options()
     {
         return $this->hasMany(AttributeOption::class, "attribute_id");
     }
