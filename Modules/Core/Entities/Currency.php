@@ -7,6 +7,7 @@ use Modules\Core\Models\CurrencyExchangeRate;
 
 class Currency extends Model
 {
+    public static $SEARCHABLE = [ 'code', 'name', 'symbol' ];
     protected $fillable = [ 'code', 'name', 'symbol' ];
 
     // Set Currency Code in Capitalized Letters
