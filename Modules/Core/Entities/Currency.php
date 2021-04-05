@@ -7,26 +7,16 @@ use Modules\Core\Models\CurrencyExchangeRate;
 
 class Currency extends Model
 {
-    protected $fillable = [
-        'code', 'name', 'symbol'
-    ];
+    public static $SEARCHABLE = [ 'code', 'name', 'symbol' ];
+    protected $fillable = [ 'code', 'name', 'symbol' ];
 
-    /**
-     * Set currency code in capital
-     *
-     * @param $code
-     * @return void
-     */
+    // Set Currency Code in Capitalized Letters
     public function setCodeAttribute($code)
     {
         $this->attributes['code'] = strtoupper($code);
     }
-
-
-
-    /**
-     * Get the currency_exchange associated with the currency.
-     */
+    
+    // Get Exchange rate from associated Currency
     public function CurrencyExchangeRate()
     {
         return $this->hasOne(CurrencyExchangeRate::class, 'target_currency');

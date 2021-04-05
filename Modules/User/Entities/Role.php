@@ -3,11 +3,11 @@
 namespace Modules\User\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\Core\Traits\SlugAble;
+use Modules\Core\Traits\Sluggable;
 
 class Role extends Model
 {
-    use SlugAble;
+    use Sluggable;
     /**
      * The attributes that are mass assignable.
      *

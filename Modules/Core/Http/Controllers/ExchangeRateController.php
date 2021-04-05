@@ -9,12 +9,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\ExchangeRate;
-use Modules\Core\Traits\ApiResponseFormat;
 use Modules\Core\Transformers\ExchangeRateResource;
 
 class ExchangeRateController extends BaseController
 {
-    use ApiResponseFormat;
+    public function __construct(ExchangeRate $exchange_rate)
+    {
+        $this->model = $exchange_rate;
+        $this->model_name = "Exchange Rate";
+        parent::__construct($this->model, $this->model_name);
+    }
 
     /**
      * Display a listing of the resource.
@@ -24,65 +28,82 @@ class ExchangeRateController extends BaseController
      */
     public function index(Request $request)
     {
-        try {
-
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-            $exchange_rates = ExchangeRate::with(['source','target']);
-            if ($request->has('q')) {
-                $exchange_rates->whereLike(ExchangeRate::$SEARCHABLE, $request->get('q'));
-            }
-            $exchange_rates->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-            $exchange_rates = $exchange_rates->paginate($limit);
-            return $this->successResponse(ExchangeRateResource::collection($exchange_rates), trans('core::app.response.fetch-list-success', ['name' => 'Exchange Rate']));
-
-        } catch (QueryException $exception) {
+        try
+        {
+            $this->validateListFiltering($request);
+            $exchange_rates = $this->getFilteredList($request);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
-
+        return $this->successResponse(ExchangeRateResource::collection($exchange_rates), $this->lang('fetch-list-success'));
     }
-
 
     /**
      * Store a newly created resource in storage.
+     * 
      * @param Request $request
      * @return JsonResponse
      */
     public function store(Request $request)
     {
-
-        try {
-            $this->validate(request(), [
-                'target_currency' => ['required', 'exists:currencies,id'],
-                'source_currency' => ['required', 'exists:currencies,id'],
-                'rate' => 'required|numeric',
-            ]);
+        try
+        {
+            $data = $this->validateData($request);
 
             Event::dispatch('core.exchange_rate.create.before');
-
-            $exchange_rate = ExchangeRate::create($request->only('source_currency', 'target_currency', 'rate'));
-
+            $exchange_rate = $this->model->create($data);
             Event::dispatch('core.exchange_rate.create.after', $exchange_rate);
-
-            return $this->successResponse(new ExchangeRateResource($exchange_rate), trans('core::app.response.create-success', ['name' => 'Exchange Rate']), 200);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(new ExchangeRateResource($exchange_rate), $this->lang('create-success'), 201);
     }
 
+    /**
+     * Get the particular resource
+     * 
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show($id)
+    {
+        try
+        {
+            $exchange_rate = $this->model->findOrFail($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponse(new ExchangeRateResource($exchange_rate), $this->lang('fetch-success'));
+    }
 
     /**
      * Update the specified resource in storage.
@@ -93,37 +114,35 @@ class ExchangeRateController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        try {
-            $this->validate(request(), [
-                'target_currency' => ['required', 'exists:currencies,id'],
-                'source_currency' => ['required', 'exists:currencies,id'],
-                'rate' => 'required|numeric',
-            ]);
-
-            $exchange_rate = ExchangeRate::findOrFail($id);
+        try
+        {
+            $data = $this->validateData($request, $id);
+            $exchange_rate = $this->model->findOrFail($id);
 
             Event::dispatch('core.exchange_rate.update.before', $id);
-
-            $exchange_rate = $exchange_rate->fill($request->only('source_currency', 'target_currency', 'rate'));
-
+            $exchange_rate = $exchange_rate->fill($data);
             $exchange_rate->save();
-
             Event::dispatch('core.exchange_rate.update.after', $exchange_rate);
-
-            return $this->successResponse(new ExchangeRateResource($exchange_rate), trans('core::app.response.update-success', ['name' => 'Exchange Rate']), 200);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(new ExchangeRateResource($exchange_rate), $this->lang('update-success'));
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -133,38 +152,41 @@ class ExchangeRateController extends BaseController
      */
     public function destroy($id)
     {
-        try {
-            $exchange_rate = ExchangeRate::findOrFail($id);
+        try
+        {
+            $exchange_rate = $this->model->findOrFail($id);
+
+            Event::dispatch('core.exchange_rate.delete.before', $exchange_rate);
             $exchange_rate->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Exchange rate']));
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+            Event::dispatch('core.exchange_rate.delete.after', $id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
-    }
 
+        return $this->successResponseWithMessage($this->lang('delete-success'));
+    }
 
     /**
-     * Get the particular resource
-     * @param $id
-     * @return JsonResponse
+     * Custom Validation for Store/Update
+     * 
+     * @param Request $request
+     * @param int $id
+     * @return Array
      */
-    public function show($id)
+    private function validateData($request, $id=null)
     {
-        try {
+        $id = $id ? ",{$id}" : null;
 
-            $exchange_rate = ExchangeRate::findOrFail($id);
-            return $this->successResponse(new ExchangeRateResource($exchange_rate), trans('core::app.response.fetch-success', ['name' => 'Exchange rate']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Exchange Rate']), 404);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
+        return $this->validate($request, [
+            "target_currency" => "required|exists:currencies,id",
+            "source_currency" => "required|exists:currencies,id",
+            "rate" => "required|numeric"
+        ]);
     }
-
 }
