@@ -15,7 +15,6 @@ class ChannelObserver
 
     public function updated(Channel $channel)
     {
-
         Audit::log($channel, __FUNCTION__);
     }
 

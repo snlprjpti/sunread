@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\Factory;
 use Modules\Core\Entities\ActivityLog;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Currency;
+use Modules\Core\Entities\ExchangeRate;
 use Modules\Core\Entities\Locale;
 use Modules\Core\Observers\ChannelObserver;
 use Modules\Core\Observers\CurrencyObserver;
 use Modules\Core\Observers\LocaleObserver;
 use Modules\Core\Services\ActivityLogHelper;
 use Modules\Core\Facades\Audit as ActivityLoggerFacade;
+use Modules\Core\Observers\ExchangeRateObserver;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -140,5 +142,6 @@ class CoreServiceProvider extends ServiceProvider
         Channel::observe(ChannelObserver::class);
         Locale::observe(LocaleObserver::class);
         Currency::observe(CurrencyObserver::class);
+        ExchangeRate::observe(ExchangeRateObserver::class);
     }
 }
