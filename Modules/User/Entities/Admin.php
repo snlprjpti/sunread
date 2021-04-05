@@ -9,7 +9,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Admin extends Authenticatable implements JWTSubject
 {
-    public static  $SEARCHABLE = ['name', 'email'];
+    public static  $SEARCHABLE = ['first_name', 'email'];
     use Notifiable;
 
     /**
