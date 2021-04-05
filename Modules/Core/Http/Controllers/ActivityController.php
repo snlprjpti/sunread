@@ -12,137 +12,121 @@ use Modules\Core\Transformers\ActivityResource;
 
 class ActivityController extends BaseController
 {
-    protected $pagination_limit;
-    protected $model_name = "Activity Log";
+    public function __construct(ActivityLog $activity_log)
+    {
+        $this->model = $activity_log;
+        $this->model_name = "Activity Log";
+        parent::__construct($this->model, $this->model_name);
+    }
 
     /**
      * Display a listing of the resource.
+     * 
      * @param Request $request
      * @return JsonResponse
      */
     public function index(Request $request)
     {
-        try {
-            $activity_log = ActivityLog::first();
-            $this->validate($request, [
-                'limit' => 'sometimes|numeric',
-                'page' => 'sometimes|numeric',
-                'sort_by' => 'sometimes',
-                'sort_order' => 'sometimes|in:asc,desc',
-                'q' => 'sometimes|string|min:1'
-            ]);
-
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-
-            $activity_logs = ActivityLog::query();
-
-            if ($request->has('q')) {
-                $activity_logs->whereLike(ActivityLog::$SEARCHABLE, $request->get('q')) ;
-            }
-            $activity_logs = $activity_logs->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-
-            $activity_logs = $activity_logs->paginate($limit);
-            return $this->successResponse(ActivityResource::collection($activity_logs), trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
-
-        } catch (QueryException $exception) {
+        try
+        {
+            $this->validateListFiltering($request);
+            $activity_logs = $this->getFilteredList($request);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
-    {
-        try {
-
-            $this->validate($request, [
-                'name' => 'required',
-                'permission_type' => 'required|in:all,custom',
-                'permissions' => 'sometimes'
-            ]);
-
-            $role = ActivityLog::create(
-                $request->only('name', 'description', 'permissions', 'permission_type', 'slug')
-            );
-            return $this->successResponse($payload = $role, trans('core::app.response.create-success', ['name' => 'Role']), 201);
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
-
-        } catch (ValidationException $exception) {
+        catch(ValidationException $exception)
+        {
             return $this->errorResponse($exception->errors(), 422);
-
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(ActivityResource::collection($activity_logs), $this->lang('fetch-list-success'));
     }
 
     /**
      * Show the specified resource.
+     * 
      * @param int $id
      * @return JsonResponse
      */
     public function show($id)
     {
-        try {
-            $activity_log = ActivityLog::findOrFail($id);
-            return $this->successResponse($activity_log, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
-
-        } catch (\Exception $exception) {
+        try
+        {
+            $activity_log = $this->model->findOrFail($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(new ActivityResource($activity_log), $this->lang('fetch-success'));
     }
 
     /**
      * Remove the specified resource from storage.
-     * @param  $id
+     * 
+     * @param int $id
      * @return JsonResponse
      */
     public function destroy($id)
     {
         try {
-            $activity_log = ActivityLog::findOrFail($id);
+            $activity_log = $this->model->findOrFail($id);
             $activity_log->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
-
-        } catch (\Exception $exception) {
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(new ActivityResource($activity_log), $this->lang('delete-success'));
     }
 
-
+    /**
+     * Remove the specified resource in bullk.
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function bulkDelete(Request $request)
     {
-        try {
-            $this->validate($request,[
+        try
+        {
+            $this->validate($request, [
                 'ids' => 'array|required',
-                'ids.*' => 'required|exists:activity_logs',
+                'ids.*' => 'required|exists:activity_logs,id',
             ]);
-            $ids = $request->get('ids');
 
-            //ActivityLog::destroy($ids);
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
-
-        } catch (\Exception $exception) {
+            $activity_logs = $this->model->whereIn('id', $request->ids);
+            $activity_logs->delete();
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
-    }
 
+        return $this->successResponseWithMessage($this->lang('delete-success'));
+    }
 }
