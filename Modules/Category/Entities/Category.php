@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
-use Modules\Core\Traits\SlugAble;
+use Modules\Core\Traits\Sluggable;
 
 class Category extends Model
 {
-    use NodeTrait,SlugAble;
+    use NodeTrait,Sluggable;
 
     protected $fillable = ['position', 'status', 'parent_id','image', 'slug'];
     protected $with =['translations'];

@@ -4,11 +4,11 @@ namespace Modules\Attribute\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Modules\Core\Traits\SlugAble;
+use Modules\Core\Traits\Sluggable;
 
 class AttributeFamily extends Model
 {
-    use SlugAble;
+    use Sluggable;
     protected $fillable = ['name', 'slug'];
     public $timestamps= false;
     public static $SEARCHABLE = ['name'];
