@@ -76,7 +76,7 @@ class ResetPasswordController extends BaseController
             return $this->errorResponse('Customer not found exception', 404);
 
         } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'));
+            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'), 400);
 
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage());
