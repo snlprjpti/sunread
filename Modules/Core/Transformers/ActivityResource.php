@@ -21,7 +21,9 @@ class ActivityResource extends Resource
             "description" => $this->description,
             "action" => $this->action,
             "activity" => $this->activity,
-            "causer" =>  isset($this->causer)? $this->causer->toArray():null,
+            "subject" => $this->subject ? $this->subject->toArray() : null,
+            "causer" => $this->causer ? $this->causer->toArray() : null,
+            "properties" => $this->properties,
             "created_at" =>  Carbon::parse($this->created_at)->format('M j\\,Y H:i A'),
         ];
     }

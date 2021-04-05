@@ -25,7 +25,6 @@ class ChannelResource extends Resource
             "base_currency"=> $this->base_currency,
             "logo_url" => $this->logo_url,
             "favicon_url" => $this->favicon_url
-
         ];
     }
 
