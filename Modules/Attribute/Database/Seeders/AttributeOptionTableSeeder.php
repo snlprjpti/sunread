@@ -7,7 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 class AttributeOptionTableSeeder extends Seeder
 {
-
+    /**
+     * Insert Attribute Options
+     * 
+     * @return Void
+     */
     public function run()
     {
         DB::table('attribute_options')->delete();

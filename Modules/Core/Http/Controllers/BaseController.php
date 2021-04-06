@@ -70,16 +70,20 @@ class BaseController extends Controller
      * Filter the requested list with parameters
      * 
      * @param \Illuminate\Http\Request $request
+     * @param Array $with
      * @return Object
      */
-    public function getFilteredList($request)
+    public function getFilteredList($request, $with = [])
     {
         $sort_by = $request->get('sort_by') ?? 'id';
         $sort_order = $request->get('sort_order') ?? 'desc';
         $limit = $request->get('limit') ?? $this->pagination_limit;
 
         $rows = $this->model::query();
+        // Load relationships
+        if ($with !== []) $rows->with($with);
         if ($request->has('q')) $rows->whereLike($this->model::$SEARCHABLE, $request->get('q'));
+
         return $rows->orderBy($sort_by, $sort_order)->paginate($limit);
     }
 

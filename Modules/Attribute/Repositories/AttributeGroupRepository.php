@@ -1,33 +1,196 @@
 <?php
 
-
 namespace Modules\Attribute\Repositories;
 
-
-use Modules\Attribute\Contracts\AttributeGroupInterface;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Request;
 use Modules\Attribute\Entities\AttributeGroup;
-use Modules\Core\Eloquent\Repository;
-use Modules\Core\Traits\Sluggable;
+use Modules\Attribute\Exceptions\AttributesPresent;
+use Modules\Attribute\Contracts\AttributeGroupInterface;
+use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
+use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
 
-class AttributeGroupRepository extends Repository implements  AttributeGroupInterface
+class AttributeGroupRepository implements AttributeGroupInterface
 {
-    use Sluggable;
+    protected $model, $model_key;
+
+    public function __construct(AttributeGroup $attribute_group)
+    {
+        $this->model = $attribute_group;
+        $this->model_key = "catalog.attribite";
+    }
+
     /**
-     * @inherit from parent repository
+     * Get current Model
+     * 
+     * @return Model
      */
     public function model()
     {
-        return AttributeGroup::class;
+        return $this->model;
     }
 
-    public static function  rules($id = 0 , $merge = [])
+    /**
+     * Create a new resource
+     * 
+     * @param array $data
+     * @return Model
+     */
+    public function create($data)
     {
-        return
-            array_merge([
-                'slug' => ['nullable', 'unique:attribute_groups,slug' . ($id ? ",$id" : '')],
-                'name' => 'required',
-                'attribute_family_id' => 'required|exists:attribute_families,id'
-            ], $merge);
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.create.before");
 
+        try
+        {
+            $created = $this->model->create($data);
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.create.after", $created);
+        DB::commit();
+
+        return $created;
+    }
+
+    /**
+     * Update requested resource
+     * 
+     * @param array $data
+     * @param int $id
+     * @return Model
+     */
+    public function update($data, $id)
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.update.before");
+
+        try
+        {
+            $updated = $this->model->findOrFail($id);
+            $updated->fill($data);
+            $updated->save();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.update.after", $updated);
+        DB::commit();
+
+        return $updated;
+    }
+
+    /**
+     * Delete requested resource
+     * 
+     * @param int $id
+     * @return Model
+     */
+    public function delete($id)
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.delete.before");
+
+        try
+        {
+            $deleted = $this->model->findOrFail($id);
+
+            // Do not allow deleting
+            if ( count($deleted->attributes) > 0 ) throw new AttributesPresent("Attribute Groups present in family.");
+
+            $deleted->delete();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.delete.after", $deleted);
+        DB::commit();
+
+        return $deleted;
+    }
+
+    /**
+     * Returns validation rules
+     * 
+     * @param int $id
+     * @param array $merge
+     * @return array
+     */
+    public function rules($id, $merge = [])
+    {
+        $id = $id ? ",{$id}" : null;
+
+        return array_merge([
+            "slug" => "nullable|unique:attribute_groups,slug{$id}",
+            "name" => "required",
+            "attribute_family_id" => "required|exists:attribute_families,id"
+        ], $merge);
+    }
+
+    /**
+     * Validates form request
+     * 
+     * @param Request $request
+     * @param int $id
+     * @return array
+     */
+    public function validateData($request, $id=null)
+    {
+        $data = $request->validate($this->rules($id));
+        if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
+        $data["is_user_defined"] = 1;
+
+        return $data;
+    }
+
+    /** Checks if locale is present in translation
+     * 
+     * @param array $translations
+     * @return boolean
+     */
+    public function validateTranslationData($translations)
+    {
+        if (empty($translations)) return false;
+
+        foreach ($translations as $translation) {
+            if (!array_key_exists('locale', $translation) || !array_key_exists('name', $translation)) return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Translations validation
+     * 
+     * @param Request $request
+     * @throws AttributeTranslationDoesNotExist
+     * @throws AttributeTranslationOptionDoesNotExist
+     */
+    public function validateTranslation($request)
+    {
+        $translations = $request->translations;
+        if (!$this->validateTranslationData($translations)) {
+            throw new AttributeTranslationDoesNotExist("Missing attribute translation.");
+        }
+
+        $options = $request->attribute_options;
+        if (is_array($options) && in_array($request->type, $this->non_filterable_fields)) {
+            foreach ($options as $option) {
+                if (!isset($option["translations"]) || !$this->validateTranslationData($option["translations"])) {
+                    throw new AttributeTranslationOptionDoesNotExist("Missing Attribute Option translation.");
+                }
+            }
+        }
     }
 }

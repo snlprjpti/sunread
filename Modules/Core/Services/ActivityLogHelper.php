@@ -13,6 +13,7 @@ class ActivityLogHelper {
     {
         $this->activityLog = $activityLog;
         $this->user = Auth::user() ?? null;
+        $this->log = [];
 
         if($this->user) {
             $this->log = [

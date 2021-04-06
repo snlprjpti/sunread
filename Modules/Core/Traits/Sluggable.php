@@ -53,7 +53,7 @@ trait Sluggable
      */
     private function getRelatedSlugs($slug, $id = 0)
     {
-        return $this->model()::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")
+        return static::whereRaw("slug RLIKE '^{$slug}(-[0-9]+)?$'")
             ->where('id', '<>', $id)
             ->get();
     }
@@ -67,7 +67,7 @@ trait Sluggable
      */
     private  function checkIfSlugExist($slug, $id = 0)
     {
-        return $this->model()::select('slug')->where('slug', $slug)
+        return static::select('slug')->where('slug', $slug)
             ->where('id', '<>', $id)
             ->exists();
     }
