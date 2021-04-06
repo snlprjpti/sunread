@@ -22,4 +22,9 @@ class AttributeGroup extends Model
     {
         return $this->hasMany(Attribute::class);
     }
+
+    public function attribute_family()
+    {
+        return $this->belongsTo(AttributeFamily::class);
+    }
 }
