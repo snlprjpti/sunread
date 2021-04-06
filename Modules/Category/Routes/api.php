@@ -1,7 +1,4 @@
 <?php
-
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,16 +10,9 @@ use Illuminate\Http\Request;
 |
 */
 
-//USER MODULE ROUTES
-
 Route::group(['middleware' => ['api']], function () {
-
     //ADMIN CATEGORY ROUTES
-    Route::group(['prefix'=>'admin/catalog','as' => 'admin.catalog.','middleware' => ['language']],function () {
-        Route::get('/categories' ,'CategoryController@index')->name('categories.index');
-        Route::post('/categories' ,'CategoryController@store')->name('categories.store');
-        Route::get('/categories/{category}' ,'CategoryController@show')->name('categories.show');
-        Route::put('/categories/{category}' ,'CategoryController@update')->name('categories.update');
-        Route::delete('/categories/{category}' ,'CategoryController@destroy')->name('categories.delete' );
+    Route::group(['prefix'=>'admin/catalog', 'as' => 'admin.catalog.categories.', 'middleware' => ['admin', 'language']], function () {
+        Route::resource('categories', 'CategoryController')->except(['create', 'edit']);
     });
 });
