@@ -17,7 +17,7 @@ use Modules\Core\Http\Controllers\BaseController;
 
 class AttributeController extends BaseController
 {
-    protected $repository, $non_filterable_fields;
+    protected $repository;
 
     public function __construct(AttributeRepository $attributeRepository, Attribute $attribute)
     {
@@ -25,7 +25,6 @@ class AttributeController extends BaseController
         $this->model = $attribute;
         $this->model_name = "Attribute";
 
-        $this->non_filterable_fields = ["select", "multiselect", "checkbox"];
         parent::__construct($this->model, $this->model_name);
     }
 
