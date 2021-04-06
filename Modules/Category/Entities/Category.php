@@ -10,13 +10,11 @@ use Modules\Core\Traits\Sluggable;
 
 class Category extends Model
 {
-    use NodeTrait,Sluggable;
+    use NodeTrait, Sluggable;
 
-    protected $fillable = ['position', 'status', 'parent_id','image', 'slug'];
-    protected $with =['translations'];
-
-
-    public static $SEARCHABLE = ['translations.name','slug'];
+    public static $SEARCHABLE = [ "translations.name", "slug" ];
+    protected $fillable = [ "position", "status", "parent_id", "image", "slug" ];
+    protected $with = [ "translations" ];
 
     public static function rules($id=0,$merge = [])
     {
@@ -31,9 +29,10 @@ class Category extends Model
 
     }
 
-
     /**
      * Get image url for the category image.
+     * 
+     * @return string
      */
     public function image_url()
     {
@@ -45,12 +44,13 @@ class Category extends Model
 
     /**
      * Get image url for the category image.
+     * 
+     * @return string
      */
     public function getImageUrlAttribute()
     {
         return $this->image_url();
     }
-
 
     /**
      * Getting the root category of a category
@@ -62,15 +62,30 @@ class Category extends Model
         return Category::where('parent_id', '=', null)->get();
     }
 
+    /**
+     * Getting the translations
+     * 
+     * @return CategoryTranslation
+     */
     public function translations()
     {
-        return $this->hasMany(CategoryTranslation::class,'category_id');
+        return $this->hasMany(CategoryTranslation::class, 'category_id');
+    }
+
+    /**
+     * Getting parent category
+     * 
+     * @return Category
+     */
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
     }
 
     /**
      * Specify category tree
      *
-     * @param integer $id
+     * @param int $id
      * @return mixed
      */
     public function getCategoryTree()
@@ -79,5 +94,4 @@ class Category extends Model
             ? $this::orderBy('position', 'ASC')->where('id', '!=', $this->id)->get()->toTree()
             : $this::orderBy('position', 'ASC')->get()->toTree();
     }
-
 }
