@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Modules\Category\Entities\CategoryTranslation;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Entities\Category;
+use Modules\Category\Repositories\CategoryRepository;
+use Modules\Category\Transformers\CategoryResource;
 
 /**
  * Category Controller for the Category
@@ -19,236 +19,172 @@ use Modules\Category\Entities\Category;
  */
 class CategoryController extends BaseController
 {
+    protected $repository;
 
-
-    protected $pagination_limit, $locale, $folder_path;
-    private $folder = 'category';
-
-    /**
-     * CategoryController constructor.
-     */
-    public function __construct()
+    public function __construct(CategoryRepository $categoryRepository, Category $category)
     {
-        parent::__construct();
-        $this->middleware('admin');
-        $this->folder_path =  storage_path('app/public/images/'). $this->folder.DIRECTORY_SEPARATOR;
+        $this->repository = $categoryRepository;
+        $this->model = $category;
+        $this->model_name = "Category";
+
+        parent::__construct($this->model, $this->model_name);
     }
 
     /**
-     * returns all the category
+     * Display a listing of the resource.
+     * 
      * @param Request $request
      * @return JsonResponse
      */
     public function index(Request $request)
     {
-        try {
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-
-            $categories =  Category::with('translations');
-            if ($request->has('q')) {
-                $categories->whereLike(Category::$SEARCHABLE,$request->get('q'));
-            }
-            $categories->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-            $categories = $categories->paginate($limit);
-            return $this->successResponse($categories, trans('core::app.response.fetch-list-success', ['name' => 'Category']));
-
-        } catch (QueryException $exception) {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request, ["translations"]);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(CategoryResource::collection($fetched), $this->lang('fetch-list-success'));
     }
 
     /**
-     * Get the particular category
-     * @param $id
-     * @return JsonResponse
-     */
-    public function show($id)
-    {
-        try {
-            $category = Category::with('translations')->findOrFail($id);
-            return $this->successResponse($category, trans('core::app.response.fetch-success', ['name' => 'Category']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-    }
-
-    /**
-     * store the new category
+     * Store a new resource
+     * 
      * @param Request $request
      * @return JsonResponse
      */
     public function store(Request $request)
     {
-        try {
+        try
+        {
+            $data = $this->repository->validateData($request);
+            $translation_data = $this->repository->validateTranslation($request);
 
-            DB::beginTransaction();
-
-            //validation
-            $this->validate($request, Category::rules());
-
-            //create slug if missing in input
-            if(!$request->get('slug')){
-                $request->merge(['slug' =>  Category::createSlug($request->get('name'))]);
-            }
-
-            //save category
-            $category = Category::create(
-                $request->only(['position', 'status', 'parent_id', 'slug'])
-            );
-
-            //upload image
-            if ($request->image) {
-                $category->image = $this->uploadImage($category, $request);
-                $category->save();
-            }
-            //create or update related translation
-            $this->createOrUpdateTranslation($category, $request);
-
-            DB::commit();
-            return $this->successResponse($category, trans('core::app.response.create-success', ['name' => 'Category']), 201);
-
-        } catch (ValidationException $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            DB::rollBack();
+            $data['image'] = $this->storeImage($request, 'image', 'category');
+            $created = $this->repository->create($data, $translation_data);
+        }
+        catch (SlugCouldNotBeGenerated $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+        catch (QueryException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch (ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponse(new CategoryResource($created), $this->lang('create-success'), 201);
     }
 
-
     /**
-     * Uploads an image
-     * Uploading file with original for better seo
-     * @param Category $category
-     * @param $request
+     * Get the particular resource
+     * 
+     * @param int $id
+     * @return JsonResponse
      */
-    public function uploadImage(Category $category, $request)
+    public function show($id)
     {
+        try
+        {
+            $fetched = $this->model->with(["translations"])->findOrFail($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
 
-        if ($uploadedFile = $request->file('image')) {
-            if (isset($category->image)) {
-                $this->removeFile($this->folder_path.$category->image);
-            }
-             return $this->uploadFile($uploadedFile ,$this->folder_path);
-
-        };
-
-    }
-
-
-    /**
-     * Update the translation of category
-     * Caution!!: createOrUpdate(built in laravel core) causes race condition
-     * @param Category $category
-     * @param Request $request
-     */
-    private function createOrUpdateTranslation(Category $category, Request $request)
-    {
-        $check_attributes = ['locale' => $this->locale, 'category_id' => $category->id];
-        $request->merge($check_attributes);
-        $category_translation = CategoryTranslation::firstorNew($check_attributes);
-        $category_translation->fill(
-            $request->only(['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'locale', 'category_id'])
-        );
-        $category_translation->save();
-
+        return $this->successResponse(new CategoryResource($fetched), $this->lang('fetch-success'));
     }
 
     /**
-    /**
-
-
      * Update the category
+     * 
      * @param Request $request
-     * @param $id
+     * @param int $id
      * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
-        try {
-            DB::beginTransaction();
+        try
+        {
+            $data = $this->repository->validateData($request, $id);
+            $translation_data = $this->repository->validateTranslation($request);
 
-            //validate
-            $this->validate($request, Category::rules($id));
+            unset($data['image']);
+            $updated = $this->repository->update($data, $id, $translation_data);
 
-
-            $category = Category::findOrFail($id);
-
-            //upload image
             if ($request->file('image')) {
-                $category->image = $this->uploadImage($category, $request);
-                $category->save();
+                $image_data = [
+                    'image' => $this->storeImage($request, 'image', 'category', $updated->image)
+                ];
+                $updated->fill($image_data);
+                $updated->save();
             }
-
-            //update a category
-            $category->update(
-                $request->only(['position', 'status', 'parent_id', 'slug'])
-            );
-
-            //create or update translation
-            $this->createOrUpdateTranslation($category, $request);
-
-            DB::commit();
-            return $this->successResponse($category, trans('core::app.response.update-success', ['name' => 'Category']), 200);
-
-        } catch (ModelNotFoundException $exception) {
-            DB::rollBack();
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
-
-        } catch (ValidationException $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->errors(), 400);
-
-        } catch (\Exception $exception) {
-            DB::rollBack();
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (QueryException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(new CategoryResource($updated), $this->lang('update-success'));
     }
 
     /**
-     * Remove the specified  admin resource from storage.
+     * Remove the specified resource
+     * 
      * @param int $id
      * @return JsonResponse
      */
     public function destroy($id)
     {
-        try {
-            $category = Category::findOrFail($id);
-
-            //remove associated image file
-            if (isset($category->image)) {
-                $this->removeFile($this->folder_path . $category->image);
-            }
-            $category->delete();
-
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Category']));
-        }catch (ModelNotFoundException $exception){
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        try
+        {
+            $this->repository->delete($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
-
-
 }
