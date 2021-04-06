@@ -3,17 +3,19 @@
 
 namespace Modules\Attribute\Repositories;
 
-use Modules\Attribute\Entities\AttributeOption;
+use Exception;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Attribute\Entities\AttributeOptionTranslation;
 
-class AttributeOptionRepository
+class AttributeOptionTranslationRepository
 {
-    protected $model, $model_key, $translation;
+    protected $model, $model_key;
 
-    public function __construct(AttributeOption $attribute_option, AttributeOptionTranslationRepository $attributeOptionTranslationRepository)
+    public function __construct(AttributeOptionTranslation $attribute_option_translation)
     {
-        $this->model = $attribute_option;
-        $this->translation = $attributeOptionTranslationRepository;
-        $this->model_key = "catalog.attribite.options";
+        $this->model = $attribute_option_translation;
+        $this->model_key = "catalog.attribite.options.translations";
     }
 
     /**
@@ -25,7 +27,7 @@ class AttributeOptionRepository
      */
     public function createOrUpdate($data, $parent)
     {
-        if ( !is_array($data) || count($data) ) return;
+        if ( !is_array($data) ) return;
 
         Event::dispatch("{$this->model_key}.create.before");
 
@@ -33,15 +35,13 @@ class AttributeOptionRepository
         {
             foreach ($data as $row){
                 $check = [
-                    "attribute_option_id" => $row["attribute_option_id"],
-                    "attribute_id" => $parent->id
+                    "locale" => $row["locale"],
+                    "attribute_option_id" => $parent->id
                 ];
     
                 $created = $this->model->firstorNew($check);
                 $created->fill($row);
                 $created->save();
-
-                $this->translation->createOrUpdate($data, $created);
             }
         }
         catch (Exception $exception)
