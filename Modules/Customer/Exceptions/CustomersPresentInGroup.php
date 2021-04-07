@@ -2,7 +2,7 @@
 
 namespace Modules\Customer\Exceptions;
 
-class CustomerNotFoundException extends  \Exception
+class CustomersPresentInGroup extends  \Exception
 {
 
 }

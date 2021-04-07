@@ -20,22 +20,25 @@ class BaseController extends Controller
         $this->pagination_limit = 25;
 
         //TODO ::future handle this variable in static memory in core helper
-        $this->locale = config('locales.lang', config('app.locale'));
+        $this->locale = config("locales.lang", config("app.locale"));
 
         $this->model = $model;
         $this->model_name = $model_name;
 
         // Frequently Used Translations
-        $name_array = ['name' => $this->model_name];
         $this->lang = [
-            "fetch-list-success" => __('core::app.response.fetch-list-success', $name_array),
-            "fetch-success" => __('core::app.response.fetch-success', $name_array),
-            "create-success" => __('core::app.response.create-success', $name_array),
-            "update-success" => __('core::app.response.update-success', $name_array),
-            "delete-success" => __('core::app.response.deleted-success', $name_array),
-            "delete-error" => __('core::app.response.deleted-error', $name_array),
-            "last-delete-error" => __('core::app.response.last-delete-error', $name_array),
-            "not-found" => __('core::app.response.not-found', $name_array),
+            "fetch-list-success" => "response.fetch-list-success",
+            "fetch-success" => "response.fetch-success",
+            "create-success" => "response.create-success",
+            "update-success" => "response.update-success",
+            "delete-success" => "response.deleted-success",
+            "delete-error" => "response.deleted-error",
+            "last-delete-error" => "response.last-delete-error",
+            "not-found" => "response.not-found",
+            "login-error" => "users.users.login-error",
+            "login-success" => "users.users.login-success",
+            "logout-success" => "users.users.logout-success",
+            "token-generation-problem" => "users.token.token-generation-problem",
         ];
     }
 
@@ -48,19 +51,19 @@ class BaseController extends Controller
     public function validateListFiltering($request)
     {
         $rules = [
-            'limit' => 'sometimes|numeric',
-            'page' => 'sometimes|numeric',
-            'sort_by' => 'sometimes',
-            'sort_order' => 'sometimes|in:asc,desc',
-            'q' => 'sometimes|string|min:1'
+            "limit" => "sometimes|numeric",
+            "page" => "sometimes|numeric",
+            "sort_by" => "sometimes",
+            "sort_order" => "sometimes|in:asc,desc",
+            "q" => "sometimes|string|min:1"
         ];
 
         $messages = [
-            'limit.numeric' => 'Limit must be a number.',
-            'page.numeric' => 'Page must be a number.',
-            'sort_order.in' => 'Order must be "asc" or "desc".',
-            'q.string' => 'Search query must be string.',
-            'q.min' => 'Search query must be at least 1 character.',
+            "limit.numeric" => "Limit must be a number.",
+            "page.numeric" => "Page must be a number.",
+            "sort_order.in" => "Order must be 'asc' or 'desc'.",
+            "q.string" => "Search query must be string.",
+            "q.min" => "Search query must be at least 1 character.",
         ];
 
         return $this->validate($request, $rules, $messages);
@@ -75,14 +78,14 @@ class BaseController extends Controller
      */
     public function getFilteredList($request, $with = [])
     {
-        $sort_by = $request->get('sort_by') ?? 'id';
-        $sort_order = $request->get('sort_order') ?? 'desc';
-        $limit = $request->get('limit') ?? $this->pagination_limit;
+        $sort_by = $request->sort_by ?? "id";
+        $sort_order = $request->sort_order ?? "desc";
+        $limit = $request->limit ?? $this->pagination_limit;
 
         $rows = $this->model::query();
         // Load relationships
         if ($with !== []) $rows->with($with);
-        if ($request->has('q')) $rows->whereLike($this->model::$SEARCHABLE, $request->get('q'));
+        if ($request->has("q")) $rows->whereLike($this->model::$SEARCHABLE, $request->q);
 
         return $rows->orderBy($sort_by, $sort_order)->paginate($limit);
     }
@@ -95,7 +98,7 @@ class BaseController extends Controller
      * @param String $folder
      * @return Mixed
      */
-    public function storeImage($request, $file_name, $folder=null, $delete_url=null)
+    public function storeImage($request, $file_name, $folder = null, $delete_url = null)
     {
         // Check if file is given
         if ( $request->file($file_name) === null ) return false;
@@ -106,15 +109,15 @@ class BaseController extends Controller
             $file = $request->file($file_name);
             $key = \Str::random(6);
             $folder = $folder ?? "default";
-            $file_path = $file->storeAs("images/{$folder}/{$key}", $file->getClientOriginalName(), ['disk' => 'public']);
+            $file_path = $file->storeAs("images/{$folder}/{$key}", $file->getClientOriginalName(), ["disk" => "public"]);
+
+            // Delete old file if requested
+            if ( $delete_url !== null ) Storage::disk("public")->delete($delete_url);
         }
         catch (\Exception $exception)
         {
             throw $exception;
         }
-
-        // Delete old file if requested
-        if ( $delete_url !== null ) Storage::disk('public')->delete($delete_url);
 
         return $file_path;
     }
@@ -123,10 +126,15 @@ class BaseController extends Controller
      * Returns translation
      * 
      * @param String $key
+     * @param array|null $parameters
+     * @param string $module
      * @return String
      */
-    public function lang($key)
+    public function lang($key, $parameters = null, $module = "core::app")
     {
-        return $this->lang[$key] ?? null;
+        $parameters = $parameters ?? ["name" => $this->model_name];
+        $translation_key = $this->lang[$key] ?? $key;
+        
+        return __("{$module}.{$translation_key}", $parameters);
     }
 }

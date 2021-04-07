@@ -3,10 +3,11 @@
 namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Modules\Customer\Entities\Customer;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Customer\Entities\Customer;
-
+use Modules\Customer\Transformers\CustomerResource;
+use Modules\Customer\Repositories\CustomerRepository;
 
 /**
  * Registration Controller customer
@@ -15,39 +16,40 @@ use Modules\Customer\Entities\Customer;
  */
 class RegistrationController extends BaseController
 {
+    protected $repository;
+
+    public function __construct(CustomerRepository $customerRepository, Customer $customer)
+    {
+        $this->repository = $customerRepository;
+        $this->model = $customer;
+        $this->model_name = "Account";
+
+        parent::__construct($this->model, $this->model_name);
+    }
 
     /**
-     * Method to store user's sign up form data to DB.
+     * Register a customer
+     * 
      * @param Request $request
      * @return Response
      */
     public function register(Request $request)
     {
-        try {
-            $this->validate(request(), [
-                'first_name' => 'string|required',
-                'last_name' => 'string|required',
-                'email' => 'email|required|unique:customers,email',
-                'password' => 'confirmed|min:6|required',
-            ]);
+        try
+        {
+            $data = $this->repository->validateData($request);
+            $created = $this->repository->create($data);
 
-            $request->merge(['password' => bcrypt($request->get('password'))]);
-
-            $email = $request->get('email');
-            $token = md5(uniqid(rand(), true));
-            //TODO::future => Send email verification for registered user
-
-            $customer = Customer::create($request->only(['first_name', 'last-name', 'email', 'password']));
-            return $this->successResponse($customer, trans('core::app.response.create-success', ['name' => 'Account']), 201);
-
-        } catch (ValidationException $exception) {
+        }
+        catch (ValidationException $exception)
+        {
             return $this->errorResponse($exception->errors(), 422);
-
-        } catch (\Exception $exception) {
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(new CustomerResource($created), $this->lang('create-success'), 201);
     }
-
-
 }

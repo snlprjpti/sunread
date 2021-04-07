@@ -2,7 +2,6 @@
 
 namespace Modules\Customer\Entities;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Modules\Customer\Notifications\CustomerResetPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -11,12 +10,10 @@ class Customer extends Authenticatable implements  JWTSubject
 {
     use Notifiable;
 
-    public static $SEARCHABLE =  ['first_name', 'last_name', 'gender', 'date_of_birth', 'email', 'password', 'customer_group_id', 'subscribed_to_news_letter',  'status'];
-    protected $table = 'customers';
+    public static $SEARCHABLE =  [ "first_name", "last_name", "email" ];
+    protected $fillable = [ "first_name", "last_name", "gender", "date_of_birth", "email", "phone", "password", "api_token", "customer_group_id", "subscribed_to_news_letter", "is_verified",  "status" ];
+    protected $hidden = [ "password", "api_token", "remember_token" ];
 
-    protected $fillable = ['first_name', 'last_name', 'gender', 'date_of_birth', 'email', 'phone', 'password', 'api_token', 'customer_group_id', 'subscribed_to_news_letter', 'is_verified',  'status'];
-
-    protected $hidden = ['password', 'api_token', 'remember_token'];
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -40,17 +37,32 @@ class Customer extends Authenticatable implements  JWTSubject
 
     /**
      * Get the customer full name.
+     * 
+     * @return string
      */
-    public function getNameAttribute() {
-        return ucfirst($this->first_name) . ' ' . ucfirst($this->last_name);
+    public function getNameAttribute()
+    {
+        return ucwords("{$this->first_name} {$this->last_name}");
     }
 
     /**
      * Get the customer group that owns the customer.
+     * 
+     * @return CustomerGroup
      */
     public function group()
     {
-        return $this->belongsTo(CustomerGroup::class, 'customer_group_id');
+        return $this->belongsTo(CustomerGroup::class, "customer_group_id");
+    }
+
+    /**
+     * Get customer addresses
+     * 
+     * @return CustomerAddress
+     */
+    public function addresses()
+    {
+        return $this->hasMany(CustomerAddress::class ,"customer_id");
     }
 
     /**
@@ -63,10 +75,4 @@ class Customer extends Authenticatable implements  JWTSubject
     {
         $this->notify(new CustomerResetPassword($token));
     }
-
-    public function addresses()
-    {
-        return $this->hasMany(CustomerAddress::class ,'customer_id');
-    }
-
 }
