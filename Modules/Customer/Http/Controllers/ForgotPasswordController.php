@@ -4,9 +4,11 @@ namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Modules\Customer\Entities\Customer;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Customer\Repositories\CustomerRepository;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Modules\Customer\Exceptions\TokenGenerationException;
 
@@ -18,6 +20,17 @@ use Modules\Customer\Exceptions\TokenGenerationException;
 class ForgotPasswordController extends BaseController
 {
     use SendsPasswordResetEmails;
+
+    protected $repository;
+
+    public function __construct(CustomerRepository $customerRepository, Customer $customer)
+    {
+        $this->repository = $customerRepository;
+        $this->model = $customer;
+        $this->model_name = "Account";
+
+        parent::__construct($this->model, $this->model_name);
+    }
 
     /**
      * Generate a token and sends token in email for user
