@@ -3,9 +3,9 @@
 namespace Modules\Customer\Contracts;
 
 /**
- * Interface Customer Group Interface
+ * Interface Customer Interface
  */
-interface CustomerGroupInterface
+interface CustomerInterface
 {
 
 }
