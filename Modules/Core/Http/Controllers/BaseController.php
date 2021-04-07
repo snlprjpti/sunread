@@ -26,7 +26,6 @@ class BaseController extends Controller
         $this->model_name = $model_name;
 
         // Frequently Used Translations
-        $name_array = ["name" => $this->model_name];
         $this->lang = [
             "fetch-list-success" => "response.fetch-list-success",
             "fetch-success" => "response.fetch-success",
@@ -134,7 +133,7 @@ class BaseController extends Controller
     public function lang($key, $parameters = null, $module = "core::app")
     {
         $parameters = $parameters ?? ["name" => $this->model_name];
-        $translation_key = $this->lang[$key];
+        $translation_key = $this->lang[$key] ?? $key;
         
         return __("{$module}.{$translation_key}", $parameters);
     }
