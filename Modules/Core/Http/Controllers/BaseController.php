@@ -36,6 +36,9 @@ class BaseController extends Controller
             "delete-error" => __('core::app.response.deleted-error', $name_array),
             "last-delete-error" => __('core::app.response.last-delete-error', $name_array),
             "not-found" => __('core::app.response.not-found', $name_array),
+            "login-error" => __("core::app.users.users.login-error"),
+            "login-success" => __("core::app.users.users.login-success"),
+            "logout-success" => __("core::app.users.users.logout-success"),
         ];
     }
 
