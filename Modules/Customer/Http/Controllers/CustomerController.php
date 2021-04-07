@@ -2,238 +2,186 @@
 
 namespace Modules\Customer\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Database\QueryException;
+use Modules\Customer\Entities\Customer;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Customer\Emails\NewCustomerNotification;
-use Modules\Customer\Entities\Customer;
-use Modules\Customer\Entities\CustomerGroup;
+use Modules\Customer\Transformers\CustomerResource;
+use Modules\Customer\Repositories\CustomerRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CustomerController extends BaseController
 {
-    public function __construct()
+    protected $repository;
+
+    public function __construct(CustomerRepository $customerRepository, Customer $customer)
     {
-        $this->middleware('admin');
+        $this->repository = $customerRepository;
+        $this->model = $customer;
+        $this->model_name = "Customer";
+
+        parent::__construct($this->model, $this->model_name);
     }
 
     /**
-     * Fetch all the customers
+     * Display a listing of the resource.
+     * 
      * @param Request $request
      * @return JsonResponse
      */
     public function index(Request $request)
     {
-        try {
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-
-            $customers = Customer::query();
-            if ($request->has('q')) {
-                $customers->whereLike(Customer::$SEARCHABLE, $request->get('q'));
-            }
-            $customers->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-            $customers = $customers->paginate($limit);
-            return $this->successResponse($customers, trans('core::app.response.fetch-list-success', ['name' => 'Customer']));
-
-        } catch (QueryException $exception) {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request, ["group"]);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponse(CustomerResource::collection($fetched), $this->lang('fetch-list-success'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new resource
      *
      * @param Request $request
      * @return JsonResponse
      */
     public function store(Request $request)
     {
-        try {
+        try
+        {
+            $custom_rules = [
+                "gender" => "required|in:male,female",
+                "date_of_birth" => "date|before:today",
+                "status" => "required|boolean",
+                "customer_group_id" => "nullable|exists:customer_groups,id",
+                "subscribed_to_news_letter" => "sometimes|boolean"
+            ];
+            $data = $this->repository->validateData($request, null, $custom_rules);
+            if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
 
-            DB::beginTransaction();
-            $this->validate(request(), [
-                'first_name' => 'string|required',
-                'last_name' => 'string|required',
-                'gender' => 'required||in:male,female',
-                'email' => 'required|email|unique:customers,email',
-                'date_of_birth' => 'date|before:today',
-                'password' => 'required|min:6|max:100|confirmed',
-                'status' => 'required|boolean',
-                'customer_group_id' => 'nullable|exists:customer_groups,id',
-                'subscribed_to_news_letter' => 'sometimes|boolean'
-            ]);
-
-            Event::dispatch('customer.registration.before');
-
-            //Hashing password
-            $password = $request->get('password');
-            $request->merge([
-               'password' => bcrypt($password)
-            ]);
-
-
-            //Assigning customer groups
-            $customer_group = CustomerGroup::find($request->get('customer_group_id'));
-            if(is_null($customer_group))
-                $customer_group = CustomerGroup::where('slug' ,'guest')->first();
-
-            $request->merge([
-                'customer_group_id' => $customer_group->id
-            ]);
-
-
-            $customer = Customer::create(
-                $request->only(['first_name', 'last_name', 'gender', 'email', 'date_of_birth', 'status', 'password', 'customer_group_id', 'subscribed_to_news_letter'])
-            );
-
-            Event::dispatch('customer.registration.after', $customer);
-
-            try {
-                Mail::queue(new NewCustomerNotification($customer, $password));
-            } catch (\Exception $e) {
-                report($e);
-            }
-            DB::commit();
-
-            return $this->successResponse($customer, trans('core::app.response.create-success', ['name' => 'Customer']), 201);
-
-        } catch (ValidationException $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            DB::rollBack();
+            $created = $this->repository->create($data);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            DB::rollBack();
+        }
+        catch (ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(new CustomerResource($created), $this->lang('create-success'), 201);
     }
 
     /**
-     * Get the particular customer
-     * @param $id
+     * Get the particular resource
+     * 
+     * @param int $id
      * @return JsonResponse
      */
     public function show($id)
     {
-        try {
-            $customer = Customer::with('group')->findOrFail($id);
-            return $this->successResponse($customer, trans('core::app.response.fetch-success', ['name' => 'Customer']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Customer']), 404);
-
-        } catch (\Exception $exception) {
+        try
+        {
+            $fetched = $this->model->with(["group"])->findOrFail($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(new CustomerResource($fetched), $this->lang('fetch-success'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
-        try {
-            DB::beginTransaction();
+        try
+        {
+            $custom_rules = [
+                "gender" => "required|in:male,female",
+                "date_of_birth" => "date|before:today",
+                "status" => "required|boolean",
+                "customer_group_id" => "nullable|exists:customer_groups,id",
+                "subscribed_to_news_letter" => "sometimes|boolean",
+                "password" => "sometimes|min:6|confirmed"
+            ];
+            
+            $data = $this->repository->validateData($request, $id, $custom_rules);
+            if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
 
-            $this->validate(request(), [
-                'first_name' => 'sometimes|string|required',
-                'last_name' => 'sometimes|string|required',
-                'gender' => 'sometimes|required|in:male,female',
-                'email' => 'sometimes|required|unique:customers,email,' . $id,
-                'date_of_birth' => 'sometimes|date|before:today',
-                'customer_group_id' => 'sometimes|exists:customer_groups,id',
-                'subscribed_to_news_letter' => 'sometimes|boolean',
-                'status' => 'sometimes|boolean',
-                'password' => 'sometimes|min:6|max:12|confirmed',
-            ]);
-
-            Event::dispatch('customer.update.before');
-
-            $customer = Customer::findOrFail($id);
-
-            //Hashing password
-            if($password = $request->get('password')){
-                $request->merge([
-                    'password' => bcrypt($password)
-                ]);
-            }
-
-            //Assigning customer groups
-            if($request->get('customer_group_id')){
-                $customer_group = CustomerGroup::find($request->get('customer_group_id'));
-                if(is_null($customer_group))
-                    $customer_group = CustomerGroup::where('slug' ,'guest')->first();
-                $request->merge([
-                    'customer_group_id' => $customer_group->id
-                ]);
-            }
-
-            $customer = $customer->fill(
-                $request->only(['first_name', 'last_name', 'gender', 'email', 'date_of_birth', 'status', 'password', 'customer_group_id', 'subscribed_to_news_letter'])
-            );
-            $customer->save();
-
-            Event::dispatch('customer.update.after', $customer);
-
-            DB::commit();
-            return $this->successResponse($customer, trans('core::app.response.update-success', ['name' => 'Customer']), 200);
-
-        } catch (ModelNotFoundException $exception) {
-            DB::rollBack();
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
-
-        } catch (ValidationException $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->errors(), 400);
-
-        } catch (\Exception $exception) {
-            DB::rollBack();
+            $updated = $this->repository->update($data, $id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (QueryException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
-
+        return $this->successResponse(new CustomerResource($updated), $this->lang('update-success'));
     }
 
     /**
-     * Remove the specified resource from storage.
-     * @param  $id
+     * Remove the specified resource
+     * 
+     * @param int $id
      * @return JsonResponse
      */
     public function destroy($id)
     {
-        try {
-            $category = Customer::findOrFail($id);
-            $category->delete();
-
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Customer']));
-        }catch (ModelNotFoundException $exception){
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        try
+        {
+            $this->repository->delete($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
-
-
 }

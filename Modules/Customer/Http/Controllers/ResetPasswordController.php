@@ -2,17 +2,18 @@
 
 namespace Modules\Customer\Http\Controllers;
 
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Foundation\Auth\ResetsPasswords;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
+use Modules\Customer\Entities\Customer;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Foundation\Auth\ResetsPasswords;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Customer\Exceptions\CustomerNotFoundException;
 use Modules\Customer\Exceptions\TokenGenerationException;
-
+use Modules\Customer\Exceptions\CustomerNotFoundException;
 
 /**
  * Reset Password controller for the Customer
@@ -23,68 +24,74 @@ class ResetPasswordController extends BaseController
 {
     use ResetsPasswords;
 
+    public function __construct(Customer $customer)
+    {
+        $this->model = $customer;
+        $this->model_name = "Password Reset";
+
+        parent::__construct($this->model, $this->model_name);
+    }
+
     /** OPTIONAL route
      * Display the password reset token is valid
      * If no token is present, display the error
+     * 
      * @param  string|null $token
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function create($token = null)
     {
-        if (!$token) {
-            return $this->errorResponse("Missing token", 400);
-        }
-        return $this->successResponse($payload = ['token' => $token]);
+        return $token
+            ? $this->successResponse(['token' => $token])
+            : $this->errorResponse("Missing token", 400);
     }
 
-
     /**
-     *
      * Store new password of the admin
+     * 
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
         try {
-            $this->validate($request, [
-                'token' => 'required',
-                'email' => 'required|email',
-                'password' => 'required|confirmed|min:6',
+            $data = $request->validate([
+                "token" => "required",
+                "email" => "required|email|exists:customers,email",
+                "password" => "required|confirmed|min:6",
+                "password_confirmation" => "required"
             ]);
 
-            $response = $this->broker()->reset(
-                $request->only(['email', 'password', 'password_confirmation', 'token']), function ($customer, $password) {
+            $response = $this->broker()->reset($data, function ($customer, $password) {
                 $this->resetPassword($customer, $password);
             });
 
-
-            if ($response == Password::INVALID_TOKEN) {
-                throw  new TokenGenerationException();
-            }
-
-            if ($response == Password::INVALID_USER) {
-                throw  new CustomerNotFoundException();
-            }
-
-            return $this->successResponseWithMessage(trans('core::app.response.create-success', ['name' => 'Password reset ']));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (CustomerNotFoundException $exception) {
-            return $this->errorResponse('Customer not found exception', 404);
-
-        } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token.token-generation-problem'), 400);
-
-        } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException($this->lang("token-generation-problem", []));
+            if ($response == Password::INVALID_USER) throw new CustomerNotFoundException("Customer not found exception");
         }
+        catch (ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (CustomerNotFoundException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 404);
+        }
+        catch (TokenGenerationException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponseWithMessage($this->lang("create-success"));
     }
 
     /**
      * Get the broker to be used during password reset.
+     * 
      * @return \Illuminate\Contracts\Auth\PasswordBroker
      */
     protected function broker()
@@ -101,11 +108,10 @@ class ResetPasswordController extends BaseController
      */
     protected function resetPassword($customer, $password)
     {
-
         $customer->password = Hash::make($password);
         $customer->setRememberToken(Str::random(60));
         $customer->save();
+
         event(new PasswordReset($customer));
     }
-
 }
