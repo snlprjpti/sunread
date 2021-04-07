@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class CustomerGroup extends Model
 {
-
-    protected $table = 'customer_groups';
-    protected $fillable = ['name', 'slug', 'is_user_defined'];
+    protected $fillable = [ "name", "slug", "is_user_defined" ];
 
     /**
      * Get the customer for this group.
+     * 
+     * @return Cutomer
      */
     public function customers()
     {

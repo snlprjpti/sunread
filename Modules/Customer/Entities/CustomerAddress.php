@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class CustomerAddress extends Model
 {
-    protected $fillable = [
-        'customer_id', 'address1', 'address2', 'country', 'state', 'city', 'postcode', 'phone', 'default_address'
-    ];
+    protected $fillable = [ "customer_id", "address1", "address2", "country", "state", "city", "postcode", "phone", "default_address" ];
 
+    /**
+     * Get customer
+     * 
+     * @return Customer
+     */
     public function customer()
     {
         return $this->belongsTo(Customer::class);
