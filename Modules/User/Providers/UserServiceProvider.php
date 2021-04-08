@@ -5,7 +5,8 @@ namespace Modules\User\Providers;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\User\Database\factories\AdminFactory;
 use Modules\User\Facades\Bouncer as BouncerFacade;
 use Modules\User\Http\Middleware\Bouncer as BouncerMiddleware;
 
@@ -88,7 +89,9 @@ class UserServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return [];
+        return [
+            AdminFactory::class
+        ];
     }
 
     protected function registerBouncer()
