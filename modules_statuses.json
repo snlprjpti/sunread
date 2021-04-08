@@ -1,8 +1,8 @@
 {
-    "User": true,
     "Core": true,
-    "Customer": true,
+    "Attribute": true,
     "Category": true,
+    "Customer": true,
     "Product": true,
-    "Attribute": true
+    "User": true
 }

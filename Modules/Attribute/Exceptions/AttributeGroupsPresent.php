@@ -2,7 +2,7 @@
 
 namespace Modules\Attribute\Exceptions;
 
-class AttributesPresent extends \Exception
+class AttributeGroupsPresent extends \Exception
 {
 
 }

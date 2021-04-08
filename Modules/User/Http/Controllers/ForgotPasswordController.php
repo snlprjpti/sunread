@@ -2,7 +2,6 @@
 
 namespace Modules\User\Http\Controllers;
 
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -18,9 +17,13 @@ use Modules\User\Exceptions\AdminNotFoundException;
  */
 class ForgotPasswordController extends BaseController
 {
+    public function __construct(Admin $admin)
+    {
+        $this->model = $admin;
+        $this->model_name = "Admin";
 
-    use SendsPasswordResetEmails;
-
+        parent::__construct($this->model, $this->model_name);
+    }
 
     /**
      *  Generate a token and sends token in email for user

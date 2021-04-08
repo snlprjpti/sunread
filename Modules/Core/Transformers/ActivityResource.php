@@ -3,9 +3,9 @@
 namespace Modules\Core\Transformers;
 
 use Carbon\Carbon;
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class ActivityResource extends Resource
+class ActivityResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

@@ -2,9 +2,9 @@
 
 namespace Modules\Attribute\Transformers;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class AttributeGroupResource extends Resource
+class AttributeGroupResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

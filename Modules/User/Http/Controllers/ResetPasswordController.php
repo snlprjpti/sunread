@@ -2,11 +2,11 @@
 
 namespace Modules\User\Http\Controllers;
 
-use Illuminate\Foundation\Auth\ResetsPasswords;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Modules\User\Entities\Admin;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Exceptions\AdminNotFoundException;
@@ -19,8 +19,13 @@ use Modules\User\Exceptions\TokenGenerationException;
  */
 class ResetPasswordController extends BaseController
 {
-    use ResetsPasswords;
+    public function __construct(Admin $admin)
+    {
+        $this->model = $admin;
+        $this->model_name = "Admin";
 
+        parent::__construct($this->model, $this->model_name);
+    }
 
     /**
      * OPTIONAL route: using frontend routes in future

@@ -2,9 +2,9 @@
 
 namespace Modules\Core\Transformers;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class LocaleResource extends Resource
+class LocaleResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

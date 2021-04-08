@@ -10,7 +10,6 @@ use Modules\Customer\Entities\Customer;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Foundation\Auth\ResetsPasswords;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Exceptions\TokenGenerationException;
 use Modules\Customer\Exceptions\CustomerNotFoundException;
@@ -22,8 +21,6 @@ use Modules\Customer\Exceptions\CustomerNotFoundException;
  */
 class ResetPasswordController extends BaseController
 {
-    use ResetsPasswords;
-
     public function __construct(Customer $customer)
     {
         $this->model = $customer;

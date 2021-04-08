@@ -14,19 +14,19 @@ Route::group(['middleware' => ['api']], function () {
     //ADMIN ATTRIBUTE ROUTES
     Route::group(['prefix' => 'admin', 'middleware' => ['admin', 'language'], 'as' => 'admin.'], function () {
         // Activities Routes
-        Route::delete('activities/bulk', 'ActivityController@bulkDelete')->name('activities.bulk-delete');
-        Route::resource('activities', 'ActivityController')->only(['index', 'show', 'destroy']);
+        Route::delete('activities/bulk', [\Modules\Core\Http\Controllers\ActivityController::class, 'bulkDelete'])->name('activities.bulk-delete');
+        Route::resource('activities', ActivityController::class)->only(['index', 'show', 'destroy']);
 
         // Locale Routes
-        Route::resource('locales', 'LocaleController')->except(['create', 'edit']);
+        Route::resource('locales', LocaleController::class)->except(['create', 'edit']);
 
         // Currency Routes
-        Route::resource('currencies', 'CurrencyController')->except(['create', 'edit']);
+        Route::resource('currencies', CurrencyController::class)->except(['create', 'edit']);
 
         // Exchange Rates Routes
-        Route::resource('exchange_rates', 'ExchangeRateController')->except(['create', 'edit']);
+        Route::resource('exchange_rates', ExchangeRateController::class)->except(['create', 'edit']);
 
         // Channels Routes
-        Route::resource('channels', 'ChannelController')->except(['create', 'edit']);
+        Route::resource('channels', ChannelController::class)->except(['create', 'edit']);
     });
 });

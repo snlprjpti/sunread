@@ -3,9 +3,9 @@
 namespace Modules\Attribute\Transformers;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class AttributeResource extends Resource
+class AttributeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
