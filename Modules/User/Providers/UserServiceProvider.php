@@ -12,6 +12,16 @@ use Modules\User\Http\Middleware\Bouncer as BouncerMiddleware;
 class UserServiceProvider extends ServiceProvider
 {
     /**
+     * @var string $moduleName
+     */
+    protected $moduleName = 'User';
+
+    /**
+     * @var string $moduleNameLower
+     */
+    protected $moduleNameLower = 'user';
+
+    /**
      * Boot the application events.
      *
      * @return void
@@ -20,7 +30,6 @@ class UserServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerConfig();
-        $this->registerFactories();
         $this->loadMigrationsFrom(module_path('User', 'Database/Migrations'));
         $router->aliasMiddleware('admin', BouncerMiddleware::class);
         include __DIR__ . '/../Http/helpers.php';
@@ -46,15 +55,14 @@ class UserServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->publishes([
-            module_path('User', 'Config/config.php') => config_path('user.php'),
+            module_path($this->moduleName, 'Config/config.php') => config_path($this->moduleNameLower . '.php'),
         ], 'config');
         $this->mergeConfigFrom(
-            module_path('User', 'Config/config.php'), 'user'
+            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
         $this->mergeConfigFrom(
-            module_path('User', 'Config/user_image.php'), 'user_image'
+            module_path($this->moduleName, 'Config/user_image.php'), 'user_image'
         );
-
     }
 
     /**
@@ -64,24 +72,12 @@ class UserServiceProvider extends ServiceProvider
      */
     public function registerTranslations()
     {
-        $langPath = resource_path('lang/modules/user');
+        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
 
         if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, 'user');
+            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
         } else {
-            $this->loadTranslationsFrom(module_path('User', 'Resources/lang'), 'user');
-        }
-    }
-
-    /**
-     * Register an additional directory of factories.
-     *
-     * @return void
-     */
-    public function registerFactories()
-    {
-        if (! app()->environment('production') && $this->app->runningInConsole()) {
-            app(Factory::class)->load(module_path('User', 'Database/factories'));
+            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
     }
 

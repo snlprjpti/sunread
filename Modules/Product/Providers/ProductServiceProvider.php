@@ -11,6 +11,16 @@ use Modules\Product\Providers\EventServiceProvider;
 class ProductServiceProvider extends ServiceProvider
 {
     /**
+     * @var string $moduleName
+     */
+    protected $moduleName = 'Product';
+
+    /**
+     * @var string $moduleNameLower
+     */
+    protected $moduleNameLower = 'product';
+
+    /**
      * Boot the application events.
      *
      * @return void
@@ -19,10 +29,9 @@ class ProductServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerConfig();
-        $this->registerFactories();
-        $this->loadMigrationsFrom(module_path('Product', 'Database/Migrations'));
-        $this->app->register(EventServiceProvider::class);
-        ProductImage::observe(ProductImageObserver::class);
+        $this->registerViews();
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObservers();
     }
 
     /**
@@ -32,6 +41,7 @@ class ProductServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
     }
 
@@ -42,17 +52,38 @@ class ProductServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-        $this->publishes([module_path('Product', 'Config/config.php') => config_path('product.php')], 'config');
-
+        $this->publishes([
+            module_path($this->moduleName, 'Config/config.php') => config_path($this->moduleNameLower . '.php'),
+        ], 'config');
         $this->mergeConfigFrom(
-            module_path('Product', 'Config/config.php'), 'product'
+            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
 
-        $this->mergeConfigFrom(module_path('Product', 'Config/product_types.php'), 'product_types');
-        $this->mergeConfigFrom(module_path('Product', 'Config/image_types.php'), 'image _types');
-
+        $this->mergeConfigFrom(
+            module_path('Product', 'Config/product_types.php'), 'product_types'
+        );
+        $this->mergeConfigFrom(
+            module_path('Product', 'Config/image_types.php'), 'image _types'
+        );
     }
 
+    /**
+     * Register views.
+     *
+     * @return void
+     */
+    public function registerViews()
+    {
+        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
+
+        $sourcePath = module_path($this->moduleName, 'Resources/views');
+
+        $this->publishes([
+            $sourcePath => $viewPath
+        ], ['views', $this->moduleNameLower . '-module-views']);
+
+        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
+    }
 
     /**
      * Register translations.
@@ -61,24 +92,12 @@ class ProductServiceProvider extends ServiceProvider
      */
     public function registerTranslations()
     {
-        $langPath = resource_path('lang/modules/product');
+        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
 
         if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, 'product');
+            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
         } else {
-            $this->loadTranslationsFrom(module_path('Product', 'Resources/lang'), 'product');
-        }
-    }
-
-    /**
-     * Register an additional directory of factories.
-     *
-     * @return void
-     */
-    public function registerFactories()
-    {
-        if (! app()->environment('production') && $this->app->runningInConsole()) {
-            app(Factory::class)->load(module_path('Product', 'Database/factories'));
+            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
     }
 
@@ -90,5 +109,26 @@ class ProductServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    private function getPublishableViewPaths(): array
+    {
+        $paths = [];
+        foreach (\Config::get('view.paths') as $path) {
+            if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
+                $paths[] = $path . '/modules/' . $this->moduleNameLower;
+            }
+        }
+        return $paths;
+    }
+
+    /**
+     * Register observers.
+     *
+     * @return void
+     */
+    public function registerObservers()
+    {
+        ProductImage::observe(ProductImageObserver::class);
     }
 }

@@ -3,9 +3,9 @@
 namespace Modules\Customer\Transformers;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class CustomerGroupResource extends Resource
+class CustomerGroupResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

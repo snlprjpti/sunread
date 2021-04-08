@@ -4,17 +4,27 @@ namespace Modules\Customer\Providers;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 use Modules\Customer\Entities\Customer;
-use Modules\Customer\Entities\CustomerAddress;
+use Illuminate\Database\Eloquent\Factory;
 use Modules\Customer\Entities\CustomerGroup;
-use Modules\Customer\Http\Middleware\RedirectIfNotCustomer;
+use Modules\Customer\Entities\CustomerAddress;
+use Modules\Customer\Observers\CustomerObserver;
 use Modules\Customer\Observers\CustomerGroupObserver;
 use Modules\Customer\Observers\CustomerAddressObserver;
-use Modules\Customer\Observers\CustomerObserver;
+use Modules\Customer\Http\Middleware\RedirectIfNotCustomer;
 
 class CustomerServiceProvider extends ServiceProvider
 {
+    /**
+     * @var string $moduleName
+     */
+    protected $moduleName = 'Customer';
+
+    /**
+     * @var string $moduleNameLower
+     */
+    protected $moduleNameLower = 'customer';
+
     /**
      * Boot the application events.
      *
@@ -26,9 +36,8 @@ class CustomerServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
         $router->aliasMiddleware('customer', RedirectIfNotCustomer::class);
-        $this->registerFactories();
-        $this->loadMigrationsFrom(module_path('Customer', 'Database/Migrations'));
         $this->registerObservers();
     }
 
@@ -50,11 +59,29 @@ class CustomerServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->publishes([
-            module_path('Customer', 'Config/config.php') => config_path('customer.php'),
+            module_path($this->moduleName, 'Config/config.php') => config_path($this->moduleNameLower . '.php'),
         ], 'config');
         $this->mergeConfigFrom(
-            module_path('Customer', 'Config/config.php'), 'customer'
+            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
+    }
+
+    /**
+     * Register views.
+     *
+     * @return void
+     */
+    public function registerViews()
+    {
+        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
+
+        $sourcePath = module_path($this->moduleName, 'Resources/views');
+
+        $this->publishes([
+            $sourcePath => $viewPath
+        ], ['views', $this->moduleNameLower . '-module-views']);
+
+        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
     }
 
     /**
@@ -64,24 +91,12 @@ class CustomerServiceProvider extends ServiceProvider
      */
     public function registerTranslations()
     {
-        $langPath = resource_path('lang/modules/customer');
+        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
 
         if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, 'customer');
+            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
         } else {
-            $this->loadTranslationsFrom(module_path('Customer', 'Resources/lang'), 'customer');
-        }
-    }
-
-    /**
-     * Register an additional directory of factories.
-     *
-     * @return void
-     */
-    public function registerFactories()
-    {
-        if (! app()->environment('production') && $this->app->runningInConsole()) {
-            app(Factory::class)->load(module_path('Customer', 'Database/factories'));
+            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
     }
 
@@ -95,30 +110,23 @@ class CustomerServiceProvider extends ServiceProvider
         return [];
     }
 
-    /**
-     * Register views.
-     *
-     * @return void
-     *
-     *
-     */
-    public function registerViews()
+    private function getPublishableViewPaths(): array
     {
-        $viewPath = resource_path('views/modules/customer');
-
-        $sourcePath = module_path('Customer', 'Resources/views');
-
-        $this->publishes([
-            $sourcePath => $viewPath
-        ],'views');
-
-
-        $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/modules/customer';
-        }, \Config::get('view.paths')), [$sourcePath]), 'customer');
+        $paths = [];
+        foreach (\Config::get('view.paths') as $path) {
+            if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
+                $paths[] = $path . '/modules/' . $this->moduleNameLower;
+            }
+        }
+        return $paths;
     }
 
-    private function registerObservers()
+    /**
+     * Register observers.
+     *
+     * @return void
+     */
+    public function registerObservers()
     {
         CustomerGroup::observe(CustomerGroupObserver::class);
         CustomerAddress::observe(CustomerAddressObserver::class);

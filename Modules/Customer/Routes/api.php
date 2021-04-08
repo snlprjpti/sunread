@@ -1,4 +1,9 @@
 <?php
+
+use Modules\Customer\Http\Controllers\SessionController;
+use Modules\Customer\Http\Controllers\RegistrationController;
+use Modules\Customer\Http\Controllers\ResetPasswordController;
+use Modules\Customer\Http\Controllers\ForgotPasswordController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,26 +18,26 @@
 Route::group(['middleware' => ['api']], function () {
     // CUSTOMER ROUTES
     Route::group(['prefix' => 'customer', 'as' => 'customer.'],function () {
-        Route::post('/register', 'RegistrationController@register')->name('register');
+        Route::post('/register', [RegistrationController::class, 'register'])->name('register');
         // Session Routes
-        Route::post('/login', 'SessionController@login')->name('session.login');
-        Route::get('/logout', 'SessionController@logout')->name('session.logout');
-        Route::post('/forget-password', 'ForgotPasswordController@store')->name('forget-password.store');
-        Route::post('/reset-password', 'ResetPasswordController@store')->name('reset-password.store');
-        Route::get('/reset-password/{token}', 'ResetPasswordController@create')->name('reset-password.create');
+        Route::post('/login', [SessionController::class, 'login'])->name('session.login');
+        Route::get('/logout', [SessionController::class, 'logout'])->name('session.logout');
+        Route::post('/forget-password', [ForgotPasswordController::class, 'store'])->name('forget-password.store');
+        Route::post('/reset-password', [ResetPasswordController::class, 'store'])->name('reset-password.store');
+        Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])->name('reset-password.create');
     });
 
     // ADMIN CUSTOMERS ROUTES
     Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['language', 'admin']],function () {
         // Customer Group Routes
-        Route::resource('groups', 'CustomerGroupController')->except(['create', 'edit']);
+        Route::resource('groups', CustomerGroupController::class)->except(['create', 'edit']);
 
         // Customer Routes
-        Route::resource('customers', 'CustomerController')->except(['create', 'edit']);
+        Route::resource('customers', CustomerController::class)->except(['create', 'edit']);
 
         // Customer Address Routes
         Route::group(['prefix' => 'customers/{customers}', 'as' => 'customer.'], function() {
-            Route::resource('addresses', 'AddressController')->except(['create', 'edit']);
+            Route::resource('addresses', AddressController::class)->except(['create', 'edit']);
         });
     });
 });

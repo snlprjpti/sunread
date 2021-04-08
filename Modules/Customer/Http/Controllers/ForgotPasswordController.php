@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Repositories\CustomerRepository;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Modules\Customer\Exceptions\TokenGenerationException;
 
 /**
@@ -19,8 +18,6 @@ use Modules\Customer\Exceptions\TokenGenerationException;
  */
 class ForgotPasswordController extends BaseController
 {
-    use SendsPasswordResetEmails;
-
     protected $repository;
 
     public function __construct(CustomerRepository $customerRepository, Customer $customer)

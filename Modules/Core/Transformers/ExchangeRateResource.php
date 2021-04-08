@@ -2,9 +2,9 @@
 
 namespace Modules\Core\Transformers;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class ExchangeRateResource extends Resource
+class ExchangeRateResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

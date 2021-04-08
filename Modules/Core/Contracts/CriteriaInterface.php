@@ -3,7 +3,7 @@
 namespace Modules\Core\Contracts;
 
 
-use Modules\Core\Repositories\Criteria\Criteria;
+use Modules\Core\Repositories\Criteria;
 
 /**
  * Interface CriteriaInterface

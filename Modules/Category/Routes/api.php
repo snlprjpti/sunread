@@ -13,6 +13,6 @@
 Route::group(['middleware' => ['api']], function () {
     //ADMIN CATEGORY ROUTES
     Route::group(['prefix'=>'admin/catalog', 'as' => 'admin.catalog.categories.', 'middleware' => ['admin', 'language']], function () {
-        Route::resource('categories', 'CategoryController')->except(['create', 'edit']);
+        Route::resource('categories', CategoryController::class)->except(['create', 'edit']);
     });
 });

@@ -3,9 +3,9 @@
 namespace Modules\Core\Transformers;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class CurrencyResource extends Resource
+class CurrencyResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

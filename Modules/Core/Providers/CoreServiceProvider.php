@@ -2,40 +2,44 @@
 
 namespace Modules\Core\Providers;
 
-use Illuminate\Foundation\AliasLoader;
-use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
-use Modules\Core\Entities\ActivityLog;
+use Modules\Core\Entities\Locale;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Currency;
+use Illuminate\Foundation\AliasLoader;
+use Modules\Core\Entities\ActivityLog;
+use Illuminate\Support\ServiceProvider;
 use Modules\Core\Entities\ExchangeRate;
-use Modules\Core\Entities\Locale;
+use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\Facades\Validator;
+use Modules\Core\Observers\LocaleObserver;
 use Modules\Core\Observers\ChannelObserver;
 use Modules\Core\Observers\CurrencyObserver;
-use Modules\Core\Observers\LocaleObserver;
 use Modules\Core\Services\ActivityLogHelper;
-use Modules\Core\Facades\Audit as ActivityLoggerFacade;
 use Modules\Core\Observers\ExchangeRateObserver;
 
 class CoreServiceProvider extends ServiceProvider
 {
     /**
+     * @var string $moduleName
+     */
+    protected $moduleName = 'Core';
+
+    /**
+     * @var string $moduleNameLower
+     */
+    protected $moduleNameLower = 'core';
+
+    /**
      * Boot the application events.
      *
-     * @param Router $router
      * @return void
      */
-    public function boot(Router $router)
+    public function boot()
     {
-
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->registerFactories();
-        $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'core');
-        $this->loadMigrationsFrom(module_path('Core', 'Database/Migrations'));
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
         $this->registerActivityLogger();
         $this->registerObserver();
 
@@ -61,10 +65,10 @@ class CoreServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->publishes([
-            module_path('Core', 'Config/config.php') => config_path('core.php'),
+            module_path($this->moduleName, 'Config/config.php') => config_path($this->moduleNameLower . '.php'),
         ], 'config');
         $this->mergeConfigFrom(
-            module_path('Core', 'Config/config.php'), 'core'
+            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
     }
 
@@ -75,17 +79,15 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function registerViews()
     {
-        $viewPath = resource_path('views/modules/core');
+        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
 
-        $sourcePath = module_path('Core', 'Resources/views');
+        $sourcePath = module_path($this->moduleName, 'Resources/views');
 
         $this->publishes([
             $sourcePath => $viewPath
-        ],'views');
+        ], ['views', $this->moduleNameLower . '-module-views']);
 
-        $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/modules/core';
-        }, \Config::get('view.paths')), [$sourcePath]), 'core');
+        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
     }
 
     /**
@@ -95,24 +97,12 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function registerTranslations()
     {
-        $langPath = resource_path('lang/modules/core');
+        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
 
         if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, 'core');
+            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
         } else {
-            $this->loadTranslationsFrom(module_path('Core', 'Resources/lang'), 'core');
-        }
-    }
-
-    /**
-     * Register an additional directory of factories.
-     *
-     * @return void
-     */
-    public function registerFactories()
-    {
-        if (! app()->environment('production') && $this->app->runningInConsole()) {
-            app(Factory::class)->load(module_path('Core', 'Database/factories'));
+            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
     }
 
@@ -126,8 +116,23 @@ class CoreServiceProvider extends ServiceProvider
         return [];
     }
 
+    private function getPublishableViewPaths(): array
+    {
+        $paths = [];
+        foreach (\Config::get('view.paths') as $path) {
+            if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
+                $paths[] = $path . '/modules/' . $this->moduleNameLower;
+            }
+        }
+        return $paths;
+    }
 
-    protected function registerActivityLogger()
+    /**
+     * Register activity logger.
+     *
+     * @return void
+     */
+    public function registerActivityLogger()
     {
         $loader = AliasLoader::getInstance();
         $loader->alias('Audit', ActivityLoggerFacade::class);
@@ -137,6 +142,11 @@ class CoreServiceProvider extends ServiceProvider
         });
     }
 
+    /**
+     * Register observers.
+     *
+     * @return void
+     */
     private function registerObserver()
     {
         Channel::observe(ChannelObserver::class);
