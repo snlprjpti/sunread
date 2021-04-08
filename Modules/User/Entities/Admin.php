@@ -2,15 +2,18 @@
 
 namespace Modules\User\Entities;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Modules\User\Notifications\ResetPasswordNotification;
+use Faker\Factory;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Modules\User\Database\factories\AdminFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Modules\User\Notifications\ResetPasswordNotification;
 
 class Admin extends Authenticatable implements JWTSubject
 {
     public static  $SEARCHABLE = ['first_name', 'email'];
-    use Notifiable;
+    use Notifiable, HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -31,6 +34,22 @@ class Admin extends Authenticatable implements JWTSubject
     ];
 
     protected $appends = ['avatar'];
+
+    /**
+     * Get a new factory instance for the model.
+     *
+     * @param  mixed  $parameters
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public static function factory(...$parameters)
+    {
+        $factory = AdminFactory::new();
+
+        return $factory
+                    ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : null)
+                    ->state(is_array($parameters[0] ?? null) ? $parameters[0] : ($parameters[1] ?? []));
+    }
+
     /**
      * Get the role that owns the admin.
      */

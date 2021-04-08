@@ -5,20 +5,22 @@ namespace Tests;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Modules\User\Entities\Role;
+use Modules\User\Entities\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Modules\User\Entities\Admin;
-use Modules\User\Entities\Role;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 
 class AuthTestCase extends TestCase
 {
+    use RefreshDatabase;
 
     protected  $headers;
     public function setUp():void
     {
         parent::setUp();
-        $this->artisan('migrate');
+
         $this->artisan('db:seed');
     }
 
@@ -32,7 +34,7 @@ class AuthTestCase extends TestCase
             'password' => Hash::make($password),
             'role_id' => $role->id
         ];
-        $admin = factory(Admin::class)->create($attributes);
+        $admin = Admin::factory()->make($attributes);
         $token =  $this->createToken($admin->email, $password);
         $this->headers['Authorization'] = 'Bearer '.$token;
         return $admin;
