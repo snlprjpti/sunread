@@ -2,7 +2,6 @@ stages:
   - preparation
   - building
   - testing
-  - security
 
 image: edbizarro/gitlab-ci-pipeline-php:7.3
 
@@ -88,15 +87,3 @@ phpcpd:
   cache:
     paths:
       - phpcpd.phar
-
-sensiolabs:
-  stage: security
-  script:
-    - test -d security-checker || git clone https://github.com/sensiolabs/security-checker.git
-    - cd security-checker
-    - composer install
-    - php security-checker security:check ../composer.lock
-  dependencies: []
-  cache:
-    paths:
-      - security-checker/
