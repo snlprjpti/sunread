@@ -10,21 +10,18 @@ class AdminsTableSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('admins')->delete();
-
-        DB::table('admins')->insert([
-                'id' => 1,
-                'first_name' => 'Admin',
-                'last_name' => 'example',
-                'email' => 'admin@example.com',
-                'password' => bcrypt('admin123'),
-                'api_token' => Str::random(80),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-                'status' => 1,
-                'role_id' => 1,
-                'company' => 'abc.co',
-                'address' => 'sweden'
-            ]);
+        DB::table("admins")->insert([
+            "first_name" => "Admin",
+            "last_name" => "example",
+            "email" => "admin@example.com",
+            "password" => bcrypt("admin123"),
+            "api_token" => Str::random(80),
+            "status" => 1,
+            "role_id" => 1,
+            "company" => "abc.co",
+            "address" => "sweden",
+            "created_at" => now(),
+            "updated_at" => now()
+        ]);
     }
 }

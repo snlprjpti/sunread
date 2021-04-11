@@ -38,7 +38,7 @@ class  Bouncer
             return  false;
         }
         $permission = $acl[$key_for_route]['key'];
+ 
         return auth()->guard('admin')->user()->hasPermission($permission);
-
     }
 }

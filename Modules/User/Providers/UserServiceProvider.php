@@ -94,6 +94,11 @@ class UserServiceProvider extends ServiceProvider
         ];
     }
 
+    /**
+     * Register Bouncer
+     * 
+     * @return Bouncer
+     */
     protected function registerBouncer()
     {
         $loader = AliasLoader::getInstance();
@@ -103,5 +108,4 @@ class UserServiceProvider extends ServiceProvider
             return new Bouncer();
         });
     }
-
 }

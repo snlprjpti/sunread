@@ -128,7 +128,7 @@ class Tree {
         $finalKey = array_shift($keys);
 
         if (isset($array[$finalKey])) {
-            $array[$finalKey] = $this->arrayMerge($array[$finalKey], [$value]);
+            $array[$finalKey] = $this->arrayMerge($array[$finalKey], $value);
         } else {
             $array[$finalKey] = $value;
         }
