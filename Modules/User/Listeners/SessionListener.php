@@ -2,20 +2,17 @@
 
 namespace Modules\User\Listeners;
 
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Modules\Core\Facades\Audit;
 
 class SessionListener
 {
     public function adminLogin($admin)
     {
-
-        Audit::log($admin, 'login' ,'Admin Login' ,$admin->full_name." logged in.");
+        Audit::log($admin, "login", "Admin Login", "{$admin->full_name} logged in.");
     }
 
     public function adminLogOut($admin)
     {
-        Audit::log($admin, 'login' ,'Admin Logout' ,$admin->full_name." logged out.");
+        Audit::log($admin, "login", "Admin Logout", "{$admin->full_name} logged out.");
     }
 }
