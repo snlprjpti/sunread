@@ -3,10 +3,9 @@
 namespace Modules\User\Entities;
 
 use Faker\Factory;
+use Modules\Core\Traits\HasFactory;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
-use Modules\User\Database\factories\AdminFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\User\Notifications\ResetPasswordNotification;
 
@@ -36,28 +35,12 @@ class Admin extends Authenticatable implements JWTSubject
     protected $appends = ['avatar'];
 
     /**
-     * Get a new factory instance for the model.
-     *
-     * @param  mixed  $parameters
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
-     */
-    public static function factory(...$parameters)
-    {
-        $factory = AdminFactory::new();
-
-        return $factory
-                    ->count(is_numeric($parameters[0] ?? null) ? $parameters[0] : null)
-                    ->state(is_array($parameters[0] ?? null) ? $parameters[0] : ($parameters[1] ?? []));
-    }
-
-    /**
      * Get the role that owns the admin.
      */
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
-
 
     /**
      * Checks if admin has permission to perform certain action.
