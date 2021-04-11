@@ -28,14 +28,8 @@ class Bouncer
     public function handle($request, Closure $next, $guard = 'admin')
     {
 
-        if (! Auth::guard($guard)->check()) {
-            return $this->errorResponse("Unauthenticated User" , 401);
-        }
-        $isAuthorised = $this->checkIfAuthorized($request);
-
-        if(!$isAuthorised){
-            return $this->errorResponse("Unauthorised access." , 403);
-        }
+        if (!Auth::guard($guard)->check()) return $this->errorResponse("Unauthenticated User." , 401);
+        if(!$this->checkIfAuthorized($request)) return $this->errorResponse("Unauthorised access." , 403);
 
         return $next($request);
     }
@@ -47,12 +41,9 @@ class Bouncer
      */
     public function checkIfAuthorized($request)
     {
-        if (! $role = auth()->guard('admin')->user()->role)
-            return false;
-        if ($role->permission_type == 'all') {
-            return true ;
-        } else {
-            return bouncer()->allow(Route::currentRouteName());
-        }
+        if ( !($role = auth()->guard('admin')->user()->role) ) return false;
+        if ($role->permission_type == 'all') return true;
+
+        return bouncer()->allow(Route::currentRouteName());
     }
 }
