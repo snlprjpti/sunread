@@ -2,17 +2,19 @@
 
 namespace Modules\User\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
-use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
-use Modules\Core\Http\Controllers\BaseController;
 use Modules\Core\Tree;
-use Modules\User\Entities\Admin;
+use Illuminate\Http\Request;
 use Modules\User\Entities\Role;
-
+use Modules\User\Entities\Admin;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Database\QueryException;
+use Modules\User\Transformers\RoleResource;
+use Modules\User\Repositories\RoleRepository;
+use Illuminate\Validation\ValidationException;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\User\Exceptions\RoleHasAdminsException;
+use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * Role controller for the Admin
@@ -21,225 +23,199 @@ use Modules\User\Entities\Role;
  */
 class RoleController extends BaseController
 {
-    protected $pagination_limit;
+    protected $repository;
 
-    protected $model_name = 'Role';
-
-    /**
-     * RoleController constructor.
-     * Admin middleware checks the admin against admins table
-     */
-
-    public function __construct()
+    public function __construct(Role $role, RoleRepository $roleRepository)
     {
         $this->middleware('admin');
-        parent::__construct();
+        $this->repository = $roleRepository;
+        $this->model = $role;
+        $this->model_name = "Role";
+
+        parent::__construct($this->model, $this->model_name);
     }
 
     /**
-     * Returns all the roles
+     * Display a listing of the resource.
+     * 
      * @param Request $request
      * @return JsonResponse
      */
     public function index(Request $request)
     {
-        try {
-
-            $this->validate($request, [
-                'limit' => 'sometimes|numeric',
-                'page' => 'sometimes|numeric',
-                'sort_by' => 'sometimes',
-                'sort_order' => 'sometimes|in:asc,desc',
-                'q' => 'sometimes|string|min:1'
-            ]);
-
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-
-            $roles = Role::query();
-            if ($request->has('q')) {
-                $roles->whereLike(Role::$SEARCHABLE, $request->get('q'));
-            }
-            $roles = $roles->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-            $roles = $roles->paginate($limit);
-            return $this->successResponse($roles, trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
-
-        } catch (QueryException $exception) {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(RoleResource::collection($fetched), $this->lang('fetch-list-success'));
     }
 
     /**
-     * Get the particular role
-     * @param $id
-     * @return JsonResponse
-     */
-    public function show($id)
-    {
-        try {
-            $role = Role::findOrFail($id);
-            return $this->successResponse($role, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * Stores new role
+     * Stores new resource
+     * 
      * @param Request $request
      * @return JsonResponse
      */
     public function store(Request $request)
     {
-        try {
+        try
+        {
+            $data = $this->repository->validateData($request);
+            if ( $request->permission_type == "custom" ) $this->repository->checkPermissionExists($request->permissions);
 
-            $this->validate($request, [
-                'name' => 'required',
-                'permission_type' => 'required|in:all,custom',
-                'permissions' => 'sometimes'
-            ]);
-
-            if (!$request->get('slug')) {
-                $request->merge(['slug' => (new Role())->createSlug($request->get('name'))]);
-            }
-
-            if($request->get('permission_type') === 'custom'){
-                $this->checkPermissionExists($request->get('permissions'));
-            }else{
-                $request->merge([
-                    'permissions' =>[]
-                ]);
-            }
-
-            $role = Role::create(
-                $request->only('name', 'description', 'permissions', 'permission_type', 'slug')
-            );
-            return $this->successResponse($payload = $role, trans('core::app.response.create-success', ['name' => 'Role']), 201);
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (SlugCouldNotBeGenerated $exception) {
-            return $this->errorResponse("Slugs could not be genereated");
-
-        } catch (\Exception $exception) {
+            $created = $this->repository->create($data);
+        }
+        catch (SlugCouldNotBeGenerated $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+        catch (QueryException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch (ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponse(new RoleResource($created), $this->lang('create-success'), 201);
+    }
+
+    /**
+     * Get the particular resource
+     * 
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show($id)
+    {
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponse(new RoleResource($fetched), $this->lang('fetch-success'));
+    }
+
+    /**
+     * Fetch Permissions
+     * 
+     * @return JsonResponse
+     */
+    public function fetchPermission()
+    {
+        try
+        {
+            $acl = $this->createACL();
+            $this->model_name = "Permission";
+        }
+        catch (QueryException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponse($acl->items, $this->lang('fetch-success'));
     }
 
 
+
     /**
-     * Updates the role details
+     * Updates the resource
+     * 
      * @param Request $request
-     * @param $id
+     * @param int $id
      * @return JsonResponse
-     * @throws ValidationException
      */
     public function update(Request $request, $id)
     {
-        try {
-            $this->validate($request, [
-                'name' => 'sometimes',
-                'permission_type' => 'required|in:all,custom',
-                'permissions' => 'sometimes'
-            ]);
-
-            $role = Role::findOrFail($id);
-
-            if($request->get('permission_type') === 'custom'){
-                $this->checkPermissionExists($request->get('permissions'));
-            }else{
-                $request->merge([
-                    'permissions' =>[]
-                ]);
-            }
-
-            $role = $role->forceFill(
-                $request->only('name', 'description', 'permissions', 'permission_type')
-            );
-            $role->save();
-
-            return $this->successResponse($role, trans('core::app.response.update-success', ['name' => 'Role']));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
-
-        } catch (QueryException $exception) {
+        try
+        {
+            $data = $this->repository->validateData($request, $id);
+            $updated = $this->repository->update($data, $id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (QueryException $exception)
+        {
             return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
+        }
+        catch(ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse(new RoleResource($updated), $this->lang('update-success'));
     }
 
     /**
-     * Destroys the particular role
-     * @param $id
+     * Remove the specified  admin resource from storage.
+     * 
+     * @param int $id
      * @return JsonResponse
      */
     public function destroy($id)
     {
-        try {
-            $role = Role::findOrFail($id);
-            $doesUserWithRoleExist = Admin::where('role_id', $role->id)->exists();
-            if ($doesUserWithRoleExist) {
-                return $this->errorResponse("User with the given role exist.", 403);
-            }
-            if ($doesUserWithRoleExist) {
-                return $this->errorResponse("Super Admin cannot be deleted.", 403);
-            }
-
-            $role->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
-
-        } catch (\Exception $exception) {
+        try
+        {
+            $this->repository->delete($id);
+        }
+        catch (ModelNotFoundException $exception)
+        {
+            return $this->errorResponse($this->lang('not-found'), 404);
+        }
+        catch (RoleHasAdminsException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 403);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
 
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
-    public function fetchPermission()
-    {
-        try{
-            $acl = $this->createACL();
-            return $this->successResponse($acl->items, trans('core::app.response.fetch-success', ['name' => "Permissions"]));
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-
-    }
-
-    private function checkPermissionExists($permissions)
-    {
-        $all_permissions = array_column(config('acl'),'key');
-        if(array_diff($permissions, $all_permissions)){
-            throw ValidationException::withMessages([
-               "permissions" => 'Invalids permissions'
-            ]);
-        };
-
-    }
+    /**
+     * Create ACL tree
+     * 
+     * @return Tree
+     */
     public function createACL()
     {
         $tree = Tree::create();

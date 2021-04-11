@@ -5,8 +5,10 @@ namespace Modules\User\Http\Controllers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Modules\User\Entities\Admin;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Exceptions\AdminNotFoundException;
@@ -31,63 +33,64 @@ class ResetPasswordController extends BaseController
      * OPTIONAL route: using frontend routes in future
      * Display the password reset token is valid
      * If no token is present, display the error
+     * 
      * @param  string|null $token
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function create($token = null)
     {
-        if (!$token) {
-            return $this->errorResponse(trans('core::app.users.token-missing'), 400);
-        }
-        return $this->successResponse($payload = ['token' => $token]);
+        return $token
+            ? $this->successResponse(['token' => $token])
+            : $this->errorResponse(trans('core::app.users.token-missing'), 400);
     }
 
     /**
-     *
      * Store new password of the admin
+     * 
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
-
-        try {
-            $this->validate($request, [
+        try
+        {
+            $data = $request->validate([
                 'token' => 'required',
                 'email' => 'required|email',
                 'password' => 'required|confirmed|min:6',
             ]);
 
-            $response = $this->broker()->reset(
-                $request->only(['email', 'password', 'password_confirmation', 'token']), function ($admin, $password) {
+            $response = $this->broker()->reset($data, function ($admin, $password) {
                 $this->resetPassword($admin, $password);
             });
 
-            if ($response == Password::INVALID_TOKEN) {
-                throw  new TokenGenerationException();
-            }
-
-            if ($response == Password::INVALID_USER) {
-                throw  new AdminNotFoundException();
-            }
-            return $this->successResponseWithMessage(trans('core::app.users.users.password-reset-success'));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token.token-generation-problem') ,400);
-
-        }catch (AdminNotFoundException $exception){
-
-        } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException(__("core::app.users.token.token-generation-problem"));
+            if ($response == Password::INVALID_USER) throw new AdminNotFoundException("Admin not found.");
         }
+        catch (ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (TokenGenerationException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 400);
+        }
+        catch (AdminNotFoundException $exception)
+        {
+            return $this->errorResponse($exception->getMessage(), 404);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->errorResponse($exception->getMessage());
+        }
+
+        return $this->successResponseWithMessage(__("core::app.users.users.password-reset-success"));
     }
 
     /**
      * Get the broker to be used during password reset.
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
+     * 
+     * @return PasswordBroker
      */
     protected function broker()
     {
@@ -103,10 +106,8 @@ class ResetPasswordController extends BaseController
      */
     protected function resetPassword($admin, $password)
     {
-
         $admin->password = Hash::make($password);
         $admin->setRememberToken(Str::random(60));
         $admin->save();
     }
-
 }
