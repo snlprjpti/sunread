@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use Modules\User\Http\Controllers\AccountController;
 use Modules\User\Http\Controllers\SessionController;
 use Modules\User\Http\Controllers\ResetPasswordController;
 use Modules\User\Http\Controllers\ForgotPasswordController;
@@ -16,14 +16,12 @@ use Modules\User\Http\Controllers\ForgotPasswordController;
 |
 */
 
-
 //USER MODULE ROUTES
-
 Route::group(['middleware' => ['api']], function () {
 
     //ADMIN USER ROUTES
-    Route::group(['prefix'=>'admin','as' => 'admin.'],function () {
-
+    Route::group(['prefix' => 'admin', 'as' => 'admin.'], function ()
+    {
         // Session Routes
         Route::post('/login', [SessionController::class, 'login'])->name('session.login');
         Route::get('/logout', [SessionController::class, 'logout'])->name('session.logout')->middleware('jwt.verify');
@@ -31,15 +29,20 @@ Route::group(['middleware' => ['api']], function () {
         Route::post('/reset-password', [ResetPasswordController::class, 'store'])->name('reset-password.store');
         Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])->name('reset-password.create');
 
-        Route::group(['middleware' => 'jwt.verify'],function(){
-            Route::resource('roles' ,'RoleController');
-            Route::get('permissions' ,'RoleController@fetchPermission');
-            Route::resource('users' ,'UserController');
-            Route::post('/account/image', 'AccountController@uploadProfileImage')->name('image.update');
-            Route::delete('/account/image', 'AccountController@deleteProfileImage')->name('image.delete');
-            Route::get('/account', 'AccountController@edit')->name('account.edit');
-            Route::put('/account', 'AccountController@update')->name('account.update');
+        Route::group(['middleware' => 'jwt.verify'],function()
+        {
+            // Roles Routes
+            Route::get('permissions', [\Modules\User\Http\Controllers\RoleController::class, 'fetchPermission']);
+            Route::resource('roles', RoleController::class);
+
+            // User Routes
+            Route::resource('users', UserController::class);
+
+            // Account Routes
+            Route::get('/account', [AccountController::class, 'show'])->name('account.show');
+            Route::put('/account', [AccountController::class, 'update'])->name('account.update');
+            Route::post('/account/image', [AccountController::class, 'uploadProfileImage'])->name('image.update');
+            Route::delete('/account/image', [AccountController::class, 'deleteProfileImage'])->name('image.delete');
         });
     });
-
 });
