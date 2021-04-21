@@ -17,7 +17,7 @@ class Category extends Model
     use NodeTrait, Sluggable;
 
     public static $SEARCHABLE = [ "translations.name", "slug" ];
-    protected $fillable = [ "position", "status", "parent_id", "image", "slug" ];
+    protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "status" ];
     protected $with = [ "translations" ];
 
     public function image_url(): ?string
