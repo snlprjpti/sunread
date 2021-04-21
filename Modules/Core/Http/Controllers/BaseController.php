@@ -126,20 +126,20 @@ class BaseController extends Controller
         return $this->exception_statuses[get_class($exception)] ?? 500;
     }
 
-    public function getExceptionMessage(object $exception): array
+    public function getExceptionMessage(object $exception): string
     {
         switch(get_class($exception))
         {
-            case ValidationException::class :
-                return $exception->errors();
+            case ValidationException::class:
+                return json_encode($exception->errors());
             break;
 
-            case ModelNotFoundException::class :
-                return ["errors" => [$this->lang('not-found')]];
+            case ModelNotFoundException::class:
+                return $this->lang('not-found');
             break;
 
-            default :
-                return ["errors" => [$exception->getMessage()]];
+            default:
+                return $exception->getMessage();
             break;
         }
     }
