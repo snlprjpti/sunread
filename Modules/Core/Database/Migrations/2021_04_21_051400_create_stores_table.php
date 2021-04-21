@@ -14,11 +14,12 @@ class CreateStoresTable extends Migration
     public function up()
     {
         Schema::create('stores', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('currency',191);
-            $table->string('slug',191);
-            $table->string('local',191);
-            $table->string('image',191);
+            $table->id();
+            $table->string('currency');
+            $table->string('name');
+            $table->string('slug');
+            $table->string('locale');
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }
