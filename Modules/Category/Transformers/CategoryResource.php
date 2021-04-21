@@ -7,23 +7,25 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class CategoryResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
-            "position" => $this->position,
+            "name" => $this->name,
             "slug" => $this->slug,
+            "position" => $this->position,
             "image" => $this->image_url,
+            "description" => $this->description,
+
+            "meta_title" => $this->meta_title,
+            "meta_description" => $this->meta_description,
+            "meta_keywords" => $this->meta_keywords,
+
             "status" => $this->status,
             "_lft" => $this->_lft,
             "_rgt" => $this->_rgt,
             "parent" => $this->parent ?? null,
+
             "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A'),
             "translations" => $this->translations
         ];
