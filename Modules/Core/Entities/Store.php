@@ -4,15 +4,14 @@ namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\Sluggable;
 
 class Store extends Model
 {
-    use HasFactory;
+    use Sluggable;
 
-    protected $fillable = [];
-    
-    protected static function newFactory()
-    {
-        return \Modules\Core\Database\factories\StoreFactory::new();
-    }
+    protected $fillable = ["name","currency","locale","image","slug"];
+
+
+
 }
