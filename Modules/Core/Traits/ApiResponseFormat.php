@@ -6,7 +6,10 @@ use Illuminate\Http\JsonResponse;
 
 trait ApiResponseFormat
 {
-    private function responseFormat(?string $message = null, string $status = "success", ?object $payload = null): array
+    /**
+     * @param array|object $payload
+     */
+    private function responseFormat(?string $message = null, string $status = "success", $payload = null): array
     {
         $format = [
             "status" => $status,
@@ -18,7 +21,10 @@ trait ApiResponseFormat
         return $format;
     }
 
-    public function successResponse(object $payload, ?string $message = null, int $code = 200): JsonResponse
+    /**
+     * @param array|object $payload
+     */
+    public function successResponse($payload, ?string $message = null, int $code = 200): JsonResponse
     {
         return response()->json($this->responseFormat($message, "success", $payload), $code);
     }
