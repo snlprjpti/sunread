@@ -7,161 +7,103 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Modules\Core\Entities\Store;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Repositories\StoreRepository;
 use Modules\Core\Transformers\StoreResource;
 
 class StoreController extends BaseController
 {
+    protected $repository;
 
-    public function __construct(Store $store)
+    public function __construct(Store $store, StoreRepository $storeRepository)
     {
         $this->model = $store;
         $this->model_name = "Store";
+        $this->repository = $storeRepository;
         parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-
-        try{
+        try
+        {
             $this->validateListFiltering($request);
-            $stores = $this->getFilteredList($request);
-        }
-        catch( QueryException $exception )
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch( ValidationException $exception )
-        {
-            return $this->errorResponse($exception->errors(), 422);
+            $fetched = $this->getFilteredList($request);
         }
         catch( Exception $exception )
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(StoreResource::collection($stores), $this->lang("fetch-list-success"));
-
+        return $this->successResponse(StoreResource::collection($fetched), $this->lang("fetch-list-success"));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        try{
-            $data = $this->validateData($request);
-            Event::dispatch('core.store.create.before');
-            $store = $this->model->create($data);
-            Event::dispatch('core.store.create.after', $store);
-
-        }
-        catch(QueryException $exception)
+        try
         {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch( ValidationException $exception )
-        {
-            return $this->errorResponse($exception->getMessage(), 422);
+            $data = $this->repository->validateData($request);
+            $data['image'] = $this->storeImage($request, 'image', 'store');
+            $created = $this->repository->create($data);
         }
         catch(\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new StoreResource($store), $this->lang('create-success'),201);
-
+        return $this->successResponse(new StoreResource($created), $this->lang('create-success'), 201);
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
-        try{
-            $store = $this->model->findOrFail($id);
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
         }
         catch(\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
-        return $this->successResponse(new StoreResource($store), $this->lang('fetch-success'));
+        return $this->successResponse(new StoreResource($fetched), $this->lang('fetch-success'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): JsonResponse
     {
-        try {
-            $data = $this->validateData($request);
-            $store = $this->model->findOrFail($id);
+        try
+        {
+            $data = $this->repository->validateData($request, $id);
+            unset($data['image']);
+            $updated = $this->repository->update($data, $id);
 
-            Event::dispatch("core.store.update.before", $id);
-            $store = $store->fill($data);
-            $store->save();
-            Event::dispatch("core.store.update.after", $store);
+            if ($request->file('image')) {
+                $image_data = [
+                    'image' => $this->storeImage($request, 'image', 'category', $updated->image)
+                ];
+                $updated->fill($image_data);
+                $updated->save();
+            }
+        }
+        catch(\Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse(new StoreResource($updated), $this->lang("update-success"));
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        try
+        {
+            $this->repository->delete($id);
         }
         catch (\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new StoreResource($store), $this->lang("update-success"));
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        try {
-            $store = $this->model->findOrFail($id);
-
-            Event::dispatch("core.store.delete.before", $store);
-            $store->delete();
-            Event::dispatch("core.store.delete.after", $id);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
-        }
-
-        return $this->successResponse($this->lang("delete-success"));
-    }
-
-    private function validateData($request, $id = null)
-    {
-        $id = $id ? ",{$id}" : '';
-        $mimes = "bmp,jpeg,jpg,png,webp";
-        $sometimes = $id ? "sometimes" : "required";
-
-         $data =  $this->validate($request,[
-            "currency" => "required",
-            "name" => "required",
-            "slug" => "nullable|unique:stores,slug{$id}",
-            "locale" => "required",
-            "image" => "{$sometimes}|mimes:{$mimes}"
-        ]);
-
-         if ($request->slug == null) $data["slug"] = $this->model->createSlug($request->name);
-
-         return $data;
-    }
-
-
 }
