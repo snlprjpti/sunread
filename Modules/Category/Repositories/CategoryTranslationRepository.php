@@ -18,24 +18,18 @@ class CategoryTranslationRepository
         $this->model_key = "catalog.attribite.translations";
     }
 
-    /**
-     * Create or update translation
-     * 
-     * @param array $data
-     * @param Model $parent
-     * @return void
-     */
-    public function createOrUpdate($data, $parent)
+    public function createOrUpdate(array $data, Model $parent): void
     {
-        if ( !is_array($data) ) return;
+        if ( !is_array($data) || $data == [] ) return;
 
+        DB::beginTransaction();
         Event::dispatch("{$this->model_key}.create.before");
 
         try
         {
             foreach ($data as $row){
                 $check = [
-                    "locale" => $row["locale"],
+                    "store_id" => $row["store_id"],
                     "category_id" => $parent->id
                 ];
     
@@ -46,9 +40,11 @@ class CategoryTranslationRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
         Event::dispatch("{$this->model_key}.create.after", $created);
+        DB::commit();
     }
 }

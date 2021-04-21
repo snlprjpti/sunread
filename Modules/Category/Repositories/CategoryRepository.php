@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
 use Modules\Category\Contracts\CategoryInterface;
@@ -23,24 +22,12 @@ class CategoryRepository implements CategoryInterface
         $this->model_key = "catalog.category";
     }
 
-    /**
-     * Get current Model
-     * 
-     * @return Model
-     */
-    public function model()
+    public function model(): Model
     {
         return $this->model;
     }
 
-    /**
-     * Create a new resource
-     * 
-     * @param array $data
-     * @param array $translation_data
-     * @return Model
-     */
-    public function create($data, $translation_data = [])
+    public function create(array $data, array $translation_data = []): object
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.create.before");
@@ -48,7 +35,7 @@ class CategoryRepository implements CategoryInterface
         try
         {
             $created = $this->model->create($data);
-            $this->translation->createOrUpdate([$translation_data], $created);
+            $this->translation->createOrUpdate($translation_data, $created);
         }
         catch (Exception $exception)
         {
@@ -62,14 +49,7 @@ class CategoryRepository implements CategoryInterface
         return $created;
     }
 
-    /**
-     * Update requested resource
-     * 
-     * @param array $data
-     * @param int $id
-     * @return Model
-     */
-    public function update($data, $id, $translation_data = [])
+    public function update(array $data, int $id, array $translation_data = []): object
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.update.before");
@@ -80,7 +60,7 @@ class CategoryRepository implements CategoryInterface
             $updated->fill($data);
             $updated->save();
 
-            $this->translation->createOrUpdate([$translation_data], $updated);
+            $this->translation->createOrUpdate($translation_data, $updated);
         }
         catch (Exception $exception)
         {
@@ -93,13 +73,7 @@ class CategoryRepository implements CategoryInterface
         return $updated;
     }
 
-    /**
-     * Delete requested resource
-     * 
-     * @param int $id
-     * @return Model
-     */
-    public function delete($id)
+    public function delete(int $id): object
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.delete.before");
@@ -122,13 +96,7 @@ class CategoryRepository implements CategoryInterface
         return $deleted;
     }
 
-    /**
-     * Delete requested resources in bulk
-     * 
-     * @param Request $request
-     * @return Model
-     */
-    public function bulkDelete($request)
+    public function bulkDelete(object $request): object
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.delete.before");
@@ -154,56 +122,43 @@ class CategoryRepository implements CategoryInterface
         return $deleted;
     }
 
-    /**
-     * Returns validation rules
-     * 
-     * @param int $id
-     * @param array $merge
-     * @return array
-     */
-    public function rules($id, $merge = [])
+    public function rules(?int $id, array $merge = []): array
     {
         $id = $id ? ",{$id}" : null;
 
         return array_merge([
+            "name" => "required",
             "slug" => "nullable|unique:categories,slug{$id}",
-            "image" => "sometimes|mimes:jpeg,jpg,bmp,png",
             "position" => "sometimes|numeric",
+            "image" => "sometimes|mimes:jpeg,jpg,bmp,png",
+            "description" => "sometimes|nullable",
+            "meta_title" => "sometimes|nullable",
+            "meta_description" => "sometimes|nullable",
+            "meta_keywords" => "sometimes|nullable",
             "status" => "sometimes|boolean",
             "parent_id" => "sometimes|exists:categories,id"
         ], $merge);
     }
 
-    /**
-     * Validates form request
-     * 
-     * @param Request $request
-     * @param int $id
-     * @return array
-     */
-    public function validateData($request, $id=null)
+    public function validateData(object $request, ?int $id=null, array $merge = []): array
     {
-        $data = $request->validate($this->rules($id));
+        $data = $request->validate($this->rules($id, $merge));
         if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
 
         return $data;
     }
 
-    /**
-     * Translations validation
-     * 
-     * @param Request $request
-     * @return array
-     */
-    public function validateTranslation($request)
+    public function validateTranslation(object $request): array
     {
+        if ( !is_array($request->translation) || $request->translation == [] ) return [];
+
         return $request->validate([
-            "name" => "required",
-            "description" => "nullable",
-            "meta_title" => "nullable",
-            "meta_description" => "nullable",
-            "meta_keywords" => "nullable",
-            "locale" => "required|exists:locales,code"
+            "translation.name" => "sometimes|required",
+            "translation.description" => "sometimes|nullable",
+            "translation.meta_title" => "sometimes|nullable",
+            "translation.meta_description" => "sometimes|nullable",
+            "translation.meta_keywords" => "sometimes|nullable",
+            "translation.store_id" => "required|exists:stores,id"
         ]);
     }
 }
