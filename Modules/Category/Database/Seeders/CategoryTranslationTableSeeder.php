@@ -3,10 +3,9 @@
 namespace Modules\Category\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class CategoryTranslationTableSeederTableSeeder extends Seeder
+class CategoryTranslationTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
