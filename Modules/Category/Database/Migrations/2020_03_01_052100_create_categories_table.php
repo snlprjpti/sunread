@@ -14,14 +14,20 @@ class CreateCategoriesTable extends Migration
      */
     public function up()
     {
-
         Schema::create('categories', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('position')->default(0);
-            $table->string('slug')->unique();
-            $table->string('image')->nullable();
-            $table->boolean('status')->default(0);
             NestedSet::columns($table);
+
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->integer('position')->default(0);
+            $table->string('image')->nullable();
+            $table->text('description')->nullable();
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->text('meta_keywords')->nullable();
+
+            $table->boolean('status')->default(0);
             $table->timestamps();
         });
     }
