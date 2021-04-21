@@ -2,25 +2,19 @@
 
 namespace Modules\Core\Traits;
 
-
-use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
 
 trait ApiResponseFormat
 {
     /**
-     * Returns a valid response format
-     * 
-     * @param Object $payload
-     * @param String $message
-     * @param String $success
-     * @return Array
+     * @param array|object $payload
      */
-    private function responseFormat($payload = null, $message = null, $status = "success")
+    private function responseFormat(?string $message = null, string $status = "success", $payload = null): array
     {
         $format = [
             "status" => $status,
             "payload" => $payload,
-            "message" => $message
+            "message" => json_decode($message) ?? $message
         ];
         if (!$payload) unset($format["payload"]);
 
@@ -28,58 +22,20 @@ trait ApiResponseFormat
     }
 
     /**
-     * Retursn a success response with payload
-     * 
-     * @param Object $payload
-     * @param String $message
-     * @param Int $code
-     * 
-     * @return JsonResponse
+     * @param array|object $payload
      */
-    public function successResponse($payload, $message = null, $code = 200)
+    public function successResponse($payload, ?string $message = null, int $code = 200): JsonResponse
     {
-        return response()->json($this->responseFormat($payload, $message), $code);
+        return response()->json($this->responseFormat($message, "success", $payload), $code);
     }
 
-    /**
-     * Retursn a error response
-     * 
-     * @param String $message
-     * @param Int $code
-     * 
-     * @return JsonResponse
-     */
-    public function errorResponse($message, $code = 500)
+    public function errorResponse(string $message, int $code = 500): JsonResponse
     {
-        return response()->json($this->responseFormat(null, $message, "error"), $code);
+        return response()->json($this->responseFormat($message, "error"), $code);
     }
 
-    /**
-     * Retursn a success response with message only
-     * 
-     * @param String $message
-     * @param Int $code
-     * 
-     * @return JsonResponse
-     */
-    public function successResponseWithMessage($message, $code = 200)
+    public function successResponseWithMessage(string $message, int $code = 200): JsonResponse
     {
-        return response()->json($this->responseFormat(null, $message), $code);
+        return response()->json($this->responseFormat($message), $code);
     }
-
-    /**
-     * Retursn a success response with message only
-     * 
-     * @param \Exception $exception
-     * 
-     * @return JsonResponse
-     */
-    public function errorResponseForMissingModel($exception)
-    {
-        $model = Str::kebab( class_basename($exception->getModel()));
-        $message = $model ? str_replace('-', ' ', $model) . " not found" : $exception->getMessage();
-
-        return response()->json($this->responseFormat(null, $message, "error"), 404);
-    }
-
 }

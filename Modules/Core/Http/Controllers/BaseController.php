@@ -2,20 +2,24 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Modules\Core\Traits\FileManager;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Traits\ApiResponseFormat;
+use Illuminate\Validation\ValidationException;
+use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BaseController extends Controller
 {
     use ApiResponseFormat, ValidatesRequests, FileManager;
 
-    protected $pagination_limit, $locale, $model, $model_name, $lang;
+    protected $pagination_limit, $locale, $model, $model_name, $lang, $exception_statuses;
 
-    public function __construct($model, $model_name)
+    public function __construct($model, string $model_name, array $exception_statuses = [])
     {
         $this->pagination_limit = 25;
 
@@ -40,15 +44,17 @@ class BaseController extends Controller
             "logout-success" => "users.users.logout-success",
             "token-generation-problem" => "users.token.token-generation-problem",
         ];
+
+        // Frequently thrown excpetions
+        $this->exception_statuses = array_merge([
+            ValidationException::class => 422,
+            ModelNotFoundException::class => 404,
+            QueryException::class => 400,
+            SlugCouldNotBeGenerated::class => 500
+        ], $exception_statuses);
     }
 
-    /**
-     * Validate list filtering query parameters
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return Array
-     */
-    public function validateListFiltering($request)
+    public function validateListFiltering(object $request): array
     {
         $rules = [
             "limit" => "sometimes|numeric",
@@ -69,14 +75,7 @@ class BaseController extends Controller
         return $this->validate($request, $rules, $messages);
     }
 
-    /**
-     * Filter the requested list with parameters
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @param Array $with
-     * @return Object
-     */
-    public function getFilteredList($request, $with = [])
+    public function getFilteredList(object $request, array $with = []): object
     {
         $sort_by = $request->sort_by ?? "id";
         $sort_order = $request->sort_order ?? "desc";
@@ -90,18 +89,10 @@ class BaseController extends Controller
         return $rows->orderBy($sort_by, $sort_order)->paginate($limit);
     }
 
-    /**
-     * Store given image to storage
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @param String $file
-     * @param String $folder
-     * @return Mixed
-     */
-    public function storeImage($request, $file_name, $folder = null, $delete_url = null)
+    public function storeImage(object $request, string $file_name, ?string $folder = null, ?string $delete_url = null): string
     {
         // Check if file is given
-        if ( $request->file($file_name) === null ) return false;
+        if ( $request->file($file_name) === null ) return null;
 
         try
         {
@@ -122,19 +113,39 @@ class BaseController extends Controller
         return $file_path;
     }
 
-    /**
-     * Returns translation
-     * 
-     * @param String $key
-     * @param array|null $parameters
-     * @param string $module
-     * @return String
-     */
-    public function lang($key, $parameters = null, $module = "core::app")
+    public function lang(string $key, ?array $parameters = null, string $module = "core::app"): string
     {
         $parameters = $parameters ?? ["name" => $this->model_name];
         $translation_key = $this->lang[$key] ?? $key;
         
         return __("{$module}.{$translation_key}", $parameters);
+    }
+
+    public function getExceptionStatus(object $exception): int
+    {
+        return $this->exception_statuses[get_class($exception)] ?? 500;
+    }
+
+    public function getExceptionMessage(object $exception): string
+    {
+        switch(get_class($exception))
+        {
+            case ValidationException::class:
+                return json_encode($exception->errors());
+            break;
+
+            case ModelNotFoundException::class:
+                return $this->lang('not-found');
+            break;
+
+            default:
+                return $exception->getMessage();
+            break;
+        }
+    }
+
+    public function handleException(object $exception): JsonResponse
+    {
+        return $this->errorResponse($this->getExceptionMessage($exception), $this->getExceptionStatus($exception));
     }
 }

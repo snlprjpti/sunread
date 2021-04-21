@@ -10,6 +10,7 @@
 |
 */
 
+
 Route::group(['middleware' => ['api']], function () {
     //ADMIN ATTRIBUTE ROUTES
     Route::group(['prefix' => 'admin', 'middleware' => ['admin', 'language'], 'as' => 'admin.'], function () {
@@ -19,6 +20,9 @@ Route::group(['middleware' => ['api']], function () {
 
         // Locale Routes
         Route::resource('locales', LocaleController::class)->except(['create', 'edit']);
+
+        // Store Routes
+        Route::resource('stores', StoreController::class)->except(['create','edit']);
 
         // Currency Routes
         Route::resource('currencies', CurrencyController::class)->except(['create', 'edit']);

@@ -13,21 +13,21 @@ class CreateCategoryTranslationsTable extends Migration
      */
     public function up()
     {
-
         Schema::create('category_translations', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->text('name');
+            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('store_id');
+
+            $table->string('name');
             $table->text('description')->nullable();
-            $table->text('meta_title')->nullable();
+            $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();
-            $table->unsignedBigInteger('category_id')->nullable();
-            $table->string('locale');
-            $table->unique(['category_id', 'locale']);
+
+            $table->unique(['category_id', 'store_id']);
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->foreign('store_id')->references('id')->on('stores')->onDelete('cascade');
         });
-
-
     }
 
     /**
