@@ -7,12 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Store extends Model
 {
-    use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ["name","currency","locale","image","slug"];
+
     
-    protected static function newFactory()
-    {
-        return \Modules\Core\Database\factories\StoreFactory::new();
-    }
+
 }
