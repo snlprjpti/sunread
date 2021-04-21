@@ -56,11 +56,8 @@ class StoreController extends BaseController
      */
     public function store(Request $request)
     {
-
         try{
-
             $data = $this->validateData($request);
-
             Event::dispatch('core.store.create.before');
             $store = $this->model->create($data);
             Event::dispatch('core.store.create.after', $store);
@@ -141,22 +138,29 @@ class StoreController extends BaseController
         }
         catch (\Exception $exception)
         {
-
+            return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse($this->lang("delete-success"));
     }
 
     private function validateData($request, $id = null)
     {
-        $id = $id ? ",{$id}" : null;
+        $id = $id ? ",{$id}" : '';
         $mimes = "bmp,jpeg,jpg,png,webp";
         $sometimes = $id ? "sometimes" : "required";
 
-        return $this->validate($request,[
+         $data =  $this->validate($request,[
             "currency" => "required",
             "name" => "required",
+            "slug" => "nullable|unique:stores,slug{$id}",
             "locale" => "required",
             "image" => "{$sometimes}|mimes:{$mimes}"
         ]);
+
+         if ($request->slug == null) $data["slug"] = $this->model->createSlug($request->name);
+
+         return $data;
     }
 
 
