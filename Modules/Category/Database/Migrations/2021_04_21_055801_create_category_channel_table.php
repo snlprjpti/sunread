@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCategoryChannelsTable extends Migration
+class CreateCategoryChannelTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateCategoryChannelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('category_channels', function (Blueprint $table) {
+        Schema::create('category_channel', function (Blueprint $table) {
             $table->unsignedBigInteger("category_id");
             $table->unsignedBigInteger("channel_id");
 
@@ -30,6 +30,6 @@ class CreateCategoryChannelsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('category_channels');
+        Schema::dropIfExists('category_channel');
     }
 }
