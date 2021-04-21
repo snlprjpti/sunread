@@ -26,7 +26,7 @@ class Category extends Model
         return Storage::url($this->image);
     }
 
-    public function getImageUrlAttribute(): string
+    public function getImageUrlAttribute(): ?string
     {
         return $this->image_url();
     }
