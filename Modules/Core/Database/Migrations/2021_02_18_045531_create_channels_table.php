@@ -16,35 +16,21 @@ class CreateChannelsTable extends Migration
         Schema::create('channels', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code');
+            $table->string('hostname')->nullable();
+
             $table->string('name');
             $table->text('description')->nullable();
+            $table->string('location')->nullable();
             $table->string('timezone')->nullable();
-            $table->string('hostname')->nullable();
             $table->string('logo')->nullable();
             $table->string('favicon')->nullable();
-            $table->unsignedBigInteger('default_locale_id');
-            $table->unsignedBigInteger('base_currency_id');
-            $table->foreign('default_locale_id')->references('id')->on('locales')->onDelete('cascade');
-            $table->foreign('base_currency_id')->references('id')->on('currencies')->onDelete('cascade');
+            $table->string('theme');
+            $table->unsignedBigInteger('default_store_id');
+            $table->unsignedBigInteger('default_currency_id');
+
+            $table->foreign('default_store_id')->references('id')->on('stores')->onDelete('cascade');
+            $table->foreign('default_currency_id')->references('id')->on('currencies')->onDelete('cascade');
             $table->timestamps();
-        });
-
-        Schema::create('channel_locales', function (Blueprint $table) {
-            $table->unsignedBigInteger('channel_id');
-            $table->unsignedBigInteger('locale_id');
-            $table->primary(['channel_id', 'locale_id']);
-            $table->foreign('channel_id')->references('id')->on('channels')->onDelete('cascade');
-            $table->foreign('locale_id')->references('id')->on('locales')->onDelete('cascade');
-        });
-
-
-
-        Schema::create('channel_currencies', function (Blueprint $table) {
-            $table->unsignedBigInteger('channel_id');
-            $table->unsignedBigInteger('currency_id');
-            $table->primary(['channel_id', 'currency_id']);
-            $table->foreign('channel_id')->references('id')->on('channels')->onDelete('cascade');
-            $table->foreign('currency_id')->references('id')->on('currencies')->onDelete('cascade');
         });
     }
 
@@ -55,10 +41,6 @@ class CreateChannelsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('channel_currencies');
-
-        Schema::dropIfExists('channel_locales');
-
         Schema::dropIfExists('channels');
     }
 }
