@@ -100,10 +100,10 @@ class BaseController extends Controller
             $file = $request->file($file_name);
             $key = \Str::random(6);
             $folder = $folder ?? "default";
-            $file_path = $file->storeAs("images/{$folder}/{$key}", $file->getClientOriginalName(), ["disk" => "public"]);
+            $file_path = $file->storeAs("images/{$folder}/{$key}", $file->getClientOriginalName());
 
             // Delete old file if requested
-            if ( $delete_url !== null ) Storage::disk("public")->delete($delete_url);
+            if ( $delete_url !== null ) Storage::delete($delete_url);
         }
         catch (\Exception $exception)
         {
@@ -131,17 +131,19 @@ class BaseController extends Controller
         switch(get_class($exception))
         {
             case ValidationException::class:
-                return json_encode($exception->errors());
+                $exception_message = json_encode($exception->errors());
             break;
 
             case ModelNotFoundException::class:
-                return $this->lang('not-found');
+                $exception_message = $this->lang('not-found');
             break;
 
             default:
-                return $exception->getMessage();
+                $exception_message = $exception->getMessage();
             break;
         }
+
+        return $exception_message;
     }
 
     public function handleException(object $exception): JsonResponse
