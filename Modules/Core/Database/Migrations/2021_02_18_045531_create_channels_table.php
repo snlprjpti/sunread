@@ -14,7 +14,7 @@ class CreateChannelsTable extends Migration
     public function up()
     {
         Schema::create('channels', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->string('code');
             $table->string('hostname')->nullable();
 
@@ -26,10 +26,10 @@ class CreateChannelsTable extends Migration
             $table->string('favicon')->nullable();
             $table->string('theme');
             $table->unsignedBigInteger('default_store_id');
-            $table->unsignedBigInteger('default_currency_id');
+            $table->string('default_currency');
 
             $table->foreign('default_store_id')->references('id')->on('stores')->onDelete('cascade');
-            $table->foreign('default_currency_id')->references('id')->on('currencies')->onDelete('cascade');
+            $table->foreign('default_currency')->references('code')->on('currencies')->onDelete('cascade');
             $table->timestamps();
         });
     }
