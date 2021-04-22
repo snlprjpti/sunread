@@ -3,57 +3,36 @@
 namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 
 class Channel extends Model
 {
-    public static $SEARCHABLE = [ 'code', 'name', 'description', 'theme', 'hostname' ];
-    protected $fillable = [ 'code', 'name', 'description', 'theme', 'hostname', 'default_locale_id', 'base_currency_id' ];
+    public static $SEARCHABLE = [ "code", "hostname", "name", "description", "location" ];
+    protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency" ];
 
-    // Get Channel Locales
-    public function locales()
+    public function default_store(): BelongsTo
     {
-        return $this->belongsToMany(Locale::class, 'channel_locales');
+        return $this->belongsTo(Store::class, "default_store_id");
     }
 
-    // Get the default Locale
-    public function default_locale()
+    public function stores(): BelongsToMany
     {
-        return $this->belongsTo(Locale::class);
+        return $this->belongsToMany(Store::class);
     }
 
-    // Get Channel Currencies
-    public function currencies()
-    {
-        return $this->belongsToMany(Currency::class, 'channel_currencies');
-    }
-
-    // Get the base Currency
-    public function base_currency()
-    {
-        return $this->belongsTo(Currency::class);
-    }
-
-    // Get the root Category
-    public function root_category()
-    {
-        return $this->belongsTo(Category::class, 'root_category_id');
-    }
-
-    // Get URL from Storage
-    private function get_url($path)
+    private function get_url(?string $path): ?string
     {
         return $path ? Storage::url($path) : null;
     }
 
-    // Get the logo URL
-    public function getLogoUrlAttribute()
+    public function getLogoUrlAttribute(): ?string
     {
         return $this->get_url($this->logo);
     }
 
-    // Get favicon URL
-    public function getFaviconUrlAttribute()
+    public function getFaviconUrlAttribute(): ?string
     {
         return $this->get_url($this->favicon);
     }
