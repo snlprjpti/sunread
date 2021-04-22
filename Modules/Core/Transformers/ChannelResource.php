@@ -2,7 +2,6 @@
 
 namespace Modules\Core\Transformers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ChannelResource extends JsonResource
@@ -16,15 +15,20 @@ class ChannelResource extends JsonResource
     public function toArray($request)
     {
         return [
-            "id"=> $this->id,
-            "code"=> $this->code,
-            "name"=> $this->name,
-            "description"=> $this->description,
-            "hostname"=> $this->hostname,
-            "default_locale"=> $this->default_locale,
-            "base_currency"=> $this->base_currency,
-            "logo_url" => $this->logo_url,
-            "favicon_url" => $this->favicon_url
+            "id" => $this->id,
+            "code" => $this->code,
+            "hostname" => $this->hostname,
+            "name" => $this->name,
+            "description" => $this->description,
+            "location" => $this->location,
+            "timezone" => $this->timezone,
+            "logo" => $this->logo_url,
+            "favicon" => $this->favicon_url,
+            "theme" => $this->theme,
+            "default_currency" => $this->default_currency,
+            "default_store" => new StoreResource($this->default_store),
+            "stores" => StoreResource::collection($this->stores),
+            "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
 
