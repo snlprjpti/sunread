@@ -4,6 +4,7 @@
 namespace Modules\Category\Repositories;
 
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Category\Entities\CategoryTranslation;
