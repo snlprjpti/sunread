@@ -18,15 +18,15 @@ class StoreTableSeeder extends Seeder
         DB::table('stores')->insert([
            [
                "currency" => "USD",
-               "name" => \Str::random(5),
-               "slug" => \Str::slug(\Str::random(5)),
-               "locale" => \Str::random(2),
+               "name" => "International Store",
+               "slug" => "international-store",
+               "locale" => "en",
            ],
             [
-                "currency" => "Euro",
-                "name" => \Str::random(5),
-                "slug" => \Str::slug(\Str::random(5)),
-                "locale" => \Str::random(2),
+                "currency" => "EUR",
+                "name" => "English Store",
+                "slug" => "english-store",
+                "locale" => "en",
             ]
         ]);
     }

@@ -2,227 +2,138 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 use Modules\Core\Entities\Channel;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Repositories\ChannelRepository;
 use Modules\Core\Transformers\ChannelResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ChannelController extends BaseController
 {
-    public function __construct(Channel $channel)
+    protected $repository;
+
+    public function __construct(Channel $channel, ChannelRepository $channelRepository)
     {
         $this->model = $channel;
         $this->model_name = "Channel";
+        $this->repository = $channelRepository;
+
         parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Display a listing of the resource.
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request)
+    public function collection(object $data): ResourceCollection
+    {
+        return ChannelResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new ChannelResource($data);
+    }
+
+    public function index(Request $request): JsonResponse
     {
         try
         {
             $this->validateListFiltering($request);
-            $channels = $this->getFilteredList($request);
+            $fetched = $this->getFilteredList($request);
         }
-        catch (QueryException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(ChannelResource::collection($channels), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try
         {
-            $data = $this->validateData($request);
+            $data = $this->repository->validateData($request);
 
-            //Event::dispatch('core.channel.create.before');
-
-            $channel = $this->model->create($data);
-
-            // Sync relations
-            $channel->locales()->sync($data['locales']);
-            $channel->currencies()->sync($data['currencies']);
-
-            // Upload files
-            $channel->logo = $this->storeImage($request, 'logo', 'channel');
-            $channel->favicon = $this->storeImage($request, 'favicon', 'channel');
-            $channel->save();
-
-            Event::dispatch('core.channel.create.after', $channel);
-        }
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
-        }
-
-        return $this->successResponse(new ChannelResource($channel), $this->lang('create-success'), 201);
-    }
-
-    /**
-     * Show the specified resource.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function show($id)
-    {
-        try
-        {
-            $channel = $this->model->with(['locales', 'currencies'])->findOrFail($id);
-        }
-        catch (ModelNotFoundException $exception)
-        {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
-        }
-
-        return $this->successResponse(new ChannelResource($channel), $this->lang('fetch-success'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
-    {
-        try
-        {
-            $data = $this->validateData($request, $id);
-            $channel = $this->model->findOrFail($id);
-
-            // Save basic data
-            $channel = $channel->fill($request->only(['code', 'name', 'description', 'hostname', 'theme']));
-            $channel->save();
-
-            // Sync relations
-            if ($request->has('locales')) $channel->locales()->sync($request->get('locales'));
-            if ($request->has('currencies')) $channel->currencies()->sync($request->get('currencies'));
-
-            // Upload Files
-            foreach (['logo', 'favicon'] as $file_name) {
-                if (!isset($data[$file_name])) continue;
-                $channel->{$file_name} = $this->storeImage($request, $file_name, 'channel', $channel->{$file_name});
-                $channel->save();
+            foreach(["logo", "favicon"] as $file_type) {
+                if ( !$request->file($file_type) ) continue;
+                $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
             }
+
+            $created = $this->repository->create($data, function($created) use ($request) {
+                $created->stores()->sync($request->stores);
+            });
         }
-        catch (ModelNotFoundException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new ChannelResource($channel), $this->lang('update-success'));
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function destroy($id)
+    public function show(int $id): JsonResponse
     {
         try
         {
-            $channel = $this->model->findOrFail($id);
-            // Cannot delete if accessed via same channel
-            if ($channel->code === config('app.channel')) return $this->errorResponse($this->lang('last-delete-error'));
-            // Delete the channel
-            $channel->delete($id);
+            $fetched = $this->model->with(["default_store", "stores"])->findOrFail($id);
         }
-        catch (ModelNotFoundException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($this->lang('not-found'), 404);
+            return $this->handleException($exception);
         }
-        catch (\Exception $exception)
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try
         {
-            return $this->errorResponse($exception->getMessage());
+            $data = $this->repository->validateData($request, [
+                "code" => "required|unique:channels,code,{$id}",
+                "hostname" => "required|unique:channels,hostname,{$id}",
+                "logo" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
+                "favicon" => "nullable|mimes:bmp,jpeg,jpg,png,webp"
+            ]);
+
+            foreach(["logo", "favicon"] as $file_type) {
+                if ( !$request->file($file_type) ) {
+                    unset($data[$file_type]);
+                    continue;
+                }
+                $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
+            }
+
+            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
+                $updated->stores()->sync($request->stores);
+            });
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        try
+        {
+            $this->repository->delete($id, function($deleted) {
+                foreach(["logo", "favicon"] as $file_type) {
+                    if ( !$deleted->{$file_type} ) continue;
+                    Storage::delete($deleted->{$file_type});
+                }
+            });
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
-    }
-
-    /**
-     * Custom Validation for Store/Update
-     * 
-     * @param Request $request
-     * @param int $id
-     * @return Array
-     */
-    private function validateData($request, $id=null)
-    {
-        $id = $id ? ",{$id}" : null;
-        $sometimes = $id ? "sometimes" : "required";
-        $mimes = "bmp,jpeg,jpg,png,webp";
-
-        return $this->validate($request, [
-            /* General */
-            "code" => "required|unique:channels,code{$id}",
-            "name" => "required",
-            "description" => "required",
-            "hostname" => "required|unique:channels,hostname{$id}",
-
-            /* Currencies and Locales */
-            "locales" => "required|array|min:1|exists:locales,id",
-            "default_locale_id" => "required|in_array:locales.*|exists:locales,id",
-            "currencies" => "required|array|min:1|exists:currencies,id",
-            "base_currency_id" => "required|in_array:currencies.*|exists:currencies,id",
-
-            /* Branding */
-            "logo" => "{$sometimes}|mimes:{$mimes}",
-            "favicon" => "{$sometimes}|mimes:{$mimes}",
-            "theme" => "required|in:default"
-        ]);
     }
 }
