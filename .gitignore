@@ -17,3 +17,5 @@ yarn-error.log
 storage/*
 .requirement
 log
+.rnd
+/log
