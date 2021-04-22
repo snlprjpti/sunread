@@ -1,125 +1,1139 @@
-# Logfile created on 2021-01-18 13:02:54 +0545 by logger.rb/66358
   INFO ---------------------------------------------------------------------------
-  INFO START 2021-01-18 13:02:54 +0545 cap production deploy
+  INFO START 2021-04-22 15:09:54 +0545 cap staging deploy
   INFO ---------------------------------------------------------------------------
-  INFO [af36b4a3] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
- DEBUG [af36b4a3] Command: /usr/bin/env mkdir -p /home/deployer/tmp
-  INFO [af36b4a3] Finished in 1.980 seconds with exit status 0 (successful).
- DEBUG Uploading /home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh 0.0%
-  INFO Uploading /home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh 100.0%
-  INFO [75dbc309] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh as deployer@94.237.40.213
- DEBUG [75dbc309] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh
-  INFO [75dbc309] Finished in 0.496 seconds with exit status 0 (successful).
-  INFO [c6b63eee] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
- DEBUG [c6b63eee] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
- DEBUG [c6b63eee] 	da46b8bfae051cec9c90b4e7c209511126467966	HEAD
-  INFO [c6b63eee] Finished in 3.065 seconds with exit status 0 (successful).
-  INFO [a8428473] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
- DEBUG [a8428473] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
-  INFO [a8428473] Finished in 0.494 seconds with exit status 0 (successful).
-  INFO [c1c6447b] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
- DEBUG [c1c6447b] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
-  INFO [c1c6447b] Finished in 0.535 seconds with exit status 0 (successful).
-  INFO [29870da0] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
- DEBUG [29870da0] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
-  INFO [29870da0] Finished in 0.498 seconds with exit status 0 (successful).
- DEBUG [c0ba4b03] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
- DEBUG [c0ba4b03] Command: [ -f /home/deployer/api/shared/.env ]
- DEBUG [c0ba4b03] Finished in 0.537 seconds with exit status 0 (successful).
- DEBUG [aec9ee8c] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
- DEBUG [aec9ee8c] Command: [ -f /home/deployer/api/current/REVISION ]
- DEBUG [aec9ee8c] Finished in 0.493 seconds with exit status 0 (successful).
- DEBUG [cad7c522] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
- DEBUG [cad7c522] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
- DEBUG [cad7c522] 	a008ed0f9684bb997465be17b55150639162dcc5
- DEBUG [cad7c522] Finished in 0.536 seconds with exit status 0 (successful).
- DEBUG [dbf82ade] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
- DEBUG [dbf82ade] Command: [ -f /home/deployer/api/repo/HEAD ]
- DEBUG [dbf82ade] Finished in 0.493 seconds with exit status 0 (successful).
+  INFO [4bbdbb8d] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [4bbdbb8d] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:11:13 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [b2de5e2a] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [b2de5e2a] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:11:36 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [ead6391c] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [ead6391c] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:14:31 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [c9f97879] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [c9f97879] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:15:36 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [3cdcd3fa] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [3cdcd3fa] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:21:11 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [91ddab23] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [91ddab23] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:24:56 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [36cb1c73] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [36cb1c73] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:25:21 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [f6012b64] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [f6012b64] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [f6012b64] Finished in 4.353 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh 100.0%
+  INFO [83f37517] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh as deployer@94.237.40.213
+ DEBUG [83f37517] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh
+  INFO [83f37517] Finished in 0.894 seconds with exit status 0 (successful).
+  INFO [984793c2] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [984793c2] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [984793c2] 	d96113221be55bad3315620f8e3b07e2ed005bf4	HEAD
+  INFO [984793c2] Finished in 4.479 seconds with exit status 0 (successful).
+  INFO [d48f412b] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [d48f412b] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [d48f412b] Finished in 1.470 seconds with exit status 0 (successful).
+  INFO [e013438b] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [e013438b] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [e013438b] Finished in 1.286 seconds with exit status 0 (successful).
+  INFO [f88d559b] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [f88d559b] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [f88d559b] Finished in 0.632 seconds with exit status 0 (successful).
+ DEBUG [2a0271d9] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [2a0271d9] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [2a0271d9] Finished in 1.475 seconds with exit status 0 (successful).
+ DEBUG [4b5be778] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [4b5be778] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [4b5be778] Finished in 1.286 seconds with exit status 0 (successful).
+ DEBUG [22baf04f] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [22baf04f] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [22baf04f] 	403fa2384d92e10af086f68bcd1fa9e80ec661d6
+ DEBUG [22baf04f] Finished in 0.598 seconds with exit status 0 (successful).
+ DEBUG [f625a8f0] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [f625a8f0] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [f625a8f0] Finished in 0.803 seconds with exit status 0 (successful).
   INFO The repository mirror is at /home/deployer/api/repo
- DEBUG [dcbd18b0] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
- DEBUG [dcbd18b0] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
- DEBUG [dcbd18b0] Finished in 0.535 seconds with exit status 0 (successful).
-  INFO [f5280942] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
- DEBUG [f5280942] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
-  INFO [f5280942] Finished in 0.496 seconds with exit status 0 (successful).
-  INFO [faada5bd] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
- DEBUG [faada5bd] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh" ; /usr/bin/env git remote update --prune )
- DEBUG [faada5bd] 	Fetching origin
-  INFO [faada5bd] Finished in 7.844 seconds with exit status 0 (successful).
- DEBUG [1d21ea04] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
- DEBUG [1d21ea04] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
- DEBUG [1d21ea04] Finished in 0.511 seconds with exit status 0 (successful).
-  INFO [d2d7bedb] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210118071803 as deployer@94.237.40.213
- DEBUG [d2d7bedb] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210118071803 )
-  INFO [d2d7bedb] Finished in 0.538 seconds with exit status 0 (successful).
-  INFO [a3da2fb9] Running /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210118071803 as deployer@94.237.40.213
- DEBUG [a3da2fb9] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh" ; /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210118071803 )
-  INFO [a3da2fb9] Finished in 0.518 seconds with exit status 0 (successful).
- DEBUG [c6a69282] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
- DEBUG [c6a69282] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
- DEBUG [c6a69282] Finished in 0.537 seconds with exit status 0 (successful).
- DEBUG [3ec30412] Running /usr/bin/env git rev-list --max-count=1 master as deployer@94.237.40.213
- DEBUG [3ec30412] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-ecommerce-production-Hazesoft.sh" ; /usr/bin/env git rev-list --max-count=1 master )
- DEBUG [3ec30412] 	a008ed0f9684bb997465be17b55150639162dcc5
- DEBUG [3ec30412] Finished in 0.501 seconds with exit status 0 (successful).
- DEBUG [f5865374] Running if test ! -d /home/deployer/api/releases/20210118071803; then echo "Directory does not exist '/home/deployer/api/releases/20210118071803'" 1>&2; false; fi as deployer@94.237.40.213
- DEBUG [f5865374] Command: if test ! -d /home/deployer/api/releases/20210118071803; then echo "Directory does not exist '/home/deployer/api/releases/20210118071803'" 1>&2; false; fi
- DEBUG [f5865374] Finished in 0.546 seconds with exit status 0 (successful).
-  INFO [99edbeb2] Running /usr/bin/env echo "a008ed0f9684bb997465be17b55150639162dcc5" > REVISION as deployer@94.237.40.213
- DEBUG [99edbeb2] Command: cd /home/deployer/api/releases/20210118071803 && /usr/bin/env echo "a008ed0f9684bb997465be17b55150639162dcc5" > REVISION
-  INFO [99edbeb2] Finished in 0.497 seconds with exit status 0 (successful).
-  INFO [1db13af7] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210118071803 as deployer@94.237.40.213
- DEBUG [1db13af7] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210118071803
-  INFO [1db13af7] Finished in 0.539 seconds with exit status 0 (successful).
- DEBUG [7eb89207] Running [ -L /home/deployer/api/releases/20210118071803/.env ] as deployer@94.237.40.213
- DEBUG [7eb89207] Command: [ -L /home/deployer/api/releases/20210118071803/.env ]
- DEBUG [7eb89207] Finished in 0.493 seconds with exit status 1 (failed).
- DEBUG [15470d16] Running [ -f /home/deployer/api/releases/20210118071803/.env ] as deployer@94.237.40.213
- DEBUG [15470d16] Command: [ -f /home/deployer/api/releases/20210118071803/.env ]
- DEBUG [15470d16] Finished in 0.536 seconds with exit status 1 (failed).
-  INFO [f9331a15] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210118071803/.env as deployer@94.237.40.213
- DEBUG [f9331a15] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210118071803/.env
-  INFO [f9331a15] Finished in 0.494 seconds with exit status 0 (successful).
-  INFO [4bdc35f7] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210118071803 as deployer@94.237.40.213
- DEBUG [4bdc35f7] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210118071803
-  INFO [4bdc35f7] Finished in 0.547 seconds with exit status 0 (successful).
- DEBUG [7b2127f8] Running [ -L /home/deployer/api/releases/20210118071803/storage ] as deployer@94.237.40.213
- DEBUG [7b2127f8] Command: [ -L /home/deployer/api/releases/20210118071803/storage ]
- DEBUG [7b2127f8] Finished in 0.493 seconds with exit status 1 (failed).
- DEBUG [f6b28b12] Running [ -d /home/deployer/api/releases/20210118071803/storage ] as deployer@94.237.40.213
- DEBUG [f6b28b12] Command: [ -d /home/deployer/api/releases/20210118071803/storage ]
- DEBUG [f6b28b12] Finished in 0.538 seconds with exit status 0 (successful).
-  INFO [4aae2794] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210118071803/storage as deployer@94.237.40.213
- DEBUG [4aae2794] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210118071803/storage
-  INFO [4aae2794] Finished in 0.495 seconds with exit status 0 (successful).
-  INFO [169bee23] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210118071803/storage as deployer@94.237.40.213
- DEBUG [169bee23] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210118071803/storage
-  INFO [169bee23] Finished in 0.849 seconds with exit status 0 (successful).
-  INFO [cc4e7c9f] Running /usr/bin/env ln -s /home/deployer/api/releases/20210118071803 /home/deployer/api/releases/current as deployer@94.237.40.213
- DEBUG [cc4e7c9f] Command: /usr/bin/env ln -s /home/deployer/api/releases/20210118071803 /home/deployer/api/releases/current
-  INFO [cc4e7c9f] Finished in 0.547 seconds with exit status 0 (successful).
-  INFO [ee08fea7] Running /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api as deployer@94.237.40.213
- DEBUG [ee08fea7] Command: /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api
-  INFO [ee08fea7] Finished in 0.545 seconds with exit status 0 (successful).
- DEBUG [fbb29e1f] Running /usr/bin/env ls -x /home/deployer/api/releases as deployer@94.237.40.213
- DEBUG [fbb29e1f] Command: /usr/bin/env ls -x /home/deployer/api/releases
- DEBUG [fbb29e1f] 	20210118071211	20210118071803
- DEBUG [fbb29e1f] Finished in 0.623 seconds with exit status 0 (successful).
+ DEBUG [3b854fb2] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [3b854fb2] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [3b854fb2] Finished in 2.269 seconds with exit status 0 (successful).
+  INFO [4c62905b] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [4c62905b] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [4c62905b] Finished in 0.782 seconds with exit status 0 (successful).
+  INFO [1254da47] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [1254da47] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [1254da47] 	Fetching origin
+ DEBUG [1254da47] 	From gitlab.com:sunread/sunread-api
+ DEBUG [1254da47] 	   214f364..d961132  dev                         -> dev
+ DEBUG [1254da47] 	 * [new branch]      rupesh/channel-update       -> rupesh/channel-update
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/89/head -> refs/merge-requests/89/head
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/89/merge -> refs/merge-requests/89/merge
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/90/head -> refs/merge-requests/90/head
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/90/merge -> refs/merge-requests/90/merge
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/91/head -> refs/merge-requests/91/head
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/91/merge -> refs/merge-requests/91/merge
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/92/head -> refs/merge-requests/92/head
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/92/merge -> refs/merge-requests/92/merge
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/93/head -> refs/merge-requests/93/head
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/93/merge -> refs/merge-requests/93/merge
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/94/head -> refs/merge-requests/94/head
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/94/merge -> refs/merge-requests/94/merge
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/95/head -> refs/merge-requests/95/head
+ DEBUG [1254da47] 	 * [new ref]         refs/merge-requests/95/merge -> refs/merge-requests/95/merge
+  INFO [1254da47] Finished in 6.197 seconds with exit status 0 (successful).
+ DEBUG [0b6d8ad8] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [0b6d8ad8] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [0b6d8ad8] Finished in 0.689 seconds with exit status 0 (successful).
+  INFO [785037f6] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094040 as deployer@94.237.40.213
+ DEBUG [785037f6] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094040 )
+  INFO [785037f6] Finished in 1.081 seconds with exit status 0 (successful).
+  INFO [15b9cdcd] Running /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422094040 as deployer@94.237.40.213
+ DEBUG [15b9cdcd] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh" ; /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422094040 )
+  INFO [15b9cdcd] Finished in 0.671 seconds with exit status 0 (successful).
+ DEBUG [33e95e98] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [33e95e98] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [33e95e98] Finished in 1.977 seconds with exit status 0 (successful).
+ DEBUG [c23b035a] Running /usr/bin/env git rev-list --max-count=1 master as deployer@94.237.40.213
+ DEBUG [c23b035a] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-865f073557f0de7f643d.sh" ; /usr/bin/env git rev-list --max-count=1 master )
+ DEBUG [c23b035a] 	403fa2384d92e10af086f68bcd1fa9e80ec661d6
+ DEBUG [c23b035a] Finished in 0.632 seconds with exit status 0 (successful).
+ DEBUG [a5105671] Running if test ! -d /home/deployer/api/releases/20210422094040; then echo "Directory does not exist '/home/deployer/api/releases/20210422094040'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [a5105671] Command: if test ! -d /home/deployer/api/releases/20210422094040; then echo "Directory does not exist '/home/deployer/api/releases/20210422094040'" 1>&2; false; fi
+ DEBUG [a5105671] Finished in 0.899 seconds with exit status 0 (successful).
+  INFO [2ff91d4c] Running /usr/bin/env echo "403fa2384d92e10af086f68bcd1fa9e80ec661d6" > REVISION as deployer@94.237.40.213
+ DEBUG [2ff91d4c] Command: cd /home/deployer/api/releases/20210422094040 && /usr/bin/env echo "403fa2384d92e10af086f68bcd1fa9e80ec661d6" > REVISION
+  INFO [2ff91d4c] Finished in 0.622 seconds with exit status 0 (successful).
+  INFO [760f1213] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094040 as deployer@94.237.40.213
+ DEBUG [760f1213] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094040
+  INFO [760f1213] Finished in 0.854 seconds with exit status 0 (successful).
+ DEBUG [fdd3bb01] Running [ -L /home/deployer/api/releases/20210422094040/.env ] as deployer@94.237.40.213
+ DEBUG [fdd3bb01] Command: [ -L /home/deployer/api/releases/20210422094040/.env ]
+ DEBUG [fdd3bb01] Finished in 0.703 seconds with exit status 1 (failed).
+ DEBUG [58dd398e] Running [ -f /home/deployer/api/releases/20210422094040/.env ] as deployer@94.237.40.213
+ DEBUG [58dd398e] Command: [ -f /home/deployer/api/releases/20210422094040/.env ]
+ DEBUG [58dd398e] Finished in 0.934 seconds with exit status 1 (failed).
+  INFO [983dd0dc] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422094040/.env as deployer@94.237.40.213
+ DEBUG [983dd0dc] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422094040/.env
+  INFO [983dd0dc] Finished in 0.620 seconds with exit status 0 (successful).
+  INFO [f8500d14] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094040 as deployer@94.237.40.213
+ DEBUG [f8500d14] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094040
+  INFO [f8500d14] Finished in 0.747 seconds with exit status 0 (successful).
+ DEBUG [55dbff41] Running [ -L /home/deployer/api/releases/20210422094040/storage ] as deployer@94.237.40.213
+ DEBUG [55dbff41] Command: [ -L /home/deployer/api/releases/20210422094040/storage ]
+ DEBUG [55dbff41] Finished in 0.615 seconds with exit status 1 (failed).
+ DEBUG [22cb710e] Running [ -d /home/deployer/api/releases/20210422094040/storage ] as deployer@94.237.40.213
+ DEBUG [22cb710e] Command: [ -d /home/deployer/api/releases/20210422094040/storage ]
+ DEBUG [22cb710e] Finished in 1.541 seconds with exit status 0 (successful).
+  INFO [8cddb96a] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422094040/storage as deployer@94.237.40.213
+ DEBUG [8cddb96a] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422094040/storage
+  INFO [8cddb96a] Finished in 0.453 seconds with exit status 0 (successful).
+  INFO [23ef1a51] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422094040/storage as deployer@94.237.40.213
+ DEBUG [23ef1a51] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422094040/storage
+  INFO [23ef1a51] Finished in 1.601 seconds with exit status 0 (successful).
+  INFO [5f7f7f4e] Running /usr/bin/env ln -s /home/deployer/api/releases/20210422094040 /home/deployer/api/releases/current as deployer@94.237.40.213
+ DEBUG [5f7f7f4e] Command: /usr/bin/env ln -s /home/deployer/api/releases/20210422094040 /home/deployer/api/releases/current
+  INFO [5f7f7f4e] Finished in 0.756 seconds with exit status 0 (successful).
+  INFO [98d86704] Running /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api as deployer@94.237.40.213
+ DEBUG [98d86704] Command: /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api
+  INFO [98d86704] Finished in 0.669 seconds with exit status 0 (successful).
+ DEBUG [24d912ad] Running /usr/bin/env ls -x /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [24d912ad] Command: /usr/bin/env ls -x /home/deployer/api/releases
+ DEBUG [24d912ad] 	20210415052617	20210422094040
+ DEBUG [24d912ad] Finished in 0.612 seconds with exit status 0 (successful).
   INFO Keeping 1 of 2 deployed releases on 94.237.40.213
- DEBUG [86f27a98] Running [ -d /home/deployer/api/current ] as deployer@94.237.40.213
- DEBUG [86f27a98] Command: [ -d /home/deployer/api/current ]
- DEBUG [86f27a98] Finished in 0.587 seconds with exit status 0 (successful).
- DEBUG [9acbba99] Running /usr/bin/env readlink /home/deployer/api/current as deployer@94.237.40.213
- DEBUG [9acbba99] Command: /usr/bin/env readlink /home/deployer/api/current
- DEBUG [9acbba99] 	/home/deployer/api/releases/20210118071803
- DEBUG [9acbba99] Finished in 0.494 seconds with exit status 0 (successful).
-  INFO [ed8901cf] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210118071211 as deployer@94.237.40.213
- DEBUG [ed8901cf] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210118071211
-  INFO [ed8901cf] Finished in 0.759 seconds with exit status 0 (successful).
- DEBUG [d674bed3] Running if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi as deployer@94.237.40.213
- DEBUG [d674bed3] Command: if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi
- DEBUG [d674bed3] Finished in 0.494 seconds with exit status 0 (successful).
-  INFO [e7181ebd] Running /usr/bin/env echo "Branch master (at a008ed0f9684bb997465be17b55150639162dcc5) deployed as release 20210118071803 by Hazesoft" >> /home/deployer/api/revisions.log as deployer@94.237.40.213
- DEBUG [e7181ebd] Command: cd /home/deployer/api/releases && /usr/bin/env echo "Branch master (at a008ed0f9684bb997465be17b55150639162dcc5) deployed as release 20210118071803 by Hazesoft" >> /home/deployer/api/revisions.log
-  INFO [e7181ebd] Finished in 0.539 seconds with exit status 0 (successful).
+ DEBUG [25b1d938] Running [ -d /home/deployer/api/current ] as deployer@94.237.40.213
+ DEBUG [25b1d938] Command: [ -d /home/deployer/api/current ]
+ DEBUG [25b1d938] Finished in 1.268 seconds with exit status 0 (successful).
+ DEBUG [5431ba39] Running /usr/bin/env readlink /home/deployer/api/current as deployer@94.237.40.213
+ DEBUG [5431ba39] Command: /usr/bin/env readlink /home/deployer/api/current
+ DEBUG [5431ba39] 	/home/deployer/api/releases/20210422094040
+ DEBUG [5431ba39] Finished in 0.618 seconds with exit status 0 (successful).
+  INFO [15d989fb] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210415052617 as deployer@94.237.40.213
+ DEBUG [15d989fb] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210415052617
+  INFO [15d989fb] Finished in 1.733 seconds with exit status 0 (successful).
+ DEBUG [e650bbb6] Running if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [e650bbb6] Command: if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi
+ DEBUG [e650bbb6] Finished in 0.625 seconds with exit status 0 (successful).
+  INFO [3842f602] Running /usr/bin/env echo "Branch master (at 403fa2384d92e10af086f68bcd1fa9e80ec661d6) deployed as release 20210422094040 by hazesoftios" >> /home/deployer/api/revisions.log as deployer@94.237.40.213
+ DEBUG [3842f602] Command: cd /home/deployer/api/releases && /usr/bin/env echo "Branch master (at 403fa2384d92e10af086f68bcd1fa9e80ec661d6) deployed as release 20210422094040 by hazesoftios" >> /home/deployer/api/revisions.log
+  INFO [3842f602] Finished in 0.802 seconds with exit status 0 (successful).
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:29:55 +0545 cap staging deploy BRANCH=dev
+  INFO ---------------------------------------------------------------------------
+  INFO [2df8f847] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [2df8f847] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [2df8f847] Finished in 2.675 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh 100.0%
+  INFO [ae97a4fd] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh as deployer@94.237.40.213
+ DEBUG [ae97a4fd] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh
+  INFO [ae97a4fd] Finished in 0.522 seconds with exit status 0 (successful).
+  INFO [93f81c78] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [93f81c78] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [93f81c78] 	d96113221be55bad3315620f8e3b07e2ed005bf4	HEAD
+  INFO [93f81c78] Finished in 4.803 seconds with exit status 0 (successful).
+  INFO [7e57d860] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [7e57d860] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [7e57d860] Finished in 0.382 seconds with exit status 0 (successful).
+  INFO [092c4b08] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [092c4b08] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [092c4b08] Finished in 0.574 seconds with exit status 0 (successful).
+  INFO [0dd7698a] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [0dd7698a] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [0dd7698a] Finished in 0.681 seconds with exit status 0 (successful).
+ DEBUG [1bb3b72c] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [1bb3b72c] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [1bb3b72c] Finished in 0.513 seconds with exit status 0 (successful).
+ DEBUG [fda59603] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [fda59603] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [fda59603] Finished in 0.805 seconds with exit status 0 (successful).
+ DEBUG [2c35d0ec] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [2c35d0ec] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [2c35d0ec] 	403fa2384d92e10af086f68bcd1fa9e80ec661d6
+ DEBUG [2c35d0ec] Finished in 0.530 seconds with exit status 0 (successful).
+ DEBUG [07810479] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [07810479] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [07810479] Finished in 0.570 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /home/deployer/api/repo
+ DEBUG [2e2341cc] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [2e2341cc] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [2e2341cc] Finished in 0.534 seconds with exit status 0 (successful).
+  INFO [2f5424c1] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [2f5424c1] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [2f5424c1] Finished in 0.675 seconds with exit status 0 (successful).
+  INFO [5c7c03bf] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [5c7c03bf] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [5c7c03bf] 	Fetching origin
+  INFO [5c7c03bf] Finished in 6.368 seconds with exit status 0 (successful).
+ DEBUG [b1a46a42] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [b1a46a42] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [b1a46a42] Finished in 0.452 seconds with exit status 0 (successful).
+  INFO [f2d2ca5e] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094507 as deployer@94.237.40.213
+ DEBUG [f2d2ca5e] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094507 )
+  INFO [f2d2ca5e] Finished in 0.634 seconds with exit status 0 (successful).
+  INFO [3348604f] Running /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422094507 as deployer@94.237.40.213
+ DEBUG [3348604f] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh" ; /usr/bin/env git archive master | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422094507 )
+  INFO [3348604f] Finished in 0.548 seconds with exit status 0 (successful).
+ DEBUG [2f7939f3] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [2f7939f3] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [2f7939f3] Finished in 0.578 seconds with exit status 0 (successful).
+ DEBUG [084cf61f] Running /usr/bin/env git rev-list --max-count=1 master as deployer@94.237.40.213
+ DEBUG [084cf61f] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-cc4701ffa10111743b04.sh" ; /usr/bin/env git rev-list --max-count=1 master )
+ DEBUG [084cf61f] 	403fa2384d92e10af086f68bcd1fa9e80ec661d6
+ DEBUG [084cf61f] Finished in 0.835 seconds with exit status 0 (successful).
+ DEBUG [bf2652ba] Running if test ! -d /home/deployer/api/releases/20210422094507; then echo "Directory does not exist '/home/deployer/api/releases/20210422094507'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [bf2652ba] Command: if test ! -d /home/deployer/api/releases/20210422094507; then echo "Directory does not exist '/home/deployer/api/releases/20210422094507'" 1>&2; false; fi
+ DEBUG [bf2652ba] Finished in 0.614 seconds with exit status 0 (successful).
+  INFO [37db9a77] Running /usr/bin/env echo "403fa2384d92e10af086f68bcd1fa9e80ec661d6" > REVISION as deployer@94.237.40.213
+ DEBUG [37db9a77] Command: cd /home/deployer/api/releases/20210422094507 && /usr/bin/env echo "403fa2384d92e10af086f68bcd1fa9e80ec661d6" > REVISION
+  INFO [37db9a77] Finished in 0.607 seconds with exit status 0 (successful).
+  INFO [e34a3416] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094507 as deployer@94.237.40.213
+ DEBUG [e34a3416] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094507
+  INFO [e34a3416] Finished in 0.602 seconds with exit status 0 (successful).
+ DEBUG [a1e62134] Running [ -L /home/deployer/api/releases/20210422094507/.env ] as deployer@94.237.40.213
+ DEBUG [a1e62134] Command: [ -L /home/deployer/api/releases/20210422094507/.env ]
+ DEBUG [a1e62134] Finished in 0.532 seconds with exit status 1 (failed).
+ DEBUG [f79a4b3d] Running [ -f /home/deployer/api/releases/20210422094507/.env ] as deployer@94.237.40.213
+ DEBUG [f79a4b3d] Command: [ -f /home/deployer/api/releases/20210422094507/.env ]
+ DEBUG [f79a4b3d] Finished in 0.704 seconds with exit status 1 (failed).
+  INFO [20db244a] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422094507/.env as deployer@94.237.40.213
+ DEBUG [20db244a] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422094507/.env
+  INFO [20db244a] Finished in 0.511 seconds with exit status 0 (successful).
+  INFO [8f2387ab] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094507 as deployer@94.237.40.213
+ DEBUG [8f2387ab] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094507
+  INFO [8f2387ab] Finished in 0.576 seconds with exit status 0 (successful).
+ DEBUG [bcb248cf] Running [ -L /home/deployer/api/releases/20210422094507/storage ] as deployer@94.237.40.213
+ DEBUG [bcb248cf] Command: [ -L /home/deployer/api/releases/20210422094507/storage ]
+ DEBUG [bcb248cf] Finished in 0.512 seconds with exit status 1 (failed).
+ DEBUG [88849b91] Running [ -d /home/deployer/api/releases/20210422094507/storage ] as deployer@94.237.40.213
+ DEBUG [88849b91] Command: [ -d /home/deployer/api/releases/20210422094507/storage ]
+ DEBUG [88849b91] Finished in 0.557 seconds with exit status 0 (successful).
+  INFO [919781b7] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422094507/storage as deployer@94.237.40.213
+ DEBUG [919781b7] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422094507/storage
+  INFO [919781b7] Finished in 0.548 seconds with exit status 0 (successful).
+  INFO [320ff733] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422094507/storage as deployer@94.237.40.213
+ DEBUG [320ff733] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422094507/storage
+  INFO [320ff733] Finished in 1.225 seconds with exit status 0 (successful).
+  INFO [5ae6eec8] Running /usr/bin/env ln -s /home/deployer/api/releases/20210422094507 /home/deployer/api/releases/current as deployer@94.237.40.213
+ DEBUG [5ae6eec8] Command: /usr/bin/env ln -s /home/deployer/api/releases/20210422094507 /home/deployer/api/releases/current
+  INFO [5ae6eec8] Finished in 0.837 seconds with exit status 0 (successful).
+  INFO [c471e226] Running /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api as deployer@94.237.40.213
+ DEBUG [c471e226] Command: /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api
+  INFO [c471e226] Finished in 0.600 seconds with exit status 0 (successful).
+ DEBUG [8535fe41] Running /usr/bin/env ls -x /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [8535fe41] Command: /usr/bin/env ls -x /home/deployer/api/releases
+ DEBUG [8535fe41] 	20210422094040	20210422094507
+ DEBUG [8535fe41] Finished in 1.257 seconds with exit status 0 (successful).
+  INFO Keeping 1 of 2 deployed releases on 94.237.40.213
+ DEBUG [0f6e7d6e] Running [ -d /home/deployer/api/current ] as deployer@94.237.40.213
+ DEBUG [0f6e7d6e] Command: [ -d /home/deployer/api/current ]
+ DEBUG [0f6e7d6e] Finished in 0.657 seconds with exit status 0 (successful).
+ DEBUG [914dcbc3] Running /usr/bin/env readlink /home/deployer/api/current as deployer@94.237.40.213
+ DEBUG [914dcbc3] Command: /usr/bin/env readlink /home/deployer/api/current
+ DEBUG [914dcbc3] 	/home/deployer/api/releases/20210422094507
+ DEBUG [914dcbc3] Finished in 0.974 seconds with exit status 0 (successful).
+  INFO [7985cc02] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422094040 as deployer@94.237.40.213
+ DEBUG [7985cc02] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422094040
+  INFO [7985cc02] Finished in 1.043 seconds with exit status 0 (successful).
+ DEBUG [22cee156] Running if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [22cee156] Command: if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi
+ DEBUG [22cee156] Finished in 0.657 seconds with exit status 0 (successful).
+  INFO [6dea795e] Running /usr/bin/env echo "Branch master (at 403fa2384d92e10af086f68bcd1fa9e80ec661d6) deployed as release 20210422094507 by hazesoftios" >> /home/deployer/api/revisions.log as deployer@94.237.40.213
+ DEBUG [6dea795e] Command: cd /home/deployer/api/releases && /usr/bin/env echo "Branch master (at 403fa2384d92e10af086f68bcd1fa9e80ec661d6) deployed as release 20210422094507 by hazesoftios" >> /home/deployer/api/revisions.log
+  INFO [6dea795e] Finished in 0.569 seconds with exit status 0 (successful).
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:30:54 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [3a827fba] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [3a827fba] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [3a827fba] Finished in 2.055 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh 100.0%
+  INFO [5f14f6e9] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh as deployer@94.237.40.213
+ DEBUG [5f14f6e9] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh
+  INFO [5f14f6e9] Finished in 0.492 seconds with exit status 0 (successful).
+  INFO [6c69d5df] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [6c69d5df] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [6c69d5df] 	d96113221be55bad3315620f8e3b07e2ed005bf4	HEAD
+  INFO [6c69d5df] Finished in 4.710 seconds with exit status 0 (successful).
+  INFO [80382dbe] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [80382dbe] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [80382dbe] Finished in 0.543 seconds with exit status 0 (successful).
+  INFO [f59f9918] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [f59f9918] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [f59f9918] Finished in 0.567 seconds with exit status 0 (successful).
+  INFO [80a5bf36] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [80a5bf36] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [80a5bf36] Finished in 1.034 seconds with exit status 0 (successful).
+ DEBUG [64f92231] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [64f92231] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [64f92231] Finished in 0.607 seconds with exit status 0 (successful).
+ DEBUG [d884cecc] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [d884cecc] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [d884cecc] Finished in 0.514 seconds with exit status 0 (successful).
+ DEBUG [1bdfb239] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [1bdfb239] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [1bdfb239] 	403fa2384d92e10af086f68bcd1fa9e80ec661d6
+ DEBUG [1bdfb239] Finished in 1.432 seconds with exit status 0 (successful).
+ DEBUG [8a6720a8] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [8a6720a8] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [8a6720a8] Finished in 0.495 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /home/deployer/api/repo
+ DEBUG [6d3a3f7a] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [6d3a3f7a] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [6d3a3f7a] Finished in 0.544 seconds with exit status 0 (successful).
+  INFO [7a5e2b69] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [7a5e2b69] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [7a5e2b69] Finished in 0.539 seconds with exit status 0 (successful).
+  INFO [3c1ea8ee] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [3c1ea8ee] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [3c1ea8ee] 	Fetching origin
+  INFO [3c1ea8ee] Finished in 3.744 seconds with exit status 0 (successful).
+ DEBUG [bcec7c1d] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [bcec7c1d] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [bcec7c1d] Finished in 0.336 seconds with exit status 0 (successful).
+  INFO [37c0fa2d] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094607 as deployer@94.237.40.213
+ DEBUG [37c0fa2d] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094607 )
+  INFO [37c0fa2d] Finished in 0.497 seconds with exit status 0 (successful).
+  INFO [d0405554] Running /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422094607 as deployer@94.237.40.213
+ DEBUG [d0405554] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh" ; /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422094607 )
+  INFO [d0405554] Finished in 0.571 seconds with exit status 0 (successful).
+ DEBUG [91a18721] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [91a18721] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [91a18721] Finished in 0.692 seconds with exit status 0 (successful).
+ DEBUG [0b792117] Running /usr/bin/env git rev-list --max-count=1 dev as deployer@94.237.40.213
+ DEBUG [0b792117] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-73e7f9435b37b6f1fc35.sh" ; /usr/bin/env git rev-list --max-count=1 dev )
+ DEBUG [0b792117] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [0b792117] Finished in 0.617 seconds with exit status 0 (successful).
+ DEBUG [f1069007] Running if test ! -d /home/deployer/api/releases/20210422094607; then echo "Directory does not exist '/home/deployer/api/releases/20210422094607'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [f1069007] Command: if test ! -d /home/deployer/api/releases/20210422094607; then echo "Directory does not exist '/home/deployer/api/releases/20210422094607'" 1>&2; false; fi
+ DEBUG [f1069007] Finished in 1.477 seconds with exit status 0 (successful).
+  INFO [dbd2d001] Running /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION as deployer@94.237.40.213
+ DEBUG [dbd2d001] Command: cd /home/deployer/api/releases/20210422094607 && /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION
+  INFO [dbd2d001] Finished in 0.551 seconds with exit status 0 (successful).
+  INFO [2fcd9714] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094607 as deployer@94.237.40.213
+ DEBUG [2fcd9714] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094607
+  INFO [2fcd9714] Finished in 0.594 seconds with exit status 0 (successful).
+ DEBUG [54dc9855] Running [ -L /home/deployer/api/releases/20210422094607/.env ] as deployer@94.237.40.213
+ DEBUG [54dc9855] Command: [ -L /home/deployer/api/releases/20210422094607/.env ]
+ DEBUG [54dc9855] Finished in 1.150 seconds with exit status 1 (failed).
+ DEBUG [daf261b1] Running [ -f /home/deployer/api/releases/20210422094607/.env ] as deployer@94.237.40.213
+ DEBUG [daf261b1] Command: [ -f /home/deployer/api/releases/20210422094607/.env ]
+ DEBUG [daf261b1] Finished in 1.014 seconds with exit status 1 (failed).
+  INFO [334802ca] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422094607/.env as deployer@94.237.40.213
+ DEBUG [334802ca] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422094607/.env
+  INFO [334802ca] Finished in 1.197 seconds with exit status 0 (successful).
+  INFO [10871994] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094607 as deployer@94.237.40.213
+ DEBUG [10871994] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422094607
+  INFO [10871994] Finished in 1.128 seconds with exit status 0 (successful).
+ DEBUG [d79f62bf] Running [ -L /home/deployer/api/releases/20210422094607/storage ] as deployer@94.237.40.213
+ DEBUG [d79f62bf] Command: [ -L /home/deployer/api/releases/20210422094607/storage ]
+ DEBUG [d79f62bf] Finished in 0.600 seconds with exit status 1 (failed).
+ DEBUG [261bc041] Running [ -d /home/deployer/api/releases/20210422094607/storage ] as deployer@94.237.40.213
+ DEBUG [261bc041] Command: [ -d /home/deployer/api/releases/20210422094607/storage ]
+ DEBUG [261bc041] Finished in 4.142 seconds with exit status 0 (successful).
+  INFO [c995c462] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422094607/storage as deployer@94.237.40.213
+ DEBUG [c995c462] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422094607/storage
+  INFO [c995c462] Finished in 0.672 seconds with exit status 0 (successful).
+  INFO [26ccf5cb] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422094607/storage as deployer@94.237.40.213
+ DEBUG [26ccf5cb] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422094607/storage
+  INFO [26ccf5cb] Finished in 1.337 seconds with exit status 0 (successful).
+  INFO [6bfec814] Running /usr/bin/env ln -s /home/deployer/api/releases/20210422094607 /home/deployer/api/releases/current as deployer@94.237.40.213
+ DEBUG [6bfec814] Command: /usr/bin/env ln -s /home/deployer/api/releases/20210422094607 /home/deployer/api/releases/current
+  INFO [6bfec814] Finished in 1.349 seconds with exit status 0 (successful).
+  INFO [0bed15b3] Running /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api as deployer@94.237.40.213
+ DEBUG [0bed15b3] Command: /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api
+  INFO [0bed15b3] Finished in 0.509 seconds with exit status 0 (successful).
+ DEBUG [62a861a4] Running /usr/bin/env ls -x /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [62a861a4] Command: /usr/bin/env ls -x /home/deployer/api/releases
+ DEBUG [62a861a4] 	20210422094507	20210422094607
+ DEBUG [62a861a4] Finished in 0.605 seconds with exit status 0 (successful).
+  INFO Keeping 1 of 2 deployed releases on 94.237.40.213
+ DEBUG [039faa27] Running [ -d /home/deployer/api/current ] as deployer@94.237.40.213
+ DEBUG [039faa27] Command: [ -d /home/deployer/api/current ]
+ DEBUG [039faa27] Finished in 0.544 seconds with exit status 0 (successful).
+ DEBUG [70d3b376] Running /usr/bin/env readlink /home/deployer/api/current as deployer@94.237.40.213
+ DEBUG [70d3b376] Command: /usr/bin/env readlink /home/deployer/api/current
+ DEBUG [70d3b376] 	/home/deployer/api/releases/20210422094607
+ DEBUG [70d3b376] Finished in 0.571 seconds with exit status 0 (successful).
+  INFO [d77c28b5] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422094507 as deployer@94.237.40.213
+ DEBUG [d77c28b5] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422094507
+  INFO [d77c28b5] Finished in 0.604 seconds with exit status 0 (successful).
+ DEBUG [1ec3a6ef] Running if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [1ec3a6ef] Command: if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi
+ DEBUG [1ec3a6ef] Finished in 0.565 seconds with exit status 0 (successful).
+  INFO [08d75511] Running /usr/bin/env echo "Branch dev (at d96113221be55bad3315620f8e3b07e2ed005bf4) deployed as release 20210422094607 by hazesoftios" >> /home/deployer/api/revisions.log as deployer@94.237.40.213
+ DEBUG [08d75511] Command: cd /home/deployer/api/releases && /usr/bin/env echo "Branch dev (at d96113221be55bad3315620f8e3b07e2ed005bf4) deployed as release 20210422094607 by hazesoftios" >> /home/deployer/api/revisions.log
+  INFO [08d75511] Finished in 0.551 seconds with exit status 0 (successful).
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:44:31 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [99df975e] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [99df975e] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [99df975e] Finished in 4.476 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-536acead159119cba6fe.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-536acead159119cba6fe.sh 100.0%
+  INFO [c42e007f] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-536acead159119cba6fe.sh as deployer@94.237.40.213
+ DEBUG [c42e007f] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-536acead159119cba6fe.sh
+  INFO [c42e007f] Finished in 0.735 seconds with exit status 0 (successful).
+  INFO [ed52ee23] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [ed52ee23] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-536acead159119cba6fe.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [ed52ee23] 	d96113221be55bad3315620f8e3b07e2ed005bf4	HEAD
+  INFO [ed52ee23] Finished in 3.340 seconds with exit status 0 (successful).
+  INFO [74fb5866] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [74fb5866] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [74fb5866] Finished in 0.517 seconds with exit status 0 (successful).
+  INFO [da344bd2] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [da344bd2] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [da344bd2] Finished in 0.806 seconds with exit status 0 (successful).
+  INFO [b679a5c6] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [b679a5c6] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [b679a5c6] Finished in 0.813 seconds with exit status 0 (successful).
+ DEBUG [2da5c842] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [2da5c842] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [2da5c842] Finished in 1.785 seconds with exit status 0 (successful).
+ DEBUG [9839ca90] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [9839ca90] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [9839ca90] Finished in 0.673 seconds with exit status 0 (successful).
+ DEBUG [dadd8366] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [dadd8366] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [dadd8366] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [dadd8366] Finished in 0.650 seconds with exit status 0 (successful).
+ DEBUG [3f806a03] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [3f806a03] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [3f806a03] Finished in 0.518 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /home/deployer/api/repo
+ DEBUG [d63d9faa] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [d63d9faa] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [d63d9faa] Finished in 1.243 seconds with exit status 0 (successful).
+  INFO [38f98ece] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [38f98ece] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-536acead159119cba6fe.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [38f98ece] Finished in 0.509 seconds with exit status 0 (successful).
+  INFO [a64e6bc7] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [a64e6bc7] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-536acead159119cba6fe.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [a64e6bc7] 	Fetching origin
+  INFO [a64e6bc7] Finished in 3.288 seconds with exit status 0 (successful).
+ DEBUG [fdf42114] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [fdf42114] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [fdf42114] Finished in 0.575 seconds with exit status 0 (successful).
+  INFO [686457ef] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422095947 as deployer@94.237.40.213
+ DEBUG [686457ef] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-536acead159119cba6fe.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210422095947 )
+  INFO [686457ef] Finished in 0.633 seconds with exit status 0 (successful).
+  INFO [1c791d83] Running /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422095947 as deployer@94.237.40.213
+ DEBUG [1c791d83] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-536acead159119cba6fe.sh" ; /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422095947 )
+  INFO [1c791d83] Finished in 0.602 seconds with exit status 0 (successful).
+ DEBUG [7b6193ac] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [7b6193ac] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [7b6193ac] Finished in 0.660 seconds with exit status 0 (successful).
+ DEBUG [ec8c7919] Running /usr/bin/env git rev-list --max-count=1 dev as deployer@94.237.40.213
+ DEBUG [ec8c7919] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-536acead159119cba6fe.sh" ; /usr/bin/env git rev-list --max-count=1 dev )
+ DEBUG [ec8c7919] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [ec8c7919] Finished in 0.518 seconds with exit status 0 (successful).
+ DEBUG [70903cd3] Running if test ! -d /home/deployer/api/releases/20210422095947; then echo "Directory does not exist '/home/deployer/api/releases/20210422095947'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [70903cd3] Command: if test ! -d /home/deployer/api/releases/20210422095947; then echo "Directory does not exist '/home/deployer/api/releases/20210422095947'" 1>&2; false; fi
+ DEBUG [70903cd3] Finished in 1.090 seconds with exit status 0 (successful).
+  INFO [ea70a564] Running /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION as deployer@94.237.40.213
+ DEBUG [ea70a564] Command: cd /home/deployer/api/releases/20210422095947 && /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION
+  INFO [ea70a564] Finished in 0.536 seconds with exit status 0 (successful).
+  INFO [a82a7ed4] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422095947 as deployer@94.237.40.213
+ DEBUG [a82a7ed4] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422095947
+  INFO [a82a7ed4] Finished in 0.583 seconds with exit status 0 (successful).
+ DEBUG [4b8e3840] Running [ -L /home/deployer/api/releases/20210422095947/.env ] as deployer@94.237.40.213
+ DEBUG [4b8e3840] Command: [ -L /home/deployer/api/releases/20210422095947/.env ]
+ DEBUG [4b8e3840] Finished in 0.524 seconds with exit status 1 (failed).
+ DEBUG [925d1e0f] Running [ -f /home/deployer/api/releases/20210422095947/.env ] as deployer@94.237.40.213
+ DEBUG [925d1e0f] Command: [ -f /home/deployer/api/releases/20210422095947/.env ]
+ DEBUG [925d1e0f] Finished in 0.564 seconds with exit status 1 (failed).
+  INFO [8b11ad22] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422095947/.env as deployer@94.237.40.213
+ DEBUG [8b11ad22] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422095947/.env
+  INFO [8b11ad22] Finished in 0.549 seconds with exit status 0 (successful).
+  INFO [ef3a029b] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422095947 as deployer@94.237.40.213
+ DEBUG [ef3a029b] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422095947
+  INFO [ef3a029b] Finished in 0.552 seconds with exit status 0 (successful).
+ DEBUG [4dea4d8b] Running [ -L /home/deployer/api/releases/20210422095947/storage ] as deployer@94.237.40.213
+ DEBUG [4dea4d8b] Command: [ -L /home/deployer/api/releases/20210422095947/storage ]
+ DEBUG [4dea4d8b] Finished in 0.514 seconds with exit status 1 (failed).
+ DEBUG [980f7886] Running [ -d /home/deployer/api/releases/20210422095947/storage ] as deployer@94.237.40.213
+ DEBUG [980f7886] Command: [ -d /home/deployer/api/releases/20210422095947/storage ]
+ DEBUG [980f7886] Finished in 1.616 seconds with exit status 0 (successful).
+  INFO [3c8c7ce4] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422095947/storage as deployer@94.237.40.213
+ DEBUG [3c8c7ce4] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422095947/storage
+  INFO [3c8c7ce4] Finished in 1.120 seconds with exit status 0 (successful).
+  INFO [02a58d38] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422095947/storage as deployer@94.237.40.213
+ DEBUG [02a58d38] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422095947/storage
+  INFO [02a58d38] Finished in 0.518 seconds with exit status 0 (successful).
+  INFO [3c34c6d7] Running /usr/bin/env ln -s /home/deployer/api/releases/20210422095947 /home/deployer/api/releases/current as deployer@94.237.40.213
+ DEBUG [3c34c6d7] Command: /usr/bin/env ln -s /home/deployer/api/releases/20210422095947 /home/deployer/api/releases/current
+  INFO [3c34c6d7] Finished in 0.849 seconds with exit status 0 (successful).
+  INFO [4c8c3bcd] Running /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api as deployer@94.237.40.213
+ DEBUG [4c8c3bcd] Command: /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api
+  INFO [4c8c3bcd] Finished in 1.917 seconds with exit status 0 (successful).
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:47:03 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [f4b70b58] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [f4b70b58] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [f4b70b58] Finished in 2.590 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh 100.0%
+  INFO [d1bbc14c] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh as deployer@94.237.40.213
+ DEBUG [d1bbc14c] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh
+  INFO [d1bbc14c] Finished in 2.052 seconds with exit status 0 (successful).
+  INFO [9765956d] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [9765956d] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [9765956d] 	d96113221be55bad3315620f8e3b07e2ed005bf4	HEAD
+  INFO [9765956d] Finished in 5.015 seconds with exit status 0 (successful).
+  INFO [08462b8e] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [08462b8e] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [08462b8e] Finished in 5.841 seconds with exit status 0 (successful).
+  INFO [26795161] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [26795161] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [26795161] Finished in 1.594 seconds with exit status 0 (successful).
+  INFO [95a3eb64] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [95a3eb64] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [95a3eb64] Finished in 2.809 seconds with exit status 0 (successful).
+ DEBUG [dea0275f] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [dea0275f] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [dea0275f] Finished in 2.379 seconds with exit status 0 (successful).
+ DEBUG [57e5ed89] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [57e5ed89] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [57e5ed89] Finished in 4.095 seconds with exit status 0 (successful).
+ DEBUG [414a241e] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [414a241e] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [414a241e] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [414a241e] Finished in 4.147 seconds with exit status 0 (successful).
+ DEBUG [b947af7b] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [b947af7b] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [b947af7b] Finished in 4.422 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /home/deployer/api/repo
+ DEBUG [04210059] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [04210059] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [04210059] Finished in 3.467 seconds with exit status 0 (successful).
+  INFO [236fc6d5] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [236fc6d5] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [236fc6d5] Finished in 1.416 seconds with exit status 0 (successful).
+  INFO [6a3e216f] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [6a3e216f] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [6a3e216f] 	Fetching origin
+  INFO [6a3e216f] Finished in 8.384 seconds with exit status 0 (successful).
+ DEBUG [1c0ca205] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [1c0ca205] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [1c0ca205] Finished in 0.609 seconds with exit status 0 (successful).
+  INFO [848af031] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100236 as deployer@94.237.40.213
+ DEBUG [848af031] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100236 )
+  INFO [848af031] Finished in 1.095 seconds with exit status 0 (successful).
+  INFO [fd02a675] Running /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422100236 as deployer@94.237.40.213
+ DEBUG [fd02a675] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh" ; /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422100236 )
+  INFO [fd02a675] Finished in 3.615 seconds with exit status 0 (successful).
+ DEBUG [5d93f00b] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [5d93f00b] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [5d93f00b] Finished in 1.070 seconds with exit status 0 (successful).
+ DEBUG [0908ccd7] Running /usr/bin/env git rev-list --max-count=1 dev as deployer@94.237.40.213
+ DEBUG [0908ccd7] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-a9d4b9db1aeea303315e.sh" ; /usr/bin/env git rev-list --max-count=1 dev )
+ DEBUG [0908ccd7] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [0908ccd7] Finished in 1.564 seconds with exit status 0 (successful).
+ DEBUG [ba94c547] Running if test ! -d /home/deployer/api/releases/20210422100236; then echo "Directory does not exist '/home/deployer/api/releases/20210422100236'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [ba94c547] Command: if test ! -d /home/deployer/api/releases/20210422100236; then echo "Directory does not exist '/home/deployer/api/releases/20210422100236'" 1>&2; false; fi
+ DEBUG [ba94c547] Finished in 2.105 seconds with exit status 0 (successful).
+  INFO [5f508bd0] Running /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION as deployer@94.237.40.213
+ DEBUG [5f508bd0] Command: cd /home/deployer/api/releases/20210422100236 && /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION
+  INFO [5f508bd0] Finished in 0.990 seconds with exit status 0 (successful).
+  INFO [d6243494] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100236 as deployer@94.237.40.213
+ DEBUG [d6243494] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100236
+  INFO [d6243494] Finished in 2.874 seconds with exit status 0 (successful).
+ DEBUG [70de0593] Running [ -L /home/deployer/api/releases/20210422100236/.env ] as deployer@94.237.40.213
+ DEBUG [70de0593] Command: [ -L /home/deployer/api/releases/20210422100236/.env ]
+ DEBUG [70de0593] Finished in 0.767 seconds with exit status 1 (failed).
+ DEBUG [50aac22c] Running [ -f /home/deployer/api/releases/20210422100236/.env ] as deployer@94.237.40.213
+ DEBUG [50aac22c] Command: [ -f /home/deployer/api/releases/20210422100236/.env ]
+ DEBUG [50aac22c] Finished in 5.223 seconds with exit status 1 (failed).
+  INFO [39efc097] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422100236/.env as deployer@94.237.40.213
+ DEBUG [39efc097] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422100236/.env
+  INFO [39efc097] Finished in 2.290 seconds with exit status 0 (successful).
+  INFO [9d250294] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100236 as deployer@94.237.40.213
+ DEBUG [9d250294] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100236
+  INFO [9d250294] Finished in 4.091 seconds with exit status 0 (successful).
+ DEBUG [913fd7e5] Running [ -L /home/deployer/api/releases/20210422100236/storage ] as deployer@94.237.40.213
+ DEBUG [913fd7e5] Command: [ -L /home/deployer/api/releases/20210422100236/storage ]
+ DEBUG [913fd7e5] Finished in 1.133 seconds with exit status 1 (failed).
+ DEBUG [21cedfd3] Running [ -d /home/deployer/api/releases/20210422100236/storage ] as deployer@94.237.40.213
+ DEBUG [21cedfd3] Command: [ -d /home/deployer/api/releases/20210422100236/storage ]
+ DEBUG [21cedfd3] Finished in 0.808 seconds with exit status 0 (successful).
+  INFO [65a84c28] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422100236/storage as deployer@94.237.40.213
+ DEBUG [65a84c28] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422100236/storage
+  INFO [65a84c28] Finished in 4.098 seconds with exit status 0 (successful).
+  INFO [389783b8] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422100236/storage as deployer@94.237.40.213
+ DEBUG [389783b8] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422100236/storage
+  INFO [389783b8] Finished in 3.746 seconds with exit status 0 (successful).
+  INFO [8dc54dd2] Running /usr/bin/env ln -s /home/deployer/api/releases/20210422100236 /home/deployer/api/releases/current as deployer@94.237.40.213
+ DEBUG [8dc54dd2] Command: /usr/bin/env ln -s /home/deployer/api/releases/20210422100236 /home/deployer/api/releases/current
+  INFO [8dc54dd2] Finished in 1.542 seconds with exit status 0 (successful).
+  INFO [09601fa4] Running /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api as deployer@94.237.40.213
+ DEBUG [09601fa4] Command: /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api
+  INFO [09601fa4] Finished in 2.193 seconds with exit status 0 (successful).
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:52:09 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [aa9af804] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [aa9af804] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [aa9af804] Finished in 2.409 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-511042caffa8c2188350.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-511042caffa8c2188350.sh 100.0%
+  INFO [5b8fb344] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-511042caffa8c2188350.sh as deployer@94.237.40.213
+ DEBUG [5b8fb344] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-511042caffa8c2188350.sh
+  INFO [5b8fb344] Finished in 0.537 seconds with exit status 0 (successful).
+  INFO [12539013] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [12539013] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-511042caffa8c2188350.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [12539013] 	d96113221be55bad3315620f8e3b07e2ed005bf4	HEAD
+  INFO [12539013] Finished in 4.987 seconds with exit status 0 (successful).
+  INFO [204a02eb] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [204a02eb] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [204a02eb] Finished in 0.535 seconds with exit status 0 (successful).
+  INFO [f0a9f467] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [f0a9f467] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [f0a9f467] Finished in 0.918 seconds with exit status 0 (successful).
+  INFO [1695c822] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [1695c822] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [1695c822] Finished in 0.554 seconds with exit status 0 (successful).
+ DEBUG [c8485e47] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [c8485e47] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [c8485e47] Finished in 0.571 seconds with exit status 0 (successful).
+ DEBUG [7d5c362f] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [7d5c362f] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [7d5c362f] Finished in 0.612 seconds with exit status 0 (successful).
+ DEBUG [f5b6991e] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [f5b6991e] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [f5b6991e] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [f5b6991e] Finished in 0.584 seconds with exit status 0 (successful).
+ DEBUG [d4f75303] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [d4f75303] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [d4f75303] Finished in 0.512 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /home/deployer/api/repo
+ DEBUG [5af204b0] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [5af204b0] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [5af204b0] Finished in 1.021 seconds with exit status 0 (successful).
+  INFO [80e1d383] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [80e1d383] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-511042caffa8c2188350.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [80e1d383] Finished in 0.507 seconds with exit status 0 (successful).
+  INFO [d37ad760] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [d37ad760] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-511042caffa8c2188350.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [d37ad760] 	Fetching origin
+  INFO [d37ad760] Finished in 3.903 seconds with exit status 0 (successful).
+ DEBUG [2f00be94] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [2f00be94] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [2f00be94] Finished in 0.539 seconds with exit status 0 (successful).
+  INFO [afd90b42] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100723 as deployer@94.237.40.213
+ DEBUG [afd90b42] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-511042caffa8c2188350.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100723 )
+  INFO [afd90b42] Finished in 0.549 seconds with exit status 0 (successful).
+  INFO [af370e7a] Running /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422100723 as deployer@94.237.40.213
+ DEBUG [af370e7a] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-511042caffa8c2188350.sh" ; /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422100723 )
+  INFO [af370e7a] Finished in 0.551 seconds with exit status 0 (successful).
+ DEBUG [5fceb5e2] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [5fceb5e2] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [5fceb5e2] Finished in 0.546 seconds with exit status 0 (successful).
+ DEBUG [f0bbd537] Running /usr/bin/env git rev-list --max-count=1 dev as deployer@94.237.40.213
+ DEBUG [f0bbd537] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-511042caffa8c2188350.sh" ; /usr/bin/env git rev-list --max-count=1 dev )
+ DEBUG [f0bbd537] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [f0bbd537] Finished in 0.515 seconds with exit status 0 (successful).
+ DEBUG [8d2ef1f4] Running if test ! -d /home/deployer/api/releases/20210422100723; then echo "Directory does not exist '/home/deployer/api/releases/20210422100723'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [8d2ef1f4] Command: if test ! -d /home/deployer/api/releases/20210422100723; then echo "Directory does not exist '/home/deployer/api/releases/20210422100723'" 1>&2; false; fi
+ DEBUG [8d2ef1f4] Finished in 0.962 seconds with exit status 0 (successful).
+  INFO [cffdc28e] Running /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION as deployer@94.237.40.213
+ DEBUG [cffdc28e] Command: cd /home/deployer/api/releases/20210422100723 && /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION
+  INFO [cffdc28e] Finished in 0.568 seconds with exit status 0 (successful).
+  INFO [6d87bd7f] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100723 as deployer@94.237.40.213
+ DEBUG [6d87bd7f] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100723
+  INFO [6d87bd7f] Finished in 1.078 seconds with exit status 0 (successful).
+ DEBUG [48d1b66c] Running [ -L /home/deployer/api/releases/20210422100723/.env ] as deployer@94.237.40.213
+ DEBUG [48d1b66c] Command: [ -L /home/deployer/api/releases/20210422100723/.env ]
+ DEBUG [48d1b66c] Finished in 3.301 seconds with exit status 1 (failed).
+ DEBUG [f78ecac9] Running [ -f /home/deployer/api/releases/20210422100723/.env ] as deployer@94.237.40.213
+ DEBUG [f78ecac9] Command: [ -f /home/deployer/api/releases/20210422100723/.env ]
+ DEBUG [f78ecac9] Finished in 0.796 seconds with exit status 1 (failed).
+  INFO [22fcdf62] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422100723/.env as deployer@94.237.40.213
+ DEBUG [22fcdf62] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422100723/.env
+  INFO [22fcdf62] Finished in 1.853 seconds with exit status 0 (successful).
+  INFO [cdc0297e] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100723 as deployer@94.237.40.213
+ DEBUG [cdc0297e] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100723
+  INFO [cdc0297e] Finished in 1.420 seconds with exit status 0 (successful).
+ DEBUG [1563f96c] Running [ -L /home/deployer/api/releases/20210422100723/storage ] as deployer@94.237.40.213
+ DEBUG [1563f96c] Command: [ -L /home/deployer/api/releases/20210422100723/storage ]
+ DEBUG [1563f96c] Finished in 0.517 seconds with exit status 1 (failed).
+ DEBUG [7956b11c] Running [ -d /home/deployer/api/releases/20210422100723/storage ] as deployer@94.237.40.213
+ DEBUG [7956b11c] Command: [ -d /home/deployer/api/releases/20210422100723/storage ]
+ DEBUG [7956b11c] Finished in 0.845 seconds with exit status 0 (successful).
+  INFO [ca058132] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422100723/storage as deployer@94.237.40.213
+ DEBUG [ca058132] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422100723/storage
+  INFO [ca058132] Finished in 0.533 seconds with exit status 0 (successful).
+  INFO [1f9aac63] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422100723/storage as deployer@94.237.40.213
+ DEBUG [1f9aac63] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422100723/storage
+  INFO [1f9aac63] Finished in 0.847 seconds with exit status 0 (successful).
+ DEBUG [7bfa6fe4] Running if test ! -d /home/deployer/api/current; then echo "Directory does not exist '/home/deployer/api/current'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [7bfa6fe4] Command: if test ! -d /home/deployer/api/current; then echo "Directory does not exist '/home/deployer/api/current'" 1>&2; false; fi
+ DEBUG [7bfa6fe4] Finished in 1.998 seconds with exit status 0 (successful).
+  INFO [b4821bd8] Running /usr/bin/env composer install --no-dev --no-interaction --quiet --optimize-autoloader as deployer@94.237.40.213
+ DEBUG [b4821bd8] Command: cd /home/deployer/api/current && /usr/bin/env composer install --no-dev --no-interaction --quiet --optimize-autoloader
+ DEBUG [b4821bd8] 	Your lock file does not contain a compatible set of packages. Please run composer update.
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:53:37 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [a3f41e09] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [a3f41e09] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [a3f41e09] Finished in 2.660 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh 100.0%
+  INFO [401f085e] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh as deployer@94.237.40.213
+ DEBUG [401f085e] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh
+  INFO [401f085e] Finished in 0.514 seconds with exit status 0 (successful).
+  INFO [3b91f999] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [3b91f999] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [3b91f999] 	d96113221be55bad3315620f8e3b07e2ed005bf4	HEAD
+  INFO [3b91f999] Finished in 4.025 seconds with exit status 0 (successful).
+  INFO [b52adc8c] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [b52adc8c] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [b52adc8c] Finished in 0.751 seconds with exit status 0 (successful).
+  INFO [b2fc91c7] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [b2fc91c7] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [b2fc91c7] Finished in 0.598 seconds with exit status 0 (successful).
+  INFO [ee4c3063] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [ee4c3063] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [ee4c3063] Finished in 0.501 seconds with exit status 0 (successful).
+ DEBUG [94c3a5a5] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [94c3a5a5] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [94c3a5a5] Finished in 0.552 seconds with exit status 0 (successful).
+ DEBUG [6c83ec05] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [6c83ec05] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [6c83ec05] Finished in 0.513 seconds with exit status 0 (successful).
+ DEBUG [cc0cca55] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [cc0cca55] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [cc0cca55] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [cc0cca55] Finished in 0.562 seconds with exit status 0 (successful).
+ DEBUG [7a84cfe8] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [7a84cfe8] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [7a84cfe8] Finished in 0.563 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /home/deployer/api/repo
+ DEBUG [9a214beb] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [9a214beb] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [9a214beb] Finished in 0.561 seconds with exit status 0 (successful).
+  INFO [e0ec01f9] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [e0ec01f9] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [e0ec01f9] Finished in 0.513 seconds with exit status 0 (successful).
+  INFO [b4ccc61c] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [b4ccc61c] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [b4ccc61c] 	Fetching origin
+  INFO [b4ccc61c] Finished in 5.568 seconds with exit status 0 (successful).
+ DEBUG [a0aef2c9] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [a0aef2c9] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [a0aef2c9] Finished in 1.015 seconds with exit status 0 (successful).
+  INFO [aca52b66] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100849 as deployer@94.237.40.213
+ DEBUG [aca52b66] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100849 )
+  INFO [aca52b66] Finished in 0.911 seconds with exit status 0 (successful).
+  INFO [9637e5e4] Running /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422100849 as deployer@94.237.40.213
+ DEBUG [9637e5e4] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh" ; /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422100849 )
+  INFO [9637e5e4] Finished in 0.572 seconds with exit status 0 (successful).
+ DEBUG [252c6696] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [252c6696] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [252c6696] Finished in 0.606 seconds with exit status 0 (successful).
+ DEBUG [c042a3dc] Running /usr/bin/env git rev-list --max-count=1 dev as deployer@94.237.40.213
+ DEBUG [c042a3dc] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-87a862a0bab94fbe768a.sh" ; /usr/bin/env git rev-list --max-count=1 dev )
+ DEBUG [c042a3dc] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [c042a3dc] Finished in 0.527 seconds with exit status 0 (successful).
+ DEBUG [da46ec99] Running if test ! -d /home/deployer/api/releases/20210422100849; then echo "Directory does not exist '/home/deployer/api/releases/20210422100849'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [da46ec99] Command: if test ! -d /home/deployer/api/releases/20210422100849; then echo "Directory does not exist '/home/deployer/api/releases/20210422100849'" 1>&2; false; fi
+ DEBUG [da46ec99] Finished in 0.716 seconds with exit status 0 (successful).
+  INFO [6a0925d7] Running /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION as deployer@94.237.40.213
+ DEBUG [6a0925d7] Command: cd /home/deployer/api/releases/20210422100849 && /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION
+  INFO [6a0925d7] Finished in 0.864 seconds with exit status 0 (successful).
+  INFO [c9cbe055] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100849 as deployer@94.237.40.213
+ DEBUG [c9cbe055] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100849
+  INFO [c9cbe055] Finished in 0.518 seconds with exit status 0 (successful).
+ DEBUG [9ed021ae] Running [ -L /home/deployer/api/releases/20210422100849/.env ] as deployer@94.237.40.213
+ DEBUG [9ed021ae] Command: [ -L /home/deployer/api/releases/20210422100849/.env ]
+ DEBUG [9ed021ae] Finished in 0.624 seconds with exit status 1 (failed).
+ DEBUG [a6fe7de4] Running [ -f /home/deployer/api/releases/20210422100849/.env ] as deployer@94.237.40.213
+ DEBUG [a6fe7de4] Command: [ -f /home/deployer/api/releases/20210422100849/.env ]
+ DEBUG [a6fe7de4] Finished in 0.663 seconds with exit status 1 (failed).
+  INFO [3bb03efe] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422100849/.env as deployer@94.237.40.213
+ DEBUG [3bb03efe] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422100849/.env
+  INFO [3bb03efe] Finished in 0.576 seconds with exit status 0 (successful).
+  INFO [c3d86f84] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100849 as deployer@94.237.40.213
+ DEBUG [c3d86f84] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422100849
+  INFO [c3d86f84] Finished in 0.793 seconds with exit status 0 (successful).
+ DEBUG [ce74b88e] Running [ -L /home/deployer/api/releases/20210422100849/storage ] as deployer@94.237.40.213
+ DEBUG [ce74b88e] Command: [ -L /home/deployer/api/releases/20210422100849/storage ]
+ DEBUG [ce74b88e] Finished in 0.602 seconds with exit status 1 (failed).
+ DEBUG [9255b5bf] Running [ -d /home/deployer/api/releases/20210422100849/storage ] as deployer@94.237.40.213
+ DEBUG [9255b5bf] Command: [ -d /home/deployer/api/releases/20210422100849/storage ]
+ DEBUG [9255b5bf] Finished in 0.521 seconds with exit status 0 (successful).
+  INFO [b645f8f0] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422100849/storage as deployer@94.237.40.213
+ DEBUG [b645f8f0] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422100849/storage
+  INFO [b645f8f0] Finished in 1.370 seconds with exit status 0 (successful).
+  INFO [f5394b6f] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422100849/storage as deployer@94.237.40.213
+ DEBUG [f5394b6f] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422100849/storage
+  INFO [f5394b6f] Finished in 0.994 seconds with exit status 0 (successful).
+ DEBUG [88b43fb3] Running if test ! -d /home/deployer/api/current; then echo "Directory does not exist '/home/deployer/api/current'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [88b43fb3] Command: if test ! -d /home/deployer/api/current; then echo "Directory does not exist '/home/deployer/api/current'" 1>&2; false; fi
+ DEBUG [88b43fb3] Finished in 1.230 seconds with exit status 0 (successful).
+  INFO [59049897] Running /usr/bin/env composer install --no-dev --no-interaction --quiet --optimize-autoloader as deployer@94.237.40.213
+ DEBUG [59049897] Command: cd /home/deployer/api/current && /usr/bin/env composer install --no-dev --no-interaction --quiet --optimize-autoloader
+ DEBUG [59049897] 	Your lock file does not contain a compatible set of packages. Please run composer update.
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-04-22 15:59:57 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [2c3cfa80] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [2c3cfa80] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [2c3cfa80] Finished in 4.133 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh 100.0%
+  INFO [45557b1a] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh as deployer@94.237.40.213
+ DEBUG [45557b1a] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh
+  INFO [45557b1a] Finished in 0.550 seconds with exit status 0 (successful).
+  INFO [ae766169] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [ae766169] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [ae766169] 	d96113221be55bad3315620f8e3b07e2ed005bf4	HEAD
+  INFO [ae766169] Finished in 6.205 seconds with exit status 0 (successful).
+  INFO [afe27e30] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [afe27e30] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [afe27e30] Finished in 0.525 seconds with exit status 0 (successful).
+  INFO [01d4aa5d] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [01d4aa5d] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [01d4aa5d] Finished in 0.739 seconds with exit status 0 (successful).
+  INFO [339aa1da] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [339aa1da] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [339aa1da] Finished in 0.522 seconds with exit status 0 (successful).
+ DEBUG [97e14199] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [97e14199] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [97e14199] Finished in 0.561 seconds with exit status 0 (successful).
+ DEBUG [9e9aa4c6] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [9e9aa4c6] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [9e9aa4c6] Finished in 0.532 seconds with exit status 0 (successful).
+ DEBUG [6d93a324] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [6d93a324] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [6d93a324] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [6d93a324] Finished in 1.670 seconds with exit status 0 (successful).
+ DEBUG [1f99422e] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [1f99422e] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [1f99422e] Finished in 0.855 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /home/deployer/api/repo
+ DEBUG [9937d721] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [9937d721] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [9937d721] Finished in 0.517 seconds with exit status 0 (successful).
+  INFO [cd66c582] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [cd66c582] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [cd66c582] Finished in 0.601 seconds with exit status 0 (successful).
+  INFO [3b101ff9] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [3b101ff9] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [3b101ff9] 	Fetching origin
+  INFO [3b101ff9] Finished in 3.687 seconds with exit status 0 (successful).
+ DEBUG [ba6078f8] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [ba6078f8] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [ba6078f8] Finished in 0.506 seconds with exit status 0 (successful).
+  INFO [6fd500ef] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422101515 as deployer@94.237.40.213
+ DEBUG [6fd500ef] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210422101515 )
+  INFO [6fd500ef] Finished in 0.589 seconds with exit status 0 (successful).
+  INFO [8c27e27a] Running /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422101515 as deployer@94.237.40.213
+ DEBUG [8c27e27a] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh" ; /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210422101515 )
+  INFO [8c27e27a] Finished in 0.549 seconds with exit status 0 (successful).
+ DEBUG [caecc885] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [caecc885] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [caecc885] Finished in 0.566 seconds with exit status 0 (successful).
+ DEBUG [3e7a54c2] Running /usr/bin/env git rev-list --max-count=1 dev as deployer@94.237.40.213
+ DEBUG [3e7a54c2] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-204d4c2975348ccd0b1a.sh" ; /usr/bin/env git rev-list --max-count=1 dev )
+ DEBUG [3e7a54c2] 	d96113221be55bad3315620f8e3b07e2ed005bf4
+ DEBUG [3e7a54c2] Finished in 0.570 seconds with exit status 0 (successful).
+ DEBUG [d565df38] Running if test ! -d /home/deployer/api/releases/20210422101515; then echo "Directory does not exist '/home/deployer/api/releases/20210422101515'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [d565df38] Command: if test ! -d /home/deployer/api/releases/20210422101515; then echo "Directory does not exist '/home/deployer/api/releases/20210422101515'" 1>&2; false; fi
+ DEBUG [d565df38] Finished in 0.597 seconds with exit status 0 (successful).
+  INFO [ab7e7db0] Running /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION as deployer@94.237.40.213
+ DEBUG [ab7e7db0] Command: cd /home/deployer/api/releases/20210422101515 && /usr/bin/env echo "d96113221be55bad3315620f8e3b07e2ed005bf4" > REVISION
+  INFO [ab7e7db0] Finished in 0.544 seconds with exit status 0 (successful).
+  INFO [5e5e548b] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422101515 as deployer@94.237.40.213
+ DEBUG [5e5e548b] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422101515
+  INFO [5e5e548b] Finished in 0.558 seconds with exit status 0 (successful).
+ DEBUG [b69a9b02] Running [ -L /home/deployer/api/releases/20210422101515/.env ] as deployer@94.237.40.213
+ DEBUG [b69a9b02] Command: [ -L /home/deployer/api/releases/20210422101515/.env ]
+ DEBUG [b69a9b02] Finished in 0.521 seconds with exit status 1 (failed).
+ DEBUG [8fa12d8a] Running [ -f /home/deployer/api/releases/20210422101515/.env ] as deployer@94.237.40.213
+ DEBUG [8fa12d8a] Command: [ -f /home/deployer/api/releases/20210422101515/.env ]
+ DEBUG [8fa12d8a] Finished in 0.590 seconds with exit status 1 (failed).
+  INFO [5c059eb7] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422101515/.env as deployer@94.237.40.213
+ DEBUG [5c059eb7] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210422101515/.env
+  INFO [5c059eb7] Finished in 0.515 seconds with exit status 0 (successful).
+  INFO [69cb9d4a] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210422101515 as deployer@94.237.40.213
+ DEBUG [69cb9d4a] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210422101515
+  INFO [69cb9d4a] Finished in 1.252 seconds with exit status 0 (successful).
+ DEBUG [e4fcd008] Running [ -L /home/deployer/api/releases/20210422101515/storage ] as deployer@94.237.40.213
+ DEBUG [e4fcd008] Command: [ -L /home/deployer/api/releases/20210422101515/storage ]
+ DEBUG [e4fcd008] Finished in 0.535 seconds with exit status 1 (failed).
+ DEBUG [6706de2e] Running [ -d /home/deployer/api/releases/20210422101515/storage ] as deployer@94.237.40.213
+ DEBUG [6706de2e] Command: [ -d /home/deployer/api/releases/20210422101515/storage ]
+ DEBUG [6706de2e] Finished in 0.567 seconds with exit status 0 (successful).
+  INFO [f7b72238] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422101515/storage as deployer@94.237.40.213
+ DEBUG [f7b72238] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422101515/storage
+  INFO [f7b72238] Finished in 0.568 seconds with exit status 0 (successful).
+  INFO [30615e8d] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422101515/storage as deployer@94.237.40.213
+ DEBUG [30615e8d] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210422101515/storage
+  INFO [30615e8d] Finished in 0.626 seconds with exit status 0 (successful).
+  INFO [c860a9bf] Running /usr/bin/env ln -s /home/deployer/api/releases/20210422101515 /home/deployer/api/releases/current as deployer@94.237.40.213
+ DEBUG [c860a9bf] Command: /usr/bin/env ln -s /home/deployer/api/releases/20210422101515 /home/deployer/api/releases/current
+  INFO [c860a9bf] Finished in 0.553 seconds with exit status 0 (successful).
+  INFO [65e5024e] Running /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api as deployer@94.237.40.213
+ DEBUG [65e5024e] Command: /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api
+  INFO [65e5024e] Finished in 0.578 seconds with exit status 0 (successful).
+ DEBUG [dfcf85fa] Running if test ! -d /home/deployer/api/current; then echo "Directory does not exist '/home/deployer/api/current'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [dfcf85fa] Command: if test ! -d /home/deployer/api/current; then echo "Directory does not exist '/home/deployer/api/current'" 1>&2; false; fi
+ DEBUG [dfcf85fa] Finished in 0.521 seconds with exit status 0 (successful).
+  INFO [4547bfec] Running /usr/bin/env composer update --prefer-dist --ignore-platform-reqs as deployer@94.237.40.213
+ DEBUG [4547bfec] Command: cd /home/deployer/api/current && /usr/bin/env composer update --prefer-dist --ignore-platform-reqs
+ DEBUG [4547bfec] 	Loading composer repositories with package information
+ DEBUG [4547bfec] 	Updating dependencies
+ DEBUG [4547bfec] 	Lock file operations: 0 installs, 12 updates, 1 removal
+ DEBUG [4547bfec] 	  - Removing dnoegel/php-xdg-base-dir (v0.1.1)
+ DEBUG [4547bfec] 	  - Upgrading facade/flare-client-php (1.5.0 => 1.7.0)
+ DEBUG [4547bfec] 	  - Upgrading facade/ignition (2.7.0 => 2.8.3)
+ DEBUG [4547bfec] 	  - Upgrading laravel/framework (v8.36.2 => v8.38.0)
+ DEBUG [4547bfec] 	  - Upgrading laravel/sail (v1.4.11 => v1.5.0)
+ DEBUG [4547bfec] 	  - Upgrading nunomaduro/collision (v5.3.0 => v5.4.0)
+ DEBUG [4547bfec] 	  - Upgrading opis/closure (3.6.1 => 3.6.2)
+ DEBUG [4547bfec] 	  - Upgrading psy/psysh (v0.10.7 => v0.10.8)
+ DEBUG [4547bfec] 	  - Upgrading symfony/deprecation-contracts (v2.2.0 => v2.4.0)
+ DEBUG [4547bfec] 	  - Upgrading symfony/event-dispatcher-contracts (v2.2.0 => v2.4.0)
+ DEBUG [4547bfec] 	  - Upgrading symfony/http-client-contracts (v2.3.1 => v2.4.0)
+ DEBUG [4547bfec] 	  - Upgrading symfony/service-contracts (v2.2.0 => v2.4.0)
+ DEBUG [4547bfec] 	  - Upgrading symfony/translation-contracts (v2.3.0 => v2.4.0)
+ DEBUG [4547bfec] 	Writing lock file
+ DEBUG [4547bfec] 	Installing dependencies from lock file (including require-dev)
+ DEBUG [4547bfec] 	Package operations: 111 installs, 0 updates, 0 removals
+ DEBUG [4547bfec] 	    0 [>---------------------------]
+ DEBUG [4547bfec] 	    0 [>---------------------------]
+ DEBUG [4547bfec] 	  - Installing doctrine/inflector (2.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing doctrine/lexer (1.2.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-ctype (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing webmozart/assert (1.10.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing dragonmantank/cron-expression (v3.1.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-php80 (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-mbstring (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/var-dumper (v5.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-intl-normalizer (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-intl-grapheme (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/string (v5.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing psr/container (1.1.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/service-contracts (v2.4.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-php73 (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/console (v5.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing psr/log (1.1.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing monolog/monolog (2.2.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing voku/portable-ascii (1.5.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpoption/phpoption (1.7.5): Extracting archive
+ DEBUG [4547bfec] 	  - Installing graham-campbell/result-type (v1.0.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing vlucas/phpdotenv (v5.3.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/css-selector (v5.2.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing tijsverkoyen/css-to-inline-styles (2.2.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/deprecation-contracts (v2.4.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/routing (v5.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/process (v5.2.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-php72 (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-intl-idn (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/mime (v5.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/http-foundation (v5.2.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/http-client-contracts (v2.4.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing psr/event-dispatcher (1.0.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/event-dispatcher-contracts (v2.4.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/event-dispatcher (v5.2.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/error-handler (v5.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/http-kernel (v5.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/finder (v5.2.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-iconv (v1.22.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing egulias/email-validator (2.1.25): Extracting archive
+ DEBUG [4547bfec] 	  - Installing swiftmailer/swiftmailer (v6.2.7): Extracting archive
+ DEBUG [4547bfec] 	  - Installing ramsey/collection (1.1.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing brick/math (0.9.2): Extracting archive
+ DEBUG [4547bfec] 	  - Installing ramsey/uuid (4.1.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing psr/simple-cache (1.0.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing opis/closure (3.6.2): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/translation-contracts (v2.4.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/translation (v5.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing nesbot/carbon (2.46.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing league/mime-type-detection (1.7.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing league/flysystem (1.1.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing league/commonmark (1.5.8): Extracting archive
+ DEBUG [4547bfec] 	  - Installing laravel/framework (v8.38.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing filp/whoops (2.12.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing facade/ignition-contracts (1.0.2): Extracting archive
+ DEBUG [4547bfec] 	  - Installing facade/flare-client-php (1.7.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing facade/ignition (2.8.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing fakerphp/faker (v1.14.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing fideloper/proxy (4.4.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing asm89/stack-cors (v2.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing fruitcake/laravel-cors (v2.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing psr/http-message (1.0.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing psr/http-client (1.0.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing ralouphie/getallheaders (3.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing guzzlehttp/psr7 (1.8.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing guzzlehttp/promises (1.4.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing guzzlehttp/guzzle (7.3.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing intervention/image (2.5.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing kalnoy/nestedset (v5.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing laravel/sail (v1.5.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing nikic/php-parser (v4.10.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing psy/psysh (v0.10.8): Extracting archive
+ DEBUG [4547bfec] 	  - Installing laravel/tinker (v2.6.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing hamcrest/hamcrest-php (v2.0.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing mockery/mockery (1.4.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing nunomaduro/collision (v5.4.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing nwidart/laravel-modules (8.2.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpdocumentor/reflection-common (2.2.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpdocumentor/type-resolver (1.4.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpdocumentor/reflection-docblock (5.2.2): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/version (3.0.2): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/type (2.3.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/resource-operations (3.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/recursion-context (4.0.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/object-reflector (2.0.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/object-enumerator (4.0.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/global-state (5.0.2): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/exporter (4.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/environment (5.1.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/diff (4.0.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/comparator (4.0.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/code-unit (1.0.8): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/cli-parser (1.0.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpunit/php-timer (5.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpunit/php-text-template (2.0.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpunit/php-invoker (3.1.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpunit/php-file-iterator (3.0.5): Extracting archive
+ DEBUG [4547bfec] 	  - Installing theseer/tokenizer (1.2.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/lines-of-code (1.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/complexity (2.0.2): Extracting archive
+ DEBUG [4547bfec] 	  - Installing sebastian/code-unit-reverse-lookup (2.0.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpunit/php-code-coverage (9.2.6): Extracting archive
+ DEBUG [4547bfec] 	  - Installing doctrine/instantiator (1.4.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpspec/prophecy (1.13.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phar-io/version (3.1.0): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phar-io/manifest (2.0.1): Extracting archive
+ DEBUG [4547bfec] 	  - Installing myclabs/deep-copy (1.10.2): Extracting archive
+ DEBUG [4547bfec] 	  - Installing phpunit/phpunit (9.5.4): Extracting archive
+ DEBUG [4547bfec] 	  - Installing symfony/polyfill-php56 (v1.20.0)
+ DEBUG [4547bfec] 	  - Installing namshi/jose (7.2.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing lcobucci/jwt (3.3.3): Extracting archive
+ DEBUG [4547bfec] 	  - Installing tymon/jwt-auth (1.0.2): Extracting archive
+ DEBUG [4547bfec] 	   0/100 [>---------------------------]   0%
+ DEBUG [4547bfec] 	
+  10/100 [==>-------------------------]  10%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	  20/100 [=====>----------------------]  20%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	  30/100 [========>-------------------]  30%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	  40/100 [===========>----------------]  40%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	  49/100 [=============>--------------]  49%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	  59/100 [================>-----------]  59%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	  69/100 [===================>--------]  69%
+ DEBUG [4547bfec] 	
+  79/100 [======================>-----]  79%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	  89/100 [========================>---]  89%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	  99/100 [===========================>]  99%
+ DEBUG [4547bfec] 	
+ DEBUG [4547bfec] 	 100/100 [============================] 100%
+ DEBUG [4547bfec] 	Generating optimized autoload files
+ DEBUG [4547bfec] 	> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+ DEBUG [4547bfec] 	> @php artisan package:discover --ansi
+ DEBUG [4547bfec] 	Discovered Package: [32mfacade/ignition[39m
+ DEBUG [4547bfec] 	Discovered Package: [32mfideloper/proxy[39m
+ DEBUG [4547bfec] 	Discovered Package: [32mfruitcake/laravel-cors[39m
+ DEBUG [4547bfec] 	Discovered Package: [32mintervention/image[39m
+Discovered Package: [32mkalnoy/nestedset[39m
+Discovered Package: [32mlaravel/sail[39m
+Discovered Package: [32mlaravel/tinker[39m
+Discovered Package: [32mnesbot/carbon[39m
+ DEBUG [4547bfec] 	Discovered Package: [32mnunomaduro/collision[39m
+Discovered Package: [32mnwidart/laravel-modules[39m
+Discovered Package: [32mtymon/jwt-auth[39m
+[32mPackage manifest generated successfully.[39m
+ DEBUG [4547bfec] 	78 packages you are using are looking for funding.
+ DEBUG [4547bfec] 	Use the `composer fund` command to find out more!
+  INFO [4547bfec] Finished in 20.890 seconds with exit status 0 (successful).
+ DEBUG [6e70258a] Running /usr/bin/env ls -x /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [6e70258a] Command: /usr/bin/env ls -x /home/deployer/api/releases
+ DEBUG [6e70258a] 	20210422094607	20210422095947	20210422100236	20210422100723	20210422100849
+20210422101515
+ DEBUG [6e70258a] Finished in 0.565 seconds with exit status 0 (successful).
+  INFO Keeping 1 of 6 deployed releases on 94.237.40.213
+ DEBUG [0cb642cb] Running [ -d /home/deployer/api/current ] as deployer@94.237.40.213
+ DEBUG [0cb642cb] Command: [ -d /home/deployer/api/current ]
+ DEBUG [0cb642cb] Finished in 0.641 seconds with exit status 0 (successful).
+ DEBUG [0c360173] Running /usr/bin/env readlink /home/deployer/api/current as deployer@94.237.40.213
+ DEBUG [0c360173] Command: /usr/bin/env readlink /home/deployer/api/current
+ DEBUG [0c360173] 	/home/deployer/api/releases/20210422101515
+ DEBUG [0c360173] Finished in 0.667 seconds with exit status 0 (successful).
+  INFO [5c869016] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210422094607 /home/deployer/api/releases/20210422095947 /home/deployer/api/releases/20210422100236 /home/deployer/api/releases/20210422100723 /home/deployer/api/releases/20210422100849 as deployer@94.237.40.213
+ DEBUG [5c869016] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210422094607 /home/deployer/api/releases/20210422095947 /home/deployer/api/releases/20210422100236 /home/deployer/api/releases/20210422100723 /home/deployer/api/releases/20210422100849
+  INFO [5c869016] Finished in 0.709 seconds with exit status 0 (successful).
+ DEBUG [50eab91f] Running if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [50eab91f] Command: if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi
+ DEBUG [50eab91f] Finished in 0.537 seconds with exit status 0 (successful).
+  INFO [a86b26d1] Running /usr/bin/env echo "Branch dev (at d96113221be55bad3315620f8e3b07e2ed005bf4) deployed as release 20210422101515 by hazesoftios" >> /home/deployer/api/revisions.log as deployer@94.237.40.213
+ DEBUG [a86b26d1] Command: cd /home/deployer/api/releases && /usr/bin/env echo "Branch dev (at d96113221be55bad3315620f8e3b07e2ed005bf4) deployed as release 20210422101515 by hazesoftios" >> /home/deployer/api/revisions.log
+  INFO [a86b26d1] Finished in 0.598 seconds with exit status 0 (successful).
