@@ -1,8 +1,9 @@
 <?php
 namespace Modules\Core\Database\factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Currency;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ChannelFactory extends Factory
 {
