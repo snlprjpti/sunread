@@ -2,11 +2,14 @@
 
 namespace Modules\Core\Tests;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
+use Modules\User\Entities\Role;
+use Modules\User\Entities\Admin;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class BaseTest extends TestCase
+class BaseTestCase extends TestCase
 {
 	use RefreshDatabase;
 
@@ -29,17 +32,17 @@ class BaseTest extends TestCase
 			"role_id" => $role->id
 		];
 		
-		$admin = Admin::factory()->make($data);
+		$admin = Admin::factory()->create($data);
 		$token = $this->createToken($admin->email, $password);
 		$this->headers["Authorization"] = "Bearer {$token}";
 
 		return $admin;
 	}
 
-	public function createToekn(string $admin_email, string $password): ?string
+	public function createToken(string $admin_email, string $password): ?string
 	{
 		$jwtToken = Auth::guard("admin")
-			->setTTL( confit("jwt.admin_jwt_ttl") )
+			->setTTL( config("jwt.admin_jwt_ttl") )
 			->attempt([
 				"email" => $admin_email,
 				"password" => $password
