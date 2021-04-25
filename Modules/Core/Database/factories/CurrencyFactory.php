@@ -1,13 +1,36 @@
 <?php
+namespace Modules\Core\Database\factories;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Core\Entities\Currency;
 
-use Faker\Generator as Faker;
+class CurrencyFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = \Modules\Core\Entities\Currency::class;
 
-$factory->define(\Modules\Core\Entities\Currency::class, function (Faker $faker) {
-    return [
-        'code' => $faker->currencyCode,
-        'name' => $faker->currencyCode,
-        'symbol' => $faker->currencyCode
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        while(true) {
+            $currency = $this->faker->currencyCode();
+            $old_currency = Currency::where("code", $currency)->first();
+            if (!$old_currency) break;
+        }
+
+        return [
+            "code" => $currency,
+            "name" => $currency,
+            "symbol" => $currency
+        ];
+    }
+}
+

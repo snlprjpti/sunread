@@ -3,15 +3,12 @@
 namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;
 
 class Store extends Model
 {
-    use Sluggable;
+    use Sluggable, HasFactory;
 
-    protected $fillable = ["name","currency","locale","image","slug"];
-
-
-
+    protected $fillable = [ "slug", "name", "currency", "locale", "image" ];
 }
