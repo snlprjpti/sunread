@@ -234,10 +234,6 @@ class BaseTestCase extends TestCase
         $response = $this->delete(route("{$this->route_prefix}.destroy", $resource_id));
 
         $response->assertStatus(204);
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.deleted-success", ["name" => $this->model_name])
-        ]);
 
         $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
         $this->assertFalse($check_resource);
