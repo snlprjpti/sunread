@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
+use Modules\Core\Traits\HasFactory;
 
 class Channel extends Model
 {
+    use HasFactory;
+
     public static $SEARCHABLE = [ "code", "hostname", "name", "description", "location" ];
     protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency" ];
 

@@ -4,9 +4,11 @@ namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Models\CurrencyExchangeRate;
+use Modules\Core\Traits\HasFactory;
 
 class Currency extends Model
 {
+    use HasFactory;
     public static $SEARCHABLE = [ 'code', 'name', 'symbol' ];
     protected $fillable = [ 'code', 'name', 'symbol' ];
 
