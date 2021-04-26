@@ -2,7 +2,6 @@
 
 namespace Modules\Core\Repositories;
 
-use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
 
