@@ -22,7 +22,8 @@ composer:
   stage: preparation
   script:
     - php -v
-    - php -d memory_limit=-1 composer.phar update --ignore-platform-reqs --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    - export COMPOSER_MEMORY_LIMIT=-1
+    - composer update --ignore-platform-reqs --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
     - cp .env.example .env
     - php artisan key:generate
     - php artisan jwt:secret --force
