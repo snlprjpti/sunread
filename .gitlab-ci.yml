@@ -71,7 +71,7 @@ phpunit:
     - echo "" | sudo tee /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
     - mysql --host="${DB_HOST}" --user="${MYSQL_USER}" --password="${MYSQL_PASSWORD}" "${MYSQL_DATABASE}" < db.sql
     - ./vendor/phpunit/phpunit/phpunit --version
-    - php artisan test
+    - php -d memory_limit -1 artisan test
     - sudo cp /usr/local/etc/php/conf.d/docker-php-ext-xdebug.bak /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
   artifacts:
     paths:
