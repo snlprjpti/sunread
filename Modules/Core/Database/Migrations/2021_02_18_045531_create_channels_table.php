@@ -17,7 +17,6 @@ class CreateChannelsTable extends Migration
             $table->id();
             $table->string('code');
             $table->string('hostname')->nullable();
-
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('location')->nullable();

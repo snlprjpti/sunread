@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class WebsiteSeederTableSeeder extends Seeder
+class WebsiteTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.

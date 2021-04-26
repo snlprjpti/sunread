@@ -22,17 +22,19 @@ class WebsiteController extends BaseController
         $this->model = $website;
         $this->model_name = "Website";
         $this->repository = $websiteRepository;
-
         parent::__construct($this->model, $this->model_name);
     }
+
     public function collection(object $data): ResourceCollection
     {
         return WebsiteResource::collection($data);
     }
+
     public function resource(object $data): JsonResource
     {
         return new WebsiteResource($data);
     }
+
     public function index(Request $request): JsonResponse
     {
         try
@@ -53,9 +55,7 @@ class WebsiteController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-
-            $created = $this->repository->create($data, function($created) use ($request) {
-            });
+            $created = $this->repository->create($data);
         }
         catch( Exception $exception )
         {
@@ -84,12 +84,7 @@ class WebsiteController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-
-          
-
-            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
-              
-            });
+            $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )
         {
@@ -103,9 +98,7 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted) {
-               
-            });
+            $this->repository->delete($id);
         }
         catch( Exception $exception )
         {

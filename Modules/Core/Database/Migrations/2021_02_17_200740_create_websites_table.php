@@ -15,9 +15,8 @@ class CreateWebsitesTable extends Migration
     {
         Schema::create('websites', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->nullable();
-            $table->string('hostname')->nullable();
-
+            $table->string('code');
+            $table->string('hostname');
             $table->string('name');
             $table->text('description')->nullable();
             $table->timestamps();

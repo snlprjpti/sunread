@@ -20,8 +20,7 @@ class WebsiteResource extends JsonResource
             "hostname" => $this->hostname,
             "name" => $this->name,
             "description" => $this->description,
-            "created_at" => $this->created_at->format("M d, Y H:i A"),
-            "updated_at" => $this->updated_at->format("M d, Y H:i A")
+            "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
 }

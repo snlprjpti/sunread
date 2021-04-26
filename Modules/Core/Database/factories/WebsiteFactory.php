@@ -9,7 +9,6 @@ $factory->define(\Modules\Core\Entities\Website::class, function (Faker $faker) 
         'code' => \Str::random(16),
         'name' => $faker->company,
         'description' => $faker->paragraph,
-        'hostname'=>$faker->name,
-       
+        'hostname'=>$faker->name
     ];
 });
