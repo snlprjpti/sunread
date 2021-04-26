@@ -3,7 +3,7 @@ stages:
   - building
   - testing
 
-image: edbizarro/gitlab-ci-pipeline-php:7.3
+image: edbizarro/gitlab-ci-pipeline-php:8.0
 
 # Variables
 variables:
@@ -70,7 +70,7 @@ phpunit:
     - echo "" | sudo tee /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
     - mysql --host="${DB_HOST}" --user="${MYSQL_USER}" --password="${MYSQL_PASSWORD}" "${MYSQL_DATABASE}" < db.sql
     - ./vendor/phpunit/phpunit/phpunit --version
-    - php -d short_open_tag=off ./vendor/phpunit/phpunit/phpunit -v --colors=never --stderr
+    - php artisan test
     - sudo cp /usr/local/etc/php/conf.d/docker-php-ext-xdebug.bak /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
   artifacts:
     paths:
