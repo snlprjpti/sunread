@@ -22,7 +22,7 @@ composer:
   stage: preparation
   script:
     - php -v
-    - composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    - composer update --ignore-platform-reqs --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
     - cp .env.example .env
     - php artisan key:generate
     - php artisan jwt:secret --force
