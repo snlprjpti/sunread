@@ -17,6 +17,7 @@ class CoreDatabaseSeeder extends Seeder
         Model::unguard();
         $this->call(CurrencyTableSeeder::class);
         $this->call(StoreTableSeeder::class);
+        $this->call(WebsiteTableSeeder::class);
         $this->call(ChannelTableSeeder::class);
     }
 }

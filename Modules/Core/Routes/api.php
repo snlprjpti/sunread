@@ -32,5 +32,8 @@ Route::group(['middleware' => ['api']], function () {
 
         // Channels Routes
         Route::resource('channels', ChannelController::class)->except(['create', 'edit']);
+       
+        // Websites Routes
+        Route::resource('websites', WebsiteController::class)->except(['create', 'edit']);
     });
 });
