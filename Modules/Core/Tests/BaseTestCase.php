@@ -31,7 +31,7 @@ class BaseTestCase extends TestCase
     public function getNonMandodtaryCreateData(): array { return $this->getCreateData(); }
     public function getInvalidCreateData(): array { return $this->getCreateData(); }
 
-    public function getUpdateData(): array { return $this->getUpdateData(); }
+    public function getUpdateData(): array { return $this->getCreateData(); }
     public function getNonMandodtaryUpdateData(): array { return $this->getUpdateData(); }
     public function getInvalidUpdateData(): array { return $this->getUpdateData(); }
 
