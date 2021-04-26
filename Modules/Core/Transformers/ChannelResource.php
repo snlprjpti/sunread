@@ -28,6 +28,7 @@ class ChannelResource extends JsonResource
             "default_currency" => $this->default_currency,
             "default_store" => new StoreResource($this->default_store),
             "stores" => StoreResource::collection($this->stores),
+            "website" => new WebsiteResource($this->website),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

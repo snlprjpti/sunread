@@ -25,6 +25,11 @@ class Channel extends Model
         return $this->belongsToMany(Store::class);
     }
 
+    public function website(): BelongsTo
+    {
+        return $this->belongsTo(Website::class, "website_id");
+    }
+
     private function get_url(?string $path): ?string
     {
         return $path ? Storage::url($path) : null;
