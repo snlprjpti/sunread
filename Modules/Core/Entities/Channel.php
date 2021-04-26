@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 class Channel extends Model
 {
     public static $SEARCHABLE = [ "code", "hostname", "name", "description", "location" ];
-    protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency" ];
+    protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency","website_id" ];
 
     public function default_store(): BelongsTo
     {
