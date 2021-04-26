@@ -13,8 +13,8 @@ class WebsiteRepository extends BaseRepository
         $this->model_key = "core.website";
         $this->rules = [
             /* General */
-            "code" => "nullable|unique:websites,code",
-            "hostname" => "nullable|unique:websites,hostname",
+            "code" => "required|unique:websites,code",
+            "hostname" => "required|unique:websites,hostname",
             "name" => "required",
             "description" => "nullable"
         ];
