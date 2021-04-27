@@ -2,12 +2,14 @@
 
 namespace Modules\User\Entities;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Core\Traits\HasFactory;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Modules\User\Notifications\ResetPasswordNotification;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class Admin extends Authenticatable implements JWTSubject
 {
@@ -18,68 +20,35 @@ class Admin extends Authenticatable implements JWTSubject
     protected $hidden = [ "password", "api_token", "remember_token" ];
     protected $appends = [ "avatar", "profile_image_url" ];
 
-    /**
-     * Get the role that owns the admin.
-     * 
-     * @return Role
-     */
-    public function role()
+    public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
-    /**
-     * Checks if admin has permission to perform certain action.
-     *
-     * @param string $permission
-     * @return boolean
-     */
-    public function hasPermission($permission)
+    public function hasPermission(string $permission): bool
     {
         if ($this->role->permission_type == 'custom' && ! $this->role->permissions) return false;
 
         return in_array($permission, $this->role->permissions);
     }
 
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
+    public function getJWTIdentifier(): ?string
     {
         return $this->getKey();
     }
 
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
         return [];
         // TODO: Implement getJWTCustomClaims() method.
     }
 
-    /**
-     * Send password reset notification
-     * 
-     * @param string $token
-     * @return ResetPasswordNotification
-     */
-    public function sendPasswordResetNotification($token)
+    public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    /**
-     * Check if the user has role
-     * 
-     * @param string $roleSlug
-     * @return boolean
-     */
-    public function hasRole($roleSlug): bool
+    public function hasRole(string $roleSlug): bool
     {
         if (empty($roleSlug) || empty($this->role)) return false;
         if ($this->role->slug == $roleSlug) return true;
@@ -87,33 +56,17 @@ class Admin extends Authenticatable implements JWTSubject
         return false;
     }
 
-    /**
-     * Get Avatar image url
-     * 
-     * @return string
-     */
-    public function getAvatarAttribute()
+    public function getAvatarAttribute(): string
     {
         return $this->getImage();
     }
 
-    /**
-     * Get Profile image url
-     * 
-     * @return string
-     */
-    public function getProfileImageUrlAttribute()
+    public function getProfileImageUrlAttribute(): ?string
     {
         return $this->profile_image ? Storage::url($this->profile_image) : null;
     }
 
-    /**
-     * Generate URL for image_type
-     * 
-     * @param string $image_type
-     * @return string
-     */
-    public function getImage($image_type = "main_image")
+    public function getImage($image_type = "main_image"): string
     {
         if ( !$this->profile_image ) return null;
         $image_url = null;
@@ -131,14 +84,7 @@ class Admin extends Authenticatable implements JWTSubject
         return $image_url;
     }
 
-    /**
-     * Get the path from dimension and type
-     * 
-     * @param string $config
-     * @param string $folder
-     * @return string
-     */
-    private function getDimensionPath($config, $folder = "main")
+    private function getDimensionPath(string $config, string $folder = "main"): string
     {
         $dimension = config($config)[0];
         $width = $dimension["width"];
@@ -148,12 +94,7 @@ class Admin extends Authenticatable implements JWTSubject
         return Storage::url("{$file_array['folder']}/{$folder}/{$width}x{$height}/{$file_array['file']}");
     }
 
-    /**
-     * Get array of folder and filename from profile_image
-     * 
-     * @return array
-     */
-    private function getFileNameArray()
+    private function getFileNameArray(): array
     {
         $path_array = explode("/", $this->profile_image);
         $file_name = $path_array[count($path_array) - 1];
@@ -165,12 +106,7 @@ class Admin extends Authenticatable implements JWTSubject
         ];
     }
 
-    /**
-     * Get full name
-     * 
-     * @return string
-     */
-    public function getFullNameAttribute()
+    public function getFullNameAttribute(): string
     {
         return ucwords("{$this->first_name} {$this->last_name}");
     }
