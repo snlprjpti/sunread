@@ -30,31 +30,22 @@ class  Bouncer
      */
     public static function allow($route)
     {
-        if (!auth()->guard('admin')->check())
-            return false;
+        if (!auth()->guard('admin')->check()) return false;
+
         $acl = config('acl');
         $key_for_route = array_search($route, array_column($acl, 'route'),true);
-        if($key_for_route === false){
-            return  false;
-        }
+        if($key_for_route === false) return  false;
+
         $permission = $acl[$key_for_route]['key'];
+        $permission_group = "";
 
-        if(auth()->guard('admin')->user()->hasPermission($permission))
-        {
-            return true;
+        foreach( explode('.', $permission) as $key ) {
+            $permission_group .= "{$key}.";
+            $check_permission = ($permission_group == "{$permission}.") ? $permission : "{$permission_group}all";
+
+            if ( auth()->guard('admin')->user()->hasPermission($check_permission) ) return true;
         }
 
-//
-        $keys = explode('.', $permission);
-
-        $value = '';
-        for ($i = 0; $i < (count($keys)-1); $i++) {
-            $value .= $keys[$i] . '.';
-            $index = $value . 'all';
-            if (auth()->guard('admin')->user()->hasPermission($index)) {
-                return true;
-            }
-        }
         return false;
     }
 }
