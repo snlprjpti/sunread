@@ -105,7 +105,7 @@ class WebsiteController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'));
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 
 }
