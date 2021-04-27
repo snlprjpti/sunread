@@ -137,7 +137,6 @@ class BaseTestCase extends TestCase
         $response->assertStatus(201);
         $response->assertJsonFragment([
             "status" => "success",
-            "payload" => $post_data,
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
@@ -181,7 +180,6 @@ class BaseTestCase extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
-            "payload" => $post_data,
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
         ]);
     }
