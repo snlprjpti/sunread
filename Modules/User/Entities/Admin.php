@@ -56,7 +56,7 @@ class Admin extends Authenticatable implements JWTSubject
         return false;
     }
 
-    public function getAvatarAttribute(): string
+    public function getAvatarAttribute(): ?string
     {
         return $this->getImage();
     }
@@ -66,7 +66,7 @@ class Admin extends Authenticatable implements JWTSubject
         return $this->profile_image ? Storage::url($this->profile_image) : null;
     }
 
-    public function getImage($image_type = "main_image"): string
+    public function getImage($image_type = "main_image"): ?string
     {
         if ( !$this->profile_image ) return null;
         $image_url = null;
