@@ -27,7 +27,7 @@ class Channel extends Model
 
     public function website(): BelongsTo
     {
-        return $this->belongsTo(Website::class,"website_id");
+        return $this->belongsTo(Website::class, "website_id");
     }
 
     private function get_url(?string $path): ?string
