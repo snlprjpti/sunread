@@ -21,12 +21,16 @@ class StoreTableSeeder extends Seeder
                "name" => "International Store",
                "slug" => "international-store",
                "locale" => "en",
+               "created_at" => now(),
+               "updated_at" => now()
            ],
             [
                 "currency" => "EUR",
                 "name" => "English Store",
                 "slug" => "english-store",
                 "locale" => "en",
+                "created_at" => now(),
+                "updated_at" => now()
             ]
         ]);
     }
