@@ -2,11 +2,10 @@
 
 namespace Modules\Core\Tests\Feature;
 
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Core\Entities\Configuration;
 use Modules\Core\Tests\BaseTestCase;
 
-class Configuration extends BaseTestCase
+class ConfigurationTest extends BaseTestCase
 {
     protected object $admin;
     protected array $headers;
@@ -43,7 +42,7 @@ class Configuration extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "scope_id" => "1"
+            "scope_id" => null
         ]);
     }
 
@@ -62,7 +61,7 @@ class Configuration extends BaseTestCase
     public function getInvalidUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
-            "scope_id" => "1"
+            "scope_id" => null
         ]);
     }
 }
