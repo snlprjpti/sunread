@@ -14,9 +14,9 @@ class ConfigurationRepository extends BaseRepository
         $this->rules = [
            /* General */
             "scope" => "required",
-            "scope_id" => "required",
+            "scope_id" => "required|integer|min:0",
             "path" => "required",
-            "value" => "required"
+            "value" => "nullable"
         ];
     }
 }
