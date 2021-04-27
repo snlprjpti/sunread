@@ -38,7 +38,23 @@ class  Bouncer
             return  false;
         }
         $permission = $acl[$key_for_route]['key'];
- 
-        return auth()->guard('admin')->user()->hasPermission($permission);
+
+        if(auth()->guard('admin')->user()->hasPermission($permission))
+        {
+            return true;
+        }
+
+//
+        $keys = explode('.', $permission);
+
+        $value = '';
+        for ($i = 0; $i < (count($keys)-1); $i++) {
+            $value .= $keys[$i] . '.';
+            $index = $value . 'all';
+            if (auth()->guard('admin')->user()->hasPermission($index)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
