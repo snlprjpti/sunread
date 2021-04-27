@@ -20,7 +20,7 @@ class ConfigurationFactory extends Factory
      */
     public function definition()
     {
-        $scope=["default", "website", "channel", "store"];
+        $scope=[ "default", "website", "channel", "store" ];
 
          return [
             'scope' => Arr::random($scope),
