@@ -26,7 +26,7 @@ class ExchangeRateFactory extends Factory
          return [
             'source_currency' => $source->id,
             'target_currency' =>$target->id,
-            'rate' => rand(0,10),
+            'rate' => rand(0,10)
         ];
     }
 }
