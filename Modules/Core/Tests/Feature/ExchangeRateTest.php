@@ -19,7 +19,7 @@ class ExchangeRateTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model = ExchangeRate::class;
-        $this->model_name = "ExchangeRate";
+        $this->model_name = "Exchange rate";
         $this->route_prefix = "admin.exchange_rates";
         $this->default_resource_id = ExchangeRate::latest()->first()->id;
         $this->fake_resource_id = 0;
