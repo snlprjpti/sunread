@@ -92,7 +92,11 @@ class StoreController extends BaseController
                 "image" => "sometimes|nullable|mimes:bmp,jpeg,jpg,png,webp"
             ]);
 
-            if ($request->file('image')) $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            if ($request->file("image")) {
+                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            } else {
+                unset($data["image"]);
+            }
             
             $updated = $this->repository->update($data, $id);
         }
