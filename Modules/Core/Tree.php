@@ -5,6 +5,7 @@ namespace Modules\Core;
 
 
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Str;
 
 class Tree {
 
@@ -119,7 +120,7 @@ class Tree {
             $key = array_shift($keys);
 
             if (! isset($array[$key]) || ! is_array($array[$key])) {
-                $array[$key] = [];
+                $array[$key] = [];($key != 'children') ? $array[$key] = ['key' => $key . '.all', 'name' => Str::ucfirst($key), 'route' => null, 'sort' => 1, 'module' => null] : $array[$key] = [];
             }
 
             $array = &$array[$key];
