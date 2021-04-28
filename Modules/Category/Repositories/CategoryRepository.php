@@ -12,7 +12,7 @@ class CategoryRepository extends BaseRepository
     public function __construct(Category $category)
     {
         $this->model = $category;
-        $this->model_key = "category.categories";
+        $this->model_key = "catalog.categories";
         $this->rules = [
             // category validation
             "name" => "required",
