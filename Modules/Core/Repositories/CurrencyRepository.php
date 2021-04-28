@@ -2,19 +2,36 @@
 
 namespace Modules\Core\Repositories;
 
+use Modules\Core\Eloquent\Repository;
 use Modules\Core\Entities\Currency;
 
-class CurrencyRepository extends BaseRepository
+class CurrencyRepository extends Repository
 {
-    public function __construct(Currency $currency)
+    /**
+     * Specify Model class name
+     *
+     * @return mixed
+     */
+    function model()
     {
-        $this->model = $currency;
-        $this->model_key = "core.currency";
-        $this->rules = [
-            /* General */
-            "code" => "required|min:3|max:3|unique:currencies,code",
-            "name" => "required",
-            "symbol" => "nullable"
-        ];
+        return Currency::class;
+    }
+
+    /**
+     * Specify Model class name
+     *
+     * @param  int  $id
+     * @return bool
+     */
+    public function delete($id) {
+        if ($this->model->count() == 1) {
+            return false;
+        } else {
+            if ($this->model->destroy($id)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }

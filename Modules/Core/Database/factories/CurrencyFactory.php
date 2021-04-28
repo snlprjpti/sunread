@@ -28,7 +28,7 @@ class CurrencyFactory extends Factory
 
         return [
             "code" => $currency,
-            "name" => $this->faker->company,
+            "name" => $currency,
             "symbol" => $currency
         ];
     }
