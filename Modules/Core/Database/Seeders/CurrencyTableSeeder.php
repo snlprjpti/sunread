@@ -9,8 +9,6 @@ class CurrencyTableSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('currencies')->delete();
-
         DB::table('currencies')->insert([
             [
                 'id' => 1,
