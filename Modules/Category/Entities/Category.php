@@ -10,11 +10,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;
 
 class Category extends Model
 {
-    use NodeTrait, Sluggable;
+    use NodeTrait, Sluggable, HasFactory;
 
     public static $SEARCHABLE = [ "translations.name", "slug" ];
     protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "status" ];
