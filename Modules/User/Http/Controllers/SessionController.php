@@ -2,6 +2,7 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
