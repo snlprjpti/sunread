@@ -23,9 +23,9 @@ class ExchangeRateFactory extends Factory
         $source = Currency::factory()->create();
         $target = Currency::factory()->create();
 
-         return [
+        return [
             'source_currency' => $source->id,
-            'target_currency' =>$target->id,
+            'target_currency' => $target->id,
             'rate' => rand(0,10)
         ];
     }

@@ -22,7 +22,7 @@ class ExchangeRateController extends BaseController
     public function __construct(ExchangeRate $exchangeRate, ExchangeRateRepository $exchangeRateRepository)
     {
         $this->model = $exchangeRate;
-        $this->model_name = "ExchangeRate";
+        $this->model_name = "Exchange rate";
         $this->repository = $exchangeRateRepository;
 
         parent::__construct($this->model, $this->model_name);
@@ -37,12 +37,7 @@ class ExchangeRateController extends BaseController
     {
         return new ExchangeRateResource($data);
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    
     public function index(Request $request): JsonResponse
     {
         try
@@ -58,15 +53,12 @@ class ExchangeRateController extends BaseController
         return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try
         {
             $data = $this->repository->validateData($request);
-            Event::dispatch('core.ExchangeRate.create.before');
-
             $created = $this->repository->create($data);
-            Event::dispatch('core.ExchangeRate.create.after', $created);
         }
         catch( Exception $exception )
         {
@@ -95,10 +87,7 @@ class ExchangeRateController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            Event::dispatch('core.ExchangeRate.update.before', $id);
-
             $updated = $this->repository->update($data, $id);
-            Event::dispatch('core.ExchangeRate.update.after', $updated);
         }
         catch( Exception $exception )
         {
@@ -112,10 +101,7 @@ class ExchangeRateController extends BaseController
     {
         try
         {
-            Event::dispatch('core.ExchangeRate.delete.before', $id);
-
             $this->repository->delete($id);
-            Event::dispatch('core.ExchangeRate.delete.after', $id);
         }
         catch( Exception $exception )
         {

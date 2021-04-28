@@ -15,8 +15,8 @@ class ExchangeRateRepository extends BaseRepository
             "rate" => "required|numeric",
            
             /* Foreign Keys */
-             "source_currency" => "required|exists:currencies,id",
-             "target_currency" => "required|exists:currencies,id"
+            "source_currency" => "required|exists:currencies,code",
+            "target_currency" => "required|exists:currencies,code"
         ];
     }
 }
