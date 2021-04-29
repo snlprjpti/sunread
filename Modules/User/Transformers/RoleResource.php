@@ -2,7 +2,6 @@
 
 namespace Modules\User\Transformers;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoleResource extends JsonResource
@@ -22,7 +21,7 @@ class RoleResource extends JsonResource
             "description" => $this->description,
             "permission_type" => $this->permission_type,
             "permissions" => $this->permissions,
-            "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
+            "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
 }

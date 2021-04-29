@@ -5,20 +5,14 @@ namespace Modules\User\Http\Controllers;
 use Illuminate\Http\Request;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Database\QueryException;
 use Modules\User\Transformers\AdminResource;
-use Illuminate\Validation\ValidationException;
 use Modules\User\Repositories\AdminRepository;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\User\Exceptions\CannotDeleteSelfException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Modules\User\Exceptions\CannotDeleteSuperAdminException;
 
-/**
- * User Controller for the Admin
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class UserController extends BaseController
 {
     protected $repository;
@@ -29,165 +23,106 @@ class UserController extends BaseController
         $this->repository = $adminRepository;
         $this->model = $admin;
         $this->model_name = "Admin";
-        parent::__construct($this->model, $this->model_name);
+        $exception_statuses = [
+            CannotDeleteSelfException::class => 403,
+            CannotDeleteSuperAdminException::class => 403
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     * Display a listing of the resource.
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request  $request)
+    public function collection(object $data): ResourceCollection
+    {
+        return AdminResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new AdminResource($data);
+    }
+
+    public function index(Request  $request): JsonResponse
     {
         try
         {
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request, ["role"]);
         }
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
         catch (\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(AdminResource::collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    /**
-     * Stores new resource
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try
         {
-            $merge_rules = [
+            $data = $this->repository->validateData($request, [
                 "password" => "required|confirmed",
                 "status" => "required|boolean",
                 "role_id" => "required|integer|exists:roles,id"
-            ];
-            $data = $this->repository->validateData($request, null, $merge_rules);
+            ]);
             $created = $this->repository->create($data);
-        }
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch (ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
         }
         catch (\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new AdminResource($created), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    /**
-     * Get the particular resource
-     * 
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         try
         {
             $fetched = $this->model->with(["role"])->findOrFail($id);
         }
-        catch (ModelNotFoundException $exception)
-        {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
         catch (\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new AdminResource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
     
-    /**
-     * Updates the resource
-     * 
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): JsonResponse
     {
         try
         {
-            $merge_rules = [
+            $data = $this->repository->validateData($request, [
                 "password" => "required|confirmed",
                 "status" => "required|boolean",
                 "role_id" => "required|integer|exists:roles,id"
-            ];
-            $data = $this->repository->validateData($request, $id, $merge_rules, false);
+            ]);
             $updated = $this->repository->update($data, $id);
-        }
-        catch (ModelNotFoundException $exception)
-        {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
         }
         catch (\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new AdminResource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-
-    /**
-     * Remove the specified  admin resource from storage.
-     * 
-     * @param int $id
-     * @return JsonResponse
-     */
     public function destroy($id)
     {
         try
         {
-            $this->repository->delete($id);
-        }
-        catch (ModelNotFoundException $exception)
-        {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (CannotDeleteSelfException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 403);
-        }
-        catch (CannotDeleteSuperAdminException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 403);
+            $this->repository->delete($id, function($deleted) {
+                if ( $deleted->id == auth()->user()->id ) throw new CannotDeleteSelfException("Admin cannot delete itself.");
+                if ( $deleted->hasRole("super-admin") ) throw new CannotDeleteSuperAdminException("Super admin cannot be deleted.");
+                $this->repository->removeOldImage($deleted->id);
+            });
         }
         catch (\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'));
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 }
