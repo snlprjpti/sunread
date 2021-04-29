@@ -20,23 +20,27 @@ use Modules\User\Http\Controllers\ForgotPasswordController;
 Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], function() {
     // Session Routes
     Route::post("/login", [SessionController::class, "login"])->name("session.login");
-    Route::get("/logout", [SessionController::class, "logout"])->name("session.logout")->middleware("jwt.verify");
     Route::post("/forget-password", [ForgotPasswordController::class, "store"])->name("forget-password.store");
     Route::post("/reset-password", [ResetPasswordController::class, "store"])->name("reset-password.store");
     Route::get("/reset-password/{token}", [ResetPasswordController::class, "create"])->name("reset-password.create");
 
-    Route::group(["middleware" => "jwt.verify"], function() {
+    Route::group(["middleware" => ["jwt.verify"]], function() {
+        // Session Routes
+        Route::get("/logout", [SessionController::class, "logout"])->name("session.logout");
+
         // Roles Routes
         Route::get("permissions", [\Modules\User\Http\Controllers\RoleController::class, "fetchPermission"]);
         Route::resource("roles", RoleController::class);
 
         // User Routes
-        Route::resource("users", UserController::class);
+        Route::resource("users", UserController::class)->except(['create', 'edit']);
 
         // Account Routes
-        Route::get("/account", [AccountController::class, "show"])->name("account.show");
-        Route::put("/account", [AccountController::class, "update"])->name("account.update");
-        Route::post("/account/image", [AccountController::class, "uploadProfileImage"])->name("image.update");
-        Route::delete("/account/image", [AccountController::class, "deleteProfileImage"])->name("image.delete");
+        Route::group(["prefix" => "account", "as" => "account."], function() {
+            Route::get("/", [AccountController::class, "show"])->name("show");
+            Route::put("/", [AccountController::class, "update"])->name("update");
+            Route::post("image", [AccountController::class, "uploadProfileImage"])->name("image.update");
+            Route::delete("image", [AccountController::class, "deleteProfileImage"])->name("image.delete");
+        });
     });
 });

@@ -135,7 +135,7 @@ class AccountTest extends TestCase
             "image" => UploadedFile::fake()->image("image.png")
         ];
 
-        $response = $this->withHeaders($this->headers)->post(route("admin.image.update"), $post_data);
+        $response = $this->withHeaders($this->headers)->post(route("admin.account.image.update"), $post_data);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -150,7 +150,7 @@ class AccountTest extends TestCase
             "image" => null
         ];
 
-        $response = $this->withHeaders($this->headers)->post(route("admin.image.update"), $post_data);
+        $response = $this->withHeaders($this->headers)->post(route("admin.account.image.update"), $post_data);
 
         $response->assertStatus(422);
         $response->assertJsonFragment([
@@ -160,7 +160,7 @@ class AccountTest extends TestCase
 
     public function testAdminShouldBeAbleToDeleteProfileImage()
     {
-        $response = $this->withHeaders($this->headers)->delete(route("admin.image.delete"));
+        $response = $this->withHeaders($this->headers)->delete(route("admin.account.image.delete"));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
