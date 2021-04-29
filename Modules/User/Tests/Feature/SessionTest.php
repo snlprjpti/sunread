@@ -14,9 +14,8 @@ class SessionTest extends TestCase
 {
 	use RefreshDatabase;
 
-    protected object $admin;
+    protected object $admin, $fake_admin;
 	protected array $headers;
-    public $model, $default_resource_id, $fake_resource_id;
 
 	public function setUp(): void
 	{
@@ -26,10 +25,6 @@ class SessionTest extends TestCase
 
         $this->admin = $this->createAdmin();
         $this->fake_admin = Admin::factory()->make();
-
-        $this->model = Admin::class;
-        $this->default_resource_id = Admin::latest()->first()->id;
-        $this->fake_resource_id = 0;
 	}
 
     public function createAdmin(array $attributes = []): object
@@ -45,6 +40,10 @@ class SessionTest extends TestCase
 
         return Admin::factory()->create($data);
 	}
+
+    /**
+     * Tests
+     */
 
     public function testAdminCanLogin()
     {
