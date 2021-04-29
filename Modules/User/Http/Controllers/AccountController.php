@@ -2,6 +2,7 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
@@ -113,6 +114,6 @@ class AccountController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($updated), "Image deleted successfully.");
+        return $this->successResponse($this->resource($updated), "Profile image deleted successfully.");
     }
 }
