@@ -120,6 +120,16 @@ class Tree {
 
             if (! isset($array[$key]) || ! is_array($array[$key])) {
                 $array[$key] = [];
+
+                if ($key != 'children') {
+                    $array[$key] = [
+                        "key" => "{$key}.all",
+                        "name" => ucfirst($key),
+                        "route" => null,
+                        "sort" => 1,
+                        "module" => null
+                    ];
+                }
             }
 
             $array = &$array[$key];
@@ -128,6 +138,7 @@ class Tree {
         $finalKey = array_shift($keys);
 
         if (isset($array[$finalKey])) {
+            $value = is_array($value) ? $value : [];
             $array[$finalKey] = $this->arrayMerge($array[$finalKey], $value);
         } else {
             $array[$finalKey] = $value;
