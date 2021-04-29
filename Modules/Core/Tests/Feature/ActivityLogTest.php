@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Modules\Core\Entities\ActivityLog;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\User\Entities\Admin;
 use Modules\User\Entities\Role;
 use Tests\TestCase;
 
-class ActivityTest extends TestCase
+class ActivityLogTest extends TestCase
 {
+
     use RefreshDatabase;
 
     protected object $admin;
@@ -69,20 +69,27 @@ class ActivityTest extends TestCase
         return $jwtToken ?? null;
     }
 
-    public function testFetchActivityList()
+    public function testTestingAllActivityLogsBecauseObserversIsntRunning()
     {
-        $response = $this->get(route("{$this->route_prefix}.index"));
+        // Admin can fetch resources
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index"));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
         ]);
-    }
 
-    public function testFetchActivity()
-    {
-        dd($this->default_resource_id);
+        // Admin can fetch filtered resources
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index", $this->filter));
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
+
+        // Admin can fetch individual resource
         $response = $this->get(route("{$this->route_prefix}.show", $this->default_resource_id));
 
         $response->assertStatus(200);
@@ -90,7 +97,14 @@ class ActivityTest extends TestCase
             "status" => "success",
             "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
         ]);
+
+        // Should return 404 error if non existent data is requested
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", $this->fake_resource_id));
+
+        $response->assertStatus(404);
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+        ]);
     }
-
-
 }
