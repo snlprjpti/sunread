@@ -91,6 +91,4 @@ class ConfigurationController extends BaseController
 
         return $this->successResponse($item->data, $this->lang($item->message), 201);
     }
-
- 
 }

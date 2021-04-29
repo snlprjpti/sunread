@@ -30,7 +30,7 @@ trait Configuration
         ]);  
     }
 
-     public function add(object $request): object
+    public function add(object $request): object
     {
         if($this->has($request))
         {
@@ -46,7 +46,7 @@ trait Configuration
         return (object) $created_data; 
     }
 
-     public function set(object $request): object
+    public function set(object $request): object
     {
         if($configData = $this->checkCondition($request)->first())
         {
@@ -98,7 +98,4 @@ trait Configuration
             return $this->getValues($request, $pluck);
         });
     }
-
-
-
 }
