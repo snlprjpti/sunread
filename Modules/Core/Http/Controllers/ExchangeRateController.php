@@ -2,191 +2,108 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Entities\ExchangeRate;
+use Modules\Core\Repositories\ExchangeRateRepository;
 use Modules\Core\Transformers\ExchangeRateResource;
 
 class ExchangeRateController extends BaseController
 {
-    public function __construct(ExchangeRate $exchange_rate)
+    protected $repository;
+
+    public function __construct(ExchangeRate $exchangeRate, ExchangeRateRepository $exchangeRateRepository)
     {
-        $this->model = $exchange_rate;
-        $this->model_name = "Exchange Rate";
+        $this->model = $exchangeRate;
+        $this->model_name = "Exchange rate";
+        $this->repository = $exchangeRateRepository;
+
         parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @return
-     */
-    public function index(Request $request)
+    public function collection(object $data): ResourceCollection
+    {
+        return ExchangeRateResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new ExchangeRateResource($data);
+    }
+    
+    public function index(Request $request): JsonResponse
     {
         try
         {
             $this->validateListFiltering($request);
-            $exchange_rates = $this->getFilteredList($request);
+            $fetched = $this->getFilteredList($request);
         }
-        catch (QueryException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(ExchangeRateResource::collection($exchange_rates), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try
         {
-            $data = $this->validateData($request);
-
-            Event::dispatch('core.exchange_rate.create.before');
-            $exchange_rate = $this->model->create($data);
-            Event::dispatch('core.exchange_rate.create.after', $exchange_rate);
+            $data = $this->repository->validateData($request);
+            $created = $this->repository->create($data);
         }
-        catch (QueryException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new ExchangeRateResource($exchange_rate), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    /**
-     * Get the particular resource
-     * 
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         try
         {
-            $exchange_rate = $this->model->findOrFail($id);
+            $fetched = $this->model->findOrFail($id);
         }
-        catch (ModelNotFoundException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new ExchangeRateResource($exchange_rate), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
         try
         {
-            $data = $this->validateData($request, $id);
-            $exchange_rate = $this->model->findOrFail($id);
-
-            Event::dispatch('core.exchange_rate.update.before', $id);
-            $exchange_rate = $exchange_rate->fill($data);
-            $exchange_rate->save();
-            Event::dispatch('core.exchange_rate.update.after', $exchange_rate);
+            $data = $this->repository->validateData($request);
+            $updated = $this->repository->update($data, $id);
         }
-        catch (ModelNotFoundException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new ExchangeRateResource($exchange_rate), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         try
         {
-            $exchange_rate = $this->model->findOrFail($id);
-
-            Event::dispatch('core.exchange_rate.delete.before', $exchange_rate);
-            $exchange_rate->delete();
-            Event::dispatch('core.exchange_rate.delete.after', $id);
+            $this->repository->delete($id);
         }
-        catch (ModelNotFoundException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'));
-    }
-
-    /**
-     * Custom Validation for Store/Update
-     * 
-     * @param Request $request
-     * @param int $id
-     * @return Array
-     */
-    private function validateData($request, $id=null)
-    {
-        $id = $id ? ",{$id}" : null;
-
-        return $this->validate($request, [
-            "target_currency" => "required|exists:currencies,id",
-            "source_currency" => "required|exists:currencies,id",
-            "rate" => "required|numeric"
-        ]);
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 }

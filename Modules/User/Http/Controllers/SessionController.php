@@ -2,7 +2,9 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
+use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -10,9 +12,14 @@ use Modules\Core\Http\Controllers\BaseController;
 
 class SessionController extends BaseController
 {
-    public function __construct()
+    public function __construct(Admin $admin)
     {
         $this->middleware('guest:admin')->except(['logout']);
+
+        $this->model = $admin;
+        $this->model_name = "Admin account";
+
+        parent::__construct($this->model, $this->model_name);
     }
 
     public function login(Request $request): JsonResponse

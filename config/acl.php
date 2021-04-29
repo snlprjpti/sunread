@@ -78,12 +78,127 @@ return [
         'route' => 'admin.catalog.categories.update',
         'sort'  => 4,
         'module' => 'Category'
-    ], [
+    ],
+    [
         'key'   => 'catalog.categories.delete',
         'name'  => 'Delete Category',
         'route' => 'admin.catalog.categories.delete',
         'sort'  => 5,
         'module' => 'Category'
+    ],
+
+    
+    //STORE
+    [
+        'key'   => 'core.stores.index',
+        'name'  => 'List stores',
+        'route' => 'admin.stores.index',
+        'sort'  => 1,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.stores.store',
+        'name'  => 'Create stores',
+        'route' => 'admin.stores.store',
+        'sort'  => 2,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.stores.show',
+        'name'  => 'Show stores',
+        'route' => 'admin.stores.show',
+        'sort'  => 3,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.stores.update',
+        'name'  => 'Update stores',
+        'route' => 'admin.stores.update',
+        'sort'  => 4,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.stores.delete',
+        'name'  => 'Delete stores',
+        'route' => 'admin.stores.delete',
+        'sort'  => 5,
+        'module' => 'Core'
+    ],
+
+    
+    //WEBSITES
+    [
+        'key'   => 'core.websites.index',
+        'name'  => 'List Website',
+        'route' => 'core.websites.index',
+        'sort'  => 1,
+        "module" => 'Core'
+    ],
+    [
+        'key'   => 'core.websites.store',
+        'name'  => 'Create Website',
+        'route' => 'core.websites.store',
+        'sort'  => 2,
+        "module" => 'Core'
+    ],
+    [
+        'key'   => 'core.websites.show',
+        'name'  => 'Show Website',
+        'route' => 'core.websites.show',
+        'sort'  => 3,
+        "module" => 'Core'
+    ],
+    [
+        'key'   => 'core.websites.update',
+        'name'  => 'Update Website',
+        'route' => 'core.websites.update',
+        'sort'  => 4,
+        "module" => 'Core'
+    ],
+    [
+        'key'   => 'core.websites.delete',
+        'name'  => 'Delete Website',
+        'route' => 'core.websites.delete',
+        'sort'  => 5,
+        "module" => 'Core'
+    ],
+
+
+    //CONFIGURATION
+    [
+        'key'   => 'core.configurations.index',
+        'name'  => 'List configurations',
+        'route' => 'core.configurations.index',
+        'sort'  => 1,
+        "module" => 'Core'
+    ],
+    [
+        'key'   => 'core.configurations.store',
+        'name'  => 'Create configurations',
+        'route' => 'core.configurations.store',
+        'sort'  => 2,
+        "module" => 'Core'
+    ],
+    [
+        'key'   => 'core.configurations.show',
+        'name'  => 'Show configurations',
+        'route' => 'core.configurations.show',
+        'sort'  => 3,
+        "module" => 'Core'
+    ],
+    [
+        'key'   => 'core.configurations.update',
+        'name'  => 'Update configurations',
+        'route' => 'core.configurations.update',
+        'sort'  => 4,
+        "module" => 'Core'
+    ],
+    [
+        'key'   => 'core.configurations.delete',
+        'name'  => 'Delete configurations',
+        'route' => 'core.configurations.delete',
+        'sort'  => 5,
+        "module" => 'Core'
     ],
 
 

@@ -3,13 +3,12 @@
 namespace Modules\Core\Http\Controllers;
 
 use Exception;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Modules\Core\Entities\Store;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Storage;
 use Modules\Core\Repositories\StoreRepository;
 use Modules\Core\Transformers\StoreResource;
 
@@ -25,6 +24,16 @@ class StoreController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
+    public function collection(object $data): ResourceCollection
+    {
+        return StoreResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new StoreResource($data);
+    }
+
     public function index(Request $request): JsonResponse
     {
         try
@@ -37,7 +46,7 @@ class StoreController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse(StoreResource::collection($fetched), $this->lang("fetch-list-success"));
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
     public function store(Request $request): JsonResponse
@@ -45,7 +54,8 @@ class StoreController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $data['image'] = $this->storeImage($request, 'image', 'store');
+            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
             $created = $this->repository->create($data);
         }
         catch(\Exception $exception)
@@ -53,7 +63,7 @@ class StoreController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse(new StoreResource($created), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
     public function show(int $id): JsonResponse
@@ -66,44 +76,47 @@ class StoreController extends BaseController
         {
             return $this->handleException($exception);
         }
-        return $this->successResponse(new StoreResource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
     {
         try
         {
-            $data = $this->repository->validateData($request, $id);
-            unset($data['image']);
-            $updated = $this->repository->update($data, $id);
+            $data = $this->repository->validateData($request,[
+                "slug" => "nullable|unique:stores,slug,{$id}",
+                "image" => "sometimes|nullable|mimes:bmp,jpeg,jpg,png,webp"
+            ]);
 
-            if ($request->file('image')) {
-                $image_data = [
-                    'image' => $this->storeImage($request, 'image', 'category', $updated->image)
-                ];
-                $updated->fill($image_data);
-                $updated->save();
+            if ($request->file("image")) {
+                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            } else {
+                unset($data["image"]);
             }
+            
+            $updated = $this->repository->update($data, $id);
         }
         catch(\Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse(new StoreResource($updated), $this->lang("update-success"));
+        return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
     public function destroy(int $id): JsonResponse
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function($deleted){
+                if($deleted->image) Storage::delete($deleted->image);
+            });
         }
         catch (\Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'));
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 }

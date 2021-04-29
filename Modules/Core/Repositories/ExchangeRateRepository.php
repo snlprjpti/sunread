@@ -2,17 +2,21 @@
 
 namespace Modules\Core\Repositories;
 
-use Modules\Core\Eloquent\Repository;
+use Modules\Core\Entities\ExchangeRate;
 
-class ExchangeRateRepository extends Repository
+class ExchangeRateRepository extends BaseRepository
 {
-    /**
-     * Specify Model class name
-     *
-     * @return mixed
-     */
-    function model()
+    public function __construct(ExchangeRate $exchangeRate)
     {
-        return  Excha;
+        $this->model = $exchangeRate;
+        $this->model_key = "core.exchange_rates";
+        $this->rules = [
+            /* General */
+            "rate" => "required|numeric",
+           
+            /* Foreign Keys */
+            "source_currency" => "required|exists:currencies,id",
+            "target_currency" => "required|exists:currencies,id"
+        ];
     }
 }
