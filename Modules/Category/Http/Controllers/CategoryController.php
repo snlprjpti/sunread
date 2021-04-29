@@ -4,22 +4,37 @@ namespace Modules\Category\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
+use Modules\Category\Entities\CategoryTranslation;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 
 class CategoryController extends BaseController
 {
-    protected $repository;
+    protected $repository, $translation;
 
-    public function __construct(CategoryRepository $categoryRepository, Category $category)
+    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryTranslation $categoryTranslation)
     {
         $this->repository = $categoryRepository;
+        $this->translation = $categoryTranslation;
         $this->model = $category;
         $this->model_name = "Category";
 
         parent::__construct($this->model, $this->model_name);
+    }
+
+    public function collection(object $data): ResourceCollection
+    {
+        return CategoryResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new CategoryResource($data);
     }
 
     public function index(Request $request): JsonResponse
@@ -34,7 +49,7 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse(CategoryResource::collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
     public function store(Request $request): JsonResponse
@@ -42,17 +57,22 @@ class CategoryController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $translation_data = $this->repository->validateTranslation($request);
+            $data['image'] = $this->storeImage($request, 'image', strtolower($this->model_name));
+            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
 
-            $data['image'] = $this->storeImage($request, 'image', 'category');
-            $created = $this->repository->create($data, $translation_data);
+            $created = $this->repository->create($data, function($created) use($request){
+                $this->translation->updateOrCreate([
+                    "store_id" => $request->translation["store_id"],
+                    "category_id" => $created->id
+                ], $request->translation);
+            });
         }
         catch (\Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse(new CategoryResource($created), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
     public function show(int $id): JsonResponse
@@ -66,46 +86,56 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse(new CategoryResource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
     {
         try
-        {
-            $data = $this->repository->validateData($request, $id);
-            $translation_data = $this->repository->validateTranslation($request);
+        {            
+            $data = $this->repository->validateData($request,[
+                "slug" => "nullable|unique:categories,slug,{$id}",
+                "image" => "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
+            ]);
 
-            unset($data['image']);
-            $updated = $this->repository->update($data, $id, $translation_data);
-
-            if ($request->file('image')) {
-                $image_data = [
-                    'image' => $this->storeImage($request, 'image', 'category', $updated->image)
-                ];
-                $updated->fill($image_data);
-                $updated->save();
+            if ($request->file("image")){
+                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
             }
+            else {
+                unset($data["image"]);
+            }
+
+            $updated = $this->repository->update($data, $id, function($updated) use($request){
+                $this->translation->updateOrCreate([
+                    "store_id" => $request->translation["store_id"],
+                    "category_id" => $updated->id
+                ], $request->translation);
+            });
+            // get latest updated translations
+            $updated->translations = $updated->translations()->get();
         }
         catch (\Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse(new CategoryResource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
     public function destroy(int $id): JsonResponse
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function($deleted){
+                $deleted->translations()->delete();
+                if($deleted->image) Storage::delete($deleted->image);
+            });
         }
         catch (\Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'));
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 }
