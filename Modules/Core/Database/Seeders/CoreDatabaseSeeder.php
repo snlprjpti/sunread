@@ -19,5 +19,6 @@ class CoreDatabaseSeeder extends Seeder
         $this->call(StoreTableSeeder::class);
         $this->call(WebsiteTableSeeder::class);
         $this->call(ChannelTableSeeder::class);
+        $this->call(ConfigurationTableSeeder::class);
     }
 }

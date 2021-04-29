@@ -4,7 +4,7 @@ namespace Modules\Core\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class StoreResource extends JsonResource
+class ConfigurationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,11 +16,10 @@ class StoreResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "currency" => $this->currency,
-            "name" => $this->name,
-            "slug" => $this->slug,
-            "locale" => $this->locale,
-            "image" => $this->image_url,
+            "scope" => $this->scope,
+            "scope_id" => $this->scope_id,
+            "path" => $this->path,
+            "value" => $this->value,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
