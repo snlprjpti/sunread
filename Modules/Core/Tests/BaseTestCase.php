@@ -12,17 +12,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BaseTestCase extends TestCase
 {
-	use RefreshDatabase;
+    use RefreshDatabase;
 
-	protected array $headers;
+    protected array $headers;
     public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id;
 
-	public function setUp(): void
-	{
-		parent::setUp();
-		Schema::disableForeignKeyConstraints();
-		$this->artisan("db:seed", ["--force" => true]);
-	}
+    public function setUp(): void
+    {
+        parent::setUp();
+        Schema::disableForeignKeyConstraints();
+        $this->artisan("db:seed", ["--force" => true]);
+    }
 
     /**
      * Fake methods
@@ -38,34 +38,34 @@ class BaseTestCase extends TestCase
     /**
      * Generate Admin data
      */
-	public function createAdmin(array $attributes = []): object
-	{
-		$password = $attributes["password"] ?? "password";
-		$role_slug = $attributes["role_slug"] ?? "super-admin";
-		$role = Role::where("slug", $role_slug)->firstOrFail();
+    public function createAdmin(array $attributes = []): object
+    {
+        $password = $attributes["password"] ?? "password";
+        $role_slug = $attributes["role_slug"] ?? "super-admin";
+        $role = Role::where("slug", $role_slug)->firstOrFail();
 
-		$data = [
-			"password" => Hash::make($password),
-			"role_id" => $role->id
-		];
-		
-		$admin = Admin::factory()->create($data);
-		$token = $this->createToken($admin->email, $password);
-		$this->headers["Authorization"] = "Bearer {$token}";
+        $data = [
+            "password" => Hash::make($password),
+            "role_id" => $role->id
+        ];
+        
+        $admin = Admin::factory()->create($data);
+        $token = $this->createToken($admin->email, $password);
+        $this->headers["Authorization"] = "Bearer {$token}";
 
-		return $admin;
-	}
+        return $admin;
+    }
 
-	public function createToken(string $admin_email, string $password): ?string
-	{
-		$jwtToken = Auth::guard("admin")
-			->setTTL( config("jwt.admin_jwt_ttl") )
-			->attempt([
-				"email" => $admin_email,
-				"password" => $password
-			]);
-		return $jwtToken ?? null;
-	}
+    public function createToken(string $admin_email, string $password): ?string
+    {
+        $jwtToken = Auth::guard("admin")
+            ->setTTL( config("jwt.admin_jwt_ttl") )
+            ->attempt([
+                "email" => $admin_email,
+                "password" => $password
+            ]);
+        return $jwtToken ?? null;
+    }
 
     /**
      * GET tests
