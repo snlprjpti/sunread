@@ -2,24 +2,20 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 use Modules\User\Transformers\AdminResource;
-use Illuminate\Validation\ValidationException;
 use Modules\User\Repositories\AdminRepository;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\User\Exceptions\InvalidCredentialException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-/**
- * Account Controller for the Admin
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class AccountController extends BaseController
 {
-
     protected $repository;
 
     public function __construct(Admin $admin, AdminRepository $adminRepository)
@@ -27,72 +23,70 @@ class AccountController extends BaseController
         $this->model = $admin;
         $this->model_name = "Admin account";
         $this->repository = $adminRepository;
+        $exception_statuses = [
+            InvalidCredentialException::class => 401
+        ];
 
-        parent::__construct($this->model, $this->model_name);
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     * Return currently logged in user's details
-     * 
-     * @return JsonResponse
-     */
-    public function show()
+    public function collection(object $data): ResourceCollection
+    {
+        return AdminResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new AdminResource($data);
+    }
+
+    public function show(): JsonResponse
     {
         try
         {
             $fetched = auth()->guard('admin')->user();
         }
-        catch (UnauthorizedHttpException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->getMessage(), 401);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new AdminResource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function update(Request $request)
+    public function update(Request $request): JsonResponse
     {
         try
         {
             $updated = auth()->guard('admin')->user();
-            $data = $this->repository->validateData($request, $updated->id);
+            $merge = ["email" => "required|email|unique:admins,email,{$updated->id}"];
+            if ( $request->has("current_password") ) {
+                $current_password_validation = $request->has("password") ? "required" : "sometimes";
+                $merge["current_password"] = "$current_password_validation|min:6|max:200";
+            }
 
-            $updated->fill($data);
-            $updated->save();
+            $data = $this->repository->validateData($request, $merge);
+
+            if ( $request->has("current_password") ) {
+                if (!Hash::check($request->current_password, auth()->guard('admin')->user()->password)) {
+                    throw new InvalidCredentialException(__("core::app.users.users.incorrect-password"));
+                }
+
+                $data["password"] = Hash::make($request->password);
+            }
+
+            unset($data["current_password"]);
+            $updated = $this->repository->update($data, $updated->id);
         }
-        catch (InvalidCredentialException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->getMessage(), 401);
-        }
-        catch (ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new AdminResource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    /**
-     * Store profile image to current user
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function uploadProfileImage(Request $request)
+    public function uploadProfileImage(Request $request): JsonResponse
     {
         try
         {
@@ -100,39 +94,26 @@ class AccountController extends BaseController
             $this->repository->removeOldImage($updated->id);
             $updated = $this->repository->uploadProfileImage($request, $updated->id);
         }
-        catch (ValidationException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new AdminResource($updated), "Profile image updated successfully.");
+        return $this->successResponse($this->resource($updated), "Profile image updated successfully.");
     }
 
-    /**
-     * Delete profile image from current user.
-     *
-     * @return JsonResponse
-     */
-    public function deleteProfileImage()
+    public function deleteProfileImage(): JsonResponse
     {
         try
         {
             $updated = auth()->guard('admin')->user();
             $updated = $this->repository->removeOldImage($updated->id);
         }
-        catch (ValidationException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new AdminResource($updated), "Image deleted successfully.");
+        return $this->successResponse($this->resource($updated), "Profile image deleted successfully.");
     }
 }

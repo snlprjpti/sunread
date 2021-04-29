@@ -2,32 +2,27 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
+use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 
-/**
- * Session Controller for the Admin
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class SessionController extends BaseController
 {
-    public function __construct()
+    public function __construct(Admin $admin)
     {
         $this->middleware('guest:admin')->except(['logout']);
+
+        $this->model = $admin;
+        $this->model_name = "Admin account";
+
+        parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Logs in user and geneates jwt token
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         Event::dispatch('admin.session.login.before');
 
@@ -49,36 +44,27 @@ class SessionController extends BaseController
                 "user" => auth()->guard("admin")->user()
             ];
         }
-        catch (ValidationException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->errors(), 422);
-
-        }
-        catch (\Exception  $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
         Event::dispatch('admin.session.login.after', auth()->guard("admin")->user());
         return $this->successResponse($payload, $this->lang("login-success"));
     }
 
-    /**
-     * Logout the Admin
-     * 
-     * @return JsonResponse
-     */
-    public function logout()
+    public function logout(): JsonResponse
     {
         Event::dispatch('admin.session.logout.before');
+
         try
         {
             $admin = auth()->guard('admin')->user();
             auth()->guard("admin")->logout();
         }
-        catch (\Exception $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
         Event::dispatch('admin.session.logout.after' , $admin);

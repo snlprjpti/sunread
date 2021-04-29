@@ -12,6 +12,7 @@ use Illuminate\Validation\ValidationException;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class BaseController extends Controller
 {
@@ -50,6 +51,7 @@ class BaseController extends Controller
             ValidationException::class => 422,
             ModelNotFoundException::class => 404,
             QueryException::class => 400,
+            UnauthorizedHttpException::class => 401,
             SlugCouldNotBeGenerated::class => 500
         ], $exception_statuses);
     }

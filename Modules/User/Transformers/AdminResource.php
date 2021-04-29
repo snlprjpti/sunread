@@ -2,8 +2,6 @@
 
 namespace Modules\User\Transformers;
 
-use Illuminate\Support\Carbon;
-use Modules\User\Transformers\RoleResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AdminResource extends JsonResource
@@ -26,7 +24,7 @@ class AdminResource extends JsonResource
             "role" => $this->role ? new RoleResource($this->role) : null,
             "profile_image" => $this->profile_image_url,
             "avatar" => $this->avatar,
-            "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
+            "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
 }

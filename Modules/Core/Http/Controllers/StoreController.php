@@ -83,12 +83,8 @@ class StoreController extends BaseController
     {
         try
         {
-
             $data = $this->repository->validateData($request,[
-                "currency" => "required",
-                "name" => "required",
                 "slug" => "nullable|unique:stores,slug,{$id}",
-                "locale" => "required",
                 "image" => "sometimes|nullable|mimes:bmp,jpeg,jpg,png,webp"
             ]);
 
