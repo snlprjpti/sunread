@@ -106,5 +106,22 @@ class ActivityLogTest extends TestCase
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
         ]);
+
+
+//        Admin Can Delete Individual resource
+        $resource_id = $this->model::factory()->create()->id;
+        $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.destroy", $resource_id));
+
+        $response->assertStatus(204);
+
+        $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
+        $this->assertFalse($check_resource);
+
+
+//        Admin Can Delete Bulk resource
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.bulk-delete"));
+        $response->assertStatus(204);
+        $check_resource = $this->model::whereId($resource_id)->get() ? true : false;
+        $this->assertFalse($check_resource);
     }
 }
