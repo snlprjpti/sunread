@@ -43,6 +43,7 @@ trait Configuration
             "scope_id" => $request->scope_id
         ]);
         $created_data['message'] = 'create-success';
+        $created_data['code'] = 201;
         return (object) $created_data; 
     }
 
@@ -58,6 +59,7 @@ trait Configuration
             ]);
             $updated_data['data'] = $this->configuration->findorfail($configData->id);
             $updated_data['message'] = 'update-success';
+            $updated_data['code'] = 200;
             return (object) $updated_data; 
         }
         return $this->add($request);

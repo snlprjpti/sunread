@@ -79,7 +79,8 @@ class ConfigurationController extends BaseController
     {
         try
         {
-            $rules = config('configuration.'.$request->absolute_path.'.rules');
+
+            $rules = isset($request->absolute_path) ? config('configuration.'.$request->absolute_path.'.rules') : "";
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["required", "integer", "min:0", new ConfigurationRule($request->scope)],
                 'value' => $rules
@@ -91,6 +92,6 @@ class ConfigurationController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($item->data, $this->lang($item->message), 201);
+        return $this->successResponse($item->data, $this->lang($item->message), $item->code);
     }
 }
