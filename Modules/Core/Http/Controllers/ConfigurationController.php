@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Config;
 use Modules\Core\Entities\Configuration;
 use Modules\Core\Repositories\ConfigurationRepository;
+use Modules\Core\Rules\ConfigurationRule;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
 use Modules\Core\Transformers\ConfigurationResource;
 
@@ -80,6 +81,7 @@ class ConfigurationController extends BaseController
         {
             $rules = config('configuration.'.$request->absolute_path.'.rules');
             $data = $this->repository->validateData($request, [
+                "scope_id" => ["required", "integer", "min:0", new ConfigurationRule($request->scope)],
                 'value' => $rules
             ]);
             $item = $this->add((object) $data);
