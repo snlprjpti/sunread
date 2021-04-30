@@ -13,7 +13,7 @@ class ConfigurationRepository extends BaseRepository
         $this->model_key = "core.configuration";
         $this->rules = [
            /* General */
-            "scope" => "required",
+            "scope" => [ "required", "in:default,website,channel,store" ],
             "scope_id" => "required|integer|min:0",
             "path" => "required",
             "value" => "nullable"
