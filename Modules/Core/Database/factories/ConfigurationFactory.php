@@ -37,7 +37,7 @@ class ConfigurationFactory extends Factory
         if($scope == "channel") $scope_id = $channel->id;
         if($scope == "store") $scope_id = $store->id;
 
-        $paths = [ "\Modules\Core\Entities\Currency", "\Modules\User\Entities\Admin", "\Modules\Core\Entities\Website", ];
+        $paths = [ "\Modules\Core\Entities\Currency", "\Modules\User\Entities\Admin", "\Modules\Core\Entities\Website" ];
         $path = Arr::random($paths);
 
         while(true) {
