@@ -25,7 +25,7 @@ class CategoryController extends BaseController
         $this->model = $category;
         $this->model_name = "Category";
         $this->is_super_admin = auth()->guard("admin")->user()->hasRole("super-admin");
-        $this->main_root_id = 1;
+        $this->main_root_id = Category::oldest()->first()->id;
 
         $exception_statuses = [
             CategoryAuthorizationException::class => 403
@@ -89,7 +89,8 @@ class CategoryController extends BaseController
     {
         try
         {
-            if ($id == $this->main_root_id) throw new CategoryAuthorizationException("Action not authorized."); 
+            $category = $this->model->findOrFail($id);
+            if ((!$this->is_super_admin && $category->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not authorized."); 
             $fetched = $this->model->with(["translations"])->findOrFail($id);
         }
         catch (\Exception $exception)
