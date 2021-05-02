@@ -70,6 +70,10 @@ class ActivityLogTest extends TestCase
 
     public function testTestingAllActivityLogsBecauseObserversIsntRunning()
     {
+        // Create Resources
+        $resource_id = $this->model::factory()->create()->id;
+        $resource_ids = $this->model::factory(2)->create()->pluck("id")->toArray();
+
         // Admin can fetch resources
         $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index"));
 
@@ -89,7 +93,7 @@ class ActivityLogTest extends TestCase
         ]);
 
         // Admin can fetch individual resource
-        $response = $this->get(route("{$this->route_prefix}.show", $this->model::latest()->first()->id));
+        $response = $this->get(route("{$this->route_prefix}.show", $resource_id));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -108,7 +112,6 @@ class ActivityLogTest extends TestCase
 
 
         // Admin Can Delete Individual resource
-        $resource_id = $this->model::factory()->create()->id;
         $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.destroy", $resource_id));
 
         $response->assertStatus(204);
@@ -117,8 +120,7 @@ class ActivityLogTest extends TestCase
         $this->assertFalse($check_resource);
 
 
-        // Admin Can Delete Bulk resource
-        $resource_ids = $this->model::factory(2)->create()->pluck("id")->toArray();
+        // Admin Can Delete Bulk resource0
         $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.bulk-delete"), [
             "ids" => $resource_ids
         ]);
