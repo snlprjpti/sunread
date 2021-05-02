@@ -2,9 +2,6 @@
 
 namespace Modules\Category\Tests\Feature;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
@@ -12,8 +9,7 @@ use Modules\Core\Entities\Store;
 use Modules\Core\Tests\BaseTestCase;
 
 class CategoryTest extends BaseTestCase
-{
-   
+{ 
     public function setUp(): void
     {
         parent::setUp();
@@ -21,7 +17,7 @@ class CategoryTest extends BaseTestCase
         $this->model = Category::class;
         $this->model_name = "Category";
         $this->route_prefix = "admin.catalog.categories.categories";
-        $this->default_resource_id = Category::latest()->first()->id;
+        $this->default_resource_id = $this->model::latest()->first()->id;
         $this->fake_resource_id = 0;
         $this->filter = [
             "sort_by" => "id",
@@ -37,6 +33,7 @@ class CategoryTest extends BaseTestCase
         return array_merge($this->model::factory()->make([
             "image" => UploadedFile::fake()->image("image.png")
         ])->toArray(), [
+            "parent_id" => $this->model::oldest()->first()->id,
             "translation" => [
                 "store_id" => $store->id,
                 "name" => "Test"
@@ -46,28 +43,16 @@ class CategoryTest extends BaseTestCase
 
     public function getNonMandotaryCreateData(): array
     {
-        return array_merge($this->getCreateData(), []);
+        return array_merge($this->getCreateData(), [
+            "position" => null
+        ]);
     }
 
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "name" => null
-        ]);
-    }
-
-    public function getUpdateData(): array
-    {
-        Storage::fake();
-        $store = Store::factory()->create();
-
-        return array_merge($this->model::factory()->make([
-            "image" => UploadedFile::fake()->image("image.png")
-        ])->toArray(), [
-            "translation" => [
-                "store_id" => $store->id,
-                "name" => "Test"
-            ]
+            "name" => null,
+            "parent_id" => null
         ]);
     }
 
@@ -77,12 +62,4 @@ class CategoryTest extends BaseTestCase
             "image" => null
         ]);   
     }
-
-    public function getInvalidUpdateData(): array
-    {
-        return array_merge($this->getUpdateData(),[
-            "name" => null
-        ]);
-    }
-
 }
