@@ -2,71 +2,52 @@
 
 namespace Modules\Customer\Http\Controllers;
 
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Modules\Customer\Entities\Customer;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Customer\Exceptions\CustomerNotFoundException;
 use Modules\Customer\Repositories\CustomerRepository;
 use Modules\Customer\Exceptions\TokenGenerationException;
+use Exception;
 
-/**
- * Forgot Password controller for the Customer
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class ForgotPasswordController extends BaseController
 {
-    protected $repository;
-
-    public function __construct(CustomerRepository $customerRepository, Customer $customer)
+    public function __construct( Customer $customer)
     {
-        $this->repository = $customerRepository;
         $this->model = $customer;
-        $this->model_name = "Account";
-
-        parent::__construct($this->model, $this->model_name);
+        $this->model_name = "Customer";
+        $exception_statuses = [
+            TokenGenerationException::class => 401,
+            CustomerNotFoundException::class => 404
+        ];
+        parent::__construct($this->model, $this->model_name,$exception_statuses);
     }
 
-    /**
-     * Generate a token and sends token in email for user
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        try {
-            $data = $request->validate([
-                "email" => "required|email|exists:customers,email"
-            ]);
-
-            $response = $this->broker()->sendResetLink($data);
-            if ($response != Password::RESET_LINK_SENT) throw new TokenGenerationException($this->lang("token-generation-problem", []));
-        }
-        catch (ValidationException $exception)
+        try
         {
-            return $this->errorResponse($exception->errors(), 422);
+            $this->validate($request, ["email" => "required|email"]);
 
-        }catch(TokenGenerationException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
+            $customer = $this->model::where("email", $request->email)->firstOrFail();
+            $response = $this->broker()->sendResetLink(["email" => $customer->email]);
+
+            if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException(__("core::app.users.token.token-generation-problem"));
+            if ($response == Password::INVALID_USER) throw new CustomerNotFoundException("Customer not found.");
         }
         catch (\Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage("Reset Link sent to your email {$request->email}");
+        return $this->successResponseWithMessage("Reset Link sent to your email {$customer->email}");
     }
 
-    /**
-     * Get the broker to be used during password reset
-     * 
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
-     */
-    public function broker()
+    public function broker(): PasswordBroker
     {
         return Password::broker('customers');
     }
