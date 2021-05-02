@@ -24,7 +24,7 @@ class CategoryRepository extends BaseRepository
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
             "status" => "sometimes|boolean",
-            "parent_id" => "sometimes|exists:categories,id",
+            "parent_id" => "required|numeric|exists:categories,id",
             // translation validation
             "translation.name" => "sometimes|required",
             "translation.description" => "sometimes|nullable",

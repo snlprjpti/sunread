@@ -2,6 +2,7 @@
 
 namespace Modules\Category\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -9,13 +10,14 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryTranslation;
+use Modules\Category\Exceptions\CategoryAuthorizationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 
 class CategoryController extends BaseController
 {
-    protected $repository, $translation;
+    protected $repository, $translation, $role_id;
 
     public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryTranslation $categoryTranslation)
     {
@@ -23,6 +25,11 @@ class CategoryController extends BaseController
         $this->translation = $categoryTranslation;
         $this->model = $category;
         $this->model_name = "Category";
+        $this->role_id = auth()->guard("admin")->user()->role->id ?? "";
+
+        $exception_statuses = [
+            CategoryAuthorizationException::class => 401
+        ];
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -43,6 +50,8 @@ class CategoryController extends BaseController
         {
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request, ["translations"]);
+            // Dont fetch root category for other admin
+            if ($this->role_id !== 1) $fetched = $fetched->where('parent_id', '<>', null);
         }
         catch (\Exception $exception)
         {
@@ -80,6 +89,8 @@ class CategoryController extends BaseController
         try
         {
             $fetched = $this->model->with(["translations"])->findOrFail($id);
+            // Dont fetch root category for other admin
+            if ($this->role_id !== 1) $fetched = $fetched->where('parent_id', '<>', null);
         }
         catch (\Exception $exception)
         {
@@ -92,7 +103,10 @@ class CategoryController extends BaseController
     public function update(Request $request, int $id): JsonResponse
     {
         try
-        {            
+        {   
+            if ($id == 1) throw new CategoryAuthorizationException("Cannot update root category.");
+            if ($this->role_id !== 1 && $request->parent_id == 1) throw new CategoryAuthorizationException("Cannot update sub-root category.");
+
             $data = $this->repository->validateData($request,[
                 "slug" => "nullable|unique:categories,slug,{$id}",
                 "image" => "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
@@ -126,6 +140,9 @@ class CategoryController extends BaseController
     {
         try
         {
+            if ($id == 1) throw new CategoryAuthorizationException("Cannot delete root category.");
+            $category = $this->model->findOrFail($id);
+            if ($this->role_id !== 1 && $category->parent == 1) throw new CategoryAuthorizationException("Cannot delete sub-root category");
             $this->repository->delete($id, function($deleted){
                 $deleted->translations()->delete();
                 if($deleted->image) Storage::delete($deleted->image);
