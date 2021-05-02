@@ -108,7 +108,7 @@ class ActivityLogTest extends TestCase
         ]);
 
 
-//        Admin Can Delete Individual resource
+        // Admin Can Delete Individual resource
         $resource_id = $this->model::factory()->create()->id;
         $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.destroy", $resource_id));
 
@@ -118,10 +118,15 @@ class ActivityLogTest extends TestCase
         $this->assertFalse($check_resource);
 
 
-//        Admin Can Delete Bulk resource
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.bulk-delete"));
+        // Admin Can Delete Bulk resource
+        $resource_ids = $this->model::factory(2)->create()->pluck("id")->toArray();
+        $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.bulk-delete"), [
+            "ids" => $resource_ids
+        ]);
+
         $response->assertStatus(204);
-        $check_resource = $this->model::whereId($resource_id)->get() ? true : false;
+
+        $check_resource = $this->model::whereIn("id", $resource_ids)->get()->count() > 0 ? true : false;
         $this->assertFalse($check_resource);
     }
 }
