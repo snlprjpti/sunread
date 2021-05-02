@@ -2,6 +2,7 @@
 
 namespace Modules\Customer\Http\Controllers;
 
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -13,50 +14,35 @@ use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Exceptions\TokenGenerationException;
 use Modules\Customer\Exceptions\CustomerNotFoundException;
+use Exception;
 
-/**
- * Reset Password controller for the Customer
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class ResetPasswordController extends BaseController
 {
     public function __construct(Customer $customer)
     {
         $this->model = $customer;
         $this->model_name = "Password Reset";
-
-        parent::__construct($this->model, $this->model_name);
+        $exception_statuses = [
+            TokenGenerationException::class => 401,
+            CustomerNotFoundException::class => 404
+        ];
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /** OPTIONAL route
-     * Display the password reset token is valid
-     * If no token is present, display the error
-     * 
-     * @param  string|null $token
-     * @return JsonResponse
-     */
-    public function create($token = null)
+    public function create(?string $token = null): JsonResponse
     {
         return $token
             ? $this->successResponse(['token' => $token])
             : $this->errorResponse("Missing token", 400);
     }
 
-    /**
-     * Store new password of the admin
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try {
             $data = $request->validate([
                 "token" => "required",
                 "email" => "required|email|exists:customers,email",
                 "password" => "required|confirmed|min:6",
-                "password_confirmation" => "required"
             ]);
 
             $response = $this->broker()->reset($data, function ($customer, $password) {
@@ -66,49 +52,24 @@ class ResetPasswordController extends BaseController
             if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException($this->lang("token-generation-problem", []));
             if ($response == Password::INVALID_USER) throw new CustomerNotFoundException("Customer not found exception");
         }
-        catch (ValidationException $exception)
+
+        catch (Exception $exception)
         {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (CustomerNotFoundException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 404);
-        }
-        catch (TokenGenerationException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang("create-success"));
+        return $this->successResponseWithMessage($this->lang("password-reset-success"));
     }
 
-    /**
-     * Get the broker to be used during password reset.
-     * 
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
-     */
-    protected function broker()
+    protected function broker(): PasswordBroker
     {
         return Password::broker('customers');
     }
 
-    /**
-     * Reset the given customer password.
-     *
-     * @param $customer
-     * @param  string $password
-     * @return void
-     */
-    protected function resetPassword($customer, $password)
+    protected function resetPassword(object $customer, string $password): void
     {
         $customer->password = Hash::make($password);
         $customer->setRememberToken(Str::random(60));
         $customer->save();
-
-        event(new PasswordReset($customer));
     }
 }
