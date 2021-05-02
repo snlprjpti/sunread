@@ -25,9 +25,9 @@ class CustomerRepository extends BaseRepository
             "first_name" => "required|min:2|max:200",
             "last_name" => "required|min:2|max:200",
             "email" => "required|email|unique:customers,email",
-            "gender" => "required|in:male,female",
+            "gender" => "sometimes|in:male,female",
             "date_of_birth" => "date|before:today",
-            "status" => "required|boolean",
+            "status" => "sometimes|boolean",
             "customer_group_id" => "nullable|exists:customer_groups,id",
             "subscribed_to_news_letter" => "sometimes|boolean",
             "password" => "sometimes|min:6|confirmed"
