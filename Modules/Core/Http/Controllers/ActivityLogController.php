@@ -8,30 +8,30 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Entities\ActivityLog;
-use Modules\Core\Repositories\ActivityRepository;
-use Modules\Core\Transformers\ActivityResource;
+use Modules\Core\Repositories\ActivityLogRepository;
+use Modules\Core\Transformers\ActivityLogResource;
 
-class ActivityController extends BaseController
+class ActivityLogController extends BaseController
 {
     private $repository;
 
-    public function __construct(ActivityLog $activityLog, ActivityRepository $activityRepository)
+    public function __construct(ActivityLog $activityLog, ActivityLogRepository $activityLogRepository)
     {
         $this->model = $activityLog;
         $this->model_name = "Activity Log";
-        $this->repository = $activityRepository;
+        $this->repository = $activityLogRepository;
 
         parent::__construct($this->model, $this->model_name);
     }
 
     public function collection(object $data): ResourceCollection
     {
-        return ActivityResource::collection($data);
+        return ActivityLogResource::collection($data);
     }
 
     public function resource(object $data): JsonResource
     {
-        return new ActivityResource($data);
+        return new ActivityLogResource($data);
     }
 
     public function index(Request $request): JsonResponse

@@ -6,13 +6,8 @@ namespace Modules\Core\Repositories;
 
 use Modules\Core\Entities\ActivityLog;
 
-class ActivityRepository extends BaseRepository
+class ActivityLogRepository extends BaseRepository
 {
-    /**
-     * @var ActivityLog
-     */
-    private $activityLog;
-
     public function __construct(ActivityLog $activityLog)
     {
         $this->model = $activityLog;
