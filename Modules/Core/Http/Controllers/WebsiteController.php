@@ -83,7 +83,10 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, [
+                "code" => "required|unique:websites,code,{$id}",
+                "hostname" => "required|unique:websites,hostname,{$id}"
+            ]);
             $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )
