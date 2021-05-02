@@ -9,8 +9,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Modules\Customer\Entities\Customer;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Exceptions\TokenGenerationException;
 use Modules\Customer\Exceptions\CustomerNotFoundException;
