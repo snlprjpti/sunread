@@ -32,14 +32,11 @@ class ConfigurationRule implements Rule
     {
         if($this->scope == "default") return ($value == 0);
 
-        $websiteIds = Website::pluck("id")->toArray();
-        if($this->scope == "website") return in_array($value, $websiteIds);
+        if($this->scope == "website") return (bool) Website::whereId($value)->first();
 
-        $channelIds = Channel::pluck("id")->toArray();
-        if($this->scope == "channel") return in_array($value, $channelIds);
+        if($this->scope == "channel")  return (bool) Channel::whereId($value)->first();
 
-        $storeIds = Store::pluck("id")->toArray();
-        if($this->scope == "store") return in_array($value, $storeIds);
+        if($this->scope == "store")  return (bool) Store::whereId($value)->first();
         
     }
 
