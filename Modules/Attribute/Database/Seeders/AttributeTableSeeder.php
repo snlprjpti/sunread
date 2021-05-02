@@ -3,19 +3,15 @@
 namespace Modules\Attribute\Database\Seeders;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Attribute\Entities\Attribute;
 
 class AttributeTableSeeder extends Seeder
 {
-    /**
-     * Insert Attribute
-     * 
-     * @return Void
-     */
-    public function run()
+    public function run(): void
     {
         $attributes = [
             [
@@ -155,36 +151,32 @@ class AttributeTableSeeder extends Seeder
         $attributes_array = array_map(function($attribute) use($count) {
             global $count;
             return [
-                "slug" => \Str::slug($attribute["name"]),
+                "slug" => Str::slug($attribute["name"]),
                 "name" => $attribute["name"],
                 "type" => $attribute["type"],
                 "validation" => $attribute["validation"] ?? NULL,
                 "position" => ++$count,
                 "is_required" => $attribute["is_required"] ?? 0,
                 "is_unique" => $attribute["is_unique"] ?? 1,
-                // "value_per_locale" => $attribute["value_per_locale"] ?? 0,
-                // "value_per_channel" => $attribute["value_per_channel"] ?? 0,
                 "is_filterable" => $attribute["is_filterable"] ?? 1,
-                // "is_configurable" => $attribute["is_configurable"] ?? 0,
                 "is_user_defined" => $attribute["is_user_defined"] ?? 0,
                 "is_visible_on_front" => 0,
-                "use_in_flat" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
             ];
         }, $attributes);
-        DB::table('attributes')->insert($attributes_array);
+        DB::table("attributes")->insert($attributes_array);
 
         $translation_count = 0;
         $attribute_translations_array = array_map(function($attribute) use($translation_count) {
             global $translation_count;
             return [
-                "locale" => "en",
+                "store_id" => 1,
                 "name" => $attribute["name"],
                 "attribute_id" => ++$translation_count
             ];
         }, $attributes);
-        DB::table('attribute_translations')->insert($attribute_translations_array);
+        DB::table("attribute_translations")->insert($attribute_translations_array);
 
         $attribute_groups = [
             1 => [1, 2, 3, 4, 5, 6, 20, 21, 22],
@@ -205,10 +197,10 @@ class AttributeTableSeeder extends Seeder
         }
 
         foreach ($attribute_groups_mapping as $map){
-            $attribute = Attribute::find($map['attribute_id']);
+            $attribute = Attribute::find($map["attribute_id"]);
             if (!$attribute) continue;
 
-            unset($map['attribute_id']);
+            unset($map["attribute_id"]);
             $attribute->update($map);
         }
     }
