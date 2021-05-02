@@ -14,6 +14,13 @@ trait Configuration
         $this->configuration = new EntitiesConfiguration();
     }
 
+    public function getAllConfigurations()
+    {
+        return Cache::remember("configurations.all", 60, function(){
+            return config("configuration");
+        }); 
+    }
+
     public function has(object $request)
     {
         return (boolean) $this->checkCondition($request)->count();
@@ -62,40 +69,18 @@ trait Configuration
         }
         return $this->add($request);
     }
-    
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::updated(function () {
-            self::flushCache();
-        });
-        static::created(function () {
-            self::flushCache();
-        });
-    }
-
-    public static function flushCache()
-    {
-        Cache::forget();
-    }
 
     public function getDefaultValues(object $request): string
     {
         return $this->checkCondition($request)->first()->value;
     }
 
-    public static function getValues(object $request, string $pluck): array
+    public function cacheQuery(object $request, array $pluck): array
     {
-        return $request->path::pluck($pluck)->toArray();
-    }
-
-    public function cacheQuery(object $request, string $pluck, $timeout = 60): array
-    {
-        if($data = Cache::get($request->scope.$request->scope_id.$request->path)) return $data;
-
-        return Cache::remember($request->scope.$request->scope_id.$request->path, $timeout, function() use ($request, $pluck) {
-            return $this->getValues($request, $pluck);
+        $resources = Cache::rememberForever($request->path, function() use ($request) {
+           return $request->path::get();
         });
+
+       return $resources->pluck(isset($pluck[0]) ? $pluck[0] : "id", isset($pluck[1]) ? $pluck[1] : "id")->toArray();
     }
 }

@@ -16,7 +16,7 @@ use Modules\Core\Traits\Configuration as TraitsConfiguration;
 
 class ConfigurationController extends BaseController
 {
-    protected $repository, $config_fields;
+    protected $repository;
     use TraitsConfiguration;
 
     public function __construct(Configuration $configuration, ConfigurationRepository $configurationRepository)
@@ -24,7 +24,6 @@ class ConfigurationController extends BaseController
         $this->model = $configuration;
         $this->model_name = "Configuration";
         $this->repository = $configurationRepository;
-        $this->config_fields = config("configuration");
         $this->createModel();
 
         parent::__construct($this->model, $this->model_name);
