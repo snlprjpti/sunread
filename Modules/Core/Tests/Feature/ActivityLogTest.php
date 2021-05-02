@@ -30,7 +30,6 @@ class ActivityLogTest extends TestCase
         $this->model = ActivityLog::class;
         $this->model_name = "Activity Log";
         $this->route_prefix = "admin.activities";
-        $this->default_resource_id = ActivityLog::latest()->first()->id;
         $this->fake_resource_id = 0;
 
         $this->filter = [
@@ -90,7 +89,7 @@ class ActivityLogTest extends TestCase
         ]);
 
         // Admin can fetch individual resource
-        $response = $this->get(route("{$this->route_prefix}.show", $this->default_resource_id));
+        $response = $this->get(route("{$this->route_prefix}.show", $this->model::latest()->first()->id));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
