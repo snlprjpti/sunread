@@ -4,8 +4,6 @@ namespace Modules\Core\Traits;
 
 use Illuminate\Support\Facades\Cache;
 use Modules\Core\Entities\Configuration as EntitiesConfiguration;
-use phpDocumentor\Reflection\Types\Boolean;
-use PhpParser\Node\Expr\Cast\Object_;
 
 trait Configuration
 {
