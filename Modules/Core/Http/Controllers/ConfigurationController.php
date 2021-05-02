@@ -13,7 +13,6 @@ use Modules\Core\Entities\Configuration;
 use Modules\Core\Repositories\ConfigurationRepository;
 use Modules\Core\Rules\ConfigurationRule;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
-use Modules\Core\Transformers\ConfigurationResource;
 
 class ConfigurationController extends BaseController
 {
