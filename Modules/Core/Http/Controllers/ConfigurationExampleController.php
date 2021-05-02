@@ -8,31 +8,31 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Routing\Controller;
-use Modules\Core\Entities\Website;
-use Modules\Core\Repositories\WebsiteRepository;
-use Modules\Core\Transformers\WebsiteResource;
+use Modules\Core\Entities\Configuration;
+use Modules\Core\Repositories\ConfigurationRepository;
+use Modules\Core\Transformers\ConfigurationResource;
 
-class WebsiteController extends BaseController
+class ConfigurationController extends BaseController
 {
     protected $repository;
 
-    public function __construct(Website $website, WebsiteRepository $websiteRepository)
+    public function __construct(Configuration $configuration, ConfigurationRepository $configurationRepository)
     {
-        $this->model = $website;
-        $this->model_name = "Website";
-        $this->repository = $websiteRepository;
+        $this->model = $configuration;
+        $this->model_name = "Configuration";
+        $this->repository = $configurationRepository;
+
         parent::__construct($this->model, $this->model_name);
     }
 
     public function collection(object $data): ResourceCollection
     {
-        return WebsiteResource::collection($data);
+        return ConfigurationResource::collection($data);
     }
 
     public function resource(object $data): JsonResource
     {
-        return new WebsiteResource($data);
+        return new ConfigurationResource($data);
     }
 
     public function index(Request $request): JsonResponse
@@ -83,10 +83,7 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, [
-                "code" => "required|unique:websites,code,{$id}",
-                "hostname" => "required|unique:websites,hostname,{$id}"
-            ]);
+            $data = $this->repository->validateData($request);
             $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )

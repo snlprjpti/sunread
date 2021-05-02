@@ -15,8 +15,8 @@ Route::group(['middleware' => ['api']], function () {
     //ADMIN ATTRIBUTE ROUTES
     Route::group(['prefix' => 'admin', 'middleware' => ['admin', 'language'], 'as' => 'admin.'], function () {
         // Activities Routes
-        Route::delete('activities/bulk', [\Modules\Core\Http\Controllers\ActivityController::class, 'bulkDelete'])->name('activities.bulk-delete');
-        Route::resource('activities', ActivityController::class)->only(['index', 'show', 'destroy']);
+        Route::delete('activities/bulk', [\Modules\Core\Http\Controllers\ActivityLogController::class, 'bulkDelete'])->name('activities.bulk-delete');
+        Route::resource('activities', ActivityLogController::class)->only(['index', 'show', 'destroy']);
 
         // Locale Routes
         Route::resource('locales', LocaleController::class)->except(['create', 'edit']);
