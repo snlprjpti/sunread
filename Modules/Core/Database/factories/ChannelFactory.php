@@ -4,6 +4,7 @@ namespace Modules\Core\Database\factories;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 
 class ChannelFactory extends Factory
@@ -27,7 +28,7 @@ class ChannelFactory extends Factory
 
         while(true) {
             $code = \Str::random(16);
-            $old_channel = Currency::where("code", $code)->first();
+            $old_channel = Channel::where("code", $code)->first();
             if (!$old_channel) break;
         }
 
