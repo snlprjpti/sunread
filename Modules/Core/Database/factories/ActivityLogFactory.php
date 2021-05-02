@@ -2,9 +2,9 @@
 
 namespace Modules\Core\Database\factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Arr;
 use Modules\Core\Entities\ActivityLog;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ActivityLogFactory extends Factory
 {
@@ -12,14 +12,16 @@ class ActivityLogFactory extends Factory
 
     public function definition()
     {
+        $fake_subject = Arr::random(["\Modules\Core\Entities\Channel", "\Modules\Core\Entities\Currency"]);
+        $fake_causer = Arr::random(["\Modules\User\Entities\Admin", "\Modules\Customer\Entities\Customer", NULL]);
         return [
             'log_name' => 'default',
-            'subject_id' => rand(1,20),
-            'subject_type' => $this->faker->paragraph,
-            'causer_id' => rand(1,20),
-            'causer_type' => 1,
-            'properties' => $this->faker->paragraph,
-            'description' => $this->faker->paragraph,
+            'subject_id' => $fake_subject::inRandomOrder()->first()->id,
+            'subject_type' => $fake_subject,
+            'causer_id' => $fake_causer ? $fake_causer::inRandomOrder()->first()->id : null,
+            'causer_type' => $fake_causer,
+            'properties' => [],
+            'description' => "created",
             'action' => $this->faker->name,
             'activity' => $this->faker->paragraph
         ];
