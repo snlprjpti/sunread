@@ -2,15 +2,8 @@
 
 namespace Modules\Customer\Repositories;
 
-use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Request;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\Customer;
-use Modules\Customer\Contracts\CustomerInterface;
 
 class CustomerRepository extends BaseRepository
 {

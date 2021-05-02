@@ -52,23 +52,11 @@ class CustomerController extends BaseController
         return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    /**
-     * Store a new resource
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function store(Request $request): JsonResponse
     {
         try
         {
-            $data = $this->repository->validateData($request, [
-                "gender" => "required|in:male,female",
-                "date_of_birth" => "date|before:today",
-                "status" => "required|boolean",
-                "customer_group_id" => "nullable|exists:customer_groups,id",
-                "subscribed_to_news_letter" => "sometimes|boolean"
-            ]);
+            $data = $this->repository->validateData($request);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
             $created = $this->repository->create($data);
         }
@@ -99,18 +87,8 @@ class CustomerController extends BaseController
     {
         try
         {
-
-             $data = $this->repository->validateData($request, [
-                "gender" => "required|in:male,female",
-                "date_of_birth" => "date|before:today",
-                "status" => "required|boolean",
-                "customer_group_id" => "nullable|exists:customer_groups,id",
-                "subscribed_to_news_letter" => "sometimes|boolean",
-                "password" => "sometimes|min:6|confirmed"
-            ]);
-
+            $data = $this->repository->validateData($request);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
-
             $updated = $this->repository->update($data, $id);
         }
         catch (\Exception $exception)
@@ -122,12 +100,6 @@ class CustomerController extends BaseController
 
     }
 
-    /**
-     * Remove the specified resource
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
     public function destroy(int $id): JsonResponse
     {
         try
