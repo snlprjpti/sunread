@@ -9,13 +9,14 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryTranslation;
+use Modules\Category\Exceptions\CategoryAuthorizationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 
 class CategoryController extends BaseController
 {
-    protected $repository, $translation;
+    protected $repository, $translation, $is_super_admin, $main_root_id;
 
     public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryTranslation $categoryTranslation)
     {
@@ -23,8 +24,14 @@ class CategoryController extends BaseController
         $this->translation = $categoryTranslation;
         $this->model = $category;
         $this->model_name = "Category";
+        $this->is_super_admin = auth()->guard("admin")->user()->hasRole("super-admin");
+        $this->main_root_id = Category::oldest()->first()->id;
 
-        parent::__construct($this->model, $this->model_name);
+        $exception_statuses = [
+            CategoryAuthorizationException::class => 403
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -43,6 +50,8 @@ class CategoryController extends BaseController
         {
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request, ["translations"]);
+            // Dont fetch root category for other admin
+            if (!$this->is_super_admin) $fetched = $fetched->where('parent_id', '<>', null);
         }
         catch (\Exception $exception)
         {
@@ -56,6 +65,7 @@ class CategoryController extends BaseController
     {
         try
         {
+            if (!$this->is_super_admin && $request->parent_id == $this->main_root_id) throw new CategoryAuthorizationException("Action not authorized.");
             $data = $this->repository->validateData($request);
             $data['image'] = $this->storeImage($request, 'image', strtolower($this->model_name));
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
@@ -79,6 +89,8 @@ class CategoryController extends BaseController
     {
         try
         {
+            $category = $this->model->findOrFail($id);
+            if ((!$this->is_super_admin && $category->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not authorized."); 
             $fetched = $this->model->with(["translations"])->findOrFail($id);
         }
         catch (\Exception $exception)
@@ -92,7 +104,9 @@ class CategoryController extends BaseController
     public function update(Request $request, int $id): JsonResponse
     {
         try
-        {            
+        {
+            if ((!$this->is_super_admin && $request->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not autorized.");
+
             $data = $this->repository->validateData($request,[
                 "slug" => "nullable|unique:categories,slug,{$id}",
                 "image" => "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
@@ -126,6 +140,8 @@ class CategoryController extends BaseController
     {
         try
         {
+            $category = $this->model->findOrFail($id);
+            if ((!$this->is_super_admin && $category->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not autorized.");
             $this->repository->delete($id, function($deleted){
                 $deleted->translations()->delete();
                 if($deleted->image) Storage::delete($deleted->image);
