@@ -3,6 +3,7 @@
 namespace Modules\Core\Services;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Modules\Core\Entities\ActivityLog;
 
 class ActivityLogHelper {
@@ -27,7 +28,15 @@ class ActivityLogHelper {
         $model_name = class_basename($model);
         $default_action = $model_name." ".$event;
         $properties = [];
-
+        
+        if(Cache::get($model::class))
+        {
+            Cache::forget($model::class);
+            Cache::rememberForever($model::class, function() use ($model){
+                return $model->get();
+            });
+        }
+        
         if ( $event == "updated" ) {
             $newValues = $model->getChanges();
             $oldValues = collect($newValues)->mapWithKeys(function($value, $key) use ($model) {
