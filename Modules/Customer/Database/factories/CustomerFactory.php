@@ -17,7 +17,7 @@ class CustomerFactory extends Factory
     {
         $gender = [ "male", "female", "other" ];
         return [
-            "customer_group_id" => CustomerGroup::first()->id,
+            "customer_group_id" => CustomerGroup::factory()->create()->id,
             "first_name" => $this->faker->firstName(),
             "last_name" => $this->faker->lastName(),
             "gender" => Arr::random($gender),
