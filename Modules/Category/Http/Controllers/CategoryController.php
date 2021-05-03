@@ -44,7 +44,7 @@ class CategoryController extends BaseController
         return new CategoryResource($data);
     }
 
-    private function blockCategoryAuthority(int $parent_id, ?int $main_root_id = null): bool
+    private function blockCategoryAuthority(?int $parent_id, ?int $main_root_id = null): bool
     {
         $parent_id_authority = (!$this->is_super_admin && $parent_id == $this->main_root_id);
         $main_root_id_authority = $main_root_id ? $main_root_id == $this->main_root_id : false;
