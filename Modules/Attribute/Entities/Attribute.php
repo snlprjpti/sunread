@@ -3,43 +3,29 @@
 namespace Modules\Attribute\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Core\Traits\Sluggable;
 
 class Attribute extends Model
 {
     use Sluggable;
 
-    public $translatedAttributes = ["name"];
     public static $SEARCHABLE = [ "name", "type" ];
-    protected $fillable = [ "slug", "name", "type", "position", "is_required", "is_unique", "validation", "is_filterable", "is_visible_on_front", "is_user_defined", "use_in_flat", "create_at", "updated_at", "attribute_group_id" ];
+    protected $fillable = [ "attribute_group_id", "slug", "name", "type", "position", "validation", "is_required", "is_unique", "is_filterable", "is_user_defined", "is_visible_on_front" ];
 
-    /**
-     * Attribute group relationship
-     * 
-     * @return AttributeGroup
-     */
-    public function attribute_group()
+    public function attribute_group(): BelongsTo
     {
-        return $this->belongsTo(AttributeGroup::class, "attribute_group_id");
+        return $this->belongsTo(AttributeGroup::class);
     }
 
-    /**
-     * Attribute options relationship
-     * 
-     * @return AttributeOption
-     */
-    public function attribute_options()
+    public function attribute_options(): HasMany
     {
-        return $this->hasMany(AttributeOption::class, "attribute_id");
+        return $this->hasMany(AttributeOption::class);
     }
 
-    /**
-     * Translations relationship
-     * 
-     * @return AttributeTranslation
-     */
-    public function translations()
+    public function translations(): HasMany
     {
-        return $this->hasMany(AttributeTranslation::class,"attribute_id");
+        return $this->hasMany(AttributeTranslation::class);
     }
 }
