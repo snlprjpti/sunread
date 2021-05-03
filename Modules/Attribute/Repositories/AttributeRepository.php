@@ -48,7 +48,7 @@ class AttributeRepository extends BaseRepository
         ];
     }
 
-    public function validateTranslationData(array $translations): bool
+    public function validateTranslationData(?array $translations): bool
     {
         if (empty($translations)) return false;
 
