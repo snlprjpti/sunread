@@ -17,7 +17,7 @@ class AttributeGroupTranslationRepository
         $this->model_key = "catalog.attribute.attribute_group_translations";
     }
 
-    public function updateOrCreate(array $data, object $parent): void
+    public function updateOrCreate(?array $data, object $parent): void
     {
         if ( !is_array($data) ) return;
 

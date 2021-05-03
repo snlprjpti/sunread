@@ -17,7 +17,7 @@ class AttributeOptionTranslationRepository
         $this->model_key = "catalog.attribute.options.translations";
     }
 
-    public function updateOrCreate(array $data, object $parent): void
+    public function updateOrCreate(?array $data, object $parent): void
     {
         if ( !is_array($data) ) return;
 

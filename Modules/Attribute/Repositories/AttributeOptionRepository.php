@@ -16,7 +16,7 @@ class AttributeOptionRepository
         $this->model_key = "catalog.attribute.options";
     }
 
-    public function updateOrCreate(array $data, object $parent): void
+    public function updateOrCreate(?array $data, object $parent): void
     {
         if ( !is_array($data) || count($data) ) return;
 
