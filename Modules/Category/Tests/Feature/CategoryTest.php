@@ -9,7 +9,9 @@ use Modules\Core\Entities\Store;
 use Modules\Core\Tests\BaseTestCase;
 
 class CategoryTest extends BaseTestCase
-{ 
+{
+    protected int $root_category_id;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -17,12 +19,17 @@ class CategoryTest extends BaseTestCase
         $this->model = Category::class;
         $this->model_name = "Category";
         $this->route_prefix = "admin.catalog.categories.categories";
-        $this->default_resource_id = $this->model::oldest()->first()->id;
+
+        $this->model::factory(10)->create();
+        $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->fake_resource_id = 0;
+
         $this->filter = [
             "sort_by" => "id",
             "sort_order" => "asc"
         ];
+
+        $this->root_category_id = $this->model::oldest('id')->first()->id;
     }
 
     public function getCreateData(): array
@@ -33,7 +40,7 @@ class CategoryTest extends BaseTestCase
         return array_merge($this->model::factory()->make([
             "image" => UploadedFile::fake()->image("image.png")
         ])->toArray(), [
-            "parent_id" => $this->model::oldest()->first()->id,
+            "parent_id" => $this->root_category_id,
             "translation" => [
                 "store_id" => $store->id,
                 "name" => "Test"
@@ -65,11 +72,8 @@ class CategoryTest extends BaseTestCase
 
     public function basicAdminHeader()
     {
-        $normal_admin = $this->createAdmin(["role_slug" => "basic-admin"]);
-        $token = $this->createToken($normal_admin["email"], $normal_admin["password"]);
-        $headers["Authorization"] = "Bearer {$token}";
-
-        return $headers;
+        $this->createAdmin(["role_slug" => "basic-admin"]);
+        return $this->headers;
     }
 
     public function testShouldReturnErrorIfBasicAdminTryToStoreRootCategory()
@@ -85,9 +89,10 @@ class CategoryTest extends BaseTestCase
 
     public function testShouldReturnErrorIfBasicAdminTryToUpdateRootCategory()
     {
-        $post_data = $this->getUpdateData();
+        $post_data = array_merge($this->getUpdateData(), ["parent_id" => $this->default_resource_id]);
         
         $response = $this->withHeaders($this->basicAdminHeader())->put(route("{$this->route_prefix}.update", $this->root_category_id), $post_data);
+
         $response->assertStatus(403);
         $response->assertJsonFragment([
             "status" => "error"
@@ -97,7 +102,7 @@ class CategoryTest extends BaseTestCase
     public function testShouldReturnErrorIfBasicAdminTryToFetchRootCategory()
     {
         
-        $response = $this->withHeaders($this->basicAdminHeader())->get(route("{$this->route_prefix}.show", $this->default_resource_id));
+        $response = $this->withHeaders($this->basicAdminHeader())->get(route("{$this->route_prefix}.show", $this->root_category_id));
 
         $response->assertStatus(403);
         $response->assertJsonFragment([
@@ -107,7 +112,7 @@ class CategoryTest extends BaseTestCase
 
     public function testShouldReturnErrorIfBasicAdminTryToDeleteRootCategory()
     {
-        $response = $this->withHeaders($this->basicAdminHeader())->delete(route("{$this->route_prefix}.destroy", $this->default_resource_id));
+        $response = $this->withHeaders($this->basicAdminHeader())->delete(route("{$this->route_prefix}.destroy", $this->root_category_id));
 
         $response->assertStatus(403);
         $response->assertJsonFragment([

@@ -25,7 +25,7 @@ class CategoryController extends BaseController
         $this->model = $category;
         $this->model_name = "Category";
         $this->is_super_admin = auth()->guard("admin")->user()->hasRole("super-admin");
-        $this->main_root_id = 1;
+        $this->main_root_id = $this->model::oldest('id')->first()->id;
 
         $exception_statuses = [
             CategoryAuthorizationException::class => 403
