@@ -44,6 +44,16 @@ class CategoryController extends BaseController
         return new CategoryResource($data);
     }
 
+    private function blockCategoryAuthority(int $parent_id, ?int $main_root_id = null): bool
+    {
+        $parent_id_authority = (!$this->is_super_admin && $parent_id == $this->main_root_id);
+        $main_root_id_authority = $main_root_id ? $main_root_id == $this->main_root_id : false;
+
+        if ( $parent_id_authority || $main_root_id_authority ) throw new CategoryAuthorizationException("Action not authorized.");
+
+        return false;
+    }
+
     public function index(Request $request): JsonResponse
     {
         try
@@ -65,7 +75,8 @@ class CategoryController extends BaseController
     {
         try
         {
-            if (!$this->is_super_admin && $request->parent_id == $this->main_root_id) throw new CategoryAuthorizationException("Action not authorized.");
+            $this->blockCategoryAuthority($request->parent_id);
+
             $data = $this->repository->validateData($request);
             $data['image'] = $this->storeImage($request, 'image', strtolower($this->model_name));
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
@@ -90,7 +101,8 @@ class CategoryController extends BaseController
         try
         {
             $category = $this->model->findOrFail($id);
-            if ((!$this->is_super_admin && $category->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not authorized."); 
+            $this->blockCategoryAuthority($category->parent_id, $id);
+
             $fetched = $this->model->with(["translations"])->findOrFail($id);
         }
         catch (\Exception $exception)
@@ -105,14 +117,14 @@ class CategoryController extends BaseController
     {
         try
         {
-            if ((!$this->is_super_admin && $request->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not authorized.");
+            $this->blockCategoryAuthority($request->parent_id, $id);
 
             $data = $this->repository->validateData($request,[
                 "slug" => "nullable|unique:categories,slug,{$id}",
                 "image" => "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
             ]);
 
-            if ($request->file("image")){
+            if ($request->file("image")) {
                 $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
             }
             else {
@@ -141,7 +153,8 @@ class CategoryController extends BaseController
         try
         {
             $category = $this->model->findOrFail($id);
-            if ((!$this->is_super_admin && $category->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not autorized.");
+            $this->blockCategoryAuthority($category->parent_id, $id);
+
             $this->repository->delete($id, function($deleted){
                 $deleted->translations()->delete();
                 if($deleted->image) Storage::delete($deleted->image);
