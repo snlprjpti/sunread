@@ -39,13 +39,6 @@ class CurrencyTest extends BaseTestCase
         return $this->model::factory()->make()->toArray();
     }
 
-    public function getNonMandodtaryUpdateData(): array
-    {
-        return array_merge($this->getUpdateData(), [
-            "name" => null
-        ]);
-    }
-
     public function getInvalidUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
