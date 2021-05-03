@@ -101,7 +101,6 @@ class CategoryTest extends BaseTestCase
 
     public function testShouldReturnErrorIfBasicAdminTryToFetchRootCategory()
     {
-        
         $response = $this->withHeaders($this->basicAdminHeader())->get(route("{$this->route_prefix}.show", $this->root_category_id));
 
         $response->assertStatus(403);
