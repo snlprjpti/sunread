@@ -3,12 +3,13 @@
 namespace Modules\Customer\Entities;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Modules\Core\Traits\HasFactory;
 use Modules\Customer\Notifications\CustomerResetPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class Customer extends Authenticatable implements  JWTSubject
 {
-    use Notifiable;
+    use Notifiable, HasFactory;
 
     public static $SEARCHABLE =  [ "first_name", "last_name", "email" ];
     protected $fillable = [ "first_name", "last_name", "gender", "date_of_birth", "email", "phone", "password", "api_token", "customer_group_id", "subscribed_to_news_letter", "is_verified",  "status" ];
@@ -37,7 +38,7 @@ class Customer extends Authenticatable implements  JWTSubject
 
     /**
      * Get the customer full name.
-     * 
+     *
      * @return string
      */
     public function getNameAttribute()
@@ -47,7 +48,7 @@ class Customer extends Authenticatable implements  JWTSubject
 
     /**
      * Get the customer group that owns the customer.
-     * 
+     *
      * @return CustomerGroup
      */
     public function group()
@@ -57,7 +58,7 @@ class Customer extends Authenticatable implements  JWTSubject
 
     /**
      * Get customer addresses
-     * 
+     *
      * @return CustomerAddress
      */
     public function addresses()

@@ -1,0 +1,32 @@
+<?php
+namespace Modules\Customer\Database\factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Modules\Customer\Entities\Customer;
+use Modules\Customer\Entities\CustomerGroup;
+
+class CustomerFactory extends Factory
+{
+
+    protected $model = Customer::class;
+
+    public function definition()
+    {
+        $gender = [ "male", "female", "other" ];
+        return [
+            "customer_group_id" => CustomerGroup::first()->id,
+            "first_name" => $this->faker->firstName(),
+            "last_name" => $this->faker->lastName(),
+            "gender" => Arr::random($gender),
+            "date_of_birth" => $this->faker->date(),
+            "email" => $this->faker->unique()->safeEmail(),
+            "status" => 1,
+            "password" => Hash::make("password"),
+            "subscribed_to_news_letter" => 0,
+        ];
+    }
+}
+

@@ -3,16 +3,13 @@
 namespace Modules\Customer\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Traits\HasFactory;
 
 class CustomerAddress extends Model
 {
-    protected $fillable = [ "customer_id", "address1", "address2", "country", "state", "city", "postcode", "phone", "default_address" ];
+    use HasFactory;
+    protected $fillable = [ "customer_id", "address1", "address2", "country", "state", "city", "postcode", "phone", "default_address","name" ];
 
-    /**
-     * Get customer
-     * 
-     * @return Customer
-     */
     public function customer()
     {
         return $this->belongsTo(Customer::class);
