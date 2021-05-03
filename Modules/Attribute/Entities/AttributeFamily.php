@@ -7,10 +7,11 @@ use Modules\Core\Traits\Sluggable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Core\Traits\HasFactory;
 
 class AttributeFamily extends Model
 {
-    use Sluggable;
+    use Sluggable, HasFactory;
 
     public static $SEARCHABLE = [ "name" ];
     protected $fillable = [ "name", "slug", "status" ];

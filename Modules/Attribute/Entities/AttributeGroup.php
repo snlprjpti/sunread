@@ -5,11 +5,12 @@ namespace Modules\Attribute\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;
 
 class AttributeGroup extends Model
 {
-    use Sluggable;
+    use Sluggable, HasFactory;
 
     public static $SEARCHABLE = [ "name", "slug" ];
     protected $fillable = [ "attribute_family_id", "name", "slug", "position", "is_user_defined" ];
