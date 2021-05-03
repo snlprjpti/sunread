@@ -14,7 +14,7 @@ class AttributeRepository extends BaseRepository
     public function __construct(Attribute $attribute)
     {
         $this->model = $attribute;
-        $this->model_key = "catalog.attribite";
+        $this->model_key = "catalog.attribute";
 
         $this->attribute_types = [
             "text" => "Text",

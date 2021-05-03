@@ -15,7 +15,7 @@ class AttributeTranslationRepository
     public function __construct(AttributeTranslation $attribute_translation)
     {
         $this->model = $attribute_translation;
-        $this->model_key = "catalog.attribite.translations";
+        $this->model_key = "catalog.attribute.translations";
     }
 
     public function updateOrCreate(array $data, object $parent): void

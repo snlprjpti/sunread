@@ -13,7 +13,7 @@ class AttributeOptionRepository
     {
         $this->model = $attribute_option;
         $this->translation = $attributeOptionTranslationRepository;
-        $this->model_key = "catalog.attribite.options";
+        $this->model_key = "catalog.attribute.options";
     }
 
     public function updateOrCreate(array $data, object $parent): void
