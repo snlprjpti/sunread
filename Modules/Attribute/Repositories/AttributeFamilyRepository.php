@@ -12,7 +12,7 @@ class AttributeFamilyRepository extends BaseRepository
     public function __construct(AttributeFamily $attribute_family)
     {
         $this->model = $attribute_family;
-        $this->model_key = "catalog.attribite";
+        $this->model_key = "catalog.attributes.attribute_family";
 
         $this->rules = [
             "slug" => "nullable|unique:attribute_families,slug",
