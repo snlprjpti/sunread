@@ -2,6 +2,7 @@
 
 namespace Modules\Attribute\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Modules\Attribute\Entities\AttributeFamily;
