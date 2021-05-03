@@ -25,7 +25,7 @@ class CategoryController extends BaseController
         $this->model = $category;
         $this->model_name = "Category";
         $this->is_super_admin = auth()->guard("admin")->user()->hasRole("super-admin");
-        $this->main_root_id = Category::oldest()->first()->id;
+        $this->main_root_id = 1;
 
         $exception_statuses = [
             CategoryAuthorizationException::class => 403
@@ -105,7 +105,7 @@ class CategoryController extends BaseController
     {
         try
         {
-            if ((!$this->is_super_admin && $request->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not autorized.");
+            if ((!$this->is_super_admin && $request->parent_id == $this->main_root_id) || $id == $this->main_root_id) throw new CategoryAuthorizationException("Action not authorized.");
 
             $data = $this->repository->validateData($request,[
                 "slug" => "nullable|unique:categories,slug,{$id}",

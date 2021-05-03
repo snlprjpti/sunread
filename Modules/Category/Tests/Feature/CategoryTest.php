@@ -17,7 +17,7 @@ class CategoryTest extends BaseTestCase
         $this->model = Category::class;
         $this->model_name = "Category";
         $this->route_prefix = "admin.catalog.categories.categories";
-        $this->default_resource_id = $this->model::latest()->first()->id;
+        $this->default_resource_id = $this->model::oldest()->first()->id;
         $this->fake_resource_id = 0;
         $this->filter = [
             "sort_by" => "id",
@@ -61,5 +61,57 @@ class CategoryTest extends BaseTestCase
         return array_merge($this->getUpdateData(),[
             "image" => null
         ]);   
+    }
+
+    public function basicAdminHeader()
+    {
+        $normal_admin = $this->createAdmin(["role_slug" => "basic-admin"]);
+        $token = $this->createToken($normal_admin["email"], $normal_admin["password"]);
+        $headers["Authorization"] = "Bearer {$token}";
+
+        return $headers;
+    }
+
+    public function testShouldReturnErrorIfBasicAdminTryToStoreRootCategory()
+    {
+        $post_data = $this->getCreateData();
+        $response = $this->withHeaders($this->basicAdminHeader())->post(route("{$this->route_prefix}.store"), $post_data);
+
+        $response->assertStatus(403);
+        $response->assertJsonFragment([
+            "status" => "error"
+        ]);
+    }
+
+    public function testShouldReturnErrorIfBasicAdminTryToUpdateRootCategory()
+    {
+        $post_data = $this->getUpdateData();
+        
+        $response = $this->withHeaders($this->basicAdminHeader())->put(route("{$this->route_prefix}.update", $this->root_category_id), $post_data);
+        $response->assertStatus(403);
+        $response->assertJsonFragment([
+            "status" => "error"
+        ]);
+    }
+
+    public function testShouldReturnErrorIfBasicAdminTryToFetchRootCategory()
+    {
+        
+        $response = $this->withHeaders($this->basicAdminHeader())->get(route("{$this->route_prefix}.show", $this->default_resource_id));
+
+        $response->assertStatus(403);
+        $response->assertJsonFragment([
+            "status" => "error"
+        ]);
+    }
+
+    public function testShouldReturnErrorIfBasicAdminTryToDeleteRootCategory()
+    {
+        $response = $this->withHeaders($this->basicAdminHeader())->delete(route("{$this->route_prefix}.destroy", $this->default_resource_id));
+
+        $response->assertStatus(403);
+        $response->assertJsonFragment([
+            "status" => "error"
+        ]);
     }
 }
