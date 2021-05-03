@@ -23,4 +23,14 @@ class Currency extends Model
     {
         return $this->hasOne(CurrencyExchangeRate::class, 'target_currency');
     }
+
+    public function stores()
+    {
+        return $this->hasMany(Store::class, 'currency', 'code');
+    }
+
+    public function channels()
+    {
+        return $this->hasMany(Channel::class, 'default_currency', 'code');
+    }
 }
