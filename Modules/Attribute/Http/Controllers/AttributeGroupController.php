@@ -13,14 +13,16 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Attribute\Transformers\AttributeGroupResource;
 use Modules\Attribute\Repositories\AttributeGroupRepository;
 use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
+use Modules\Attribute\Repositories\AttributeGroupTranslationRepository;
 
 class AttributeGroupController extends BaseController
 {
     protected $repository, $translation_repository;
 
-    public function __construct(AttributeGroup $attribute_group, AttributeGroupRepository $attributeGroupRepository)
+    public function __construct(AttributeGroup $attribute_group, AttributeGroupRepository $attributeGroupRepository, AttributeGroupTranslationRepository $attributeGroupTranslationRepository)
     {
         $this->repository = $attributeGroupRepository;
+        $this->translation_repository = $attributeGroupTranslationRepository;
         $this->model = $attribute_group;
         $this->model_name = "Attribute Group";
         $exception_statuses = [
