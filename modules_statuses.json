@@ -4,5 +4,6 @@
     "Category": true,
     "Customer": true,
     "Product": true,
-    "User": true
+    "User": true,
+    "Brand": true
 }
