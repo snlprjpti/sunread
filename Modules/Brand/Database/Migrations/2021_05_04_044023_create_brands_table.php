@@ -19,9 +19,9 @@ class CreateBrandsTable extends Migration
             $table->string('slug');
             $table->string('image');
             $table->text('description');
-            $table->string('meta_title');
-            $table->text('meta_desctiption');
-            $table->text('meta_keywords');
+            $table->string('meta_title')->nullable();
+            $table->text('meta_desctiption')->nullable();
+            $table->text('meta_keywords')->nullable();
             $table->timestamps();
         });
     }
