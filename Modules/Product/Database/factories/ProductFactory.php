@@ -2,25 +2,22 @@
 namespace Modules\Product\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Attribute\Entities\AttributeGroup;
 
 class ProductFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = \Modules\Product\Entities\Product::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
         return [
-            //
+            "parent_id" => null,
+            "brand_id" => null, // TODO::Brand::factory()->create()->id
+            "attribute_group_id" => AttributeGroup::factory()->create()->id,
+
+            "sku" => $this->faker->slug(),
+            "type" => "simple",
+            "status" => 1
         ];
     }
 }
