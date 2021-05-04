@@ -11,19 +11,13 @@ class AttributeTest extends BaseTestCase
 {
     public function setUp(): void
     {
+        $this->model = Attribute::class;
+
         parent::setUp();
         $this->admin = $this->createAdmin();
-        $this->model = Attribute::class;
+
         $this->model_name = "Attribute";
         $this->route_prefix = "admin.catalog.attributes";
-
-        $this->default_resource_id = $this->model::latest('id')->first()->id;
-        $this->fake_resource_id = 0;
-
-        $this->filter = [
-            "sort_by" => "id",
-            "sort_order" => "asc"
-        ];
     }
 
     public function getCreateData(): array
