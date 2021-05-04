@@ -18,5 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Modules\Customer\Database\Seeders\CustomerDatabaseSeeder::class);
         $this->call(\Modules\Category\Database\Seeders\CategoryDatabaseSeeder::class);
         $this->call(\Modules\Attribute\Database\Seeders\AttributeDatabaseSeeder::class);
+        $this->call(\Modules\Brand\Database\Seeders\BrandDatabaseSeeder::class);
     }
 }
