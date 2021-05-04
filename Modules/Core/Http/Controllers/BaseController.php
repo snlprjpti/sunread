@@ -44,6 +44,7 @@ class BaseController extends Controller
             "login-success" => "users.users.login-success",
             "logout-success" => "users.users.logout-success",
             "token-generation-problem" => "users.token.token-generation-problem",
+            "password-reset-success" => "users.reset-password.password-reset-success"
         ];
 
         // Frequently thrown excpetions
