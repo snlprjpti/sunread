@@ -21,6 +21,7 @@ class StoreTableSeeder extends Seeder
                "name" => "International Store",
                "slug" => "international-store",
                "locale" => "en",
+               "position" => 1,
                "created_at" => now(),
                "updated_at" => now()
            ],
@@ -29,6 +30,7 @@ class StoreTableSeeder extends Seeder
                 "name" => "English Store",
                 "slug" => "english-store",
                 "locale" => "en",
+                "position" => 2,
                 "created_at" => now(),
                 "updated_at" => now()
             ]
