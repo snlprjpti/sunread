@@ -40,7 +40,10 @@ class SessionTest extends TestCase
         return Customer::factory()->create($data);
     }
 
-    /**     * Tests     */
+    /**
+     * Tests
+    */
+
     public function testCustomerCanLogin()
     {
         $post_data = [
@@ -99,7 +102,7 @@ class SessionTest extends TestCase
 
     public function testCustomerCanResetPassword()
     {
-        $reset_token = Password::broker()->createToken($this->customer);
+        $reset_token = Password::broker('customers')->createToken($this->customer);
         $post_data = [
             "email" => $this->customer->email,
             "password" => "new_password",
@@ -111,7 +114,7 @@ class SessionTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
-            "message" => __("core::app.users.users.password-reset-success")
+            "message" => __("core::app.users.reset-password.password-reset-success")
         ]);
     }
 
@@ -173,5 +176,4 @@ class SessionTest extends TestCase
             "status" => "error"
         ]);
     }
-
 }
