@@ -4,18 +4,20 @@ namespace Modules\Brand\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class BrandTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        Model::unguard();
-
-        // $this->call("OthersTableSeeder");
+        DB::table("brands")->insert([
+            [
+                "name" => "Fancy Wears",
+                "slug" => "fancy-wears",
+                "description" => "This is a fancy wear.",
+                "created_at" => now(),
+                "updated_at" => now()
+            ]
+        ]);
     }
 }
