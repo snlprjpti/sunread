@@ -8,7 +8,6 @@ use Modules\User\Entities\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -19,19 +18,20 @@ class AccountTest extends TestCase
 
     protected object $admin;
 	protected array $headers;
-    public $model, $model_name;
+    public $model, $model_name, $route_prefix;
 
 	public function setUp(): void
 	{
-		parent::setUp();
-		Schema::disableForeignKeyConstraints();
-		$this->artisan("db:seed", ["--force" => true]);
-
-        $this->admin = $this->createAdmin();
         $this->model = Admin::class;
 
+        parent::setUp();
+		Schema::disableForeignKeyConstraints();
+		$this->artisan("db:seed", ["--force" => true]);
+        $this->admin = $this->createAdmin();
         $this->fake_admin = $this->model::factory()->make();
+
         $this->model_name = "Admin account";
+        $this->route_prefix = "admin.account";
 	}
 
     /**
@@ -72,7 +72,7 @@ class AccountTest extends TestCase
 
     public function testAdminCanFetchAccountDetails()
     {
-        $response = $this->withHeaders($this->headers)->get(route("admin.account.show"));
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show"));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -83,7 +83,7 @@ class AccountTest extends TestCase
 
     public function testAdminShouldNotBeAbleToFetchAccountDetailsWithoutAuth()
     {
-        $response = $this->withHeaders(["Authorization" => "Bearer invalid_token"])->get(route("admin.account.show"));
+        $response = $this->withHeaders(["Authorization" => "Bearer invalid_token"])->get(route("{$this->route_prefix}.show"));
 
         $response->assertStatus(401);
         $response->assertJsonFragment([
@@ -95,13 +95,12 @@ class AccountTest extends TestCase
     public function testAdminCanUpdateAccountDetails()
     {
         $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "_method" => "PUT",
             "current_password" => "password",
             "password" => "new_password",
             "password_confirmation" => "new_password"
         ]);
 
-        $response = $this->withHeaders($this->headers)->post(route("admin.account.update"), $post_data);
+        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update"), $post_data);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -113,13 +112,12 @@ class AccountTest extends TestCase
     public function testAdminShouldNotBeAbleToUpdateAccountDetailsWithInvalidPassword()
     {
         $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "_method" => "PUT",
             "current_password" => "invalid_password",
             "password" => "new_password",
             "password_confirmation" => "new_password"
         ]);
 
-        $response = $this->withHeaders($this->headers)->post(route("admin.account.update"), $post_data);
+        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update"), $post_data);
 
         $response->assertStatus(401);
         $response->assertJsonFragment([
@@ -135,7 +133,7 @@ class AccountTest extends TestCase
             "image" => UploadedFile::fake()->image("image.png")
         ];
 
-        $response = $this->withHeaders($this->headers)->post(route("admin.account.image.update"), $post_data);
+        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.image.update"), $post_data);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -150,7 +148,7 @@ class AccountTest extends TestCase
             "image" => null
         ];
 
-        $response = $this->withHeaders($this->headers)->post(route("admin.account.image.update"), $post_data);
+        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.image.update"), $post_data);
 
         $response->assertStatus(422);
         $response->assertJsonFragment([
@@ -160,7 +158,7 @@ class AccountTest extends TestCase
 
     public function testAdminShouldBeAbleToDeleteProfileImage()
     {
-        $response = $this->withHeaders($this->headers)->delete(route("admin.account.image.delete"));
+        $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.image.delete"));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
