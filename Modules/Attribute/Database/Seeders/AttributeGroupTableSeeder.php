@@ -2,31 +2,28 @@
 
 namespace Modules\Attribute\Database\Seeders;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class AttributeGroupTableSeeder extends Seeder
 {
-    /**
-     * Insert Attribute Groups
-     * 
-     * @return Void
-     */
-    public function run()
+    public function run(): void
     {
-        $data = [];
         $groups = ["General", "Description", "Meta Description", "Price", "Shipping"];
         $count = 0;
-        foreach ($groups as $name) {
-            $data[] = [
-                "name" => $name,
-                "slug"=> \Str::slug($name),
+        $data = array_map(function($data) use ($count) {
+            return [
+                "name" => $data,
+                "slug"=> Str::slug($data),
                 "position" => ++$count,
                 "is_user_defined" => 0,
-                "attribute_family_id" => 1
+                "attribute_family_id" => 1,
+                "created_at" => now(),
+                "updated_at" => now()
             ];
-        }
+        }, $groups);
 
-        DB::table('attribute_groups')->insert($data);
+        DB::table("attribute_groups")->insert($data);
     }
 }

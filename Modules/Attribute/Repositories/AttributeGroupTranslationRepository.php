@@ -5,17 +5,16 @@ namespace Modules\Attribute\Repositories;
 
 use Exception;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Database\Eloquent\Model;
-use Modules\Attribute\Entities\AttributeTranslation;
+use Modules\Attribute\Entities\AttributeGroupTranslation;
 
-class AttributeTranslationRepository
+class AttributeGroupTranslationRepository
 {
     protected $model, $model_key;
 
-    public function __construct(AttributeTranslation $attribute_translation)
+    public function __construct(AttributeGroupTranslation $attributeGroupTranslation)
     {
-        $this->model = $attribute_translation;
-        $this->model_key = "catalog.attribute.translations";
+        $this->model = $attributeGroupTranslation;
+        $this->model_key = "catalog.attribute.attribute_group_translations";
     }
 
     public function updateOrCreate(?array $data, object $parent): void
@@ -29,7 +28,7 @@ class AttributeTranslationRepository
             foreach ($data as $row){
                 $check = [
                     "store_id" => $row["store_id"],
-                    "attribute_id" => $parent->id
+                    "attribute_group_id" => $parent->id
                 ];
     
                 $created = $this->model->firstorNew($check);

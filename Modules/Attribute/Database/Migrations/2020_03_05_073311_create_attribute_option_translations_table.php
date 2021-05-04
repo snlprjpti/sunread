@@ -6,29 +6,21 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateAttributeOptionTranslationsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('attribute_option_translations', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('locale');
-            $table->text('name')->nullable();
-            $table->bigInteger('attribute_option_id')->unsigned();
-            $table->unique(['attribute_option_id', 'locale']);
+            $table->id();
+            $table->unsignedBigInteger('attribute_option_id');
             $table->foreign('attribute_option_id')->references('id')->on('attribute_options')->onDelete('cascade');
+            $table->unsignedBigInteger('store_id');
+            $table->foreign('store_id')->references('id')->on('stores')->onDelete('cascade');
+
+            $table->text('name')->nullable();
+            $table->unique(['attribute_option_id', 'store_id'], 'attribute_option_store_unique');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('attribute_option_translations');
     }

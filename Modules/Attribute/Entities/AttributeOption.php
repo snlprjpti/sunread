@@ -3,39 +3,24 @@
 namespace Modules\Attribute\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Core\Traits\HasFactory;
 
 class AttributeOption extends Model
 {
-    public $timestamps = false;
-    protected $fillable = [ "name", "position", "attribute_id" ];
+    use HasFactory;
 
-    /**
-     * Attribute relationship
-     * 
-     * @return Attribute
-     */
-    public function attribute()
+    public static $SEARCHABLE = [ "name" ];
+    protected $fillable = [ "attribute_id", "name", "position" ];
+
+    public function attribute(): BelongsTo
     {
         return $this->belongsTo(Attribute::class);
     }
-    
-    /**
-     * Translations relationship
-     * 
-     * @return AttributeOptionTranslation
-     */
-    public function translations()
-    {
-        return $this->hasMany(AttributeOptionTranslation::class, "attribute_option_id");
-    }
 
-    /**
-     * Get Translated data
-     * 
-     * @return AttributeOptionTranslation
-     */
-    public function translate($locale)
+    public function translations(): HasMany
     {
-        return $this->translations()->where("locale", $locale)->first();
+        return $this->hasMany(AttributeOptionTranslation::class);
     }
 }
