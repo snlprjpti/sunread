@@ -28,7 +28,7 @@ class CreateChannelsTable extends Migration
             $table->string('default_currency');
             $table->unsignedBigInteger("website_id");
             $table->foreign('default_store_id')->references('id')->on('stores')->onDelete('cascade');
-            $table->foreign('default_currency')->references('code')->on('currencies')->onDelete('cascade');
+            $table->foreign('default_currency')->references('code')->on('currencies')->onUpdate('cascade');
             $table->foreign('website_id')->references('id')->on('websites')->onDelete('cascade');
             $table->timestamps();
         });
