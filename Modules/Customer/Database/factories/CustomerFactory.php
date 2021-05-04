@@ -26,6 +26,7 @@ class CustomerFactory extends Factory
             "status" => 1,
             "password" => Hash::make("password"),
             "subscribed_to_news_letter" => 0,
+            "remember_token" => Str::random(10)
         ];
     }
 }
