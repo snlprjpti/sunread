@@ -16,7 +16,8 @@ class WebsiteRepository extends BaseRepository
             "code" => "required|unique:websites,code",
             "hostname" => "required|unique:websites,hostname",
             "name" => "required",
-            "description" => "nullable"
+            "description" => "nullable",
+            "position" => "sometimes|numeric"
         ];
     }
 }

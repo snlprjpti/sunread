@@ -13,17 +13,10 @@ class AttributeOptionRepository
     {
         $this->model = $attribute_option;
         $this->translation = $attributeOptionTranslationRepository;
-        $this->model_key = "catalog.attribite.options";
+        $this->model_key = "catalog.attribute.options";
     }
 
-    /**
-     * Create or update translation
-     * 
-     * @param array $data
-     * @param Model $parent
-     * @return void
-     */
-    public function createOrUpdate($data, $parent)
+    public function updateOrCreate(?array $data, object $parent): void
     {
         if ( !is_array($data) || count($data) ) return;
 
@@ -41,7 +34,7 @@ class AttributeOptionRepository
                 $created->fill($row);
                 $created->save();
 
-                $this->translation->createOrUpdate($data, $created);
+                $this->translation->updateOrCreate($data, $created);
             }
         }
         catch (Exception $exception)
