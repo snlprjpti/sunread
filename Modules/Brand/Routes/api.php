@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +11,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/brand', function (Request $request) {
-    return $request->user();
+Route::group(["middleware" => ["api"]], function () {
+    Route::group(["prefix" => "admin", "middleware" => ["admin", "language"], "as" => "admin"], function () {
+        Route::resource("brands", BrandController::class)->except(["create","edit"]);
+    });
 });
