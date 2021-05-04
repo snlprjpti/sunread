@@ -23,9 +23,7 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Name",
                 "type" => "text",
-                "is_required" => 1,
-                "value_per_locale" => 1,
-                "value_per_channel" => 1
+                "is_required" => 1
             ],
             [
                 "name" => "New",
@@ -48,16 +46,12 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Short Description",
                 "type" => "textarea",
-                "is_required" => 1,
-                "value_per_locale" => 1,
-                "value_per_channel" => 1
+                "is_required" => 1
             ],
             [
                 "name" => "Description",
                 "type" => "textarea",
-                "is_required" => 1,
-                "value_per_locale" => 1,
-                "value_per_channel" => 1
+                "is_required" => 1
             ],
             [
                 "name" => "Price",
@@ -90,21 +84,15 @@ class AttributeTableSeeder extends Seeder
             ],
             [
                 "name" => "Meta Title",
-                "type" => "textarea",
-                "value_per_locale" => 1,
-                "value_per_channel" => 1
+                "type" => "textarea"
             ],
             [
                 "name" => "Meta Keywords",
-                "type" => "textarea",
-                "value_per_locale" => 1,
-                "value_per_channel" => 1
+                "type" => "textarea"
             ],
             [
                 "name" => "Meta Description",
                 "type" => "textarea",
-                "value_per_locale" => 1,
-                "value_per_channel" => 1,
                 "is_user_defined" => 1
             ],
             [
