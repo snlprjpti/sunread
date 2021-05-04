@@ -4,6 +4,7 @@ namespace Modules\Core\Database\factories;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 
@@ -24,7 +25,8 @@ class ChannelFactory extends Factory
     public function definition()
     {
         $store = Store::factory()->create();
-        $website=Website::factory()->create();
+        $website = Website::factory()->create();
+        $category = Category::factory()->create();
 
         while(true) {
             $code = \Str::random(16);
@@ -42,7 +44,8 @@ class ChannelFactory extends Factory
             "theme" => "default",
             "default_store_id" => $store->id,
             "default_currency" => $store->currency,
-            "website_id" => $website->id
+            "website_id" => $website->id,
+            "default_category_id" => $category->id
         ];
     }
 }

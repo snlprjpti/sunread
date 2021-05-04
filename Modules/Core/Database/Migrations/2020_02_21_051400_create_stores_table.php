@@ -20,7 +20,7 @@ class CreateStoresTable extends Migration
             $table->string('slug');
             $table->string('locale');
             $table->string('image')->nullable();
-            $table->foreign('currency')->references('code')->on('currencies')->onDelete('cascade');
+            $table->foreign('currency')->references('code')->on('currencies')->onUpdate('cascade');
             $table->timestamps();
         });
     }

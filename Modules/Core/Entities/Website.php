@@ -12,7 +12,7 @@ class Website extends Model
     use HasFactory;
 
     public static $SEARCHABLE = [ "code", "hostname", "name", "description" ];
-    protected $fillable = [ "code", "hostname", "name", "description" ];
+    protected $fillable = [ "code", "hostname", "name", "description", "position" ];
 
     public function channels(): HasMany
     {

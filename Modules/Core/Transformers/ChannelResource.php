@@ -3,6 +3,7 @@
 namespace Modules\Core\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Category\Transformers\CategoryResource;
 
 class ChannelResource extends JsonResource
 {
@@ -29,6 +30,7 @@ class ChannelResource extends JsonResource
             "default_store" => new StoreResource($this->default_store),
             "stores" => StoreResource::collection($this->stores),
             "website" => new WebsiteResource($this->website),
+            "default_category" => new CategoryResource($this->default_category),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

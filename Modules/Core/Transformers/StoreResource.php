@@ -21,6 +21,7 @@ class StoreResource extends JsonResource
             "slug" => $this->slug,
             "locale" => $this->locale,
             "image" => $this->image_url,
+            "position" => $this->position,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

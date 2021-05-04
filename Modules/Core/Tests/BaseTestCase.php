@@ -15,13 +15,21 @@ class BaseTestCase extends TestCase
     use RefreshDatabase;
 
     protected array $headers;
-    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id;
+    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count;
 
     public function setUp(): void
     {
         parent::setUp();
         Schema::disableForeignKeyConstraints();
         $this->artisan("db:seed", ["--force" => true]);
+
+        $this->factory_count = 10;
+        $this->default_resource_id = $this->model::latest('id')->first()->id;
+        $this->fake_resource_id = 0;
+        $this->filter = [
+            "sort_by" => "id",
+            "sort_order" => "asc"
+        ];
     }
 
     /**
@@ -78,7 +86,7 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanFetchResources()
     {
-        $this->model::factory(10)->create();
+        $this->model::factory($this->factory_count)->create();
         $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index"));
 
         $response->assertStatus(200);
@@ -172,6 +180,7 @@ class BaseTestCase extends TestCase
      * 3. Assert if application returns correct error for invalid data
      * 4. Assert if application returns correct error when trying to update non-existent data
      */
+
     public function testAdminCanUpdateResource()
     {
         $post_data = $this->getUpdateData();

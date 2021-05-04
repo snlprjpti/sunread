@@ -13,7 +13,6 @@ use Tests\TestCase;
 
 class ActivityLogTest extends TestCase
 {
-
     use RefreshDatabase;
 
     protected object $admin;
@@ -55,7 +54,6 @@ class ActivityLogTest extends TestCase
 
         return $admin;
     }
-
 
     public function createToken(string $admin_email, string $password): ?string
     {

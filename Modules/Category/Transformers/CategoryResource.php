@@ -4,6 +4,7 @@ namespace Modules\Category\Transformers;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Transformers\ChannelResource;
 
 class CategoryResource extends JsonResource
 {
@@ -27,7 +28,8 @@ class CategoryResource extends JsonResource
             "parent" => $this->parent ?? null,
 
             "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A'),
-            "translations" => $this->translations
+            "translations" => $this->translations,
+            "channels" => ChannelResource::collection($this->channels),
         ];
     }
 }

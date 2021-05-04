@@ -17,6 +17,7 @@ class ChannelRepository extends BaseRepository
             "default_store_id" => "required|exists:stores,id",
             "default_currency" => "required|exists:currencies,code",
             "website_id" => "required|exists:websites,id",
+            "default_category_id" => "sometimes|exists:categories,id",
 
             /* General */
             "code" => "required|unique:channels,code",

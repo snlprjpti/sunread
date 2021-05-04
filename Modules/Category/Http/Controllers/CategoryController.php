@@ -9,13 +9,14 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryTranslation;
+use Modules\Category\Exceptions\CategoryAuthorizationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 
 class CategoryController extends BaseController
 {
-    protected $repository, $translation;
+    protected $repository, $translation, $is_super_admin, $main_root_id;
 
     public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryTranslation $categoryTranslation)
     {
@@ -23,8 +24,14 @@ class CategoryController extends BaseController
         $this->translation = $categoryTranslation;
         $this->model = $category;
         $this->model_name = "Category";
+        $this->is_super_admin = auth()->guard("admin")->user()->hasRole("super-admin");
+        $this->main_root_id = $this->model::oldest('id')->first()->id;
 
-        parent::__construct($this->model, $this->model_name);
+        $exception_statuses = [
+            CategoryAuthorizationException::class => 403
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -37,12 +44,24 @@ class CategoryController extends BaseController
         return new CategoryResource($data);
     }
 
+    private function blockCategoryAuthority(?int $parent_id, ?int $main_root_id = null): bool
+    {
+        $parent_id_authority = (!$this->is_super_admin && $parent_id == $this->main_root_id);
+        $main_root_id_authority = $main_root_id ? $main_root_id == $this->main_root_id : false;
+
+        if ( $parent_id_authority || $main_root_id_authority ) throw new CategoryAuthorizationException("Action not authorized.");
+
+        return false;
+    }
+
     public function index(Request $request): JsonResponse
     {
         try
         {
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request, ["translations"]);
+            // Dont fetch root category for other admin
+            if (!$this->is_super_admin) $fetched = $fetched->where('parent_id', '<>', null);
         }
         catch (\Exception $exception)
         {
@@ -56,6 +75,8 @@ class CategoryController extends BaseController
     {
         try
         {
+            $this->blockCategoryAuthority($request->parent_id);
+
             $data = $this->repository->validateData($request);
             $data['image'] = $this->storeImage($request, 'image', strtolower($this->model_name));
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
@@ -65,6 +86,7 @@ class CategoryController extends BaseController
                     "store_id" => $request->translation["store_id"],
                     "category_id" => $created->id
                 ], $request->translation);
+                $created->channels()->sync($request->channels);
             });
         }
         catch (\Exception $exception)
@@ -79,6 +101,9 @@ class CategoryController extends BaseController
     {
         try
         {
+            $category = $this->model->findOrFail($id);
+            $this->blockCategoryAuthority($category->parent_id, $id);
+
             $fetched = $this->model->with(["translations"])->findOrFail($id);
         }
         catch (\Exception $exception)
@@ -92,13 +117,15 @@ class CategoryController extends BaseController
     public function update(Request $request, int $id): JsonResponse
     {
         try
-        {            
+        {
+            $this->blockCategoryAuthority($request->parent_id, $id);
+
             $data = $this->repository->validateData($request,[
                 "slug" => "nullable|unique:categories,slug,{$id}",
                 "image" => "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
             ]);
 
-            if ($request->file("image")){
+            if ($request->file("image")) {
                 $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
             }
             else {
@@ -110,6 +137,7 @@ class CategoryController extends BaseController
                     "store_id" => $request->translation["store_id"],
                     "category_id" => $updated->id
                 ], $request->translation);
+                $updated->channels()->sync($request->channels);
             });
             // get latest updated translations
             $updated->translations = $updated->translations()->get();
@@ -126,6 +154,9 @@ class CategoryController extends BaseController
     {
         try
         {
+            $category = $this->model->findOrFail($id);
+            $this->blockCategoryAuthority($category->parent_id, $id);
+
             $this->repository->delete($id, function($deleted){
                 $deleted->translations()->delete();
                 if($deleted->image) Storage::delete($deleted->image);

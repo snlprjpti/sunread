@@ -2,7 +2,6 @@
 
 namespace Modules\Core\Transformers;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CurrencyResource extends JsonResource
@@ -19,7 +18,9 @@ class CurrencyResource extends JsonResource
             "id" => $this->id,
             "code" => $this->code,
             "name" => $this->name,
-            "symbol" => $this->symbol
+            "symbol" => $this->symbol,
+            "status" => $this->status,
+            "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
 }

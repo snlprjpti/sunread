@@ -89,7 +89,7 @@ class SessionTest extends TestCase
         ]);
     }
 
-    public function testInvalidAdminCanRequestResetLink()
+    public function testAdminCanRequestResetLink()
     {
         $post_data = ["email" => $this->admin->email];
         $response = $this->post(route("admin.forget-password.store"), $post_data);

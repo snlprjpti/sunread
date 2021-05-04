@@ -6,29 +6,22 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateAttributeTranslationsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('attribute_translations', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('locale');
+            $table->id();
+            $table->unsignedBigInteger('attribute_id');
+            $table->unsignedBigInteger('store_id');
+
             $table->text('name')->nullable();
-            $table->bigInteger('attribute_id')->unsigned();
-            $table->unique(['attribute_id', 'locale']);
+
+            $table->unique(['attribute_id', 'store_id']);
             $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
+            $table->foreign('store_id')->references('id')->on('stores')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('attribute_translations');
     }
