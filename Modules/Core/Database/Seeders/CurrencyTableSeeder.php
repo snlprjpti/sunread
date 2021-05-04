@@ -17,11 +17,15 @@ class CurrencyTableSeeder extends Seeder
                 'code' => 'USD',
                 'name' => 'US Dollar',
                 'symbol' => '$',
+                'created_at' => now(),
+                'updated_at' => now()
             ], [
                 'id' => 2,
                 'code' => 'EUR',
                 'name' => 'Euro',
                 'symbol' => '€',
+                'created_at' => now(),
+                'updated_at' => now()
             ]
         ]);
     }
