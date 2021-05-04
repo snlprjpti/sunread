@@ -17,7 +17,8 @@ class StoreRepository extends BaseRepository
             "name" => "required",
             "slug" => "nullable|unique:stores,slug",
             "locale" => "required",
-            "image" => "required|mimes:bmp,jpeg,jpg,png,webp"    
+            "image" => "required|mimes:bmp,jpeg,jpg,png,webp",
+            "position" => "sometimes|numeric"
         ];
     }
 
