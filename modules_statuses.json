@@ -3,6 +3,7 @@
     "Attribute": true,
     "Category": true,
     "Customer": true,
+    "Product": true,
     "User": true,
-    "Product": true
+    "Brand": true
 }

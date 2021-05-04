@@ -2,34 +2,26 @@
 
 namespace Modules\Attribute\Entities;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Traits\Sluggable;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Core\Traits\HasFactory;
 
 class AttributeFamily extends Model
 {
-    use Sluggable;
+    use Sluggable, HasFactory;
 
     public static $SEARCHABLE = [ "name" ];
-    public $timestamps= false;
-    protected $fillable = [ "name", "slug" ];
+    protected $fillable = [ "name", "slug", "status" ];
 
-    /**
-     * Attribute Groups relationship
-     * 
-     * @return AttributeGroup
-     */
-    public function attributeGroups()
+    public function attributeGroups(): HasMany
     {
         return $this->hasMany(AttributeGroup::class, "attribute_family_id");
     }
 
-    /**
-     * Custom Attributes
-     * 
-     * @return Collection
-     */
-    public function custom_attributes()
+    public function custom_attributes(): Builder
     {
         return DB::table("attributes")
             ->join("attribute_groups", "attributes.attribute_group_id", "=", "attribute_groups.id")

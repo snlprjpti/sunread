@@ -5,7 +5,6 @@ namespace Modules\Attribute\Repositories;
 
 use Exception;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Database\Eloquent\Model;
 use Modules\Attribute\Entities\AttributeOptionTranslation;
 
 class AttributeOptionTranslationRepository
@@ -15,17 +14,10 @@ class AttributeOptionTranslationRepository
     public function __construct(AttributeOptionTranslation $attribute_option_translation)
     {
         $this->model = $attribute_option_translation;
-        $this->model_key = "catalog.attribite.options.translations";
+        $this->model_key = "catalog.attribute.options.translations";
     }
 
-    /**
-     * Create or update translation
-     * 
-     * @param array $data
-     * @param Model $parent
-     * @return void
-     */
-    public function createOrUpdate($data, $parent)
+    public function updateOrCreate(?array $data, object $parent): void
     {
         if ( !is_array($data) ) return;
 
@@ -35,7 +27,7 @@ class AttributeOptionTranslationRepository
         {
             foreach ($data as $row){
                 $check = [
-                    "locale" => $row["locale"],
+                    "store_id" => $row["store_id"],
                     "attribute_option_id" => $parent->id
                 ];
     
