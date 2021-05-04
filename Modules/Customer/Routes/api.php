@@ -1,7 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
-
+use Modules\Customer\Http\Controllers\SessionController;
+use Modules\Customer\Http\Controllers\RegistrationController;
+use Modules\Customer\Http\Controllers\ResetPasswordController;
+use Modules\Customer\Http\Controllers\ForgotPasswordController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,50 +15,29 @@ use Illuminate\Http\Request;
 |
 */
 
-//CUSTOMER MODULE ROUTES
-
 Route::group(['middleware' => ['api']], function () {
-
-    Route::group(['prefix'=>'customer','as' => 'customer.'],function () {
-
-        Route::post('/register', 'RegistrationController@register')->name('register');
-
+    // CUSTOMER ROUTES
+    Route::group(['prefix' => 'customer', 'as' => 'customer.'],function () {
+        Route::post('/register', [RegistrationController::class, 'register'])->name('register');
         // Session Routes
-        Route::post('/login', 'SessionController@login')->name('session.login');
-        Route::get('/logout', 'SessionController@logout')->name('session.logout');
-        Route::post('/forget-password', 'ForgotPasswordController@store')->name('forget-password.store');
-        Route::post('/reset-password', 'ResetPasswordController@store')->name('reset-password.store');
-        Route::get('/reset-password/{token}', 'ResetPasswordController@create')->name('reset-password.create');
-
+        Route::post('/login', [SessionController::class, 'login'])->name('session.login');
+        Route::get('/logout', [SessionController::class, 'logout'])->name('session.logout');
+        Route::post('/forget-password', [ForgotPasswordController::class, 'store'])->name('forget-password.store');
+        Route::post('/reset-password', [ResetPasswordController::class, 'store'])->name('reset-password.store');
+        Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])->name('reset-password.create');
     });
 
-    //ADMIN CUSTOMERS ROUTES
-    Route::group(['prefix'=>'admin','as' => 'admin.','middleware' => ['language', 'admin']],function () {
+    // ADMIN CUSTOMERS ROUTES
+    Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['language', 'admin']],function () {
+        // Customer Group Routes
+        Route::resource('groups', CustomerGroupController::class)->except(['create', 'edit']);
 
-        //Customer Address
-        Route::get('customers/{customer_id}/addresses', 'AddressController@index')->name('customer.address.index');
-        Route::post('customers/{customer_id}/addresses', 'AddressController@store')->name('customer.address.store');
-        Route::get('customers/{customer_id}/addresses/{address_id}', 'AddressController@show')->name('customer.address.show');
-        Route::post('customers/{customer_id}/addresses/{address_id}', 'AddressController@update')->name('customer.address.update');
-        Route::delete('customers/{customer_id}/addresses/{address_id}', 'AddressController@destroy')->name('customer.address.delete');
+        // Customer Routes
+        Route::resource('customers', CustomerController::class)->except(['create', 'edit']);
 
-        //Customer Routes
-        Route::get('/customers' ,'CustomerController@index')->name('customers.index');
-        Route::post('/customers' ,'CustomerController@store')->name('customers.store');
-        Route::get('/customers/{customer}' ,'CustomerController@show')->name('customers.show');
-        Route::put('/customers/{customer}' ,'CustomerController@update')->name('customers.update');
-        Route::delete('/customers/{customer}' ,'CustomerController@destroy')->name('customers.delete' );
-    });
-
-    Route::group(['prefix'=>'admin','as' => 'admin.','middleware' => ['language', 'admin']],function () {
-        Route::get('groups', 'CustomerGroupController@index')->name('groups.index');
-        Route::post('groups', 'CustomerGroupController@store')->name('groups.store');
-        Route::get('groups/{group_id}', 'CustomerGroupController@show')->name('groups.show');
-        Route::post('groups/{group_id}', 'CustomerGroupController@update')->name('groups.update');
-        Route::delete('groups/{group_id}', 'CustomerGroupController@destroy')->name('groups.delete');
+        // Customer Address Routes
+        Route::group(['prefix' => 'customers/{customers}', 'as' => 'customer.'], function() {
+            Route::resource('addresses', AddressController::class)->except(['create', 'edit']);
+        });
     });
 });
-
-
-
-

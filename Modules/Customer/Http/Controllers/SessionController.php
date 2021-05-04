@@ -3,8 +3,8 @@
 namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 
@@ -15,66 +15,65 @@ use Modules\Core\Http\Controllers\BaseController;
  */
 class SessionController extends BaseController
 {
-
-    /**
-     * Create a new controller instance.
-     * @return void
-     */
     public function __construct()
     {
-        $this->middleware('customer')->except(['login']);
+        $this->middleware("customer")->except(["login"]);
     }
 
     /**
      * Logs in user and geneates jwt token
+     * 
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function login(Request $request)
     {
-        try {
-            $this->validate($request, [
-                'email' => 'required|email',
-                'password' => 'required'
+        try
+        {
+            $data = $request->validate([
+                "email" => "required|email|exists:customers,email",
+                "password" => "required"
             ]);
 
-            $jwtToken = null;
-            $customer_jwt_ttl = config('jwt.customer_jwt_ttl');
-            if (!$jwtToken = Auth::guard('customer')->setTTL($customer_jwt_ttl)->attempt(request()->only('email', 'password'))) {
-                return $this->errorResponse(trans('core::app.users.users.login-error'), 401);
-            }
+            $jwtToken = Auth::guard("customer")
+                ->setTTL(config("jwt.customer_jwt_ttl")) // Customer's JWT token time to live
+                ->attempt($data);
 
-            $customer = auth()->guard('customer')->user();
+            if (!$jwtToken) return $this->errorResponse($this->lang("login-error"), 401);
+
             $payload = [
-                'token' => $jwtToken,
-                'user' => $customer
+                "token" => $jwtToken,
+                "user" => auth()->guard("customer")->user()
             ];
-
-            return $this->successResponse($payload, trans('core::app.users.users.login-success'));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->getMessage(), 422);
-
-        } catch (\Exception  $exception) {
+        }
+        catch (ValidationException $exception)
+        {
+            return $this->errorResponse($exception->errors(), 422);
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
         }
+
+        return $this->successResponse($payload, $this->lang("login-success"));
     }
 
     /**
-     * Logout the Admin
-     * @return \Illuminate\Http\JsonResponse
+     * Logout the Customer
+     * 
+     * @return JsonResponse
      */
     public function logout()
     {
-        try {
-
-            auth()->guard('customer')->logout();
-            return $this->successResponseWithMessage(trans('core::app.users.users.logout-success'));
-
-        } catch (\Exception $exception) {
+        try
+        {
+            auth()->guard("customer")->logout();
+        }
+        catch (\Exception $exception)
+        {
             return $this->errorResponse($exception->getMessage());
-
         }
 
+        return $this->successResponseWithMessage($this->lang("logout-success"));
     }
 }

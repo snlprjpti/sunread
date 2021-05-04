@@ -7,16 +7,15 @@ use Illuminate\Support\Facades\DB;
 
 class AttributeFamilyTableSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
-        DB::table('attribute_families')->delete();
-
-        DB::table('attribute_families')->insert([
-            ['id' => '1','slug' => 'default','name' => 'Default','status' => '0','is_user_defined' => '1']
+        DB::table("attribute_families")->insert([
+            "slug" => "default",
+            "name" => "Default",
+            "status" => 0,
+            "is_user_defined" => 0,
+            "created_at" => now(),
+            "updated_at" => now()
         ]);
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

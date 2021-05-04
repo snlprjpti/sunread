@@ -2,184 +2,124 @@
 
 namespace Modules\Attribute\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 use Modules\Attribute\Entities\AttributeFamily;
-use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
-use Modules\Attribute\Repositories\AttributeFamilyRepository;
-use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Attribute\Exceptions\AttributeGroupsPresent;
+use Modules\Attribute\Transformers\AttributeFamilyResource;
+use Modules\Attribute\Repositories\AttributeFamilyRepository;
+use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
 
 class AttributeFamilyController extends BaseController
 {
-    //set custom pagination list
-    protected $pagination_limit;
+    protected $repository;
 
-    protected $model_name = 'Attribute Family';
-
-    private $attributeFamilyRepository;
-    /**
-     * Attribute Family constructor.
-     * @param AttributeFamilyRepository $attributeFamilyRepository
-     */
-
-    public function __construct(AttributeFamilyRepository $attributeFamilyRepository)
+    public function __construct(AttributeFamilyRepository $attributeFamilyRepository, AttributeFamily $attribute_family)
     {
-        $this->middleware('admin');
-        parent::__construct();
-        $this->attributeFamilyRepository = $attributeFamilyRepository;
+        $this->repository = $attributeFamilyRepository;
+        $this->model = $attribute_family;
+        $this->model_name = "Attribute Family";
+        $exception_statuses = [
+            DefaultFamilyCanNotBeDeleted::class => 403,
+            AttributeGroupsPresent::class => 403
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     * Returns all the attribute family
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request)
+    public function collection(object $data): ResourceCollection
     {
-        try {
+        return AttributeFamilyResource::collection($data);
+    }
 
-            $this->validate($request, [
-                'limit' => 'sometimes|numeric',
-                'page' => 'sometimes|numeric',
-                'sort_by' => 'sometimes',
-                'sort_order' => 'sometimes|in:asc,desc',
-                'q' => 'sometimes|string|min:1'
+    public function resource(object $data): JsonResource
+    {
+        return new AttributeFamilyResource($data);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request);
+            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
+
+            $created = $this->repository->create($data);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request, [
+                "slug" => "nullable|unique:attribute_families,slug,{$id}"
             ]);
+            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
 
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-
-            $attribute_families = AttributeFamily::query();
-            if ($request->has('q')) {
-                $attribute_families->whereLike(AttributeFamily::$SEARCHABLE, $request->get('q'));
-            }
-            $attribute_families = $attribute_families->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-            $attribute_families = $attribute_families->paginate($limit);
-            return $this->successResponse($attribute_families, trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+            $updated = $this->repository->update($data, $id);
         }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    /**
-     * Get the particular attribute_family
-     * @param $id
-     * @return JsonResponse
-     */
-    public function show($id)
+    public function destroy(int $id): JsonResponse
     {
-        try {
-            $attribute_family = $this->attributeFamilyRepository->findOrFail($id);
-            return $this->successResponse($attribute_family, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $this->repository->delete($id, function($deleted) {
+                if ($deleted->slug == 'default') throw new DefaultFamilyCanNotBeDeleted("Default family cannot be deleted.");
+                if ( count($deleted->attributeGroups) > 0 ) throw new AttributeGroupsPresent("Attribute Groups present in family.");
+            });
         }
-    }
-
-
-    /**
-     * Stores new attribute_family
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
-    {
-        try {
-
-            //validation
-            $this->validate($request, [
-                'slug' => 'required|unique:attribute_families',
-                'name' => 'required'
-            ]);
-            $attribute_family = AttributeFamily::create($request->only('name', 'slug'));
-            return $this->successResponse($payload = $attribute_family, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (SlugCouldNotBeGenerated $exception) {
-            return $this->errorResponse("Slugs could not be genereated");
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * Updates the attribute_family details
-     * @param Request $request
-     * @param $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $this->validate($request, [
-                'slug' => 'required|unique:attribute_families,slug,'.$id,
-                'name' => 'required'
-            ]);
-
-            $attribute_family =  AttributeFamily::findOrFail($id);
-            $attribute_family->fill($request->only('name', 'slug'));
-            $attribute_family->save();
-            return $this->successResponse($attribute_family, trans('core::app.response.update-success', ['name' => 'Attribute Family']));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-    }
-
-    /**
-     * Destroys the particular attribute_family
-     * @param $id
-     * @return JsonResponse
-     */
-    public function destroy($id)
-    {
-        try {
-
-            $attribute_family = AttributeFamily::findOrFail($id);
-            if ($attribute_family->slug == 'default') {
-                throw  new DefaultFamilyCanNotBeDeleted;
-            }
-            $attribute_groups = $attribute_family->attributeGroups;
-
-            if($attribute_groups && count($attribute_groups)>0){
-                return $this->errorResponse("Attribute Groups present in family.", 403);
-            }
-            $attribute_family->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Attribute Family']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
-
-        } catch (DefaultFamilyCanNotBeDeleted $exception) {
-            return $this->errorResponse("default family cannot be deleted", 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
         }
 
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
-
 }

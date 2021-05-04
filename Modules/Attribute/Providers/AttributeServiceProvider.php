@@ -5,14 +5,24 @@ namespace Modules\Attribute\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Attribute\Entities\AttributeGroup;
-use Modules\Attribute\Observers\AttributeFamilyObserver;
-use Modules\Attribute\Observers\AttributeGroupObserver;
+use Modules\Attribute\Entities\AttributeFamily;
 use Modules\Attribute\Observers\AttributeObserver;
+use Modules\Attribute\Observers\AttributeGroupObserver;
+use Modules\Attribute\Observers\AttributeFamilyObserver;
 
 class AttributeServiceProvider extends ServiceProvider
 {
+    /**
+     * @var string $moduleName
+     */
+    protected $moduleName = 'Attribute';
+
+    /**
+     * @var string $moduleNameLower
+     */
+    protected $moduleNameLower = 'attribute';
+
     /**
      * Boot the application events.
      *
@@ -23,8 +33,7 @@ class AttributeServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->registerFactories();
-        $this->loadMigrationsFrom(module_path('Attribute', 'Database/Migrations'));
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
         $this->registerObservers();
     }
 
@@ -46,10 +55,10 @@ class AttributeServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->publishes([
-            module_path('Attribute', 'Config/config.php') => config_path('attribute.php'),
+            module_path($this->moduleName, 'Config/config.php') => config_path($this->moduleNameLower . '.php'),
         ], 'config');
         $this->mergeConfigFrom(
-            module_path('Attribute', 'Config/config.php'), 'attribute'
+            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
     }
 
@@ -60,17 +69,15 @@ class AttributeServiceProvider extends ServiceProvider
      */
     public function registerViews()
     {
-        $viewPath = resource_path('views/modules/attribute');
+        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
 
-        $sourcePath = module_path('Attribute', 'Resources/views');
+        $sourcePath = module_path($this->moduleName, 'Resources/views');
 
         $this->publishes([
             $sourcePath => $viewPath
-        ],'views');
+        ], ['views', $this->moduleNameLower . '-module-views']);
 
-        $this->loadViewsFrom(array_merge(array_map(function ($path) {
-            return $path . '/modules/attribute';
-        }, \Config::get('view.paths')), [$sourcePath]), 'attribute');
+        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
     }
 
     /**
@@ -80,24 +87,12 @@ class AttributeServiceProvider extends ServiceProvider
      */
     public function registerTranslations()
     {
-        $langPath = resource_path('lang/modules/attribute');
+        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
 
         if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, 'attribute');
+            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
         } else {
-            $this->loadTranslationsFrom(module_path('Attribute', 'Resources/lang'), 'attribute');
-        }
-    }
-
-    /**
-     * Register an additional directory of factories.
-     *
-     * @return void
-     */
-    public function registerFactories()
-    {
-        if (! app()->environment('production') && $this->app->runningInConsole()) {
-            app(Factory::class)->load(module_path('Attribute', 'Database/factories'));
+            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
     }
 
@@ -111,7 +106,23 @@ class AttributeServiceProvider extends ServiceProvider
         return [];
     }
 
-    private function registerObservers()
+    private function getPublishableViewPaths(): array
+    {
+        $paths = [];
+        foreach (\Config::get('view.paths') as $path) {
+            if (is_dir($path . '/modules/' . $this->moduleNameLower)) {
+                $paths[] = $path . '/modules/' . $this->moduleNameLower;
+            }
+        }
+        return $paths;
+    }
+
+    /**
+     * Register observers.
+     *
+     * @return void
+     */
+    public function registerObservers()
     {
         AttributeGroup::observe(AttributeGroupObserver::class);
         AttributeFamily::observe(AttributeFamilyObserver::class);

@@ -2,85 +2,72 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
+use Modules\User\Entities\Admin;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 
-/**
- * Session Controller for the Admin
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class SessionController extends BaseController
 {
-
-    /**
-     * Create a new controller instance.
-     * @return void
-     */
-    public function __construct()
+    public function __construct(Admin $admin)
     {
         $this->middleware('guest:admin')->except(['logout']);
+
+        $this->model = $admin;
+        $this->model_name = "Admin account";
+
+        parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Logs in user and geneates jwt token
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
-        try {
+        Event::dispatch('admin.session.login.before');
 
-            Event::dispatch('admin.session.login.before');
-
-            $this->validate($request, [
-                'email' => 'required|email',
-                'password' => 'required'
+        try
+        {
+            $data = $request->validate([
+                "email" => "required|email|exists:admins,email",
+                "password" => "required"
             ]);
 
-            $jwtToken = null;
-            $admin_jwt_ttl = config('jwt.admin_jwt_ttl');
-            if (!$jwtToken = Auth::guard('admin')->setTTl($admin_jwt_ttl)->attempt(request()->only('email', 'password'))) {
-                return $this->errorResponse(trans('core::app.users.users.login-error'), 401);
-            }
-            $admin = auth()->guard('admin')->user();
+            $jwtToken = Auth::guard("admin")
+                ->setTTL(config("jwt.admin_jwt_ttl")) // Customer's JWT token time to live
+                ->attempt($data);
+
+            if (!$jwtToken) return $this->errorResponse($this->lang("login-error"), 401);
+
             $payload = [
-                'token' => $jwtToken,
-                'user' => $admin
+                "token" => $jwtToken,
+                "user" => auth()->guard("admin")->user()
             ];
-
-            Event::dispatch('admin.session.login.after',$admin);
-
-            return $this->successResponse($payload, trans('core::app.users.users.login-success'));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->getMessage(), 422);
-
-        } catch (\Exception  $exception) {
-            return $this->errorResponse($exception->getMessage());
         }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        Event::dispatch('admin.session.login.after', auth()->guard("admin")->user());
+        return $this->successResponse($payload, $this->lang("login-success"));
     }
 
-    /**
-     * Logout the Admin
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function logout()
+    public function logout(): JsonResponse
     {
-        try {
-            Event::dispatch('admin.session.logout.before');
-            $admin = auth()->guard('admin')->user();
-            auth()->guard('admin')->logout();
-            Event::dispatch('admin.session.logout.after' , $admin);
-            return $this->successResponseWithMessage(trans('core::app.users.users.logout-success'));
+        Event::dispatch('admin.session.logout.before');
 
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $admin = auth()->guard('admin')->user();
+            auth()->guard("admin")->logout();
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
         }
 
+        Event::dispatch('admin.session.logout.after' , $admin);
+        return $this->successResponseWithMessage($this->lang("logout-success"));
     }
 }

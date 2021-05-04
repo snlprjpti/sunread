@@ -2,106 +2,72 @@
 
 namespace Modules\User\Http\Controllers;
 
-use Illuminate\Foundation\Auth\ResetsPasswords;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request;
+use Modules\User\Entities\Admin;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Exceptions\AdminNotFoundException;
 use Modules\User\Exceptions\TokenGenerationException;
 
-/**
- * Reset Password controller for the Admin
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class ResetPasswordController extends BaseController
 {
-    use ResetsPasswords;
-
-
-    /**
-     * OPTIONAL route: using frontend routes in future
-     * Display the password reset token is valid
-     * If no token is present, display the error
-     * @param  string|null $token
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function create($token = null)
+    public function __construct(Admin $admin)
     {
-        if (!$token) {
-            return $this->errorResponse(trans('core::app.users.token-missing'), 400);
-        }
-        return $this->successResponse($payload = ['token' => $token]);
+        $this->model = $admin;
+        $this->model_name = "Admin";
+        $exception_statuses = [
+            TokenGenerationException::class => 401,
+            AdminNotFoundException::class => 404
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     *
-     * Store new password of the admin
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request)
+    public function create(?string $token = null): JsonResponse
     {
+        return $token
+            ? $this->successResponse(['token' => $token])
+            : $this->errorResponse(__('core::app.users.token-missing'), 400);
+    }
 
-        try {
-            $this->validate($request, [
+    public function store(Request $request): JsonResponse
+    {
+        try
+        {
+            $data = $request->validate([
                 'token' => 'required',
                 'email' => 'required|email',
                 'password' => 'required|confirmed|min:6',
             ]);
 
-            $response = $this->broker()->reset(
-                $request->only(['email', 'password', 'password_confirmation', 'token']), function ($admin, $password) {
+            $response = $this->broker()->reset($data, function ($admin, $password) {
                 $this->resetPassword($admin, $password);
             });
 
-            if ($response == Password::INVALID_TOKEN) {
-                throw  new TokenGenerationException();
-            }
-
-            if ($response == Password::INVALID_USER) {
-                throw  new AdminNotFoundException();
-            }
-            return $this->successResponseWithMessage(trans('core::app.users.users.password-reset-success'));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (TokenGenerationException $exception) {
-            return $this->errorResponse(trans('core::app.users.token.token-generation-problem') ,400);
-
-        }catch (AdminNotFoundException $exception){
-
-        } catch (\Exception $e) {
-            return $this->errorResponse($e->getMessage());
+            if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException(__("core::app.users.token.token-generation-problem"));
+            if ($response == Password::INVALID_USER) throw new AdminNotFoundException("Admin not found.");
         }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage(__("core::app.users.users.password-reset-success"));
     }
 
-    /**
-     * Get the broker to be used during password reset.
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
-     */
-    protected function broker()
+    protected function broker(): PasswordBroker
     {
         return Password::broker('admins');
     }
 
-    /**
-     * Reset the given customer password.
-     *
-     * @param $admin
-     * @param  string $password
-     * @return void
-     */
-    protected function resetPassword($admin, $password)
+    protected function resetPassword(object $admin, string $password): void
     {
-
         $admin->password = Hash::make($password);
         $admin->setRememberToken(Str::random(60));
         $admin->save();
     }
-
 }

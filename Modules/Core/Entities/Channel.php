@@ -3,101 +3,45 @@
 namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
-
+use Modules\Core\Traits\HasFactory;
 
 class Channel extends Model
 {
-    protected $fillable = [
-        'code',
-        'name',
-        'description',
-        'theme',
-        'hostname',
-        'default_locale_id',
-        'base_currency_id',
-    ];
+    use HasFactory;
 
-    public static $SEARCHABLE = ['code', 'name', 'description', 'theme', 'hostname'];
+    public static $SEARCHABLE = [ "code", "hostname", "name", "description", "location" ];
+    protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency", "website_id" ];
 
-    /**
-     * Get the channel locales.
-     */
-    public function locales()
+    public function default_store(): BelongsTo
     {
-        return $this->belongsToMany(Locale::class, 'channel_locales');
+        return $this->belongsTo(Store::class, "default_store_id");
     }
 
-    /**
-     * Get the default locale
-     */
-    public function default_locale()
+    public function stores(): BelongsToMany
     {
-        return $this->belongsTo(Locale::class);
+        return $this->belongsToMany(Store::class);
     }
 
-    /**
-     * Get the channel locales.
-     */
-    public function currencies()
+    public function website(): BelongsTo
     {
-        return $this->belongsToMany(Currency::class, 'channel_currencies');
+        return $this->belongsTo(Website::class, "website_id");
     }
 
-
-    /**
-     * Get the base currency
-     */
-    public function base_currency()
+    private function get_url(?string $path): ?string
     {
-        return $this->belongsTo(Currency::class);
+        return $path ? Storage::url($path) : null;
     }
 
-    /**
-     * Get the base currency
-     */
-    public function root_category()
+    public function getLogoUrlAttribute(): ?string
     {
-        return $this->belongsTo(Category::class, 'root_category_id');
+        return $this->get_url($this->logo);
     }
 
-    /**
-     * Get logo image url.
-     */
-    public function logo_url()
+    public function getFaviconUrlAttribute(): ?string
     {
-        if (! $this->logo) {
-            return;
-        }
-
-        return Storage::url($this->logo);
-    }
-
-    /**
-     * Get logo image url.
-     */
-    public function getLogoUrlAttribute()
-    {
-        return $this->logo_url();
-    }
-
-    /**
-     * Get favicon image url.
-     */
-    public function favicon_url()
-    {
-        if (! $this->favicon) {
-            return;
-        }
-
-        return Storage::url($this->favicon);
-    }
-
-    /**
-     * Get favicon image url.
-     */
-    public function getFaviconUrlAttribute()
-    {
-        return $this->favicon_url();
+        return $this->get_url($this->favicon);
     }
 }

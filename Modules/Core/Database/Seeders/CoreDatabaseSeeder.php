@@ -15,7 +15,11 @@ class CoreDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-        $this->call(LocalesTableSeeder::class);
         $this->call(CurrencyTableSeeder::class);
+        $this->call(ExchangeRateTableSeeder::class);
+        $this->call(StoreTableSeeder::class);
+        $this->call(WebsiteTableSeeder::class);
+        $this->call(ChannelTableSeeder::class);
+        $this->call(ConfigurationTableSeeder::class);
     }
 }

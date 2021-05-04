@@ -2,206 +2,127 @@
 
 namespace Modules\User\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
-use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
+use Illuminate\Http\JsonResponse;
+use Modules\User\Transformers\AdminResource;
+use Modules\User\Repositories\AdminRepository;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Http\Controllers\BaseController;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\User\Exceptions\CannotDeleteSelfException;
+use Modules\User\Exceptions\CannotDeleteSuperAdminException;
 
-/**
- * User Controller for the Admin
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class UserController extends BaseController
 {
+    protected $repository;
 
-
-    protected $pagination_limit;
-
-    protected $model_name = 'Admin';
-    /**
-     * UserController constructor.
-     */
-    public function __construct()
+    public function __construct(Admin $admin, AdminRepository $adminRepository)
     {
-        parent::__construct();
         $this->middleware('admin');
+        $this->repository = $adminRepository;
+        $this->model = $admin;
+        $this->model_name = "Admin";
+        $exception_statuses = [
+            CannotDeleteSelfException::class => 403,
+            CannotDeleteSuperAdminException::class => 403
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     * returns all the admins
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index(Request  $request)
+    public function collection(object $data): ResourceCollection
     {
-        try {
-            $this->validate($request, [
-                'limit' => 'sometimes|numeric',
-                'page' => 'sometimes|numeric',
-                'sort_by' => 'sometimes',
-                'sort_order' => 'sometimes|in:asc,desc',
-                'q' => 'sometimes|string|min:1'
+        return AdminResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new AdminResource($data);
+    }
+
+    public function index(Request  $request): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request, ["role"]);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request, [
+                "password" => "required|confirmed",
+                "status" => "required|boolean",
+                "role_id" => "required|integer|exists:roles,id"
             ]);
-
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-
-            $admins =  Admin::query();
-            if ($request->has('q')) {
-                $admins->whereLike(Admin::$SEARCHABLE,$request->get('q'));
-            }
-            $admins = $admins->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-            $admins = $admins->paginate($limit);
-            return $this->successResponse($admins, trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+            $created = $this->repository->create($data);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
         }
 
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    /**
-     * Get the particular admin
-     * @param $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
-        try {
-            $admin = Admin::findOrFail($id);
-            return $this->successResponse($admin, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $fetched = $this->model->with(["role"])->findOrFail($id);
         }
-    }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
 
-    /**
-     * store the new admin resource
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request)
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
+    
+    public function update(Request $request, int $id): JsonResponse
     {
-        try {
-            $this->validate($request, [
-                'first_name' => 'required|min:2|max:200',
-                'last_name' => 'required|min:2|max:200',
-                'company' =>'required|min:3|max:200',
-                'address' =>'required|min:3|max:200',
-                'email' => 'required|unique:admins,email',
-                'password' => 'required|confirmed',
-                'status' => 'required|boolean',
-                'role_id' => 'required|integer'
+        try
+        {
+            $data = $this->repository->validateData($request, [
+                "password" => "required|confirmed",
+                "status" => "required|boolean",
+                "role_id" => "required|integer|exists:roles,id"
             ]);
-
-            $password = $request->get('password');
-            if (isset($password)) {
-                $request->merge(['password' => bcrypt($password)]);
-            }
-
-            $admin = Admin::create(
-                $request->only('first_name','last_name','address','company', 'email', 'password', 'role_id', 'status')
-            );
-
-            return $this->successResponse($admin, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->errors(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+            $updated = $this->repository->update($data, $id);
         }
-    }
-
-    /**
-     * Update the admin details
-     * @param Request $request
-     * @param $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $this->validate($request, [
-                'first_name' => 'sometimes|min:2|max:200',
-                'last_name' => 'sometimes|min:2|max:200',
-                'company' =>'sometimes|min:3|max:200',
-                'address' =>'sometimes|min:3|max:200',
-                'email' => 'sometimes|unique:admins,email,'.$id,
-                'password' => 'sometimes|confirmed',
-                'status' => 'sometimes|boolean',
-                'role_id' => 'sometimes|integer',
-            ]);
-
-            $password = $request->get('password');
-            if (isset($password)) {
-                $request->merge(['password' => bcrypt($password)]);
-            }
-            $admin = Admin::findOrFail($id);
-            $admin->forceFill(
-                $request->only('first_name','last_name','address','company', 'email', 'password', 'role_id', 'status')
-            );
-            $admin->save();
-            return $this->successResponse($admin, trans('core::app.response.update-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
         }
 
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-
-    /**
-     * Remove the specified  admin resource from storage.
-     * @param int $id
-     * @return JsonResponse
-     */
     public function destroy($id)
     {
-        try {
-            $admin = Admin::findOrFail($id);
-            $current_user = Auth::guard('admin')->user();
-
-            if($admin->id === $current_user->id){
-                return $this->errorResponse("Admin cannot delete itself.",403);
-            }
-            if($admin->hasRole('super-admin')){
-                return $this->errorResponse("Super Admin cannot be deleted." ,403);
-            }
-            $admin->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
-
-        }catch (ModelNotFoundException $exception){
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]), 404);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $this->repository->delete($id, function($deleted) {
+                if ( $deleted->id == auth()->user()->id ) throw new CannotDeleteSelfException("Admin cannot delete itself.");
+                if ( $deleted->hasRole("super-admin") ) throw new CannotDeleteSuperAdminException("Super admin cannot be deleted.");
+                $this->repository->removeOldImage($deleted->id);
+            });
         }
-    }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
 
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
 }

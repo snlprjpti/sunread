@@ -15,7 +15,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         Event::listen('admin.session.login.after', 'Modules\User\Listeners\SessionListener@adminLogin');
-
         Event::listen('admin.session.logout.after', 'Modules\User\Listeners\SessionListener@adminLogOut');
     }
 }

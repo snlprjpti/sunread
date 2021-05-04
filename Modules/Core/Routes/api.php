@@ -1,7 +1,4 @@
 <?php
-
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -15,42 +12,31 @@ use Illuminate\Http\Request;
 
 
 Route::group(['middleware' => ['api']], function () {
-
     //ADMIN ATTRIBUTE ROUTES
-    Route::group(['prefix' => 'admin', 'middleware' => ['admin','language']], function () {
+    Route::group(['prefix' => 'admin', 'middleware' => ['admin', 'language'], 'as' => 'admin.'], function () {
+        // Activities Routes
+        Route::delete('activities/bulk', [\Modules\Core\Http\Controllers\ActivityLogController::class, 'bulkDelete'])->name('activities.bulk-delete');
+        Route::resource('activities', ActivityLogController::class)->only(['index', 'show', 'destroy']);
 
         // Locale Routes
-        Route::get('/locales', 'LocaleController@index')->name('admin.locales.index');
-        Route::post('/locales', 'LocaleController@store')->name('admin.locales.store');
-        Route::get('/locales/{locale}', 'LocaleController@show')->name('admin.locales.show');
-        Route::put('/locales/{locale}', 'LocaleController@update')->name('admin.locales.update');
-        Route::delete('/locales/{locale}', 'LocaleController@destroy')->name('admin.locales.delete');
+        Route::resource('locales', LocaleController::class)->except(['create', 'edit']);
+
+        // Store Routes
+        Route::resource('stores', StoreController::class)->except(['create','edit']);
 
         // Currency Routes
-        Route::get('/currencies', 'CurrencyController@index')->name('admin.currencies.index');
-        Route::post('/currencies', 'CurrencyController@store')->name('admin.currencies.store');
-        Route::get('/currencies/{currency}', 'CurrencyController@show')->name('admin.currencies.show');
-        Route::put('/currencies/{currency}', 'CurrencyController@update')->name('admin.currencies.update');
-        Route::delete('/currencies/{currency}', 'CurrencyController@destroy')->name('admin.currencies.delete');
+        Route::resource('currencies', CurrencyController::class)->except(['create', 'edit']);
 
         // Exchange Rates Routes
-        Route::get('/exchange_rates', 'ExchangeRateController@index')->name('admin.exchange_rates.index');
-        Route::post('/exchange_rates', 'ExchangeRateController@store')->name('admin.exchange_rates.store');
-        Route::get('/exchange_rates/{id}', 'ExchangeRateController@show')->name('admin.exchange_rates.show');
-        Route::post('/exchange_rates/{id}', 'ExchangeRateController@update')->name('admin.exchange_rates.update-rates');
-        Route::delete('/exchange_rates/{id}', 'ExchangeRateController@destroy')->name('admin.exchange_rates.delete');
+        Route::resource('exchange_rates', ExchangeRateController::class)->except(['create', 'edit']);
 
+        // Channels Routes
+        Route::resource('channels', ChannelController::class)->except(['create', 'edit']);
+       
+        // Websites Routes
+        Route::resource('websites', WebsiteController::class)->except(['create', 'edit']);
 
-        Route::get('/activities', 'ActivityController@index')->name('admin.activities.index');
-        Route::get('/activities/{activity}', 'ActivityController@show')->name('admin.activities.show');
-        Route::delete('/activities/{activity}', 'ActivityController@destroy')->name('admin.activities.delete');
-        Route::delete('/activities/bulk', 'ActivityController@bulkDelete')->name('admin.activities.bulk.delete');
-
-        Route::get('/channels', 'ChannelController@index')->name('admin.channels.index');
-        Route::post('/channels', 'ChannelController@store')->name('admin.channels.store');
-        Route::get('/channels/{channel}', 'ChannelController@show')->name('admin.channels.show');
-        Route::put('/channels/{channel}', 'ChannelController@update')->name('admin.channels.update');
-        Route::delete('/channels/{channel}', 'ChannelController@destroy')->name('admin.channels.delete');
-
+        // Configurations Routes
+        Route::resource('configurations', ConfigurationController::class)->except(['create', 'edit']);
     });
 });

@@ -1,22 +1,22 @@
 <?php
 
-
 namespace Modules\Attribute\Repositories;
 
-use Modules\Attribute\Contracts\AttributeFamilyInterface;
 use Modules\Attribute\Entities\AttributeFamily;
-use Modules\Core\Eloquent\Repository;
-use Modules\Core\Traits\Sluggable;
+use Modules\Core\Repositories\BaseRepository;
 
-class AttributeFamilyRepository extends Repository implements AttributeFamilyInterface
+class AttributeFamilyRepository extends BaseRepository
 {
-    use Sluggable;
-    /**
-     * @inheritDoc
-     */
-    public function model()
-    {
-        return AttributeFamily::class;
-    }
+    protected $model, $model_key;
 
+    public function __construct(AttributeFamily $attribute_family)
+    {
+        $this->model = $attribute_family;
+        $this->model_key = "catalog.attributes.attribute_family";
+
+        $this->rules = [
+            "slug" => "nullable|unique:attribute_families,slug",
+            "name" => "required"
+        ];
+    }
 }

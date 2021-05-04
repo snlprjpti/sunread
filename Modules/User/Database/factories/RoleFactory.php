@@ -1,18 +1,31 @@
 <?php
+namespace Modules\User\Database\factories;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-use Faker\Generator as Faker;
-use Modules\User\Entities\Role;
+class RoleFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = \Modules\User\Entities\Role::class;
 
-$factory->define(Role::class, function (Faker $faker) {
-    return [
-        'name' => $this->faker->name,
-        'slug' => $this->faker->slug,
-        'description' => $this->faker->sentence,
-        'permission_type' => 'custom',
-        'permissions' => [
-            '*'
-        ]
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            "name" => $this->faker->name(),
+            "slug" => $this->faker->slug(),
+            "description" => $this->faker->sentence(),
+            "permission_type" => "custom",
+            "permissions" => []
+        ];
+    }
+}
+

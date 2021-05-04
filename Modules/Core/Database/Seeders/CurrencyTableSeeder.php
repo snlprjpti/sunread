@@ -9,20 +9,23 @@ class CurrencyTableSeeder extends Seeder
 {
     public function run()
     {
-
         DB::table('currencies')->delete();
 
         DB::table('currencies')->insert([
             [
-                'id'     => 1,
-                'code'   => 'USD',
-                'name'   => 'US Dollar',
+                'id' => 1,
+                'code' => 'USD',
+                'name' => 'US Dollar',
                 'symbol' => '$',
+                'created_at' => now(),
+                'updated_at' => now()
             ], [
-                'id'     => 2,
-                'code'   => 'EUR',
-                'name'   => 'Euro',
+                'id' => 2,
+                'code' => 'EUR',
+                'name' => 'Euro',
                 'symbol' => '€',
+                'created_at' => now(),
+                'updated_at' => now()
             ]
         ]);
     }

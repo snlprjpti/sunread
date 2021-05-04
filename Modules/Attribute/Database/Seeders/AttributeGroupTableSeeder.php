@@ -2,25 +2,28 @@
 
 namespace Modules\Attribute\Database\Seeders;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class AttributeGroupTableSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $groups = ["General", "Description", "Meta Description", "Price", "Shipping"];
+        $count = 0;
+        $data = array_map(function($data) use ($count) {
+            return [
+                "name" => $data,
+                "slug"=> Str::slug($data),
+                "position" => ++$count,
+                "is_user_defined" => 0,
+                "attribute_family_id" => 1,
+                "created_at" => now(),
+                "updated_at" => now()
+            ];
+        }, $groups);
 
-        DB::table('attribute_groups')->delete();
-
-        DB::table('attribute_groups')->insert([
-            ['id' => '1','name' => 'General','position' => '1','is_user_defined' => '0','attribute_family_id' => '1','slug'=> 'general'],
-            ['id' => '2','name' => 'Description','position' => '2','is_user_defined' => '0','attribute_family_id' => '1','slug'=> 'description'],
-            ['id' => '3','name' => 'Meta Description','position' => '3','is_user_defined' => '0','attribute_family_id' => '1','slug'=> 'meta-description'],
-            ['id' => '4','name' => 'Price','position' => '4','is_user_defined' => '0','attribute_family_id' => '1','slug'=> 'price'],
-            ['id' => '5','name' => 'Shipping','position' => '5','is_user_defined' => '0','attribute_family_id' => '1','slug'=> 'shipping']
-        ]);
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table("attribute_groups")->insert($data);
     }
 }

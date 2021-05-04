@@ -3,66 +3,45 @@
 
 namespace Modules\Attribute\Repositories;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Modules\Attribute\Contracts\AttributeOptionInterface;
 use Modules\Attribute\Entities\AttributeOption;
-use Modules\Attribute\Entities\AttributeOptionTranslation;
-use Modules\Core\Eloquent\Repository;
 
-class AttributeOptionRepository  extends Repository implements AttributeOptionInterface
+class AttributeOptionRepository
 {
+    protected $model, $model_key, $translation;
 
-
-    /**
-     * @inheritDoc
-     */
-    public function model()
+    public function __construct(AttributeOption $attribute_option, AttributeOptionTranslationRepository $attributeOptionTranslationRepository)
     {
-        return AttributeOption::class;
+        $this->model = $attribute_option;
+        $this->translation = $attributeOptionTranslationRepository;
+        $this->model_key = "catalog.attribute.options";
     }
 
-    public function createOrUpdateAttributeOption(array $data)
+    public function updateOrCreate(?array $data, object $parent): void
     {
-        try {
-            if (isset($data['attribute_option_id'])) {
-                $attributeOption = $this->model->findOrFail($data['attribute_option_id']);
-            }else{
-                $attributeOption =  new AttributeOption();
-            }
-            $attributeOption->fill($data);
-            $attributeOption->save();
-            $this->createUpdateOptionTranslation($data,$attributeOption);
-            return $attributeOption;
+        if ( !is_array($data) || count($data) ) return;
 
-        }catch (ModelNotFoundException $exception){
+        Event::dispatch("{$this->model_key}.create.before");
+
+        try
+        {
+            foreach ($data as $row){
+                $check = [
+                    "attribute_option_id" => $row["attribute_option_id"],
+                    "attribute_id" => $parent->id
+                ];
+    
+                $created = $this->model->firstorNew($check);
+                $created->fill($row);
+                $created->save();
+
+                $this->translation->updateOrCreate($data, $created);
+            }
+        }
+        catch (Exception $exception)
+        {
             throw $exception;
         }
 
+        Event::dispatch("{$this->model_key}.create.after", $created);
     }
-
-
-    public function createUpdateOptionTranslation(Array $optionInputs,$attributeOption)
-    {
-        try {
-            if(isset($optionInputs['translations'])){
-                $translated_options = $optionInputs['translations'];
-
-                foreach ($translated_options as $translated_option){
-                    $check_attributes = ['locale' => $translated_option['locale'], 'attribute_option_id' => $attributeOption->id];
-                    $optionInputs = array_merge($translated_option, $check_attributes);
-                    $option_translation = AttributeOptionTranslation::firstOrNew($check_attributes);
-                    $option_translation->fill($optionInputs);
-                    $option_translation->save();
-
-                }
-
-            }
-        }catch (\Exception $exception){
-            throw $exception;
-        }
-
-    }
-
-
-
 }

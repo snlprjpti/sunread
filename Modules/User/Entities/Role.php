@@ -3,34 +3,20 @@
 namespace Modules\User\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\Core\Traits\SlugAble;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Core\Traits\HasFactory;
+use Modules\Core\Traits\Sluggable;
 
 class Role extends Model
 {
-    use SlugAble;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'description', 'permission_type', 'permissions','slug'
-    ];
+    use Sluggable, HasFactory;
 
-    public static $SEARCHABLE = ['name' ,'description', 'permissions', 'permission_type', 'slug'];
+    public static $SEARCHABLE = [ "name", "description", "permissions", "permission_type", "slug" ];
+    protected $fillable = [ "name", "description", "permission_type", "permissions", "slug" ];
+    protected $casts = [ "permissions" => "array" ];
 
-    protected $casts = [
-        'permissions' => 'array'
-    ];
-
-    /**
-     * Get the admins.
-     */
-    public function admins()
+    public function admins(): HasMany
     {
         return $this->hasMany(Admin::class);
     }
-
-
 }
-

@@ -1,18 +1,10 @@
 <?php
 
-namespace Modules\Core\Models;
+namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
 class CurrencyExchangeRate extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'target_currency',
-        'rate',
-    ];
+    protected $fillable = [ 'target_currency', 'rate' ];
 }

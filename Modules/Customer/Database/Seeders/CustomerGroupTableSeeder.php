@@ -7,18 +7,19 @@ use Illuminate\Support\Facades\DB;
 
 class CustomerGroupTableSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
-        DB::table('customer_groups')->delete();
-
         DB::table('customer_groups')->insert([
             [
-                'id' => 1,
                 'slug' => 'guest',
                 'name' => 'Guest',
-                'is_user_defined' => 0,
+                'is_user_defined' => 0
             ]
-            //insert more groups here
         ]);
     }
 }

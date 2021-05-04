@@ -2,241 +2,152 @@
 
 namespace Modules\Attribute\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
-use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
-use Modules\Attribute\Repositories\AttributeRepository;
-use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Attribute\Transformers\AttributeResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Attribute\Repositories\AttributeRepository;
+use Modules\Attribute\Repositories\AttributeOptionRepository;
+use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
+use Modules\Attribute\Repositories\AttributeTranslationRepository;
+use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
 
 class AttributeController extends BaseController
 {
-    protected $pagination_limit, $attributeRepository;
-    protected $model_name = 'Attribute';
+    protected $repository, $translation_repository, $option_repository;
 
-    /**
-     * Attribute constructor.
-     * Admin middleware checks the admin against admins table
-     * @param AttributeRepository $attributeRepository
-     */
-
-    public function __construct(AttributeRepository $attributeRepository)
+    public function __construct(Attribute $attribute, AttributeRepository $attributeRepository, AttributeTranslationRepository $attributeTranslationRepository, AttributeOptionRepository $attributeOptionRepository)
     {
-        parent::__construct();
-        $this->middleware('admin');
-        $this->attributeRepository = $attributeRepository;
+        $this->repository = $attributeRepository;
+        $this->model = $attribute;
+        $this->model_name = "Attribute";
+        $exception_statuses = [
+            AttributeTranslationDoesNotExist::class => 422,
+            AttributeTranslationOptionDoesNotExist::class => 422
+        ];
+
+        $this->translation_repository = $attributeTranslationRepository;
+        $this->option_repository = $attributeOptionRepository;
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     * Returns all the attributes
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request)
+    public function collection(object $data): ResourceCollection
     {
-        try {
-            $this->validate($request, [
-                'limit' => 'sometimes|numeric',
-                'page' => 'sometimes|numeric',
-                'sort_by' => 'sometimes',
-                'sort_order' => 'sometimes|in:asc,desc',
-                'q' => 'sometimes|string|min:1'
+        return AttributeResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new AttributeResource($data);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request, ["translations", "attribute_group"]);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request);
+            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
+            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["is_filterable"] = 0;
+
+            $this->repository->validateTranslation($request);
+
+            $created = $this->repository->create($data, function($created) use ($request) {
+                $this->translation_repository->updateOrCreate($request->translations, $created);
+                if (in_array($request->type, $this->repository->non_filterable_fields)) $this->option_repository->updateOrCreate($request->attribute_options, $created);
+            });
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->model->with(["attribute_options", "translations"])->findOrFail($id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request, [
+                "slug" => "nullable|unique:attributes,slug,{$id}"
             ]);
+            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
+            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["is_filterable"] = 0;
 
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-            $attributes = Attribute::with('translations');
-            if ($request->has('q')) {
-                $attributes->whereLike(Attribute::$SEARCHABLE, $request->get('q'));
-            }
-            $attributes = $attributes->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-            $attributes = $attributes->paginate($limit);
-            return $this->successResponse($attributes, trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
+            $this->repository->validateTranslation($request);
 
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
+                $this->translation_repository->updateOrCreate($request->translations, $updated);
+                if (in_array($request->type, $this->repository->non_filterable_fields)) $this->option_repository->updateOrCreate($request->attribute_options, $updated);
+            });
         }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    /**
-     * Get the particular attribute
-     * @param $id
-     * @return JsonResponse
-     */
-    public function show($id)
+    public function destroy(int $id): JsonResponse
     {
-        try {
-
-            $attribute = Attribute::with(['attributeOptions' ,'translations'])->findOrFail($id);
-            return $this->successResponse($attribute, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $this->repository->delete($id);
         }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 
-
-    /**
-     * Stores new attribute
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
+    public function bulkDelete(Request $request): JsonResponse
     {
-        try {
-            //Validation
-            $this->validate($request, $this->attributeRepository->rules());
-
-            //custom validation to for translation
-            $this->checkCustomCustomValidation($request);
-            if (!in_array($request->get('type'), ['select', 'multiselect', 'checkbox'])) {
-                $request->merge(['is_filterable' => 0]);
-            }
-
-            //create slug if missing
-            if (!$request->get('slug')) {
-                $request->merge(['slug' => $this->attributeRepository->createSlug($request->get('name'))]);
-            }
-
-            //TODO::future ,available for development only
-            $request->merge(["use_in_flat" => 0]);
-
-            //Store Attributes
-            $attribute = $this->attributeRepository->createAttribute($request);
-            return $this->successResponse($attribute, trans('core::app.response.create-success', ['name' => $this->model_name]), 201);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (SlugCouldNotBeGenerated $exception) {
-            return $this->errorResponse("Slugs could not be generated");
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $this->repository->bulkDelete($request);
         }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
-
-    /**
-     * Updates the attribute
-     * @param Request $request
-     * @param $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-
-            //validation
-            $this->validate($request, $this->attributeRepository->rules($id));
-
-            // custom validation for translation and options
-            $this->checkCustomCustomValidation($request);
-
-            //TODO::future , available for development only
-            $request->merge(["use_in_flat" => 0]);
-
-            //update attribute
-            $this->attributeRepository->updateAttributes($request, $id);
-
-            return $this->successResponseWithMessage(trans('core::app.response.update-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-    }
-
-    /**
-     * Destroys the particular attribute
-     * @param $id
-     * @return JsonResponse
-     */
-    public function destroy($id)
-    {
-        try {
-            $this->attributeRepository->delete($id);
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-
-    }
-
-
-    /** Checks if locale is present in translation
-     * @param $translations
-     * @return bool
-     */
-    public function checkIfTranslationExist($translations)
-    {
-        if (empty($translations)) {
-            return false;
-        }
-        $locale_key_present = true;
-        foreach ($translations as $translation) {
-            if (!array_key_exists('locale', $translation) || !array_key_exists('name', $translation)) {
-                return false;
-            }
-        }
-        return $locale_key_present;
-
-    }
-
-    /**
-     * Checks if translation exist for attributes and attribute options
-     * At least one translation is needed
-     * @param $request
-     * @throws AttributeTranslationDoesNotExist
-     * @throws AttributeTranslationOptionDoesNotExist
-     */
-    public function checkCustomCustomValidation($request)
-    {
-        $translations = $request->get('translations');
-
-        //check attribute translation
-        $isAttributeTranslationExist = $this->checkIfTranslationExist($translations);
-        if (!$isAttributeTranslationExist) {
-            throw new AttributeTranslationDoesNotExist("Missing attribute translation.");
-        }
-
-        //check options translations
-        $options = $request->get('attribute_options');
-
-        if (is_array($options) && in_array($request->type, ['select', 'multiselect', 'checkbox'])) {
-            foreach ($options as $option) {
-                if (!isset($option['translations'])) {
-                    throw new AttributeTranslationOptionDoesNotExist("Missing Attribute Option translation.");
-                }
-                $isOptionTranslationExist = $this->checkIfTranslationExist($translations);
-                if (!$isOptionTranslationExist) {
-                    throw new  AttributeTranslationOptionDoesNotExist("Missing Attribute Option translation.");
-                }
-            }
-        }
-    }
-
 }

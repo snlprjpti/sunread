@@ -15,7 +15,6 @@ class LocaleObserver
 
     public function updated(Locale $locale)
     {
-
         Audit::log($locale, __FUNCTION__);
     }
 

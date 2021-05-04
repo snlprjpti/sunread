@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Container\Container as App;
 use Modules\Core\Contracts\CriteriaInterface;
 use Modules\Core\Contracts\RepositoryInterface;
-use Modules\Core\Repositories\Criteria\Criteria;
-use Modules\Core\Traits\SlugAble;
+use Modules\Core\Repositories\Criteria;
+use Modules\Core\Traits\Sluggable;
 use Prettus\Repository\Exceptions\RepositoryException;
 
 

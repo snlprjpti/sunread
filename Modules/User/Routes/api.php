@@ -1,6 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
+use Modules\User\Http\Controllers\AccountController;
+use Modules\User\Http\Controllers\SessionController;
+use Modules\User\Http\Controllers\ResetPasswordController;
+use Modules\User\Http\Controllers\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,30 +16,31 @@ use Illuminate\Http\Request;
 |
 */
 
-
 //USER MODULE ROUTES
+Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], function() {
+    // Session Routes
+    Route::post("/login", [SessionController::class, "login"])->name("session.login");
+    Route::post("/forget-password", [ForgotPasswordController::class, "store"])->name("forget-password.store");
+    Route::post("/reset-password", [ResetPasswordController::class, "store"])->name("reset-password.store");
+    Route::get("/reset-password/{token}", [ResetPasswordController::class, "create"])->name("reset-password.create");
 
-Route::group(['middleware' => ['api']], function () {
-
-    //ADMIN USER ROUTES
-    Route::group(['prefix'=>'admin','as' => 'admin.'],function () {
-
+    Route::group(["middleware" => ["jwt.verify"]], function() {
         // Session Routes
-        Route::post('/login', 'SessionController@login')->name('session.login');
-        Route::get('/logout', 'SessionController@logout')->name('session.logout')->middleware('jwt.verify');
-        Route::post('/forget-password', 'ForgotPasswordController@store')->name('forget-password.store');
-        Route::post('/reset-password', 'ResetPasswordController@store')->name('reset-password.store');
-        Route::get('/reset-password/{token}', 'ResetPasswordController@create')->name('reset-password.create');
+        Route::get("/logout", [SessionController::class, "logout"])->name("session.logout");
 
-        Route::group(['middleware' => 'jwt.verify'],function(){
-            Route::resource('roles' ,'RoleController');
-            Route::get('permissions' ,'RoleController@fetchPermission');
-            Route::resource('users' ,'UserController');
-            Route::post('/account/image', 'AccountController@uploadProfileImage')->name('image.update');
-            Route::delete('/account/image', 'AccountController@deleteProfileImage')->name('image.delete');
-            Route::get('/account', 'AccountController@edit')->name('account.edit');
-            Route::put('/account', 'AccountController@update')->name('account.update');
+        // Roles Routes
+        Route::get("permissions", [\Modules\User\Http\Controllers\RoleController::class, "fetchPermission"]);
+        Route::resource("roles", RoleController::class);
+
+        // User Routes
+        Route::resource("users", UserController::class)->except(['create', 'edit']);
+
+        // Account Routes
+        Route::group(["prefix" => "account", "as" => "account."], function() {
+            Route::get("/", [AccountController::class, "show"])->name("show");
+            Route::put("/", [AccountController::class, "update"])->name("update");
+            Route::post("image", [AccountController::class, "uploadProfileImage"])->name("image.update");
+            Route::delete("image", [AccountController::class, "deleteProfileImage"])->name("image.delete");
         });
     });
-
 });

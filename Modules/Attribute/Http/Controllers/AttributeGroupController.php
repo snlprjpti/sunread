@@ -2,181 +2,129 @@
 
 namespace Modules\Attribute\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 use Modules\Attribute\Entities\AttributeGroup;
-use Modules\Attribute\Repositories\AttributeGroupRepository;
-use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\User\Entities\Role;
+use Modules\Attribute\Exceptions\AttributesPresent;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Attribute\Transformers\AttributeGroupResource;
+use Modules\Attribute\Repositories\AttributeGroupRepository;
+use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
+use Modules\Attribute\Repositories\AttributeGroupTranslationRepository;
 
 class AttributeGroupController extends BaseController
 {
-    protected $pagination_limit;
+    protected $repository, $translation_repository;
 
-    protected $model_name = "Attribute Group";
-    /**
-     * AttributeGroup Controller constructor.
-     * Admin middleware checks the admin against admins table
-     */
-    private $attributeGroupRepository;
-
-    public function __construct(AttributeGroupRepository $attributeGroupRepository)
+    public function __construct(AttributeGroup $attribute_group, AttributeGroupRepository $attributeGroupRepository, AttributeGroupTranslationRepository $attributeGroupTranslationRepository)
     {
-        parent::__construct();
-        $this->middleware('admin');
-        $this->attributeGroupRepository = $attributeGroupRepository;
+        $this->repository = $attributeGroupRepository;
+        $this->translation_repository = $attributeGroupTranslationRepository;
+        $this->model = $attribute_group;
+        $this->model_name = "Attribute Group";
+        $exception_statuses = [
+            AttributesPresent::class => 403,
+            AttributeTranslationDoesNotExist::class => 422
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     * Returns all the attribute_group
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request)
+    public function collection(object $data): ResourceCollection
     {
-        try {
+        return AttributeGroupResource::collection($data);
+    }
 
-            $this->validate($request, [
-                'limit' => 'sometimes|numeric',
-                'page' => 'sometimes|numeric',
-                'sort_by' => 'sometimes',
-                'sort_order' => 'sometimes|in:asc,desc',
-                'q' => 'sometimes|string|min:1'
+    public function resource(object $data): JsonResource
+    {
+        return new AttributeGroupResource($data);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request, ["attribute_family"]);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request);
+            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
+
+            $created = $this->repository->create($data, function($created) use ($request) {
+                $this->translation_repository->updateOrCreate($request->translations, $created);
+            });
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request, [
+                "slug" => "nullable|unique:attribute_groups,slug,{$id}"
             ]);
+            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
 
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-
-            $attribute_groups = AttributeGroup::query();
-            if ($request->has('q')) {
-                $attribute_groups->whereLike(AttributeGroup::$SEARCHABLE, $request->get('q'));
-            }
-            $attribute_groups = $attribute_groups->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-            $attribute_groups = $attribute_groups->paginate($limit);
-            return $this->successResponse($attribute_groups, trans('core::app.response.fetch-list-success', ['name' => $this->model_name]));
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
+                $this->translation_repository->updateOrCreate($request->translations, $updated);
+            });
         }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    /**
-     * Get the particular attribute group
-     * @param $id
-     * @return JsonResponse
-     */
-    public function show($id)
+    public function destroy(int $id): JsonResponse
     {
-        try {
-            $attribute_group = AttributeGroup::findOrFail($id);
-            return $this->successResponse($attribute_group, trans('core::app.response.fetch-success', ['name' => $this->model_name]));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => $this->model_name]));
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $this->repository->delete($id, function($deleted) {
+                if ( count($deleted->attributes) > 0 ) throw new AttributesPresent("Attribute Groups present in family.");
+            });
         }
-    }
-
-
-    /**
-     * Stores new attribute group
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
-    {
-        try {
-
-            $this->validate($request, [
-                'slug' => ['nullable', 'unique:attribute_groups,slug'],
-                'name' => 'required',
-                'attribute_family_id' => 'required|exists:attribute_families,id'
-            ]);
-            $request->merge([
-                'is_user_defined' => 1
-            ]);
-
-            $attribute_group = $this->attributeGroupRepository->create(
-                $request->only('name', 'slug' ,'is_user_defined','attribute_family_id')
-            );
-
-            return $this->successResponse($payload = $attribute_group, trans('core::app.response.create-success', ['name' => 'Attribute Group']), 201);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (SlugCouldNotBeGenerated $exception) {
-            return $this->errorResponse("Slugs could not be genereated");
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * Updates the attribute group details
-     * @param Request $request
-     * @param $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $attribute_group = AttributeGroup::findOrFail($id);
-            $this->validate($request, [
-                'slug' => 'sometimes|required|unique:attribute_groups,slug,'.$id,
-                'name' => 'sometimes|min:2|max:200',
-                'attribute_family_id' => 'sometimes|required|exists:attribute_families,id'
-            ]);
-            $attribute_group = $attribute_group->forceFill($request->only('name', 'slug'));
-            $attribute_group->save();
-            return $this->successResponse($attribute_group,trans('core::app.response.update-success', ['name' => $this->model_name]));
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-    }
-
-    /**
-     * Destroys the particular attribute group
-     * @param $id
-     * @return JsonResponse
-     */
-    public function destroy($id)
-    {
-        try {
-            $attribute_group = AttributeGroup::findOrFail($id);
-            $attributes = $attribute_group->attributes;
-            if(isset($attributes) && $attributes->count()>0){
-                return $this->errorResponse("Attributes present in attribute groups", 403);
-            }
-            $attribute_group->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Attribute Group']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse($exception->getMessage(), 404);
-
-        }catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
         }
 
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
-
 }

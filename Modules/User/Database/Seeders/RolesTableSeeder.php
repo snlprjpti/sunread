@@ -9,14 +9,23 @@ class RolesTableSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('roles')->delete();
-
-        DB::table('roles')->insert([
-                'id' => 1,
-                'name' => 'Administrator',
-                'slug' => 'super-admin',
-                'description' => 'Administrator role',
-                'permission_type' => 'all'
-            ]);
+        DB::table("roles")->insert([
+            [
+                "name" => "Administrator",
+                "slug" => "super-admin",
+                "description" => "Administrator role",
+                "permission_type" => "all",
+                "created_at" => now(),
+                "updated_at" => now()
+            ],
+            [
+                "name" => "Site Administrator",
+                "slug" => "basic-admin",
+                "description" => "Basic Administrator role",
+                "permission_type" => "all",
+                "created_at" => now(),
+                "updated_at" => now()
+            ]
+        ]);
     }
 }

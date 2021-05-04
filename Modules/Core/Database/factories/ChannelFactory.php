@@ -1,17 +1,49 @@
 <?php
+namespace Modules\Core\Database\factories;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Currency;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Website;
 
-use Faker\Generator as Faker;
+class ChannelFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = \Modules\Core\Entities\Channel::class;
 
-$factory->define(\Modules\Core\Entities\Channel::class, function (Faker $faker) {
-    return [
-        'code' => \Illuminate\Support\Str::random(16),
-        'name' => $faker->company,
-        'description' => $faker->paragraph,
-        'timezone' => $faker->timezone,
-        'theme' => \Illuminate\Support\Str::random(16),
-        'default_locale_id' => factory(\Modules\Core\Entities\Locale::class)->create()->id,
-        'base_currency_id' => factory(\Modules\Core\Entities\Currency::class)->create()->id,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        $store = Store::factory()->create();
+        $website=Website::factory()->create();
+
+        while(true) {
+            $code = \Str::random(16);
+            $old_channel = Channel::where("code", $code)->first();
+            if (!$old_channel) break;
+        }
+
+        return [
+            "code" => $code,
+            "hostname" => $code,
+            "name" => $this->faker->company(),
+            "description" => $this->faker->paragraph(),
+            "location" => $this->faker->address(),
+            "timezone" => $this->faker->timezone(),
+            "theme" => "default",
+            "default_store_id" => $store->id,
+            "default_currency" => $store->currency,
+            "website_id" => $website->id
+        ];
+    }
+}
+

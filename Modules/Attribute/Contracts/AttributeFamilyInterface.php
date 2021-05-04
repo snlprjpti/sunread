@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Modules\Attribute\Contracts;
 
 /**

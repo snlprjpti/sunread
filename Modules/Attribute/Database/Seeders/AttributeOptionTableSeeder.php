@@ -7,34 +7,30 @@ use Illuminate\Support\Facades\DB;
 
 class AttributeOptionTableSeeder extends Seeder
 {
-
-    public function run()
+    public function run(): void
     {
-        DB::table('attribute_options')->delete();
-        DB::table('attribute_option_translations')->delete();
-
-        DB::table('attribute_options')->insert([
-            ['id' => '1', 'name' => 'Red', 'position' => '1', 'attribute_id' => '21'],
-            ['id' => '2', 'name' => 'Green', 'position' => '2', 'attribute_id' => '21'],
-            ['id' => '3', 'name' => 'Yellow', 'position' => '3', 'attribute_id' => '21'],
-            ['id' => '4', 'name' => 'Black', 'position' => '4', 'attribute_id' => '21'],
-            ['id' => '5', 'name' => 'White', 'position' => '5', 'attribute_id' => '21'],
-            ['id' => '6', 'name' => 'S', 'position' => '1', 'attribute_id' => '22'],
-            ['id' => '7', 'name' => 'M', 'position' => '2', 'attribute_id' => '22'],
-            ['id' => '8', 'name' => 'L', 'position' => '3', 'attribute_id' => '22'],
-            ['id' => '9', 'name' => 'XL', 'position' => '4', 'attribute_id' => '22']
+        DB::table("attribute_options")->insert([
+            ["position" => 1, "attribute_id" => 21, "created_at" => now(), "updated_at" => now(), "name" => "Red"],
+            ["position" => 2, "attribute_id" => 21, "created_at" => now(), "updated_at" => now(), "name" => "Green"],
+            ["position" => 3, "attribute_id" => 21, "created_at" => now(), "updated_at" => now(), "name" => "Yellow"],
+            ["position" => 4, "attribute_id" => 21, "created_at" => now(), "updated_at" => now(), "name" => "Black"],
+            ["position" => 5, "attribute_id" => 21, "created_at" => now(), "updated_at" => now(), "name" => "White"],
+            ["position" => 1, "attribute_id" => 22, "created_at" => now(), "updated_at" => now(), "name" => "S"],
+            ["position" => 2, "attribute_id" => 22, "created_at" => now(), "updated_at" => now(), "name" => "M"],
+            ["position" => 3, "attribute_id" => 22, "created_at" => now(), "updated_at" => now(), "name" => "L"],
+            ["position" => 4, "attribute_id" => 22, "created_at" => now(), "updated_at" => now(), "name" => "XL"]
         ]);
 
-        DB::table('attribute_option_translations')->insert([
-            ['id' => '1', 'locale' => 'en', 'name' => 'Red', 'attribute_option_id' => '1'],
-            ['id' => '2', 'locale' => 'en', 'name' => 'Green', 'attribute_option_id' => '2'],
-            ['id' => '3', 'locale' => 'en', 'name' => 'Yellow', 'attribute_option_id' => '3'],
-            ['id' => '4', 'locale' => 'en', 'name' => 'Black', 'attribute_option_id' => '4'],
-            ['id' => '5', 'locale' => 'en', 'name' => 'White', 'attribute_option_id' => '5'],
-            ['id' => '6', 'locale' => 'en', 'name' => 'S', 'attribute_option_id' => '6'],
-            ['id' => '7', 'locale' => 'en', 'name' => 'M', 'attribute_option_id' => '7'],
-            ['id' => '8', 'locale' => 'en', 'name' => 'L', 'attribute_option_id' => '8'],
-            ['id' => '9', 'locale' => 'en', 'name' => 'XL', 'attribute_option_id' => '9']
+        DB::table("attribute_option_translations")->insert([
+            ["store_id" => 1, "attribute_option_id" => 1, "name" => "Red"],
+            ["store_id" => 1, "attribute_option_id" => 2, "name" => "Green"],
+            ["store_id" => 1, "attribute_option_id" => 3, "name" => "Yellow"],
+            ["store_id" => 1, "attribute_option_id" => 4, "name" => "Black"],
+            ["store_id" => 1, "attribute_option_id" => 5, "name" => "White"],
+            ["store_id" => 1, "attribute_option_id" => 6, "name" => "S"],
+            ["store_id" => 1, "attribute_option_id" => 7, "name" => "M"],
+            ["store_id" => 1, "attribute_option_id" => 8, "name" => "L"],
+            ["store_id" => 1, "attribute_option_id" => 9, "name" => "XL"]
         ]);
     }
 }

@@ -2,169 +2,108 @@
 
 namespace Modules\Core\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Entities\ExchangeRate;
-use Modules\Core\Traits\ApiResponseFormat;
+use Modules\Core\Repositories\ExchangeRateRepository;
 use Modules\Core\Transformers\ExchangeRateResource;
 
 class ExchangeRateController extends BaseController
 {
-    use ApiResponseFormat;
+    protected $repository;
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @return
-     */
-    public function index(Request $request)
+    public function __construct(ExchangeRate $exchangeRate, ExchangeRateRepository $exchangeRateRepository)
     {
-        try {
+        $this->model = $exchangeRate;
+        $this->model_name = "Exchange rate";
+        $this->repository = $exchangeRateRepository;
 
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
-            $exchange_rates = ExchangeRate::with(['source','target']);
-            if ($request->has('q')) {
-                $exchange_rates->whereLike(ExchangeRate::$SEARCHABLE, $request->get('q'));
-            }
-            $exchange_rates->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit') ? $request->get('limit') : $this->pagination_limit;
-            $exchange_rates = $exchange_rates->paginate($limit);
-            return $this->successResponse(ExchangeRateResource::collection($exchange_rates), trans('core::app.response.fetch-list-success', ['name' => 'Exchange Rate']));
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-
-
+        parent::__construct($this->model, $this->model_name);
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
+    public function collection(object $data): ResourceCollection
     {
-
-        try {
-            $this->validate(request(), [
-                'target_currency' => ['required', 'exists:currencies,id'],
-                'source_currency' => ['required', 'exists:currencies,id'],
-                'rate' => 'required|numeric',
-            ]);
-
-            Event::dispatch('core.exchange_rate.create.before');
-
-            $exchange_rate = ExchangeRate::create($request->only('source_currency', 'target_currency', 'rate'));
-
-            Event::dispatch('core.exchange_rate.create.after', $exchange_rate);
-
-            return $this->successResponse(new ExchangeRateResource($exchange_rate), trans('core::app.response.create-success', ['name' => 'Exchange Rate']), 200);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
-        }
-
+        return ExchangeRateResource::collection($data);
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
+    public function resource(object $data): JsonResource
     {
-        try {
-            $this->validate(request(), [
-                'target_currency' => ['required', 'exists:currencies,id'],
-                'source_currency' => ['required', 'exists:currencies,id'],
-                'rate' => 'required|numeric',
-            ]);
-
-            $exchange_rate = ExchangeRate::findOrFail($id);
-
-            Event::dispatch('core.exchange_rate.update.before', $id);
-
-            $exchange_rate = $exchange_rate->fill($request->only('source_currency', 'target_currency', 'rate'));
-
-            $exchange_rate->save();
-
-            Event::dispatch('core.exchange_rate.update.after', $exchange_rate);
-
-            return $this->successResponse(new ExchangeRateResource($exchange_rate), trans('core::app.response.update-success', ['name' => 'Exchange Rate']), 200);
-
-        } catch (ValidationException $exception) {
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        return new ExchangeRateResource($data);
+    }
+    
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
         }
 
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function destroy($id)
+    public function store(Request $request): JsonResponse
     {
-        try {
-            $exchange_rate = ExchangeRate::findOrFail($id);
-            $exchange_rate->delete();
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Exchange rate']));
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $data = $this->repository->validateData($request);
+            $created = $this->repository->create($data);
         }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-
-    /**
-     * Get the particular resource
-     * @param $id
-     * @return JsonResponse
-     */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
-        try {
-
-            $exchange_rate = ExchangeRate::findOrFail($id);
-            return $this->successResponse(new ExchangeRateResource($exchange_rate), trans('core::app.response.fetch-success', ['name' => 'Exchange rate']));
-
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Exchange Rate']), 404);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
         }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
+    public function update(Request $request, $id): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request);
+            $updated = $this->repository->update($data, $id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+    }
+
+    public function destroy($id): JsonResponse
+    {
+        try
+        {
+            $this->repository->delete($id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
 }

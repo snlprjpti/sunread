@@ -2,144 +2,113 @@
 
 namespace Modules\User\Entities;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Modules\User\Notifications\ResetPasswordNotification;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Core\Traits\HasFactory;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Storage;
+use Modules\User\Notifications\ResetPasswordNotification;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class Admin extends Authenticatable implements JWTSubject
 {
-    public static  $SEARCHABLE = ['name', 'email'];
-    use Notifiable;
+    use Notifiable, HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-         'email', 'password', 'api_token', 'role_id', 'status',"first_name", "last_name", "company", "address","profile_image"
-    ];
+    public static $SEARCHABLE = [ "first_name", "email" ];
+    protected $fillable = [ "first_name", "last_name", "email", "password", "api_token", "role_id", "status", "company", "address", "profile_image" ];
+    protected $hidden = [ "password", "api_token", "remember_token" ];
+    protected $appends = [ "avatar", "profile_image_url" ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'api_token', 'remember_token',
-    ];
-
-    protected $appends = ['avatar'];
-    /**
-     * Get the role that owns the admin.
-     */
-    public function role()
+    public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
-
-    /**
-     * Checks if admin has permission to perform certain action.
-     *
-     * @param  String  $permission
-     * @return Boolean
-     */
-    public function hasPermission($permission)
+    public function hasPermission(string $permission): bool
     {
-        if ($this->role->permission_type == 'custom' && ! $this->role->permissions)
-            return false;
+        if ($this->role->permission_type == 'custom' && ! $this->role->permissions) return false;
 
         return in_array($permission, $this->role->permissions);
     }
 
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
+    public function getJWTIdentifier(): ?string
     {
         return $this->getKey();
     }
 
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
         return [];
         // TODO: Implement getJWTCustomClaims() method.
     }
 
-
-    public static function rules ($id = 0, $merge=[]) {
-        return array_merge([
-            'name' => 'required',
-            'email' => 'required|unique:admins,email,'.($id ? ",$id" : ''),
-            'password' => 'nullable|confirmed',
-            'status' => 'required|boolean',
-            'role_id' => 'required|integer'
-        ], $merge);
-
-
-    }
-
-    public function sendPasswordResetNotification($token)
+    public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    public function hasRole($roleSlug): bool
+    public function hasRole(string $roleSlug): bool
     {
-        if (empty($roleSlug) || empty($this->role)){
-            return false;
-        }
-
-        if ($this->role->slug ==  $roleSlug) {
-            return true;
-        }
+        if (empty($roleSlug) || empty($this->role)) return false;
+        if ($this->role->slug == $roleSlug) return true;
 
         return false;
     }
 
-    public function getAvatarAttribute()
+    public function getAvatarAttribute(): ?string
     {
         return $this->getImage();
     }
 
-    public function getImage($image_type = 'main_image')
+    public function getProfileImageUrlAttribute(): ?string
     {
-        $main_image_dimension = config('user_image.image_dimensions.user.main_image')[0];
-        $gallery_image_dimension = config('user_image.image_dimensions.user.gallery_images')[0];
+        return $this->profile_image ? Storage::url($this->profile_image) : null;
+    }
+
+    public function getImage($image_type = "main_image"): ?string
+    {
+        if ( !$this->profile_image ) return null;
+        $image_url = null;
 
         switch ($image_type){
-
             case 'main_image':
-                $d = $main_image_dimension['width'] . '_' . $main_image_dimension['height'] . '_';
-
-                if(isset($this->profile_image)){
-                    return asset('storage/images/admin/'.$d.$this->profile_image);
-                }
+                $image_url = $this->getDimensionPath("user_image.image_dimensions.user.main_image");
                 break;
 
             case 'gallery_image':
-                $d = $gallery_image_dimension['width'] . '_' . $gallery_image_dimension['height'] . '_';
-                if(isset($this->profile_image)){
-                    return asset('storage/images/admin/'.$d . $this->profile_image);
-                }
+                $image_url = $this->getDimensionPath("user_image.image_dimensions.user.gallery_images");
                 break;
         }
-        return 1;
 
+        return $image_url;
     }
 
-    public function getFullNameAttribute()
+    private function getDimensionPath(string $config, string $folder = "main"): string
     {
-        return "{$this->first_name} {$this->last_name}";
+        $dimension = config($config)[0];
+        $width = $dimension["width"];
+        $height = $dimension["height"];
+
+        $file_array = $this->getFileNameArray();
+        return Storage::url("{$file_array['folder']}/{$folder}/{$width}x{$height}/{$file_array['file']}");
+    }
+
+    private function getFileNameArray(): array
+    {
+        $path_array = explode("/", $this->profile_image);
+        $file_name = $path_array[count($path_array) - 1];
+        unset($path_array[count($path_array) - 1]);
+
+        return [
+            "folder" => implode("/", $path_array),
+            "file" => $file_name
+        ];
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return ucwords("{$this->first_name} {$this->last_name}");
     }
 
 }

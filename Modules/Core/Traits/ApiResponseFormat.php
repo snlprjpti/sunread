@@ -2,45 +2,40 @@
 
 namespace Modules\Core\Traits;
 
-
-use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
 
 trait ApiResponseFormat
 {
-    public function successResponse($payload, $message = null, $code = 200)
+    /**
+     * @param array|object $payload
+     */
+    private function responseFormat(?string $message = null, string $status = "success", $payload = null): array
     {
         $format = [
-            'status' => 'success',
-            'payload' => $payload,
-            'message' => $message
+            "status" => $status,
+            "payload" => $payload,
+            "message" => json_decode($message) ?? $message
         ];
-        return response()->json($format, $code);
+        if (!$payload) unset($format["payload"]);
+
+        return $format;
     }
 
-    public function errorResponse($message, $code = 500)
+    /**
+     * @param array|object $payload
+     */
+    public function successResponse($payload, ?string $message = null, int $code = 200): JsonResponse
     {
-        $format = [
-            'status' => 'error',
-            'message' => $message,
-        ];
-        return response()->json($format, $code);
+        return response()->json($this->responseFormat($message, "success", $payload), $code);
     }
 
-    public function successResponseWithMessage($message, $code = 200)
+    public function errorResponse(string $message, int $code = 500): JsonResponse
     {
-        $format = [
-            'status' => 'success',
-            'message' => $message,
-        ];
-        return response()->json($format, $code);
+        return response()->json($this->responseFormat($message, "error"), $code);
     }
 
-    public function errorResponseForMissingModel($exception)
+    public function successResponseWithMessage(string $message, int $code = 200): JsonResponse
     {
-        $model = Str::kebab( class_basename($exception->getModel()));
-        $message = $model ? str_replace('-', ' ', $model) . " not found" : $exception->getMessage();
-        return $this->errorResponse($message , 404);
-
+        return response()->json($this->responseFormat($message), $code);
     }
-
 }

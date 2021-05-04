@@ -2,253 +2,169 @@
 
 namespace Modules\Category\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
-use Modules\Category\Entities\CategoryTranslation;
-use Modules\Core\Http\Controllers\BaseController;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
+use Modules\Category\Entities\CategoryTranslation;
+use Modules\Category\Exceptions\CategoryAuthorizationException;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\Category\Transformers\CategoryResource;
+use Modules\Category\Repositories\CategoryRepository;
 
-/**
- * Category Controller for the Category
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class CategoryController extends BaseController
 {
+    protected $repository, $translation, $is_super_admin, $main_root_id;
 
-
-    protected $pagination_limit, $locale, $folder_path;
-    private $folder = 'category';
-
-    /**
-     * CategoryController constructor.
-     */
-    public function __construct()
+    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryTranslation $categoryTranslation)
     {
-        parent::__construct();
-        $this->middleware('admin');
-        $this->folder_path =  storage_path('app/public/images/'). $this->folder.DIRECTORY_SEPARATOR;
+        $this->repository = $categoryRepository;
+        $this->translation = $categoryTranslation;
+        $this->model = $category;
+        $this->model_name = "Category";
+        $this->is_super_admin = auth()->guard("admin")->user()->hasRole("super-admin");
+        $this->main_root_id = $this->model::oldest('id')->first()->id;
+
+        $exception_statuses = [
+            CategoryAuthorizationException::class => 403
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     * returns all the category
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request)
+    public function collection(object $data): ResourceCollection
     {
-        try {
-            $sort_by = $request->get('sort_by') ? $request->get('sort_by') : 'id';
-            $sort_order = $request->get('sort_order') ? $request->get('sort_order') : 'desc';
+        return CategoryResource::collection($data);
+    }
 
-            $categories =  Category::with('translations');
-            if ($request->has('q')) {
-                $categories->whereLike(Category::$SEARCHABLE,$request->get('q'));
-            }
-            $categories->orderBy($sort_by, $sort_order);
-            $limit = $request->get('limit')? $request->get('limit'):$this->pagination_limit;
-            $categories = $categories->paginate($limit);
-            return $this->successResponse($categories, trans('core::app.response.fetch-list-success', ['name' => 'Category']));
+    public function resource(object $data): JsonResource
+    {
+        return new CategoryResource($data);
+    }
 
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
+    private function blockCategoryAuthority(?int $parent_id, ?int $main_root_id = null): bool
+    {
+        $parent_id_authority = (!$this->is_super_admin && $parent_id == $this->main_root_id);
+        $main_root_id_authority = $main_root_id ? $main_root_id == $this->main_root_id : false;
 
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+        if ( $parent_id_authority || $main_root_id_authority ) throw new CategoryAuthorizationException("Action not authorized.");
+
+        return false;
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request, ["translations"]);
+            // Dont fetch root category for other admin
+            if (!$this->is_super_admin) $fetched = $fetched->where('parent_id', '<>', null);
+        }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
         }
 
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    /**
-     * Get the particular category
-     * @param $id
-     * @return JsonResponse
-     */
-    public function show($id)
+    public function store(Request $request): JsonResponse
     {
-        try {
-            $category = Category::with('translations')->findOrFail($id);
-            return $this->successResponse($category, trans('core::app.response.fetch-success', ['name' => 'Category']));
+        try
+        {
+            $this->blockCategoryAuthority($request->parent_id);
 
-        } catch (ModelNotFoundException $exception) {
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
+            $data = $this->repository->validateData($request);
+            $data['image'] = $this->storeImage($request, 'image', strtolower($this->model_name));
+            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
 
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+            $created = $this->repository->create($data, function($created) use($request){
+                $this->translation->updateOrCreate([
+                    "store_id" => $request->translation["store_id"],
+                    "category_id" => $created->id
+                ], $request->translation);
+            });
         }
-    }
-
-    /**
-     * store the new category
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function store(Request $request)
-    {
-        try {
-
-            DB::beginTransaction();
-
-            //validation
-            $this->validate($request, Category::rules());
-
-            //create slug if missing in input
-            if(!$request->get('slug')){
-                $request->merge(['slug' =>  Category::createSlug($request->get('name'))]);
-            }
-
-            //save category
-            $category = Category::create(
-                $request->only(['position', 'status', 'parent_id', 'slug'])
-            );
-
-            //upload image
-            if ($request->image) {
-                $category->image = $this->uploadImage($category, $request);
-                $category->save();
-            }
-            //create or update related translation
-            $this->createOrUpdateTranslation($category, $request);
-
-            DB::commit();
-            return $this->successResponse($category, trans('core::app.response.create-success', ['name' => 'Category']), 201);
-
-        } catch (ValidationException $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->errors(), 422);
-
-        } catch (QueryException $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->getMessage());
-        }
-    }
-
-
-    /**
-     * Uploads an image
-     * Uploading file with original for better seo
-     * @param Category $category
-     * @param $request
-     */
-    public function uploadImage(Category $category, $request)
-    {
-
-        if ($uploadedFile = $request->file('image')) {
-            if (isset($category->image)) {
-                $this->removeFile($this->folder_path.$category->image);
-            }
-             return $this->uploadFile($uploadedFile ,$this->folder_path);
-
-        };
-
-    }
-
-
-    /**
-     * Update the translation of category
-     * Caution!!: createOrUpdate(built in laravel core) causes race condition
-     * @param Category $category
-     * @param Request $request
-     */
-    private function createOrUpdateTranslation(Category $category, Request $request)
-    {
-        $check_attributes = ['locale' => $this->locale, 'category_id' => $category->id];
-        $request->merge($check_attributes);
-        $category_translation = CategoryTranslation::firstorNew($check_attributes);
-        $category_translation->fill(
-            $request->only(['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'locale', 'category_id'])
-        );
-        $category_translation->save();
-
-    }
-
-    /**
-    /**
-
-
-     * Update the category
-     * @param Request $request
-     * @param $id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            DB::beginTransaction();
-
-            //validate
-            $this->validate($request, Category::rules($id));
-
-
-            $category = Category::findOrFail($id);
-
-            //upload image
-            if ($request->file('image')) {
-                $category->image = $this->uploadImage($category, $request);
-                $category->save();
-            }
-
-            //update a category
-            $category->update(
-                $request->only(['position', 'status', 'parent_id', 'slug'])
-            );
-
-            //create or update translation
-            $this->createOrUpdateTranslation($category, $request);
-
-            DB::commit();
-            return $this->successResponse($category, trans('core::app.response.update-success', ['name' => 'Category']), 200);
-
-        } catch (ModelNotFoundException $exception) {
-            DB::rollBack();
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
-
-        } catch (ValidationException $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->errors(), 400);
-
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return $this->errorResponse($exception->getMessage());
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
         }
 
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    /**
-     * Remove the specified  admin resource from storage.
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function destroy($id)
+    public function show(int $id): JsonResponse
     {
-        try {
-            $category = Category::findOrFail($id);
+        try
+        {
+            $category = $this->model->findOrFail($id);
+            $this->blockCategoryAuthority($category->parent_id, $id);
 
-            //remove associated image file
-            if (isset($category->image)) {
-                $this->removeFile($this->folder_path . $category->image);
-            }
-            $category->delete();
-
-            return $this->successResponseWithMessage(trans('core::app.response.deleted-success', ['name' => 'Category']));
-        }catch (ModelNotFoundException $exception){
-            return $this->errorResponse(trans('core::app.response.not-found', ['name' => 'Category']), 404);
-
-        } catch (QueryException $exception) {
-            return $this->errorResponse($exception->getMessage(), 400);
-
-        } catch (\Exception $exception) {
-            return $this->errorResponse($exception->getMessage());
+            $fetched = $this->model->with(["translations"])->findOrFail($id);
         }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $this->blockCategoryAuthority($request->parent_id, $id);
 
+            $data = $this->repository->validateData($request,[
+                "slug" => "nullable|unique:categories,slug,{$id}",
+                "image" => "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
+            ]);
+
+            if ($request->file("image")) {
+                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            }
+            else {
+                unset($data["image"]);
+            }
+
+            $updated = $this->repository->update($data, $id, function($updated) use($request){
+                $this->translation->updateOrCreate([
+                    "store_id" => $request->translation["store_id"],
+                    "category_id" => $updated->id
+                ], $request->translation);
+            });
+            // get latest updated translations
+            $updated->translations = $updated->translations()->get();
+        }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        try
+        {
+            $category = $this->model->findOrFail($id);
+            $this->blockCategoryAuthority($category->parent_id, $id);
+
+            $this->repository->delete($id, function($deleted){
+                $deleted->translations()->delete();
+                if($deleted->image) Storage::delete($deleted->image);
+            });
+        }
+        catch (\Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
 }

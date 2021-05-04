@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,35 +11,17 @@ use Illuminate\Http\Request;
 |
 */
 
-
 Route::group(['middleware' => ['api']], function () {
-
     //ADMIN ATTRIBUTE ROUTES
-    Route::group(['prefix' => 'admin/catalog', 'as' => 'admin.catalog.', 'middleware' => ['language']], function () {
-
+    Route::group(['prefix' => 'admin/catalog', 'as' => 'admin.catalog.', 'middleware' => ['admin', 'language']], function () {
         // Catalog Family Routes
-        Route::get('/families', 'AttributeFamilyController@index')->name('families.index');
-        Route::post('/families', 'AttributeFamilyController@store')->name('families.store');
-        Route::get('/families/{family}', 'AttributeFamilyController@show')->name('families.show');
-        Route::put('/families/{family}', 'AttributeFamilyController@update')->name('families.update');
-        Route::delete('/families/{family}', 'AttributeFamilyController@destroy')->name('families.delete');
-
+        Route::resource('families', AttributeFamilyController::class)->except(['create', 'edit']);
 
         // Catalog Attribute Group Routes
-        Route::get('/attribute-groups', 'AttributeGroupController@index')->name('attribute-groups.index');
-        Route::post('/attribute-groups', 'AttributeGroupController@store')->name('attribute-groups.store');
-        Route::get('/attribute-groups/{id}', 'AttributeGroupController@show')->name('attribute-groups.show');
-        Route::put('/attribute-groups/{id}', 'AttributeGroupController@update')->name('attribute-groups.update');
-        Route::delete('/attribute-groups/{id}', 'AttributeGroupController@destroy')->name('attribute-groups.delete');
+        Route::resource('attribute-groups', AttributeGroupController::class)->except(['create', 'edit']);
 
-
-        Route::get('/attributes', 'AttributeController@index')->name('attributes.index');
-        Route::post('/attributes', 'AttributeController@store')->name('attributes.store');
-        Route::get('/attributes/{id}', 'AttributeController@show')->name('attributes.show');
-        Route::put('/attributes/{id}', 'AttributeController@update')->name('attributes.update');
-        Route::delete('/attributes/{id}', 'AttributeController@destroy')->name('attributes.delete');
-        Route::post('/attributes/mass-delete', 'AttributeController@massDestroy')->name('attributes.mass-delete');
-
-
+        // Attributes Routes
+        Route::delete('attributes/bulk', [\Modules\Attribute\Http\Controllers\AttributeController::class, 'bulkDelete'])->name('attributes.bulk-delete');
+        Route::resource('attributes', AttributeController::class)->except(['create', 'edit']);
     });
 });
