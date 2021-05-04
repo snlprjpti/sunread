@@ -15,7 +15,7 @@ class AddDefaultCategoryOnChannelsTable extends Migration
     {
         Schema::table('channels', function (Blueprint $table) {
             $table->unsignedBigInteger('default_category_id')->nullable();
-            $table->foreign('default_category_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->foreign('default_category_id')->references('id')->on('categories')->onDelete('restrict');
         });
     }
 
