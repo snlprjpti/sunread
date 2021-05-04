@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Schema;
 use Modules\Core\Entities\Configuration;
 use Modules\User\Entities\Admin;
 use Modules\User\Entities\Role;
-use Tests\TestCase;
+use Modules\Core\Tests\BaseTestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class ConfigurationTest extends TestCase
+class ConfigurationTest extends BaseTestCase
 {
     use RefreshDatabase;
     protected object $admin;
@@ -20,70 +20,51 @@ class ConfigurationTest extends TestCase
 
     public function setUp(): void
     {
-        parent::setUp();
-		Schema::disableForeignKeyConstraints();
-		$this->artisan("db:seed", ["--force" => true]);
+        $this->model = Configuration::class;
 
+        parent::setUp();
         $this->admin = $this->createAdmin();
 
-        $this->model = Configuration::class;
         $this->model_name = "Configuration";
         $this->route_prefix = "admin.configurations";
+
         $this->default_resource = Configuration::latest()->first();
     }
 
-    public function createAdmin(array $attributes = []): object
-	{
-		$password = $attributes["password"] ?? "password";
-		$role_slug = $attributes["role_slug"] ?? "super-admin";
-		$role = Role::where("slug", $role_slug)->firstOrFail();
+    /**
+     * 1. No individual resources can be fetched in configuration.
+    */
 
-		$data = [
-			"password" => Hash::make($password),
-			"role_id" => $role->id
-		];
-		
-		$admin = Admin::factory()->create($data);
-		$token = $this->createToken($admin->email, $password);
-		$this->headers["Authorization"] = "Bearer {$token}";
-
-		return $admin;
-	}
-
-    public function createToken(string $admin_email, string $password): ?string
-	{
-		$jwtToken = Auth::guard("admin")
-			->setTTL( config("jwt.admin_jwt_ttl") )
-			->attempt([
-				"email" => $admin_email,
-				"password" => $password
-			]);
-		return $jwtToken ?? null;
-	}
-
-    public function testAdminCanFetchResources()
+    public function testAdminCanFetchIndividualResource()
     {
-        $this->model::factory(10)->create();
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index"));
+        $this->assertTrue(true);
+    }
 
-        $response->assertStatus(200);
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+    public function testShouldReturnErrorIfResourceDoesNotExist()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function getNonMandodtaryCreateData(): array
+    {
+        return array_merge($this->getCreateData(), [
+            "value" => null
         ]);
     }
 
-    public function testAdminCanCreateResources()
+    public function getInvalidCreateData(): array
     {
-        $post_data = $this->model::factory()->make()->toArray();
-        $response =  $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
-
-        $response->assertStatus(201);
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
+        return array_merge($this->getCreateData(), [
+            "path" => null,
         ]);
     }
+
+    /**
+     * POST tests
+     * 
+     * 1. Assert if application returns correct error if scope is invalid
+     * 3. Assert if application returns correct error if scope_id is invalid
+     */
 
     public function testShouldReturnErrorIfScopeFieldIsInvalid()
     {
@@ -111,7 +92,11 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
-    public function testShouldUpdateDataIfExists()
+    /**
+     * 1. Configuration call store method to update resource but not update method.
+    */
+
+    public function testAdminCanUpdateResource()
     {
         $post_data = array_merge($this->model::factory()->make()->toArray(), [
             "scope" => $this->default_resource->scope,
@@ -124,20 +109,6 @@ class ConfigurationTest extends TestCase
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
-        ]);
-    }
-
-    public function testAdminCanCreateResourceWithNonMandatoryData()
-    {
-        $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "value" => null
-        ]);
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
-
-        $response->assertStatus(201);
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
 
@@ -156,5 +127,37 @@ class ConfigurationTest extends TestCase
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
         ]);
+    }
+
+    /**
+     * 1. Invalid data is already checked in store method.
+    */
+
+    public function testShouldReturnErrorIfUpdateDataIsInvalid()
+    {
+        $this->assertTrue(true);
+    }
+    
+    //If update resource doesnt exists, it create new data.
+
+    public function testShouldReturnErrorIfUpdateResourceDoesNotExist()
+    {
+        $this->assertTrue(true);
+    }
+
+    /**
+     * DELETE tests
+     * 
+     * 1. resource can't be deleted
+     */
+    
+    public function testAdminCanDeleteResource()
+    {
+        $this->assertTrue(true);
+    }
+
+    public function testShouldReturnErrorIfDeleteResourceDoesNotExist()
+    {
+        $this->assertTrue(true);
     }
 }
