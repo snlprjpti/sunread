@@ -23,7 +23,7 @@ class ActivityLogFactory extends Factory
             'properties' => [],
             'description' => "created",
             'action' => $this->faker->name,
-            'activity' => $this->faker->paragraph
+            'activity' => $this->faker->name
         ];
     }
 }

@@ -9,19 +9,13 @@ class AttributeGroupTest extends BaseTestCase
 {
     public function setUp(): void
     {
+        $this->model = AttributeGroup::class;
+
         parent::setUp();
         $this->admin = $this->createAdmin();
-        $this->model = AttributeGroup::class;
+
         $this->model_name = "Attribute Group";
         $this->route_prefix = "admin.catalog.attribute-groups";
-
-        $this->default_resource_id = $this->model::latest('id')->first()->id;
-        $this->fake_resource_id = 0;
-
-        $this->filter = [
-            "sort_by" => "id",
-            "sort_order" => "asc"
-        ];
     }
 
     public function getNonMandotaryCreateData(): array
