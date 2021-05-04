@@ -56,7 +56,9 @@ class StoreController extends BaseController
             $data = $this->repository->validateData($request);
             $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
-            $created = $this->repository->create($data);
+            $created = $this->repository->create($data, function($created) use ($request) {
+                $created->channels()->sync($request->channels);
+            });
         }
         catch(\Exception $exception)
         {
@@ -94,7 +96,9 @@ class StoreController extends BaseController
                 unset($data["image"]);
             }
             
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
+                $updated->channels()->sync($request->channels);
+            });
         }
         catch(\Exception $exception)
         {

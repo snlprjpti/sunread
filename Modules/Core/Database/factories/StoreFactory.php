@@ -32,7 +32,8 @@ class StoreFactory extends Factory
             "slug" => $slug,
             "name" => $name,
             "currency" => Currency::factory()->create()->code,
-            "locale" => $this->faker->locale()
+            "locale" => $this->faker->locale(),
+            "position" => $this->faker->randomDigit()
         ];
     }
 }
