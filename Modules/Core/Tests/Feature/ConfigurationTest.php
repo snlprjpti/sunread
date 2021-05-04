@@ -2,12 +2,7 @@
 
 namespace Modules\Core\Tests\Feature;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Modules\Core\Entities\Configuration;
-use Modules\User\Entities\Admin;
-use Modules\User\Entities\Role;
 use Modules\Core\Tests\BaseTestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
