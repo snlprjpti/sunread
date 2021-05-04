@@ -37,50 +37,43 @@ trait Configuration
 
     public function add(object $request): object
     {
-        if($this->has($request))
+        $item['scope'] = $request->scope;
+        $item['scope_id'] = $request->scope_id;
+        foreach($request->items as $key => $val)
         {
-            return $this->set($request);
+            $item['path'] = $key;
+            $item['value'] = $val;
+            if($configData = $this->checkCondition((object) $item)->first())
+            {
+                $configData->update($item);
+                $created_data['data'][] = $this->configuration->findorfail($configData->id);
+                continue;
+            }
+            $created_data['data'][] = $this->configuration->create($item);
         }
-        $created_data['data'] = $this->configuration->create([
-            "path" => $request->path,
-            "value" => $request->value,
-            "scope" => $request->scope,
-            "scope_id" => $request->scope_id
-        ]);
         $created_data['message'] = 'create-success';
         $created_data['code'] = 201;
         return (object) $created_data; 
     }
 
-    public function set(object $request): object
-    {
-        if($configData = $this->checkCondition($request)->first())
-        {
-            $configData->update([
-                "path" => $request->path,
-                "value" => $request->value,
-                "scope" => $request->scope,
-                "scope_id"=> $request->scope_id
-            ]);
-            $updated_data['data'] = $this->configuration->findorfail($configData->id);
-            $updated_data['message'] = 'update-success';
-            $updated_data['code'] = 200;
-            return (object) $updated_data; 
-        }
-        return $this->add($request);
-    }
-
-    public function getDefaultValues(object $request): string
+    public function getDefaultValues(object $request): mixed
     {
         return $this->checkCondition($request)->first()->value;
     }
 
     public function cacheQuery(object $request, array $pluck): array
     {
-        $resources = Cache::rememberForever($request->path, function() use ($request) {
-           return $request->path::get();
+        $resources = Cache::rememberForever($request->provider, function() use ($request) {
+           return $request->provider::get();
         });
 
        return $resources->pluck(isset($pluck[0]) ? $pluck[0] : "id", isset($pluck[1]) ? $pluck[1] : "id")->toArray();
+    }
+
+    public function getValidationRules($absolute_path): array
+    {
+        return collect(config('configuration.'.$absolute_path))->pluck('elements')->flatten(1)->pluck('rules','path')->mapWithKeys(function($val, $key) {
+           return ['items.'.$key => $val];
+        })->toArray();
     }
 }

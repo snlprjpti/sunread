@@ -20,8 +20,6 @@ class ConfigurationRepository extends BaseRepository
            /* General */
             "scope" => [ "required", "in:default,website,channel,store" ],
             "scope_id" => "required|integer|min:0",
-            "path" => "required",
-            "value" => "nullable"
         ];
         $this->config_fields = ($data = Cache::get("configurations.all")) ? $data : config("configuration");
         $this->createModel();
@@ -48,16 +46,17 @@ class ConfigurationRepository extends BaseRepository
                             continue;
                         }
                         $checkKey["path"] = $element['path'];
+                        $checkKey["provider"] = $element['provider'];
                         $element['default'] = $this->has((object) $checkKey) ? $this->getDefaultValues((object) $checkKey) : "" ;
                         $element['value'] = ( $element['values'] === "") ? $this->cacheQuery((object) $checkKey, $element['pluck']) : $element['values'];
-                        $element['absolute_path'] = $key.'.children.'.$i.'.subChildren.'.$j.'.elements.'.$k;
+                        // $element['absolute_path'] = $key.'.children.'.$i.'.subChildren.'.$j.'.elements.'.$k;
                         unset($element['values'], $element['pluck']);
                         $subchildren['elements'][$k] = $element;
-                        
-                    }
+                        }
                     $children['subChildren'][$j] = $subchildren;
                 }
                 $data['children'][$i] = $children;
+                $data['children'][$i]['absolute_path'] =  $key.'.children.'.$i.'.subChildren.';
             }
             $fetched[$key] = $data;
         }

@@ -8,10 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ConfigurationTest extends BaseTestCase
 {
-    use RefreshDatabase;
-    protected object $admin;
-    protected array $headers;
-    public $model, $model_name, $route_prefix, $default_resource;
+    public $default_resource;
 
     public function setUp(): void
     {
@@ -24,6 +21,17 @@ class ConfigurationTest extends BaseTestCase
         $this->route_prefix = "admin.configurations";
 
         $this->default_resource = Configuration::latest()->first();
+    }
+
+    public function testAdminCanFetchResources()
+    {
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index"));
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
     }
 
     /**
@@ -43,14 +51,22 @@ class ConfigurationTest extends BaseTestCase
     public function getNonMandodtaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "value" => null
+            "scope" => "default",
+            "scope_id" => 0,
+            "items" => [
+                "optional_zip_countries" => null,
+            ]
         ]);
     }
 
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "path" => null,
+            "scope" => "store",
+            "scope_id" => 1,
+            "items" => [
+                null => 5,
+            ]
         ]);
     }
 
@@ -96,14 +112,16 @@ class ConfigurationTest extends BaseTestCase
         $post_data = array_merge($this->model::factory()->make()->toArray(), [
             "scope" => $this->default_resource->scope,
             "scope_id" => $this->default_resource->scope_id,
-            "path" => $this->default_resource->path,
+            "items" => [
+                $this->default_resource->path => 15,
+            ]
             ]);
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $response->assertJsonFragment([
             "status" => "success",
-            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
+            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
 
@@ -112,15 +130,16 @@ class ConfigurationTest extends BaseTestCase
         $post_data = array_merge($this->model::factory()->make()->toArray(), [
             "scope" => $this->default_resource->scope,
             "scope_id" => $this->default_resource->scope_id,
-            "path" => $this->default_resource->path,
-            "value" => null
+            "items" => [
+                $this->default_resource->path => null,
+            ]
             ]);
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $response->assertJsonFragment([
             "status" => "success",
-            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
+            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
 
