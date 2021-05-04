@@ -86,6 +86,7 @@ class CategoryController extends BaseController
                     "store_id" => $request->translation["store_id"],
                     "category_id" => $created->id
                 ], $request->translation);
+                $created->channels()->sync($request->channels);
             });
         }
         catch (\Exception $exception)
@@ -136,6 +137,7 @@ class CategoryController extends BaseController
                     "store_id" => $request->translation["store_id"],
                     "category_id" => $updated->id
                 ], $request->translation);
+                $updated->channels()->sync($request->channels);
             });
             // get latest updated translations
             $updated->translations = $updated->translations()->get();
