@@ -15,12 +15,12 @@ class ReviewVote extends Model
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, "customer_id");
+        return $this->belongsTo(Customer::class);
     }
 
     public function review(): BelongsTo
     {
-        return $this->belongsTo(Review::class, "review_id");
+        return $this->belongsTo(Review::class);
     }
 
     

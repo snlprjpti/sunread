@@ -17,22 +17,22 @@ class Review extends Model
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, "customer_id");
+        return $this->belongsTo(Customer::class);
     }
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class, "product_id");
+        return $this->belongsTo(Product::class);
     }
 
     public function review_votes(): HasMany
     {
-        return $this->hasMany(ReviewVote::class, "review_id");
+        return $this->hasMany(ReviewVote::class);
     }
 
     public function review_replies(): HasMany
     {
-        return $this->hasMany(ReviewReply::class, "review_id");
+        return $this->hasMany(ReviewReply::class);
     }
 
 }
