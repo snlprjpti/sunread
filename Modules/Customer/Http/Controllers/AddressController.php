@@ -11,6 +11,7 @@ use Modules\Customer\Entities\CustomerAddress;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerAddressResource;
 use Modules\Customer\Repositories\CustomerAddressRepository;
+use Exception;
 
 class AddressController extends BaseController
 {
@@ -41,7 +42,7 @@ class AddressController extends BaseController
         {
             $fetched = Customer::with('addresses')->findOrFail($customer_id)->addresses;
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -58,7 +59,7 @@ class AddressController extends BaseController
             $data["customer_id"] = $customer->id;
             $created = $this->repository->create($data);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -75,7 +76,7 @@ class AddressController extends BaseController
                 ->addresses()
                 ->findOrFail($address_id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -93,7 +94,7 @@ class AddressController extends BaseController
             $data = $this->repository->validateData($request);
             $updated = $this->repository->update($data, $address_id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -112,7 +113,7 @@ class AddressController extends BaseController
 
             $deleted->delete();
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }

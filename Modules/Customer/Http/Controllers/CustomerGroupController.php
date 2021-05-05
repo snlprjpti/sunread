@@ -10,6 +10,7 @@ use Modules\Customer\Entities\CustomerGroup;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerGroupResource;
 use Modules\Customer\Repositories\CustomerGroupRepository;
+use Exception;
 
 class CustomerGroupController extends BaseController
 {
@@ -41,7 +42,7 @@ class CustomerGroupController extends BaseController
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -57,7 +58,7 @@ class CustomerGroupController extends BaseController
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
             $created = $this->repository->create($data);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -71,7 +72,7 @@ class CustomerGroupController extends BaseController
         {
             $fetched = $this->model->findOrFail($id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -89,7 +90,7 @@ class CustomerGroupController extends BaseController
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
             $updated = $this->repository->update($data, $id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -103,7 +104,7 @@ class CustomerGroupController extends BaseController
         {
             $this->repository->delete($id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
