@@ -11,17 +11,11 @@ class BrandTest extends BaseTestCase
 {
     public function setUp(): void
     {
+        $this->model = Brand::class;
         parent::setUp();
         $this->admin = $this->createAdmin();
-        $this->model = Brand::class;
         $this->model_name = "Brand";
         $this->route_prefix = "admin.brands";
-        $this->default_resource_id = Brand::latest()->first()->id;
-        $this->fake_resource_id = 0;
-        $this->filter = [
-            "sort_by" => "id",
-            "sort_order" => "asc"
-        ];
     }
 
     public function getCreateData(): array
