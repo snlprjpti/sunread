@@ -12,7 +12,7 @@
 */
 
 Route::group(["middleware" => ["api"]], function () {
-    Route::group(["prefix" => "admin", "middleware" => ["admin", "language"], "as" => "admin"], function () {
+    Route::group(["prefix" => "admin", "middleware" => ["admin", "language"], "as" => "admin."], function () {
         Route::resource("brands", BrandController::class)->except(["create","edit"]);
     });
 });
