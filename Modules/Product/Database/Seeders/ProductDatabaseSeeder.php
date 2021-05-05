@@ -7,15 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call(ProductTableSeeder::class);
     }
 }

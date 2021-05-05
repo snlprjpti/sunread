@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +11,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/product', function (Request $request) {
-    return $request->user();
+Route::group(["middleware" => ["api"]], function() {
+    // ADMIN PRODUCT ROUTES
+    Route::group(["prefix" => "admin/catalog", "as" => "admin.catalog.", "middleware" => ["admin", "language"]], function() {
+        // Catalog Product Routes
+        Route::resource("products", ProductController::class)->except(["create", "edit"]);
+    });
 });
