@@ -73,8 +73,7 @@ class AddressController extends BaseController
             $fetched = Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->where("id", $address_id)
-                ->firstOrFail();
+                ->findOrFail($address_id);
         }
         catch (\Exception $exception)
         {
@@ -89,8 +88,7 @@ class AddressController extends BaseController
             Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->where("id", $address_id)
-                ->firstOrFail();
+                ->findOrFail($address_id);
 
             $data = $this->repository->validateData($request);
             $updated = $this->repository->update($data, $address_id);
@@ -110,8 +108,7 @@ class AddressController extends BaseController
             $deleted = Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->where("id", $address_id)
-                ->firstOrFail();
+                ->findOrFail($address_id);
 
             $deleted->delete();
         }
