@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/review', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => ['api']], function () {
+    //ADMIN CATEGORY ROUTES
+    Route::group(['prefix'=>'admin', 'as' => 'admin.', 'middleware' => ['admin', 'language']], function () {
+        Route::resource('reviews', ReviewController::class)->except(['create', 'edit']);
+    });
 });
