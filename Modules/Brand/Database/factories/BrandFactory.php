@@ -27,10 +27,10 @@ class BrandFactory extends Factory
             if (!$old_brand) break;
         }
 
-        return [
-            "slug" => $slug,
+        return [   
             "name" => $name,
-            "description" => $this->faker->sentences()
+            "slug" => $slug,
+            "description" => $this->faker->paragraph
         ];
     }
 }
