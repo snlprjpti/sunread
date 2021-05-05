@@ -16,22 +16,9 @@ class AttributeRepository extends BaseRepository
         $this->model = $attribute;
         $this->model_key = "catalog.attribute";
 
-        $this->attribute_types = [
-            "text" => "Text",
-            "textarea" => "Textarea",
-            "price" => "Price",
-            "boolean" => "Boolean",
-            "select" => "Select",
-            "multiselect" => "Multiselect",
-            "datetime" => "Datetime",
-            "date" => "Date",
-            "image" => "Image",
-            "file" => "File",
-            "checkbox" => "Checkbox"
-        ];
         $this->non_filterable_fields = ["select", "multiselect", "checkbox"];
 
-        $attribute_types = implode(",", array_keys($this->attribute_types));
+        $attribute_types = implode(",", array_keys(config("attribute_types")));
         $this->rules = [
             "slug" => "nullable|unique:attributes,slug",
             "name" => "required",
