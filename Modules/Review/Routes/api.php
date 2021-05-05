@@ -17,5 +17,7 @@ Route::group(['middleware' => ['api']], function () {
     //ADMIN CATEGORY ROUTES
     Route::group(['prefix'=>'admin', 'as' => 'admin.', 'middleware' => ['admin', 'language']], function () {
         Route::resource('reviews', ReviewController::class)->except(['create', 'edit']);
+        Route::resource('review_votes', ReviewVoteController::class)->except(['create', 'edit']);
+        Route::resource('review_replies', ReviewReplyController::class)->except(['create', 'edit']);
     });
 });
