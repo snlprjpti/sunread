@@ -5,7 +5,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Modules\Core\Traits\HasFactory;
 use Modules\Customer\Notifications\CustomerResetPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Modules\Core\Traits\HasFactory;
