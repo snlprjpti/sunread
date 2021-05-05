@@ -23,7 +23,8 @@ class WebsiteFactory extends Factory
             'code' => \Str::random(16),
             'name' => $this->faker->company,
             'description' => $this->faker->paragraph,
-            'hostname' => $this->faker->name
+            'hostname' => $this->faker->name,
+            "position" => $this->faker->randomDigit()
         ];
     }
 }

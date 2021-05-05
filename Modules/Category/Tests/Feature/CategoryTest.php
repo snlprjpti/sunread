@@ -14,21 +14,16 @@ class CategoryTest extends BaseTestCase
 
     public function setUp(): void
     {
+        $this->model = Category::class;
+
         parent::setUp();
         $this->admin = $this->createAdmin();
-        $this->model = Category::class;
+
         $this->model_name = "Category";
         $this->route_prefix = "admin.catalog.categories.categories";
 
         $this->model::factory(10)->create();
         $this->default_resource_id = $this->model::latest('id')->first()->id;
-        $this->fake_resource_id = 0;
-
-        $this->filter = [
-            "sort_by" => "id",
-            "sort_order" => "asc"
-        ];
-
         $this->root_category_id = $this->model::oldest('id')->first()->id;
     }
 

@@ -4,9 +4,6 @@ namespace Modules\Product\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
-use Modules\Product\Entities\ProductImage;
-use Modules\Product\Observer\ProductImageObserver;
-use Modules\Product\Providers\EventServiceProvider;
 
 class ProductServiceProvider extends ServiceProvider
 {
@@ -31,7 +28,7 @@ class ProductServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
-        $this->registerObservers();
+        $this->registerObserver();
     }
 
     /**
@@ -41,7 +38,6 @@ class ProductServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
     }
 
@@ -57,13 +53,6 @@ class ProductServiceProvider extends ServiceProvider
         ], 'config');
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
-        );
-
-        $this->mergeConfigFrom(
-            module_path('Product', 'Config/product_types.php'), 'product_types'
-        );
-        $this->mergeConfigFrom(
-            module_path('Product', 'Config/image_types.php'), 'image _types'
         );
     }
 
@@ -122,13 +111,8 @@ class ProductServiceProvider extends ServiceProvider
         return $paths;
     }
 
-    /**
-     * Register observers.
-     *
-     * @return void
-     */
-    public function registerObservers()
+    public function registerObserver(): void
     {
-        ProductImage::observe(ProductImageObserver::class);
+        // TODO :: Product::observe(ProductObserver::class);
     }
 }

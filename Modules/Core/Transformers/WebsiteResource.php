@@ -19,6 +19,7 @@ class WebsiteResource extends JsonResource
             "code" => $this->code,
             "hostname" => $this->hostname,
             "name" => $this->name,
+            "position" => $this->position,
             "description" => $this->description,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];

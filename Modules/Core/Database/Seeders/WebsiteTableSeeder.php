@@ -21,6 +21,7 @@ class WebsiteTableSeeder extends Seeder
                 "hostname" => "international",
                 "name" => "International",
                 "description" => "For all countries",
+                "position" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
             ]

@@ -15,17 +15,10 @@ class AttributeTranslationRepository
     public function __construct(AttributeTranslation $attribute_translation)
     {
         $this->model = $attribute_translation;
-        $this->model_key = "catalog.attribite.translations";
+        $this->model_key = "catalog.attribute.translations";
     }
 
-    /**
-     * Create or update translation
-     * 
-     * @param array $data
-     * @param Model $parent
-     * @return void
-     */
-    public function createOrUpdate($data, $parent)
+    public function updateOrCreate(?array $data, object $parent): void
     {
         if ( !is_array($data) ) return;
 
@@ -35,7 +28,7 @@ class AttributeTranslationRepository
         {
             foreach ($data as $row){
                 $check = [
-                    "locale" => $row["locale"],
+                    "store_id" => $row["store_id"],
                     "attribute_id" => $parent->id
                 ];
     

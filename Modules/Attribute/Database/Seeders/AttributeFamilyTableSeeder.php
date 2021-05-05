@@ -7,18 +7,15 @@ use Illuminate\Support\Facades\DB;
 
 class AttributeFamilyTableSeeder extends Seeder
 {
-    /**
-     * Insert Attribute Family
-     * 
-     * @return Void
-     */
-    public function run()
+    public function run(): void
     {
-        DB::table('attribute_families')->insert([
+        DB::table("attribute_families")->insert([
             "slug" => "default",
             "name" => "Default",
             "status" => 0,
-            "is_user_defined" => 1
+            "is_user_defined" => 0,
+            "created_at" => now(),
+            "updated_at" => now()
         ]);
     }
 }
