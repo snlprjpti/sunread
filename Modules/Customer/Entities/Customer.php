@@ -5,10 +5,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Modules\Customer\Notifications\CustomerResetPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Modules\Core\Traits\HasFactory;
 
 class Customer extends Authenticatable implements  JWTSubject
 {
-    use Notifiable;
+    use Notifiable, HasFactory;
 
     public static $SEARCHABLE =  [ "first_name", "last_name", "email" ];
     protected $fillable = [ "first_name", "last_name", "gender", "date_of_birth", "email", "phone", "password", "api_token", "customer_group_id", "subscribed_to_news_letter", "is_verified",  "status" ];
