@@ -2,18 +2,15 @@
 
 namespace Modules\Customer\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Customer\Entities\Customer;
-use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
 use Modules\Customer\Repositories\CustomerRepository;
+use Exception;
 
-/**
- * Registration Controller customer
- * @author    Hemant Achhami
- * @copyright 2020 Hazesoft Pvt Ltd
- */
 class RegistrationController extends BaseController
 {
     protected $repository;
@@ -22,18 +19,17 @@ class RegistrationController extends BaseController
     {
         $this->repository = $customerRepository;
         $this->model = $customer;
-        $this->model_name = "Account";
+        $this->model_name = "Customer Registration";
 
         parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Register a customer
-     * 
-     * @param Request $request
-     * @return Response
-     */
-    public function register(Request $request)
+    public function resource(object $data): JsonResource
+    {
+        return new CustomerResource($data);
+    }
+
+    public function register(Request $request): JsonResponse
     {
         try
         {
@@ -41,15 +37,11 @@ class RegistrationController extends BaseController
             $created = $this->repository->create($data);
 
         }
-        catch (ValidationException $exception)
+        catch (Exception $exception)
         {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new CustomerResource($created), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 }

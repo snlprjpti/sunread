@@ -21,7 +21,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::post('/register', [RegistrationController::class, 'register'])->name('register');
         // Session Routes
         Route::post('/login', [SessionController::class, 'login'])->name('session.login');
-        Route::get('/logout', [SessionController::class, 'logout'])->name('session.logout');
+        Route::get('/logout', [SessionController::class, 'logout'])->middleware("jwt.verify")->name('session.logout');
         Route::post('/forget-password', [ForgotPasswordController::class, 'store'])->name('forget-password.store');
         Route::post('/reset-password', [ResetPasswordController::class, 'store'])->name('reset-password.store');
         Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])->name('reset-password.create');
