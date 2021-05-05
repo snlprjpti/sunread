@@ -26,7 +26,7 @@ class CustomerFactory extends Factory
             "first_name" => $this->faker->firstName(),
             "last_name" => $this->faker->lastName(),
             "gender" => Arr::random($gender),
-            "date_of_birth" => $this->faker->date(),
+            "date_of_birth" => $this->faker->dateTimeBetween('1950-01-01', '2012-12-31'),
             "email" => $this->faker->unique()->safeEmail(),
             "status" => 1,
             "password" => Hash::make("password"),
