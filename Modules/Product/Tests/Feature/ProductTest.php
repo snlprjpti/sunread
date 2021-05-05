@@ -20,7 +20,7 @@ class ProductTest extends BaseTestCase
 
     public function getNonMandodtaryCreateData(): array
     {
-        return array_merge($this->getCreate(), [
+        return array_merge($this->getCreateData(), [
             "parent_id" => null,
             "brand_id" => null
         ]);
