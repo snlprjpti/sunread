@@ -35,7 +35,7 @@ class ReviewTest extends BaseTestCase
     public function getNonMandodtaryUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
-            "tile" => null
+            "title" => null
         ]);
     }
 
