@@ -3,16 +3,18 @@
 namespace Modules\Brand\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\HasFactory;
+use Illuminate\Support\Facades\Storage;
+use Modules\Core\Traits\Sluggable;
 
 class Brand extends Model
 {
-    use HasFactory;
+    use HasFactory, Sluggable;
 
-    protected $fillable = [];
+    protected $fillable = ["slug", "name", "image", "description", "meta_title", "meta_description", "meta_keywords"];
     
-    protected static function newFactory()
+    public function getImageUrlAttribute()
     {
-        return \Modules\Brand\Database\factories\BrandFactory::new();
+        return Storage::url($this->image);
     }
 }
