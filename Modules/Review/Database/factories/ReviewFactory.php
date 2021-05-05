@@ -28,8 +28,8 @@ class ReviewFactory extends Factory
             'customer_id' => $customer->id,
             'product_id' => $product->id,
             'rating' => rand(1,5),
-            'title' => $this->faker->name,
-            'description' => $this->faker->paragraph
+            'title' => $this->faker->name(),
+            'description' => $this->faker->paragraph()
         ];
     }
 }

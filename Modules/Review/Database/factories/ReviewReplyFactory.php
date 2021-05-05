@@ -24,7 +24,7 @@ class ReviewReplyFactory extends Factory
 
         return [
             'review_id' => $review->id,
-            'description' => $this->faker->paragraph
+            'description' => $this->faker->paragraph()
         ];
     }
 }
