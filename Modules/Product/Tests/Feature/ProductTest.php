@@ -15,7 +15,7 @@ class ProductTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Product";
-        $this->route_prefix = "admin.products";
+        $this->route_prefix = "admin.catalog.products";
     }
 
     public function getNonMandodtaryCreateData(): array
