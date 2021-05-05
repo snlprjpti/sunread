@@ -3,20 +3,17 @@
 namespace Modules\Customer\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;
 
 class CustomerGroup extends Model
 {
-    use Sluggable;
+    use Sluggable, HasFactory;
 
     protected $fillable = [ "name", "slug", "is_user_defined" ];
 
-    /**
-     * Get the customer for this group.
-     * 
-     * @return Cutomer
-     */
-    public function customers()
+    public function customers(): HasMany
     {
         return $this->hasMany(Customer::class);
     }

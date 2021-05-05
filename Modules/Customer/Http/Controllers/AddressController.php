@@ -4,14 +4,14 @@ namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Database\QueryException;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Customer\Entities\Customer;
-use Illuminate\Validation\ValidationException;
 use Modules\Customer\Entities\CustomerAddress;
 use Modules\Core\Http\Controllers\BaseController;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Modules\Customer\Transformers\CustomerAddressResource;
 use Modules\Customer\Repositories\CustomerAddressRepository;
+use Exception;
 
 class AddressController extends BaseController
 {
@@ -26,171 +26,98 @@ class AddressController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Display a listing of the resource.
-     * 
-     * @param int $customer_id
-     * @return JsonResponse
-     */
-    public function index($customer_id)
+    public function collection(object $data): ResourceCollection
+    {
+        return CustomerAddressResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new CustomerAddressResource($data);
+    }
+
+    public function index(int $customer_id): JsonResponse
     {
         try
         {
             $fetched = Customer::with('addresses')->findOrFail($customer_id)->addresses;
-        } 
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(CustomerAddressResource::collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    /**
-     * Store a new resource
-     *
-     * @param Request $request
-     * @param int $customer_id
-     * @return JsonResponse
-     */
-    public function store(Request $request, $customer_id)
+    public function store(Request $request, int $customer_id): JsonResponse
     {
         try
         {
             $customer = Customer::findOrFail($customer_id);
             $data = $this->repository->validateData($request);
             $data["customer_id"] = $customer->id;
-
             $created = $this->repository->create($data);
         }
-        catch (ModelNotFoundException $exception)
+        catch (Exception $exception)
         {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch (ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new CustomerAddressResource($created), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    /**
-     * Get the particular resource
-     * 
-     * @param $customer_id
-     * @param $address_id
-     * @return JsonResponse
-     */
-    public function show($customer_id, $address_id)
+    public function show(int $customer_id, int $address_id): JsonResponse
     {
         try
         {
             $fetched = Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->with("customer")
-                ->where("id", $address_id)
-                ->firstOrFail();
+                ->findOrFail($address_id);
         }
-        catch (ModelNotFoundException $exception)
+        catch (Exception $exception)
         {
-            return $this->errorResponse($this->lang('not-found'), 404);
+            return $this->handleException($exception);
         }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
-        }
-
-        return $this->successResponse(new CustomerAddressResource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-
-    /**
-     * Update the specified resource.
-     * 
-     * @param Request $request
-     * @param int $customer_id
-     * @param int $address_id
-     * @return JsonResponse
-     */
-    public function update(Request $request, $customer_id, $address_id)
+    public function update(Request $request, int $customer_id, int $address_id): JsonResponse
     {
         try {
             Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->with("customer")
-                ->where("id", $address_id)
-                ->firstOrFail();
+                ->findOrFail($address_id);
 
-            $data = $this->repository->validateData($request, $address_id);
+            $data = $this->repository->validateData($request);
             $updated = $this->repository->update($data, $address_id);
         }
-        catch (ModelNotFoundException $exception)
+        catch (Exception $exception)
         {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (QueryException $exception)
-        {
-            return $this->errorResponse($exception->getMessage(), 400);
-        }
-        catch(ValidationException $exception)
-        {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponse(new CustomerAddressResource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    /**
-     * Destroys the particular customer address
-     * @param $customer_id
-     * @param $address_id
-     * @return JsonResponse
-     */
-    public function destroy($customer_id, $address_id)
+    public function destroy(int $customer_id, int $address_id): JsonResponse
     {
         try
         {
             $deleted = Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->with("customer")
-                ->where("id", $address_id)
-                ->firstOrFail();
+                ->findOrFail($address_id);
 
             $deleted->delete();
         }
-        catch (CustomersPresentInGroup $exception)
+        catch (Exception $exception)
         {
-            return $this->errorResponse($exception->getMessage(), 403);
-        }
-        catch (ModelNotFoundException $exception)
-        {
-            return $this->errorResponse($this->lang('not-found'), 404);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'));
+        return $this->successResponseWithMessage($this->lang('delete-success'),204);
     }
 }

@@ -5,8 +5,10 @@ namespace Modules\Customer\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Event;
 use Modules\Core\Http\Controllers\BaseController;
+use Exception;
+use Modules\Customer\Entities\Customer;
 
 /**
  * Session Controller for the Customer
@@ -15,19 +17,20 @@ use Modules\Core\Http\Controllers\BaseController;
  */
 class SessionController extends BaseController
 {
-    public function __construct()
+    public function __construct(Customer $customer)
     {
-        $this->middleware("customer")->except(["login"]);
+        $this->middleware('guest:customer')->except(['logout']);
+
+        $this->model = $customer;
+        $this->model_name = "Customer account";
+
+        parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Logs in user and geneates jwt token
-     * 
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function login(Request $request)
     {
+        Event::dispatch('customer.session.login.before');
+
         try
         {
             $data = $request->validate([
@@ -46,34 +49,35 @@ class SessionController extends BaseController
                 "user" => auth()->guard("customer")->user()
             ];
         }
-        catch (ValidationException $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->errors(), 422);
-        }
-        catch (\Exception $exception)
-        {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
+        Event::dispatch('customer.session.login.after', auth()->guard("customer")->user());
         return $this->successResponse($payload, $this->lang("login-success"));
     }
 
     /**
      * Logout the Customer
-     * 
+     *
      * @return JsonResponse
      */
     public function logout()
     {
+        Event::dispatch('customer.session.logout.before');
+
         try
         {
+            $customer = auth()->guard('customer')->user();
             auth()->guard("customer")->logout();
         }
-        catch (\Exception $exception)
+        catch( Exception $exception )
         {
-            return $this->errorResponse($exception->getMessage());
+            return $this->handleException($exception);
         }
 
+        Event::dispatch('customer.session.logout.after' , $customer);
         return $this->successResponseWithMessage($this->lang("logout-success"));
     }
 }
