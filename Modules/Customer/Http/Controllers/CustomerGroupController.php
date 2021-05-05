@@ -65,7 +65,7 @@ class CustomerGroupController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try
         {
@@ -79,7 +79,7 @@ class CustomerGroupController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
         try
         {

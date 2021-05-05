@@ -8,7 +8,11 @@ class CustomerGroupFactory extends Factory
 {
 
     protected $model = CustomerGroup::class;
-
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
     public function definition()
     {
         return [

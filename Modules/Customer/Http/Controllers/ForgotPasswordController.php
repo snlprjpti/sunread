@@ -39,7 +39,7 @@ class ForgotPasswordController extends BaseController
             if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException(__("core::app.users.token.token-generation-problem"));
             if ($response == Password::INVALID_USER) throw new CustomerNotFoundException("Customer not found.");
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }

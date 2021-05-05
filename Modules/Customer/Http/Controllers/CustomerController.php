@@ -13,6 +13,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
 use Modules\Customer\Repositories\CustomerRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Exception;
 
 class CustomerController extends BaseController
 {
@@ -44,7 +45,7 @@ class CustomerController extends BaseController
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request, ["group"]);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -60,7 +61,7 @@ class CustomerController extends BaseController
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
             $created = $this->repository->create($data);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -75,7 +76,7 @@ class CustomerController extends BaseController
         {
             $fetched = $this->model->with(["group"])->findOrFail($id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -91,7 +92,7 @@ class CustomerController extends BaseController
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
             $updated = $this->repository->update($data, $id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -106,7 +107,7 @@ class CustomerController extends BaseController
         {
             $this->repository->delete($id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }

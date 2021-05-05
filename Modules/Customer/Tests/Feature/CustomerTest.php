@@ -42,4 +42,15 @@ class CustomerTest extends BaseTestCase
         ]);
     }
 
+    public function getNonMandodtaryCreateData(): array
+    {
+        return array_merge($this->getCreateData(), [
+            "last_name" => null,
+            "gender" => null,
+            "date_of_birth" => null,
+            "customer_group_id" => null,
+            "remember_token" => null
+        ]);
+    }
+
 }

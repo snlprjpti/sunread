@@ -35,7 +35,7 @@ class AddressController extends BaseController
         return new CustomerAddressResource($data);
     }
 
-    public function index($customer_id): JsonResponse
+    public function index(int $customer_id): JsonResponse
     {
         try
         {
@@ -66,14 +66,13 @@ class AddressController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function show($customer_id, $address_id): JsonResponse
+    public function show(int $customer_id, int $address_id): JsonResponse
     {
         try
         {
             $fetched = Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->with("customer")
                 ->where("id", $address_id)
                 ->firstOrFail();
         }
@@ -84,13 +83,12 @@ class AddressController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    public function update(Request $request, $customer_id, $address_id): JsonResponse
+    public function update(Request $request, int $customer_id, int $address_id): JsonResponse
     {
         try {
             Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->with("customer")
                 ->where("id", $address_id)
                 ->firstOrFail();
 
@@ -105,14 +103,13 @@ class AddressController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    public function destroy($customer_id, $address_id): JsonResponse
+    public function destroy(int $customer_id, int $address_id): JsonResponse
     {
         try
         {
             $deleted = Customer::with("addresses")
                 ->findOrFail($customer_id)
                 ->addresses()
-                ->with("customer")
                 ->where("id", $address_id)
                 ->firstOrFail();
 
