@@ -16,7 +16,7 @@ class CreateReviewRepliesTable extends Migration
         Schema::create('review_replies', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("review_id");
-            $table->foreign("review_id")->references("id")->on("reviews")->onDelete("restrict");
+            $table->foreign("review_id")->references("id")->on("reviews")->onDelete("cascade");
             $table->text('description');
             $table->timestamps();
         });
