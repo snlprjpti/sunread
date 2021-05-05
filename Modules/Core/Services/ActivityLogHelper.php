@@ -5,6 +5,7 @@ namespace Modules\Core\Services;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Modules\Core\Entities\ActivityLog;
+use Modules\Review\Entities\ReviewVote;
 
 class ActivityLogHelper {
 
@@ -28,6 +29,19 @@ class ActivityLogHelper {
         $model_name = class_basename($model);
         $default_action = $model_name." ".$event;
         $properties = [];
+
+        if($model_name == "ReviewVote")
+        {
+            Cache::forget('positive_vote_count-'.$model->review_id);
+            Cache::rememberForever('positive_vote_count-'.$model->review_id, function() use($model){
+                return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 0)->count();
+            });
+            
+            Cache::forget('negative_vote_count-'.$model->review_id);
+            Cache::rememberForever('negative_vote_count-'.$model->review_id, function() use($model){
+                return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 1)->count();
+            });
+        }
         
         if(Cache::get($model::class))
         {
