@@ -21,6 +21,8 @@ class ReviewResource extends JsonResource
             "rating" => $this->rating,
             "title" => $this->title,
             "description" => $this->description,
+            "review_votes" => ReviewVoteResource::collection($this->review_votes),
+            "review_replies" => ReviewReplyResource::collection($this->review_replies),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
