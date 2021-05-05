@@ -32,12 +32,4 @@ class ProductTest extends BaseTestCase
             "sku" => null
         ]);
     }
-
-    public function getNonMandodtaryUpdateData(): array
-    {
-        return array_merge($this->getUpdateData(), [
-            "logo" => null,
-            "favicon" => null
-        ]);
-    }
 }
