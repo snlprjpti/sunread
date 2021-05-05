@@ -18,18 +18,11 @@ class BrandFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
-        while(true) {
-            $name = $this->faker->name();
-            $slug = \Str::slug($name);
-            $old_brand = Brand::where("slug", $slug)->first();
-            if (!$old_brand) break;
-        }
-
         return [   
-            "name" => $name,
-            "slug" => $slug,
+            "name" => $this->faker->name(),
+            "slug" => $this->faker->slug(),
             "description" => $this->faker->paragraph
         ];
     }
