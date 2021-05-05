@@ -7,30 +7,20 @@ use Modules\Customer\Entities\Customer;
 
 class CustomerTest extends BaseTestCase
 {
-    protected object $admin;
-    protected array $headers;
-
     public function setUp(): void
     {
+        $this->model = Customer::class;
         parent::setUp();
         $this->admin = $this->createAdmin();
-
-        $this->model = Customer::class;
         $this->model_name = "Customer";
         $this->route_prefix = "admin.customers";
-        $this->default_resource_id = $this->model::latest()->first()->id;
-        $this->fake_resource_id = 0;
-
-        $this->filter = [
-            "sort_by" => "id",
-            "sort_order" => "asc"
-        ];
     }
 
     public function getCreateData(): array
     {
         return array_merge($this->model::factory()->make()->toArray(), [
             "password" => "password",
+            "gender" => "male",
             "password_confirmation" => "password"
         ]);
     }
@@ -45,11 +35,7 @@ class CustomerTest extends BaseTestCase
     public function getNonMandodtaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "last_name" => null,
-            "gender" => null,
-            "date_of_birth" => null,
-            "customer_group_id" => null,
-            "remember_token" => null
+            "customer_group_id" => null
         ]);
     }
 

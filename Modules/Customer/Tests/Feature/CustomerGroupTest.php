@@ -12,19 +12,11 @@ class CustomerGroupTest extends BaseTestCase
 
     public function setUp(): void
     {
+        $this->model = CustomerGroup::class;
         parent::setUp();
         $this->admin = $this->createAdmin();
-
-        $this->model = CustomerGroup::class;
         $this->model_name = "Customer Group";
         $this->route_prefix = "admin.groups";
-        $this->default_resource_id = CustomerGroup::latest()->first()->id;
-        $this->fake_resource_id = 0;
-
-        $this->filter = [
-            "sort_by" => "id",
-            "sort_order" => "asc"
-        ];
     }
 
     public function getNonMandodtaryCreateData(): array

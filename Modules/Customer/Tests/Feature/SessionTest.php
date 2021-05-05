@@ -88,7 +88,7 @@ class SessionTest extends TestCase
         ]);
     }
 
-    public function testInvalidCustomerCanRequestResetLink()
+    public function testCustomerCanRequestResetLink()
     {
         $post_data = ["email" => $this->customer->email];
         $response = $this->post(route("customer.forget-password.store"), $post_data);

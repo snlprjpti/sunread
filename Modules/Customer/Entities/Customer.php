@@ -42,7 +42,7 @@ class Customer extends Authenticatable implements  JWTSubject
         return $this->hasMany(CustomerAddress::class ,"customer_id");
     }
 
-    public function sendPasswordResetNotification($token): ?string
+    public function sendPasswordResetNotification($token): void
     {
         $this->notify(new CustomerResetPassword($token));
     }
