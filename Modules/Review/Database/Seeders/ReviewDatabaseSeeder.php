@@ -16,6 +16,8 @@ class ReviewDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call(ReviewTableSeeder::class);
+        $this->call(ReviewVoteTableSeeder::class);
+        $this->call(ReviewReplyTableSeeder::class);
     }
 }
