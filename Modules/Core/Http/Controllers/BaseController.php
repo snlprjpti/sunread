@@ -78,13 +78,13 @@ class BaseController extends Controller
         return $this->validate($request, $rules, $messages);
     }
 
-    public function getFilteredList(object $request, array $with = []): object
+    public function getFilteredList(object $request, array $with = [], ?object $rows = null): object
     {
         $sort_by = $request->sort_by ?? "id";
         $sort_order = $request->sort_order ?? "desc";
         $limit = $request->limit ?? $this->pagination_limit;
 
-        $rows = $this->model::query();
+        $rows = $rows ?? $this->model::query();
         // Load relationships
         if ($with !== []) $rows->with($with);
         if ($request->has("q")) $rows->whereLike($this->model::$SEARCHABLE, $request->q);
@@ -139,6 +139,10 @@ class BaseController extends Controller
 
             case ModelNotFoundException::class:
                 $exception_message = $this->lang('not-found');
+            break;
+
+            case QueryException::class:
+                $exception_message = $exception->errorInfo[1] == 1062 ? "Duplicate Entry" : $exception->getMessage();
             break;
 
             default:

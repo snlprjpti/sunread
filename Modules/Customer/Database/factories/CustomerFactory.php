@@ -10,7 +10,6 @@ use Modules\Customer\Entities\CustomerGroup;
 
 class CustomerFactory extends Factory
 {
-
     protected $model = Customer::class;
 
     /**
