@@ -17,7 +17,7 @@ Route::group(["middleware" => ["api"]], function() {
         // Catalog Product Routes
         Route::resource("products", ProductController::class)->except(["create", "edit"]);
         // Product Images Routes
-        Route::group(['prefix' => 'product', 'as' => 'product.'], function() {
+        Route::group(['prefix' => 'product', 'as' => 'products.'], function() {
             Route::resource('image', ProductImageController::class)->only(['store', 'destroy']);
         });
     });

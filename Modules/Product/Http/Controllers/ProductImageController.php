@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
+use League\CommonMark\Inline\Element\Strong;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductImage;
@@ -59,18 +60,15 @@ class ProductImageController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id): JsonResponse
     {
         try
         {
-            $image = $this->model->findOrFail($id);
-            $this->repository->delete($id);
-            if($image->path){
-                $path_array = explode("/", $image->path);
-                unset($path_array[count($path_array) - 1]);
-                $delete_folder = implode("/", $path_array);
-                Storage::disk("public")->deleteDirectory($delete_folder);
-            }
+
+            $this->repository->delete($id, function ($deleted){
+                if ($deleted->image) Storage::delete($deleted->path);
+            });
+
         }
         catch (Exception $exception)
         {
