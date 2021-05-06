@@ -16,8 +16,6 @@ use Modules\Core\Observers\ChannelObserver;
 use Modules\Core\Observers\CurrencyObserver;
 use Modules\Core\Services\ActivityLogHelper;
 use Modules\Core\Observers\ExchangeRateObserver;
-use Modules\Review\Entities\ReviewVote;
-use Modules\Review\Observers\ReviewVoteObserver;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -158,6 +156,5 @@ class CoreServiceProvider extends ServiceProvider
         Locale::observe(LocaleObserver::class);
         Currency::observe(CurrencyObserver::class);
         ExchangeRate::observe(ExchangeRateObserver::class);
-        ReviewVote::observe(ReviewVoteObserver::class);
     }
 }

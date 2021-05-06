@@ -17,9 +17,9 @@ class CreateReviewVotesTable extends Migration
             $table->id();
             $table->unsignedBigInteger("customer_id");
             $table->unsignedBigInteger("review_id");
-            $table->unique(['customer_id', 'review_id']);
-            $table->foreign("customer_id")->references("id")->on("customers")->onDelete("cascade");
-            $table->foreign("review_id")->references("id")->on("reviews")->onDelete("cascade");
+            $table->unique(['customer_id', 'review_id'], "review_vote_compound_unique");
+            $table->foreign("customer_id")->references("id")->on("customers");
+            $table->foreign("review_id")->references("id")->on("reviews");
             $table->boolean('vote_type');
             $table->timestamps();
         });

@@ -32,23 +32,12 @@ class ActivityLogHelper {
 
         if($model_name == "ReviewVote")
         {
-            Cache::forget('positive_vote_count-'.$model->review_id);
-            Cache::rememberForever('positive_vote_count-'.$model->review_id, function() use($model){
-                return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 0)->count();
-            });
-            
-            Cache::forget('negative_vote_count-'.$model->review_id);
-            Cache::rememberForever('negative_vote_count-'.$model->review_id, function() use($model){
-                return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 1)->count();
-            });
+           $this->reviewVoteCache($model); 
         }
         
         if(Cache::get($model::class))
         {
-            Cache::forget($model::class);
-            Cache::rememberForever($model::class, function() use ($model){
-                return $model->get();
-            });
+            $this->modelCache($model);
         }
         
         if ( $event == "updated" ) {
@@ -80,5 +69,26 @@ class ActivityLogHelper {
         ];
 
         $this->activityLog->create( array_merge($this->log, $log) );
+    }
+
+    public function reviewVoteCache(object $model)
+    {
+        Cache::forget('positive_vote_count-'.$model->review_id);
+        Cache::rememberForever('positive_vote_count-'.$model->review_id, function() use($model){
+            return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 0)->count();
+        });
+        
+        Cache::forget('negative_vote_count-'.$model->review_id);
+        Cache::rememberForever('negative_vote_count-'.$model->review_id, function() use($model){
+            return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 1)->count();
+        });
+    }
+
+    public function modelCache(object $model)
+    {
+        Cache::forget($model::class);
+        Cache::rememberForever($model::class, function() use ($model){
+            return $model->get();
+        });  
     }
 }

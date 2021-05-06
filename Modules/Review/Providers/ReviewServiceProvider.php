@@ -4,6 +4,8 @@ namespace Modules\Review\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Review\Entities\ReviewVote;
+use Modules\Review\Observers\ReviewVoteObserver;
 
 class ReviewServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,7 @@ class ReviewServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObserver();
     }
 
     /**
@@ -108,5 +111,15 @@ class ReviewServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+     /**
+     * Register observers.
+     *
+     * @return void
+     */
+    public function registerObserver()
+    {
+        ReviewVote::observe(ReviewVoteObserver::class);
     }
 }

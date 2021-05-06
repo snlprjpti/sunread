@@ -55,7 +55,7 @@ class Review extends Model
 
     public function getVisibleVoteCountAttribute()
     {
-        return $this->positive_vote_count + $this->negative_vote_count;
+        return $this->positive_vote_count - $this->negative_vote_count;
     }
 
 }
