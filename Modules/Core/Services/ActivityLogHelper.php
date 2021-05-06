@@ -30,15 +30,9 @@ class ActivityLogHelper {
         $default_action = $model_name." ".$event;
         $properties = [];
 
-        if($model_name == "ReviewVote")
-        {
-           $this->reviewVoteCache($model); 
-        }
+        if($model_name == "ReviewVote") $this->reviewVoteCache($model);
         
-        if(Cache::get($model::class))
-        {
-            $this->modelCache($model);
-        }
+        if(Cache::get($model::class)) $this->modelCache($model);
         
         if ( $event == "updated" ) {
             $newValues = $model->getChanges();
@@ -71,7 +65,7 @@ class ActivityLogHelper {
         $this->activityLog->create( array_merge($this->log, $log) );
     }
 
-    public function reviewVoteCache(object $model)
+    public function reviewVoteCache(object $model): void
     {
         Cache::forget('positive_vote_count-'.$model->review_id);
         Cache::rememberForever('positive_vote_count-'.$model->review_id, function() use($model){
@@ -84,7 +78,7 @@ class ActivityLogHelper {
         });
     }
 
-    public function modelCache(object $model)
+    public function modelCache(object $model): void
     {
         Cache::forget($model::class);
         Cache::rememberForever($model::class, function() use ($model){

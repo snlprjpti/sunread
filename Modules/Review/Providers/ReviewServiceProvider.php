@@ -4,7 +4,11 @@ namespace Modules\Review\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Review\Entities\Review;
+use Modules\Review\Entities\ReviewReply;
 use Modules\Review\Entities\ReviewVote;
+use Modules\Review\Observers\ReviewObserver;
+use Modules\Review\Observers\ReviewReplyObserver;
 use Modules\Review\Observers\ReviewVoteObserver;
 
 class ReviewServiceProvider extends ServiceProvider
@@ -120,6 +124,8 @@ class ReviewServiceProvider extends ServiceProvider
      */
     public function registerObserver()
     {
+        Review::observe(ReviewObserver::class);
         ReviewVote::observe(ReviewVoteObserver::class);
+        ReviewReply::observe(ReviewReplyObserver::class);
     }
 }

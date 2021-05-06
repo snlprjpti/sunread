@@ -54,7 +54,7 @@ class ReviewController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $rows = $this->model::query()->where('status', 0);
+            $rows = $this->model::whereStatus(0);
             $fetched = $this->getFilteredList($request, [], $rows);
         }
         catch( Exception $exception )
