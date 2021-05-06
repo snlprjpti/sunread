@@ -15,6 +15,7 @@ class ProductImageRepository extends BaseRepository
         $this->model_key = "catalog.product.images";
         $this->rules = [
             "product_id" => "required|exists:products,id",
+            "image" => "required|mimes:bmp,jpeg,jpg,png",
             "position" => "sometimes|numeric",
             "main_image" => "sometimes|boolean",
             "small_image" => "sometimes|boolean",

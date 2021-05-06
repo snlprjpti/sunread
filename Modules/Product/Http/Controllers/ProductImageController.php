@@ -2,16 +2,12 @@
 
 namespace Modules\Product\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
-use League\CommonMark\Inline\Element\Strong;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductImage;
 use Modules\Product\Repositories\ProductImageRepository;
 use Modules\Product\Transformers\ProductImageResource;
