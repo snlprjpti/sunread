@@ -64,11 +64,9 @@ class ProductImageController extends BaseController
     {
         try
         {
-
-            $this->repository->delete($id, function ($deleted){
-                if ($deleted->image) Storage::delete($deleted->path);
+            $this->repository->delete($id, function ($deleted) {
+                if ($deleted->path) Storage::delete($deleted->path);
             });
-
         }
         catch (Exception $exception)
         {
