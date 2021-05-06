@@ -22,26 +22,4 @@ class ProductImageRepository extends BaseRepository
             "thumbnail" => "sometimes|boolean"
         ];
     }
-
-
-    public function removeImage(int $id): object
-    {
-        try
-        {
-            $updated = $this->model->findOrFail($id);
-            if (!$updated->path) {
-                return $updated;
-            }
-            $path_array = explode("/", $updated->path);
-            unset($path_array[count($path_array) - 1]);
-            $delete_folder = implode("/", $path_array);
-            rmdir($delete_folder);
-        }
-        catch (\Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $updated;
-    }
 }
