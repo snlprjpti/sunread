@@ -2,6 +2,7 @@
 
 namespace Modules\Product\Entities;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,5 +36,10 @@ class Product extends Model
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class ,"product_id");
     }
 }
