@@ -23,9 +23,9 @@ class CreateChannelsTable extends Migration
             $table->string('timezone')->nullable();
             $table->string('logo')->nullable();
             $table->string('favicon')->nullable();
-            $table->string('theme');
-            $table->unsignedBigInteger('default_store_id');
-            $table->string('default_currency');
+            $table->string('theme')->nullable();
+            $table->unsignedBigInteger('default_store_id')->nullable();
+            $table->string('default_currency')->nullable();
             $table->unsignedBigInteger("website_id");
             $table->foreign('default_store_id')->references('id')->on('stores')->onDelete('cascade');
             $table->foreign('default_currency')->references('code')->on('currencies')->onUpdate('cascade');
