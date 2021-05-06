@@ -141,6 +141,11 @@ class BaseController extends Controller
                 $exception_message = $this->lang('not-found');
             break;
 
+            case QueryException::class:
+                if($exception->errorInfo[1] == 1062 ) $exception_message = "Duplicate Entry";
+                else $exception_message = $exception->getMessage();
+            break;
+
             default:
                 $exception_message = $exception->getMessage();
             break;
