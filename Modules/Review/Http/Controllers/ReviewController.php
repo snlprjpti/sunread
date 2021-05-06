@@ -49,6 +49,22 @@ class ReviewController extends BaseController
         return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
+    public function pendingList(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $rows = $this->model::query()->where('status', 0);
+            $fetched = $this->getFilteredList($request, [], $rows);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), "Pending review list fetched successfully.");
+    }
+
     public function store(Request $request): JsonResponse
     {
         try
@@ -105,5 +121,21 @@ class ReviewController extends BaseController
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
+
+    public function verify(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
+            $fetched->status = 1;
+            $fetched->save();
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), "Review verified successfully.", 200);
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,5 +18,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('reviews', ReviewController::class)->except(['create', 'edit']);
         Route::resource('review_votes', ReviewVoteController::class)->except(['create', 'edit']);
         Route::resource('review_replies', ReviewReplyController::class)->except(['create', 'edit']);
+        Route::get('pending/reviews', [Modules\Review\Http\Controllers\ReviewController::class, 'pendingList'])->name('reviews.pending');
+        Route::get('verify/reviews/{id}', [Modules\Review\Http\Controllers\ReviewController::class, 'verify'])->name('reviews.verify');
     });
 });

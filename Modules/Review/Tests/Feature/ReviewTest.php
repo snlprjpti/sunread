@@ -45,4 +45,27 @@ class ReviewTest extends BaseTestCase
             "customer_id" => null
         ]);
     }
+
+    public function testAdminCanVerifyResource()
+    {
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.verify", $this->default_resource_id));
+        
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => "Review verified successfully."
+        ]);
+    }
+
+    public function testAdminCanFetchPendingResources()
+    {
+        $this->model::factory($this->factory_count)->create();
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.pending"));
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => "Pending review list fetched successfully."
+        ]);
+    }
 }
