@@ -14,7 +14,7 @@ class WebsiteRepository extends BaseRepository
         $this->rules = [
             /* General */
             "code" => "required|unique:websites,code",
-            "hostname" => "required|unique:websites,hostname",
+            "hostname" => "nullable|unique:websites,hostname",
             "name" => "required",
             "description" => "nullable",
             "position" => "sometimes|numeric"
