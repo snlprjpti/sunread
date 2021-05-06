@@ -17,9 +17,7 @@ class ProductImageRepository extends BaseRepository
             "product_id" => "required|exists:products,id",
             "image" => "required|mimes:bmp,jpeg,jpg,png",
             "position" => "sometimes|numeric",
-            "main_image" => "sometimes|boolean",
-            "small_image" => "sometimes|boolean",
-            "thumbnail" => "sometimes|boolean"
+            "main_image" => "sometimes|boolean"
         ];
     }
 }

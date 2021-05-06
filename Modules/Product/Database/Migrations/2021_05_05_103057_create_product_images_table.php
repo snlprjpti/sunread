@@ -19,7 +19,7 @@ class CreateProductImagesTable extends Migration
             $table->foreign("product_id")->references("id")->on("products")->onDelete("cascade");
 
             $table->integer('position')->default(0);
-            $table->string('path')->nullable();
+            $table->string('path');
             $table->boolean('main_image')->default(0);
             $table->boolean('small_image')->default(0);
             $table->boolean('thumbnail')->default(0);
