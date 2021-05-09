@@ -54,6 +54,9 @@ class ProductServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/product_image.php'), 'product_image'
+        );
     }
 
     /**
