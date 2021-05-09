@@ -25,7 +25,7 @@ class ProductImageRepository extends BaseRepository
         ];
     }
 
-    public function createImage($request)
+    public function createImage($request): array
     {
         DB::beginTransaction();
 
@@ -63,5 +63,35 @@ class ProductImageRepository extends BaseRepository
         }
         DB::commit();
         return $data;
+    }
+
+
+    public function deleteThumbnail(int $id): object
+    {
+        DB::beginTransaction();
+
+        try
+        {
+            $updated = $this->model->findOrFail($id);
+
+            $path_array = explode("/", $updated->path);
+            unset($path_array[count($path_array) - 1]);
+
+            $delete_folder = implode("/", $path_array);
+            $product_folder = (substr($delete_folder, strrpos($delete_folder, '/' )+1));
+            $file = substr($updated->path, strrpos($updated->path, '/' )+1);
+            foreach ([ "small_image","thumbnail"] as $subfolder) {
+                $folder = $delete_folder.'/'.$subfolder.'/'.$file;
+                Storage::disk("public")->delete($folder);
+            }
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
+        return $updated;
     }
 }

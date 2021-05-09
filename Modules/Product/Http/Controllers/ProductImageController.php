@@ -61,6 +61,7 @@ class ProductImageController extends BaseController
     {
         try
         {
+            $this->repository->deleteThumbnail($id);
             $this->repository->delete($id, function ($deleted) {
                 if ($deleted->path) Storage::delete($deleted->path);
             });
