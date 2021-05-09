@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -12,7 +10,10 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::group(['middleware' => ['api']], function () {
+    Route::group(["prefix" => "admin", "middleware" => ["admin", "language"], "as" => "admin."], function () {
+        Route::resource("url-rewrites", UrlRewriteController::class)->except(["create","edit"]);
+    });
 
-Route::middleware('auth:api')->get('/urlrewrite', function (Request $request) {
-    return $request->user();
 });
+// Route::rewrite();
