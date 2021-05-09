@@ -11,25 +11,20 @@ class ProductImage extends Model
     use HasFactory;
 
     protected $fillable = ["product_id","position","path","main_image","small_image","thumbnail"];
-    protected $appends = [ "main_image_url", "small_image_url", "thumbnail_url" ];
+    protected $appends = [ "small_image_url", "thumbnail_url" ];
 
-
-    public function getMainImageUrlAttribute(): ?string
-    {
-        return $this->path ? Storage::url($this->path) : null;
-    }
 
     public function getSmallImageUrlAttribute(): ?string
     {
-        return $this->getImage();
+        return $this->getImage("small_image");
     }
 
     public function getThumbnailUrlAttribute(): ?string
     {
-        return $this->getImage();
+        return $this->getImage("thumbnail");
     }
 
-    public function getImage($image_type = "small_image"): ?string
+    public function getImage($image_type): ?string
     {
         if ( !$this->path ) return null;
         $image_url = null;
@@ -47,7 +42,7 @@ class ProductImage extends Model
         return $image_url;
     }
 
-    private function getPath(string $folder = ""): string
+    private function getPath(string $folder): string
     {
         $file_array = $this->getFileNameArray();
         return Storage::url("{$file_array['folder']}/{$folder}/{$file_array['file']}");
