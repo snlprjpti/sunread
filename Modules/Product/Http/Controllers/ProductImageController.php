@@ -61,10 +61,11 @@ class ProductImageController extends BaseController
     {
         try
         {
-            $image = $this->model->findOrFail($id);
-            $this->repository->deleteThumbnail($image->path);
             $this->repository->delete($id, function ($deleted) {
-                if ($deleted->path) Storage::delete($deleted->path);
+                if ($deleted->path){
+                    Storage::delete($deleted->path);
+                    $this->repository->deleteThumbnail($deleted->path);
+                }
             });
         }
         catch (Exception $exception)
