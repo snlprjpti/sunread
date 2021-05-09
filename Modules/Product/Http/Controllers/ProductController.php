@@ -78,7 +78,7 @@ class ProductController extends BaseController
 
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
-
+    
     public function update(Request $request, int $id): JsonResponse
     {
         try
