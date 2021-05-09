@@ -2,7 +2,6 @@
 
 namespace Modules\Product\Entities;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
