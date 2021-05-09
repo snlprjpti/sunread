@@ -6,13 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class AttributeGroupResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
@@ -20,7 +14,8 @@ class AttributeGroupResource extends JsonResource
             "slug" => $this->slug,
             "position" => $this->position,
             "is_user_defined" => $this->is_user_defined,
-            "attribute_family" => $this->attribute_family
+            "attribute_family" => new AttributeFamilyResource($this->whenLoaded("attribute_family")),
+            "attributes" => AttributeResource::collection($this->whenLoaded("attributes")),
         ];
     }
 }
