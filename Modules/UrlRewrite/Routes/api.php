@@ -16,4 +16,5 @@ Route::group(['middleware' => ['api']], function () {
     });
 
 });
-// Route::rewrite();
+
+Route::rewrites();
