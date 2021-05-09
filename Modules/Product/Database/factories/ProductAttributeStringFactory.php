@@ -10,7 +10,7 @@ class ProductAttributeStringFactory extends Factory
     public function definition(): array
     {
         return [
-            "value" => $this->faker->randomName()
+            "value" => $this->faker->name()
         ];
     }
 }

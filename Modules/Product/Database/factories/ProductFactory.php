@@ -1,8 +1,11 @@
 <?php
 namespace Modules\Product\Database\factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
+use Modules\Brand\Entities\Brand;
+use Modules\Product\Entities\Product;
 use Modules\Attribute\Entities\AttributeGroup;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
 {
@@ -12,13 +15,23 @@ class ProductFactory extends Factory
     {
         return [
             "parent_id" => null,
-            "brand_id" => null, // TODO::Brand::factory()->create()->id
+            "brand_id" => Brand::factory()->create()->id,
             "attribute_group_id" => AttributeGroup::factory()->create()->id,
 
             "sku" => $this->faker->slug(),
             "type" => "simple",
             "status" => 1
         ];
+    }
+
+    public function configurable(): Self
+    {
+        return $this->state(function(array $attributes) {
+            return [
+                "parent_id" => null,
+                "type" => "configurable"
+            ];
+        });
     }
 }
 

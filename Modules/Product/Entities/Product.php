@@ -2,11 +2,11 @@
 
 namespace Modules\Product\Entities;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Brand\Entities\Brand;
 use Modules\Category\Entities\Category;
@@ -30,7 +30,7 @@ class Product extends Model
 
     public function attribute_group(): BelongsTo
     {
-        return $this->belongsTo(AttributeGroup::class);
+        return $this->belongsTo(AttributeGroup::class)->with(["attributes"]);
     }
 
     public function brand(): BelongsTo
@@ -38,8 +38,13 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    public function product_attributes(): HasMany
+    {
+        return $this->hasMany(ProductAttribute::class)->with(["value"]);
+    }
+
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class ,"product_id");
+        return $this->hasMany(ProductImage::class);
     }
 }

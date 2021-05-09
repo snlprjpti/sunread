@@ -11,10 +11,10 @@ class Brand extends Model
 {
     use HasFactory, Sluggable;
 
-    protected $fillable = ["slug", "name", "image", "description", "meta_title", "meta_description", "meta_keywords"];
+    protected $fillable = [ "slug", "name", "image", "description", "meta_title", "meta_description", "meta_keywords" ];
     
-    public function getImageUrlAttribute()
+    public function getImageUrlAttribute(): ?string
     {
-        return Storage::url($this->image);
+        return $this->image ? Storage::url($this->image): null;
     }
 }
