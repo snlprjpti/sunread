@@ -29,4 +29,15 @@ class Attribute extends Model
     {
         return $this->hasMany(AttributeTranslation::class);
     }
+
+    public function generateValidation(): array
+    {
+        $validation = $this->is_required ? ["required"] : ["sometimes", "nullable"];
+        return array_merge($validation, [config("attribute_types")[$this->type]::$type]);
+    }
+
+    public function getValidationAttribute(): ?array
+    {
+        return $this->validation ?? $this->generateValidation();
+    }
 }
