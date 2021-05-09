@@ -46,7 +46,8 @@ class ProductImageController extends BaseController
             ]);
 
             $data = $this->repository->validateData($request);
-            $data['path'] = $this->storeImage($request, 'image', strtolower($this->model_name));
+            $image = $this->repository->createImage($request);
+            $data = array_merge($data,$image);
             $created = $this->repository->create($data);
         }
         catch (Exception $exception)
