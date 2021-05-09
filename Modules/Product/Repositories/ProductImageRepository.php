@@ -39,7 +39,7 @@ class ProductImageRepository extends BaseRepository
             $data['path'] = $file->storeAs("images/products/{$key}", $file_name, ["disk" => "public"]);
 
 
-            // Store main_image and gallery_image variations
+            // Store small_image and thumbnail variations
             foreach (["small_image_dimensions" => "small_image", "thumbnail_image_dimensions" => "thumbnail"] as $type => $folder) {
                 foreach ($this->{$type} as $dimension) {
                     $width = $dimension["width"];
@@ -52,7 +52,7 @@ class ProductImageRepository extends BaseRepository
                             $constraint->upsize();
                         })
                         ->encode('jpg', 80);
-                    $data[$folder] = Storage::put("$path/{$file_name}", $image)?1:0;
+                    $data[$folder] = Storage::put("$path/{$file_name}", $image) ? 1 : 0;
                 }
             }
         }
@@ -66,19 +66,17 @@ class ProductImageRepository extends BaseRepository
     }
 
 
-    public function deleteThumbnail(int $id): object
+    public function deleteThumbnail($path): bool
     {
         DB::beginTransaction();
 
         try
         {
-            $updated = $this->model->findOrFail($id);
-
-            $path_array = explode("/", $updated->path);
+            $path_array = explode("/", $path);
             unset($path_array[count($path_array) - 1]);
 
             $delete_folder = implode("/", $path_array);
-            $file = substr($updated->path, strrpos($updated->path, '/' )+1);
+            $file = substr($path, strrpos($path, '/' )+1);
             foreach ([ "small_image","thumbnail"] as $subfolder) {
                 $folder = $delete_folder.'/'.$subfolder.'/'.$file;
                 Storage::disk("public")->delete($folder);
@@ -91,6 +89,6 @@ class ProductImageRepository extends BaseRepository
         }
 
         DB::commit();
-        return $updated;
+        return true;
     }
 }
