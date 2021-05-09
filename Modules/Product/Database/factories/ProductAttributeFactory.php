@@ -2,7 +2,6 @@
 namespace Modules\Product\Database\factories;
 
 use Modules\Core\Entities\Store;
-use Modules\Product\Entities\Product;
 use Modules\Attribute\Entities\Attribute;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
