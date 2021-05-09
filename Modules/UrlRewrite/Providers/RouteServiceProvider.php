@@ -4,6 +4,7 @@ namespace Modules\UrlRewrite\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Modules\UrlRewrite\Http\Controllers\RewriteBaseController;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -22,8 +23,17 @@ class RouteServiceProvider extends ServiceProvider
      * @return void
      */
     public function boot()
-    {
+    {      
+        $this->registerRouteMacro();  
         parent::boot();
+    }
+
+    protected function registerRouteMacro(): void
+    {
+        $queryParam = '.*';
+        Route::macro('rewrites', function () use ($queryParam) {
+            Route::get('{url}', [RewriteBaseController::class])->where('url', $queryParam)->name('url.rewrite');
+        });
     }
 
     /**
