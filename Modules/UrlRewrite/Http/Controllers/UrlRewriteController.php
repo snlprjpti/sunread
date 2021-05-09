@@ -2,38 +2,60 @@
 
 namespace Modules\UrlRewrite\Http\Controllers;
 
+use Exception;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Routing\Route;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\UrlRewrite\Entities\UrlRewrite;
+use Modules\UrlRewrite\Repositories\UrlRewriteRepository;
+use Modules\UrlRewrite\Transformers\UrlRewriteResource;
 
-class UrlRewriteController extends Controller
+class UrlRewriteController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    protected $repository;
+
+    public function __construct(UrlRewrite $urlRewrite, UrlRewriteRepository $urlRewriteRepository)
     {
-        return view('urlrewrite::index');
+        $this->model = $urlRewrite;
+        $this->model_name = "UrlRewrite";
+        $this->repository = $urlRewriteRepository;
+        parent::__construct($this->model, $this->model_name);    
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function collection(object $data): ResourceCollection
     {
-        return view('urlrewrite::create');
+        return UrlRewriteResource::collection($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
+    public function resource(object $data): JsonResource
+    {
+        return new UrlRewriteResource($data);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        dd(Route::hasMacro("rewrites"));
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request);    
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
+    }
+
     public function store(Request $request)
     {
-        //
+        dd($request->all());
     }
 
     /**
