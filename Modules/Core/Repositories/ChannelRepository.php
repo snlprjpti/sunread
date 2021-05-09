@@ -14,23 +14,23 @@ class ChannelRepository extends BaseRepository
         $this->rules = [
             /* Foreign Keys */
             "stores.*" => "sometimes|required|exists:stores,id",
-            "default_store_id" => "required|exists:stores,id",
-            "default_currency" => "required|exists:currencies,code",
+            "default_store_id" => "nullable|exists:stores,id",
+            "default_currency" => "nullable|exists:currencies,code",
             "website_id" => "required|exists:websites,id",
-            "default_category_id" => "sometimes|exists:categories,id",
+            "default_category_id" => "nullable|exists:categories,id",
 
             /* General */
             "code" => "required|unique:channels,code",
-            "hostname" => "required|unique:channels,hostname",
+            "hostname" => "nullable|unique:channels,hostname",
             "name" => "required",
             "description" => "required",
-            "location" => "required",
-            "timezone" => "required",
+            "location" => "nullable",
+            "timezone" => "nullable",
 
             /* Branding */
-            "logo" => "required|mimes:bmp,jpeg,jpg,png,webp",
-            "favicon" => "required|mimes:bmp,jpeg,jpg,png,webp",
-            "theme" => "required|in:default"
+            "logo" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
+            "favicon" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
+            "theme" => "nullable|in:default"
         ];
     }
 }

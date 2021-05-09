@@ -2,8 +2,11 @@
 
 namespace Modules\Product\Tests\Feature;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Product\Entities\Product;
+use Modules\Product\Entities\ProductImage;
 
 class ProductTest extends BaseTestCase
 {
@@ -31,5 +34,29 @@ class ProductTest extends BaseTestCase
         return array_merge($this->getCreateData(), [
             "sku" => null
         ]);
+    }
+
+    public function testAdminCanUploadProductImage()
+    {
+        Storage::fake();
+        $post_data = [
+            "product_id" => Product::first()->id,
+            "image" => UploadedFile::fake()->image('image.jpeg')
+        ];
+
+        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.image.store"), $post_data);
+
+        $response->assertStatus(201);
+        $response->assertJsonFragment([
+            "status" => "success"
+        ]);
+    }
+
+
+    public function testAdminShouldBeAbleToDeleteProductImage()
+    {
+        $product_image_id = ProductImage::factory()->create()->id;
+        $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.image.destroy",$product_image_id));
+        $response->assertStatus(204);
     }
 }
