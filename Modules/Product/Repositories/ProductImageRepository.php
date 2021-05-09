@@ -78,7 +78,6 @@ class ProductImageRepository extends BaseRepository
             unset($path_array[count($path_array) - 1]);
 
             $delete_folder = implode("/", $path_array);
-            $product_folder = (substr($delete_folder, strrpos($delete_folder, '/' )+1));
             $file = substr($updated->path, strrpos($updated->path, '/' )+1);
             foreach ([ "small_image","thumbnail"] as $subfolder) {
                 $folder = $delete_folder.'/'.$subfolder.'/'.$file;
