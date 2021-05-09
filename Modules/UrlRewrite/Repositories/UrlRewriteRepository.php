@@ -4,19 +4,26 @@ namespace Modules\UrlRewrite\Repositories;
 
 use Modules\UrlRewrite\Entities\UrlRewrite;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\UrlRewrite\Contracts\UrlRewriteInterface;
 
-class UrlRewriteRepository extends BaseRepository
+class UrlRewriteRepository implements UrlRewriteInterface
 {
-    public function __construct(UrlRewrite $urlRewrite)
+
+	public function getByRequestPath(string $url): ?object
     {
-		$this->model = $urlRewrite;
-		$this->model_key = "UrlRewrites";
-		$this->rules = [
-			"request_path" => "required",
-			"entity_controller" => "required",
-			"entity_method" => "required",
-			"entity_id" => "required|exist:products,id"
-		];
+        return $this->model->where('request_path', $url)->first();
+    }
+
+	public function getModel(): object
+    {
+        return $this->model;
+    }
+
+    public function setModel(object $model): object
+    {
+        $this->model = $model;
+
+        return $this;
     }
 
 }
