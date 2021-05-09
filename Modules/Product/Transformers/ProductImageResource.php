@@ -19,9 +19,9 @@ class ProductImageResource extends JsonResource
             "id" => $this->id,
             "position" => $this->position,
             "path" => $this->path,
-            "main_image" => $this->main_image,
-            "small_image" => $this->small_image,
-            "thumbnail" => $this->thumbnail,
+            "main_image" => $this->main_image_url,
+            "small_image" => $this->small_image_url,
+            "thumbnail" => $this->thumbnail_url,
             "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
         ];
     }
