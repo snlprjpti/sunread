@@ -55,7 +55,11 @@ class ProductController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $created = $this->repository->create($data);
+
+            $created = $this->repository->create($data, function($created) use($request) {
+                $attributes = $this->repository->validateAttributes($request);
+                $this->repository->syncAttributes($attributes, $created);
+            });
         }
         catch( Exception $exception )
         {
@@ -87,7 +91,10 @@ class ProductController extends BaseController
                 "sku" => "required|unique:products,sku,{$id}"
             ]);
 
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function($updated) use($request) {
+                $attributes = $this->repository->validateAttributes($request);
+                $this->repository->syncAttributes($attributes, $updated);
+            });
         }
         catch( Exception $exception )
         {
