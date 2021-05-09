@@ -3,14 +3,17 @@
 namespace Modules\Product\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Attribute\Transformers\AttributeResource;
 
 class ProductAttributeResource extends JsonResource
 {
     public function toArray($request): array
     {
         return [
-            "attribute" => new AttributeResource($this->attribute),
+            "attribute" => [
+                "name" => $this->attribute->name,
+                "slug" => $this->attribute->slug,
+                "type" => $this->attribute->type
+            ],
             "value" => $this->value_data
         ];
     }
