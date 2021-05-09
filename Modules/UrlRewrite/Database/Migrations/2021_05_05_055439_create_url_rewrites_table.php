@@ -15,11 +15,11 @@ class CreateUrlRewritesTable extends Migration
     {
         Schema::create('url_rewrites', function (Blueprint $table) {
             $table->id();
-            $table->string("request_path");
-            $table->string("entity_controller");
-            $table->string("entity_method");
-            $table->unsignedBigInteger("entity_id");
-            $table->foreign('entity_id')->references('id')->on('products')->onDelete('cascade');
+            $table->string("type")->nullable();
+            $table->json("type_attributes")->nullable();
+            $table->string("request_path")->index();
+            $table->string("target_path");
+            $table->smallInteger("redirect_type")->default(0);
             $table->timestamps();
         });
     }
