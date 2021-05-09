@@ -40,7 +40,7 @@ class ProductController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->getFilteredList($request, ["product_attributes"]);
         }
         catch( Exception $exception )
         {
@@ -69,7 +69,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->model->findOrFail($id);
+            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
@@ -78,7 +78,7 @@ class ProductController extends BaseController
 
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
-    
+
     public function update(Request $request, int $id): JsonResponse
     {
         try
