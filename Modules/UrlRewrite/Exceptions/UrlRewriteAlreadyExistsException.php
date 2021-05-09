@@ -1,0 +1,9 @@
+<?php
+
+class UrlRewriteAlreadyExistsException extends \Exception
+{
+	public static function requestPath(string $requestPath): self
+    {
+        return new static("Request path `{$requestPath}` already exists.");
+    }
+}
