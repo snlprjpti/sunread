@@ -23,6 +23,13 @@ class Category extends Model
     protected $with = [ "translations" ];
     public $urlRewriteType = 'category';
 
+    // protected $appends = ['category'];
+ 
+    // public function getCategoryAttribute(): string
+    // {
+    //     return $this->id;
+    // }
+
 
     public function image_url(): ?string
     {

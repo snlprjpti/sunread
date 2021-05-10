@@ -14,11 +14,14 @@ return [
     'types' => [
         'product' => [
             'route' => 'admin.catalog.products.show',
-            'attributes' => ['id']
+            'attributes' => ['id'],
+            'parameter' => ['product']
         ],
         'category' => [
             'route' => 'admin.catalog.categories.categories.show',
-            'attributes' => ['id']
+            'attributes' => ['id'],
+            'parameter' => ['category']
+          
         ],
     ],
 ];

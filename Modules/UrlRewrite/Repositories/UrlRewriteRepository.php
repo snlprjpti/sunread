@@ -114,6 +114,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         ?string $description = null,
         ?bool $unique = false): object 
     {
+      
 
         [$requestPath, $targetPath] = $this->validateCreate(
             $requestPath,
@@ -158,6 +159,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
     protected function targetPathFromRoute($type, $attributes): string
     {
         return route($type, $attributes, false);
+    //    dd( config("url-rewrite.types.category.attributes"));
     }
 
     protected function validateCreate(string $requestPath,

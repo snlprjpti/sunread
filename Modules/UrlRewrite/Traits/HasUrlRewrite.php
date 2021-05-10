@@ -24,8 +24,8 @@ trait HasUrlRewrite
     {
         $mapped = [];
 
-        foreach (config("url-rewrite.types.$this->urlRewriteType.attributes") as $attribute) {
-            $mapped[$attribute] = $this->getAttribute($attribute);
+        foreach (config("url-rewrite.types.$this->urlRewriteType.attributes") as $key => $attribute) {
+            $mapped[config("url-rewrite.types.$this->urlRewriteType.parameter.$key")] = $this->getAttribute($attribute);
         }
 
         return $mapped;

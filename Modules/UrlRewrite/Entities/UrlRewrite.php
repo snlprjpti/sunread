@@ -10,13 +10,17 @@ class UrlRewrite extends Model
 {
     use HasFactory, HasUrlRewrite;
 
-    protected $fillable = ["type", "type_attribute", "request_path", "target_path", "redirect_type"];
+    protected $fillable = ["type", "type_attributes", "request_path", "target_path", "redirect_type"];
 
     public const FORWARD = 0;
 
     public const PERMANENT = 1;
 
     public const TEMPORARY = 2;
+
+    protected $casts = [
+        'type_attributes' => 'array',
+    ];
 
     public function __construct(?array $attributes = [])
     {   

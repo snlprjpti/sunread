@@ -13,9 +13,8 @@ class CategoryObserver
     public function created(Category $category)
     {
         // Audit::log($category, __FUNCTION__);
-
         UrlRewrite::create(
-            Str::slug($category->{config("url-rewrite.types.$category->urlRewriteType.create-slug-from")}),
+            Str::slug($category->slug),
             null,
             config("url-rewrite.types.$category->urlRewriteType.route"),
             $category->getUrlRewriteAttributesArray(),
@@ -26,8 +25,10 @@ class CategoryObserver
 
     public function updated(Category $category)
     {
+        dd($category->getUrlRewrite());
+        // // Audit::log($category, __FUNCTION__);
 
-        Audit::log($category, __FUNCTION__);
+        // UrlRewrite::regenerateRoute($category->getUrlRewrite());
     }
 
     public function deleted(Category $category)
