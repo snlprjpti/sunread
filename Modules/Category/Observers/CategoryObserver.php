@@ -5,12 +5,23 @@ namespace Modules\Category\Observers;
 
 use Modules\Core\Facades\Audit;
 use Modules\Category\Entities\Category;
+use Modules\UrlRewrite\Facades\UrlRewrite;
+use Illuminate\Support\Str;
 
 class CategoryObserver
 {
     public function created(Category $category)
     {
-        Audit::log($category, __FUNCTION__);
+        // Audit::log($category, __FUNCTION__);
+
+        UrlRewrite::create(
+            Str::slug($category->{config("url-rewrite.types.$category->urlRewriteType.create-slug-from")}),
+            null,
+            config("url-rewrite.types.$category->urlRewriteType.route"),
+            $category->getUrlRewriteAttributesArray(),
+            0,
+            true
+        );
     }
 
     public function updated(Category $category)
