@@ -2,10 +2,12 @@
 
 namespace Modules\Product\Tests\Feature;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Product\Entities\Product;
+use Illuminate\Support\Facades\Storage;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\ProductImage;
 
 class ProductTest extends BaseTestCase
@@ -19,6 +21,19 @@ class ProductTest extends BaseTestCase
 
         $this->model_name = "Product";
         $this->route_prefix = "admin.catalog.products";
+    }
+
+    public function getCreateData(): array
+    {
+        $attribute = Attribute::whereType("text")->inRandomOrder()->first();
+        return $this->model::factory()->make([
+            "attributes" => [
+                [
+                    "attribute_id" => $attribute->id,
+                    "value" => Str::random(10)
+                ]
+            ]
+        ])->toArray();
     }
 
     public function getNonMandodtaryCreateData(): array
