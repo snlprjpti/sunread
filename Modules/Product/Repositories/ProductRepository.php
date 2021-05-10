@@ -31,22 +31,29 @@ class ProductRepository extends BaseRepository
 
     public function validateAttributes(object $request): array
     {
-        $attributes = Attribute::all();
-        $product_attributes = array_map(function($product_attribute) use ($attributes) {
-            $attribute = $attributes->where("id", $product_attribute["attribute_id"])->first() ?? null;
-            if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute["attribute_id"]} does not exist." ]);
+        try
+        {
+            $attributes = Attribute::all();
+            $product_attributes = array_map(function($product_attribute) use ($attributes) {
+                if ( !is_array($product_attribute) ) throw ValidationException::withMessages([ "attributes" => "Invalid attributes format." ]);
+                $attribute = $attributes->where("id", $product_attribute["attribute_id"])->first() ?? null;
+                if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute["attribute_id"]} does not exist." ]);
 
-            $validator = Validator::make($product_attribute, [
-                "store_id" => "sometimes|nullable|exists:stores,id",
-                "channel_id" => "sometimes|nullable|exists:channels,id",
-                "value" => $attribute->validation
-            ]);
-            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+                $validator = Validator::make($product_attribute, [
+                    "store_id" => "sometimes|nullable|exists:stores,id",
+                    "channel_id" => "sometimes|nullable|exists:channels,id",
+                    "value" => $attribute->validation
+                ]);
+                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
 
-            $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
-            return array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid());
-        }, $request->get("attributes"));
-        
+                $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
+                return array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid());
+            }, $request->get("attributes"));
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
         
         return $product_attributes;
     }
