@@ -25,10 +25,10 @@ class CategoryObserver
 
     public function updated(Category $category)
     {
-        dd($category->getUrlRewrite());
+        // dd($category->slug);
         // // Audit::log($category, __FUNCTION__);
 
-        // UrlRewrite::regenerateRoute($category->getUrlRewrite());
+        UrlRewrite::regenerateRoute($category->slug, $category->getUrlRewrite());
     }
 
     public function deleted(Category $category)
