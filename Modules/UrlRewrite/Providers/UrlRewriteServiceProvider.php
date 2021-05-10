@@ -53,6 +53,9 @@ class UrlRewriteServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/url-rewrite.php'), "url-rewrite"
+        );
     }
 
     /**
