@@ -36,8 +36,8 @@ class Attribute extends Model
         return array_merge($validation, [config("attribute_types")[$this->type]::$type]);
     }
 
-    public function getValidationAttribute(): ?array
+    public function getValidationAttribute(): ?string
     {
-        return $this->validation ?? $this->generateValidation();
+        return $this->validation ?? implode("|", $this->generateValidation());
     }
 }
