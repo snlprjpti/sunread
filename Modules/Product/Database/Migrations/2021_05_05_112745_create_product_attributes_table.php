@@ -19,7 +19,7 @@ class CreateProductAttributesTable extends Migration
             $table->foreign("store_id")->references("id")->on("stores")->onDelete("cascade");
 
             $table->string("value_type");
-            $table->unsignedBigInteger("value_id");
+            $table->unsignedBigInteger("value_id")->nullable();
 
             $table->unique(["attribute_id", "channel_id", "product_id", "store_id", "value_type"], "attribute_compound_unique");
         });
