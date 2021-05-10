@@ -38,4 +38,45 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 			$this->cache = $this->cache->tags(config("url-rewrite.cache-key"));
 		}
 	}
+
+	protected function getTtl(): int
+	{
+		return config("url-rewrite.cache-ttl");
+	}
+
+	public function find(int $id): ?object
+	{
+		return $this->remember(self::URL_REWRITE_ID.$id, __FUNCTION__, $id);
+	}
+
+	public function getByRequestPath(string $url): ?object
+	{
+		return $this->remember(static::URL_REWRITE_REQUEST_PATH.md5($url), __FUNCTION__, $url);
+	}
+
+	public function all(): ?object
+	{
+		return $this->remember(static::URL_REWRITE_ALL, __FUNCTION__);
+	}
+
+	public function getByTargetPath(string $url): ?object
+	{
+		return $this->remember(static::URL_REWRITE_TARGET_PATH.md5($url), __FUNCTION__, $url);
+	}
+
+	public function getByTypeAndAttribute(string $type, array $attributes): ?object
+	{
+		return $this->remember(self::URL_REWRITE_TYPE_ATTRIBUTES.md5($type.json_encode($attributes)), __FUNCTION__, $type, $attributes);
+	}
+
+	public function getModel(): object
+	{
+		return $this->repository->getModel();
+	}
+
+	public function setModel(object $model): object
+	{
+		// return $this->repository->;	
+	}
+
 }
