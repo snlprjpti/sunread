@@ -7,9 +7,10 @@ return [
     'table-name' => 'url_rewrites',
     'repository' => UrlRewriteRepository::class,
     'model' => UrlRewrite::class,
-    'cache' => true,
+    'cache' => false,
     'cache-tag' => 'url_rewrites',
     'cache-ttl' => 86400,
+    'cache-decorator' => CachingUrlRewriteRepository::class,
     'types' => [
         'product' => [
             'route' => 'admin.catalog.products.show',
