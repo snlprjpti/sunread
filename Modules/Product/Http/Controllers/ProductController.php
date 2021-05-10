@@ -59,6 +59,7 @@ class ProductController extends BaseController
             $created = $this->repository->create($data, function($created) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $created);
+                $created->categories()->sync($request->get("categories"));
             });
         }
         catch( Exception $exception )
@@ -73,7 +74,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes"])->findOrFail($id);
+            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
@@ -94,6 +95,7 @@ class ProductController extends BaseController
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $updated);
+                $updated->categories()->sync($request->get("categories"));
             });
         }
         catch( Exception $exception )

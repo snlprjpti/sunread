@@ -25,7 +25,9 @@ class ProductRepository extends BaseRepository
             "sku" => "required|unique:products,sku",
             "type" => "required|in:simple,configurable",
             "status" => "sometimes|boolean",
-            "attributes" => "required|array"
+            "attributes" => "required|array",
+            "categories" => "required|array",
+            "categories.*" => "required|exists:categories,id"
         ];
     }
 
