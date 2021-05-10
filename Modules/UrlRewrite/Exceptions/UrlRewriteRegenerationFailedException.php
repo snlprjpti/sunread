@@ -1,6 +1,10 @@
 <?php
 
-class UrlRewriteRegenerationFailedException extends \Exception
+namespace  Modules\UrlRewrite\Exceptions;
+
+use Exception;
+
+class UrlRewriteRegenerationFailedException extends Exception
 {
     public static function noConfiguration(): self
     {
