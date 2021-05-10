@@ -12,11 +12,11 @@ return [
     'cache-ttl' => 86400,
     'types' => [
         'product' => [
-            'route' => 'product',
+            'route' => 'admin.catalog.products',
             'attributes' => ['id', 'store_id']
         ],
         'category' => [
-            'route' => 'category',
+            'route' => 'admin.catalog.categories.categories',
             'attributes' => ['id', 'store_id']
         ],
     ],
