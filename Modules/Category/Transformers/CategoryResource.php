@@ -28,8 +28,8 @@ class CategoryResource extends JsonResource
             "parent" => $this->parent ?? null,
 
             "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A'),
-            "translations" => $this->translations,
-            "channels" => ChannelResource::collection($this->channels),
+            "translations" => $this->whenLoaded("translations"),
+            "channels" => ChannelResource::collection($this->whenLoaded("channels")),
         ];
     }
 }

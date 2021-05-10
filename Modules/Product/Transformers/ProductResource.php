@@ -5,6 +5,7 @@ namespace Modules\Product\Transformers;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Attribute\Transformers\AttributeGroupResource;
 use Modules\Brand\Transformers\BrandResource;
+use Modules\Category\Transformers\CategoryResource;
 
 class ProductResource extends JsonResource
 {
@@ -18,6 +19,7 @@ class ProductResource extends JsonResource
             "sku" => $this->sku,
             "type" => $this->type,
             "status" => $this->status,
+            "categories" => CategoryResource::collection($this->whenLoaded("categories")),
             "attribute_values" => ProductAttributeResource::collection($this->whenLoaded("product_attributes")),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];

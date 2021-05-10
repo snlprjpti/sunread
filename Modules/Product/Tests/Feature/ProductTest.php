@@ -8,6 +8,7 @@ use Modules\Core\Tests\BaseTestCase;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Category\Entities\Category;
 use Modules\Product\Entities\ProductImage;
 
 class ProductTest extends BaseTestCase
@@ -26,13 +27,16 @@ class ProductTest extends BaseTestCase
     public function getCreateData(): array
     {
         $attribute = Attribute::whereType("text")->inRandomOrder()->first();
+        $category = Category::inRandomOrder()->first();
+
         return $this->model::factory()->make([
             "attributes" => [
                 [
                     "attribute_id" => $attribute->id,
                     "value" => Str::random(10)
                 ]
-            ]
+            ],
+            "categories" => [$category->id]
         ])->toArray();
     }
 
