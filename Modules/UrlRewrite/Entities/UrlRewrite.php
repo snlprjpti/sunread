@@ -3,16 +3,50 @@
 namespace Modules\UrlRewrite\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\HasFactory;
+use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class UrlRewrite extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUrlRewrite;
 
-    protected $fillable = [];
-    
-    protected static function newFactory()
-    {
-        return \Modules\UrlRewrite\Database\factories\UrlRewriteFactory::new();
+    protected $fillable = ["type", "type_attribute", "request_path", "target_path", "redirect_type"];
+
+    public const FORWARD = 0;
+
+    public const PERMANENT = 1;
+
+    public const TEMPORARY = 2;
+
+    public function __construct(?array $attributes = [])
+    {   
+        parent::__construct($attributes);
     }
+
+    public function isForward(): bool
+    {
+        return $this->redirect_type === static::FORWARD;
+    }
+
+    public function isRedirect(): bool
+    {
+        return $this->redirect_type !== static::FORWARD;
+    }
+
+    public function getRedirectType(): int
+    {
+        return $this->redirect_type === static::PERMANENT ? 301 : 302;
+    }
+
+    public static function getPossibleTypesArray(): array
+    {
+        $array = [];
+
+        foreach (array_keys(config('url-rewrite.types')) as $type) {
+            $array[$type] = $type;
+        }
+
+        return $array;
+    }
+    
 }
