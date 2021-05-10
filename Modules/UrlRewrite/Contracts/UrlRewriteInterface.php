@@ -35,5 +35,5 @@ interface UrlRewriteInterface
 
     public function update(array $data, int $id): object;
 
-    public function regenerateRoute(object $urlRewrite): object;
+    public function regenerateRoute(string $requestPath, object $urlRewrite): object;
 }
