@@ -8,14 +8,17 @@ return [
     'repository' => UrlRewriteRepository::class,
     'model' => UrlRewrite::class,
     'cache' => true,
+    'cache-tag' => 'url_rewrites',
+    'cache-ttl' => 86400,
     'types' => [
         'product' => [
             'route' => 'product',
-            'attributes' => ['id']
+            'attributes' => ['id', 'store_id']
         ],
         'category' => [
             'route' => 'category',
-            'attributes' => ['id']
+            'attributes' => ['id', 'store_id']
         ],
     ],
 ];
+
