@@ -13,11 +13,11 @@ return [
     'types' => [
         'product' => [
             'route' => 'admin.catalog.products',
-            'attributes' => ['id', 'store_id']
+            'attributes' => ['id']
         ],
         'category' => [
             'route' => 'admin.catalog.categories.categories',
-            'attributes' => ['id', 'store_id']
+            'attributes' => ['id']
         ],
     ],
 ];
