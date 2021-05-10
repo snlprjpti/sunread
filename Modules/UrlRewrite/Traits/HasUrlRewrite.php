@@ -14,18 +14,15 @@ trait HasUrlRewrite
 
 	public function getUrlRewrite(): ?object
     {
-        return UrlRewrite::getByTypeAndAttributes(
-			config("url-rewrite.types.$this->urlRewriteType.route"),
-			$this->getUrlRewriteAttributesArray()
-        );
+        return UrlRewrite::getByTypeAndAttributes(config("url-rewrite.types.{$this->urlRewriteType}.route"), $this->getUrlRewriteAttributesArray());
     }
 
 	public function getUrlRewriteAttributesArray(): ?array
     {
         $mapped = [];
 
-        foreach (config("url-rewrite.types.$this->urlRewriteType.attributes") as $key => $attribute) {
-            $mapped[config("url-rewrite.types.$this->urlRewriteType.parameter.$key")] = $this->getAttribute($attribute);
+        foreach (config("url-rewrite.types.{$this->urlRewriteType}.attributes") as $key => $attribute) {
+            $mapped[config("url-rewrite.types.{$this->urlRewriteType}.parameter.$key")] = $this->getAttribute($attribute);
         }
 
         return $mapped;
