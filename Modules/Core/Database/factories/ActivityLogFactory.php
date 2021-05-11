@@ -10,10 +10,11 @@ class ActivityLogFactory extends Factory
 {
     protected $model = ActivityLog::class;
 
-    public function definition()
+    public function definition(): array
     {
         $fake_subject = Arr::random(["\Modules\Core\Entities\Channel", "\Modules\Core\Entities\Currency"]);
         $fake_causer = Arr::random(["\Modules\User\Entities\Admin", "\Modules\Customer\Entities\Customer", NULL]);
+
         return [
             'log_name' => 'default',
             'subject_id' => $fake_subject::inRandomOrder()->first()->id,
@@ -22,8 +23,8 @@ class ActivityLogFactory extends Factory
             'causer_type' => $fake_causer,
             'properties' => [],
             'description' => "created",
-            'action' => $this->faker->name,
-            'activity' => $this->faker->name
+            'action' => $this->faker->name(),
+            'activity' => $this->faker->name()
         ];
     }
 }

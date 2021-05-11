@@ -15,7 +15,7 @@ class BaseTestCase extends TestCase
     use RefreshDatabase;
 
     protected array $headers;
-    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count;
+    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route;
 
     public function setUp(): void
     {
@@ -23,7 +23,8 @@ class BaseTestCase extends TestCase
         Schema::disableForeignKeyConstraints();
         $this->artisan("db:seed", ["--force" => true]);
 
-        $this->factory_count = 10;
+        $this->factory_count = 2;
+        $this->append_to_route = null;
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->fake_resource_id = 0;
         $this->filter = [
@@ -75,6 +76,12 @@ class BaseTestCase extends TestCase
         return $jwtToken ?? null;
     }
 
+    public function getRoute(string $method, ?array $parameters = null): string
+    {
+        $parameters = $this->append_to_route ? array_merge([$this->append_to_route], $parameters ?? []) : $parameters;
+        return route("{$this->route_prefix}.{$method}", $parameters);
+    }
+
     /**
      * GET tests
      * 
@@ -87,7 +94,7 @@ class BaseTestCase extends TestCase
     public function testAdminCanFetchResources()
     {
         $this->model::factory($this->factory_count)->create();
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index"));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index"));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -98,7 +105,7 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanFetchFilteredResources()
     {
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index", $this->filter));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -109,7 +116,7 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanFetchIndividualResource()
     {
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", $this->default_resource_id));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_id]));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -120,7 +127,7 @@ class BaseTestCase extends TestCase
 
     public function testShouldReturnErrorIfResourceDoesNotExist()
     {
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", $this->fake_resource_id));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->fake_resource_id]));
 
         $response->assertStatus(404);
         $response->assertJsonFragment([
@@ -140,7 +147,7 @@ class BaseTestCase extends TestCase
     public function testAdminCanCreateResource()
     {
         $post_data = $this->getCreateData();
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
+        $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
         $response->assertStatus(201);
         $response->assertJsonFragment([
@@ -152,7 +159,7 @@ class BaseTestCase extends TestCase
     public function testAdminCanCreateResourceWithNonMandatoryData()
     {
         $post_data = $this->getNonMandodtaryCreateData();
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
+        $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
         $response->assertStatus(201);
         $response->assertJsonFragment([
@@ -164,7 +171,7 @@ class BaseTestCase extends TestCase
     public function testShouldReturnErrorIfCreateDataIsInvalid()
     {
         $post_data = $this->getInvalidCreateData();
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
+        $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
         $response->assertStatus(422);
         $response->assertJsonFragment([
@@ -184,7 +191,7 @@ class BaseTestCase extends TestCase
     public function testAdminCanUpdateResource()
     {
         $post_data = $this->getUpdateData();
-        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update", $this->default_resource_id), $post_data);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -196,7 +203,7 @@ class BaseTestCase extends TestCase
     public function testAdminCanUpdateResourceWithNonMandatoryData()
     {
         $post_data = $this->getNonMandodtaryUpdateData();
-        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update", $this->default_resource_id), $post_data);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -208,7 +215,7 @@ class BaseTestCase extends TestCase
     public function testShouldReturnErrorIfUpdateDataIsInvalid()
     {
         $post_data = $this->getInvalidUpdateData();
-        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update", $this->default_resource_id), $post_data);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
         $response->assertStatus(422);
         $response->assertJsonFragment([
@@ -219,7 +226,7 @@ class BaseTestCase extends TestCase
     public function testShouldReturnErrorIfUpdateResourceDoesNotExist()
     {
         $post_data = $this->getUpdateData();
-        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update", $this->fake_resource_id), $post_data);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->fake_resource_id]), $post_data);
 
         $response->assertStatus(404);
         $response->assertJsonFragment([
@@ -238,7 +245,7 @@ class BaseTestCase extends TestCase
     public function testAdminCanDeleteResource()
     {
         $resource_id = $this->model::factory()->create()->id;
-        $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.destroy", $resource_id));
+        $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
 
         $response->assertStatus(204);
 
@@ -248,7 +255,7 @@ class BaseTestCase extends TestCase
 
     public function testShouldReturnErrorIfDeleteResourceDoesNotExist()
     {
-        $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.destroy", $this->fake_resource_id));
+        $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$this->fake_resource_id]));
 
         $response->assertStatus(404);
         $response->assertJsonFragment([

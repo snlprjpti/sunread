@@ -7,13 +7,12 @@ use Modules\Customer\Entities\CustomerGroup;
 
 class CustomerGroupTest extends BaseTestCase
 {
-    protected object $admin;
-    protected array $headers;
-
     public function setUp(): void
     {
         $this->model = CustomerGroup::class;
+
         parent::setUp();
+
         $this->admin = $this->createAdmin();
         $this->model_name = "Customer Group";
         $this->route_prefix = "admin.groups";

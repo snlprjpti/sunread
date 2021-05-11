@@ -46,9 +46,13 @@ class ReviewTest extends BaseTestCase
         ]);
     }
 
-    public function testAdminCanVerifyResource()
+    /**
+     * Tests
+     */
+
+     public function testAdminCanVerifyResource()
     {
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.verify", $this->default_resource_id));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("verify", [$this->default_resource_id]));
         
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -60,7 +64,7 @@ class ReviewTest extends BaseTestCase
     public function testAdminCanFetchPendingResources()
     {
         $this->model::factory($this->factory_count)->create();
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.pending"));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("pending"));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([

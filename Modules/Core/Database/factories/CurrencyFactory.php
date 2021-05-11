@@ -6,23 +6,13 @@ use Modules\Core\Entities\Currency;
 
 class CurrencyFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = \Modules\Core\Entities\Currency::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
         while(true) {
-            $currency = $this->faker->currencyCode();
-            $old_currency = Currency::where("code", $currency)->first();
+            $currency = $this->faker->unique()->currencyCode();
+            $old_currency = Currency::whereCode($currency)->first();
             if (!$old_currency) break;
         }
 
@@ -33,4 +23,3 @@ class CurrencyFactory extends Factory
         ];
     }
 }
-

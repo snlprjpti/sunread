@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminsTableSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         DB::table("admins")->insert([
             "first_name" => "Admin",
