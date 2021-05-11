@@ -4,6 +4,8 @@ namespace Modules\Product\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Product\Entities\Product;
+use Modules\Product\Observers\ProductObserver;
 
 class ProductServiceProvider extends ServiceProvider
 {
@@ -53,6 +55,9 @@ class ProductServiceProvider extends ServiceProvider
         ], 'config');
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
+        );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/product_image.php'), 'product_image'
         );
     }
 
@@ -113,6 +118,6 @@ class ProductServiceProvider extends ServiceProvider
 
     public function registerObserver(): void
     {
-        // TODO :: Product::observe(ProductObserver::class);
+        Product::observe(ProductObserver::class);
     }
 }

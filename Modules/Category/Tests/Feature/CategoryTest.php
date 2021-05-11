@@ -85,7 +85,6 @@ class CategoryTest extends BaseTestCase
     public function testShouldReturnErrorIfBasicAdminTryToUpdateRootCategory()
     {
         $post_data = array_merge($this->getUpdateData(), ["parent_id" => $this->default_resource_id]);
-        
         $response = $this->withHeaders($this->basicAdminHeader())->put(route("{$this->route_prefix}.update", $this->root_category_id), $post_data);
 
         $response->assertStatus(403);

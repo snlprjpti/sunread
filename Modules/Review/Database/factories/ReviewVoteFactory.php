@@ -7,27 +7,17 @@ use Modules\Review\Entities\Review;
 
 class ReviewVoteFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = \Modules\Review\Entities\ReviewVote::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
-        $customer = Customer::factory()->create();
+        $customer = Customer::latest("id")->first();
         $review = Review::factory()->create();
 
         return [
-            'customer_id' => $customer->id,
-            'review_id' => $review->id,
-            'vote_type' => rand(0,1)
+            "customer_id" => $customer->id,
+            "review_id" => $review->id,
+            "vote_type" => rand(0,1)
         ];
     }
 }

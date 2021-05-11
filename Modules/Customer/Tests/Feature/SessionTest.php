@@ -30,11 +30,10 @@ class SessionTest extends TestCase
     public function createCustomer(array $attributes = []): object
     {
         $password = $attributes["password"] ?? "password";
-        $group = CustomerGroup::first();
 
         $data = [
             "password" => Hash::make($password),
-            "customer_group_id" => $group->id
+            "customer_group_id" => CustomerGroup::first()->id
         ];
 
         return Customer::factory()->create($data);

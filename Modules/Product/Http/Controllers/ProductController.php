@@ -40,7 +40,7 @@ class ProductController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["product_attributes"]);
+            $fetched = $this->getFilteredList($request, ["product_attributes", "images"]);
         }
         catch( Exception $exception )
         {
@@ -55,7 +55,12 @@ class ProductController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $created = $this->repository->create($data);
+
+            $created = $this->repository->create($data, function($created) use($request) {
+                $attributes = $this->repository->validateAttributes($request);
+                $this->repository->syncAttributes($attributes, $created);
+                $created->categories()->sync($request->get("categories"));
+            });
         }
         catch( Exception $exception )
         {
@@ -69,7 +74,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes"])->findOrFail($id);
+            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
@@ -87,7 +92,11 @@ class ProductController extends BaseController
                 "sku" => "required|unique:products,sku,{$id}"
             ]);
 
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function($updated) use($request) {
+                $attributes = $this->repository->validateAttributes($request);
+                $this->repository->syncAttributes($attributes, $updated);
+                $updated->categories()->sync($request->get("categories"));
+            });
         }
         catch( Exception $exception )
         {
