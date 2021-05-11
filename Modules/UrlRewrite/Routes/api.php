@@ -13,8 +13,6 @@
 Route::group(['middleware' => ['api']], function () {
     Route::group(["prefix" => "admin", "middleware" => ["admin", "language"], "as" => "admin."], function () {
         Route::resource("url-rewrites", UrlRewriteController::class)->except(["create","edit"]);
-        
-        Route::rewrites();
     });
     
 });
