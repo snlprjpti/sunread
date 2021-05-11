@@ -85,6 +85,6 @@ class ProductImageController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('status-change'));
+        return $this->successResponseWithMessage($this->lang('status-change-success'));
     }
 }
