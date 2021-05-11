@@ -74,11 +74,11 @@ class ProductImageController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 
-    public function setMainImage(int $id): JsonResponse
+    public function changeMainImage(int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->setMainImage($id);
+            $fetched = $this->repository->changeMainImage($id);
         }
         catch( Exception $exception )
         {

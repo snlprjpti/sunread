@@ -33,7 +33,7 @@ class ProductImageRepository extends BaseRepository
             // Store File
             $key = \Str::random(6);
             $file_name = $file->getClientOriginalName();
-            $data['path'] = $file->storeAs("images/products/{$key}", $file_name, ["disk" => "public"]);
+            $data['path'] = $file->storeAs("images/products/{$key}", $file_name);
 
 
             // Store small_image and thumbnail variations
@@ -89,7 +89,7 @@ class ProductImageRepository extends BaseRepository
         return true;
     }
 
-    public function setMainImage($id): object
+    public function changeMainImage($id): bool
     {
         DB::beginTransaction();
 
@@ -97,7 +97,7 @@ class ProductImageRepository extends BaseRepository
         {
             $currentImage = $this->model->findOrFail($id);
             $this->model->where('product_id', $currentImage->product_id)->update(['main_image' => 0]);
-            $currentImage->update(['main_image' => 1]);
+            $currentImage->update(['main_image' => ($currentImage->main_image == 1) ? 0 : 1]);
         }
         catch (Exception $exception)
         {
@@ -106,6 +106,6 @@ class ProductImageRepository extends BaseRepository
         }
 
         DB::commit();
-        return $currentImage;
+        return true;
     }
 }
