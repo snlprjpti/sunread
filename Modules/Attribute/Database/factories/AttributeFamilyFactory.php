@@ -10,7 +10,7 @@ class AttributeFamilyFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->name();
-        $slug = $this->faker()->unique()->slug();
+        $slug = $this->faker->unique()->slug();
     
         return [
             "slug" => $slug,

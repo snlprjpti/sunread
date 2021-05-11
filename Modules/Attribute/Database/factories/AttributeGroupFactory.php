@@ -1,7 +1,6 @@
 <?php
 namespace Modules\Attribute\Database\factories;
 
-use Illuminate\Support\Str;
 use Modules\Attribute\Entities\AttributeFamily;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -12,7 +11,7 @@ class AttributeGroupFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->name();
-        $slug = $this->faker()->unique()->slug();
+        $slug = $this->faker->unique()->slug();
     
         return [
             "attribute_family_id" => AttributeFamily::factory()->create()->id,
