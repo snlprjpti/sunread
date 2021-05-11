@@ -97,7 +97,7 @@ class ProductImageRepository extends BaseRepository
         {
             $currentImage = $this->model->findOrFail($id);
             $this->model->where('product_id', $currentImage->product_id)->update(['main_image' => 0]);
-            $currentImage->update(['main_image' => ($currentImage->main_image == 1) ? 0 : 1]);
+            $currentImage->update(['main_image' => !$currentImage->main_image]);
         }
         catch (Exception $exception)
         {
