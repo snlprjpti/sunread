@@ -8,7 +8,7 @@ Route::group(["middleware" => ["api"]], function() {
         Route::resource("products", ProductController::class)->except(["create", "edit"]);
         // Product Images Routes
         Route::group(['prefix' => 'product', 'as' => 'products.'], function() {
-            Route::put('image/{id}/change-main-image', [\Modules\Product\Http\Controllers\ProductImageController::class,"changeMainImage"])->name("image.changeMainImage");
+            Route::put('image/{id}/change-main-image', [\Modules\Product\Http\Controllers\ProductImageController::class,"changeMainImage"])->name("image.change_main_image");
             Route::resource('image', ProductImageController::class)->only(['store', 'destroy']);
         });
     });
