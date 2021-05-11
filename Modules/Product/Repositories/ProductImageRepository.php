@@ -20,8 +20,7 @@ class ProductImageRepository extends BaseRepository
         $this->rules = [
             "product_id" => "required|exists:products,id",
             "image.*" => "required|mimes:bmp,jpeg,jpg,png",
-            "position" => "sometimes|numeric",
-            "main_image" => "sometimes|boolean"
+            "position" => "sometimes|numeric"
         ];
     }
 
@@ -98,7 +97,7 @@ class ProductImageRepository extends BaseRepository
         {
             $currentImage = $this->model->findOrFail($id);
             $this->model->where('product_id', $currentImage->product_id)->update(['main_image' => 0]);
-            $this->model->where('id', $id)->update(['main_image' => 1]);
+            $currentImage->update(['main_image' => 1]);
         }
         catch (Exception $exception)
         {
