@@ -87,9 +87,13 @@ class ProductTest extends BaseTestCase
     public function testAdminShouldBeAbleToChangeMainProductImage()
     {
         $product_image_id = ProductImage::factory()->create()->id;
-        $response = $this->withHeaders($this->headers)->put($this->getRoute("image.changeMainImage", [$product_image_id]));
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("image.change_main_image", [$product_image_id]));
 
         $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.status-change-success", ["name" => $this->model_name])
+        ]);
     }
 
 }
