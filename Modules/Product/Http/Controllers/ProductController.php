@@ -40,7 +40,7 @@ class ProductController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["product_attributes"]);
+            $fetched = $this->getFilteredList($request, ["product_attributes", "images"]);
         }
         catch( Exception $exception )
         {
@@ -74,7 +74,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories"])->findOrFail($id);
+            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
