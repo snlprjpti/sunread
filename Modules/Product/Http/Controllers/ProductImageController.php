@@ -77,4 +77,18 @@ class ProductImageController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
+
+    public function setMainImage(int $id)
+    {
+        try
+        {
+            $fetched = $this->repository->setMainImage($id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
 }

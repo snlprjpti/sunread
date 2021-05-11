@@ -89,4 +89,24 @@ class ProductImageRepository extends BaseRepository
         DB::commit();
         return true;
     }
+
+    public function setMainImage($id): object
+    {
+        DB::beginTransaction();
+
+        try
+        {
+            $currentImage = $this->model->findOrFail($id);
+            $this->model->where('product_id', $currentImage->product_id)->update(['main_image' => 0]);
+            $this->model->where('id', $id)->update(['main_image' => 1]);
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
+        return $currentImage;
+    }
 }
