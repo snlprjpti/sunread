@@ -14,6 +14,7 @@ class CategoryTranslationResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "description" => $this->description,
+            "url" => $this->url,
             "store" => new StoreResource($this->store),
 
             "meta_title" => $this->meta_title,

@@ -12,6 +12,7 @@ use Kalnoy\Nestedset\NodeTrait;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;
+use Modules\UrlRewrite\Facades\UrlRewrite;
 use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Category extends Model
@@ -22,7 +23,8 @@ class Category extends Model
     protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "status" ];
     protected $with = [ "translations" ];
     public $urlRewriteType = 'category';
-
+    protected $appends = ['url'];
+ 
     public function image_url(): ?string
     {
         if (!$this->image) return null;
