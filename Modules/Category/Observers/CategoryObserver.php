@@ -12,27 +12,19 @@ class CategoryObserver
 {
     public function created(Category $category)
     {
-        // Audit::log($category, __FUNCTION__);
-        UrlRewrite::create(
-            Str::slug($category->slug),
-            null,
-            config("url-rewrite.types.$category->urlRewriteType.route"),
-            $category->getUrlRewriteAttributesArray(),
-            0,
-            true
-        );
+        Audit::log($category, __FUNCTION__);
+        UrlRewrite::handleUrlRewrite($category, __FUNCTION__, $category->createUrlRewrite());
     }
 
     public function updated(Category $category)
     {
-        // dd($category->slug);
-        // // Audit::log($category, __FUNCTION__);
-
-        UrlRewrite::regenerateRoute($category->slug, $category->getUrlRewrite());
+        Audit::log($category, __FUNCTION__);
+        UrlRewrite::handleUrlRewrite($category, __FUNCTION__, $category->createUrlRewrite());
     }
 
     public function deleted(Category $category)
     {
         Audit::log($category, __FUNCTION__);
+        UrlRewrite::handleUrlRewrite($category, __FUNCTION__, $category->createUrlRewrite());
     }
 }

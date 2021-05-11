@@ -59,7 +59,7 @@ class CategoryController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["translations"]);
+            $fetched = $this->getFilteredList($request);
             // Dont fetch root category for other admin
             if (!$this->is_super_admin) $fetched = $fetched->where('parent_id', '<>', null);
         }

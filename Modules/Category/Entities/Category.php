@@ -23,14 +23,6 @@ class Category extends Model
     protected $with = [ "translations" ];
     public $urlRewriteType = 'category';
 
-    // protected $appends = ['category'];
- 
-    // public function getCategoryAttribute(): string
-    // {
-    //     return $this->id;
-    // }
-
-
     public function image_url(): ?string
     {
         if (!$this->image) return null;
@@ -68,4 +60,10 @@ class Category extends Model
             ? $this::orderBy('position', 'ASC')->where('id', '!=', $this->id)->get()->toTree()
             : $this::orderBy('position', 'ASC')->get()->toTree();
     }
+
+    public function createUrlRewrite()
+    {
+        return $this->slug;
+    }
+
 }
