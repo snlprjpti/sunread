@@ -76,7 +76,46 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 
 	public function setModel(object $model): object
 	{
-		// return $this->repository->;	
+		return $this->repository->getModel();	
 	}
 
+	public function delete(int $id): bool
+	{		
+		$deleted = $this->repository->delete($id);
+		$cache_delete =  $this->forgetById($id);
+		return $deleted;
+	}
+
+	protected function forgetById(int $id): bool
+	{
+		if ($model = $this->find($id)) {
+			$this->cache->forget(static::URL_REWRITE_ALL);
+			$this->cache->forget(static::URL_REWRITE_ID.$model->id);
+			$this->cache->forget(static::URL_REWRITE_REQUEST_PATH.md5($model->requestPath));
+			$this->cache->forget(static::URL_REWRITE_TARGET_PATH.md5($model->target_path));
+			$this->cache->forget(static::URL_REWRITE_TYPE_ATTRIBUTES.md5($model->type.json_encode($model->type_attributes)));
+		
+			return true;
+		}
+		return false;
+	}
+
+	public function create(string $requestPath, ?string $targetPath, ?string $type = null,
+	?array $typeAttributes = null, int $redirectType = 0, ?bool $unique = false)
+	{
+		return $this->repository
+		->create($requestPath, $targetPath, $type, $typeAttributes, $redirectType, $unique);
+	}
+
+	public function update(array $data, int $id): object
+	{
+		$updated = $this->repository->update($data, $id);
+		$cache_delete = $this->forgetById($id);
+		return $updated;
+	}
+
+	public function regenerateRoute($urlRewrite): object
+	{
+		return $this->repository->regenerateRoute($urlRewrite);
+	}
 }
