@@ -48,6 +48,7 @@ class ProductImageController extends BaseController
             $data = $this->repository->validateData($request);
             foreach($request->file("image") as $file){
                 $image = $this->repository->createImage($file);
+                $image['main_image'] = 0;
                 $data = array_merge($data,$image);
                 $created = $this->repository->create($data);
             }
@@ -78,7 +79,7 @@ class ProductImageController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 
-    public function setMainImage(int $id)
+    public function setMainImage(int $id): JsonResponse
     {
         try
         {
