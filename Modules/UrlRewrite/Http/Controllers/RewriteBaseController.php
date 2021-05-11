@@ -21,7 +21,8 @@ class RewriteBaseController
 
     public function __invoke($url): object
     {
-        if (! $urlRewrite = $this->repository->getByRequestPath($url)) abort(404);
+        $urlRewrite = $this->repository->getByRequestPath($url);
+        if (!$urlRewrite) abort(404);
         if ($urlRewrite->isForward()) return $this->forwardResponse($urlRewrite->target_path);
         return redirect($urlRewrite->target_path, $urlRewrite->getRedirectType());
     }
