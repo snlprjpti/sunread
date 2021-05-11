@@ -23,7 +23,7 @@ class BaseTestCase extends TestCase
         Schema::disableForeignKeyConstraints();
         $this->artisan("db:seed", ["--force" => true]);
 
-        $this->factory_count = 10;
+        $this->factory_count = 2;
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->fake_resource_id = 0;
         $this->filter = [
