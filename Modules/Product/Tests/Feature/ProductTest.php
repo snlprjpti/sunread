@@ -60,7 +60,7 @@ class ProductTest extends BaseTestCase
         Storage::fake();
         $post_data = [
             "product_id" => Product::first()->id,
-            "image" => UploadedFile::fake()->image('image.jpeg')
+            "image" => [UploadedFile::fake()->image('image.jpeg')]
         ];
 
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.image.store"), $post_data);
