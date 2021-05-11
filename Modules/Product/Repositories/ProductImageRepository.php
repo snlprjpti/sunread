@@ -19,21 +19,19 @@ class ProductImageRepository extends BaseRepository
         $this->thumbnail_image_dimensions = config('product_image.image_dimensions.product_thumbnail_image');
         $this->rules = [
             "product_id" => "required|exists:products,id",
-            "image" => "required|mimes:bmp,jpeg,jpg,png",
+            "image.*" => "required|mimes:bmp,jpeg,jpg,png",
             "position" => "sometimes|numeric",
             "main_image" => "sometimes|boolean"
         ];
     }
 
-    public function createImage($request): array
+    public function createImage($file): array
     {
         DB::beginTransaction();
 
         try
         {
-
             // Store File
-            $file = $request->file("image");
             $key = \Str::random(6);
             $file_name = $file->getClientOriginalName();
             $data['path'] = $file->storeAs("images/products/{$key}", $file_name, ["disk" => "public"]);
