@@ -8,19 +8,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AdminFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = \Modules\User\Entities\Admin::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
         return [
             "role_id" => Role::where("slug", "<>", "super-admin")->first()->id,

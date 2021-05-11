@@ -16,7 +16,7 @@ class AccountTest extends TestCase
 {
 	use RefreshDatabase;
 
-    protected object $admin;
+    protected object $admin, $fake_admin;
 	protected array $headers;
     public $model, $model_name, $route_prefix;
 
