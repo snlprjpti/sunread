@@ -6,25 +6,15 @@ use Modules\Review\Entities\Review;
 
 class ReviewReplyFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = \Modules\Review\Entities\ReviewReply::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
-        $review = Review::factory()->create();
+        $review = Review::latest("id")->first();
 
         return [
-            'review_id' => $review->id,
-            'description' => $this->faker->paragraph()
+            "review_id" => $review->id,
+            "description" => $this->faker->paragraph()
         ];
     }
 }
