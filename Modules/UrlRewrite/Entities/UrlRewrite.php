@@ -45,8 +45,18 @@ class UrlRewrite extends Model
     {
         $query = $this->where('type', $type);
 
-        foreach ($attributes as $key => $attribute) {
-            $query = $query->where("type_attributes->$key", (string) $attribute);
+        if(isset($attributes['parameter']))
+        {
+            foreach ($attributes['parameter'] as $key => $attribute) {
+                $query = $query->where("type_attributes->parameter->$key", (string) $attribute);
+            }
+        }
+
+        if(isset($attributes['extra_fields']))
+        {
+            foreach ($attributes['extra_fields'] as $key => $attribute) {
+                $query = $query->where("type_attributes->extra_fields->$key", (string) $attribute);
+            }
         }
 
         return $query;

@@ -162,7 +162,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     protected function targetPathFromRoute($type, $attributes): string
     {
-        return route($type, $attributes, false);
+        return route($type, $attributes['parameter'], false);
     }
 
     protected function validateCreate(string $requestPath,
@@ -186,7 +186,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         return [$requestPath, $targetPath];
     }
 
-    public function handleUrlRewrite($model, $event, $request_path)
+    public function handleUrlRewrite(object $model, string $event, string $request_path): void
     {
         if( $event == "created" ) {
             $this->create($request_path,

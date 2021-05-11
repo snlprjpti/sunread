@@ -20,11 +20,16 @@ trait HasUrlRewrite
 	public function getUrlRewriteAttributesArray(): ?array
     {
         $mapped = [];
+        $base_config_key = "url-rewrite.types.{$this->urlRewriteType}.attributes";
 
-        foreach (config("url-rewrite.types.{$this->urlRewriteType}.attributes") as $key => $attribute) {
-            $mapped[config("url-rewrite.types.{$this->urlRewriteType}.parameter.$key")] = $this->getAttribute($attribute);
+        foreach (config("{$base_config_key}.parameter") as $key => $attribute) {
+            $mapped['parameter'][config("{$base_config_key}.parameter_key.$key")] = $this->getAttribute($attribute);
         }
 
+        foreach (config("{$base_config_key}.extra_fields") as $key => $attribute) {
+            ($this->getAttribute($attribute) != null) ? $mapped['extra_fields'][$attribute] = $this->getAttribute($attribute) : false;
+        }
+        
         return $mapped;
     }
 }
