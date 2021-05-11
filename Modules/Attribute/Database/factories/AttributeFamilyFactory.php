@@ -1,7 +1,6 @@
 <?php
 namespace Modules\Attribute\Database\factories;
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AttributeFamilyFactory extends Factory
@@ -10,13 +9,9 @@ class AttributeFamilyFactory extends Factory
 
     public function definition(): array
     {
-        while(true) {
-            $name = $this->faker->name();
-            $slug = Str::slug($name);
-            $old = $this->model::whereSlug($slug)->first();
-            if(!$old) break;
-        }
-        
+        $name = $this->faker->name();
+        $slug = $this->faker()->unique()->slug();
+    
         return [
             "slug" => $slug,
             "name" => $name
