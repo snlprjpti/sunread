@@ -29,7 +29,6 @@ interface UrlRewriteInterface
         ?string $type = null,
         ?array $typeAttributes = null,
         int $redirectType = 0,
-        ?string $description = null,
         bool $unique = false
     );
 
