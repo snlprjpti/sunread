@@ -4,6 +4,8 @@ namespace Modules\Product\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Product\Entities\Product;
+use Modules\Product\Observers\ProductObserver;
 
 class ProductServiceProvider extends ServiceProvider
 {
@@ -116,6 +118,6 @@ class ProductServiceProvider extends ServiceProvider
 
     public function registerObserver(): void
     {
-        // TODO :: Product::observe(ProductObserver::class);
+        Product::observe(ProductObserver::class);
     }
 }
