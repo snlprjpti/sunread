@@ -7,30 +7,19 @@ use Modules\Product\Entities\Product;
 
 class ReviewFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = \Modules\Review\Entities\Review::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
-        $customer = Customer::factory()->create();
-        $product = Product::factory()->create();
+        $customer = Customer::latest("id")->first();
+        $product = Product::latest("id")->first();
 
         return [
-            'customer_id' => $customer->id,
-            'product_id' => $product->id,
-            'rating' => rand(1,5),
-            'title' => $this->faker->name(),
-            'description' => $this->faker->paragraph()
+            "customer_id" => $customer->id,
+            "product_id" => $product->id,
+            "rating" => rand(1,5),
+            "title" => $this->faker->name(),
+            "description" => $this->faker->paragraph()
         ];
     }
 }
-

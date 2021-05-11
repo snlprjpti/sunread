@@ -18,7 +18,7 @@ class ProductFactory extends Factory
             "brand_id" => Brand::factory()->create()->id,
             "attribute_group_id" => AttributeGroup::factory()->create()->id,
 
-            "sku" => $this->faker->slug(),
+            "sku" => $this->faker->unique()->slug(),
             "type" => "simple",
             "status" => 1
         ];
