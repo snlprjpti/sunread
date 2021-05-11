@@ -85,6 +85,6 @@ class ProductImageController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponseWithMessage($this->lang('status-change'));
     }
 }
