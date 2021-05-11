@@ -4,8 +4,8 @@ namespace Modules\UrlRewrite\Repositories;
 
 use Modules\UrlRewrite\Entities\UrlRewrite;
 use Modules\UrlRewrite\Contracts\UrlRewriteInterface;
-use UrlRewriteAlreadyExistsException;
-use UrlRewriteRegenerationFailedException;
+use Modules\UrlRewrite\Exceptions\UrlRewriteAlreadyExistsException;
+use Modules\UrlRewrite\Exceptions\UrlRewriteRegenerationFailedException;
 
 class UrlRewriteRepository implements UrlRewriteInterface
 {
@@ -86,22 +86,26 @@ class UrlRewriteRepository implements UrlRewriteInterface
         $rewrites = $this->model->where('type', $type)->get();
 
         foreach ($rewrites as $rewrite) {
-            $this->regenerateRoute($rewrite);
+            $this->regenerateRoute($rewrite->request_path, $rewrite);
         }
     }
 
-    public function regenerateRoute(object $urlRewrite): object
+    public function regenerateRoute(string $requestPath, object $urlRewrite): object
     {
-        if (! array_key_exists($urlRewrite->type, $this->getTypes())) {
-            throw UrlRewriteRegenerationFailedException::invalidType($urlRewrite->type);
-        }
+
+        // if (! array_key_exists($urlRewrite->type, $this->getTypes())) {
+        //     throw UrlRewriteRegenerationFailedException::invalidType($urlRewrite->type);
+        // }
 
         if (! \is_array($urlRewrite->type_attributes)) {
             throw UrlRewriteRegenerationFailedException::columnNotSet($urlRewrite, 'type_attributes');
         }
 
         return $this->update(
-            ['target_path' => $this->targetPathFromRoute($urlRewrite->type, $urlRewrite->type_attributes)],
+            [
+                "target_path" => $this->targetPathFromRoute($urlRewrite->type, $urlRewrite->type_attributes),
+                "request_path" => $requestPath
+            ],
             $urlRewrite->id
         );
     }
@@ -113,6 +117,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         int $redirectType = 0,
         ?bool $unique = false): object 
     {
+      
 
         [$requestPath, $targetPath] = $this->validateCreate(
             $requestPath,
@@ -178,6 +183,27 @@ class UrlRewriteRepository implements UrlRewriteInterface
         }
 
         return [$requestPath, $targetPath];
+    }
+
+    public function handleUrlRewrite($model, $event, $request_path)
+    {
+        if( $event == "created" ) {
+            $this->create($request_path,
+                null,
+                config("url-rewrite.types.$model->urlRewriteType.route"),
+                $model->getUrlRewriteAttributesArray(),
+                0,
+                true
+            );
+        }
+
+        if ( $event == "updated" ) {
+            $this->regenerateRoute($request_path, $model->getUrlRewrite());
+        }
+
+        if( $event == "deleted" ){
+            $this->delete($model->getUrlRewrite()->id);
+        }
     }
 
 }

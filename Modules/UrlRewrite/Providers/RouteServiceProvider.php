@@ -26,6 +26,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {      
+        $this->registerRepository();
         $this->registerRouteMacro();
         $this->registerFacade();  
         parent::boot();
@@ -45,6 +46,26 @@ class RouteServiceProvider extends ServiceProvider
             return $this->app->make(UrlRewriteInterface::class);
         });
     }
+
+    protected function registerRepository(): void
+    {
+        $this->app->singleton(UrlRewriteInterface::class, function () {
+            $urlRewriteConfig = $this->app['config']['url-rewrite'];
+            $repositoryClass = $urlRewriteConfig['repository'];
+            $modelClass = $urlRewriteConfig['model'];
+
+            $repository = new $repositoryClass(new $modelClass);
+
+            if (! $urlRewriteConfig['cache']) {
+                return $repository;
+            }
+
+            $cacheClass = $urlRewriteConfig['cache-decorator'];
+
+            return new $cacheClass($repository, $this->app['cache.store']);
+        });
+    }
+    
 
     /**
      * Define the routes for the application.

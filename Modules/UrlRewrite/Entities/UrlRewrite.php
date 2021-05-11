@@ -4,11 +4,10 @@ namespace Modules\UrlRewrite\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Traits\HasFactory;
-use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class UrlRewrite extends Model
 {
-    use HasFactory, HasUrlRewrite;
+    use HasFactory;
 
     protected $fillable = ["type", "type_attributes", "request_path", "target_path", "redirect_type"];
 
@@ -38,6 +37,17 @@ class UrlRewrite extends Model
     public function getRedirectType(): int
     {
         return $this->redirect_type === static::PERMANENT ? 301 : 302;
+    }
+
+    public function getByTypeAndAttributes(string $type, array $attributes)
+    {
+        $query = $this->where('type', $type);
+
+        foreach ($attributes as $key => $attribute) {
+            $query = $query->where("type_attributes->$key", (string) $attribute);
+        }
+
+        return $query;
     }
 
     public static function getPossibleTypesArray(): array
