@@ -7,15 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class CustomerDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         Model::unguard();
         $this->call(CustomerGroupTableSeeder::class);
         $this->call(CustomerTableSeeder::class);
+        $this->call(CustomerAddressTableSeeder::class);
     }
 }
