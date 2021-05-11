@@ -158,7 +158,9 @@ class CategoryController extends BaseController
             $this->blockCategoryAuthority($category->parent_id, $id);
 
             $this->repository->delete($id, function($deleted){
-                $deleted->translations()->delete();
+                $deleted->translations()->each(function($translation){
+                    $translation->delete();
+                });
                 if($deleted->image) Storage::delete($deleted->image);
             });
         }

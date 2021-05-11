@@ -3,7 +3,6 @@
 
 namespace Modules\Category\Observers;
 
-use Modules\Core\Facades\Audit;
 use Modules\UrlRewrite\Facades\UrlRewrite;
 use Modules\Category\Entities\CategoryTranslation;
 

@@ -61,7 +61,7 @@ class Category extends Model
             : $this::orderBy('position', 'ASC')->get()->toTree();
     }
 
-    public function createUrlRewrite()
+    public function createUrlRewrite(): string
     {
         return $this->slug;
     }
