@@ -40,11 +40,6 @@ class ProductImageController extends BaseController
     {
         try {
 
-            $this->validate($request, [
-                'product_id' => 'required|exists:products,id',
-                'image.*' => 'required|mimes:jpeg,jpg,bmp,png',
-            ]);
-
             $data = $this->repository->validateData($request);
             foreach($request->file("image") as $file){
                 $image = $this->repository->createImage($file);
