@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttribute;
+use Modules\Product\Entities\ProductAttributeString;
 use Modules\Product\Observers\ProductAttributeObserver;
+use Modules\Product\Observers\ProductAttributeStringObserver;
 use Modules\Product\Observers\ProductObserver;
 
 class ProductServiceProvider extends ServiceProvider
@@ -122,5 +124,6 @@ class ProductServiceProvider extends ServiceProvider
     {
         Product::observe(ProductObserver::class);
         ProductAttribute::observe(ProductAttributeObserver::class);
+        ProductAttributeString::observe(ProductAttributeStringObserver::class);
     }
 }

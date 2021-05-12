@@ -9,6 +9,7 @@ class CreateProductAttributesTable extends Migration
     public function up(): void
     {
         Schema::create('product_attributes', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger("attribute_id");
             $table->foreign("attribute_id")->references("id")->on("attributes")->onDelete("cascade");
             $table->unsignedBigInteger("channel_id")->nullable();

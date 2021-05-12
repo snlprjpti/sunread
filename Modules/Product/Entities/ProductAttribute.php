@@ -8,14 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Core\Entities\Store;
+use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class ProductAttribute extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUrlRewrite;
 
     protected $fillable = [ "attribute_id", "channel_id", "product_id", "store_id", "value_type", "value_id" ];
     public $timestamps = false;
-    protected $appends = ["value_data"];
+    protected $appends = ["value_data", "url"];
+    public $urlRewriteType = 'product';
 
     public function value(): MorphTo
     {
@@ -35,5 +37,10 @@ class ProductAttribute extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function createUrlRewrite(): string
+    {
+        return (isset($this->store->slug)? $this->store->slug : "") ."/" . $this->value->value;
     }
 }

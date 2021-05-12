@@ -110,7 +110,11 @@ class ProductController extends BaseController
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function($deleted){
+                $deleted->product_attributes()->each(function($product_attribute){
+                    $product_attribute->delete();
+                });
+            });
         }
         catch( Exception $exception )
         {
