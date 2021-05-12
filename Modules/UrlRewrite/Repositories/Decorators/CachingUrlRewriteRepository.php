@@ -114,8 +114,8 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 		return $updated;
 	}
 
-	public function regenerateRoute($urlRewrite): object
-	{
-		return $this->repository->regenerateRoute($urlRewrite);
-	}
+	// public function regenerateRoute($urlRewrite): object
+	// {
+	// 	return $this->repository->regenerateRoute($urlRewrite);
+	// }
 }

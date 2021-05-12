@@ -2,12 +2,10 @@
 
 namespace Modules\UrlRewrite\Http\Controllers;
 
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Routing\Controller;
 use Modules\UrlRewrite\Contracts\UrlRewriteInterface;
-use Modules\UrlRewrite\Repositories\UrlRewriteRepository;
+
 
 class RewriteBaseController
 {
@@ -19,15 +17,16 @@ class RewriteBaseController
         $this->repository = $repository;
     }
 
-    public function __invoke($url): object
+    public function __invoke(): object
     {
+        $url = request()->path();
         $urlRewrite = $this->repository->getByRequestPath($url);
         if (!$urlRewrite) abort(404);
         if ($urlRewrite->isForward()) return $this->forwardResponse($urlRewrite->target_path);
         return redirect($urlRewrite->target_path, $urlRewrite->getRedirectType());
     }
 
-    protected function forwardResponse($url): Response
+    protected function forwardResponse($url)
     {
         return Route::dispatch(Request::create('/'.ltrim($url, '/'), request()->getMethod()));
     } 
