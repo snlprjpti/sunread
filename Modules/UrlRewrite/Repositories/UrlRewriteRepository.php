@@ -117,8 +117,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         int $redirectType = 0,
         ?bool $unique = false): object 
     {
-      
-
+        
         [$requestPath, $targetPath] = $this->validateCreate(
             $requestPath,
             $targetPath,
@@ -142,9 +141,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
     public function update(array $data, int $id): object
     {
         $record = $this->find($id);
-
         $record->update($data);
-
         return $record;
     }
 
@@ -188,22 +185,12 @@ class UrlRewriteRepository implements UrlRewriteInterface
     public function handleUrlRewrite(object $model, string $event, string $request_path): void
     {
         if( $event == "created" ) {
-            $this->create($request_path,
-                null,
-                config("url-rewrite.types.$model->urlRewriteType.route"),
-                $model->getUrlRewriteAttributesArray(),
-                0,
-                true
-            );
+            $this->create($request_path, null, 
+            config("url-rewrite.types.$model->urlRewriteType.route"),
+            $model->getUrlRewriteAttributesArray(), 0, true);
         }
-
-        if ( $event == "updated" ) {
-            $this->regenerateRoute($request_path, $model->getUrlRewrite());
-        }
-
-        if( $event == "deleted" ){
-            $this->delete($model->getUrlRewrite()->id);
-        }
+        if ( $event == "updated" ) $this->regenerateRoute($request_path, $model->getUrlRewrite());
+        if( $event == "deleted" ) $this->delete($model->getUrlRewrite()->id);
     }
 
 }
