@@ -17,7 +17,7 @@ class ProductAttribute extends Model
     protected $fillable = [ "attribute_id", "channel_id", "product_id", "store_id", "value_type", "value_id" ];
     public $timestamps = false;
     protected $appends = ["value_data", "url"];
-    public $urlRewriteType = 'product';
+    public $urlRewriteType = "product";
 
     public function value(): MorphTo
     {
@@ -41,6 +41,6 @@ class ProductAttribute extends Model
 
     public function createUrlRewrite(): string
     {
-        return (isset($this->store->slug)? $this->store->slug : "") ."/" . $this->value->value;
+        return (isset($this->store->slug) ? $this->store->slug . "/" : "") . $this->value->value;
     }
 }

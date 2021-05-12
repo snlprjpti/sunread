@@ -16,6 +16,6 @@ class ProductAttributeString extends Model
 
     public function product_attribute()
     {
-        return $this->morphOne(ProductAttribute::class, 'value');
+        return $this->morphOne(ProductAttribute::class, "value");
     }
 }
