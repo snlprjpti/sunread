@@ -15,7 +15,7 @@ class ProductImageFactory extends Factory
             "product_id" => Product::latest()->first()->id,
             "position" => $this->faker->randomDigit(),
             "path" => Str::random(20),
-            "main_image" => 1,
+            "main_image" => 0,
             "small_image" => 1,
             "thumbnail" => 1
         ];
