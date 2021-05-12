@@ -36,7 +36,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         $queryParam = '.*';
         Route::macro('rewrites', function () use ($queryParam) {
-            Route::get('{url}', '\\'.RewriteBaseController::class)->name('url.rewrite');
+            $url = request()->path();
+            Route::get($url, '\\'.RewriteBaseController::class)->name('url.rewrite');
         });
     }
 
