@@ -44,9 +44,7 @@ class UrlRewriteMainRepository extends BaseRepository
 
         if($item['store_id']) $urlRewrite['type_attributes']["extra_fields"]["store_id"] = $item['store_id'];
 
-        $exist_data_query = $this->model->getByTypeAndAttributes($urlRewrite['type'], $urlRewrite['type_attributes']);
-        if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
-        if($exist_data_query->first()) throw new Exception("Already Exists");
+        if($this->UrlRewriteExists($urlRewrite, $id)) throw new Exception("Already Exists");
         
         $urlRewrite['target_path'] = route($urlRewrite['type'],  $urlRewrite['type_attributes']["parameter"], false);
         
@@ -62,5 +60,12 @@ class UrlRewriteMainRepository extends BaseRepository
             "request_path" => "required" 
         ]);
         return $data;
+    }
+
+    public function UrlRewriteExists(array $urlRewrite, int $id = null)
+    {
+        $exist_data_query = $this->model->getByTypeAndAttributes($urlRewrite['type'], $urlRewrite['type_attributes']);
+        if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
+        return (boolean) $exist_data_query->first();
     }
 }

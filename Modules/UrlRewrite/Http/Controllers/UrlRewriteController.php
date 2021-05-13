@@ -3,6 +3,7 @@
 namespace Modules\UrlRewrite\Http\Controllers;
 
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -84,6 +85,7 @@ class UrlRewriteController extends BaseController
     {
         try
         {
+            if(!(UrlRewrite::find($id))) throw new ModelNotFoundException(); 
             $validated_data = $this->repository->ValidateUrlRewrite($request);
             $urlRewrite = new Request($this->repository->geturlRewriteData($validated_data, $id));
 
