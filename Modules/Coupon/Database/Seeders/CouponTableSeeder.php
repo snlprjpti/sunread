@@ -4,13 +4,12 @@ namespace Modules\Coupon\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Coupon\Entities\Coupon;
 
-class CouponDatabaseSeeder extends Seeder
+class CouponTableSeeder extends Seeder
 {
     public function run(): void
     {
-        Model::unguard();
-
-        $this->call(CouponTableSeeder::class);
+        Coupon::factory()->count(10)->create();
     }
 }
