@@ -17,7 +17,7 @@ class UrlRewriteMainRepository extends BaseRepository
         $this->model_key = "url_rewrites";
         $this->rules = [
             "type" => "required",
-            "type_attributes" =>"required|array|unique:url_rewrites,type_attributes",
+            "type_attributes" =>"required|array",
             "request_path" => "required",
             "target_path" => "required",
             "redirect_type" => "sometimes",
