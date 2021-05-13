@@ -12,6 +12,4 @@
 */
 
 
-// Route::fallback(function(){
-//     Route::rewrites();
-// });
+Route::rewrites();
