@@ -40,15 +40,12 @@ class ProductImageController extends BaseController
     {
         try {
 
-            $this->validate($request, [
-                'product_id' => 'required|exists:products,id',
-                'image' => 'required|mimes:jpeg,jpg,bmp,png',
-            ]);
-
             $data = $this->repository->validateData($request);
-            $image = $this->repository->createImage($request);
-            $data = array_merge($data,$image);
-            $created = $this->repository->create($data);
+            foreach($request->file("image") as $file){
+                $image = $this->repository->createImage($file);
+                $data = array_merge($data,$image);
+                $created = $this->repository->create($data);
+            }
         }
         catch (Exception $exception)
         {
@@ -74,5 +71,19 @@ class ProductImageController extends BaseController
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
+
+    public function changeMainImage(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->changeMainImage($id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('status-change-success'));
     }
 }

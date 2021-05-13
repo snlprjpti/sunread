@@ -15,7 +15,9 @@ return [
         'cancel-success' => ':name canceled successfully.',
         'cancel-error' => ':name can not be canceled.',
         'already-taken' => 'The :name has already been taken.',
-        'not-found' => ':name not found.'
+        'not-found' => ':name not found.',
+        'status-change-success' => 'The :name has changed successfully.',
+        'status-change-failed' => 'Cannot change the status.'
 
     ],
     'users' => [
