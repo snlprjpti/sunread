@@ -3,26 +3,24 @@
 namespace Modules\UrlRewrite\Http\Controllers;
 
 use Exception;
-use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Routing\Route;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\UrlRewrite\Entities\UrlRewrite;
-use Modules\UrlRewrite\Repositories\UrlRewriteRepository;
+use Modules\UrlRewrite\Repositories\UrlRewriteMainRepository;
 use Modules\UrlRewrite\Transformers\UrlRewriteResource;
 
 class UrlRewriteController extends BaseController
 {
     protected $repository;
 
-    public function __construct(UrlRewrite $urlRewrite, UrlRewriteRepository $urlRewriteRepository)
+    public function __construct(UrlRewrite $urlRewrite, UrlRewriteMainRepository $urlRewriteRepository)
     {
         $this->model = $urlRewrite;
-        $this->model_name = "UrlRewrite";
+        $this->model_name = "Url Rewrite";
         $this->repository = $urlRewriteRepository;
         parent::__construct($this->model, $this->model_name);    
     }
@@ -39,7 +37,6 @@ class UrlRewriteController extends BaseController
 
     public function index(Request $request): JsonResponse
     {
-        dd(Route::hasMacro("rewrites"));
         try
         {
             $this->validateListFiltering($request);
@@ -55,47 +52,65 @@ class UrlRewriteController extends BaseController
 
     public function store(Request $request)
     {
-        dd($request->all());
+        try
+        {
+            $validated_data = $this->repository->ValidateUrlRewrite($request);
+            $urlRewrite = new Request($this->repository->geturlRewriteData($validated_data));
+
+            $data = $this->repository->validateData($urlRewrite);
+            $created = $this->repository->create($data);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
-        return view('urlrewrite::show');
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
+    public function update(Request $request, int $id): JsonResponse
     {
-        return view('urlrewrite::edit');
+        try
+        {
+            if(!(UrlRewrite::find($id))) throw new ModelNotFoundException(); 
+            $validated_data = $this->repository->ValidateUrlRewrite($request);
+            $urlRewrite = new Request($this->repository->geturlRewriteData($validated_data, $id));
+
+            $data = $this->repository->validateData($urlRewrite);
+            $updated = $this->repository->update($data, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
+    public function destroy(int $id): JsonResponse
     {
-        //
-    }
+        try
+        {
+            $this->repository->delete($id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        return $this->successResponseWithMessage($this->lang("delete-success"), 204);
     }
 }
