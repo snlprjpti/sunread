@@ -2,33 +2,64 @@
 
 namespace Modules\UrlRewrite\Traits;
 
+use Modules\UrlRewrite\Exceptions\UrlRewriteException;
 use Modules\UrlRewrite\Facades\UrlRewrite;
 
 trait HasUrlRewrite
 {
+    public array $urlRewriteParameter = ["id"];
+    public array $urlRewriteExtraFields = [];
+    public array $urlRewriteParameterKey = ["id"];
+
+    public $urlRewriteRoute;
+
+    public function getClass(): string
+    {
+        $name = explode("\\", get_class($this));
+        return array_pop($name);
+    }
+
+    public function UrlTypeAttribute(): array
+    {
+        return [
+            "parameter" => $this->urlRewriteParameter ?? ["id"],
+            "extra_fields" => $this->urlRewriteExtraFields ?? [],
+            "parameter_key" => $this->urlRewriteParameterKey ?? ["id"]
+        ];
+    }
+
+    public function getTypes(): array
+    {
+        return [
+            $this->getClass() => [
+                "route" => $this->urlRewriteRoute,
+                "attributes" => $this->UrlTypeAttribute()
+            ]
+        ];
+    }
+
 	public function getUrlAttribute(): ?string
 	{
         $urlRewrite = $this->getUrlRewrite();
-        if (!$urlRewrite) return '';
-		return route('url.rewrite', $urlRewrite->request_path, false);
+		return $urlRewrite ? route('url.rewrite', $urlRewrite->request_path, false) : '';
 	}
 
 	public function getUrlRewrite(): ?object
     {
-        return UrlRewrite::getByTypeAndAttributes(config("url-rewrite.types.{$this->urlRewriteType}.route"), $this->getUrlRewriteAttributesArray());
+        if (!$this->urlRewriteRoute) throw new UrlRewriteException("Model {$this->getClass()} has not set route."); 
+        return UrlRewrite::getByTypeAndAttributes($this->urlRewriteRoute, $this->getUrlRewriteAttributesArray());
     }
 
-	public function getUrlRewriteAttributesArray(): ?array
+    public function getUrlRewriteAttributesArray(): ?array
     {
         $mapped = [];
-        $base_config_key = "url-rewrite.types.{$this->urlRewriteType}.attributes";
 
-        foreach (config("{$base_config_key}.parameter") as $key => $attribute) {
-            $mapped['parameter'][config("{$base_config_key}.parameter_key.$key")] = $this->getAttribute($attribute);
+        foreach ($this->urlRewriteParameter as $key => $attribute) {
+            $mapped["parameter"][$this->urlRewriteParameterKey[$key]] = $this->getAttribute($attribute);
         }
 
-        foreach (config("{$base_config_key}.extra_fields") as $key => $attribute) {
-            ($this->getAttribute($attribute) != null) ? $mapped['extra_fields'][$attribute] = $this->getAttribute($attribute) : false;
+        foreach ($this->urlRewriteExtraFields as $key => $attribute) {
+            ($this->getAttribute($attribute) != null) ? $mapped["extra_fields"][$attribute] = $this->getAttribute($attribute) : false;
         }
         return $mapped;
     }

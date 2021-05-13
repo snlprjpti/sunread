@@ -22,8 +22,18 @@ class Category extends Model
     public static $SEARCHABLE = [ "translations.name", "slug" ];
     protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "status" ];
     protected $with = [ "translations" ];
-    public $urlRewriteType = 'category';
+
     protected $appends = ['url'];
+
+    public function __construct(?array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->urlRewriteRoute = "admin.catalog.categories.categories.show";
+        $this->urlRewriteParameter = ["id"];
+        $this->urlRewriteExtraFields = ["store_id"];
+        $this->urlRewriteParameterKey = ["category"];
+        
+    }
  
     public function image_url(): ?string
     {

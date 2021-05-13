@@ -64,7 +64,7 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 		return $this->remember(static::URL_REWRITE_TARGET_PATH.md5($url), __FUNCTION__, $url);
 	}
 
-	public function getByTypeAndAttribute(string $type, array $attributes): ?object
+	public function getByTypeAndAttributes(string $type, array $attributes): ?object
 	{
 		return $this->remember(self::URL_REWRITE_TYPE_ATTRIBUTES.md5($type.json_encode($attributes)), __FUNCTION__, $type, $attributes);
 	}
@@ -114,8 +114,13 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 		return $updated;
 	}
 
-	// public function regenerateRoute($urlRewrite): object
-	// {
-	// 	return $this->repository->regenerateRoute($urlRewrite);
-	// }
+	public function regenerateRoute( string $requestPath, object $urlRewrite): object
+	{
+		return $this->repository->regenerateRoute($requestPath, $urlRewrite);
+	}
+
+	public function handleUrlRewrite(object $model, string $event, string $request_path): void
+	{
+		return $this->repository->handleUrlRewrite($model, $event, $request_path);
+	}
 }

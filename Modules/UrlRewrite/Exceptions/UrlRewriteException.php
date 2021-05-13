@@ -4,11 +4,16 @@ namespace  Modules\UrlRewrite\Exceptions;
 
 use Exception;
 
-class UrlRewriteRegenerationFailedException extends Exception
+class UrlRewriteException extends Exception
 {
-    public static function noConfiguration(): self
+	public static function requestPath(string $requestPath): self
     {
-        return new static('No types are set in the configuration.');
+        return new static("Request path `{$requestPath}` already exists.");
+    }
+
+	public static function noConfiguration(): self
+    {
+        return new static('Not configure properly.');
     }
 
     public static function invalidType($type): self

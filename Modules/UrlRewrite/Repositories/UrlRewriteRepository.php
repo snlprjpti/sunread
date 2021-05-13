@@ -4,8 +4,7 @@ namespace Modules\UrlRewrite\Repositories;
 
 use Modules\UrlRewrite\Entities\UrlRewrite;
 use Modules\UrlRewrite\Contracts\UrlRewriteInterface;
-use Modules\UrlRewrite\Exceptions\UrlRewriteAlreadyExistsException;
-use Modules\UrlRewrite\Exceptions\UrlRewriteRegenerationFailedException;
+use Modules\UrlRewrite\Exceptions\UrlRewriteException;
 
 class UrlRewriteRepository implements UrlRewriteInterface
 {
@@ -72,18 +71,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     public function regenerateAll(): void
     {
-        if (empty($this->getTypes())) throw UrlRewriteRegenerationFailedException::noConfiguration();
-
-        foreach ($this->getTypes() as $type) {
-            $this->regenerateRoutesFromType($type);
-        }
-    }
-
-    public function regenerateRoutesFromType(string $type): void
-    {
-        if (! array_key_exists($type, $this->getTypes())) throw UrlRewriteRegenerationFailedException::invalidType($type);
-
-        $rewrites = $this->model->where('type', $type)->get();
+        $rewrites = $this->model->all();
 
         foreach ($rewrites as $rewrite) {
             $this->regenerateRoute($rewrite->request_path, $rewrite);
@@ -92,22 +80,12 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     public function regenerateRoute(string $requestPath, object $urlRewrite): object
     {
+        if (! \is_array($urlRewrite->type_attributes)) throw UrlRewriteException::columnNotSet($urlRewrite, 'type_attributes');
 
-        // if (! array_key_exists($urlRewrite->type, $this->getTypes())) {
-        //     throw UrlRewriteRegenerationFailedException::invalidType($urlRewrite->type);
-        // }
-
-        if (! \is_array($urlRewrite->type_attributes)) {
-            throw UrlRewriteRegenerationFailedException::columnNotSet($urlRewrite, 'type_attributes');
-        }
-
-        return $this->update(
-            [
-                "target_path" => $this->targetPathFromRoute($urlRewrite->type, $urlRewrite->type_attributes),
-                "request_path" => $requestPath
-            ],
-            $urlRewrite->id
-        );
+        return $this->update([ 
+            "target_path" => $this->targetPathFromRoute($urlRewrite->type, $urlRewrite->type_attributes),
+            "request_path" => $requestPath 
+        ], $urlRewrite->id );
     }
 
     public function create(string $requestPath,
@@ -151,11 +129,6 @@ class UrlRewriteRepository implements UrlRewriteInterface
         return $requestPath.'-'.$id;
     }
 
-    protected function getTypes(): array
-    {
-        return config('url-rewrite.types');
-    }
-
     protected function targetPathFromRoute($type, $attributes): string
     {
         return route($type, $attributes['parameter'], false);
@@ -168,10 +141,10 @@ class UrlRewriteRepository implements UrlRewriteInterface
     int $redirectType,
     ?bool $unique): array 
     {
-        if (! in_array($redirectType, self::allowedTypes, true)) throw new \Exception('Redirect type must be 0, 1 or 2');
+        if (! in_array($redirectType, self::allowedTypes, true)) throw new UrlRewriteException('Redirect type must be 0, 1 or 2');
 
         if ($this->checkIfRequestPathExists($requestPath)) {
-            if (! $unique) throw UrlRewriteAlreadyExistsException::requestPath($requestPath);
+            if (! $unique) throw UrlRewriteException::requestPath($requestPath);
             $requestPath = $this->generateUnique($requestPath);
         }
 
@@ -184,7 +157,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     public function handleUrlRewrite(object $model, string $event, string $request_path): void
     {
-        if( $event == "created" ) $this->create($request_path, null, config("url-rewrite.types.$model->urlRewriteType.route"), $model->getUrlRewriteAttributesArray(), 0, true);
+        if( $event == "created" ) $this->create($request_path, null, $model->urlRewriteRoute, $model->getUrlRewriteAttributesArray(), 0, true);
         if ( $event == "updated" ) $this->regenerateRoute($request_path, $model->getUrlRewrite());
         if( $event == "deleted" ) $this->delete($model->getUrlRewrite()->id);
     }
