@@ -24,7 +24,7 @@ class CategoryController extends BaseController
         $this->translation = $categoryTranslation;
         $this->model = $category;
         $this->model_name = "Category";
-        $this->is_super_admin = auth()->guard("admin")->user()->hasRole("super-admin");
+        $this->is_super_admin = auth()->guard("admin")->check() ? auth()->guard("admin")->user()->hasRole("super-admin") : false;
         $this->main_root_id = $this->model::oldest('id')->first()->id;
 
         $exception_statuses = [
