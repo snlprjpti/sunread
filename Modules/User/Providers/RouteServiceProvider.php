@@ -24,16 +24,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerRouteMacro();
         parent::boot();
-    }
-
-    protected function registerRouteMacro(): void
-    {
-        $queryParam = '.*';
-        Route::macro('rewrites', function () use ($queryParam) {
-            Route::get('{url?}', '\\'.RewriteBaseController::class)->where("url", $queryParam)->name('url.rewrite');
-        });
     }
 
     /**
