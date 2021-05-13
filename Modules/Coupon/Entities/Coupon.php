@@ -3,16 +3,13 @@
 namespace Modules\Coupon\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\HasFactory;
 
 class Coupon extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
-    
-    protected static function newFactory()
-    {
-        return \Modules\Coupon\Database\factories\CouponFactory::new();
-    }
+    protected $fillable = ["code","name","description","valid_from","valid_to","flat_discount_amount","min_discount_amount", "max_discount_amount",
+        "discount_percent","max_uses","single_user_uses","only_new_user","min_purchase_amount","scope_public","status"];
+
 }
