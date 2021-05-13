@@ -6,5 +6,6 @@
     "Product": true,
     "User": true,
     "Brand": true,
-    "Review": true
+    "Review": true,
+    "Coupon": true
 }
