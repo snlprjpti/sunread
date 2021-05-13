@@ -11,5 +11,6 @@
 |
 */
 
-
-Route::rewrites();
+Route::group(["middleware" => ["api", "admin", "language"]], function () {
+	Route::rewrites();
+});
