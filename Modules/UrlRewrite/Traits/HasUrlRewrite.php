@@ -6,9 +6,10 @@ use Modules\UrlRewrite\Facades\UrlRewrite;
 
 trait HasUrlRewrite
 {
-	public function getUrlAttribute(): string
+	public function getUrlAttribute(): ?string
 	{
-		if (! $urlRewrite = $this->getUrlRewrite()) return '';
+        $urlRewrite = $this->getUrlRewrite();
+        if (!$urlRewrite) return '';
 		return route('url.rewrite', $urlRewrite->request_path, false);
 	}
 

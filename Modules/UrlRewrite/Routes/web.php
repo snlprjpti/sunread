@@ -11,8 +11,11 @@
 |
 */
 
+
 Route::prefix('urlrewrite')->group(function() {
     Route::get('/', 'UrlRewriteController@index');
 });
 
-Route::rewrites();
+Route::fallback(function(){
+    Route::rewrites();
+});
