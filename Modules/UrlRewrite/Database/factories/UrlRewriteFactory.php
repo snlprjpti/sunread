@@ -12,19 +12,17 @@ class UrlRewriteFactory extends Factory
 
     public function definition(): array
     {
-        $config_types = [ "product", "category" ];
-        $config_type = Arr::random($config_types);
-        $config_base_name = "url-rewrite.types.{$config_type}";
-        $route = config("{$config_base_name}.route");
+        $types = [ "product", "category" ];
+        $type = Arr::random($types);
         $request_path = "";
 
-        switch ($config_type) {
+        switch ($type) {
             case "product":
                 $product_attribute = ProductAttribute::factory()->create();
-                $type_attributes["parameter"]["product"] = $product_attribute->product_id;
+                $parameter_id = $product_attribute->product_id;
                 if($product_attribute->store_id != null)
                 {
-                    $type_attributes["extra_fields"]["store_id"] = $product_attribute->store_id;
+                    $store_id = $product_attribute->store_id;
                     $request_path = "{$product_attribute->store->slug}/";
                 }
                 $request_path .= $product_attribute->value->value;
@@ -32,21 +30,16 @@ class UrlRewriteFactory extends Factory
 
             case "category":
                 $category = Category::factory()->create();
-                $type_attributes = [
-                    "parameter" => [
-                        "category" => $category->id
-                    ]
-                ];
+                $parameter_id = $category->id;
                 $request_path .= $category->slug;
                 break;
         }
 
         return [
-            "type" => $route,
-            "type_attributes" => $type_attributes,
+            "type" => $type,
+            "parameter_id" => $parameter_id,
             "request_path" => $request_path,
-            "target_path" => route($route, $type_attributes['parameter'], false),
-            "redirect_type" => 0
+            'store_id' => $store_id
         ];
     }
 }
