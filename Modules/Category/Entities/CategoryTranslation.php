@@ -13,8 +13,18 @@ class CategoryTranslation extends Model
 
     public $timestamps = false;
     protected $fillable = [ "name", "description", "meta_title", "meta_description", "meta_keywords", "store_id", "category_id" ];
-    public $urlRewriteType = 'category_translation';
+
     protected $appends = ['url'];
+
+    public function __construct(?array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->urlRewriteRoute = "admin.catalog.categories.categories.show";
+        $this->urlRewriteParameter = ["category_id"];
+        $this->urlRewriteExtraFields = ["store_id"];
+        $this->urlRewriteParameterKey = ["category"];
+        
+    }
 
     public function store(): BelongsTo
     {
