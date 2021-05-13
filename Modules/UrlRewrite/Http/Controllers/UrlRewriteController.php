@@ -3,13 +3,10 @@
 namespace Modules\UrlRewrite\Http\Controllers;
 
 use Exception;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Routing\Route;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\UrlRewrite\Entities\UrlRewrite;
 use Modules\UrlRewrite\Repositories\UrlRewriteMainRepository;
@@ -88,7 +85,7 @@ class UrlRewriteController extends BaseController
         try
         {
             $validated_data = $this->repository->ValidateUrlRewrite($request);
-            $urlRewrite = new Request($this->repository->geturlRewriteData($validated_data));
+            $urlRewrite = new Request($this->repository->geturlRewriteData($validated_data, $id));
 
             $data = $this->repository->validateData($urlRewrite);
             $updated = $this->repository->update($data, $id);
