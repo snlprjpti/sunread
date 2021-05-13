@@ -39,7 +39,7 @@ class UrlRewriteFactory extends Factory
             "type" => $type,
             "parameter_id" => $parameter_id,
             "request_path" => $request_path,
-            'store_id' => $store_id
+            'store_id' => isset($store_id) ? $store_id : null
         ];
     }
 }

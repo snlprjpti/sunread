@@ -56,7 +56,7 @@ class UrlRewriteMainRepository extends BaseRepository
         $data = $request->validate([
             "type" => "required|in:product,category",
             "parameter_id" => [ "required", new UrlRewriteRule($request->type) ],
-            "store_id" => "sometimes|exists:stores,id",
+            "store_id" => "nullable|exists:stores,id",
             "request_path" => "required" 
         ]);
         return $data;
