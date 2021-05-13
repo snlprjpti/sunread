@@ -16,6 +16,6 @@ Route::prefix('urlrewrite')->group(function() {
     Route::get('/', 'UrlRewriteController@index');
 });
 
-Route::fallback(function(){
+// Route::fallback(function(){
     Route::rewrites();
-});
+// });
