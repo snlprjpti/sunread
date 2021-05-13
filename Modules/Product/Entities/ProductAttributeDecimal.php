@@ -9,6 +9,7 @@ class ProductAttributeDecimal extends Model
 {
     use HasFactory;
 
+    public static $type = "decimal";
     protected $fillable = [ "value" ];
     protected $table = "product_attribute_decimal";
 }

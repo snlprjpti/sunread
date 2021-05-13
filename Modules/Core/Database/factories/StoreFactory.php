@@ -7,26 +7,12 @@ use Modules\Core\Entities\Store;
 
 class StoreFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = \Modules\Core\Entities\Store::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
-        while(true) {
-            $name = $this->faker->name();
-            $slug = \Str::slug($name);
-            $old_store = Store::where("slug", $slug)->first();
-            if (!$old_store) break;
-        }
+        $name = $this->faker->name();
+        $slug = $this->faker->unique()->slug();
 
         return [
             "slug" => $slug,
@@ -37,4 +23,3 @@ class StoreFactory extends Factory
         ];
     }
 }
-

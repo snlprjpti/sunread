@@ -15,7 +15,7 @@ return [
         'product' => [
             'route' => 'admin.catalog.products.show',
             'attributes' => [
-                'parameter' => [ 'id' ],
+                'parameter' => [ 'product_id' ],
                 'extra_fields' => [ 'store_id' ],
                 'parameter_key' => [ 'product' ]
             ]

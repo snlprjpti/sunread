@@ -9,6 +9,7 @@ class ProductAttributeText extends Model
 {
     use HasFactory;
 
+    public static $type = "text";
     protected $fillable = [ "value" ];
     protected $table = "product_attribute_text";
 }

@@ -10,7 +10,9 @@ class CustomerTest extends BaseTestCase
     public function setUp(): void
     {
         $this->model = Customer::class;
+
         parent::setUp();
+
         $this->admin = $this->createAdmin();
         $this->model_name = "Customer";
         $this->route_prefix = "admin.customers";
@@ -38,5 +40,4 @@ class CustomerTest extends BaseTestCase
             "customer_group_id" => null
         ]);
     }
-
 }

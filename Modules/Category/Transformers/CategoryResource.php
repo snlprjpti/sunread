@@ -28,10 +28,9 @@ class CategoryResource extends JsonResource
             "_rgt" => $this->_rgt,
             "parent" => $this->parent ?? null,
 
-            "translations" => CategoryTranslationResource::collection($this->translations),
-            "channels" => ChannelResource::collection($this->channels),
-
             "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A'),
+            "translations" => $this->whenLoaded("translations"),
+            "channels" => ChannelResource::collection($this->whenLoaded("channels")),
         ];
     }
 }

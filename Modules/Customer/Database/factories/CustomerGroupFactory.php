@@ -2,24 +2,17 @@
 namespace Modules\Customer\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\Customer\Entities\CustomerGroup;
 
 class CustomerGroupFactory extends Factory
 {
+    protected $model = \Modules\Customer\Entities\CustomerGroup::class;
 
-    protected $model = CustomerGroup::class;
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
         return [
             "name" => $this->faker->name(),
-            "slug" => $this->faker->slug(),
+            "slug" => $this->faker->unique()->slug(),
             "is_user_defined" => 0,
         ];
     }
 }
-

@@ -45,6 +45,6 @@ class Product extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(ProductImage::class)->orderBy("main_image", "desc")->orderBy("position");
     }
 }

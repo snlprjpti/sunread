@@ -12,7 +12,7 @@ class ProductImageFactory extends Factory
     public function definition(): array
     {
         return [
-            "product_id" => Product::first()->id,
+            "product_id" => Product::latest()->first()->id,
             "position" => $this->faker->randomDigit(),
             "path" => Str::random(20),
             "main_image" => 1,

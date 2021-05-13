@@ -30,7 +30,6 @@ trait HasUrlRewrite
         foreach (config("{$base_config_key}.extra_fields") as $key => $attribute) {
             ($this->getAttribute($attribute) != null) ? $mapped['extra_fields'][$attribute] = $this->getAttribute($attribute) : false;
         }
-        
         return $mapped;
     }
 }
