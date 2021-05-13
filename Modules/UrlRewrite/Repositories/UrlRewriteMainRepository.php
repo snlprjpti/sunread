@@ -4,6 +4,7 @@ namespace Modules\UrlRewrite\Repositories;
 
 
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Core\Rules\UrlRewriteRule;
 use Modules\UrlRewrite\Entities\UrlRewrite;
 
 class UrlRewriteMainRepository extends BaseRepository
@@ -38,7 +39,7 @@ class UrlRewriteMainRepository extends BaseRepository
                 $urlRewrite['type_attributes']["parameter"]["category"] = $item['parameter_id'];
                 break;
         }
-        
+
         $urlRewrite['request_path'] = $item['request_path'];
 
         if($item['store_id']) $urlRewrite['type_attributes']["extra_fields"]["store_id"] = $item['store_id'];
@@ -53,7 +54,7 @@ class UrlRewriteMainRepository extends BaseRepository
     {
         $data = $request->validate([
             "type" => "required|in:product, category",
-            "parameter_id" => "required",
+            "parameter_id" => [ "required", new UrlRewriteRule($request->type) ],
             "store_id" => "sometimes|exists:stores,id",
             "request_path" => "required" 
         ]);
