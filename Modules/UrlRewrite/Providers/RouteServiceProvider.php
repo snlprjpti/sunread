@@ -27,18 +27,18 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {      
         $this->registerRepository();
-        $this->registerRouteMacro();
+        // $this->registerRouteMacro();
         $this->registerFacade();  
         parent::boot();
     }
 
-    protected function registerRouteMacro(): void
-    {
-        $queryParam = '.*';
-        Route::macro('rewrites', function () use ($queryParam) {
-            Route::get('{url?}', '\\'.RewriteBaseController::class)->where("url", $queryParam)->name('url.rewrite');
-        });
-    }
+    // protected function registerRouteMacro(): void
+    // {
+    //     $queryParam = '.*';
+    //     Route::macro('rewrites', function () use ($queryParam) {
+    //         Route::get('{url?}', '\\'.RewriteBaseController::class)->where("url", $queryParam)->name('url.rewrite');
+    //     });
+    // }
 
     protected function registerFacade(): void
     {
