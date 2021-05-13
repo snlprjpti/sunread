@@ -2,76 +2,79 @@
 
 namespace Modules\Coupon\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\Coupon\Entities\Coupon;
+use Modules\Coupon\Repositories\CouponRepository;
+use Modules\Coupon\Transformers\CouponResource;
+use Exception;
 
-class CouponController extends Controller
+class CouponController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    private $coupon;
+    private $repository;
+
+    public function __construct(Coupon $coupon, CouponRepository $couponRepository)
     {
-        return view('coupon::index');
+        $this->model = $coupon;
+        $this->model_name = "Coupon";
+        $this->repository = $couponRepository;
+        parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
+    public function collection(object $data): ResourceCollection
+    {
+        return CouponResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new CouponResource($data);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
     public function create()
     {
         return view('coupon::create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
     public function show($id)
     {
         return view('coupon::show');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
     public function edit($id)
     {
         return view('coupon::edit');
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
     public function destroy($id)
     {
         //
