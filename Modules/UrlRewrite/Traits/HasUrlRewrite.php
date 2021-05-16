@@ -30,7 +30,7 @@ trait HasUrlRewrite
 	public function getUrlRewrite(): ?object
     {
         if (!$this->urlRewriteRoute) throw new UrlRewriteException("Model {$this->getClass()} has not set route."); 
-        return UrlRewrite::getByTypeAndAttributes(get_class($this), $this->getUrlRewriteAttributesArray());
+        return UrlRewrite::getByTypeAndAttributes($this->urlRewriteType, $this->getUrlRewriteAttributesArray());
     }
 
     public function getUrlRewriteAttributesArray(): ?array
