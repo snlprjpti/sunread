@@ -1,12 +1,9 @@
 <?php
 
-use Modules\UrlRewrite\Entities\UrlRewrite;
-use Modules\UrlRewrite\Repositories\UrlRewriteRepository;
-
 return [
     'table-name' => 'url_rewrites',
-    'repository' => UrlRewriteRepository::class,
-    'model' => UrlRewrite::class,
+    'repository' => Modules\UrlRewrite\Repositories\UrlRewriteRepository::class,
+    'model' => Modules\UrlRewrite\Entities\UrlRewrite::class,
     'cache' => false,
     'cache-tag' => 'url_rewrites',
     'cache-ttl' => 86400,
