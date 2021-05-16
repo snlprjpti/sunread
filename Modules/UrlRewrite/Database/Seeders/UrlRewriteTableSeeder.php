@@ -22,7 +22,7 @@ class UrlRewriteTableSeeder extends Seeder
         ]);
         DB::table("url_rewrites")->insert([
             [
-                "type" => "admin.catalog.categories.categories.show",
+                "type" => "Modules\Category\Entities\Category",
                 "type_attributes" => $type_attributes,
                 "request_path" => "root",
                 "target_path" => "admin/catalog/categories/1"

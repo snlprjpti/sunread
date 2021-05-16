@@ -23,18 +23,11 @@ interface UrlRewriteInterface
 
     public function delete(int $id): bool;
 
-    public function create(
-        string $requestPath,
-        ?string $targetPath,
-        ?string $type = null,
-        ?array $typeAttributes = null,
-        int $redirectType = 0,
-        bool $unique = false
-    );
+    public function create(string $requestPath, ?string $targetPath, ?string $type = null, ?array $typeAttributes = null, ?int $redirectType = 0, bool $unique = false, ?object $model = null );
 
     public function update(array $data, int $id): object;
 
-    public function regenerateRoute(string $requestPath, object $urlRewrite): object;
+    public function regenerateRoute(string $requestPath, object $urlRewrite, object $model): object;
 
     public function handleUrlRewrite(object $model, string $event, string $request_path): void;
 }
