@@ -12,13 +12,16 @@ class UrlRewriteFactory extends Factory
 
     public function definition(): array
     {
-        $types = [ "product", "category" ];
+        $types = [ "Product", "Category" ];
         $type = Arr::random($types);
         $request_path = "";
 
         switch ($type) {
-            case "product":
-                $product_attribute = ProductAttribute::factory()->create();
+            case "Product":
+                $product_attribute = ProductAttribute::withoutEvents(function (){
+                    return ProductAttribute::factory()->create();
+                });
+                
                 $parameter_id = $product_attribute->product_id;
                 if($product_attribute->store_id != null)
                 {
@@ -28,8 +31,11 @@ class UrlRewriteFactory extends Factory
                 $request_path .= $product_attribute->value->value;
                 break;
 
-            case "category":
-                $category = Category::factory()->create();
+            case "Category":
+                $category = Category::withoutEvents(function (){
+                    return Category::factory()->create();
+                });
+
                 $parameter_id = $category->id;
                 $request_path .= $category->slug;
                 break;
