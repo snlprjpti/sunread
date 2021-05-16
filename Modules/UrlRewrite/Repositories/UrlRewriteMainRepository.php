@@ -6,6 +6,7 @@ use Exception;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\UrlRewrite\Rules\UrlRewriteRule;
 use Modules\UrlRewrite\Entities\UrlRewrite;
+use Modules\UrlRewrite\Facades\UrlRewrite as FacadesUrlRewrite;
 
 class UrlRewriteMainRepository extends BaseRepository
 {
@@ -41,11 +42,12 @@ class UrlRewriteMainRepository extends BaseRepository
         }
 
         $urlRewrite['type'] = $model->urlRewriteType;
-        $urlRewrite['request_path'] = $item['request_path'];
+
+        $this->requestPathExists($item, $id) ? $urlRewrite['request_path'] = FacadesUrlRewrite::generateUnique($item['request_path']) : $urlRewrite['request_path'] = $item['request_path'];
 
         if($item['store_id']) $urlRewrite['type_attributes']["extra_fields"]["store_id"] = $item['store_id'];
 
-        if($this->UrlRewriteExists($urlRewrite, $id)) throw new Exception("Already Exists");
+        if($this->urlRewriteExists($urlRewrite, $id)) throw new Exception("Already Exists");
         
         $urlRewrite['target_path'] = route($model->urlRewriteRoute,  $urlRewrite['type_attributes']["parameter"], false);
 
@@ -63,9 +65,16 @@ class UrlRewriteMainRepository extends BaseRepository
         return $data;
     }
 
-    public function UrlRewriteExists(array $urlRewrite, int $id = null)
+    public function urlRewriteExists(array $urlRewrite, int $id = null)
     {
         $exist_data_query = $this->model->getByTypeAndAttributes($urlRewrite['type'], $urlRewrite['type_attributes']);
+        if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
+        return (boolean) $exist_data_query->first();
+    }
+
+    public function requestPathExists(array $item, int $id = null)
+    {
+        $exist_data_query = $this->model->where('request_path', $item['request_path']);
         if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
         return (boolean) $exist_data_query->first();
     }
