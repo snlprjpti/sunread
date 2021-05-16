@@ -32,7 +32,6 @@ class Category extends Model
         $this->urlRewriteParameter = ["id"];
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["category"];
-        $this->urlRewriteRequestPath = $this->slug;
         $this->urlRewriteType = "Modules\Category\Entities\Category";
     }
  
@@ -74,9 +73,9 @@ class Category extends Model
             : $this::orderBy('position', 'ASC')->get()->toTree();
     }
 
-    // public function createUrlRewrite(): string
-    // {
-    //     return $this->slug;
-    // }
+    public function getUrlRewriteRequestPathAttribute(): string
+    {
+        return $this->slug;
+    }
 
 }

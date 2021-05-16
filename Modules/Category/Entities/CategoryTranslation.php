@@ -23,7 +23,6 @@ class CategoryTranslation extends Model
         $this->urlRewriteParameter = ["category_id"];
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["category"];
-        $this->urlRewriteRequestPath = (isset($this->store->slug) ? $this->store->slug . "/" : "") . $this->name;
         $this->urlRewriteType = "Modules\Category\Entities\Category";
         
     }
@@ -33,8 +32,8 @@ class CategoryTranslation extends Model
         return $this->belongsTo(Store::class, 'store_id');
     }
 
-    // public function createUrlRewrite(): string
-    // {
-    //     return $this->store->slug.'/'.$this->name;
-    // }
+    public function getUrlRewriteRequestPathAttribute(): string
+    {
+       return (isset($this->store->slug) ? $this->store->slug . "/" : "") . $this->name;
+    }
 }
