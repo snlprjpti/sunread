@@ -4,16 +4,18 @@
 namespace Modules\Coupon\Repositories;
 
 
+use Illuminate\Support\Str;
+use Modules\Core\Repositories\BaseRepository;
 use Modules\Coupon\Entities\Coupon;
 
-class CouponRepository
+class CouponRepository extends BaseRepository
 {
     public function __construct(Coupon $coupon)
     {
         $this->model = $coupon;
         $this->model_key = "coupons";
         $this->rules = [
-            "code" => "required|unique:products,sku",
+            "code" => "nullable|unique:coupons,code",
             "name" => "required",
             "description" => "sometimes|nullable",
             "valid_from" => "required",
@@ -29,6 +31,14 @@ class CouponRepository
             "scope_public" => "sometimes|boolean",
             "status" => "sometimes|boolean"
         ];
+    }
+
+    public function createCouponCode($name): string
+    {
+        $replace = str_replace(' ','-',$name);
+        $name = substr(strtoupper($replace),0,10);
+        $code = $name.'-'.strtoupper(Str::random(4));
+        return $code;
     }
 
 }

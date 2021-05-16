@@ -50,33 +50,62 @@ class CouponController extends BaseController
         return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    public function create()
+
+    public function store(Request $request): JsonResponse
     {
-        return view('coupon::create');
+        try
+        {
+            $data = $this->repository->validateData($request);
+            $data['code'] = $this->repository->createCouponCode($request->name);
+            $created = $this->repository->create($data);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function store(Request $request)
+    public function show($id): JsonResponse
     {
-        //
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
-    public function show($id)
+    public function update(Request $request, $id): JsonResponse
     {
-        return view('coupon::show');
+        try
+        {
+            $data = $this->repository->validateData($request);
+            $updated = $this->repository->update($data, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
-    public function edit($id)
+    public function destroy($id): JsonResponse
     {
-        return view('coupon::edit');
-    }
+        try
+        {
+            $this->repository->delete($id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
 
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    public function destroy($id)
-    {
-        //
+        return $this->successResponseWithMessage($this->lang("delete-success"), 204);
     }
 }
