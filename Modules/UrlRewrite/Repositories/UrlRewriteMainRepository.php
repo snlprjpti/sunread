@@ -40,7 +40,7 @@ class UrlRewriteMainRepository extends BaseRepository
                 break;
         }
 
-        $urlRewrite['type'] = $model_path;
+        $urlRewrite['type'] = $model->urlRewriteType;
         $urlRewrite['request_path'] = $item['request_path'];
 
         if($item['store_id']) $urlRewrite['type_attributes']["extra_fields"]["store_id"] = $item['store_id'];

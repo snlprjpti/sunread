@@ -13,7 +13,7 @@ return [
     'cache-decorator' => CachingUrlRewriteRepository::class,
     'path' => [
         'Category' => 'Modules\Category\Entities\Category',
-        'Product' => 'Modules\Product\Entities\Product'
+        'Product' => 'Modules\Product\Entities\ProductAttribute'
     ]
 ];
 
