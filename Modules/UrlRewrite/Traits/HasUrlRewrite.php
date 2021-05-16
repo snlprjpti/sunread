@@ -19,25 +19,6 @@ trait HasUrlRewrite
         return array_pop($name);
     }
 
-    public function UrlTypeAttribute(): array
-    {
-        return [
-            "parameter" => $this->urlRewriteParameter ?? ["id"],
-            "extra_fields" => $this->urlRewriteExtraFields ?? [],
-            "parameter_key" => $this->urlRewriteParameterKey ?? ["id"]
-        ];
-    }
-
-    public function getTypes(): array
-    {
-        return [
-            $this->getClass() => [
-                "route" => $this->urlRewriteRoute,
-                "attributes" => $this->UrlTypeAttribute()
-            ]
-        ];
-    }
-
 	public function getUrlAttribute(): ?string
 	{
         $urlRewrite = $this->getUrlRewrite();
@@ -47,7 +28,7 @@ trait HasUrlRewrite
 	public function getUrlRewrite(): ?object
     {
         if (!$this->urlRewriteRoute) throw new UrlRewriteException("Model {$this->getClass()} has not set route."); 
-        return UrlRewrite::getByTypeAndAttributes($this->urlRewriteRoute, $this->getUrlRewriteAttributesArray());
+        return UrlRewrite::getByTypeAndAttributes(get_class($this), $this->getUrlRewriteAttributesArray());
     }
 
     public function getUrlRewriteAttributesArray(): ?array
