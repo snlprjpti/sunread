@@ -13,6 +13,7 @@ trait HasUrlRewrite
 
     public $urlRewriteRoute;
     public $urlRewriteRequestPath = "";
+    public $urlRewriteType = "";
 
     public function getClass(): string
     {
