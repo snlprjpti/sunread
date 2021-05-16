@@ -15,7 +15,6 @@ class ProductAttributeObserver
 
     public function updated(ProductAttribute $product_attribute)
     {
-        dd($product_attribute->urlRewriteRequestPath);
         if($product_attribute->attribute->name === 'SKU' && isset($product_attribute->value_id))
         {
             if($product_attribute->getUrlRewrite()) UrlRewrite::handleUrlRewrite($product_attribute, __FUNCTION__);

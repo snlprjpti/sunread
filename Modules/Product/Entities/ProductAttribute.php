@@ -26,7 +26,7 @@ class ProductAttribute extends Model
         $this->urlRewriteParameter = ["product_id"];
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["product"];
-        $this->urlRewriteRequestPath = (isset($this->store->slug) ? $this->store->slug . "/" : "") . (isset($this->value->value) ? $this->value->value : "");
+        $this->urlRewriteType = "Modules\Product\Entities\Product";
     }
 
     public function value(): MorphTo
@@ -49,8 +49,8 @@ class ProductAttribute extends Model
         return $this->belongsTo(Store::class);
     }
 
-    // public function createUrlRewrite(): string
-    // {
-    //     return (isset($this->store->slug) ? $this->store->slug . "/" : "") . $this->value->value;
-    // }
+    public function getUrlRewriteRequestPathAttribute(): string
+    {
+        return (isset($this->store->slug) ? $this->store->slug . "/" : "") . $this->value->value;
+    }
 }

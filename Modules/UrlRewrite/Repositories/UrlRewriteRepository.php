@@ -127,8 +127,8 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     public function handleUrlRewrite(object $model, string $event): void
     {
-        if( $event == "created" ) $this->create($model->urlRewriteRequestPath, null, get_class($model), $model->getUrlRewriteAttributesArray(), 0, true, $model);
-        if ( $event == "updated" ) $this->regenerateRoute($model->urlRewriteRequestPath, $model->getUrlRewrite(), $model);
+        if( $event == "created" ) $this->create($model->url_rewrite_request_path, null, $model->urlRewriteType, $model->getUrlRewriteAttributesArray(), 0, true, $model);
+        if ( $event == "updated" ) $this->regenerateRoute($model->url_rewrite_request_path, $model->getUrlRewrite(), $model);
         if( $event == "deleted" ) $this->delete($model->getUrlRewrite()->id);
     }
 
