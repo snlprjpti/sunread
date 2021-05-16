@@ -23,6 +23,8 @@ class CategoryTranslation extends Model
         $this->urlRewriteParameter = ["category_id"];
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["category"];
+        $this->urlRewriteRequestPath = (isset($this->store->slug) ? $this->store->slug . "/" : "") . $this->name;
+        
         
     }
 
@@ -31,8 +33,8 @@ class CategoryTranslation extends Model
         return $this->belongsTo(Store::class, 'store_id');
     }
 
-    public function createUrlRewrite(): string
-    {
-        return $this->store->slug.'/'.$this->name;
-    }
+    // public function createUrlRewrite(): string
+    // {
+    //     return $this->store->slug.'/'.$this->name;
+    // }
 }
