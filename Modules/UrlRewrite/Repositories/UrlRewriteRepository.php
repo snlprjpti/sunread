@@ -104,7 +104,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         return $record;
     }
 
-    protected function generateUnique(string $requestPath, int $id = 1): string
+    public function generateUnique(string $requestPath, int $id = 1): string
     {
         if ($this->checkIfRequestPathExists($requestPath.'-'.$id)) return $this->generateUnique($requestPath, $id + 1);
         return $requestPath.'-'.$id;
