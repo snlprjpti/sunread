@@ -24,7 +24,7 @@ class CategoryTranslation extends Model
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["category"];
         $this->urlRewriteRequestPath = (isset($this->store->slug) ? $this->store->slug . "/" : "") . $this->name;
-        
+        $this->urlRewriteType = "Modules\Category\Entities\Category";
         
     }
 

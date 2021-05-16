@@ -33,7 +33,7 @@ class Category extends Model
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["category"];
         $this->urlRewriteRequestPath = $this->slug;
-        
+        $this->urlRewriteType = "Modules\Category\Entities\Category";
     }
  
     public function image_url(): ?string
