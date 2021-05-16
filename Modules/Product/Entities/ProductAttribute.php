@@ -27,6 +27,7 @@ class ProductAttribute extends Model
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["product"];
         $this->urlRewriteRequestPath = (isset($this->store->slug) ? $this->store->slug . "/" : "") . (isset($this->value->value) ? $this->value->value : "");
+        $this->urlRewriteType = "Modules\Product\Entities\ProductAttribute";
     }
 
     public function value(): MorphTo
