@@ -29,5 +29,5 @@ interface UrlRewriteInterface
 
     public function regenerateRoute(string $requestPath, object $urlRewrite, object $model): object;
 
-    public function handleUrlRewrite(object $model, string $event, string $request_path): void;
+    public function handleUrlRewrite(object $model, string $event): void;
 }

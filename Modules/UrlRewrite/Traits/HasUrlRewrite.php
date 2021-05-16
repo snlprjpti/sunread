@@ -12,6 +12,7 @@ trait HasUrlRewrite
     public array $urlRewriteParameterKey = ["id"];
 
     public $urlRewriteRoute;
+    public $urlRewriteRequestPath = "";
 
     public function getClass(): string
     {

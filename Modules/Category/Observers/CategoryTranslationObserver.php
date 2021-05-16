@@ -10,16 +10,16 @@ class CategoryTranslationObserver
 {
     public function created(CategoryTranslation $category_translation)
     {
-        UrlRewrite::handleUrlRewrite($category_translation, __FUNCTION__, $category_translation->createUrlRewrite());
+        UrlRewrite::handleUrlRewrite($category_translation, __FUNCTION__);
     }
 
     public function updated(CategoryTranslation $category_translation)
     {
-        UrlRewrite::handleUrlRewrite($category_translation, __FUNCTION__, $category_translation->createUrlRewrite());
+        UrlRewrite::handleUrlRewrite($category_translation, __FUNCTION__);
     }
 
     public function deleted(CategoryTranslation $category_translation)
     {
-        UrlRewrite::handleUrlRewrite($category_translation, __FUNCTION__, $category_translation->createUrlRewrite());
+        UrlRewrite::handleUrlRewrite($category_translation, __FUNCTION__);
     }
 }

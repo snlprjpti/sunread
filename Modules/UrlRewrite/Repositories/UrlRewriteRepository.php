@@ -125,11 +125,11 @@ class UrlRewriteRepository implements UrlRewriteInterface
         return [$requestPath, $targetPath];
     }
 
-    public function handleUrlRewrite(object $model, string $event, string $request_path): void
+    public function handleUrlRewrite(object $model, string $event): void
     {
-        if ( $event == "created" ) $this->create($request_path, null, get_class($model), $model->getUrlRewriteAttributesArray(), 0, true, $model);
-        if ( $event == "updated" ) $this->regenerateRoute($request_path, $model->getUrlRewrite(), $model);
-        if ( $event == "deleted" ) $this->delete($model->getUrlRewrite()->id);
+        if( $event == "created" ) $this->create($model->urlRewriteRequestPath, null, get_class($model), $model->getUrlRewriteAttributesArray(), 0, true, $model);
+        if ( $event == "updated" ) $this->regenerateRoute($model->urlRewriteRequestPath, $model->getUrlRewrite(), $model);
+        if( $event == "deleted" ) $this->delete($model->getUrlRewrite()->id);
     }
 
 }
