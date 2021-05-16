@@ -100,11 +100,16 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 		return false;
 	}
 
-	public function create(string $requestPath, ?string $targetPath, ?string $type = null,
-	?array $typeAttributes = null, int $redirectType = 0, ?bool $unique = false)
+	public function create( string $requestPath,
+	?string $targetPath,
+	?string $type = null,
+	?array $typeAttributes = null,
+	?int $redirectType = 0,
+	bool $unique = false,
+	?object $model = null)
 	{
 		return $this->repository
-		->create($requestPath, $targetPath, $type, $typeAttributes, $redirectType, $unique);
+		->create($requestPath, $targetPath, $type, $typeAttributes, $redirectType, $unique, $model);
 	}
 
 	public function update(array $data, int $id): object
@@ -114,9 +119,9 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 		return $updated;
 	}
 
-	public function regenerateRoute( string $requestPath, object $urlRewrite): object
+	public function regenerateRoute( string $requestPath, object $urlRewrite, object $model): object
 	{
-		return $this->repository->regenerateRoute($requestPath, $urlRewrite);
+		return $this->repository->regenerateRoute($requestPath, $urlRewrite, $model);
 	}
 
 	public function handleUrlRewrite(object $model, string $event, string $request_path): void
