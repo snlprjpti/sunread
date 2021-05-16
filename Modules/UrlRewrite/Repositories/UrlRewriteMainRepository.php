@@ -27,34 +27,35 @@ class UrlRewriteMainRepository extends BaseRepository
     public function geturlRewriteData(array $item, ?int $id = null): array
     {
         $urlRewrite = [];
-        $config_base_name = "url-rewrite.types.".$item['type'];
-        $urlRewrite['type'] = config("{$config_base_name}.route");
+        $model_path = config("url-rewrite.path.".$item['type']);
+        $model = new $model_path();
 
         switch ($item['type']) {
-            case "product":
+            case "Product":
                 $urlRewrite['type_attributes']["parameter"]["product"] = $item['parameter_id'];
                 break;
 
-            case "category":
+            case "Category":
                 $urlRewrite['type_attributes']["parameter"]["category"] = $item['parameter_id'];
                 break;
         }
 
+        $urlRewrite['type'] = $item['type'];
         $urlRewrite['request_path'] = $item['request_path'];
 
         if($item['store_id']) $urlRewrite['type_attributes']["extra_fields"]["store_id"] = $item['store_id'];
 
         if($this->UrlRewriteExists($urlRewrite, $id)) throw new Exception("Already Exists");
         
-        $urlRewrite['target_path'] = route($urlRewrite['type'],  $urlRewrite['type_attributes']["parameter"], false);
-        
+        $urlRewrite['target_path'] = route($model->urlRewriteRoute,  $urlRewrite['type_attributes']["parameter"], false);
+        dd($urlRewrite);
         return $urlRewrite;
     }
 
     public function ValidateUrlRewrite(object $request): array
     {
         $data = $request->validate([
-            "type" => "required|in:product,category",
+            "type" => "required|in:Product,Category",
             "parameter_id" => [ "required", new UrlRewriteRule($request->type) ],
             "store_id" => "nullable|exists:stores,id",
             "request_path" => "required" 

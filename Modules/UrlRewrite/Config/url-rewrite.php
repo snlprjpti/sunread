@@ -12,8 +12,8 @@ return [
     'cache-ttl' => 86400,
     'cache-decorator' => CachingUrlRewriteRepository::class,
     'path' => [
-        'product' => 'Modules\Category\Entities\Category',
-        'category' => 'Modules\Product\Entities\Product'
+        'Category' => 'Modules\Category\Entities\Category',
+        'Product' => 'Modules\Product\Entities\Product'
     ]
 ];
 
