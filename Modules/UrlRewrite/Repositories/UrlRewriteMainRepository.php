@@ -54,7 +54,7 @@ class UrlRewriteMainRepository extends BaseRepository
         return $urlRewrite;
     }
 
-    public function ValidateUrlRewrite(object $request): array
+    public function validateUrlRewrite(object $request): array
     {
         $data = $request->validate([
             "type" => "required|in:Product,Category",

@@ -54,7 +54,7 @@ class UrlRewriteController extends BaseController
     {
         try
         {
-            $validated_data = $this->repository->ValidateUrlRewrite($request);
+            $validated_data = $this->repository->validateUrlRewrite($request);
             $urlRewrite = new Request($this->repository->geturlRewriteData($validated_data));
 
             $data = $this->repository->validateData($urlRewrite);
@@ -86,7 +86,7 @@ class UrlRewriteController extends BaseController
         try
         {
             if(!(UrlRewrite::find($id))) throw new ModelNotFoundException(); 
-            $validated_data = $this->repository->ValidateUrlRewrite($request);
+            $validated_data = $this->repository->validateUrlRewrite($request);
             $urlRewrite = new Request($this->repository->geturlRewriteData($validated_data, $id));
 
             $data = $this->repository->validateData($urlRewrite);
