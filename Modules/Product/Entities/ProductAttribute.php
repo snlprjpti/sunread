@@ -16,8 +16,17 @@ class ProductAttribute extends Model
 
     protected $fillable = [ "attribute_id", "channel_id", "product_id", "store_id", "value_type", "value_id" ];
     public $timestamps = false;
+
     protected $appends = ["value_data", "url"];
-    public $urlRewriteType = "product";
+
+    public function __construct(?array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->urlRewriteRoute = "admin.catalog.products.show";
+        $this->urlRewriteParameter = ["product_id"];
+        $this->urlRewriteExtraFields = ["store_id"];
+        $this->urlRewriteParameterKey = ["product"];
+    }
 
     public function value(): MorphTo
     {

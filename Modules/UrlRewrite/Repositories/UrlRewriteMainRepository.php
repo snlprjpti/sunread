@@ -40,7 +40,7 @@ class UrlRewriteMainRepository extends BaseRepository
                 break;
         }
 
-        $urlRewrite['type'] = $item['type'];
+        $urlRewrite['type'] = $model_path;
         $urlRewrite['request_path'] = $item['request_path'];
 
         if($item['store_id']) $urlRewrite['type_attributes']["extra_fields"]["store_id"] = $item['store_id'];
@@ -48,7 +48,7 @@ class UrlRewriteMainRepository extends BaseRepository
         if($this->UrlRewriteExists($urlRewrite, $id)) throw new Exception("Already Exists");
         
         $urlRewrite['target_path'] = route($model->urlRewriteRoute,  $urlRewrite['type_attributes']["parameter"], false);
-        dd($urlRewrite);
+
         return $urlRewrite;
     }
 

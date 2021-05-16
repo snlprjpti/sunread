@@ -10,13 +10,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Brand\Entities\Brand;
 use Modules\Category\Entities\Category;
+use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUrlRewrite;
 
     protected $fillable = [ "parent_id", "brand_id", "attribute_group_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];
+
+    public function __construct(?array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->urlRewriteRoute = "admin.catalog.products.show";
+        $this->urlRewriteParameter = ["id"];
+        $this->urlRewriteExtraFields = ["store_id"];
+        $this->urlRewriteParameterKey = ["product"];
+        
+    }
 
     public function parent(): BelongsTo
     {
