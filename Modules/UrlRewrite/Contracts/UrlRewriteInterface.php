@@ -19,6 +19,8 @@ interface UrlRewriteInterface
 
     public function getByTargetPath(string $url): ?object;
 
+    public function generateUnique(string $requestPath, int $id = 1): string;
+
     public function all(): ?object;
 
     public function delete(int $id): bool;

@@ -73,6 +73,11 @@ class UrlRewriteRepository implements UrlRewriteInterface
     {
         if (! \is_array($urlRewrite->type_attributes)) throw UrlRewriteException::columnNotSet($urlRewrite, 'type_attributes');
 
+        
+        if ($this->checkIfRequestPathExists($requestPath)) {
+            if($this->model->where('request_path', $requestPath)->first()->id != $urlRewrite->id) $requestPath = $this->generateUnique($requestPath);
+        }
+
         return $this->update([ 
             "target_path" => $this->targetPathFromRoute($model->urlRewriteRoute, $urlRewrite->type_attributes),
             "request_path" => $requestPath 
@@ -98,7 +103,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         return $record;
     }
 
-    protected function generateUnique(string $requestPath, int $id = 1): string
+    public function generateUnique(string $requestPath, int $id = 1): string
     {
         if ($this->checkIfRequestPathExists($requestPath.'-'.$id)) return $this->generateUnique($requestPath, $id + 1);
         return $requestPath.'-'.$id;
