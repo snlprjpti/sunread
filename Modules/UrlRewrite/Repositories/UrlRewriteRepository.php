@@ -25,7 +25,6 @@ class UrlRewriteRepository implements UrlRewriteInterface
     public function setModel(object $model): object
     {
         $this->model = $model;
-
         return $this;
     }
 
@@ -73,7 +72,6 @@ class UrlRewriteRepository implements UrlRewriteInterface
     {
         if (! \is_array($urlRewrite->type_attributes)) throw UrlRewriteException::columnNotSet($urlRewrite, 'type_attributes');
 
-        
         if ($this->checkIfRequestPathExists($requestPath)) {
             if($this->model->where('request_path', $requestPath)->first()->id != $urlRewrite->id) $requestPath = $this->generateUnique($requestPath);
         }
@@ -132,9 +130,9 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     public function handleUrlRewrite(object $model, string $event): void
     {
-        if( $event == "created" ) $this->create($model->url_rewrite_request_path, null, $model->urlRewriteType, $model->getUrlRewriteAttributesArray(), 0, true, $model);
+        if ( $event == "created" ) $this->create($model->url_rewrite_request_path, null, $model->urlRewriteType, $model->getUrlRewriteAttributesArray(), 0, true, $model);
         if ( $event == "updated" ) $this->regenerateRoute($model->url_rewrite_request_path, $model->getUrlRewrite(), $model);
-        if( $event == "deleted" ) $this->delete($model->getUrlRewrite()->id);
+        if ( $event == "deleted" ) $this->delete($model->getUrlRewrite()->id);
     }
 
 }

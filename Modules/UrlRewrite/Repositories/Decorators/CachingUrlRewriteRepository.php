@@ -102,13 +102,7 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 		return false;
 	}
 
-	public function create( string $requestPath,
-	?string $targetPath,
-	?string $type = null,
-	?array $typeAttributes = null,
-	?int $redirectType = 0,
-	bool $unique = false,
-	?object $model = null)
+	public function create( string $requestPath, ?string $targetPath, ?string $type = null, ?array $typeAttributes = null, ?int $redirectType = 0, bool $unique = false, ?object $model = null)
 	{
 		return $this->repository
 		->create($requestPath, $targetPath, $type, $typeAttributes, $redirectType, $unique, $model);
@@ -129,5 +123,10 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 	public function handleUrlRewrite(object $model, string $event): void
 	{
 		$this->repository->handleUrlRewrite($model, $event);
+	}
+
+	public function generateUnique(string $requestPath, int $id = 1): string 
+	{
+		return $this->repository->generateUnique($requestPath, $id);
 	}
 }
