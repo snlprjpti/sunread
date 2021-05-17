@@ -1,7 +1,9 @@
 <?php
 
+namespace Modules\UrlRewrite\Repositories\Decorators;
+
 use Illuminate\Cache\TaggableStore;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Modules\UrlRewrite\Contracts\UrlRewriteInterface;
 
 class CachingUrlRewriteRepository implements UrlRewriteInterface
@@ -126,6 +128,6 @@ class CachingUrlRewriteRepository implements UrlRewriteInterface
 
 	public function handleUrlRewrite(object $model, string $event): void
 	{
-		return $this->repository->handleUrlRewrite($model, $event);
+		$this->repository->handleUrlRewrite($model, $event);
 	}
 }
