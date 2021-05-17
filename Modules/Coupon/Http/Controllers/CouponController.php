@@ -101,7 +101,9 @@ class CouponController extends BaseController
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function ($id){
+                $this->allowCoupon->where('coupon_id',$id)->delete();
+            });
         }
         catch (Exception $exception)
         {

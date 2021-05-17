@@ -45,7 +45,7 @@ class AllowCouponController extends BaseController
             if($coupon){
                 $request['coupon_id'] = $couponId;
                 $allowExist = $this->repository->allowedCouponExist($request);
-                if ($allowExist < 0) {
+                if ($allowExist < 1) {
                     $data = $this->repository->validateData($request);
                     $created = $this->repository->create($data);
                 }
