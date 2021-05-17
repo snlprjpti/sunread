@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Coupon\Entities\AllowCoupon;
 use Modules\Coupon\Entities\Coupon;
 use Modules\Coupon\Repositories\CouponRepository;
 use Modules\Coupon\Transformers\CouponResource;
@@ -14,14 +15,15 @@ use Exception;
 
 class CouponController extends BaseController
 {
-    private $coupon;
     private $repository;
+    private $allowCoupon;
 
-    public function __construct(Coupon $coupon, CouponRepository $couponRepository)
+    public function __construct(Coupon $coupon, CouponRepository $couponRepository, AllowCoupon $allowCoupon)
     {
         $this->model = $coupon;
         $this->model_name = "Coupon";
         $this->repository = $couponRepository;
+        $this->allowCoupon = $allowCoupon;
         parent::__construct($this->model, $this->model_name);
     }
 
@@ -67,7 +69,7 @@ class CouponController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try
         {
@@ -80,7 +82,7 @@ class CouponController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
         try
         {
@@ -95,7 +97,7 @@ class CouponController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         try
         {
