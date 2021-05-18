@@ -27,7 +27,7 @@ class CouponResource extends JsonResource
             "only_new_user" => $this->only_new_user,
             "scope_public" => $this->scope_public,
             "status" => $this->status,
-            "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
+            "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
 }

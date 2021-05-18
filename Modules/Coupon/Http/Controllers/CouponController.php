@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Coupon\Entities\AllowCoupon;
 use Modules\Coupon\Entities\Coupon;
 use Modules\Coupon\Repositories\CouponRepository;
 use Modules\Coupon\Transformers\CouponResource;
@@ -16,14 +15,12 @@ use Exception;
 class CouponController extends BaseController
 {
     private $repository;
-    private $allowCoupon;
 
-    public function __construct(Coupon $coupon, CouponRepository $couponRepository, AllowCoupon $allowCoupon)
+    public function __construct(Coupon $coupon, CouponRepository $couponRepository)
     {
         $this->model = $coupon;
         $this->model_name = "Coupon";
         $this->repository = $couponRepository;
-        $this->allowCoupon = $allowCoupon;
         parent::__construct($this->model, $this->model_name);
     }
 
