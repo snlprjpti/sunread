@@ -20,9 +20,9 @@ class CustomerAddressRepository extends BaseRepository
             "country" => "required",
             "state" => "required",
             "city" => "required",
-            "postcode" => "required",
+            "postcode" => "required|numeric",
             "phone" => "required",
-            "default_address" => "required"
+            "default_address" => "sometimes|numeric"
         ];
     }
 
