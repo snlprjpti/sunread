@@ -16,7 +16,7 @@ class CreateAllowCouponsTable extends Migration
         Schema::create('allow_coupons', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('coupon_id');
-            $table->foreign('coupon_id')->references('id')->on('coupons')->onDelete('cascade');
+            $table->foreign('coupon_id')->references('id')->on('coupons');
 
             $table->string('model_type');
             $table->bigInteger('model_id');
