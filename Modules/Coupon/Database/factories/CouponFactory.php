@@ -9,7 +9,7 @@ class CouponFactory extends Factory
 {
     protected $model = \Modules\Coupon\Entities\Coupon::class;
 
-    public function definition()
+    public function definition(): array
     {
         $date = $this->faker->date();
         return [
