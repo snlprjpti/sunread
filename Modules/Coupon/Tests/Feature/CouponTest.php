@@ -2,6 +2,7 @@
 
 namespace Modules\Coupon\Tests\Feature;
 
+use Illuminate\Support\Arr;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Coupon\Entities\Coupon;
 
@@ -35,9 +36,10 @@ class CouponTest extends BaseTestCase
 
     public function testAdminCanAllowCoupon()
     {
+        $model_type = Arr::random(["\Modules\Customer\Entities\Customer", "\Modules\Brand\Entities\Brand", "\Modules\Product\Entities\Product"]);
         $post_data = [
-            "model_type" => 'dsadasd',
-            "model_id" => 1,
+            "model_type" => $model_type,
+            "model_id" => random_int(1,10),
             "status" => 1
         ];
 
