@@ -24,7 +24,7 @@ class CustomerAddressResource extends JsonResource
             "city" => $this->city,
             "postcode" => $this->postcode,
             "phone" => $this->phone,
-            "default_address" => $this->default_address,
+            "default_address" => ($this->default_address) ? $this->default_address : 0,
             "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
         ];
     }
