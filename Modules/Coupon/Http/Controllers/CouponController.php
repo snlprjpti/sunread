@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Str;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Coupon\Entities\Coupon;
 use Modules\Coupon\Repositories\CouponRepository;
@@ -55,7 +56,7 @@ class CouponController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $data['code'] = $this->repository->createCouponCode($request->name);
+            $data['code'] = strtoupper(Str::random(10));
             $created = $this->repository->create($data);
         }
         catch( Exception $exception )

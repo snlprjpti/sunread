@@ -1,10 +1,7 @@
 <?php
 
-
 namespace Modules\Coupon\Repositories;
 
-
-use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Coupon\Entities\Coupon;
 
@@ -32,13 +29,4 @@ class CouponRepository extends BaseRepository
             "status" => "sometimes|boolean"
         ];
     }
-
-    public function createCouponCode($name): string
-    {
-        $replace = str_replace(' ','-',$name);
-        $name = substr(strtoupper($replace),0,10);
-        $code = $name.'-'.strtoupper(Str::random(4));
-        return $code;
-    }
-
 }
