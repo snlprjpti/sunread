@@ -18,20 +18,18 @@ class CouponTest extends BaseTestCase
         $this->route_prefix = "admin.coupons";
     }
 
-    public function getCreateData(): array
-    {
-        return array_merge($this->model::factory()->make()->toArray(), [
-            "password" => "password",
-            "gender" => "male",
-            "password_confirmation" => "password"
-        ]);
-    }
-
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "name" => null,
             "status"=>null
+        ]);
+    }
+
+    public function getNonMandodtaryCreateData(): array
+    {
+        return array_merge($this->getCreateData(), [
+            "discount_percent" => null
         ]);
     }
 }

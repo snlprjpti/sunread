@@ -24,7 +24,7 @@ class CouponRepository extends BaseRepository
             "min_discount_amount" => "sometimes|nullable",
             "max_discount_amount" => "sometimes|nullable",
             "min_purchase_amount" => "sometimes|nullable",
-            "discount_percent" => "sometimes|numeric",
+            "discount_percent" => "sometimes|nullable|numeric",
             "max_uses" => "required|numeric",
             "single_user_uses" => "sometimes|numeric",
             "only_new_user" => "sometimes|boolean",
