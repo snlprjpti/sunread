@@ -21,7 +21,7 @@ class AllowCouponController extends BaseController
     public function __construct(AllowCoupon $allowCoupon, Coupon $coupon, AllowCouponRepository $allowCouponRepository)
     {
         $this->model = $allowCoupon;
-        $this->model_name = "Coupon Allow";
+        $this->model_name = "Coupon";
         $this->coupon = $coupon;
         $this->repository = $allowCouponRepository;
         parent::__construct($this->model, $this->model_name);
@@ -37,21 +37,19 @@ class AllowCouponController extends BaseController
         return new AllowCouponResource($data);
     }
 
-    public function allowCoupon(Request $request, int $couponId): JsonResponse
+    public function allowCoupon(Request $request, int $coupon_id): JsonResponse
     {
         try
         {
-            $coupon = $this->coupon->where('id',$couponId)->where('status',1)->first();
-            if($coupon){
-                $request['coupon_id'] = $couponId;
-                $allowExist = $this->repository->allowedCouponExist($request);
-                if ($allowExist < 1) {
-                    $data = $this->repository->validateData($request);
-                    $created = $this->repository->create($data);
-                }
-                else{
-                    return $this->successResponseWithMessage($this->lang('already-created'));
-                }
+            $this->coupon->findOrFail($coupon_id)->where('status',1)->first();
+            $request['coupon_id'] = $coupon_id;
+            $allowExist = $this->repository->allowedCouponExist($request);
+            if ($allowExist < 1) {
+                $data = $this->repository->validateData($request);
+                $created = $this->repository->create($data);
+            }
+            else{
+                return $this->successResponseWithMessage($this->lang('already-created'));
             }
         }
         catch( Exception $exception )
