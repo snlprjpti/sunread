@@ -4,6 +4,8 @@ namespace Modules\Coupon\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Coupon\Entities\Coupon;
+use Modules\Coupon\Observers\CouponObserver;
 
 class CouponServiceProvider extends ServiceProvider
 {
@@ -108,5 +110,10 @@ class CouponServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    public function registerObservers()
+    {
+        Coupon::observe(CouponObserver::class);
     }
 }
