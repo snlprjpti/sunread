@@ -10,8 +10,8 @@ class CustomerGroupTableSeeder extends Seeder
     public function run(): void
     {
         DB::table("customer_groups")->insert([
-            "slug" => "guest",
-            "name" => "Guest",
+            "slug" => "general",
+            "name" => "General",
             "is_user_defined" => 0
         ]);
     }
