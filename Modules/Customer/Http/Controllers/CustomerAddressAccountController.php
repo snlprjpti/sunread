@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Lang;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\CustomerAddress;
+use Modules\Customer\Exceptions\ActionUnauthorizedException;
 use Modules\Customer\Repositories\CustomerAddressRepository;
 use Modules\Customer\Transformers\CustomerAddressResource;
 
@@ -24,7 +25,10 @@ class CustomerAddressAccountController extends BaseController
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
         $this->customer = auth()->guard("customer")->check() ? auth()->guard("customer")->user() : [];
-        parent::__construct($this->model, $this->model_name);
+        $exception_statuses = [
+            ActionUnauthorizedException::class => 403
+        ];
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -101,11 +105,6 @@ class CustomerAddressAccountController extends BaseController
     protected function checkAuthority($id): void
     {
         $customer_address_ids = $this->customer->addresses->pluck("id")->toArray() ?? [];
-        if (!in_array($id, $customer_address_ids)) throw new Exception("Action not authorized.");
-    }
-
-    protected function checkDefaultAddress():void
-    {
-
+        if (!in_array($id, $customer_address_ids)) throw new ActionUnauthorizedException("Action not authorized.");
     }
 }
