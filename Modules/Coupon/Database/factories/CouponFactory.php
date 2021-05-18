@@ -18,16 +18,16 @@ class CouponFactory extends Factory
             "description" => $this->faker->paragraph(),
             "valid_from" => $date,
             "valid_to" => Carbon::parse(now())->format('Y.m.d'),
-            "flat_discount_amount" => random_int(1,100),
-            "min_discount_amount" => random_int(1,100),
-            "max_discount_amount" => random_int(1,500),
-            "min_purchase_amount" => random_int(1,1000),
-            "discount_percent" => 1,
-            "max_uses" => 10,
-            "single_user_uses" => 1,
-            "only_new_user" => 0,
-            "scope_public" => 0,
-            "status" => 1
+            "flat_discount_amount" => rand(1,100),
+            "min_discount_amount" => rand(1,100),
+            "max_discount_amount" => rand(1,500),
+            "min_purchase_amount" => rand(1,1000),
+            "discount_percent" => rand(0, 10),
+            "max_uses" => rand(1,1000),
+            "single_user_uses" => rand(1, 10),
+            "only_new_user" => rand(0, 1),
+            "scope_public" => rand(0, 1),
+            "status" => rand(0, 1)
         ];
     }
 }
