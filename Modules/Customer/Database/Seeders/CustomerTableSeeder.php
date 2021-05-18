@@ -13,6 +13,7 @@ class CustomerTableSeeder extends Seeder
             "first_name" => "John",
             "last_name" => "Doe",
             "email" => "customer@example.net",
+            "customer_group_id" => 1,
             "password" => bcrypt("password")
         ]);
     }
