@@ -15,7 +15,7 @@ class CouponTest extends BaseTestCase
 
         $this->admin = $this->createAdmin();
         $this->model_name = "Coupon";
-        $this->route_prefix = "admin.coupon";
+        $this->route_prefix = "admin.coupons";
     }
 
     public function getCreateData(): array
