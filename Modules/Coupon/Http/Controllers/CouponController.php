@@ -56,7 +56,9 @@ class CouponController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $data['code'] = strtoupper(Str::random(10));
+            if(!$request->code){
+                $data['code'] = strtoupper(Str::random(10));
+            }
             $created = $this->repository->create($data);
         }
         catch( Exception $exception )
