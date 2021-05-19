@@ -48,6 +48,7 @@ class CouponTest extends BaseTestCase
         $response->assertStatus(201);
         $response->assertJsonFragment([
             "status" => "success",
+            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
 }
