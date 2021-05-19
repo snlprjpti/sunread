@@ -44,13 +44,11 @@ class AllowCouponController extends BaseController
             $this->coupon->findOrFail($coupon_id)->where('status',1)->first();
             $request['coupon_id'] = $coupon_id;
             $allowExist = $this->repository->allowedCouponExist($request);
-            if ($allowExist < 1) {
-                $data = $this->repository->validateData($request);
-                $created = $this->repository->create($data);
-            }
-            else{
+            if ($allowExist > 0) {
                 return $this->successResponseWithMessage($this->lang('already-created'));
             }
+            $data = $this->repository->validateData($request);
+            $created = $this->repository->create($data);
         }
         catch( Exception $exception )
         {
