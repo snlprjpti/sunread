@@ -3,6 +3,7 @@
 namespace Modules\Coupon\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Modules\Core\Traits\HasFactory;
 
@@ -17,4 +18,8 @@ class AllowCoupon extends Model
         return $this->morphTo();
     }
 
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
+    }
 }

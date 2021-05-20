@@ -13,7 +13,7 @@ class Coupon extends Model
     protected $fillable = ["code","name","description","valid_from","valid_to","flat_discount_amount","min_discount_amount", "max_discount_amount",
         "discount_percent","max_uses","single_user_uses","only_new_user","min_purchase_amount","scope_public","status"];
 
-    public function allowCoupon(): HasMany
+    public function allowCoupons(): HasMany
     {
         return $this->hasMany(AllowCoupon::class);
     }

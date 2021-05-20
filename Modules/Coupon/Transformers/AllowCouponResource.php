@@ -10,7 +10,7 @@ class AllowCouponResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "coupon_id" => $this->coupon_id,
+            "coupon" => new CouponResource($this->whenLoaded("coupon")),
             "model_type" => $this->model_type,
             "model_id" => $this->model_id,
             "status" => $this->status,
