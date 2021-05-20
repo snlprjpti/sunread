@@ -12,7 +12,7 @@ class AllowCouponRepository extends BaseRepository
     public function __construct(AllowCoupon $allowCoupon)
     {
         $this->model = $allowCoupon;
-        $this->model_key = "coupon allow";
+        $this->model_key = "coupon-allow";
         $this->rules = [
             "coupon_id" => "required",
             "model_type" => "required",
