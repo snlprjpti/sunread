@@ -41,7 +41,7 @@ class AllowCouponController extends BaseController
     {
         try
         {
-            $this->coupon->findOrFail($coupon_id)->where('status',1)->first();
+            $this->coupon->firstOrFail($coupon_id)->where('status',1)->first();
             $request->request->add(['coupon_id' => $coupon_id]);
             $allowExist = $this->repository->allowedCouponExist($request);
             if ($allowExist > 0) {
