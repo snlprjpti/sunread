@@ -12,7 +12,6 @@ use Kalnoy\Nestedset\NodeTrait;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;
-use Modules\UrlRewrite\Facades\UrlRewrite;
 use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Category extends Model
