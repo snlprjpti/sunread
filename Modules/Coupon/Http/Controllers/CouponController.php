@@ -59,7 +59,7 @@ class CouponController extends BaseController
             if(!$request->code){
                 do
                 {
-                    $code = strtoupper(Str::random(8));
+                    $code = strtoupper(Str::random(rand(6,8)));
                     $coupon_code = $this->model->where('code', $code)->first();
                 }
                 while(!empty($coupon_code));
@@ -96,7 +96,7 @@ class CouponController extends BaseController
             if(!$request->code){
                 do
                 {
-                    $code = strtoupper(Str::random(8));
+                    $code = strtoupper(Str::random(rand(6,8)));
                     $coupon_code = $this->model->where('code', $code)->first();
                 }
                 while(!empty($coupon_code));
