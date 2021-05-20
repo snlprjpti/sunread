@@ -57,4 +57,29 @@ class AllowCouponController extends BaseController
 
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
+
+    public function allowMultipleCoupon(Request $request, int $coupon_id): JsonResponse
+    {
+        try
+        {
+            $this->coupon->where('id',$coupon_id)->where('status',1)->firstOrFail();
+            foreach($request->all() as $key=>$value){
+                $model_type = $value['model_type'];
+                $status = $value['status'];
+                foreach($value['model_id'] as $model_id){
+                    $request->request->add(['coupon_id' => $coupon_id, 'model_type'=>$model_type, 'model_id'=>$model_id, 'status'=>$status]);
+                    $allow_exist = $this->repository->allowedCouponExist($request);
+                    if ($allow_exist < 1) {
+                        $data = $this->repository->validateData($request);
+                        $created = $this->repository->create($data);
+                    }
+                }
+            }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+    }
 }
