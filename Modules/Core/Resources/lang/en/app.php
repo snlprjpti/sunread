@@ -14,6 +14,7 @@ return [
         'user-define-error' => 'Can not delete system :name',
         'cancel-success' => ':name canceled successfully.',
         'cancel-error' => ':name can not be canceled.',
+        'already-created' => 'Already Created',
         'already-taken' => 'The :name has already been taken.',
         'not-found' => ':name not found.',
         'status-change-success' => 'The :name has changed successfully.',
