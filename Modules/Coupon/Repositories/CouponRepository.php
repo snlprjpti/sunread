@@ -12,7 +12,7 @@ class CouponRepository extends BaseRepository
         $this->model = $coupon;
         $this->model_key = "coupons";
         $this->rules = [
-            "code" => "nullable|unique:coupons,code|min:6|max:8",
+            "code" => "nullable|unique:coupons,code",
             "name" => "required",
             "description" => "sometimes|nullable",
             "valid_from" => "required|date",
