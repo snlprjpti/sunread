@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Modules\Brand\Database\Seeders\BrandDatabaseSeeder::class);
         $this->call(\Modules\Product\Database\Seeders\ProductDatabaseSeeder::class);
         $this->call(\Modules\Review\Database\Seeders\ReviewDatabaseSeeder::class);
+        $this->call(\Modules\UrlRewrite\Database\Seeders\UrlRewriteDatabaseSeeder::class);
     }
 }

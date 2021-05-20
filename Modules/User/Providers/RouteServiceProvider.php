@@ -4,6 +4,7 @@ namespace Modules\User\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Modules\UrlRewrite\Http\Controllers\RewriteBaseController;
 
 class RouteServiceProvider extends ServiceProvider
 {

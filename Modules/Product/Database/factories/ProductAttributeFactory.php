@@ -4,6 +4,7 @@ namespace Modules\Product\Database\factories;
 use Modules\Core\Entities\Store;
 use Modules\Attribute\Entities\Attribute;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Product\Entities\Product;
 
 class ProductAttributeFactory extends Factory
 {
@@ -16,6 +17,7 @@ class ProductAttributeFactory extends Factory
         $attribute_model = $attribute_types[$attribute_type];
 
         return [
+            "product_id" => Product::factory()->create()->id,
             "attribute_id" => Attribute::factory()->create(["type" => $attribute_type])->id,
             "channel_id" => null,
             "store_id" => Store::factory()->create()->id,

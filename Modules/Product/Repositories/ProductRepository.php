@@ -76,11 +76,13 @@ class ProductRepository extends BaseRepository
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
 
                 if ( $product_attribute->value_id != null ) {
-                    $product_attribute->value()->update(["value" => $attribute["value"]]);
+                    $product_attribute->value()->each(function($attribute_value) use($attribute){
+                        $attribute_value->update(["value" => $attribute["value"]]);
+                    });
                     continue;
                 }
 
-                ProductAttribute::where($match)->update(["value_id" => $attribute["value_type"]::create(["value" => $attribute["value"]])->id]);
+                $product_attribute->update(["value_id" => $attribute["value_type"]::create(["value" => $attribute["value"]])->id]);
             }
         }
         catch (Exception $exception)

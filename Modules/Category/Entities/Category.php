@@ -12,15 +12,29 @@ use Kalnoy\Nestedset\NodeTrait;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;
+use Modules\UrlRewrite\Facades\UrlRewrite;
+use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Category extends Model
 {
-    use NodeTrait, Sluggable, HasFactory;
+    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite;
 
     public static $SEARCHABLE = [ "translations.name", "slug" ];
     protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "status" ];
     protected $with = [ "translations" ];
 
+    protected $appends = ['url'];
+
+    public function __construct(?array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->urlRewriteRoute = "admin.catalog.categories.categories.show";
+        $this->urlRewriteParameter = ["id"];
+        $this->urlRewriteExtraFields = ["store_id"];
+        $this->urlRewriteParameterKey = ["category"];
+        $this->urlRewriteType = "Modules\Category\Entities\Category";
+    }
+ 
     public function image_url(): ?string
     {
         if (!$this->image) return null;
@@ -58,4 +72,10 @@ class Category extends Model
             ? $this::orderBy('position', 'ASC')->where('id', '!=', $this->id)->get()->toTree()
             : $this::orderBy('position', 'ASC')->get()->toTree();
     }
+
+    public function getUrlRewriteRequestPathAttribute(): string
+    {
+        return $this->slug;
+    }
+
 }
