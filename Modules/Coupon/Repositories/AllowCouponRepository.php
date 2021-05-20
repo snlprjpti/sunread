@@ -21,7 +21,7 @@ class AllowCouponRepository extends BaseRepository
         ];
     }
 
-    public function allowedCouponExist($request)
+    public function allowedCouponExist($request): int
     {
         try
         {
