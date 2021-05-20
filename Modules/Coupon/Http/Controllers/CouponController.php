@@ -57,9 +57,14 @@ class CouponController extends BaseController
         {
             $data = $this->repository->validateData($request);
             if(!$request->code){
-                $data['code'] = strtoupper(Str::random(8));
+                do
+                {
+                    $code = strtoupper(Str::random(8));
+                    $coupon_code = $this->model->where('code', $code)->first();
+                }
+                while(!empty($coupon_code));
+                $data['code'] = $code;
             }
-            $data['code'] = strtoupper($request->code);
             $created = $this->repository->create($data);
         }
         catch( Exception $exception )
@@ -89,7 +94,13 @@ class CouponController extends BaseController
         {
             $data = $this->repository->validateData($request);
             if(!$request->code){
-                $data['code'] = strtoupper(Str::random(10));
+                do
+                {
+                    $code = strtoupper(Str::random(8));
+                    $coupon_code = $this->model->where('code', $code)->first();
+                }
+                while(!empty($coupon_code));
+                $data['code'] = $code;
             }
             $updated = $this->repository->update($data, $id);
         }
