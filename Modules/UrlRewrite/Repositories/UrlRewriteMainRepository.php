@@ -29,18 +29,9 @@ class UrlRewriteMainRepository extends BaseRepository
     {
         $urlRewrite = [];
         $model_path = config("url-rewrite.path.".$item['type']);
-        $model = new $model_path();
+        $model = new $model_path(); 
 
-        switch ($item['type']) {
-            case "Product":
-                $urlRewrite['type_attributes']["parameter"]["product"] = $item['parameter_id'];
-                break;
-
-            case "Category":
-                $urlRewrite['type_attributes']["parameter"]["category"] = $item['parameter_id'];
-                break;
-        }
-
+        $urlRewrite['type_attributes']["parameter"][$model->urlRewriteParameterKey[0]] = $item['parameter_id'];
         $urlRewrite['type'] = $model->urlRewriteType;
 
         $this->requestPathExists($item, $id) ? $urlRewrite['request_path'] = FacadesUrlRewrite::generateUnique($item['request_path']) : $urlRewrite['request_path'] = $item['request_path'];
@@ -56,8 +47,9 @@ class UrlRewriteMainRepository extends BaseRepository
 
     public function validateUrlRewrite(object $request): array
     {
+        $types = implode(',', config('url-rewrite.types'));
         $data = $request->validate([
-            "type" => "required|in:Product,Category",
+            "type" => "required|in:$types",
             "parameter_id" => [ "required", new UrlRewriteRule($request->type) ],
             "store_id" => "nullable|exists:stores,id",
             "request_path" => "required" 
