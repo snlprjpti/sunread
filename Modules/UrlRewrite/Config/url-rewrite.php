@@ -10,9 +10,8 @@ return [
     'cache-decorator' => Modules\UrlRewrite\Repositories\Decorators\CachingUrlRewriteRepository::class,
     'path' => [
         'Category' => 'Modules\Category\Entities\Category',
-        'Product' => 'Modules\Product\Entities\ProductAttribute',
-        'Review' => 'Modules\Review\Entities\Review'
+        'Product' => 'Modules\Product\Entities\ProductAttribute'
     ],
-    'types' => ['Category', 'Product', 'Review']
+    'types' => ['Category', 'Product']
 ];
 
