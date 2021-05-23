@@ -1,5 +1,7 @@
 <?php
 
+namespace Modules\UrlRewrite\Observers;
+
 use Modules\Core\Facades\Audit;
 use Modules\UrlRewrite\Entities\UrlRewrite;
 

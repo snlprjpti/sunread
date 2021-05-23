@@ -4,7 +4,7 @@ namespace Modules\UrlRewrite\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Modules\UrlRewrite\Entities\UrlRewrite;
-use UrlRewriteObserver;
+use Modules\UrlRewrite\Observers\UrlRewriteObserver;
 
 class UrlRewriteServiceProvider extends ServiceProvider
 {
