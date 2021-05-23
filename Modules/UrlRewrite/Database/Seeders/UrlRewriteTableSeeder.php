@@ -25,7 +25,9 @@ class UrlRewriteTableSeeder extends Seeder
                 "type" => "Modules\Category\Entities\Category",
                 "type_attributes" => $type_attributes,
                 "request_path" => "root",
-                "target_path" => "admin/catalog/categories/1"
+                "target_path" => "admin/catalog/categories/1",
+                "created_at" => now(),
+                "updated_at" => now()
             ]
         ]);
     }
