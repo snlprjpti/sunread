@@ -38,9 +38,11 @@ class CouponTest extends BaseTestCase
     {
         $model_type = Arr::random(["\Modules\Customer\Entities\Customer", "\Modules\Brand\Entities\Brand", "\Modules\Product\Entities\Product"]);
         $post_data = [
-            "model_type" => $model_type,
-            "model_id" => random_int(1,10),
-            "status" => 1
+            [
+                "model_type" => $model_type,
+                "model_id" => [random_int(1,10),random_int(1,10)],
+                "status" => 1
+            ]
         ];
 
         $response = $this->withHeaders($this->headers)->post($this->getRoute("allow_coupon", [$this->default_resource_id]), $post_data);

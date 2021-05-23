@@ -21,7 +21,7 @@ class AllowCouponController extends BaseController
     public function __construct(AllowCoupon $allowCoupon, Coupon $coupon, AllowCouponRepository $allowCouponRepository)
     {
         $this->model = $allowCoupon;
-        $this->model_name = "Coupon";
+        $this->model_name = "Allow Coupon";
         $this->coupon = $coupon;
         $this->repository = $allowCouponRepository;
         parent::__construct($this->model, $this->model_name);
@@ -42,27 +42,6 @@ class AllowCouponController extends BaseController
         try
         {
             $this->coupon->where('id',$coupon_id)->where('status',1)->firstOrFail();
-            $request->request->add(['coupon_id' => $coupon_id]);
-            $allowExist = $this->repository->allowedCouponExist($request);
-            if ($allowExist > 0) {
-                return $this->successResponseWithMessage($this->lang('already-created'));
-            }
-            $data = $this->repository->validateData($request);
-            $created = $this->repository->create($data);
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
-    }
-
-    public function allowMultipleCoupon(Request $request, int $coupon_id): JsonResponse
-    {
-        try
-        {
-            $this->coupon->where('id',$coupon_id)->where('status',1)->firstOrFail();
             foreach($request->all() as $key=>$value){
                 $model_type = $value['model_type'];
                 $status = $value['status'];
@@ -74,6 +53,9 @@ class AllowCouponController extends BaseController
                         $created = $this->repository->create($data);
                     }
                 }
+            }
+            if(empty($created)){
+                return $this->successResponseWithMessage($this->lang('already-created'));
             }
         }
         catch( Exception $exception )
