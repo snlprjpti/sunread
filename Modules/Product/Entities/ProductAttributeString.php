@@ -13,4 +13,8 @@ class ProductAttributeString extends Model
     protected $fillable = [ "value" ];
     protected $table = "product_attribute_string";
 
+    public function product_attribute()
+    {
+        return $this->morphOne(ProductAttribute::class, "value");
+    }
 }
