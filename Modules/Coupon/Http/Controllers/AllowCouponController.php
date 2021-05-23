@@ -10,6 +10,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Coupon\Entities\AllowCoupon;
 use Exception;
 use Modules\Coupon\Entities\Coupon;
+use Modules\Coupon\Exceptions\AlreadyCreatedException;
 use Modules\Coupon\Repositories\AllowCouponRepository;
 use Modules\Coupon\Transformers\AllowCouponResource;
 
@@ -24,7 +25,12 @@ class AllowCouponController extends BaseController
         $this->model_name = "Allow Coupon";
         $this->coupon = $coupon;
         $this->repository = $allowCouponRepository;
-        parent::__construct($this->model, $this->model_name);
+
+        $exception_statuses = [
+            AlreadyCreatedException::class => 400
+        ];
+
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -41,27 +47,16 @@ class AllowCouponController extends BaseController
     {
         try
         {
-            $this->coupon->where('id',$coupon_id)->where('status',1)->firstOrFail();
-            foreach($request->all() as $key=>$value){
-                $model_type = $value['model_type'];
-                $status = $value['status'];
-                foreach($value['model_id'] as $model_id){
-                    $request->request->add(['coupon_id' => $coupon_id, 'model_type'=>$model_type, 'model_id'=>$model_id, 'status'=>$status]);
-                    $allow_exist = $this->repository->allowedCouponExist($request);
-                    if ($allow_exist < 1) {
-                        $data = $this->repository->validateData($request);
-                        $created = $this->repository->create($data);
-                    }
-                }
-            }
-            if(empty($created)){
-                return $this->successResponseWithMessage($this->lang('already-created'));
-            }
+            // Get requested coupon with Status 1
+            $coupon = $this->coupon->whereId($coupon_id)->whereStatus(1)->firstOrFail();
+
+            $data = $this->repository->getBulkData($request, $coupon);
+            $this->repository->insertBulkData($data);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
-        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+        return $this->successResponseWithMessage($this->lang('create-success'), 201);
     }
 }
