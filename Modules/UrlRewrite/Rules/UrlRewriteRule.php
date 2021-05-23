@@ -42,6 +42,6 @@ class UrlRewriteRule implements Rule
      */
     public function message()
     {
-        return "{$this->type}  doesn't found";
+        return "{$this->type}  is not found";
     }
 }
