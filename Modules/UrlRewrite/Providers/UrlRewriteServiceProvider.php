@@ -3,7 +3,8 @@
 namespace Modules\UrlRewrite\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
+use Modules\UrlRewrite\Entities\UrlRewrite;
+use UrlRewriteObserver;
 
 class UrlRewriteServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,7 @@ class UrlRewriteServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObserver();
     }
 
     /**
@@ -111,5 +113,10 @@ class UrlRewriteServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    private function registerObserver()
+    {
+        UrlRewrite::observe(UrlRewriteObserver::class);
     }
 }
