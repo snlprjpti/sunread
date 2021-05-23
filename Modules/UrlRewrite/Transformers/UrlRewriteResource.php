@@ -2,7 +2,6 @@
 
 namespace Modules\UrlRewrite\Transformers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UrlRewriteResource extends JsonResource
@@ -16,7 +15,7 @@ class UrlRewriteResource extends JsonResource
             "request_path" => $this->request_path,
             "target_path" => $this->target_path,
             "redirect_type" => $this->redirect_type,
-            "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
+            "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
 }
