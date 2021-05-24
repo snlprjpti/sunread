@@ -5,7 +5,9 @@ namespace Modules\Category\Providers;
 use Illuminate\Support\ServiceProvider;
 use Modules\Category\Entities\Category;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Category\Entities\CategoryTranslation;
 use Modules\Category\Observers\CategoryObserver;
+use Modules\Category\Observers\CategoryTranslationObserver;
 
 class CategoryServiceProvider extends ServiceProvider
 {
@@ -121,5 +123,6 @@ class CategoryServiceProvider extends ServiceProvider
     public function registerObserver()
     {
         Category::observe(CategoryObserver::class);
+        CategoryTranslation::observe(CategoryTranslationObserver::class);
     }
 }

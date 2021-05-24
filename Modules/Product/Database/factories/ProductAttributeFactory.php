@@ -4,6 +4,7 @@ namespace Modules\Product\Database\factories;
 use Modules\Core\Entities\Store;
 use Modules\Attribute\Entities\Attribute;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Product\Entities\Product;
 
 class ProductAttributeFactory extends Factory
 {
