@@ -57,14 +57,14 @@ class UrlRewriteMainRepository extends BaseRepository
         return $data;
     }
 
-    public function urlRewriteExists(array $urlRewrite, int $id = null)
+    public function urlRewriteExists(array $urlRewrite, int $id = null): bool
     {
         $exist_data_query = $this->model->getByTypeAndAttributes($urlRewrite['type'], $urlRewrite['type_attributes']);
         if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
         return (boolean) $exist_data_query->first();
     }
 
-    public function requestPathExists(array $item, int $id = null)
+    public function requestPathExists(array $item, int $id = null): bool
     {
         $exist_data_query = $this->model->where('request_path', $item['request_path']);
         if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
