@@ -32,53 +32,15 @@ class UrlRewriteTest extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "request_path" => null
+            "request_path" => null,
+            "type" => "invalid",
+            "parameter_id" => 0
         ]);
     }
 
     public function getNonMandodtaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "store_id" => null
-        ]);
-    }
-
-    public function testShouldReturnErrorIfTypeIsInvalid()
-    {
-        $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "type" => "invalid"
-        ]);
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
-
-        $response->assertStatus(422);
-        $response->assertJsonFragment([
-            "status" => "error"
-        ]);
-    }
-
-    public function testShouldReturnErrorIfParameterIdIsInvalid()
-    {
-        $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "parameter_id" => 0
-        ]);
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
-
-        $response->assertStatus(422);
-        $response->assertJsonFragment([
-            "status" => "error"
-        ]);
-    }
-
-    public function getInvalidUpdateData(): array
-    {
-        return array_merge($this->getUpdateData(), [
-            "request_path" => null
-        ]);
-    }
-
-    public function getNonMandodtaryUpdateData(): array
-    {
-        return array_merge($this->getUpdateData(), [
             "store_id" => null
         ]);
     }
