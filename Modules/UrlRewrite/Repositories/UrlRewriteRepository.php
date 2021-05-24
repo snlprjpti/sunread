@@ -73,7 +73,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
     {
         try 
         {
-            if (! \is_array($urlRewrite->type_attributes)) throw UrlRewriteException::columnNotSet($urlRewrite, 'type_attributes');
+            if (! is_array($urlRewrite->type_attributes)) throw UrlRewriteException::columnNotSet($urlRewrite, 'type_attributes');
 
             if ($this->checkIfRequestPathExists($requestPath)) {
                 if($this->model->where('request_path', $requestPath)->first()->id != $urlRewrite->id) $requestPath = $this->generateUnique($requestPath);
