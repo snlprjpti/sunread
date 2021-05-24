@@ -15,7 +15,7 @@ class AttributeTableSeeder extends Seeder
     {
         $attributes = [
             [
-                "name" => "SKU",
+                "name" => "Slug",
                 "type" => "text",
                 "is_required" => 1,
                 "is_unique" => 1

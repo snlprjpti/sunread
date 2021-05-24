@@ -6,5 +6,7 @@
     "Product": true,
     "User": true,
     "Brand": true,
-    "Review": true
+    "Review": true,
+    "UrlRewrite": true,
+    "Coupon": true
 }
