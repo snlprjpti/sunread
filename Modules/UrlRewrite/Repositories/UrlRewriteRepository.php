@@ -2,6 +2,7 @@
 
 namespace Modules\UrlRewrite\Repositories;
 
+use Exception;
 use Modules\UrlRewrite\Entities\UrlRewrite;
 use Modules\UrlRewrite\Contracts\UrlRewriteInterface;
 use Modules\UrlRewrite\Exceptions\UrlRewriteException;
@@ -30,7 +31,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     public function find(int $id): ?object
     {
-        return $this->model->find($id);
+        return $this->model->findOrFail($id);
     }
 
     public function checkIfIdExists(int $id): bool
@@ -70,41 +71,82 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     public function regenerateRoute(string $requestPath, object $urlRewrite, object $model = null): object
     {
-        if (! \is_array($urlRewrite->type_attributes)) throw UrlRewriteException::columnNotSet($urlRewrite, 'type_attributes');
+        try 
+        {
+            if (! \is_array($urlRewrite->type_attributes)) throw UrlRewriteException::columnNotSet($urlRewrite, 'type_attributes');
 
-        if ($this->checkIfRequestPathExists($requestPath)) {
-            if($this->model->where('request_path', $requestPath)->first()->id != $urlRewrite->id) $requestPath = $this->generateUnique($requestPath);
+            if ($this->checkIfRequestPathExists($requestPath)) {
+                if($this->model->where('request_path', $requestPath)->first()->id != $urlRewrite->id) $requestPath = $this->generateUnique($requestPath);
+            }
+
+            $updated = $this->update([ 
+                "target_path" => $this->targetPathFromRoute($model->urlRewriteRoute, $urlRewrite->type_attributes),
+                "request_path" => $requestPath 
+            ], $urlRewrite->id );
+        }
+        catch (Exception $exception)
+        {
+            return $exception->getMessage();
         }
 
-        return $this->update([ 
-            "target_path" => $this->targetPathFromRoute($model->urlRewriteRoute, $urlRewrite->type_attributes),
-            "request_path" => $requestPath 
-        ], $urlRewrite->id );
+        return $updated;
     }
 
     public function create(string $requestPath, ?string $targetPath, ?string $type = null, ?array $typeAttributes = null, ?int $redirectType = 0, bool $unique = false, ?object $model = null): object 
     {
-        [$requestPath, $targetPath] = $this->validateCreate($requestPath, $targetPath, $type, $typeAttributes, $redirectType, $unique, $model);
-        return $this->model->create([
+        try
+        {
+            [$requestPath, $targetPath] = $this->validateCreate($requestPath, $targetPath, $type, $typeAttributes, $redirectType, $unique, $model);
+            $created = $this->model->create([
                 'type' => $type,
                 'type_attributes' => $typeAttributes,
                 'request_path' => $requestPath,
                 'target_path' => $targetPath,
                 'redirect_type' => $redirectType
             ]);
+        }
+        catch (Exception $exception)
+        {
+            return $exception->getMessage();
+        }
+
+        return $created;
     }
 
     public function update(array $data, int $id): object
     {
-        $record = $this->find($id);
-        $record->update($data);
+        try 
+        {
+            $record = $this->find($id);
+            $record->update($data);
+        }
+        catch (Exception $exception)
+        {
+            return $exception->getMessage();
+        }
+
         return $record;
     }
 
     public function generateUnique(string $requestPath, int $id = 1): string
     {
-        if ($this->checkIfRequestPathExists($requestPath.'-'.$id)) return $this->generateUnique($requestPath, $id + 1);
-        return $requestPath.'-'.$id;
+        try
+        {
+            if ($this->checkIfRequestPathExists($requestPath.'-'.$id))
+            {
+                $generated =  $this->generateUnique($requestPath, $id + 1);
+            }
+            else 
+            {
+                $generated = $requestPath.'-'.$id; 
+            }
+        }
+        catch (Exception $exception)
+        {
+            return $exception->getMessage();
+        }
+        
+        return $generated; 
     }
 
     protected function targetPathFromRoute($route, $attributes): string
@@ -114,17 +156,24 @@ class UrlRewriteRepository implements UrlRewriteInterface
 
     protected function validateCreate(string $requestPath, ?string $targetPath, ?string $type, ?array $typeAttributes, int $redirectType, ?bool $unique, object $model): array 
     {
-        if (! in_array($redirectType, self::allowedTypes, true)) throw new UrlRewriteException('Redirect type must be 0, 1 or 2');
+        try 
+        {
+            if (! in_array($redirectType, self::allowedTypes, true)) throw new UrlRewriteException('Redirect type must be 0, 1 or 2');
 
-        if ($this->checkIfRequestPathExists($requestPath)) {
-            if (! $unique) throw UrlRewriteException::requestPath($requestPath);
-            $requestPath = $this->generateUnique($requestPath);
+            if ($this->checkIfRequestPathExists($requestPath)) {
+                if (! $unique) throw UrlRewriteException::requestPath($requestPath);
+                $requestPath = $this->generateUnique($requestPath);
+            }
+    
+            if ($targetPath === null && isset($model, $typeAttributes)) {
+                $targetPath = $this->targetPathFromRoute($model->urlRewriteRoute, $typeAttributes);
+            }
         }
-
-        if ($targetPath === null && isset($model, $typeAttributes)) {
-            $targetPath = $this->targetPathFromRoute($model->urlRewriteRoute, $typeAttributes);
+        catch (Exception $exception)
+        {
+            return $exception->getMessage();
         }
-
+        
         return [$requestPath, $targetPath];
     }
 
