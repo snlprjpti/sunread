@@ -59,4 +59,24 @@ class AllowCouponController extends BaseController
         }
         return $this->successResponseWithMessage($this->lang('create-success'), 201);
     }
+
+    public function deleteAllowCoupon(Request $request): JsonResponse
+    {
+        try
+        {
+            $request->validate([
+                'ids' => 'array|required',
+                'ids.*' => 'required|exists:allow_coupons,id',
+            ]);
+
+            $deleted = $this->model->whereIn('id', $request->ids);
+            $deleted->delete();
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
 }
