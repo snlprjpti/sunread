@@ -27,20 +27,28 @@ class UrlRewriteMainRepository extends BaseRepository
 
     public function geturlRewriteData(array $item, ?int $id = null): array
     {
-        $urlRewrite = [];
-        $model_path = config("url-rewrite.path.".$item['type']);
-        $model = new $model_path(); 
-
-        $urlRewrite['type_attributes']["parameter"][$model->urlRewriteParameterKey[0]] = $item['parameter_id'];
-        $urlRewrite['type'] = $model->urlRewriteType;
-
-        $this->requestPathExists($item, $id) ? $urlRewrite['request_path'] = FacadesUrlRewrite::generateUnique($item['request_path']) : $urlRewrite['request_path'] = $item['request_path'];
-
-        if($item['store_id']) $urlRewrite['type_attributes']["extra_fields"]["store_id"] = $item['store_id'];
-
-        if($this->urlRewriteExists($urlRewrite, $id)) throw new Exception("Already Exists");
-        
-        $urlRewrite['target_path'] = route($model->urlRewriteRoute,  $urlRewrite['type_attributes']["parameter"], false);
+        try
+        {
+            $urlRewrite = [];
+            $model_path = config("url-rewrite.path.".$item['type']);
+            $model = new $model_path(); 
+    
+            $urlRewrite['type_attributes']["parameter"][$model->urlRewriteParameterKey[0]] = $item['parameter_id'];
+            $urlRewrite['type'] = $model->urlRewriteType;
+    
+            $this->requestPathExists($item, $id) ? $urlRewrite['request_path'] = FacadesUrlRewrite::generateUnique($item['request_path']) : $urlRewrite['request_path'] = $item['request_path'];
+    
+            if($item['store_id']) $urlRewrite['type_attributes']["extra_fields"]["store_id"] = $item['store_id'];
+    
+            if($this->urlRewriteExists($urlRewrite, $id)) throw new Exception("Already Exists");
+            
+            $urlRewrite['target_path'] = route($model->urlRewriteRoute,  $urlRewrite['type_attributes']["parameter"], false);
+    
+        }
+        catch (Exception $exception)
+        {
+            return $exception->getMessage();
+        }
 
         return $urlRewrite;
     }
@@ -59,15 +67,33 @@ class UrlRewriteMainRepository extends BaseRepository
 
     public function urlRewriteExists(array $urlRewrite, int $id = null): bool
     {
-        $exist_data_query = $this->model->getByTypeAndAttributes($urlRewrite['type'], $urlRewrite['type_attributes']);
-        if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
-        return (boolean) $exist_data_query->first();
+        try
+        {
+            $exist_data_query = $this->model->getByTypeAndAttributes($urlRewrite['type'], $urlRewrite['type_attributes']);
+            if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
+            $existed = (boolean) $exist_data_query->first();
+        }
+        catch (Exception $exception)
+        {
+            return $exception->getMessage();
+        }
+        
+        return $existed;
     }
 
     public function requestPathExists(array $item, int $id = null): bool
     {
-        $exist_data_query = $this->model->where('request_path', $item['request_path']);
-        if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
-        return (boolean) $exist_data_query->first();
+        try
+        {
+            $exist_data_query = $this->model->where('request_path', $item['request_path']);
+            if(isset($id)) $exist_data_query = $exist_data_query->where('id', '!=', $id);
+            $existed = (boolean) $exist_data_query->first();
+        }
+        catch (Exception $exception)
+        {
+            return $exception->getMessage();
+        }
+
+        return $existed;
     }
 }
