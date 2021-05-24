@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Modules\Product\Database\Seeders\ProductDatabaseSeeder::class);
         $this->call(\Modules\Review\Database\Seeders\ReviewDatabaseSeeder::class);
         $this->call(\Modules\UrlRewrite\Database\Seeders\UrlRewriteDatabaseSeeder::class);
+        $this->call(\Modules\Coupon\Database\Seeders\CouponDatabaseSeeder::class);
     }
 }
