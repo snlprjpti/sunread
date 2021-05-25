@@ -125,4 +125,19 @@ class CouponController extends BaseController
 
         return $this->successResponseWithMessage($this->lang("delete-success"), 204);
     }
+
+
+    public function modelList(): JsonResponse
+    {
+        try
+        {
+            $fetched = config('model_list.model_type');
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, 'Model List fetch successfully');
+    }
 }

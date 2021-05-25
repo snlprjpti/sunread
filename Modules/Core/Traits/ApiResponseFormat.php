@@ -17,7 +17,7 @@ trait ApiResponseFormat
             "message" => json_decode($message) ?? $message
         ];
         if (!$payload) unset($format["payload"]);
-
+dd($format);
         return $format;
     }
 
