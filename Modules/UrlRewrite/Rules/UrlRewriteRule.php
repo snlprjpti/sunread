@@ -3,8 +3,6 @@
 namespace Modules\UrlRewrite\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use Modules\Category\Entities\Category;
-use Modules\Product\Entities\Product;
 
 class UrlRewriteRule implements Rule
 {
@@ -29,12 +27,13 @@ class UrlRewriteRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($this->type == "Product") return (bool) Product::whereId($value)->first();
+        $types = config("url-rewrite.path");
 
-        if($this->type == "Category") return (bool) Category::whereId($value)->first();
-        
+        foreach ($types as $key => $type) { 
+            if (! class_exists($type) ) return false;
+            if($this->type == $key ) return (bool) $type::whereId($value)->first();
+        }
     }
-
     /**
      * Get the validation error message.
      *
