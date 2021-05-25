@@ -4,6 +4,9 @@
 Route::group(["middleware" => ["api"]], function() {
     // ADMIN PRODUCT ROUTES
     Route::group(["prefix" => "admin/catalog", "as" => "admin.catalog.", "middleware" => ["admin", "language"]], function() {
+
+        Route::get('products/search', [\Modules\Product\Http\Controllers\ProductSearchController::class,"search"]);
+        Route::get('allproducts', [\Modules\Product\Http\Controllers\ProductSearchController::class,"productWithFilters"]);
         // Catalog Product Routes
         Route::resource("products", ProductController::class)->except(["create", "edit"]);
         // Product Images Routes
