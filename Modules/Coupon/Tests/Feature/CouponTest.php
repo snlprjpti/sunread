@@ -68,4 +68,12 @@ class CouponTest extends BaseTestCase
         $check_resource = AllowCoupon::whereIn("id", $resource_ids)->get()->count() > 0 ? true : false;
         $this->assertFalse($check_resource);
     }
+
+
+    public function testAdminCanFetchModelListResources()
+    {
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("model_list"));
+
+        $response->assertStatus(200);
+    }
 }
