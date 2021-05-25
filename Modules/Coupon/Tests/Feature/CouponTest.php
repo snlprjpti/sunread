@@ -75,5 +75,9 @@ class CouponTest extends BaseTestCase
         $response = $this->withHeaders($this->headers)->get($this->getRoute("model_list"));
 
         $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name"=>"Model List"])
+        ]);
     }
 }
