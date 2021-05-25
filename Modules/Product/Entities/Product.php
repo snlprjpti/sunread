@@ -19,15 +19,20 @@ class Product extends Model
 
     protected $fillable = [ "parent_id", "brand_id", "attribute_group_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];
+
     protected $indexConfigurator = ProductIndexConfigurator::class;
 
     protected $searchRules = [
         //
     ];
+    
+    protected $mapping;
 
-    protected $mapping = [
-        
-    ];
+    public function __construct(?array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->mapping = config('mapping');
+    }
 
     public function parent(): BelongsTo
     {
