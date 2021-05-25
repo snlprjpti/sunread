@@ -12,4 +12,9 @@ class ProductAttributeInteger extends Model
     public static $type = "integer";
     protected $fillable = [ "value" ];
     protected $table = "product_attribute_integer";
+
+    public function product_attribute()
+    {
+        return $this->morphOne(ProductAttribute::class, "value");
+    }
 }

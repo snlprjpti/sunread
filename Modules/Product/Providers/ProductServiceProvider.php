@@ -6,9 +6,19 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttribute;
+use Modules\Product\Entities\ProductAttributeBoolean;
+use Modules\Product\Entities\ProductAttributeDecimal;
+use Modules\Product\Entities\ProductAttributeInteger;
 use Modules\Product\Entities\ProductAttributeString;
+use Modules\Product\Entities\ProductAttributeText;
+use Modules\Product\Entities\ProductAttributeTimestamp;
+use Modules\Product\Observers\ProductAttributeBooleanObserver;
+use Modules\Product\Observers\ProductAttributeDecimalObserver;
+use Modules\Product\Observers\ProductAttributeIntegerObserver;
 use Modules\Product\Observers\ProductAttributeObserver;
 use Modules\Product\Observers\ProductAttributeStringObserver;
+use Modules\Product\Observers\ProductAttributeTextObserver;
+use Modules\Product\Observers\ProductAttributeTimestampObserver;
 use Modules\Product\Observers\ProductObserver;
 
 class ProductServiceProvider extends ServiceProvider
@@ -128,5 +138,10 @@ class ProductServiceProvider extends ServiceProvider
         Product::observe(ProductObserver::class);
         ProductAttribute::observe(ProductAttributeObserver::class);
         ProductAttributeString::observe(ProductAttributeStringObserver::class);
+        ProductAttributeBoolean::observe(ProductAttributeBooleanObserver::class);
+        ProductAttributeDecimal::observe(ProductAttributeDecimalObserver::class);
+        ProductAttributeInteger::observe(ProductAttributeIntegerObserver::class);
+        ProductAttributeText::observe(ProductAttributeTextObserver::class);
+        ProductAttributeTimestamp::observe(ProductAttributeTimestampObserver::class);
     }
 }
