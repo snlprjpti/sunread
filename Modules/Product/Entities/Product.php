@@ -10,13 +10,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Brand\Entities\Brand;
 use Modules\Category\Entities\Category;
+use Modules\Product\IndexConfigurator\ProductIndexConfigurator;
+use ScoutElastic\Searchable;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $fillable = [ "parent_id", "brand_id", "attribute_group_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];
+    protected $indexConfigurator = ProductIndexConfigurator::class;
+
+    protected $searchRules = [
+        //
+    ];
+
+    protected $mapping = [
+        
+    ];
 
     public function parent(): BelongsTo
     {
