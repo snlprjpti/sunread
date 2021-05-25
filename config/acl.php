@@ -49,7 +49,6 @@ return [
 
 
     //CATEGORY PERMISSION
-
     [
         'key'   => 'catalog.categories.index',
         'name'  => 'List Categories',
@@ -87,6 +86,147 @@ return [
         'module' => 'Category'
     ],
 
+    // ACTIVITY
+    [
+        'key'   => 'core.activities.index',
+        'name'  => 'List activities',
+        'route' => 'admin.activities.index',
+        'sort'  => 1,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.activities.show',
+        'name'  => 'Show activities',
+        'route' => 'admin.activities.show',
+        'sort'  => 2,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.activities.delete',
+        'name'  => 'Delete activities',
+        'route' => 'admin.activities.delete',
+        'sort'  => 3,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.activities.bulk-delete',
+        'name'  => 'Bulk Delete activities',
+        'route' => 'admin.activities.bulk-delete',
+        'sort'  => 1,
+        'module' => 'Core'
+    ],
+
+    
+    //LOCALE
+    [
+        'key'   => 'core.locales.index',
+        'name'  => 'List locales',
+        'route' => 'admin.locales.index',
+        'sort'  => 1,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.locales.store',
+        'name'  => 'Create locales',
+        'route' => 'admin.locales.store',
+        'sort'  => 2,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.locales.show',
+        'name'  => 'Show locales',
+        'route' => 'admin.locales.show',
+        'sort'  => 3,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.locales.update',
+        'name'  => 'Update locales',
+        'route' => 'admin.locales.update',
+        'sort'  => 4,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.locales.delete',
+        'name'  => 'Delete locales',
+        'route' => 'admin.locales.delete',
+        'sort'  => 5,
+        'module' => 'Core'
+    ],
+
+    //CURRENCY
+    [
+        'key'   => 'core.currencies.index',
+        'name'  => 'List currencies',
+        'route' => 'admin.currencies.index',
+        'sort'  => 1,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.currencies.store',
+        'name'  => 'Create currencies',
+        'route' => 'admin.currencies.store',
+        'sort'  => 2,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.currencies.show',
+        'name'  => 'Show currencies',
+        'route' => 'admin.currencies.show',
+        'sort'  => 3,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.currencies.update',
+        'name'  => 'Update currencies',
+        'route' => 'admin.currencies.update',
+        'sort'  => 4,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.currencies.delete',
+        'name'  => 'Delete currencies',
+        'route' => 'admin.currencies.delete',
+        'sort'  => 5,
+        'module' => 'Core'
+    ],
+
+    //EXCHANGE RATE
+    [
+        'key'   => 'core.exchange_rates.index',
+        'name'  => 'List Exchange Rates',
+        'route' => 'admin.exchange_rates.index',
+        'sort'  => 1,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.exchange_rates.store',
+        'name'  => 'Create Exchange Rates',
+        'route' => 'admin.exchange_rates.store',
+        'sort'  => 2,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.exchange_rates.show',
+        'name'  => 'Show Exchange Rates',
+        'route' => 'admin.exchange_rates.show',
+        'sort'  => 3,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.exchange_rates.update',
+        'name'  => 'Update Exchange Rates',
+        'route' => 'admin.exchange_rates.update',
+        'sort'  => 4,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.exchange_rates.delete',
+        'name'  => 'Delete Exchange Rates',
+        'route' => 'admin.exchange_rates.delete',
+        'sort'  => 5,
+        'module' => 'Core'
+    ],
     
     //STORE
     [
@@ -125,7 +265,44 @@ return [
         'module' => 'Core'
     ],
 
-    
+     //CHANNEL
+     [
+        'key'   => 'core.channels.index',
+        'name'  => 'List channels',
+        'route' => 'admin.channels.index',
+        'sort'  => 1,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.channels.store',
+        'name'  => 'Create channels',
+        'route' => 'admin.channels.store',
+        'sort'  => 2,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.channels.show',
+        'name'  => 'Show channels',
+        'route' => 'admin.channels.show',
+        'sort'  => 3,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.channels.update',
+        'name'  => 'Update channels',
+        'route' => 'admin.channels.update',
+        'sort'  => 4,
+        'module' => 'Core'
+    ],
+    [
+        'key'   => 'core.channels.delete',
+        'name'  => 'Delete channels',
+        'route' => 'admin.channels.delete',
+        'sort'  => 5,
+        'module' => 'Core'
+    ],
+
+        
     //WEBSITES
     [
         'key'   => 'core.websites.index',
@@ -501,6 +678,254 @@ return [
         'route' => 'admin.users.delete',
         'sort'  => 5,
         'module' => 'User'
+    ],
+
+     //BRAND
+     [
+        'key'   => 'admin.brands.index',
+        'name'  => 'List Brand',
+        'route' => 'admin.brands.index',
+        'sort'  => 1,
+        'module' => 'Brand'
+    ],
+    [
+        'key'   => 'admin.brands.store',
+        'name'  => 'Create Brand',
+        'route' => 'admin.brands.store',
+        'sort'  => 2,
+        'module' => 'Brand'
+    ],
+
+    [
+        'key'   => 'admin.brands.show',
+        'name'  => 'Show Brand',
+        'route' => 'admin.brands.show',
+        'sort'  => 3,
+        'module' => 'Brand'
+    ],
+    [
+        'key'   => 'admin.brands.update',
+        'name'  => 'Update Brand',
+        'route' => 'admin.brands.update',
+        'sort'  => 4,
+        'module' => 'Brand'
+    ],
+    [
+        'key'   => 'admin.brands.delete',
+        'name'  => 'Delete Brand',
+        'route' => 'admin.brands.delete',
+        'sort'  => 5,
+        'module' => 'Brand'
+    ],
+
+    //Review
+    [
+        'key'   => 'admin.reviews.index',
+        'name'  => 'List Review',
+        'route' => 'admin.reviews.index',
+        'sort'  => 1,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.reviews.store',
+        'name'  => 'Create Review',
+        'route' => 'admin.reviews.store',
+        'sort'  => 2,
+        'module' => 'Review'
+    ],
+
+    [
+        'key'   => 'admin.reviews.show',
+        'name'  => 'Show Review',
+        'route' => 'admin.reviews.show',
+        'sort'  => 3,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.reviews.update',
+        'name'  => 'Update Review',
+        'route' => 'admin.reviews.update',
+        'sort'  => 4,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.reviews.delete',
+        'name'  => 'Delete Review',
+        'route' => 'admin.reviews.delete',
+        'sort'  => 5,
+        'module' => 'Review'
+    ],
+
+    //REVIEW VOTES
+    [
+        'key'   => 'admin.review_votes.index',
+        'name'  => 'List Review Votes',
+        'route' => 'admin.review_votes.index',
+        'sort'  => 1,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.review_votes.store',
+        'name'  => 'Create Review Votes',
+        'route' => 'admin.review_votes.store',
+        'sort'  => 2,
+        'module' => 'Review'
+    ],
+
+    [
+        'key'   => 'admin.review_votes.show',
+        'name'  => 'Show Review Votes',
+        'route' => 'admin.review_votes.show',
+        'sort'  => 3,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.review_votes.update',
+        'name'  => 'Update Review Votes',
+        'route' => 'admin.review_votes.update',
+        'sort'  => 4,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.review_votes.delete',
+        'name'  => 'Delete Review Votes',
+        'route' => 'admin.review_votes.delete',
+        'sort'  => 5,
+        'module' => 'Review'
+    ],
+
+     //REVIEW REPLIES
+    [
+        'key'   => 'admin.review_replies.index',
+        'name'  => 'List Review Reply',
+        'route' => 'admin.review_replies.index',
+        'sort'  => 1,
+        'module' => 'Review'
+    ],
+
+    [
+        'key'   => 'admin.review_replies.store',
+        'name'  => 'Create Review Reply',
+        'route' => 'admin.review_replies.store',
+        'sort'  => 2,
+        'module' => 'Review'
+    ],
+
+    [
+        'key'   => 'admin.review_replies.show',
+        'name'  => 'Show Review Reply',
+        'route' => 'admin.review_replies.show',
+        'sort'  => 3,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.review_replies.update',
+        'name'  => 'Update Review Reply',
+        'route' => 'admin.review_replies.update',
+        'sort'  => 4,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.review_replies.delete',
+        'name'  => 'Delete Review Reply',
+        'route' => 'admin.review_replies.delete',
+        'sort'  => 5,
+        'module' => 'Review'
+    ],
+
+    // REVIEW PENDING AND VERIFY
+    [
+        'key'   => 'admin.reviews.pending',
+        'name'  => 'List Review Pending',
+        'route' => 'admin.reviews.pending',
+        'sort'  => 1,
+        'module' => 'Review'
+    ],
+    [
+        'key'   => 'admin.reviews.verify',
+        'name'  => 'Delete Review Verify',
+        'route' => 'admin.reviews.verify',
+        'sort'  => 1,
+        'module' => 'Review'
+    ],
+
+
+    //URL REWRITE
+    [
+        'key'   => 'admin.url-rewrites.index',
+        'name'  => 'List URL Rewrite',
+        'route' => 'admin.url-rewrites.index',
+        'sort'  => 1,
+        'module' => 'URL Rewrite'
+    ],
+    
+    [
+        'key'   => 'admin.url-rewrites.store',
+        'name'  => 'Create URL Rewrite',
+        'route' => 'admin.url-rewrites.store',
+        'sort'  => 2,
+        'module' => 'URL Rewrite'
+    ],
+
+    [
+        'key'   => 'admin.url-rewrites.show',
+        'name'  => 'Show URL Rewrite',
+        'route' => 'admin.url-rewrites.show',
+        'sort'  => 3,
+        'module' => 'URL Rewrite'
+    ],
+    [
+        'key'   => 'admin.url-rewrites.update',
+        'name'  => 'Update URL Rewrite',
+        'route' => 'admin.url-rewrites.update',
+        'sort'  => 4,
+        'module' => 'URL Rewrite'
+    ],
+    [
+        'key'   => 'admin.url-rewrites.delete',
+        'name'  => 'Delete URL Rewrite',
+        'route' => 'admin.url-rewrites.delete',
+        'sort'  => 5,
+        'module' => 'URL Rewrite'
+    ],
+
+    //COUPON MODULE
+    [
+        'key'   => 'admin.coupons.index',
+        'name'  => 'List Coupon',
+        'route' => 'admin.coupons.index',
+        'sort'  => 1,
+        'module' => 'Coupon'
+    ],
+    
+    [
+        'key'   => 'admin.coupons.store',
+        'name'  => 'Create Coupon',
+        'route' => 'admin.coupons.store',
+        'sort'  => 2,
+        'module' => 'Coupon'
+    ],
+
+    [
+        'key'   => 'admin.coupons.show',
+        'name'  => 'Show Coupon',
+        'route' => 'admin.coupons.show',
+        'sort'  => 3,
+        'module' => 'Coupon'
+    ],
+    [
+        'key'   => 'admin.coupons.update',
+        'name'  => 'Update Coupon',
+        'route' => 'admin.coupons.update',
+        'sort'  => 4,
+        'module' => 'Coupon'
+    ],
+    [
+        'key'   => 'admin.coupons.delete',
+        'name'  => 'Delete Coupon',
+        'route' => 'admin.coupons.delete',
+        'sort'  => 5,
+        'module' => 'Coupon'
     ],
 
 ];

@@ -47,8 +47,8 @@ class ConfigurationRepository extends BaseRepository
                         }
                         $checkKey["path"] = $element['path'];
                         $checkKey["provider"] = $element['provider'];
-                        $element['default'] = $this->has((object) $checkKey) ? $this->getDefaultValues((object) $checkKey) : "" ;
-                        $element['value'] = ( $element['values'] === "") ? $this->cacheQuery((object) $checkKey, $element['pluck']) : $element['values'];
+                        if ($element["default"] == "" ) $element['default'] = $this->has((object) $checkKey) ? $this->getDefaultValues((object) $checkKey) : "";
+                        if( $element['provider'] !== "") $element['value'] = ( $element['values'] === "") ? $this->cacheQuery((object) $checkKey, $element['pluck']) : $element['values'];
                         // $element['absolute_path'] = $key.'.children.'.$i.'.subChildren.'.$j.'.elements.'.$k;
                         unset($element['values'], $element['pluck']);
                         $subchildren['elements'][$k] = $element;
