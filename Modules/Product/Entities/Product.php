@@ -11,11 +11,12 @@ use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Brand\Entities\Brand;
 use Modules\Category\Entities\Category;
 use Modules\Product\IndexConfigurator\ProductIndexConfigurator;
+use Modules\Product\Traits\IndexFormat;
 use ScoutElastic\Searchable;
 
 class Product extends Model
 {
-    use HasFactory, Searchable;
+    use HasFactory, Searchable, IndexFormat;
 
     protected $fillable = [ "parent_id", "brand_id", "attribute_group_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];
@@ -62,5 +63,10 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy("main_image", "desc")->orderBy("position");
+    }
+
+    public function toSearchableArray()
+    {
+      return $this->documentDataStructure();
     }
 }
