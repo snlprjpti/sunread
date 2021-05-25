@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'model_type' => [
+    'model_types' => [
         'Channel' => 'Modules\Core\Entities\Channel',
         'Brand' => 'Modules\Brand\Entities\Brand',
         'Category' => 'Modules\Category\Entities\Category',
