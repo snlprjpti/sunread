@@ -131,13 +131,13 @@ class CouponController extends BaseController
     {
         try
         {
-            $fetched = config('model_list.model_type');
+            $fetched = config('model_list.model_types');
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, 'Model List fetch successfully');
+        return $this->successResponse($fetched, $this->lang("fetch-success",["name"=>"Model List"]));
     }
 }
