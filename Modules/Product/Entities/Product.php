@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Brand\Entities\Brand;
 use Modules\Category\Entities\Category;
+use Modules\Core\Entities\Channel;
 use Modules\Product\IndexConfigurator\ProductIndexConfigurator;
 use Modules\Product\Traits\IndexFormat;
 use ScoutElastic\Searchable;
@@ -43,6 +44,11 @@ class Product extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);
+    }
+
+    public function channels(): BelongsToMany
+    {
+        return $this->belongsToMany(Channel::class);
     }
 
     public function attribute_group(): BelongsTo

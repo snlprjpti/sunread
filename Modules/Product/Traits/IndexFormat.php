@@ -10,6 +10,8 @@ trait IndexFormat
 
         $array['categories'] = $this->categories;
 
+        $array['channels'] = $this->channels;
+
         $array['product_attributes'] = [
             'global' => [],
             'channel' => [],
