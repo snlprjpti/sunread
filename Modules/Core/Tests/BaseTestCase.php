@@ -15,7 +15,7 @@ class BaseTestCase extends TestCase
     use RefreshDatabase;
 
     protected array $headers;
-    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route;
+    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route, $hasStatusRoute;
 
     public function setUp(): void
     {
@@ -27,6 +27,7 @@ class BaseTestCase extends TestCase
         $this->append_to_route = null;
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->fake_resource_id = 0;
+        $this->hasStatusRoute = false;
         $this->filter = [
             "sort_by" => "id",
             "sort_order" => "asc"
@@ -96,7 +97,7 @@ class BaseTestCase extends TestCase
         $this->model::factory($this->factory_count)->create();
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index"));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
@@ -107,7 +108,7 @@ class BaseTestCase extends TestCase
     {
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
@@ -118,7 +119,7 @@ class BaseTestCase extends TestCase
     {
         $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_id]));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
@@ -129,7 +130,7 @@ class BaseTestCase extends TestCase
     {
         $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->fake_resource_id]));
 
-        $response->assertStatus(404);
+        $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
@@ -149,7 +150,7 @@ class BaseTestCase extends TestCase
         $post_data = $this->getCreateData();
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
@@ -161,7 +162,7 @@ class BaseTestCase extends TestCase
         $post_data = $this->getNonMandodtaryCreateData();
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
@@ -193,7 +194,7 @@ class BaseTestCase extends TestCase
         $post_data = $this->getUpdateData();
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
@@ -205,7 +206,7 @@ class BaseTestCase extends TestCase
         $post_data = $this->getNonMandodtaryUpdateData();
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
@@ -228,7 +229,7 @@ class BaseTestCase extends TestCase
         $post_data = $this->getUpdateData();
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->fake_resource_id]), $post_data);
 
-        $response->assertStatus(404);
+        $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
@@ -239,7 +240,7 @@ class BaseTestCase extends TestCase
      * DELETE tests
      * 
      * 1. Assert if resource can be deleted
-     * 2. Assert if application returns correct error when trying to delet non-existent data
+     * 2. Assert if application returns correct error when trying to delete non-existent data
      */
     
     public function testAdminCanDeleteResource()
@@ -247,7 +248,7 @@ class BaseTestCase extends TestCase
         $resource_id = $this->model::factory()->create()->id;
         $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
 
-        $response->assertStatus(204);
+        $response->assertNoContent();
 
         $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
         $this->assertFalse($check_resource);
@@ -257,7 +258,46 @@ class BaseTestCase extends TestCase
     {
         $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$this->fake_resource_id]));
 
-        $response->assertStatus(404);
+        $response->assertNotFound();
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+        ]);
+    }
+
+    /**
+     * STATUS tests
+     * 
+     * 1. Assert if reource's status can be updated
+     * 2. Assert if application returns correct error when trying to update non-existent data
+     */
+
+    public function testAdminCanUpdateResourceStatus()
+    {
+        if ( !$this->hasStatusRoute ) $this->markTestSkipped("Status update method not available.");
+
+        $resource = $this->model::factory()->create(["status" => 1]);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("status", [$resource->id]));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.status-updated", ["name" => $this->model_name])
+        ]);
+
+        // Checking if status has been updated
+        $expected_resource_status = !$resource->status;
+        $updated_resource_status = $this->model::find($resource->id)->status;
+        $this->assertTrue($updated_resource_status === $expected_resource_status);
+    }
+
+    public function testShouldReturnErrorIfUpdateStatusResourceDoesNotExist()
+    {
+        if ( !$this->hasStatusRoute ) $this->markTestSkipped("Status update method not available.");
+
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("status", [$this->fake_resource_id]));
+
+        $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
