@@ -13,7 +13,7 @@ trait ApiResponseFormat
     {
         $format = [
             "status" => $status,
-            "payload" => $payload->response()->getData(true),
+            "payload" => $payload,
             "message" => json_decode($message) ?? $message
         ];
         if (!$payload) unset($format["payload"]);
@@ -26,7 +26,7 @@ trait ApiResponseFormat
      */
     public function successResponse($payload, ?string $message = null, int $code = 200): JsonResponse
     {
-        return response()->json($this->responseFormat($message, "success", $payload), $code);
+        return response()->json($this->responseFormat($message, "success", $payload->response()->getData(true)), $code);
     }
 
     public function errorResponse(string $message, int $code = 500): JsonResponse
