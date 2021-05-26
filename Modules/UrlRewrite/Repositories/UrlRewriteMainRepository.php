@@ -47,7 +47,7 @@ class UrlRewriteMainRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
-            return $exception->getMessage();
+            throw $exception;
         }
 
         return $urlRewrite;
@@ -75,7 +75,7 @@ class UrlRewriteMainRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
-            return $exception->getMessage();
+            throw $exception;
         }
         
         return $existed;
@@ -91,7 +91,7 @@ class UrlRewriteMainRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
-            return $exception->getMessage();
+            throw $exception;
         }
 
         return $existed;
