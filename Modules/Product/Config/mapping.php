@@ -7,7 +7,7 @@ return [
         "created_at" =>  [
             "type" => "date"
         ],
-        "categories"=> [
+        "categories" => [
             "properties"=> [
                 "_lft"=> [
                     "type"=>  "long"
@@ -100,20 +100,211 @@ return [
                 ]
             ]
         ],
+        "channels" => [
+            "properties"=> [
+                "code"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                            ]
+                        ]
+                    ],
+                "created_at"=> [
+                    "type"=> "date"
+                ],
+                "default_category_id"=> [
+                    "type"=> "long"
+                ],
+                "default_currency"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "default_store_id"=> [
+                    "type"=> "long"
+                ],
+                "description"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "favicon"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "hostname"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],                    
+                "id"=> [
+                    "type"=> "long"
+                ],
+                "location"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "logo"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "name"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "pivot"=> [
+                    "properties"=> [
+                        "channel_id"=> [
+                            "type"=> "long"
+                        ],
+                        "product_id"=> [
+                            "type"=> "long"
+                        ]
+                    ]
+                ],
+                "stores"=> [
+                    "properties"=> [
+                        "created_at"=> [
+                            "type"=> "date"
+                        ],
+                        "currency"=> [
+                            "type"=> "text",
+                            "fields"=> [
+                                "keyword"=> [
+                                    "type"=> "keyword",
+                                    "ignore_above"=> 256
+                                ]
+                            ]
+                        ],
+                        "id"=> [
+                            "type"=> "long"
+                        ],
+                        "locale"=> [
+                            "type"=> "text",
+                            "fields"=> [
+                                "keyword"=> [
+                                    "type"=> "keyword",
+                                    "ignore_above"=> 256
+                                ]
+                            ]
+                        ],
+                        "name"=> [
+                            "type"=> "text",
+                            "fields"=> [
+                                "keyword"=> [
+                                    "type"=> "keyword",
+                                    "ignore_above"=> 256
+                                ]
+                            ]
+                        ],
+                        "pivot"=> [
+                            "properties"=> [
+                                "channel_id"=> [
+                                    "type"=> "long"
+                                ],
+                                "store_id"=> [
+                                    "type"=> "long"
+                                ]
+                            ]
+                        ],
+                        "position"=> [
+                            "type"=> "long"
+                        ],
+                        "slug"=> [
+                            "type"=> "text",
+                            "fields"=> [
+                                "keyword"=> [
+                                    "type"=> "keyword",
+                                    "ignore_above"=> 256
+                                ]
+                            ]
+                        ],
+                        "updated_at"=> [
+                            "type"=> "date"
+                        ]
+                    ]
+                ],
+                "theme"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "timezone"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "updated_at"=> [
+                    "type"=> "date"
+                ],
+                "website_id"=> [
+                    "type"=> "long"
+                ]
+            ]
+        ],
         "id" =>  [
             "type" => "long"
         ],
         "product_attributes" =>  [
+            "dynamic" => false,
             "type" => "nested",
             "properties" =>  [
                 "global" =>  [
-                    "type" => "object"
+                    "dynamic" =>  false,
+                    "properties" => [
+                    ]
                 ],
                 "channel" =>  [
-                    "type" => "object"
+                    "dynamic" =>  false,
+                    "properties" => [
+                    ]
                 ],
                 "store" =>  [
-                    "type" => "object"
+                    "dynamic" =>  false,
+                    "properties" => [
+                    ]
                 ]
             ]
         ],

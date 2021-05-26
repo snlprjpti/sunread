@@ -14,6 +14,6 @@ class ProductIndexConfigurator extends IndexConfigurator
      * @var array
      */
     protected $settings = [
-        //
+        "index.mapping.total_fields.limit" => 2000
     ];
 }

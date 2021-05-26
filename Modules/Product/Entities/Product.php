@@ -12,12 +12,12 @@ use Modules\Brand\Entities\Brand;
 use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Channel;
 use Modules\Product\IndexConfigurator\ProductIndexConfigurator;
-use Modules\Product\Traits\IndexFormat;
+use Modules\Product\Traits\ElasticSearch\ElasticSearchFormat;
 use ScoutElastic\Searchable;
 
 class Product extends Model
 {
-    use HasFactory, Searchable, IndexFormat;
+    use HasFactory, Searchable, ElasticSearchFormat ;
 
     protected $fillable = [ "parent_id", "brand_id", "attribute_group_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];
