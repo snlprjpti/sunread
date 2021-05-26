@@ -12,7 +12,7 @@
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "intervention/image": "^2.5",
-        "kalnoy/nestedset": "5.0",
+        "kalnoy/nestedset": "5.0.3",
         "nwidart/laravel-modules": "^8.0",
         "tymon/jwt-auth": "^1.0",
         "ext-intl": "*"
