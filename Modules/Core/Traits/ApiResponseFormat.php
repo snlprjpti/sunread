@@ -26,7 +26,7 @@ trait ApiResponseFormat
      */
     public function successResponse($payload, ?string $message = null, int $code = 200): JsonResponse
     {
-        return response()->json($this->responseFormat($message, "success", $payload->response()->getData(true)), $code);
+        return response()->json($this->responseFormat($message, "success", !is_object($payload)?["data"=>$payload]:$payload->response()->getData(true)), $code);
     }
 
     public function errorResponse(string $message, int $code = 500): JsonResponse
