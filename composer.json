@@ -9,10 +9,10 @@
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/framework": "^8.12",
+        "laravel/framework": "8.41.0",
         "laravel/tinker": "^2.5",
         "intervention/image": "^2.5",
-        "kalnoy/nestedset": "5.0.3",
+        "kalnoy/nestedset": "^5.0",
         "nwidart/laravel-modules": "^8.0",
         "tymon/jwt-auth": "^1.0",
         "ext-intl": "*"
