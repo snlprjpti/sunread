@@ -33,7 +33,7 @@ class UrlRewriteFactory extends Factory
                     $store_id = $product_attribute->store_id;
                     $request_path = "{$product_attribute->store->slug}/";
                 }
-                $request_path .= Str::slug(Str::limit($product_attribute->value->value, 20));
+                $request_path .= $product_attribute->attribute->slug;
                 break;
 
             case "Category":
