@@ -13,7 +13,7 @@ trait ApiResponseFormat
     {
         $format = [
             "status" => $status,
-            "payload" => $payload,
+            "payload" => $payload->response()->getData(true),
             "message" => json_decode($message) ?? $message
         ];
         if (!$payload) unset($format["payload"]);
