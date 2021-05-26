@@ -22,14 +22,51 @@ class ProductSearchController extends BaseController
 
     public function search(Request $request): JsonResponse
     {
-        return $this->successResponse([],  $this->lang('fetch-list-success'));
+        $fetched = $this->model->searchRaw([
+            'query' => [
+            'bool' => [
+                'must' => [
+                    ['match' => ['sku' => $request->search ]]
+                ]
+            ]
+            ]
+        ]); 
+        return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
     public function productWithFilters(Request $request): JsonResponse
     {
-        $filter = isset($request->channel_id) ? "channel.$request->channel_id" : (isset($requeststore_id) ? "store.$requeststore_id" : "global"); 
+        $filter = isset($request->store_id) ? "store.$request->store_id" : (isset($request->channel_id) ? "channel.$request->channel_id" : "global"); 
+
         $fetched = $this->model->searchRaw([
-           "_source" => ["type", "product_attributes.$filter", "sku", "brand_id", "attribute_group_id"]
+           "_source" => ["id","parent_id","brand_id","attribute_group_id","sku","type","created_at","updated_at", "categories","channels", "product_attributes.$filter"],
+           'query' => [
+                'bool' => [
+                    'must' => [
+                        [
+                            "match" => [
+                                "sku" => isset($request->sku) ? $request->sku : "",
+                            ]
+                        ]
+                    ]
+                ],
+                "nested" => [
+                    "path" => "product_attributes",
+                    "query" => [
+                        'bool' => [
+                            'must' => [
+                                [
+                                    "match" => [
+                                        "product_attributes.$filter.slug.attribute.value" => $request->slug,
+                                        // "product_attributes.$filter.name" => $request->name,
+                                        // "product_attributes.$filter.price" => $request->price,
+                                    ]
+                                ]
+                            ]
+                        ],
+                    ]
+                ] 
+            ]
         ]);
         $fetched = collect($fetched["hits"]["hits"]);
         
