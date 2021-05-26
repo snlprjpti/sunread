@@ -3,6 +3,7 @@ namespace Modules\UrlRewrite\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Modules\Category\Entities\Category;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttribute;
@@ -32,7 +33,7 @@ class UrlRewriteFactory extends Factory
                     $store_id = $product_attribute->store_id;
                     $request_path = "{$product_attribute->store->slug}/";
                 }
-                $request_path .= $product_attribute->value->value;
+                $request_path .= Str::slug(Str::limit($product_attribute->value->value, 20));
                 break;
 
             case "Category":
