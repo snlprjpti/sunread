@@ -49,7 +49,9 @@ class ConfigurationController extends BaseController
         {
             $rules = isset($request->absolute_path) ? $this->getValidationRules($request->absolute_path) : ["items"=>[]];
             $rules = array_merge(["scope_id" => ["required", "integer", "min:0", new ConfigurationRule($request->scope)]], $rules);
-            $data = $this->repository->validateData($request, $rules);
+            $data = $this->repository->validateData($request, $rules, function ($current_data) {
+                return $current_data->all();
+            });
             $created_data = $this->add((object) $data);
         }
         catch( Exception $exception )
