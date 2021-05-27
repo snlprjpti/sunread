@@ -92,7 +92,9 @@ class CouponController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request,[
+                "code" => "nullable|unique:coupons,code,{$id}",
+            ]);
             if(!$request->code){
                 do
                 {
