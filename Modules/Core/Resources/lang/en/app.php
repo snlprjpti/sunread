@@ -18,7 +18,8 @@ return [
         'already-taken' => 'The :name has already been taken.',
         'not-found' => ':name not found.',
         'status-change-success' => 'The :name has changed successfully.',
-        'status-change-failed' => 'Cannot change the status.'
+        'status-change-failed' => 'Cannot change the status.',
+        'status-updated'=>':name status updated successfully.'
 
     ],
     'users' => [

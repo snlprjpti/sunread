@@ -44,7 +44,8 @@ class BaseController extends Controller
             "login-success" => "users.users.login-success",
             "logout-success" => "users.users.logout-success",
             "token-generation-problem" => "users.token.token-generation-problem",
-            "password-reset-success" => "users.reset-password.password-reset-success"
+            "password-reset-success" => "users.reset-password.password-reset-success",
+            "status-updated" => "response.status-updated"
         ];
 
         // Frequently thrown excpetions
@@ -120,7 +121,7 @@ class BaseController extends Controller
     {
         $parameters = $parameters ?? ["name" => $this->model_name];
         $translation_key = $this->lang[$key] ?? $key;
-        
+
         return __("{$module}.{$translation_key}", $parameters);
     }
 
