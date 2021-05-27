@@ -146,6 +146,9 @@ class CouponController extends BaseController
     {
         try
         {
+            $this->validate($request,[
+                'status'=> 'required|boolean'
+            ]);
             $fetched = $this->model->findOrFail($id);
             $fetched->update(['status' => $request->status]);
         }
