@@ -34,6 +34,7 @@ class UrlRewriteRule implements Rule
 
         if($this->type == "Category") return (bool) Category::whereId($value)->first();
 
+        return false;
     }
     /**
      * Get the validation error message.
