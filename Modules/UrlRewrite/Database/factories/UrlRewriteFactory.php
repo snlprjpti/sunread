@@ -4,6 +4,7 @@ namespace Modules\UrlRewrite\Database\factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Category\Entities\Category;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttribute;
@@ -20,20 +21,29 @@ class UrlRewriteFactory extends Factory
 
         switch ($type) {
             case "Product":
-                $product_attribute = ProductAttribute::withoutEvents(function (){
-                    $product_id = [
-                        "product_id" => Product::factory()->create()->id,
-                    ];
-                    return ProductAttribute::factory()->create($product_id);
+                $slug_attribute = Attribute::whereSlug("slug")->first();
+                $slug_model = config("attribute_types")[$slug_attribute->type];
+                $product = Product::factory()->create();
+                $product_attribute = ProductAttribute::withoutEvents(function () use ($slug_model,$slug_attribute,$product){
+                    return ProductAttribute::factory()->create([
+                        "attribute_id" => $slug_attribute->id,
+                        "product_id" => $product->id,
+                        "value_type" => $slug_model,
+                        "value_id" => $slug_model::factory()->create([
+                            "value" => $this->faker->unique()->slug()
+                        ])->id
+                    ]);
                 });
                 
+                $product = Product::find($product->id);
                 $parameter_id = $product_attribute->product_id;
+                $request_path = "";
                 if($product_attribute->store_id != null)
                 {
                     $store_id = $product_attribute->store_id;
                     $request_path = "{$product_attribute->store->slug}/";
                 }
-                $request_path .= $product_attribute->attribute->slug;
+                $request_path .= Str::slug(Str::random(10));
                 break;
 
             case "Category":
