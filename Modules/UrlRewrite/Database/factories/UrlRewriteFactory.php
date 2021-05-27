@@ -14,7 +14,6 @@ class UrlRewriteFactory extends Factory
     {
         $types = [ "Product", "Category" ];
         $type = Arr::random($types);
-        $request_path = "";
 
         switch ($type) {
             case "Product":
@@ -34,7 +33,7 @@ class UrlRewriteFactory extends Factory
                 });
 
                 $parameter_id = $category->id;
-                $request_path .= $category->slug;
+                $request_path = $category->slug;
                 break;
         }
 
