@@ -21,29 +21,18 @@ class UrlRewriteFactory extends Factory
 
         switch ($type) {
             case "Product":
-                $slug_attribute = Attribute::whereSlug("slug")->first();
-                $slug_model = config("attribute_types")[$slug_attribute->type];
-                $product = Product::factory()->create();
-                $product_attribute = ProductAttribute::withoutEvents(function () use ($slug_model,$slug_attribute,$product){
-                    return ProductAttribute::factory()->create([
-                        "attribute_id" => $slug_attribute->id,
-                        "product_id" => $product->id,
-                        "value_type" => $slug_model,
-                        "value_id" => $slug_model::factory()->create([
-                            "value" => $this->faker->unique()->slug()
-                        ])->id
-                    ]);
+                $product_attribute = ProductAttribute::withoutEvents(function (){
+                    return ProductAttribute::factory()->create();
                 });
                 
-                $product = Product::find($product->id);
                 $parameter_id = $product_attribute->product_id;
-                $request_path = "";
                 if($product_attribute->store_id != null)
                 {
                     $store_id = $product_attribute->store_id;
                     $request_path = "{$product_attribute->store->slug}/";
                 }
-                $request_path .= Str::slug(Str::random(10));
+
+                $request_path .= $this->faker->unique()->slug();
                 break;
 
             case "Category":
