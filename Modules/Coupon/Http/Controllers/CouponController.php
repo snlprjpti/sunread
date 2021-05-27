@@ -147,16 +147,16 @@ class CouponController extends BaseController
         try
         {
             $this->validate($request,[
-                'status'=> 'required|boolean'
+                'status'=> 'boolean'
             ]);
-            $fetched = $this->model->findOrFail($id);
-            $fetched->update(['status' => $request->status]);
+            $this->repository->changeStatus($request, $id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang("status-change-success"));
+        return $this->successResponseWithMessage($this->lang('status-updated'));
+
     }
 }

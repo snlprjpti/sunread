@@ -2,8 +2,10 @@
 
 namespace Modules\Coupon\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Coupon\Entities\Coupon;
+use Exception;
 
 class CouponRepository extends BaseRepository
 {
@@ -28,5 +30,25 @@ class CouponRepository extends BaseRepository
             "scope_public" => "sometimes|boolean",
             "status" => "sometimes|boolean"
         ];
+    }
+
+
+    public function changeStatus(object $request, int $id): bool
+    {
+        DB::beginTransaction();
+
+        try
+        {
+            $coupon = $this->model->findOrFail($id);
+            $coupon->update(['status' => $request->status??!$coupon->status]);
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
+        return true;
     }
 }
