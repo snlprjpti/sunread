@@ -86,7 +86,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         }
         catch (Exception $exception)
         {
-            return $exception->getMessage();
+            throw $exception;
         }
 
         return $updated;
@@ -107,7 +107,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         }
         catch (Exception $exception)
         {
-            return $exception->getMessage();
+            throw $exception;
         }
 
         return $created;
@@ -122,7 +122,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         }
         catch (Exception $exception)
         {
-            return $exception->getMessage();
+            throw $exception;
         }
 
         return $record;
@@ -143,7 +143,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         }
         catch (Exception $exception)
         {
-            return $exception->getMessage();
+            throw $exception;
         }
         
         return $generated; 
@@ -171,7 +171,7 @@ class UrlRewriteRepository implements UrlRewriteInterface
         }
         catch (Exception $exception)
         {
-            return $exception->getMessage();
+            throw $exception;
         }
         
         return [$requestPath, $targetPath];
