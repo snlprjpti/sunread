@@ -22,7 +22,10 @@ class UrlRewriteFactory extends Factory
         switch ($type) {
             case "Product":
                 $product_attribute = ProductAttribute::withoutEvents(function (){
-                    return ProductAttribute::factory()->create();
+                    $product_id = [
+                        "product_id" => Product::factory()->create()->id,
+                    ];
+                    return ProductAttribute::factory()->create($product_id);
                 });
                 
                 $parameter_id = $product_attribute->product_id;
