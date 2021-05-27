@@ -128,7 +128,6 @@ class CouponController extends BaseController
         return $this->successResponseWithMessage($this->lang("delete-success"), 204);
     }
 
-
     public function modelList(): JsonResponse
     {
         try
@@ -141,5 +140,20 @@ class CouponController extends BaseController
         }
 
         return $this->successResponse($fetched, $this->lang("fetch-success",["name"=>"Model List"]));
+    }
+
+    public function changeStatus(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->model->findOrFail($id);
+            $fetched->update(['status' => $request->status]);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang("status-change-success"));
     }
 }
