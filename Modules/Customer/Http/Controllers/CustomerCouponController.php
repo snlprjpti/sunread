@@ -10,14 +10,18 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Coupon\Entities\Coupon;
 use Modules\Coupon\Transformers\CouponResource;
 use Exception;
+use Modules\Customer\Repositories\CustomerCouponRepository;
 
 class CustomerCouponController extends BaseController
 {
-    public function __construct(Coupon $coupon)
+    private $repository;
+
+    public function __construct(Coupon $coupon, CustomerCouponRepository $customerCouponRepository)
     {
         $this->model = $coupon;
         $this->model_name = "Customer Coupon";
         parent::__construct($this->model, $this->model_name);
+        $this->repository = $customerCouponRepository;
     }
     public function collection(object $data): ResourceCollection
     {
@@ -35,7 +39,7 @@ class CustomerCouponController extends BaseController
         {
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request);
-            $fetched = $fetched->where('status',1)->where('scope_public',1);
+            $fetched = $this->repository->getPubliclyAvailableData($fetched);
         }
         catch( Exception $exception )
         {
@@ -49,7 +53,7 @@ class CustomerCouponController extends BaseController
     {
         try
         {
-            $fetched = $this->model->whereId($id)->whereScopePublic(1)->whereStatus(1)->firstOrFail();
+            $fetched = $this->repository->getPubliclyAvailableCouponDetail($id);
         }
         catch (Exception $exception)
         {
