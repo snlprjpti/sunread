@@ -2,6 +2,9 @@
 
 namespace Modules\Product\Traits\ElasticSearch;
 
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
+
 trait ElasticSearchFormat
 {
     use CategoryFormat, AttributeFormat;
@@ -12,7 +15,7 @@ trait ElasticSearchFormat
         'store' => []
     ];
 
-    protected $categoryData, $attributeData;
+    protected $categoryData, $attributeData, $globalAttributes, $channelAttributes, $storeAttributes;
 
 
     public function documentDataStructure(): array
@@ -39,5 +42,13 @@ trait ElasticSearchFormat
            }
         } 
        return array_unique($stores);
+    }
+
+    public function getChannelID($store_id)
+    {
+       foreach($this->channels as $channel)
+       {
+           if(in_array($store_id, $channel->stores->pluck('id')->toArray())) return $channel->id;
+       }
     }
 }

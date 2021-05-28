@@ -288,22 +288,298 @@ return [
             "type" => "long"
         ],
         "product_attributes" =>  [
-            "dynamic" => false,
             "type" => "nested",
             "properties" =>  [
                 "global" =>  [
-                    "dynamic" =>  false,
+                    "type" => "nested",
+                    "dynamic" =>  true,
                     "properties" => [
+                        "price"=> [
+                                            "properties"=> [
+                                                "attribute"=> [
+                                                    "properties"=> [
+                                                        "attribute_group"=> [
+                                                            "properties"=> [
+                                                                "attribute_family"=> [
+                                                                    "properties"=> [
+                                                                        "id"=> [
+                                                                            "type"=>  "long"
+                                                                        ],
+                                                                        "name"=> [
+                                                                            "type"=>  "text",
+                                                                            "fields"=> [
+                                                                                "keyword"=> [
+                                                                                    "type"=>  "keyword",
+                                                                                    "ignore_above"=>  256
+                                                                                ]
+                                                                            ]
+                                                                        ],
+                                                                        "slug"=> [
+                                                                            "type"=>  "text",
+                                                                            "fields"=> [
+                                                                                "keyword"=> [
+                                                                                    "type"=>  "keyword",
+                                                                                    "ignore_above"=>  256
+                                                                                ]
+                                                                            ]
+                                                                        ]
+                                                                    ]
+                                                                ],
+                                                                "id"=> [
+                                                                    "type"=>  "long"
+                                                                ],
+                                                                "name"=> [
+                                                                    "type"=>  "text",
+                                                                    "fields"=> [
+                                                                        "keyword"=> [
+                                                                            "type"=>  "keyword",
+                                                                            "ignore_above"=>  256
+                                                                        ]
+                                                                    ]
+                                                                ],
+                                                                "slug"=> [
+                                                                    "type"=>  "text",
+                                                                    "fields"=> [
+                                                                        "keyword"=> [
+                                                                            "type"=>  "keyword",
+                                                                            "ignore_above"=>  256
+                                                                        ]
+                                                                    ]
+                                                                ]
+                                                            ]
+                                                        ],
+                                                        "id"=> [
+                                                            "type"=>  "long"
+                                                        ],
+                                                        "name"=> [
+                                                            "type"=>  "text",
+                                                            "fields"=> [
+                                                                "keyword"=> [
+                                                                    "type"=>  "keyword",
+                                                                    "ignore_above"=>  256
+                                                                ]
+                                                            ]
+                                                        ],
+                                                        "slug"=> [
+                                                            "type"=>  "text",
+                                                            "fields"=> [
+                                                                "keyword"=> [
+                                                                    "type"=>  "keyword",
+                                                                    "ignore_above"=>  256
+                                                                ]
+                                                            ]
+                                                        ],
+                                                        "type"=> [
+                                                            "type"=>  "text",
+                                                            "fields"=> [
+                                                                "keyword"=> [
+                                                                    "type"=>  "keyword",
+                                                                    "ignore_above"=>  256
+                                                                ]
+                                                            ]
+                                                        ],
+                                                        "value"=> [
+                                                            "type"=>  "long"
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ],
+                                       
                     ]
                 ],
                 "channel" =>  [
-                    "dynamic" =>  false,
+                    "dynamic" =>  true,
+                    "type" => "nested",
                     "properties" => [
+                        "price"=> [
+                            "properties"=> [
+                                "attribute"=> [
+                                    "properties"=> [
+                                        "attribute_group"=> [
+                                            "properties"=> [
+                                                "attribute_family"=> [
+                                                    "properties"=> [
+                                                        "id"=> [
+                                                            "type"=>  "long"
+                                                        ],
+                                                        "name"=> [
+                                                            "type"=>  "text",
+                                                            "fields"=> [
+                                                                "keyword"=> [
+                                                                    "type"=>  "keyword",
+                                                                    "ignore_above"=>  256
+                                                                ]
+                                                            ]
+                                                        ],
+                                                        "slug"=> [
+                                                            "type"=>  "text",
+                                                            "fields"=> [
+                                                                "keyword"=> [
+                                                                    "type"=>  "keyword",
+                                                                    "ignore_above"=>  256
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ],
+                                                "id"=> [
+                                                    "type"=>  "long"
+                                                ],
+                                                "name"=> [
+                                                    "type"=>  "text",
+                                                    "fields"=> [
+                                                        "keyword"=> [
+                                                            "type"=>  "keyword",
+                                                            "ignore_above"=>  256
+                                                        ]
+                                                    ]
+                                                ],
+                                                "slug"=> [
+                                                    "type"=>  "text",
+                                                    "fields"=> [
+                                                        "keyword"=> [
+                                                            "type"=>  "keyword",
+                                                            "ignore_above"=>  256
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ],
+                                        "id"=> [
+                                            "type"=>  "long"
+                                        ],
+                                        "name"=> [
+                                            "type"=>  "text",
+                                            "fields"=> [
+                                                "keyword"=> [
+                                                    "type"=>  "keyword",
+                                                    "ignore_above"=>  256
+                                                ]
+                                            ]
+                                        ],
+                                        "slug"=> [
+                                            "type"=>  "text",
+                                            "fields"=> [
+                                                "keyword"=> [
+                                                    "type"=>  "keyword",
+                                                    "ignore_above"=>  256
+                                                ]
+                                            ]
+                                        ],
+                                        "type"=> [
+                                            "type"=>  "text",
+                                            "fields"=> [
+                                                "keyword"=> [
+                                                    "type"=>  "keyword",
+                                                    "ignore_above"=>  256
+                                                ]
+                                            ]
+                                        ],
+                                        "value"=> [
+                                            "type"=>  "long"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
                     ]
                 ],
                 "store" =>  [
-                    "dynamic" =>  false,
+                    "dynamic" =>  true,
+                    "type" => "nested",
                     "properties" => [
+                        "price"=> [
+                            "properties"=> [
+                                "attribute"=> [
+                                    "properties"=> [
+                                        "attribute_group"=> [
+                                            "properties"=> [
+                                                "attribute_family"=> [
+                                                    "properties"=> [
+                                                        "id"=> [
+                                                            "type"=>  "long"
+                                                        ],
+                                                        "name"=> [
+                                                            "type"=>  "text",
+                                                            "fields"=> [
+                                                                "keyword"=> [
+                                                                    "type"=>  "keyword",
+                                                                    "ignore_above"=>  256
+                                                                ]
+                                                            ]
+                                                        ],
+                                                        "slug"=> [
+                                                            "type"=>  "text",
+                                                            "fields"=> [
+                                                                "keyword"=> [
+                                                                    "type"=>  "keyword",
+                                                                    "ignore_above"=>  256
+                                                                ]
+                                                            ]
+                                                        ]
+                                                    ]
+                                                ],
+                                                "id"=> [
+                                                    "type"=>  "long"
+                                                ],
+                                                "name"=> [
+                                                    "type"=>  "text",
+                                                    "fields"=> [
+                                                        "keyword"=> [
+                                                            "type"=>  "keyword",
+                                                            "ignore_above"=>  256
+                                                        ]
+                                                    ]
+                                                ],
+                                                "slug"=> [
+                                                    "type"=>  "text",
+                                                    "fields"=> [
+                                                        "keyword"=> [
+                                                            "type"=>  "keyword",
+                                                            "ignore_above"=>  256
+                                                        ]
+                                                    ]
+                                                ]
+                                            ]
+                                        ],
+                                        "id"=> [
+                                            "type"=>  "long"
+                                        ],
+                                        "name"=> [
+                                            "type"=>  "text",
+                                            "fields"=> [
+                                                "keyword"=> [
+                                                    "type"=>  "keyword",
+                                                    "ignore_above"=>  256
+                                                ]
+                                            ]
+                                        ],
+                                        "slug"=> [
+                                            "type"=>  "text",
+                                            "fields"=> [
+                                                "keyword"=> [
+                                                    "type"=>  "keyword",
+                                                    "ignore_above"=>  256
+                                                ]
+                                            ]
+                                        ],
+                                        "type"=> [
+                                            "type"=>  "text",
+                                            "fields"=> [
+                                                "keyword"=> [
+                                                    "type"=>  "keyword",
+                                                    "ignore_above"=>  256
+                                                ]
+                                            ]
+                                        ],
+                                        "value"=> [
+                                            "type"=>  "long"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
                     ]
                 ]
             ]

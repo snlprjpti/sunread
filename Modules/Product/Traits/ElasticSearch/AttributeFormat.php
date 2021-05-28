@@ -2,6 +2,7 @@
 
 namespace Modules\Product\Traits\ElasticSearch;
 
+use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeGroupTranslation;
 use Modules\Attribute\Entities\AttributeTranslation;
 use Modules\Category\Entities\CategoryTranslation;
@@ -10,46 +11,80 @@ trait AttributeFormat
 {
     public function getScopeWiseAttribute()
     {
-        foreach($this->product_attributes as $data){
-            
-            $this->getAttributeData($data);
+        $uniqueAttributeIDS= array_unique($this->product_attributes->pluck('attribute_id')->toArray());
+        $available_attributes = Attribute::whereIn('id', $uniqueAttributeIDS)->get();
 
-            if(!isset($data->store_id) && !isset($data->channel_id))  $this->getGlobalWiseAttribute();
+        foreach($available_attributes as $attribute)
+        {
+            $this->getSingleAttributeData($attribute);
 
-            foreach($this->channels->pluck('id')->toArray() as $channelID)
-            {
-                $this->getChannelWiseAttribute($data, $channelID);
+            if(isset($this->globalAttributes)) $this->getGlobalWiseAttribute();
 
-                foreach($this->getChannelWiseStoreID() as $storeID)
-                {
-                    $this->getStoreWiseAttribute($data, $channelID, $storeID);
-                }
-            }
+            if(isset($this->channelAttributes)) $this->getChannelWiseAttribute();
+
+          
+            if(isset($this->storeAttributes)) $this->getStoreWiseAttribute();
+
         }
-        
         return $this->attribute_array;
+    }
+
+    public function getSingleAttributeData($attribute)
+    {
+        $attributes = $this->product_attributes()->where('attribute_id', $attribute->id);
+
+        $this->globalAttributes = (clone $attributes)->where('store_id', null)->where('channel_id', null)->first();
+        $this->channelAttributes = (clone $attributes)->where('channel_id', '!=', null)->get();
+        $this->storeAttributes = $attributes->where('store_id', '!=', null)->get();
+
     }
 
     public function getGlobalWiseAttribute()
     {
-        $this->attribute_array['global'] = array_merge($this->attribute_array['global'], $this->attributeData);
+        $data = $this->globalAttributes;
+        $this->getAttributeData($data);
+        $this->attribute_array['global'][$data->attribute->slug] = $this->attributeData;
     }
 
-    public function getChannelWiseAttribute($data, $channelID)
+    public function getChannelWiseAttribute()
     {
-        if($data->channel_id == $channelID)
-        $this->attribute_array['channel'][$channelID] = (array_key_exists ($data->channel_id, $this->attribute_array['channel'])) ? array_merge($this->attribute_array['channel'][$data->channel_id], $this->attributeData) : $this->attributeData;
-        else 
-        $this->attribute_array['channel'] [$channelID] = $this->attribute_array['global'];
-           
+        foreach($this->channels->pluck('id')->toArray() as $channelID){
+            foreach($this->channelAttributes as $data){
+                if(isset($data)){
+                    $this->getAttributeData($data);
+
+                    if($data->channel_id == $channelID)
+                    $item = $this->attributeData;
+
+                    if(!in_array($channelID, $this->channelAttributes->pluck('channel_id')->toArray()))
+                    $item = $this->attribute_array['global'][$data->attribute->slug] ?? [];
+
+                    $this->attribute_array['channel'] [$channelID][$data->attribute->slug] = $item;
+                }
+            }
+        }
     }
 
-    public function getStoreWiseAttribute($data, $channelID, $storeID)
+    public function getStoreWiseAttribute()
     {
-        if($data->store_id == $storeID)
-        $this->attribute_array['store'] [$storeID] = array_key_exists ($data->store_id, $this->attribute_array['store']) ? array_merge($this->attribute_array['store'][$data->store_id], $this->attributeData) : $this->attributeData; 
-        else 
-        $this->attribute_array['store'] [$storeID] = $this->attribute_array['channel'] [$channelID];
+        foreach($this->getChannelWiseStoreID() as $storeID){
+            foreach($this->storeAttributes as $data){
+                if(isset($data)){
+                    $this->getAttributeData($data);
+
+                    if($data->store_id == $storeID)
+                    $item =  $this->attributeData; 
+
+                    if(!in_array($storeID, $this->storeAttributes->pluck('store_id')->toArray())){
+                    $input = $this->attribute_array['channel'] [$this->getChannelID($storeID)] [$data->attribute->slug] ?? 
+                    $this->attribute_array['global'][$data->attribute->slug] ?? [] ;
+                    $item = $this->mergeAttributeData($input, $storeID);
+                    }
+
+                    $this->attribute_array['store'] [$storeID][$data->attribute->slug] = $item;
+                }
+            }
+        }
     }
 
     public function getAttributeData($data)
@@ -58,51 +93,51 @@ trait AttributeFormat
         $attribute_group = $attribute->attribute_group;
         $attribute_family = $attribute_group->attribute_family;
 
+        if(isset($data->store_id)) $storeWise = $this->getTranslateData($attribute->id, $data->store_id, $attribute_group->id);
+
         return $this->attributeData = [
-            $attribute->slug => [
-                "attribute" => [
-                    "id" => $attribute->id,
-                    "slug" => $attribute->slug,
-                    "name" => $attribute->name,
-                    "type" => $attribute->type,
-                    "value" => isset($data->value->value) ?? $data->value->value,
-                    "attribute_group" => [
-                        "id" => $attribute_group->id,
-                        "name" => $attribute_group->name,
-                        "slug" => $attribute_group->slug,
-                        "attribute_family" => [
-                            "id" => $attribute_family->id,
-                            "name" => $attribute_family->name,
-                            "slug" => $attribute_family->slug
-                        ],
-                    ]
-                ]
+            "id" => $attribute->id,
+            "slug" => $attribute->slug,
+            "name" => (isset($storeWise['attribute']) ) ? $storeWise['attribute']->name : $attribute->name,
+            "type" => $attribute->type,
+            "value" => isset($data->value->value) ? (( $attribute->slug == "price") ? (doubleval($data->value->value)) : $data->value->value)  : "",
+            "attribute_group" => [
+                "id" => $attribute_group->id,
+                "name" => (isset($storeWise['attributeGroup']) ) ? $storeWise['attributeGroup']->name : $attribute_group->name,
+                "slug" => $attribute_group->slug,
+                "attribute_family" => [
+                    "id" => $attribute_family->id,
+                    "name" => $attribute_family->name,
+                    "slug" => $attribute_family->slug
+                ],
             ]
         ];
     }
 
-    public function getAttributeTranslationData($data)
+    public function getTranslateData($attribute_id, $store_id, $attribute_group_id)
     {
-        if(isset($data->store_id)) $storeWiseAttribute = AttributeTranslation::where([
-            [ 'attribute_id', $data->attribute->id ],
-            [ 'store_id', $data->store_id ]
+        $storeWise['attribute'] = AttributeTranslation::where([
+            [ 'attribute_id', $attribute_id ],
+            [ 'store_id', $store_id ]
         ])->first();
-        if(isset($data->store_id)) $storeWiseAttributeGroup = AttributeGroupTranslation::where([
-            [ 'attribute_group_id', $data->attribute->attribute_group_id ],
-            [ 'store_id', $data->store_id ]
+        $storeWise['attributeGroup'] = AttributeGroupTranslation::where([
+            [ 'attribute_group_id', $attribute_group_id ],
+            [ 'store_id', $store_id ]
         ])->first();
 
-        return (!isset($storeWiseAttribute) && !isset($storeWiseAttributeGroup)) ? $this->attributeData :
-        array_merge($this->categoryData, [
-            $data->attribute->slug => [
-                "attribute" => [
-                    "name" => (isset($storeWiseAttribute) ) ? $storeWiseAttribute->name : $data->attribute->name,
-                    "attribute_group" => [
-                        "name" => (isset($storeWiseAttributeGroup) ) ? $storeWiseAttributeGroup->name : $data->attribute->attribute_group->name
-                    ]
-                ]
-            ]
-        ]);
+        return $storeWise;
     }
 
+    public function mergeAttributeData($data, $storeID)
+    {
+        if(isset($storeID)) $storeWise = $this->getTranslateData($data['id'], $storeID, $data['attribute_group']['id']);
+
+        return !isset($storeWise['attribute']) && !isset($storeWise['attributeGroup']) ?  $data : 
+        $this->attributeData = array_merge($data, [
+            "name" => (isset($storeWise['attribute']) ) ? $storeWise['attribute']->name : $data["name"],
+            "attribute_group" => array_merge($data["attribute_group"], [
+                "name" => (isset($storeWise['attributeGroup']) ) ? $storeWise['attributeGroup']->name : $data['attribute_group']['name'],
+            ])
+        ]);
+    }
 }
