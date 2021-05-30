@@ -31,7 +31,7 @@ Route::group(['middleware' => ['api']], function () {
 
     Route::group(["middleware" => ["customer"], "prefix" => "customer", "as" => "customer."], function () {
         // CUSTOMER PROFILE
-        Route::group(["prefix" => "account", "as" => "account."], function () {
+        Route::group(["prefix" => "accounts", "as" => "account."], function () {
             Route::get("/", [CustomerAccountController::class, "show"])->name("show");
             Route::put("/", [CustomerAccountController::class, "update"])->name("update");
             Route::post("image", [CustomerAccountController::class, "uploadProfileImage"])->name("image.update");
@@ -39,7 +39,7 @@ Route::group(['middleware' => ['api']], function () {
         });
         
         // CUSTOMER ADDRESS
-        Route::group(["prefix" => "address", "as" => "address."], function () {
+        Route::group(["prefix" => "addresses", "as" => "address."], function () {
             Route::get("/", [CustomerAddressAccountController::class, "show"])->name("show");
             Route::post("/", [CustomerAddressAccountController::class, "create"])->name("create");
             Route::put("/{id}", [CustomerAddressAccountController::class, "update"])->name("update");
