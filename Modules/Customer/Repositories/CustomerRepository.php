@@ -66,7 +66,7 @@ class CustomerRepository extends BaseRepository
                             $constraint->upsize();
                         })
                         ->encode('jpg', 80);
-                    Storage::put("$path/{$file_name}", $image);
+                    Storage::put("{$path}/{$file_name}", $image);
                 }
             }
         }

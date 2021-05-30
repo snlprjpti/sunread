@@ -60,11 +60,11 @@ class CustomerAccountController extends BaseController
         try
         {
             $updated = auth()->guard("customer")->user();
-            $merge = ["email" => "required|email|unique:customers,email,{$updated->id}",];
+            $merge = ["email" => "required|email|unique:customers,email,{$updated->id}"];
 
             if ( $request->has("current_password") ) {
                 $current_password_validation = $request->has("password") ? "required" : "sometimes";
-                $merge["current_password"] = "$current_password_validation|min:6|max:200";
+                $merge["current_password"] = "{$current_password_validation}|min:6|max:200";
             }
 
             $data = $this->repository->validateData($request, $merge);
@@ -93,7 +93,7 @@ class CustomerAccountController extends BaseController
         try
         {
             $updated = auth()->guard('customer')->user();
-            // $this->repository->removeOldImage($updated->id);
+            $this->repository->removeOldImage($updated->id);
             $updated = $this->repository->uploadProfileImage($request, $updated->id);
         }
         catch( Exception $exception )
