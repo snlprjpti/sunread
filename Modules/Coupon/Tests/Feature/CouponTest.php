@@ -18,7 +18,7 @@ class CouponTest extends BaseTestCase
         $this->admin = $this->createAdmin();
         $this->model_name = "Coupon";
         $this->route_prefix = "admin.coupons";
-        $this->hasStatusRoute = true;
+        $this->hasStatusTest = true;
     }
 
     public function getInvalidCreateData(): array
