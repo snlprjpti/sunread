@@ -24,10 +24,10 @@ class CustomerResource extends JsonResource
             "date_of_birth" => $this->date_of_birth,
             "email" => $this->email,
             "status" => $this->status,
-            "profil_image" => $this->profile_image_url,
-            "group" => $this->group ? new CustomerGroupResource($this->whenLoaded('group')) : null,
+            "profile_image" => $this->profile_image_url,
+            "group" => new CustomerGroupResource($this->whenLoaded('group')),
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,
-            "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
+            "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
 }

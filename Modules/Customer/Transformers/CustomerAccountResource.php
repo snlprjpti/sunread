@@ -4,7 +4,6 @@ namespace Modules\Customer\Transformers;
 
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Carbon;
 
 class CustomerAccountResource extends JsonResource
 {
@@ -28,7 +27,7 @@ class CustomerAccountResource extends JsonResource
             "addresses" => CustomerAddressResource::collection($this->whenLoaded("addresses")),
             "profil_image" => $this->profile_image_url,
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,
-            "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
+            "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
 }
