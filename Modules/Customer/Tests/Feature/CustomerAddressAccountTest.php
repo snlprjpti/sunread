@@ -99,7 +99,7 @@ class CustomerAddressAccountTest extends TestCase
         ]);  
     }
 
-    public function testCustomerCanDeleteOwnAddress()
+    public function testCustomerCannotDeleteOthersAddress()
     {
         $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.delete", [$this->default_resource_id]));
 
