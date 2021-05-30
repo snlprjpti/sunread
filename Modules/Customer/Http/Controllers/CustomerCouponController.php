@@ -62,4 +62,24 @@ class CustomerCouponController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
+    public function applyCoupon(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validate($request,[
+                'coupon_code'=> 'required',
+                'total_amount'=> 'required'
+            ]);
+
+            $coupon = $this->repository->getAvailableCoupon($request);
+            $this->repository->applyCoupon($coupon);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        return $this->successResponseWithMessage($this->lang("apply-success"));
+
+    }
+
 }

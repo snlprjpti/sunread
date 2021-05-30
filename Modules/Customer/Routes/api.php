@@ -47,6 +47,7 @@ Route::group(['middleware' => ['api']], function () {
 
         Route::get('/publicly-available', [\Modules\Customer\Http\Controllers\CustomerCouponController::class,"publiclyAvailableCoupons"])->name('publicly_available');
         Route::get('/{id}', [\Modules\Customer\Http\Controllers\CustomerCouponController::class,"show"])->name('show');
+        Route::post('/apply', [\Modules\Customer\Http\Controllers\CustomerCouponController::class,"applyCoupon"])->name('apply');
 
     });
 });
