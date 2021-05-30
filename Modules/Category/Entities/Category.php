@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Traits\HasFactory;
+use Modules\Core\Traits\HasTranslation;
 use Modules\Core\Traits\Sluggable;
 use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Category extends Model
 {
-    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite;
+    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation;
 
     public static $SEARCHABLE = [ "translations.name", "slug" ];
     protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "status" ];
