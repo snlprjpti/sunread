@@ -10,6 +10,7 @@ use Modules\Product\Entities\Product;
 
 class ElasticSearchRepository 
 {
+    protected $scope, $path, $storeORGlobal;
 
     public function getScope($request)
     {
@@ -21,6 +22,11 @@ class ElasticSearchRepository
     {
         return isset($request->store_id) ? "store" : 
         (isset($request->channel_id) ? "channel" : "global"); 
+    }
+
+    public function getStore($request)
+    {
+        return isset($request->store_id) ? $request->store_id : "global"; 
     }
 
     public function orwhereQuery(array $filter)

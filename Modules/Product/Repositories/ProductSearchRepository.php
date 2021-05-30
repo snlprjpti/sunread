@@ -20,79 +20,81 @@ class ProductSearchRepository extends ElasticSearchRepository
           ];
     }
 
-    public function search(object $request, ?callable $callback = null)
+    public function search(object $request)
     {
         try
         {
-            $scope = $this->getScope($request);
-            $path = $this->getPath($request);
-
             $nested_filter = isset($request->search) ? [
-                $this->queryString(["product_attributes.$scope.slug.value"], $request->search),
-                $this->match("product_attributes.$scope.slug.value", $request->search)
+                $this->queryString(["product_attributes.$this->scope.slug.value"], $request->search),
+                $this->match("product_attributes.$this->scope.slug.value", $request->search)
             ] : [];
             $all_filter = isset($request->search) ? [
                 $this->queryString([ "sku" ], $request->search),
                 $this->match("sku", $request->search),
                 [
                     "nested" => [
-                      "path" => "product_attributes.$path",
+                      "path" => "product_attributes.$this->path",
                       "score_mode" => "avg",
                       "query"=> $this->orwhereQuery($nested_filter)
                     ]
                 ],
             ] : [];
 
-            $fetched = $this->model->searchRaw([
-                "_source" => array_merge($this->attributeToRetrieve, ["product_attributes.$scope"]),
-                "query" => $this->orwhereQuery($all_filter)
-              ]);
-
-            if ($callback) $callback($fetched);
+            $query = $this->orwhereQuery($all_filter);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
         
-        return $fetched;
+        return $query;
     }
 
-    public function filter(object $request, ?callable $callback = null)
+    public function filter(object $request)
     {
         try
         {
-            $scope = $this->getScope($request);
-            $path = $this->getPath($request);
             $all_filter = [];
             $nested_filter = [];
 
             if(isset($request->attribute_group_id)) array_push($all_filter, $this->term("attribute_group_id", $request->attribute_group_id));
             
-            if(isset($request->category_id)) array_push($all_filter, $this->term("categories.$request->category_id.$scope.id", $request->category_id));
+            if(isset($request->category_id)) array_push($all_filter, $this->term("categories.$request->category_id.$this->storeORGlobal.id", $request->category_id));
 
-            if(isset($request->max_price) && isset($request->min_price) ) array_push($nested_filter, $this->range("product_attributes.$scope.price.value", $request->min_price, $request->max_price));
+            if(isset($request->max_price) && isset($request->min_price) ) array_push($nested_filter, $this->range("product_attributes.$this->scope.price.value", $request->min_price, $request->max_price));
 
             if(isset($nested_filter)) array_push($all_filter, [
                     "nested" => [
-                      "path" => "product_attributes.$path",
+                      "path" => "product_attributes.$this->path",
                       "score_mode" => "avg",
                       "query"=> $this->whereQuery($nested_filter)
                     ]
                 ]);
 
-            $fetched = $this->model->searchRaw([
-                "_source" => array_merge($this->attributeToRetrieve, ["product_attributes.$scope"]),
-                "query"=> $this->whereQuery($all_filter)
-            ]);
-
-            if ($callback) $callback($fetched);
+            $query = $this->whereQuery($all_filter);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
     
+        return $query;
+    }
+
+    public function getProduct($request)
+    {
+        $this->scope = $this->getScope($request);
+        $this->path = $this->getPath($request);
+        $this->storeORGlobal = $this->getStore($request);
+        $data =[];
+
+        array_push($data, $this->search($request));
+        array_push($data, $this->filter($request));
+
+         $fetched = $this->model->searchRaw([
+            "_source" => array_merge($this->attributeToRetrieve, ["product_attributes.$this->scope"]),
+            "query"=> $this->whereQuery($data)
+        ]);
         return $fetched;
     }
 

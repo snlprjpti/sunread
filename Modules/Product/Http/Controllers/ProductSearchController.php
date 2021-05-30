@@ -26,25 +26,11 @@ class ProductSearchController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function search(Request $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->search($request);
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
-    }
-
-    public function filter(Request $request): JsonResponse
-    {
-        try
-        {
-            $fetched = $this->repository->filter($request);
+            $fetched = $this->repository->getProduct($request);
         }
         catch( Exception $exception )
         {
