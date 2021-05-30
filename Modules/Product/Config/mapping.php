@@ -1,118 +1,82 @@
 <?php 
 return [
     "properties" =>  [
-        "attribute_group_id" =>  [
+        "id" =>  [
             "type" => "long"
         ],
-        "created_at" =>  [
-            "type" => "date"
-        ],
-        "categories" => [
-            "properties"=> [
-                "_lft"=> [
-                    "type"=>  "long"
-                ],
-                "_rgt"=> [
-                    "type"=>  "long"
-                ],
-                "created_at"=> [
-                    "type"=>  "date"
-                ],
-                "id"=> [
-                    "type"=>  "long"
-                ],
-                "name"=> [
-                    "type"=>  "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=>  "keyword",
-                            "ignore_above"=>  256
-                        ]
-                    ]
-                ],
-                "pivot"=> [
-                    "properties"=> [
-                        "category_id"=> [
-                            "type"=>  "long"
-                        ],
-                        "product_id"=> [
-                            "type"=>  "long"
-                        ]
-                    ]
-                ],
-                "position"=> [
-                    "type"=>  "long"
-                ],
-                "slug"=> [
-                    "type"=>  "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=>  "keyword",
-                            "ignore_above"=>  256
-                        ]
-                    ]
-                ],
-                "status"=> [
-                    "type"=>  "long"
-                ],
-                "translations"=> [
-                    "properties"=> [
-                        "category_id"=> [
-                            "type"=>  "long"
-                        ],
-                        "id"=> [
-                            "type"=>  "long"
-                        ],
-                        "name"=> [
-                            "type"=>  "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=>  "keyword",
-                                    "ignore_above"=>  256
-                                ]
-                            ]
-                        ],
-                        "store_id"=> [
-                            "type"=>  "long"
-                        ],
-                        "url"=> [
-                            "type"=>  "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=>  "keyword",
-                                    "ignore_above"=>  256
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                "updated_at"=> [
-                    "type"=>  "date"
-                ],
-                "url"=> [
-                    "type"=>  "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=>  "keyword",
-                            "ignore_above"=>  256
-                        ]
-                    ]
+        "sku" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
                 ]
             ]
         ],
+        "type" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "attribute_group_id" =>  [
+            "type" => "long"
+        ],
         "channels" => [
             "properties"=> [
+                "id"=> [
+                    "type"=> "long"
+                ],
+                "website_id"=> [
+                    "type"=> "long"
+                ],
+                "name"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
                 "code"=> [
                     "type"=> "text",
                     "fields"=> [
                         "keyword"=> [
                             "type"=> "keyword",
                             "ignore_above"=> 256
-                            ]
                         ]
-                    ],
-                "created_at"=> [
-                    "type"=> "date"
+                    ]
+                ],
+                "hostname"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],      
+                "location"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "logo"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
                 ],
                 "default_category_id"=> [
                     "type"=> "long"
@@ -146,46 +110,7 @@ return [
                             "ignore_above"=> 256
                         ]
                     ]
-                ],
-                "hostname"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],                    
-                "id"=> [
-                    "type"=> "long"
-                ],
-                "location"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "logo"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "name"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
+                ],              
                 "pivot"=> [
                     "properties"=> [
                         "channel_id"=> [
@@ -276,16 +201,101 @@ return [
                         ]
                     ]
                 ],
+                "created_at"=> [
+                    "type"=> "date"
+                ],
                 "updated_at"=> [
                     "type"=> "date"
                 ],
-                "website_id"=> [
-                    "type"=> "long"
-                ]
             ]
         ],
-        "id" =>  [
-            "type" => "long"
+        "categories" => [
+            "properties"=> [
+                "id"=> [
+                    "type"=> "long"
+                ],
+                "name"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "slug"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "image"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "_lft"=> [
+                    "type"=> "long"
+                ],
+                "_rgt"=> [
+                    "type"=> "long"
+                ],
+                "description"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "meta_description"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "meta_keywords"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "meta_title"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+                "position"=> [
+                    "type"=> "long"
+                ],
+                "created_at"=> [
+                    "type"=> "text",
+                    "fields"=> [
+                        "keyword"=> [
+                            "type"=> "keyword",
+                            "ignore_above"=> 256
+                        ]
+                    ]
+                ],
+            ]
         ],
         "product_attributes" =>  [
             "type" => "nested",
@@ -574,26 +584,11 @@ return [
                 ]
             ]
         ],
-        "sku" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
-                ]
-            ]
-        ],
         "status" =>  [
             "type" => "long"
         ],
-        "type" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
-                ]
-            ]
+        "created_at" =>  [
+            "type" => "date"
         ],
         "updated_at" =>  [
             "type" => "date"

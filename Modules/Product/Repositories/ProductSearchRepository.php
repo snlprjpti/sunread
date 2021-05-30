@@ -13,7 +13,7 @@ class ProductSearchRepository extends ElasticSearchRepository
     {
         $this->model = $product;
         $this->attributeToRetrieve = [
-            "id", "parent_id", "brand_id", "attribute_group_id", "sku", "type", "created_at", "updated_at", "categories", "channels"
+            "id", "parent_id", "brand_id", "attribute_group_id", "sku", "type", "created_at", "updated_at", "channels"
           ];
     }
 
@@ -56,7 +56,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             if(isset($request->attribute_group_id)) array_push($all_filter, $this->term("attribute_group_id", $request->attribute_group_id));
             
-            if(isset($request->category_id)) array_push($all_filter, $this->term("categories.$request->category_id.$this->storeORGlobal.id", $request->category_id));
+            if(isset($request->category_id)) array_push($all_filter, $this->term("categories.$this->storeORGlobal.id", $request->category_id));
 
             if(isset($request->max_price) && isset($request->min_price) ) array_push($nested_filter, $this->range("product_attributes.$this->scope.price.value", $request->min_price, $request->max_price));
 
@@ -88,9 +88,13 @@ class ProductSearchRepository extends ElasticSearchRepository
         array_push($data, $this->search($request));
         array_push($data, $this->filter($request));
 
-         $fetched = $this->model->searchRaw([
-            "_source" => array_merge($this->attributeToRetrieve, ["product_attributes.$this->scope"]),
+        $source = array_merge($this->attributeToRetrieve, ["product_attributes.$this->scope", "categories.$this->storeORGlobal"]);
+
+         $fetched = $this->model->searchRaw((count($request->all())>0) ? [
+            "_source" => $source,
             "query"=> $this->whereQuery($data)
+        ] : [
+            "_source" => $source,
         ]);
         return $fetched;
     }

@@ -20,7 +20,7 @@ class ElasticSearchRepository
 
     public function getStore($request)
     {
-        return isset($request->store_id) ? $request->store_id : "global"; 
+        return isset($request->store_id) ? "store.$request->store_id" : "global"; 
     }
 
     public function orwhereQuery(array $filter)

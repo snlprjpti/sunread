@@ -100,7 +100,7 @@ trait AttributeFormat
             "slug" => $attribute->slug,
             "name" => (isset($storeWise['attribute']) ) ? $storeWise['attribute']->name : $attribute->name,
             "type" => $attribute->type,
-            "value" => isset($data->value->value) ? (( $attribute->slug == "price") ? (doubleval($data->value->value)) : $data->value->value)  : "",
+            "value" => isset($data->value->value) ? $data->value->value : "",
             "attribute_group" => [
                 "id" => $attribute_group->id,
                 "name" => (isset($storeWise['attributeGroup']) ) ? $storeWise['attributeGroup']->name : $attribute_group->name,

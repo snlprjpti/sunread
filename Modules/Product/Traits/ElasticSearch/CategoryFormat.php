@@ -14,11 +14,11 @@ trait CategoryFormat
         
         foreach($this->categories as $category)
         {
-            $data[$category->id]['global'] = $this->getCategoryData($category);
+            $data['global'][] = $this->getCategoryData($category);
 
             foreach($this->getChannelWiseStoreID() as $store_id)
             {
-                $data[$category->id][$store_id] = $this->getCategoryTranslationData($category, $store_id);
+                $data['store'][$store_id][] = $this->getCategoryTranslationData($category, $store_id);
             }
         }
         return $data;
@@ -38,7 +38,6 @@ trait CategoryFormat
             "meta_keywords" => $category->meta_keywords,
             "_lft" => $category->_lft,
             "_rgt" => $category->_rgt,
-            "parent" => $category->parent ?? null,
             "created_at" => $category->created_at->format('M d, Y H:i A')
         ];
     }
