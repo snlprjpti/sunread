@@ -115,7 +115,7 @@ class CustomerController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 
-    public function changeStatus(int $id): JsonResponse
+    public function deactivate(int $id): JsonResponse
     {
         try
         {
