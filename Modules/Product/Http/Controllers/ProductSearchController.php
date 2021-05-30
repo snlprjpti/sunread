@@ -2,7 +2,6 @@
 
 namespace Modules\Product\Http\Controllers;
 
-use Elasticsearch\ClientBuilder;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,9 +18,6 @@ class ProductSearchController extends BaseController
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $repository;
-        $this->attributeToRetrieve = [
-          "id", "parent_id", "brand_id", "attribute_group_id", "sku", "type", "created_at", "updated_at", "categories", "channels"
-        ];
 
         parent::__construct($this->model, $this->model_name);
     }

@@ -2,12 +2,6 @@
 
 namespace Modules\Product\Repositories;
 
-use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Database\Eloquent\Model;
-use Modules\Product\Entities\Product;
-
 class ElasticSearchRepository 
 {
     protected $scope, $path, $storeORGlobal;
