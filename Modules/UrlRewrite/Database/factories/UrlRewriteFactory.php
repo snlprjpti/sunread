@@ -5,7 +5,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Modules\Category\Entities\Category;
 use Modules\Product\Entities\Product;
-use Modules\Product\Entities\ProductAttribute;
 
 class UrlRewriteFactory extends Factory
 {
@@ -15,24 +14,17 @@ class UrlRewriteFactory extends Factory
     {
         $types = [ "Product", "Category" ];
         $type = Arr::random($types);
-        $request_path = "";
 
         switch ($type) {
             case "Product":
-                $product_attribute = ProductAttribute::withoutEvents(function (){
-                    $product_id = [
-                        "product_id" => Product::factory()->create()->id,
-                    ];
-                    return ProductAttribute::factory()->create($product_id);
+
+                $product = Product::withoutEvents(function () {
+                    return Product::factory()->create();
                 });
                 
-                $parameter_id = $product_attribute->product_id;
-                if($product_attribute->store_id != null)
-                {
-                    $store_id = $product_attribute->store_id;
-                    $request_path = "{$product_attribute->store->slug}/";
-                }
-                $request_path .= $product_attribute->value->value;
+                $parameter_id = $product->id;
+
+                $request_path = $this->faker->unique()->slug();
                 break;
 
             case "Category":
@@ -41,7 +33,7 @@ class UrlRewriteFactory extends Factory
                 });
 
                 $parameter_id = $category->id;
-                $request_path .= $category->slug;
+                $request_path = $category->slug;
                 break;
         }
 

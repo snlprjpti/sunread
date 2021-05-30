@@ -29,12 +29,13 @@ class UrlRewriteRule implements Rule
      */
     public function passes($attribute, $value)
     {
+
         if($this->type == "Product") return (bool) Product::whereId($value)->first();
 
         if($this->type == "Category") return (bool) Category::whereId($value)->first();
-        
-    }
 
+        return false;
+    }
     /**
      * Get the validation error message.
      *
