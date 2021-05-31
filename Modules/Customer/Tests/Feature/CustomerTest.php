@@ -37,6 +37,7 @@ class CustomerTest extends BaseTestCase
     public function getNonMandodtaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
+<<<<<<< HEAD
             "customer_group_id" => null
         ]);
     }
@@ -68,4 +69,14 @@ class CustomerTest extends BaseTestCase
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
         ]);
     }
+=======
+            "last_name" => null,
+            "gender" => null,
+            "date_of_birth" => null,
+            "customer_group_id" => null,
+            "remember_token" => null
+        ]);
+    }
+
+>>>>>>> 5fdfc1b (refactor customer fixed)
 }

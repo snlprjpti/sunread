@@ -7,7 +7,17 @@ class CustomerGroupFactory extends Factory
 {
     protected $model = \Modules\Customer\Entities\CustomerGroup::class;
 
+<<<<<<< HEAD
     public function definition(): array
+=======
+    protected $model = CustomerGroup::class;
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+>>>>>>> 5fdfc1b (refactor customer fixed)
     {
         return [
             "name" => $this->faker->name(),

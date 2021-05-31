@@ -11,7 +11,18 @@ class CustomerFactory extends Factory
 {
     protected $model = \Modules\Customer\Entities\Customer::class;
 
+<<<<<<< HEAD
     public function definition(): array
+=======
+    protected $model = Customer::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+>>>>>>> 5fdfc1b (refactor customer fixed)
     {
         $gender = Arr::random([ "male", "female", "other" ]);
         return [
