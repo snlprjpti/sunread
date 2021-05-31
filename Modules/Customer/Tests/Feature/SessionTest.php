@@ -153,7 +153,7 @@ class SessionTest extends TestCase
             "password" => "password"
         ];
         $response = $this->post(route("customer.session.login"), $post_data);
-        $jwt_token = $response->json()["payload"]["token"];
+        $jwt_token = $response->json()["payload"]["data"]["token"];
         $this->headers["Authorization"] = "Bearer {$jwt_token}";
 
         /**
