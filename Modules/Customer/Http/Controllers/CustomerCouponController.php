@@ -2,6 +2,7 @@
 
 namespace Modules\Customer\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -38,8 +39,9 @@ class CustomerCouponController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
-            $fetched = $this->repository->getPubliclyAvailableData($fetched);
+            $today = Carbon::today()->format('Y-m-d');
+            $query = $this->model->where('valid_from','<=',$today)->where('valid_to','>=',$today)->where('status',1)->where('scope_public',1);
+            $fetched = $this->getFilteredList($request,[], $query);
         }
         catch( Exception $exception )
         {

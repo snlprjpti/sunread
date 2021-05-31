@@ -19,20 +19,6 @@ class CustomerCouponRepository
         $this->allowCoupon = $allowCoupon;
     }
 
-    public function getPubliclyAvailableData(object $data): object
-    {
-        try
-        {
-            $today = Carbon::today()->format('Y-m-d');
-            $fetched = $data->where('valid_from','<=',$today)->where('valid_to','>=',$today)->where('status',1)->where('scope_public',1);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-        return $fetched;
-    }
-
     public function getPubliclyAvailableCouponDetail(int $id): object
     {
         try
@@ -47,60 +33,4 @@ class CustomerCouponRepository
         return $fetched;
     }
 
-
-    public function getAvailableCoupon(object $data): object
-    {
-        try
-        {
-            $today = Carbon::today()->format('Y-m-d');
-            $fetched = $this->model->whereStatus(1)
-                ->whereCode($data->coupon_code)
-                ->where('valid_from','<=',$today)
-                ->where('valid_to','>=',$today)
-                ->where('min_purchase_amount','<=',$data->total_amount)
-                ->firstOrFail();
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-        return $fetched;
-    }
-
-    public function applyCoupon(object $coupon): object
-    {
-        try
-        {
-//            for eg
-            $user_id = 1;
-            $data['coupon_id'] = $coupon->id;
-            $data['model_type'] = '\Modules\Customer\Entities\Customer';
-            $data['model_id'] = $user_id;
-            $data['status'] = 0;
-            $allow_check = $this->alreadyApplied($data);
-            if ($allow_check){
-                throw new CouponAlreadyApplyException();
-            }
-            $created = $this->allowCoupon->create($data);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-        return $created;
-    }
-
-    public function alreadyApplied(array $data): bool
-    {
-        try
-        {
-            $exists = $this->allowCoupon->where($data)->exists();
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $exists;
-    }
 }
