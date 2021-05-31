@@ -2,10 +2,8 @@
 
 namespace Modules\Customer\Repositories;
 
-use Illuminate\Support\Facades\DB;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\Customer;
-use Exception;
 
 class CustomerRepository extends BaseRepository
 {
@@ -29,22 +27,5 @@ class CustomerRepository extends BaseRepository
         ];
     }
 
-    public function deactivateCustomer(int $id): bool
-    {
-        DB::beginTransaction();
 
-        try
-        {
-            $coupon = $this->model->findOrFail($id);
-            $coupon->update(['status' => 0]);
-        }
-        catch (Exception $exception)
-        {
-            DB::rollBack();
-            throw $exception;
-        }
-
-        DB::commit();
-        return true;
-    }
 }
