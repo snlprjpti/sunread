@@ -2,6 +2,7 @@
 
 namespace Modules\UrlRewrite\Http\Controllers;
 
+use Exception;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\Core\Traits\ApiResponseFormat;
