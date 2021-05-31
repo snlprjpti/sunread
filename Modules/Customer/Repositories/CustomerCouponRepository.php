@@ -19,18 +19,5 @@ class CustomerCouponRepository
         $this->allowCoupon = $allowCoupon;
     }
 
-    public function getPubliclyAvailableCouponDetail(int $id): object
-    {
-        try
-        {
-            $today = Carbon::today()->format('Y-m-d');
-            $fetched = $this->model->whereId($id)->where('valid_from','<=',$today)->where('valid_to','>=',$today)->whereScopePublic(1)->whereStatus(1)->firstOrFail();
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-        return $fetched;
-    }
 
 }

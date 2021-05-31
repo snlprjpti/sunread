@@ -55,7 +55,8 @@ class CustomerCouponController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->getPubliclyAvailableCouponDetail($id);
+            $today = Carbon::today()->format('Y-m-d');
+            $fetched = $this->model->whereId($id)->where('valid_from','<=',$today)->where('valid_to','>=',$today)->whereScopePublic(1)->whereStatus(1)->firstOrFail();
         }
         catch (Exception $exception)
         {
