@@ -16,6 +16,7 @@ class BaseTestCase extends TestCase
 
     protected array $headers;
     public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route;
+    public $createFactories, $hasFilters, $hasIndexTest, $hasShowTest, $hasStoreTest, $hasUpdateTest, $hasDestroyTest, $hasBulkDestroyTest, $hasStatusTest;
 
     public function setUp(): void
     {
@@ -31,10 +32,21 @@ class BaseTestCase extends TestCase
             "sort_by" => "id",
             "sort_order" => "asc"
         ];
+
+        // Tests skipping
+        $this->createFactories = true;
+        $this->hasFilters = true;
+        $this->hasIndexTest = true;
+        $this->hasShowTest = true;
+        $this->hasStoreTest = true;
+        $this->hasUpdateTest = true;
+        $this->hasDestroyTest = true;
+        $this->hasBulkDestroyTest = false;
+        $this->hasStatusTest = false;
     }
 
     /**
-     * Fake methods
+     * Factory methods
      */
     public function getCreateData(): array { return $this->model::factory()->make()->toArray(); }
     public function getNonMandodtaryCreateData(): array { return $this->getCreateData(); }
@@ -93,10 +105,12 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanFetchResources()
     {
-        $this->model::factory($this->factory_count)->create();
+        if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
+        if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
+
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index"));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
@@ -105,9 +119,12 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanFetchFilteredResources()
     {
+        if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
+        if ( !$this->hasFilters ) $this->markTestSkipped("Filters not available.");
+
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
@@ -116,9 +133,11 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanFetchIndividualResource()
     {
+        if ( !$this->hasShowTest ) $this->markTestSkipped("Show method not available.");
+
         $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_id]));
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
@@ -127,9 +146,11 @@ class BaseTestCase extends TestCase
 
     public function testShouldReturnErrorIfResourceDoesNotExist()
     {
+        if ( !$this->hasShowTest ) $this->markTestSkipped("Show method not available.");
+
         $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->fake_resource_id]));
 
-        $response->assertStatus(404);
+        $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
@@ -146,10 +167,12 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanCreateResource()
     {
+        if ( !$this->hasStoreTest ) $this->markTestSkipped("Store method not available.");
+
         $post_data = $this->getCreateData();
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
@@ -158,10 +181,12 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanCreateResourceWithNonMandatoryData()
     {
+        if ( !$this->hasStoreTest ) $this->markTestSkipped("Store method not available.");
+
         $post_data = $this->getNonMandodtaryCreateData();
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
@@ -170,6 +195,8 @@ class BaseTestCase extends TestCase
     
     public function testShouldReturnErrorIfCreateDataIsInvalid()
     {
+        if ( !$this->hasStoreTest ) $this->markTestSkipped("Store method not available.");
+
         $post_data = $this->getInvalidCreateData();
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
@@ -190,10 +217,12 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanUpdateResource()
     {
+        if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
+
         $post_data = $this->getUpdateData();
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
@@ -202,10 +231,12 @@ class BaseTestCase extends TestCase
 
     public function testAdminCanUpdateResourceWithNonMandatoryData()
     {
+        if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
+
         $post_data = $this->getNonMandodtaryUpdateData();
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
-        $response->assertStatus(200);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
@@ -214,6 +245,8 @@ class BaseTestCase extends TestCase
     
     public function testShouldReturnErrorIfUpdateDataIsInvalid()
     {
+        if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
+
         $post_data = $this->getInvalidUpdateData();
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
@@ -225,10 +258,12 @@ class BaseTestCase extends TestCase
 
     public function testShouldReturnErrorIfUpdateResourceDoesNotExist()
     {
+        if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
+
         $post_data = $this->getUpdateData();
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->fake_resource_id]), $post_data);
 
-        $response->assertStatus(404);
+        $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
@@ -239,15 +274,17 @@ class BaseTestCase extends TestCase
      * DELETE tests
      * 
      * 1. Assert if resource can be deleted
-     * 2. Assert if application returns correct error when trying to delet non-existent data
+     * 2. Assert if application returns correct error when trying to delete non-existent data
      */
     
     public function testAdminCanDeleteResource()
     {
+        if ( !$this->hasDestroyTest ) $this->markTestSkipped("Destroy method not available.");
+
         $resource_id = $this->model::factory()->create()->id;
         $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
 
-        $response->assertStatus(204);
+        $response->assertNoContent();
 
         $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
         $this->assertFalse($check_resource);
@@ -255,9 +292,71 @@ class BaseTestCase extends TestCase
 
     public function testShouldReturnErrorIfDeleteResourceDoesNotExist()
     {
+        if ( !$this->hasDestroyTest ) $this->markTestSkipped("Destroy method not available.");
+
         $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$this->fake_resource_id]));
 
-        $response->assertStatus(404);
+        $response->assertNotFound();
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+        ]);
+    }
+
+    /**
+     * STATUS tests
+     * 
+     * 1. Assert if reource's status can be updated
+     * 2. Assert if application returns correct error when trying to update non-existent data
+     */
+
+    public function testAdminCanUpdateResourceStatus()
+    {
+        if ( !$this->hasStatusTest ) $this->markTestSkipped("Status update method not available.");
+
+        $resource = $this->model::factory()->create(["status" => 1]);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("status", [$resource->id]));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.status-updated", ["name" => $this->model_name])
+        ]);
+
+        // Checking if status has been updated
+        $expected_resource_status = !$resource->status;
+        $updated_resource_status = $this->model::find($resource->id)->status;
+        $this->assertTrue($updated_resource_status == $expected_resource_status);
+    }
+
+    public function testAdminCanUpdateResourceStatusToSpecific()
+    {
+        if ( !$this->hasStatusTest ) $this->markTestSkipped("Status update method not available.");
+
+        $resource = $this->model::factory()->create(["status" => 1]);
+        $expected_resource_status = rand(0, 1);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("status", [$resource->id]), [
+            "status" => $expected_resource_status
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.status-updated", ["name" => $this->model_name])
+        ]);
+
+        // Checking if status has been updated
+        $updated_resource_status = $this->model::find($resource->id)->status;
+        $this->assertTrue($updated_resource_status == $expected_resource_status);
+    }
+
+    public function testShouldReturnErrorIfUpdateStatusResourceDoesNotExist()
+    {
+        if ( !$this->hasStatusTest ) $this->markTestSkipped("Status update method not available.");
+
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("status", [$this->fake_resource_id]));
+
+        $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])

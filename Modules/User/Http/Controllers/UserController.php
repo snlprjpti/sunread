@@ -10,6 +10,7 @@ use Modules\User\Repositories\AdminRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Hash;
 use Modules\User\Exceptions\CannotDeleteSelfException;
 use Modules\User\Exceptions\CannotDeleteSuperAdminException;
 
@@ -65,6 +66,8 @@ class UserController extends BaseController
                 "status" => "required|boolean",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
+            $data["password"] = Hash::make($data["password"]);
+
             $created = $this->repository->create($data);
         }
         catch (\Exception $exception)
@@ -94,10 +97,17 @@ class UserController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "password" => "required|confirmed",
+                "email" => "required|email|unique:admins,email,{$id}",
+                "password" => is_null($request->password) ? "sometimes|nullable" : "required|confirmed",
                 "status" => "required|boolean",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
+            if ( is_null($request->password) ) {
+                unset($data["password"]);
+            } else {
+                $data["password"] = Hash::make($data["password"]);
+            }
+
             $updated = $this->repository->update($data, $id);
         }
         catch (\Exception $exception)

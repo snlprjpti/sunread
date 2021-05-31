@@ -4,6 +4,7 @@ namespace Modules\Coupon\Tests\Feature;
 
 use Illuminate\Support\Arr;
 use Modules\Core\Tests\BaseTestCase;
+use Modules\Coupon\Entities\AllowCoupon;
 use Modules\Coupon\Entities\Coupon;
 
 class CouponTest extends BaseTestCase
@@ -51,6 +52,32 @@ class CouponTest extends BaseTestCase
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.create-success", ["name" => "Allow Coupon"])
+        ]);
+    }
+
+    public function testAdminCanDeleteAllowCoupon()
+    {
+        $resource_ids = AllowCoupon::factory(2)->create()->pluck("id")->toArray();
+
+        $response = $this->withHeaders($this->headers)->delete($this->getRoute("delete_allow_coupon"),[
+            "ids" => $resource_ids
+        ]);
+
+        $response->assertStatus(204);
+
+        $check_resource = AllowCoupon::whereIn("id", $resource_ids)->get()->count() > 0 ? true : false;
+        $this->assertFalse($check_resource);
+    }
+
+
+    public function testAdminCanFetchModelListResources()
+    {
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("model_list"));
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name"=>"Model List"])
         ]);
     }
 }

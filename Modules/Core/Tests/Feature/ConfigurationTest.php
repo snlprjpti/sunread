@@ -14,10 +14,16 @@ class ConfigurationTest extends BaseTestCase
         $this->model = Configuration::class;
 
         parent::setUp();
+
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Configuration";
         $this->route_prefix = "admin.configurations";
+        
+        $this->hasFilters = false;
+        $this->hasShowTest = false;
+        $this->hasUpdateTest = false;
+        $this->hasDestroyTest = false;
 
         $this->default_resource = Configuration::latest()->first();
     }
@@ -44,23 +50,27 @@ class ConfigurationTest extends BaseTestCase
         ]);
     }
 
-    /**
-     * Skip Tests
-     * 
-     * 1. Individual resources cannot be fetched.
-     * 2. Individual resource cannot be fetched, so no need to test for 404 errors.
-     * 3. Update is done in Store method, no need to test for errors.
-     * 4. While storing/updating, non existing resource is created.
-     * 5. Resource cannot be deleted.
-     * 6. Resource cannot be deleted, no need to test for 404 errors.
-    */
+    public function getUpdateData(): array
+    {
+        return array_merge($this->model::factory()->make()->toArray(), [
+            "scope" => $this->default_resource->scope,
+            "scope_id" => $this->default_resource->scope_id,
+            "items" => [
+                $this->default_resource->path => 15,
+            ]
+        ]);
+    }
 
-    public function testAdminCanFetchIndividualResource() { $this->assertTrue(true); }
-    public function testShouldReturnErrorIfResourceDoesNotExist() { $this->assertTrue(true); }
-    public function testShouldReturnErrorIfUpdateDataIsInvalid() { $this->assertTrue(true); }
-    public function testShouldReturnErrorIfUpdateResourceDoesNotExist() { $this->assertTrue(true); }
-    public function testAdminCanDeleteResource() { $this->assertTrue(true); }
-    public function testShouldReturnErrorIfDeleteResourceDoesNotExist() { $this->assertTrue(true); }
+    public function getNonMandodtaryUpdateData(): array
+    {
+        return array_merge($this->model::factory()->make()->toArray(), [
+            "scope" => $this->default_resource->scope,
+            "scope_id" => $this->default_resource->scope_id,
+            "items" => [
+                $this->default_resource->path => null,
+            ]
+        ]);
+    }
 
     /**
      * Fetch tests
@@ -119,14 +129,7 @@ class ConfigurationTest extends BaseTestCase
 
     public function testAdminCanUpdateResource()
     {
-        $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "scope" => $this->default_resource->scope,
-            "scope_id" => $this->default_resource->scope_id,
-            "items" => [
-                $this->default_resource->path => 15,
-            ]
-        ]);
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
+        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $this->getUpdateData());
 
         $response->assertStatus(201);
         $response->assertJsonFragment([
@@ -137,14 +140,7 @@ class ConfigurationTest extends BaseTestCase
 
     public function testAdminCanUpdateResourceWithNonMandatoryData()
     {
-        $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "scope" => $this->default_resource->scope,
-            "scope_id" => $this->default_resource->scope_id,
-            "items" => [
-                $this->default_resource->path => null,
-            ]
-        ]);
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
+        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $this->getNonMandodtaryUpdateData());
 
         $response->assertStatus(201);
         $response->assertJsonFragment([

@@ -6,17 +6,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class AdminResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
             "name" => $this->full_name,
+            "first_name" => $this->first_name,
+            "last_name" => $this->last_name,
             "company" => $this->company,
             "address" => $this->address,
             "email" => $this->email,
