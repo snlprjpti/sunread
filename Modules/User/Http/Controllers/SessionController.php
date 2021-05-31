@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\User\Transformers\AdminResource;
 
 class SessionController extends BaseController
 {
@@ -31,6 +32,8 @@ class SessionController extends BaseController
             $data = $request->validate([
                 "email" => "required|email|exists:admins,email",
                 "password" => "required"
+            ], [
+                "email.exists" => "Invalid Credentials."
             ]);
 
             $jwtToken = Auth::guard("admin")
@@ -41,7 +44,7 @@ class SessionController extends BaseController
 
             $payload = [
                 "token" => $jwtToken,
-                "user" => auth()->guard("admin")->user()
+                "user" => new AdminResource(auth()->guard("admin")->user())
             ];
         }
         catch( Exception $exception )
