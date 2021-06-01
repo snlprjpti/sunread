@@ -10,7 +10,7 @@ class CreateProductAttributeDecimalTable extends Migration
     {
         Schema::create("product_attribute_decimal", function (Blueprint $table) {
             $table->id();
-            $table->decimal("value");
+            $table->double("value");
             $table->timestamps();
         });
     }
