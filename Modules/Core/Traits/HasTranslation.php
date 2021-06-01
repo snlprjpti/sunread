@@ -18,7 +18,7 @@ trait HasTranslation
 
 	public function translation($data, $storeID = null)
     {
-        $translation = $this->getTranslationData($data, $storeID ?? $storeID);
+        $translation = $this->getTranslateData($data, $storeID ?? $storeID);
         if($translation) 
         {
             array_map(function($attribute) use($data, $translation) {
@@ -28,7 +28,7 @@ trait HasTranslation
         return $data;
     }
  
-    public function getTranslationData($data, $storeID = null)
+    public function getTranslateData($data, $storeID = null)
     {
         if(!$storeID) $storeID =  $this->getStore();
         return  $data->translations()->where('store_id', $storeID)->first(); 
