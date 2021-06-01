@@ -14,7 +14,7 @@ trait CategoryFormat
         
         foreach($this->categories as $category)
         {
-            $data['global'][] = $category->firstTranslation();
+            $data['global'][] = $category;
 
             foreach($this->getChannelWiseStoreID() as $store_id)
             {
