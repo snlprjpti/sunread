@@ -4,11 +4,14 @@ namespace Modules\Core\Traits;
 
 trait HasTranslation 
 {
-	public function allTranslations()
+    protected $translationStoreID;
+
+	public function allTranslations($storeID = null)
 	{
-		$store = $this->getStore();
-		$model = $this->all();
-		if (!$store) return $model;
+		$this->translationStoreID = (!$storeID) ? $this->getStore() : $storeID;
+        $model = $this->all();
+        
+		if (!$this->translationStoreID) return $model;
 
 		$translated_data = [];
 		foreach($model as $data) $translated_data[] = $this->translation($data);
@@ -16,9 +19,9 @@ trait HasTranslation
 		return collect($translated_data);
 	}
 
-	public function translation($data, $storeID = null)
+	public function translation($data)
     {
-        $translation = $this->getTranslateData($data, $storeID ?? $storeID);
+        $translation = $this->getTranslateData($data);
         if($translation) 
         {
             array_map(function($attribute) use($data, $translation) {
@@ -28,15 +31,15 @@ trait HasTranslation
         return $data;
     }
  
-    public function getTranslateData($data, $storeID = null)
+    public function getTranslateData($data)
     {
-        if(!$storeID) $storeID =  $this->getStore();
-        return  $data->translations()->where('store_id', $storeID)->first(); 
+        return  $data->translations()->where('store_id', $this->translationStoreID)->first(); 
     }
 
-    public function firstTranslation()
+    public function firstTranslation($storeID = null)
     {
-        return (!$this->getStore()) ? $this : $this->translation($this);
+        $this->translationStoreID = (!$storeID) ? $this->getStore() : $storeID;
+        return (!$this->translationStoreID) ? $this : $this->translation($this);
     }
 
 	public function getStore()
