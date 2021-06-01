@@ -38,8 +38,7 @@ class CustomerCouponController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $query = $this->model->publiclyAvailable();
-            $fetched = $this->getFilteredList($request,[], $query);
+            $fetched = $this->getFilteredList($request,[], $this->model->publiclyAvailable());
         }
         catch( Exception $exception )
         {
@@ -53,8 +52,7 @@ class CustomerCouponController extends BaseController
     {
         try
         {
-            $today = date('Y-m-d');
-            $fetched = $this->model->whereId($id)->where('valid_from','<=',$today)->where('valid_to','>=',$today)->whereScopePublic(1)->whereStatus(1)->firstOrFail();
+            $fetched = $this->model->publiclyAvailable()->firstOrFail();
         }
         catch (Exception $exception)
         {
