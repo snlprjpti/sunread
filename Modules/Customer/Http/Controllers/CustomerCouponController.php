@@ -38,8 +38,7 @@ class CustomerCouponController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $today = date('Y-m-d');
-            $query = $this->model->where('valid_from','<=',$today)->where('valid_to','>=',$today)->where('status',1)->where('scope_public',1);
+            $query = $this->model->publiclyAvailable();
             $fetched = $this->getFilteredList($request,[], $query);
         }
         catch( Exception $exception )

@@ -17,4 +17,10 @@ class Coupon extends Model
     {
         return $this->hasMany(AllowCoupon::class);
     }
+
+    public function scopePubliclyAvailable($query)
+    {
+        $today = date('Y-m-d');
+        return $query->where('valid_from','<=',$today)->where('valid_to','>=',$today)->whereStatus(1)->whereScopePublic(1);
+    }
 }
