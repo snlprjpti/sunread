@@ -2,8 +2,10 @@
 
 namespace Modules\Customer\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\Customer;
+use Exception;
 
 class CustomerRepository extends BaseRepository
 {
@@ -27,5 +29,22 @@ class CustomerRepository extends BaseRepository
         ];
     }
 
+    public function changeStatus(object $request, int $id): bool
+    {
+        DB::beginTransaction();
 
+        try
+        {
+            $coupon = $this->model->findOrFail($id);
+            $coupon->update(['status' => $request->status??!$coupon->status]);
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
+        return true;
+    }
 }
