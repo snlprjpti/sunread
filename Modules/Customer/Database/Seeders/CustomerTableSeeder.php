@@ -14,7 +14,10 @@ class CustomerTableSeeder extends Seeder
             "last_name" => "Doe",
             "email" => "customer@example.net",
             "customer_group_id" => 1,
-            "password" => bcrypt("password")
+            "password" => bcrypt("password"),
+            "profile_image" => null,
+            "created_at" => now(),
+            "updated_at" => now()
         ]);
     }
 }
