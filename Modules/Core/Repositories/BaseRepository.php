@@ -16,6 +16,25 @@ class BaseRepository
         return $this->model;
     }
 
+    public function relationships(int $id, array $relationships = [], ?callable $callback = null): object
+    {
+        Event::dispatch("{$this->model_key}.fetch-single.before");
+
+        try
+        {
+            $fetched = $this->model->whereId($id)->with($relationships)->firstOrFail();
+			if ($callback) $callback($fetched);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.fetch-single.after", $fetched);
+
+        return $fetched;
+    }
+
     public function create(array $data, ?callable $callback = null): object
     {
         DB::beginTransaction();
