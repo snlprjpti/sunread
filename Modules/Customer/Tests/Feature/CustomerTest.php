@@ -40,5 +40,4 @@ class CustomerTest extends BaseTestCase
             "customer_group_id" => null
         ]);
     }
-
 }
