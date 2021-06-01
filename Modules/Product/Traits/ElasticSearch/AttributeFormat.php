@@ -78,7 +78,7 @@ trait AttributeFormat
                     if(!in_array($storeID, $this->storeAttributes->pluck('store_id')->toArray())){
                     $input = $this->attribute_array['channel'] [$this->getChannelID($storeID)] [$data->attribute->slug] ?? 
                     $this->attribute_array['global'][$data->attribute->slug] ?? [] ;
-                    $item = $this->mergeAttributeData($input, $storeID);
+                    $item = $this->mergeAttributeData($input, $storeID, $data);
                     }
 
                     $this->attribute_array['store'] [$storeID][$data->attribute->slug] = $item;
@@ -89,55 +89,17 @@ trait AttributeFormat
 
     public function getAttributeData($data)
     {
-        $attribute = $data->attribute;
-        $attribute_group = $attribute->attribute_group;
-        $attribute_family = $attribute_group->attribute_family;
+        $attribute = (!$data->store_id) ? $data->attribute : $data->attribute->translation($data->attribute, $data->store_id);
 
-        if(isset($data->store_id)) $storeWise = $this->getTranslateData($attribute->id, $data->store_id, $attribute_group->id);
-
-        return $this->attributeData = [
-            "id" => $attribute->id,
-            "slug" => $attribute->slug,
-            "name" => (isset($storeWise['attribute']) ) ? $storeWise['attribute']->name : $attribute->name,
-            "type" => $attribute->type,
-            "value" => isset($data->value->value) ? $data->value->value : "",
-            "attribute_group" => [
-                "id" => $attribute_group->id,
-                "name" => (isset($storeWise['attributeGroup']) ) ? $storeWise['attributeGroup']->name : $attribute_group->name,
-                "slug" => $attribute_group->slug,
-                "attribute_family" => [
-                    "id" => $attribute_family->id,
-                    "name" => $attribute_family->name,
-                    "slug" => $attribute_family->slug
-                ],
-            ]
+        $this->attributeData = [
+            "attribute" => $attribute,
+            "value" => isset($data->value->value) ? $data->value->value : ""
         ];
     }
 
-    public function getTranslateData($attribute_id, $store_id, $attribute_group_id)
+    public function mergeAttributeData($input, $storeID, $data)
     {
-        $storeWise['attribute'] = AttributeTranslation::where([
-            [ 'attribute_id', $attribute_id ],
-            [ 'store_id', $store_id ]
-        ])->first();
-        $storeWise['attributeGroup'] = AttributeGroupTranslation::where([
-            [ 'attribute_group_id', $attribute_group_id ],
-            [ 'store_id', $store_id ]
-        ])->first();
-
-        return $storeWise;
-    }
-
-    public function mergeAttributeData($data, $storeID)
-    {
-        if(isset($storeID)) $storeWise = $this->getTranslateData($data['id'], $storeID, $data['attribute_group']['id']);
-
-        return !isset($storeWise['attribute']) && !isset($storeWise['attributeGroup']) ?  $data : 
-        $this->attributeData = array_merge($data, [
-            "name" => (isset($storeWise['attribute']) ) ? $storeWise['attribute']->name : $data["name"],
-            "attribute_group" => array_merge($data["attribute_group"], [
-                "name" => (isset($storeWise['attributeGroup']) ) ? $storeWise['attributeGroup']->name : $data['attribute_group']['name'],
-            ])
-        ]);
+        $input["attribute"] = (!$storeID) ? $data->attribute : $data->attribute->translation($data->attribute, $storeID);
+        return $input;
     }
 }
