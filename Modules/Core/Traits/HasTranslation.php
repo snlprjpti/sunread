@@ -37,9 +37,7 @@ trait HasTranslation
 
     public function firstTranslation()
     {
-		$store = $this->getStore();
-        if(!$store) return $this;
-        return $this->translation($this);
+        return (!$this->getStore()) ? $this : $this->translation($this);
     }
 
 	public function getStore()
