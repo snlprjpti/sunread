@@ -52,7 +52,7 @@ class CustomerCouponController extends BaseController
     {
         try
         {
-            $fetched = $this->model->publiclyAvailable()->firstOrFail();
+            $fetched = $this->model->whereId($id)->publiclyAvailable()->firstOrFail();
         }
         catch (Exception $exception)
         {
