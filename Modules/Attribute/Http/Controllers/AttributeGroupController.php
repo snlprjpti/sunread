@@ -47,8 +47,9 @@ class AttributeGroupController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["attribute_family"]);
+            // $this->validateListFiltering($request);
+            // $fetched = $this->getFilteredList($request, ["attribute_family"]);
+            $fetched = $this->model->allTranslations();
         }
         catch( Exception $exception )
         {

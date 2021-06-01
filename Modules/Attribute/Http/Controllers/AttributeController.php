@@ -50,8 +50,9 @@ class AttributeController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["translations", "attribute_group"]);
+            // $this->validateListFiltering($request);
+            // $fetched = $this->getFilteredList($request, ["translations", "attribute_group"]);
+            $fetched = $this->model->allTranslations();
         }
         catch( Exception $exception )
         {
@@ -88,7 +89,8 @@ class AttributeController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["attribute_options", "translations"])->findOrFail($id);
+            $fetched = $this->model->findOrFail($id);
+            $fetched = $fetched->firstTranslation();
         }
         catch( Exception $exception )
         {
