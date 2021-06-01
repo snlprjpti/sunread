@@ -40,4 +40,12 @@ Route::group(['middleware' => ['api']], function () {
             Route::resource('addresses', AddressController::class)->except(['create', 'edit']);
         });
     });
+
+
+//        Customer Coupon Routes
+    Route::group(['prefix' => 'customers/coupon', 'as' => 'customer.coupon.'],function () {
+
+        Route::get('/publicly-available', [\Modules\Customer\Http\Controllers\CustomerCouponController::class,"publiclyAvailableCoupons"])->name('publicly_available');
+        Route::get('/{id}', [\Modules\Customer\Http\Controllers\CustomerCouponController::class,"show"])->name('show');
+    });
 });
