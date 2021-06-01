@@ -18,9 +18,9 @@ trait HasTranslation
 		return collect($translated_data);
 	}
 
-	public function translation($data)
+	public function translation($data, $storeID = null)
     {
-        $translation = $this->getTranslationData($data);
+        $translation = $this->getTranslationData($data, $storeID ?? $storeID);
         if($translation) 
         {
             array_map(function($attribute) use($data, $translation) {
@@ -30,9 +30,10 @@ trait HasTranslation
         return $data;
     }
  
-    public function getTranslationData($data)
+    public function getTranslationData($data, $storeID = null)
     {
-       return  $data->translations()->where('store_id', $this->getStore()->id)->first(); 
+        if(!$storeID) $storeID =  $this->getStore();
+        return  $data->translations()->where('store_id', $storeID)->first(); 
     }
 
     public function firstTranslation()
@@ -42,11 +43,6 @@ trait HasTranslation
 
 	public function getStore()
 	{
-		$store_id = array_key_exists("store_id", getallheaders()) ? getallheaders()["store_id"] : 0;
-		return Store::whereId($store_id)->first();
+		return array_key_exists("store_id", getallheaders()) ? getallheaders()["store_id"] : 0;
 	}
- 
-   
-
-
-}
+ }
