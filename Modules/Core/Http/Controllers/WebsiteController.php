@@ -79,6 +79,20 @@ class WebsiteController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
+    public function relationships(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->relationships($id, ["channels.stores", "channels.default_store"]);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
+
     public function update(Request $request, int $id): JsonResponse
     {
         try
