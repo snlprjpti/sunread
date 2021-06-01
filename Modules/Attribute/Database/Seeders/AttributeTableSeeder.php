@@ -18,12 +18,14 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Slug",
                 "type" => "text",
                 "is_required" => 1,
+                "is_searchable" => 1,
                 "is_unique" => 1
             ],
             [
                 "name" => "Name",
                 "type" => "text",
-                "is_required" => 1
+                "is_required" => 1,
+                "is_searchable" => 1
             ],
             [
                 "name" => "New",
@@ -46,7 +48,8 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Short Description",
                 "type" => "textarea",
-                "is_required" => 1
+                "is_required" => 1,
+                "is_searchable" => 1
             ],
             [
                 "name" => "Description",
@@ -147,6 +150,7 @@ class AttributeTableSeeder extends Seeder
                 "is_required" => $attribute["is_required"] ?? 0,
                 "is_unique" => $attribute["is_unique"] ?? 1,
                 "is_filterable" => $attribute["is_filterable"] ?? 1,
+                "is_searchable" => $attribute["is_searchable"] ?? 0,
                 "is_user_defined" => $attribute["is_user_defined"] ?? 0,
                 "is_visible_on_front" => 0,
                 "created_at" => now(),
