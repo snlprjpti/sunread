@@ -21,7 +21,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->mainSearchKeys = [ "sku" ];
 
         $this->nestedFilterKeys = Attribute::where('is_filterable', 1)->pluck('slug')->toArray();
-        $this->nestedSearchKeys = [ "slug" ];
+        $this->nestedSearchKeys = Attribute::where('is_searchable', 1)->pluck('slug')->toArray();;
 
         $this->categoryFilterKeys = [ "category_id", "category_slug" ];
     }
@@ -54,9 +54,12 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function getNestedSearch($request)
     {
-        foreach($this->nestedSearchKeys as $key) array_push($this->nestedSearch, $this->match("product_attributes.$this->scope.$key.value", $request->search));
+        $this->nestedSearchKeys = array_map(function($item){
+            return "product_attributes.$this->scope.$item.value" ;
+        }, $this->nestedSearchKeys);
+        array_push($this->nestedSearch, $this->queryString($this->nestedSearchKeys, $request->search));
 
-        array_push($this->nestedSearch, $this->queryString(["product_attributes.$this->scope.slug.value"], $request->search));
+        foreach($this->nestedSearchKeys as $key) array_push($this->nestedSearch, $this->match("product_attributes.$this->scope.$key.value", $request->search));
 
         if(count($this->nestedSearch)>0) array_push($this->allSearch,
         [
