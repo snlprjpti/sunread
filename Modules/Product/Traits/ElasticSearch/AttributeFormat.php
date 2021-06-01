@@ -54,12 +54,10 @@ trait AttributeFormat
                     $this->getAttributeData($data);
 
                     if($data->channel_id == $channelID)
-                    $item = $this->attributeData;
+                    $this->attribute_array['channel'] [$channelID][$data->attribute->slug] = $this->attributeData;
 
                     if(!in_array($channelID, $this->channelAttributes->pluck('channel_id')->toArray()))
-                    $item = $this->attribute_array['global'][$data->attribute->slug] ?? [];
-
-                    $this->attribute_array['channel'] [$channelID][$data->attribute->slug] = $item;
+                    $this->attribute_array['channel'] [$channelID][$data->attribute->slug] = $this->attribute_array['global'][$data->attribute->slug] ?? [];
                 }
             }
         }
@@ -73,15 +71,13 @@ trait AttributeFormat
                     $this->getAttributeData($data);
 
                     if($data->store_id == $storeID)
-                    $item =  $this->attributeData; 
+                    $this->attribute_array['store'] [$storeID][$data->attribute->slug] =  $this->attributeData; 
 
                     if(!in_array($storeID, $this->storeAttributes->pluck('store_id')->toArray())){
                     $input = $this->attribute_array['channel'] [$this->getChannelID($storeID)] [$data->attribute->slug] ?? 
                     $this->attribute_array['global'][$data->attribute->slug] ?? [] ;
-                    $item = $this->mergeAttributeData($input, $storeID, $data);
+                    $this->attribute_array['store'] [$storeID][$data->attribute->slug] = $this->mergeAttributeData($input, $storeID, $data);
                     }
-
-                    $this->attribute_array['store'] [$storeID][$data->attribute->slug] = $item;
                 }
             }
         }
