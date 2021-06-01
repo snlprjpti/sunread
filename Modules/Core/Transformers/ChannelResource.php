@@ -7,13 +7,7 @@ use Modules\Category\Transformers\CategoryResource;
 
 class ChannelResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
@@ -27,12 +21,11 @@ class ChannelResource extends JsonResource
             "favicon" => $this->favicon_url,
             "theme" => $this->theme,
             "default_currency" => $this->default_currency,
-            "default_store" => new StoreResource($this->default_store),
-            "stores" => StoreResource::collection($this->stores),
-            "website" => new WebsiteResource($this->website),
-            "default_category" => new CategoryResource($this->default_category),
+            "default_store" => new StoreResource($this->whenLoaded("default_store")),
+            "stores" => StoreResource::collection($this->whenLoaded("stores")),
+            "website" => new WebsiteResource($this->whenLoaded("website")),
+            "default_category" => new CategoryResource($this->whenLoaded("default_category")),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
-
 }
