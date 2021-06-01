@@ -89,7 +89,7 @@ trait AttributeFormat
 
     public function getAttributeData($data)
     {
-        $attribute = (!$data->store_id) ? $data->attribute : $data->attribute->translation($data->attribute, $data->store_id);
+        $attribute = (!$data->store_id) ? $data->attribute : $data->attribute->firstTranslation($data->store_id);
 
         $this->attributeData = [
             "attribute" => $attribute,
@@ -99,7 +99,7 @@ trait AttributeFormat
 
     public function mergeAttributeData($input, $storeID, $data)
     {
-        $input["attribute"] = (!$storeID) ? $data->attribute : $data->attribute->translation($data->attribute, $storeID);
+        $input["attribute"] = (!$storeID) ? $data->attribute : $data->attribute->firstTranslation($storeID);
         return $input;
     }
 }
