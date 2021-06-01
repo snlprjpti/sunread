@@ -2,8 +2,6 @@
 
 namespace Modules\Core\Traits;
 
-use Modules\Core\Entities\Store;
-
 trait HasTranslation 
 {
 	public function allTranslations()
