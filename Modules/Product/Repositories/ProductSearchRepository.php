@@ -3,41 +3,40 @@
 namespace Modules\Product\Repositories;
 
 use Exception;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\Product;
 
 class ProductSearchRepository extends ElasticSearchRepository
 {
-    protected $model, $attributeToRetrieve;
+    protected $model, $attributeToRetrieve; 
+    protected $mainFilterKeys, $nestedFilterKeys, $categoryFilterKeys, $mainSearchKeys, $nestedSearchKeys;
+    protected  $allFilter = [], $nestedFilter = [], $allSearch = [], $nestedSearch = [];
 
     public function __construct(Product $product)
     {
         $this->model = $product;
-        $this->attributeToRetrieve = [
-            "id", "parent_id", "brand_id", "attribute_group_id", "sku", "type", "created_at", "updated_at", "channels"
-          ];
+        $this->attributeToRetrieve = [ "id", "parent_id", "brand_id", "attribute_group_id", "sku", "type", "created_at", "updated_at" ];
+       
+        $this->mainFilterKeys = [ "brand_id", "attribute_group_id", "type" ];
+        $this->mainSearchKeys = [ "sku" ];
+
+        $this->nestedFilterKeys = Attribute::where('is_filterable', 1)->pluck('slug')->toArray();
+        $this->nestedSearchKeys = [ "slug" ];
+
+        $this->categoryFilterKeys = [ "category_id", "category_slug" ];
     }
 
     public function search(object $request)
     {
         try
         {
-            $nested_filter = isset($request->search) ? [
-                $this->queryString(["product_attributes.$this->scope.slug.value"], $request->search),
-                $this->match("product_attributes.$this->scope.slug.value", $request->search)
-            ] : [];
-            $all_filter = isset($request->search) ? [
-                $this->queryString([ "sku" ], $request->search),
-                $this->match("sku", $request->search),
-                [
-                    "nested" => [
-                      "path" => "product_attributes.$this->path",
-                      "score_mode" => "avg",
-                      "query"=> $this->orwhereQuery($nested_filter)
-                    ]
-                ],
-            ] : [];
-
-            $query = $this->orwhereQuery($all_filter);
+            if(isset($request->search))
+            {
+                $this->getMainSearch($request);
+                $this->getNestedSearch($request);
+            }
+            
+            $query = $this->orwhereQuery($this->allSearch);
         }
         catch (Exception $exception)
         {
@@ -47,28 +46,41 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $query;
     }
 
+    public function getMainSearch($request)
+    {
+        array_push($this->allSearch, $this->queryString($this->mainSearchKeys, $request->search));
+        foreach($this->mainSearchKeys as $key) array_push($this->allSearch, $this->match($key, $request->search));
+    }
+
+    public function getNestedSearch($request)
+    {
+        foreach($this->nestedSearchKeys as $key) array_push($this->nestedSearch, $this->match("product_attributes.$this->scope.$key.value", $request->search));
+
+        array_push($this->nestedSearch, $this->queryString(["product_attributes.$this->scope.slug.value"], $request->search));
+
+        if(count($this->nestedSearch)>0) array_push($this->allSearch,
+        [
+            "nested" => [
+              "path" => "product_attributes.$this->path",
+              "score_mode" => "avg",
+              "query" => $this->orwhereQuery($this->nestedSearch)
+            ]
+        ]);
+    }
+
     public function filter(object $request)
     {
         try
         {
-            $all_filter = [];
-            $nested_filter = [];
+            $this->getMainFilter($request);
 
-            if(isset($request->attribute_group_id)) array_push($all_filter, $this->term("attribute_group_id", $request->attribute_group_id));
+            $this->getNestedFilter($request);
+
+            $this->getCategoryFilter($request);
             
-            if(isset($request->category_id)) array_push($all_filter, $this->term("categories.$this->storeORGlobal.id", $request->category_id));
+            if(isset($request->max_price) && isset($request->min_price) ) array_push($this->nestedFilter, $this->range("product_attributes.$this->scope.price.value", $request->min_price, $request->max_price));
 
-            if(isset($request->max_price) && isset($request->min_price) ) array_push($nested_filter, $this->range("product_attributes.$this->scope.price.value", $request->min_price, $request->max_price));
-
-            if(isset($nested_filter)) array_push($all_filter, [
-                    "nested" => [
-                      "path" => "product_attributes.$this->path",
-                      "score_mode" => "avg",
-                      "query"=> $this->whereQuery($nested_filter)
-                    ]
-                ]);
-
-            $query = $this->whereQuery($all_filter);
+            $query = $this->whereQuery($this->allFilter);
         }
         catch (Exception $exception)
         {
@@ -78,6 +90,29 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $query;
     }
 
+    public function getMainFilter($request)
+    {
+        foreach($this->mainFilterKeys as $key) if(isset($request->$key)) array_push($this->allFilter, $this->term($key, $request->$key));
+    }
+
+    public function getNestedFilter($request)
+    {
+        foreach($this->nestedFilterKeys as $key) if(isset($request->$key)) array_push($this->nestedFilter, $this->term("product_attributes.$this->scope.$key.value", $request->$key));
+
+        if(count($this->nestedFilter)>0) array_push($this->allFilter, [
+            "nested" => [
+              "path" => "product_attributes.$this->path",
+              "score_mode" => "avg",
+              "query"=> $this->whereQuery($this->nestedFilter)
+            ]
+        ]);
+    }
+
+    public function getCategoryFilter($request)
+    {
+        foreach($this->categoryFilterKeys as $key) if(isset($request->$key)) array_push($this->allFilter, $this->term("categories.$this->storeORGlobal.".substr($key,9), $request->$key));
+    }
+
     public function getProduct($request)
     {
         $this->scope = $this->getScope($request);
@@ -85,17 +120,22 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->storeORGlobal = $this->getStore($request);
         $data =[];
 
-        array_push($data, $this->search($request));
-        array_push($data, $this->filter($request));
+        if(count($request->all())>0)
+        {
+            array_push($data, $this->search($request));
+            array_push($data, $this->filter($request));
+        }
+
 
         $source = array_merge($this->attributeToRetrieve, ["product_attributes.$this->scope", "categories.$this->storeORGlobal"]);
 
-         $fetched = $this->model->searchRaw((count($request->all())>0) ? [
+         $fetched = $this->model->searchRaw((count($data)>0) ? [
             "_source" => $source,
             "query"=> $this->whereQuery($data)
         ] : [
             "_source" => $source,
         ]);
+
         return $fetched;
     }
 
