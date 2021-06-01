@@ -2,15 +2,16 @@
 
 namespace Modules\Core\Traits;
 
-use Modules\Core\Entities\Store;
-
 trait HasTranslation 
 {
-	public function allTranslations()
+    protected $translationStoreID;
+
+	public function allTranslations($storeID = null)
 	{
-		$store = $this->getStore();
-		$model = $this->all();
-		if (!$store) return $model;
+		$this->translationStoreID = (!$storeID) ? $this->getStore() : $storeID;
+        $model = $this->all();
+        
+		if (!$this->translationStoreID) return $model;
 
 		$translated_data = [];
 		foreach($model as $data) $translated_data[] = $this->translation($data);
@@ -20,7 +21,7 @@ trait HasTranslation
 
 	public function translation($data)
     {
-        $translation = $this->getTranslationData($data);
+        $translation = $this->getTranslateData($data);
         if($translation) 
         {
             array_map(function($attribute) use($data, $translation) {
@@ -30,23 +31,19 @@ trait HasTranslation
         return $data;
     }
  
-    public function getTranslationData($data)
+    public function getTranslateData($data)
     {
-       return  $data->translations()->where('store_id', $this->getStore()->id)->first(); 
+        return  $data->translations()->where('store_id', $this->translationStoreID)->first(); 
     }
 
-    public function firstTranslation()
+    public function firstTranslation($storeID = null)
     {
-        return (!$this->getStore()) ? $this : $this->translation($this);
+        $this->translationStoreID = (!$storeID) ? $this->getStore() : $storeID;
+        return (!$this->translationStoreID) ? $this : $this->translation($this);
     }
 
 	public function getStore()
 	{
-		$store_id = array_key_exists("store_id", getallheaders()) ? getallheaders()["store_id"] : 0;
-		return Store::whereId($store_id)->first();
+		return array_key_exists("store_id", getallheaders()) ? getallheaders()["store_id"] : 0;
 	}
- 
-   
-
-
-}
+ }
