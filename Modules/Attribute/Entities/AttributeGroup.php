@@ -6,15 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Core\Traits\HasFactory;
+use Modules\Core\Traits\HasTranslation;
 use Modules\Core\Traits\Sluggable;
 
 class AttributeGroup extends Model
 {
-    use Sluggable, HasFactory;
+    use Sluggable, HasFactory, HasTranslation;
 
     public static $SEARCHABLE = [ "name", "slug" ];
     protected $fillable = [ "attribute_family_id", "name", "slug", "position", "is_user_defined" ];
 
+    public $translatedAttributes = ["name"];
+    
     public function attributes(): HasMany
     {
         return $this->hasMany(Attribute::class);
