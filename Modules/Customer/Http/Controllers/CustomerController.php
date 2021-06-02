@@ -4,15 +4,12 @@ namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Customer\Entities\Customer;
-use Illuminate\Validation\ValidationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
 use Modules\Customer\Repositories\CustomerRepository;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 
 class CustomerController extends BaseController
@@ -50,7 +47,7 @@ class CustomerController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
     public function store(Request $request): JsonResponse
@@ -66,7 +63,7 @@ class CustomerController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
 
     }
 
@@ -81,14 +78,16 @@ class CustomerController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
     public function update(Request $request, int $id): JsonResponse
     {
         try
         {
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, [
+                "email" => "required|email|unique:customers,email,{$id}"
+            ]);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
             $updated = $this->repository->update($data, $id);
         }
@@ -97,7 +96,7 @@ class CustomerController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang("update-success"));
 
     }
 
@@ -112,24 +111,20 @@ class CustomerController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang("delete-success"), 204);
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse
     {
         try
         {
-            $this->validate($request,[
-                'status'=> 'boolean'
-            ]);
-            $this->repository->changeStatus($request, $id);
+            $updated = $this->repository->updateStatus($request, $id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('status-updated'));
-
+        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 }
