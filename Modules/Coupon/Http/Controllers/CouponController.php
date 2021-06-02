@@ -92,7 +92,9 @@ class CouponController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request,[
+                "code" => "nullable|unique:coupons,code,{$id}",
+            ]);
             if(!$request->code){
                 do
                 {
@@ -126,7 +128,6 @@ class CouponController extends BaseController
         return $this->successResponseWithMessage($this->lang("delete-success"), 204);
     }
 
-
     public function modelList(): JsonResponse
     {
         try
@@ -139,5 +140,23 @@ class CouponController extends BaseController
         }
 
         return $this->successResponse($fetched, $this->lang("fetch-success",["name"=>"Model List"]));
+    }
+
+    public function changeStatus(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $this->validate($request,[
+                'status'=> 'boolean'
+            ]);
+            $this->repository->changeStatus($request, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('status-updated'));
+
     }
 }

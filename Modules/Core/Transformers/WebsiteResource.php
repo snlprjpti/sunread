@@ -6,13 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class WebsiteResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
@@ -21,6 +15,7 @@ class WebsiteResource extends JsonResource
             "name" => $this->name,
             "position" => $this->position,
             "description" => $this->description,
+            "channels" => ChannelResource::collection($this->whenLoaded("channels")),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
