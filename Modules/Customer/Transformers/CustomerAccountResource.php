@@ -2,18 +2,11 @@
 
 namespace Modules\Customer\Transformers;
 
-
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CustomerAccountResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
@@ -25,7 +18,7 @@ class CustomerAccountResource extends JsonResource
             "email" => $this->email,
             "status" => $this->status,
             "addresses" => CustomerAddressResource::collection($this->whenLoaded("addresses")),
-            "profil_image" => $this->profile_image_url,
+            "profile_image" => $this->profile_image_url,
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
