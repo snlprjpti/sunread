@@ -29,7 +29,7 @@ class CustomerAddressAccountTest extends TestCase
         $this->customer = $this->createCustomer();
         $this->default_resource_id = 1;
         $this->model_name = "Customer Address";
-        $this->route_prefix = "customer.address";
+        $this->route_prefix = "customers.address";
     }
 
     public function getCreateData(): array {

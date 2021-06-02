@@ -29,7 +29,7 @@ class SessionController extends BaseController
 
     public function login(Request $request)
     {
-        Event::dispatch('customer.session.login.before');
+        Event::dispatch('customers.session.login.before');
 
         try
         {
@@ -54,7 +54,7 @@ class SessionController extends BaseController
             return $this->handleException($exception);
         }
 
-        Event::dispatch('customer.session.login.after', auth()->guard("customer")->user());
+        Event::dispatch('customers.session.login.after', auth()->guard("customer")->user());
         return $this->successResponse($payload, $this->lang("login-success"));
     }
 
@@ -65,7 +65,7 @@ class SessionController extends BaseController
      */
     public function logout()
     {
-        Event::dispatch('customer.session.logout.before');
+        Event::dispatch('customers.session.logout.before');
 
         try
         {
@@ -77,7 +77,7 @@ class SessionController extends BaseController
             return $this->handleException($exception);
         }
 
-        Event::dispatch('customer.session.logout.after' , $customer);
+        Event::dispatch('customers.session.logout.after' , $customer);
         return $this->successResponseWithMessage($this->lang("logout-success"));
     }
 }

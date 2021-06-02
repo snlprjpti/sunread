@@ -28,7 +28,7 @@ class CustomerAccountTest extends TestCase
         $this->artisan("db:seed", ["--force" => true]);
         $this->customer = $this->createCustomer();
         $this->model_name = "Customer";
-        $this->route_prefix = "customer.account";
+        $this->route_prefix = "customers.account";
     }
 
     public function getCreateData(): array {

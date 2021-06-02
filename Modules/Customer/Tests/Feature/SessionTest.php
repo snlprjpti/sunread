@@ -49,7 +49,7 @@ class SessionTest extends TestCase
             "email" => $this->customer->email,
             "password" => "password"
         ];
-        $response = $this->post(route("customer.session.login"), $post_data);
+        $response = $this->post(route("customers.session.login"), $post_data);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -64,7 +64,7 @@ class SessionTest extends TestCase
             "email" => $this->customer->email,
             "password" => "wrong_password"
         ];
-        $response = $this->post(route("customer.session.login"), $post_data);
+        $response = $this->post(route("customers.session.login"), $post_data);
 
         $response->assertStatus(401);
         $response->assertJsonFragment([
@@ -79,7 +79,7 @@ class SessionTest extends TestCase
             "email" => $this->fake_customer->email,
             "password" => null
         ];
-        $response = $this->post(route("customer.session.login"), $post_data);
+        $response = $this->post(route("customers.session.login"), $post_data);
 
         $response->assertStatus(422);
         $response->assertJsonFragment([
@@ -90,7 +90,7 @@ class SessionTest extends TestCase
     public function testCustomerCanRequestResetLink()
     {
         $post_data = ["email" => $this->customer->email];
-        $response = $this->post(route("customer.forget-password.store"), $post_data);
+        $response = $this->post(route("customers.forget-password.store"), $post_data);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -108,7 +108,7 @@ class SessionTest extends TestCase
             "password_confirmation" => "new_password",
             "token" => $reset_token
         ];
-        $response = $this->post(route("customer.reset-password.store"), $post_data);
+        $response = $this->post(route("customers.reset-password.store"), $post_data);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
@@ -120,7 +120,7 @@ class SessionTest extends TestCase
     public function testInvalidCustomerShouldNotBeAbleToRequestResetLink()
     {
         $post_data = ["email" => $this->fake_customer->email];
-        $response = $this->post(route("customer.forget-password.store"), $post_data);
+        $response = $this->post(route("customers.forget-password.store"), $post_data);
 
         $response->assertStatus(404);
         $response->assertJsonFragment([
@@ -137,7 +137,7 @@ class SessionTest extends TestCase
             "password_confirmation" => "new_password",
             "token" => $reset_token
         ];
-        $response = $this->post(route("customer.reset-password.store"), $post_data);
+        $response = $this->post(route("customers.reset-password.store"), $post_data);
 
         $response->assertStatus(401);
         $response->assertJsonFragment([
@@ -152,14 +152,14 @@ class SessionTest extends TestCase
             "email" => $this->customer->email,
             "password" => "password"
         ];
-        $response = $this->post(route("customer.session.login"), $post_data);
+        $response = $this->post(route("customers.session.login"), $post_data);
         $jwt_token = $response->json()["payload"]["data"]["token"];
         $this->headers["Authorization"] = "Bearer {$jwt_token}";
 
         /**
          * This logout should be successful because token is valid
          */
-        $response = $this->withHeaders($this->headers)->get(route("customer.session.logout"));
+        $response = $this->withHeaders($this->headers)->get(route("customers.session.logout"));
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
@@ -169,7 +169,7 @@ class SessionTest extends TestCase
         /**
          * This logout should be unsuccessful because token is invalidated
          */
-        $response = $this->withHeaders($this->headers)->get(route("customer.session.logout"));
+        $response = $this->withHeaders($this->headers)->get(route("customers.session.logout"));
         $response->assertStatus(401);
         $response->assertJsonFragment([
             "status" => "error"
