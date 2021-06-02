@@ -59,7 +59,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         }, $this->nestedSearchKeys);
         array_push($this->nestedSearch, $this->queryString($this->nestedSearchKeys, $request->search));
 
-        foreach($this->nestedSearchKeys as $key) array_push($this->nestedSearch, $this->match("product_attributes.$this->scope.$key.value", $request->search));
+        foreach($this->nestedSearchKeys as $key) array_push($this->nestedSearch, $this->match($key, $request->search));
 
         if(count($this->nestedSearch)>0) array_push($this->allSearch,
         [
@@ -132,11 +132,15 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         $source = array_merge($this->attributeToRetrieve, ["product_attributes.$this->scope", "categories.$this->storeORGlobal"]);
 
-         $fetched = $this->model->searchRaw((count($data)>0) ? [
+         $fetched = $this->model->searchRaw([
+            "size"=> 500,
             "_source" => $source,
-            "query"=> $this->whereQuery($data)
-        ] : [
-            "_source" => $source,
+            "query"=> (count($data)>0) ? $this->whereQuery($data) : [
+                "match_all"=> (object)[]
+            ],
+            "sort" => [
+                ["id" => ["order" => "asc", "mode" => "avg"]]
+            ],
         ]);
 
         return $fetched;
