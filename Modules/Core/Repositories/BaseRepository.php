@@ -145,7 +145,8 @@ class BaseRepository
             ]);
 
             $updated = $this->model->findOrFail($id);
-            $data["status"] = $data["status"] ?? (bool) !$updated->status;
+            $data["status"] = $data["status"] ?? !$updated->status;
+            $data["status"] = (bool) $data["status"];
 
             $updated->fill($data);
             $updated->save();
@@ -155,7 +156,7 @@ class BaseRepository
         catch (Exception $exception)
         {
             DB::rollBack();
-            return $this->handleException($exception);
+            throw $exception;
         }
 
         Event::dispatch("{$this->model_key}.update-status.after", $updated);

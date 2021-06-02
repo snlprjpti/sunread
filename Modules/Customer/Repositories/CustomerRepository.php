@@ -28,23 +28,4 @@ class CustomerRepository extends BaseRepository
             "password" => "sometimes|min:6|confirmed"
         ];
     }
-
-    public function changeStatus(object $request, int $id): bool
-    {
-        DB::beginTransaction();
-
-        try
-        {
-            $coupon = $this->model->findOrFail($id);
-            $coupon->update(['status' => $request->status??!$coupon->status]);
-        }
-        catch (Exception $exception)
-        {
-            DB::rollBack();
-            throw $exception;
-        }
-
-        DB::commit();
-        return true;
-    }
 }
