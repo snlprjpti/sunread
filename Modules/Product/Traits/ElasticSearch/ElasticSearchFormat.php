@@ -7,7 +7,7 @@ use Modules\Core\Entities\Store;
 
 trait ElasticSearchFormat
 {
-    use CategoryFormat, AttributeFormat;
+    use AttributeFormat;
 
     protected $attribute_array = [
         'global' => [],
@@ -34,21 +34,25 @@ trait ElasticSearchFormat
     public function getChannelWiseStoreID()
     {
         $stores = [];   
-        foreach($this->channels as $channel)
-        {
-           foreach($channel->stores as $store)
-           {
-               array_push($stores, $store->id);
-           }
-        } 
-       return array_unique($stores);
+        foreach($this->channels as $channel) foreach($channel->stores as $store) array_push($stores, $store->id);
+        return array_unique($stores);
     }
 
     public function getChannelID($store_id)
     {
-       foreach($this->channels as $channel)
-       {
-           if(in_array($store_id, $channel->stores->pluck('id')->toArray())) return $channel->id;
-       }
+        foreach($this->channels as $channel) if(in_array($store_id, $channel->stores->pluck('id')->toArray())) return $channel->id;
+    }
+
+    public function getScopeWiseCategory()
+    {
+        $data = [];
+        
+        foreach($this->categories as $category)
+        {
+            $data['global'][] = $category;
+            foreach($this->getChannelWiseStoreID() as $store_id) $data['store'][$store_id][] = $category->firstTranslation($store_id);
+        }
+
+        return $data;
     }
 }
