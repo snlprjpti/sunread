@@ -72,6 +72,7 @@ class BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -94,6 +95,7 @@ class BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -111,16 +113,17 @@ class BaseRepository
         try
         {
             $request->validate([
-                'ids' => 'array|required',
-                'ids.*' => 'required|exists:activity_logs,id',
+                "ids" => "array|required",
+                "ids.*" => "required|exists:{$this->model->getTable()},id",
             ]);
 
-            $deleted = $this->model->whereIn('id', $request->ids);
+            $deleted = $this->model->whereIn("id", $request->ids);
             if ($callback) $callback($deleted);
             $deleted->delete();
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -128,6 +131,37 @@ class BaseRepository
         DB::commit();
 
         return $deleted;
+    }
+
+    public function updateStatus(object $request, int $id, ?callable $callback = null): object
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.update-status.before");
+
+        try
+        {
+            $data = $request->validate([
+                "status" => "sometimes|boolean"
+            ]);
+
+            $updated = $this->model->findOrFail($id);
+            $data["status"] = $data["status"] ?? (bool) !$updated->status;
+
+            $updated->fill($data);
+            $updated->save();
+
+            if ($callback) $callback($updated);
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            return $this->handleException($exception);
+        }
+
+        Event::dispatch("{$this->model_key}.update-status.after", $updated);
+        DB::commit();
+
+        return $updated;
     }
 
     public function rules(array $merge = []): array
