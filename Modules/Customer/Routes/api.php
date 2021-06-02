@@ -54,11 +54,20 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('groups', CustomerGroupController::class)->except(['create', 'edit']);
 
         // Customer Routes
+        Route::put("/customers/{customer_id}/update-status", [\Modules\Customer\Http\Controllers\CustomerController::class, "updateStatus"])->name('customers.status');
         Route::resource('customers', CustomerController::class)->except(['create', 'edit']);
 
         // Customer Address Routes
         Route::group(['prefix' => 'customers/{customers}', 'as' => 'customer.'], function() {
             Route::resource('addresses', AddressController::class)->except(['create', 'edit']);
         });
+    });
+
+
+//        Customer Coupon Routes
+    Route::group(['prefix' => 'customers/coupon', 'as' => 'customer.coupon.'],function () {
+
+        Route::get('/publicly-available', [\Modules\Customer\Http\Controllers\CustomerCouponController::class,"publiclyAvailableCoupons"])->name('publicly_available');
+        Route::get('/{id}', [\Modules\Customer\Http\Controllers\CustomerCouponController::class,"show"])->name('show');
     });
 });

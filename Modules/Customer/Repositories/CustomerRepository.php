@@ -115,6 +115,4 @@ class CustomerRepository extends BaseRepository
 
         return $updated;
     }
-
-
 }

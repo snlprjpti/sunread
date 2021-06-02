@@ -9,11 +9,30 @@ use Illuminate\Database\Eloquent\Model;
 
 class BaseRepository
 {
-	protected $model, $model_key, $rules;
+    protected $model, $model_key, $rules;
 
     public function model(): Model
     {
         return $this->model;
+    }
+
+    public function relationships(int $id, array $relationships = [], ?callable $callback = null): object
+    {
+        Event::dispatch("{$this->model_key}.fetch-single.before");
+
+        try
+        {
+            $fetched = $this->model->whereId($id)->with($relationships)->firstOrFail();
+            if ($callback) $callback($fetched);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.fetch-single.after", $fetched);
+
+        return $fetched;
     }
 
     public function create(array $data, ?callable $callback = null): object
@@ -24,7 +43,7 @@ class BaseRepository
         try
         {
             $created = $this->model->create($data);
-			if ($callback) $callback($created);
+            if ($callback) $callback($created);
         }
         catch (Exception $exception)
         {
@@ -49,10 +68,11 @@ class BaseRepository
             $updated->fill($data);
             $updated->save();
 
-			if ($callback) $callback($updated);
+            if ($callback) $callback($updated);
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -70,11 +90,12 @@ class BaseRepository
         try
         {
             $deleted = $this->model->findOrFail($id);
-			if ($callback) $callback($deleted);
+            if ($callback) $callback($deleted);
             $deleted->delete();
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -92,16 +113,17 @@ class BaseRepository
         try
         {
             $request->validate([
-                'ids' => 'array|required',
-                'ids.*' => 'required|exists:activity_logs,id',
+                "ids" => "array|required",
+                "ids.*" => "required|exists:{$this->model->getTable()},id",
             ]);
 
-            $deleted = $this->model->whereIn('id', $request->ids);
-			if ($callback) $callback($deleted);
+            $deleted = $this->model->whereIn("id", $request->ids);
+            if ($callback) $callback($deleted);
             $deleted->delete();
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -109,6 +131,37 @@ class BaseRepository
         DB::commit();
 
         return $deleted;
+    }
+
+    public function updateStatus(object $request, int $id, ?callable $callback = null): object
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.update-status.before");
+
+        try
+        {
+            $data = $request->validate([
+                "status" => "sometimes|boolean"
+            ]);
+
+            $updated = $this->model->findOrFail($id);
+            $data["status"] = $data["status"] ?? (bool) !$updated->status;
+
+            $updated->fill($data);
+            $updated->save();
+
+            if ($callback) $callback($updated);
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            return $this->handleException($exception);
+        }
+
+        Event::dispatch("{$this->model_key}.update-status.after", $updated);
+        DB::commit();
+
+        return $updated;
     }
 
     public function rules(array $merge = []): array
@@ -119,7 +172,7 @@ class BaseRepository
     public function validateData(object $request, array $merge = [], ?callable $callback = null): array
     {
         $data = $request->validate($this->rules($merge));
-		$append_data = $callback ? $callback($request) : [];
+        $append_data = $callback ? $callback($request) : [];
 
         return array_merge($data, $append_data);
     }

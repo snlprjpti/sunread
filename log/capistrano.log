@@ -1502,3 +1502,351 @@ Discovered Package: [32mtymon/jwt-auth[39m
   INFO [ac9ddc23] Running /usr/bin/env echo "Branch dev (at a0d5e1a54a7225825a6a04d3eff8b3f7bb38690e) deployed as release 20210531063135 by bikram" >> /home/deployer/api/revisions.log as deployer@94.237.40.213
  DEBUG [ac9ddc23] Command: cd /home/deployer/api/releases && /usr/bin/env echo "Branch dev (at a0d5e1a54a7225825a6a04d3eff8b3f7bb38690e) deployed as release 20210531063135 by bikram" >> /home/deployer/api/revisions.log
   INFO [ac9ddc23] Finished in 0.580 seconds with exit status 0 (successful).
+  INFO ---------------------------------------------------------------------------
+  INFO START 2021-06-01 16:40:26 +0545 cap staging deploy
+  INFO ---------------------------------------------------------------------------
+  INFO [4f8f1a81] Running /usr/bin/env mkdir -p /home/deployer/tmp as deployer@94.237.40.213
+ DEBUG [4f8f1a81] Command: /usr/bin/env mkdir -p /home/deployer/tmp
+  INFO [4f8f1a81] Finished in 1.992 seconds with exit status 0 (successful).
+ DEBUG Uploading /home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh 0.0%
+  INFO Uploading /home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh 100.0%
+  INFO [25d5aca6] Running /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh as deployer@94.237.40.213
+ DEBUG [25d5aca6] Command: /usr/bin/env chmod 700 /home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh
+  INFO [25d5aca6] Finished in 0.465 seconds with exit status 0 (successful).
+  INFO [34643169] Running /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD as deployer@94.237.40.213
+ DEBUG [34643169] Command: ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh" ; /usr/bin/env git ls-remote git@gitlab.com:sunread/sunread-api.git HEAD )
+ DEBUG [34643169] 	3ec0a3da30f9f6ac24b1e0c63010f27c505f0543	HEAD
+  INFO [34643169] Finished in 2.825 seconds with exit status 0 (successful).
+  INFO [7b37fabe] Running /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [7b37fabe] Command: /usr/bin/env mkdir -p /home/deployer/api/shared /home/deployer/api/releases
+  INFO [7b37fabe] Finished in 0.457 seconds with exit status 0 (successful).
+  INFO [bf34b124] Running /usr/bin/env mkdir -p /home/deployer/api/shared/storage as deployer@94.237.40.213
+ DEBUG [bf34b124] Command: /usr/bin/env mkdir -p /home/deployer/api/shared/storage
+  INFO [bf34b124] Finished in 0.507 seconds with exit status 0 (successful).
+  INFO [f48e6bd5] Running /usr/bin/env mkdir -p /home/deployer/api/shared as deployer@94.237.40.213
+ DEBUG [f48e6bd5] Command: /usr/bin/env mkdir -p /home/deployer/api/shared
+  INFO [f48e6bd5] Finished in 0.618 seconds with exit status 0 (successful).
+ DEBUG [9fb2d228] Running [ -f /home/deployer/api/shared/.env ] as deployer@94.237.40.213
+ DEBUG [9fb2d228] Command: [ -f /home/deployer/api/shared/.env ]
+ DEBUG [9fb2d228] Finished in 0.504 seconds with exit status 0 (successful).
+ DEBUG [1396b96a] Running [ -f /home/deployer/api/current/REVISION ] as deployer@94.237.40.213
+ DEBUG [1396b96a] Command: [ -f /home/deployer/api/current/REVISION ]
+ DEBUG [1396b96a] Finished in 0.464 seconds with exit status 0 (successful).
+ DEBUG [7b8bfd66] Running /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null as deployer@94.237.40.213
+ DEBUG [7b8bfd66] Command: /usr/bin/env cat /home/deployer/api/current/REVISION 2>/dev/null
+ DEBUG [7b8bfd66] 	a0d5e1a54a7225825a6a04d3eff8b3f7bb38690e
+ DEBUG [7b8bfd66] Finished in 0.509 seconds with exit status 0 (successful).
+ DEBUG [7666a758] Running [ -f /home/deployer/api/repo/HEAD ] as deployer@94.237.40.213
+ DEBUG [7666a758] Command: [ -f /home/deployer/api/repo/HEAD ]
+ DEBUG [7666a758] Finished in 0.443 seconds with exit status 0 (successful).
+  INFO The repository mirror is at /home/deployer/api/repo
+ DEBUG [f60f5ade] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [f60f5ade] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [f60f5ade] Finished in 0.502 seconds with exit status 0 (successful).
+  INFO [1bf59d21] Running /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git as deployer@94.237.40.213
+ DEBUG [1bf59d21] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh" ; /usr/bin/env git remote set-url origin git@gitlab.com:sunread/sunread-api.git )
+  INFO [1bf59d21] Finished in 0.466 seconds with exit status 0 (successful).
+  INFO [9e0626fd] Running /usr/bin/env git remote update --prune as deployer@94.237.40.213
+ DEBUG [9e0626fd] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh" ; /usr/bin/env git remote update --prune )
+ DEBUG [9e0626fd] 	Fetching origin
+ DEBUG [9e0626fd] 	From gitlab.com:sunread/sunread-api
+ DEBUG [9e0626fd] 	 - [deleted]         (none)     -> sunil/coupon-update
+ DEBUG [9e0626fd] 	 * [new branch]      aneesha/Locale        -> aneesha/Locale
+ DEBUG [9e0626fd] 	 * [new branch]      aneesha/elasticsearch -> aneesha/elasticsearch
+ DEBUG [9e0626fd] 	   a0d5e1a..3ec0a3d  dev                   -> dev
+ DEBUG [9e0626fd] 	   82c9db0..d2d407e  rupesh/customer       -> rupesh/customer
+ DEBUG [9e0626fd] 	 * [new branch]      rupesh/locale         -> rupesh/locale
+ DEBUG [9e0626fd] 	 * [new branch]      sunil/customer-status -> sunil/customer-status
+ DEBUG [9e0626fd] 	   82c9db0..d2d407e  refs/merge-requests/170/head -> refs/merge-requests/170/head
+ DEBUG [9e0626fd] 	 + bb09453...34d6c64 refs/merge-requests/170/merge -> refs/merge-requests/170/merge  (forced update)
+ DEBUG [9e0626fd] 	   84257e7..9e8a43e  refs/merge-requests/171/head -> refs/merge-requests/171/head
+ DEBUG [9e0626fd] 	 + def68e9...41fb664 refs/merge-requests/171/merge -> refs/merge-requests/171/merge  (forced update)
+ DEBUG [9e0626fd] 	 * [new ref]         refs/merge-requests/175/head -> refs/merge-requests/175/head
+ DEBUG [9e0626fd] 	 * [new ref]         refs/merge-requests/175/merge -> refs/merge-requests/175/merge
+ DEBUG [9e0626fd] 	 * [new ref]         refs/merge-requests/176/head -> refs/merge-requests/176/head
+ DEBUG [9e0626fd] 	 * [new ref]         refs/merge-requests/176/merge -> refs/merge-requests/176/merge
+ DEBUG [9e0626fd] 	 * [new ref]         refs/merge-requests/177/head -> refs/merge-requests/177/head
+ DEBUG [9e0626fd] 	 * [new ref]         refs/merge-requests/177/merge -> refs/merge-requests/177/merge
+  INFO [9e0626fd] Finished in 3.370 seconds with exit status 0 (successful).
+ DEBUG [0b6ddefd] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [0b6ddefd] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [0b6ddefd] Finished in 0.463 seconds with exit status 0 (successful).
+  INFO [670f3e49] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210601105536 as deployer@94.237.40.213
+ DEBUG [670f3e49] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh" ; /usr/bin/env mkdir -p /home/deployer/api/releases/20210601105536 )
+  INFO [670f3e49] Finished in 0.506 seconds with exit status 0 (successful).
+  INFO [bbb69b85] Running /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210601105536 as deployer@94.237.40.213
+ DEBUG [bbb69b85] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh" ; /usr/bin/env git archive dev | /usr/bin/env tar -x -f - -C /home/deployer/api/releases/20210601105536 )
+  INFO [bbb69b85] Finished in 0.491 seconds with exit status 0 (successful).
+ DEBUG [0accd122] Running if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [0accd122] Command: if test ! -d /home/deployer/api/repo; then echo "Directory does not exist '/home/deployer/api/repo'" 1>&2; false; fi
+ DEBUG [0accd122] Finished in 0.505 seconds with exit status 0 (successful).
+ DEBUG [29f8ac2f] Running /usr/bin/env git rev-list --max-count=1 dev as deployer@94.237.40.213
+ DEBUG [29f8ac2f] Command: cd /home/deployer/api/repo && ( export GIT_ASKPASS="/bin/echo" GIT_SSH="/home/deployer/tmp/git-ssh-e7784a7e54aee16693c8.sh" ; /usr/bin/env git rev-list --max-count=1 dev )
+ DEBUG [29f8ac2f] 	3ec0a3da30f9f6ac24b1e0c63010f27c505f0543
+ DEBUG [29f8ac2f] Finished in 0.468 seconds with exit status 0 (successful).
+ DEBUG [4b56082d] Running if test ! -d /home/deployer/api/releases/20210601105536; then echo "Directory does not exist '/home/deployer/api/releases/20210601105536'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [4b56082d] Command: if test ! -d /home/deployer/api/releases/20210601105536; then echo "Directory does not exist '/home/deployer/api/releases/20210601105536'" 1>&2; false; fi
+ DEBUG [4b56082d] Finished in 0.507 seconds with exit status 0 (successful).
+  INFO [8b5db20d] Running /usr/bin/env echo "3ec0a3da30f9f6ac24b1e0c63010f27c505f0543" > REVISION as deployer@94.237.40.213
+ DEBUG [8b5db20d] Command: cd /home/deployer/api/releases/20210601105536 && /usr/bin/env echo "3ec0a3da30f9f6ac24b1e0c63010f27c505f0543" > REVISION
+  INFO [8b5db20d] Finished in 0.465 seconds with exit status 0 (successful).
+  INFO [e3f9c6a4] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210601105536 as deployer@94.237.40.213
+ DEBUG [e3f9c6a4] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210601105536
+  INFO [e3f9c6a4] Finished in 0.502 seconds with exit status 0 (successful).
+ DEBUG [2f49c62c] Running [ -L /home/deployer/api/releases/20210601105536/.env ] as deployer@94.237.40.213
+ DEBUG [2f49c62c] Command: [ -L /home/deployer/api/releases/20210601105536/.env ]
+ DEBUG [2f49c62c] Finished in 0.464 seconds with exit status 1 (failed).
+ DEBUG [82b0032a] Running [ -f /home/deployer/api/releases/20210601105536/.env ] as deployer@94.237.40.213
+ DEBUG [82b0032a] Command: [ -f /home/deployer/api/releases/20210601105536/.env ]
+ DEBUG [82b0032a] Finished in 0.506 seconds with exit status 1 (failed).
+  INFO [00e9e734] Running /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210601105536/.env as deployer@94.237.40.213
+ DEBUG [00e9e734] Command: /usr/bin/env ln -s /home/deployer/api/shared/.env /home/deployer/api/releases/20210601105536/.env
+  INFO [00e9e734] Finished in 0.465 seconds with exit status 0 (successful).
+  INFO [a02934b5] Running /usr/bin/env mkdir -p /home/deployer/api/releases/20210601105536 as deployer@94.237.40.213
+ DEBUG [a02934b5] Command: /usr/bin/env mkdir -p /home/deployer/api/releases/20210601105536
+  INFO [a02934b5] Finished in 0.501 seconds with exit status 0 (successful).
+ DEBUG [7fc86a51] Running [ -L /home/deployer/api/releases/20210601105536/storage ] as deployer@94.237.40.213
+ DEBUG [7fc86a51] Command: [ -L /home/deployer/api/releases/20210601105536/storage ]
+ DEBUG [7fc86a51] Finished in 0.464 seconds with exit status 1 (failed).
+ DEBUG [f077bbbc] Running [ -d /home/deployer/api/releases/20210601105536/storage ] as deployer@94.237.40.213
+ DEBUG [f077bbbc] Command: [ -d /home/deployer/api/releases/20210601105536/storage ]
+ DEBUG [f077bbbc] Finished in 0.509 seconds with exit status 0 (successful).
+  INFO [fcb29410] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210601105536/storage as deployer@94.237.40.213
+ DEBUG [fcb29410] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210601105536/storage
+  INFO [fcb29410] Finished in 0.467 seconds with exit status 0 (successful).
+  INFO [3fb5d18b] Running /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210601105536/storage as deployer@94.237.40.213
+ DEBUG [3fb5d18b] Command: /usr/bin/env ln -s /home/deployer/api/shared/storage /home/deployer/api/releases/20210601105536/storage
+  INFO [3fb5d18b] Finished in 0.509 seconds with exit status 0 (successful).
+  INFO [57fa1696] Running /usr/bin/env ln -s /home/deployer/api/releases/20210601105536 /home/deployer/api/releases/current as deployer@94.237.40.213
+ DEBUG [57fa1696] Command: /usr/bin/env ln -s /home/deployer/api/releases/20210601105536 /home/deployer/api/releases/current
+  INFO [57fa1696] Finished in 0.456 seconds with exit status 0 (successful).
+  INFO [136c5e43] Running /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api as deployer@94.237.40.213
+ DEBUG [136c5e43] Command: /usr/bin/env mv /home/deployer/api/releases/current /home/deployer/api
+  INFO [136c5e43] Finished in 0.506 seconds with exit status 0 (successful).
+ DEBUG [d96bc290] Running if test ! -d /home/deployer/api/current; then echo "Directory does not exist '/home/deployer/api/current'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [d96bc290] Command: if test ! -d /home/deployer/api/current; then echo "Directory does not exist '/home/deployer/api/current'" 1>&2; false; fi
+ DEBUG [d96bc290] Finished in 0.459 seconds with exit status 0 (successful).
+  INFO [f1f378fe] Running /usr/bin/env composer update --prefer-dist --ignore-platform-reqs as deployer@94.237.40.213
+ DEBUG [f1f378fe] Command: cd /home/deployer/api/current && /usr/bin/env composer update --prefer-dist --ignore-platform-reqs
+ DEBUG [f1f378fe] 	Loading composer repositories with package information
+ DEBUG [f1f378fe] 	Updating dependencies
+ DEBUG [f1f378fe] 	Lock file operations: 0 installs, 27 updates, 0 removals
+ DEBUG [f1f378fe] 	  - Upgrading facade/flare-client-php (1.8.0 => 1.8.1)
+  - Upgrading kalnoy/nestedset (v5.0.3 => v5.0.5)
+ DEBUG [f1f378fe] 	  - Upgrading lcobucci/jwt (3.2.5 => 3.3.3)
+ DEBUG [f1f378fe] 	  - Upgrading nesbot/carbon (2.48.0 => 2.48.1)
+  - Upgrading symfony/console (v5.2.8 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/css-selector (v5.2.9 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/error-handler (v5.2.8 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/event-dispatcher (v5.2.4 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/finder (v5.2.9 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/http-foundation (v5.2.8 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/http-kernel (v5.2.9 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/mime (v5.2.9 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-ctype (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-iconv (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-intl-grapheme (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-intl-idn (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-intl-normalizer (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-mbstring (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-php72 (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-php73 (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/polyfill-php80 (v1.22.1 => v1.23.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/process (v5.2.7 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/routing (v5.2.9 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/string (v5.2.8 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/translation (v5.2.9 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading symfony/var-dumper (v5.2.8 => v5.3.0)
+ DEBUG [f1f378fe] 	  - Upgrading tymon/jwt-auth (dev-develop ab00f2d => 1.0.2)
+ DEBUG [f1f378fe] 	Writing lock file
+ DEBUG [f1f378fe] 	Installing dependencies from lock file (including require-dev)
+ DEBUG [f1f378fe] 	Package operations: 111 installs, 0 updates, 0 removals
+ DEBUG [f1f378fe] 	  - Downloading symfony/var-dumper (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/string (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/console (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/css-selector (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/routing (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/process (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/mime (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/http-foundation (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/event-dispatcher (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/error-handler (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/http-kernel (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/finder (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading symfony/translation (v5.3.0)
+ DEBUG [f1f378fe] 	  - Downloading facade/flare-client-php (1.8.1)
+ DEBUG [f1f378fe] 	    0 [>---------------------------]    0 [>---------------------------]
+ DEBUG [f1f378fe] 	  - Installing doctrine/inflector (2.0.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing doctrine/lexer (1.2.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-ctype (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing webmozart/assert (1.10.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing dragonmantank/cron-expression (v3.1.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-php80 (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-mbstring (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/var-dumper (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-intl-normalizer (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-intl-grapheme (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/string (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing psr/container (1.1.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/service-contracts (v2.4.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-php73 (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/deprecation-contracts (v2.4.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/console (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing psr/log (1.1.4): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing monolog/monolog (2.2.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing voku/portable-ascii (1.5.6): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpoption/phpoption (1.7.5): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing graham-campbell/result-type (v1.0.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing vlucas/phpdotenv (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/css-selector (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing tijsverkoyen/css-to-inline-styles (2.2.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/routing (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/process (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-php72 (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-intl-idn (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/mime (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/http-foundation (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/http-client-contracts (v2.4.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing psr/event-dispatcher (1.0.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/event-dispatcher-contracts (v2.4.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/event-dispatcher (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/error-handler (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/http-kernel (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/finder (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-iconv (v1.23.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing egulias/email-validator (2.1.25): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing swiftmailer/swiftmailer (v6.2.7): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing ramsey/collection (1.1.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing brick/math (0.9.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing ramsey/uuid (4.1.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing psr/simple-cache (1.0.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing opis/closure (3.6.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/translation-contracts (v2.4.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/translation (v5.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing nesbot/carbon (2.48.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing league/mime-type-detection (1.7.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing league/flysystem (1.1.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing league/commonmark (1.6.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing laravel/framework (v8.41.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing filp/whoops (2.12.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing facade/ignition-contracts (1.0.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing facade/flare-client-php (1.8.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing facade/ignition (2.9.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing fakerphp/faker (v1.14.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing fideloper/proxy (4.4.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing asm89/stack-cors (v2.0.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing fruitcake/laravel-cors (v2.0.4): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing psr/http-message (1.0.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing psr/http-client (1.0.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing ralouphie/getallheaders (3.0.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing guzzlehttp/psr7 (1.8.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing guzzlehttp/promises (1.4.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing guzzlehttp/guzzle (7.3.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing intervention/image (2.5.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing kalnoy/nestedset (v5.0.5): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing laravel/sail (v1.7.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing nikic/php-parser (v4.10.5): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing psy/psysh (v0.10.8): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing laravel/tinker (v2.6.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing hamcrest/hamcrest-php (v2.0.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing mockery/mockery (1.4.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing nunomaduro/collision (v5.4.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing nwidart/laravel-modules (8.2.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpdocumentor/reflection-common (2.2.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpdocumentor/type-resolver (1.4.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpdocumentor/reflection-docblock (5.2.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/version (3.0.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/type (2.3.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/resource-operations (3.0.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/recursion-context (4.0.4): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/object-reflector (2.0.4): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/object-enumerator (4.0.4): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/global-state (5.0.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/exporter (4.0.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/environment (5.1.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/diff (4.0.4): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/comparator (4.0.6): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/code-unit (1.0.8): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/cli-parser (1.0.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpunit/php-timer (5.0.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpunit/php-text-template (2.0.4): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpunit/php-invoker (3.1.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpunit/php-file-iterator (3.0.5): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing theseer/tokenizer (1.2.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/lines-of-code (1.0.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/complexity (2.0.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing sebastian/code-unit-reverse-lookup (2.0.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpunit/php-code-coverage (9.2.6): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing doctrine/instantiator (1.4.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpspec/prophecy (1.13.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phar-io/version (3.1.0): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phar-io/manifest (2.0.1): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing myclabs/deep-copy (1.10.2): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing phpunit/phpunit (9.5.4): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing symfony/polyfill-php56 (v1.20.0)
+ DEBUG [f1f378fe] 	  - Installing namshi/jose (7.2.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing lcobucci/jwt (3.3.3): Extracting archive
+ DEBUG [f1f378fe] 	  - Installing tymon/jwt-auth (1.0.2): Extracting archive
+ DEBUG [f1f378fe] 	   0/100 [>---------------------------]   0%
+ DEBUG [f1f378fe] 	
+  10/100 [==>-------------------------]  10%
+ DEBUG [f1f378fe] 	
+  20/100 [=====>----------------------]  20%
+ DEBUG [f1f378fe] 	
+  30/100 [========>-------------------]  30%
+ DEBUG [f1f378fe] 	
+  40/100 [===========>----------------]  40%
+ DEBUG [f1f378fe] 	
+  49/100 [=============>--------------]  49%
+ DEBUG [f1f378fe] 	
+ DEBUG [f1f378fe] 	  59/100 [================>-----------]  59%
+ DEBUG [f1f378fe] 	
+  67/100 [==================>---------]  67%
+ DEBUG [f1f378fe] 	
+  77/100 [=====================>------]  77%
+ DEBUG [f1f378fe] 	
+  87/100 [========================>---]  87%
+ DEBUG [f1f378fe] 	
+  97/100 [===========================>]  97%
+ DEBUG [f1f378fe] 	
+ 100/100 [============================] 100%
+ DEBUG [f1f378fe] 	Generating optimized autoload files
+ DEBUG [f1f378fe] 	Class Modules\Core\Http\Controllers\ConfigurationController located in ./Modules/Core/Http/Controllers/ConfigurationExampleController.php does not comply with psr-4 autoloading standard. Skipping.
+ DEBUG [f1f378fe] 	> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+ DEBUG [f1f378fe] 	> @php artisan package:discover --ansi
+ DEBUG [f1f378fe] 	Discovered Package: [32mfacade/ignition[39m
+ DEBUG [f1f378fe] 	Discovered Package: [32mfideloper/proxy[39m
+ DEBUG [f1f378fe] 	Discovered Package: [32mfruitcake/laravel-cors[39m
+ DEBUG [f1f378fe] 	Discovered Package: [32mintervention/image[39m
+ DEBUG [f1f378fe] 	Discovered Package: [32mkalnoy/nestedset[39m
+ DEBUG [f1f378fe] 	Discovered Package: [32mlaravel/sail[39m
+ DEBUG [f1f378fe] 	Discovered Package: [32mlaravel/tinker[39m
+Discovered Package: [32mnesbot/carbon[39m
+Discovered Package: [32mnunomaduro/collision[39m
+Discovered Package: [32mnwidart/laravel-modules[39m
+ DEBUG [f1f378fe] 	Discovered Package: [32mtymon/jwt-auth[39m
+[32mPackage manifest generated successfully.[39m
+ DEBUG [f1f378fe] 	78 packages you are using are looking for funding.
+ DEBUG [f1f378fe] 	Use the `composer fund` command to find out more!
+  INFO [f1f378fe] Finished in 20.318 seconds with exit status 0 (successful).
+ DEBUG [25501073] Running /usr/bin/env ls -x /home/deployer/api/releases as deployer@94.237.40.213
+ DEBUG [25501073] Command: /usr/bin/env ls -x /home/deployer/api/releases
+ DEBUG [25501073] 	20210531063135	20210601105536
+ DEBUG [25501073] Finished in 0.461 seconds with exit status 0 (successful).
+  INFO Keeping 1 of 2 deployed releases on 94.237.40.213
+ DEBUG [b8987f63] Running [ -d /home/deployer/api/current ] as deployer@94.237.40.213
+ DEBUG [b8987f63] Command: [ -d /home/deployer/api/current ]
+ DEBUG [b8987f63] Finished in 0.505 seconds with exit status 0 (successful).
+ DEBUG [349bd2b3] Running /usr/bin/env readlink /home/deployer/api/current as deployer@94.237.40.213
+ DEBUG [349bd2b3] Command: /usr/bin/env readlink /home/deployer/api/current
+ DEBUG [349bd2b3] 	/home/deployer/api/releases/20210601105536
+ DEBUG [349bd2b3] Finished in 0.470 seconds with exit status 0 (successful).
+  INFO [18abc6f7] Running /usr/bin/env rm -rf /home/deployer/api/releases/20210531063135 as deployer@94.237.40.213
+ DEBUG [18abc6f7] Command: /usr/bin/env rm -rf /home/deployer/api/releases/20210531063135
+  INFO [18abc6f7] Finished in 0.628 seconds with exit status 0 (successful).
+ DEBUG [a81b9c0f] Running if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi as deployer@94.237.40.213
+ DEBUG [a81b9c0f] Command: if test ! -d /home/deployer/api/releases; then echo "Directory does not exist '/home/deployer/api/releases'" 1>&2; false; fi
+ DEBUG [a81b9c0f] Finished in 0.461 seconds with exit status 0 (successful).
+  INFO [9432a813] Running /usr/bin/env echo "Branch dev (at 3ec0a3da30f9f6ac24b1e0c63010f27c505f0543) deployed as release 20210601105536 by bikram" >> /home/deployer/api/revisions.log as deployer@94.237.40.213
+ DEBUG [9432a813] Command: cd /home/deployer/api/releases && /usr/bin/env echo "Branch dev (at 3ec0a3da30f9f6ac24b1e0c63010f27c505f0543) deployed as release 20210601105536 by bikram" >> /home/deployer/api/revisions.log
+  INFO [9432a813] Finished in 0.506 seconds with exit status 0 (successful).
