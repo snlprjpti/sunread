@@ -3,7 +3,6 @@
 namespace Modules\Customer\Http\Controllers;
 
 use Exception;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,7 +14,6 @@ use Modules\Customer\Repositories\CustomerAddressRepository;
 use Modules\Customer\Repositories\CustomerRepository;
 use Modules\Customer\Transformers\CustomerAccountResource;
 
-
 class CustomerAccountController extends BaseController
 {
     protected $repository, $customerAddressRepository;
@@ -26,7 +24,6 @@ class CustomerAccountController extends BaseController
         $this->customerAddressRepository = $customerAddressRepository;
         $this->model = $customer;
         $this->model_name = "Customer";
-        $this->customer_id = auth()->guard("customer")->check() ? auth()->guard("customer")->user()->id : 0;
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -88,7 +85,7 @@ class CustomerAccountController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
-     public function uploadProfileImage(Request $request): JsonResponse
+    public function uploadProfileImage(Request $request): JsonResponse
     {
         try
         {
