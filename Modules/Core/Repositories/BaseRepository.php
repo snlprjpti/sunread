@@ -72,6 +72,7 @@ class BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -94,6 +95,7 @@ class BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -111,16 +113,17 @@ class BaseRepository
         try
         {
             $request->validate([
-                'ids' => 'array|required',
-                'ids.*' => 'required|exists:activity_logs,id',
+                "ids" => "array|required",
+                "ids.*" => "required|exists:{$this->model->getTable()},id",
             ]);
 
-            $deleted = $this->model->whereIn('id', $request->ids);
+            $deleted = $this->model->whereIn("id", $request->ids);
             if ($callback) $callback($deleted);
             $deleted->delete();
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
