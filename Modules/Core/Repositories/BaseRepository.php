@@ -130,6 +130,37 @@ class BaseRepository
         return $deleted;
     }
 
+    public function updateStatus(object $request, int $id, ?callable $callback = null): object
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.update-status.before");
+
+        try
+        {
+            $data = $request->validate([
+                "status" => "sometimes|boolean"
+            ]);
+
+            $updated = $this->model->findOrFail($id);
+            $data["status"] = $data["status"] ?? (bool) !$updated->status;
+
+            $updated->fill($data);
+            $updated->save();
+
+            if ($callback) $callback($updated);
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            return $this->handleException($exception);
+        }
+
+        Event::dispatch("{$this->model_key}.update-status.after", $updated);
+        DB::commit();
+
+        return $updated;
+    }
+
     public function rules(array $merge = []): array
     {
         return array_merge($this->rules, $merge);
