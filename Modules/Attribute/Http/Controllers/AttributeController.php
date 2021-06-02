@@ -50,7 +50,7 @@ class AttributeController extends BaseController
     {
         try
         {
-            $fetched = $this->model->allTranslations(null,["translations", "attribute_group"]);
+            $fetched = $this->model->allTranslations(null,["attribute_group"]);
             // $fetched = $this->model->paginate($fetched, 1);
         }
         catch( Exception $exception )
