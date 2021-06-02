@@ -10,7 +10,7 @@ class EventServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        Event::listen('customer.session.login.after', 'Modules\Customer\Listeners\SessionListener@customerLogin');
-        Event::listen('customer.session.logout.after', 'Modules\Customer\Listeners\SessionListener@customerLogOut');
+        Event::listen('customers.session.login.after', 'Modules\Customer\Listeners\SessionListener@customerLogin');
+        Event::listen('customers.session.logout.after', 'Modules\Customer\Listeners\SessionListener@customerLogOut');
     }
 }

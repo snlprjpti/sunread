@@ -64,6 +64,9 @@ class CustomerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/customer_image.php'), 'customer_image'
+        );
     }
 
     /**

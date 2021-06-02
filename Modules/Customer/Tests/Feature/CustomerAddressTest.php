@@ -16,7 +16,7 @@ class CustomerAddressTest extends BaseTestCase
 
         $this->admin = $this->createAdmin();
         $this->model_name = "Customer Address";
-        $this->route_prefix = "admin.customer.addresses";
+        $this->route_prefix = "admin.customers.addresses";
         $this->append_to_route = Customer::latest("id")->first()->id;
     }
 

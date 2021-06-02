@@ -2,7 +2,6 @@
 
 namespace Modules\Customer\Transformers;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CustomerAddressResource extends JsonResource
@@ -25,7 +24,7 @@ class CustomerAddressResource extends JsonResource
             "postcode" => $this->postcode,
             "phone" => $this->phone,
             "default_address" => $this->default_address,
-            "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
+            "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
 }

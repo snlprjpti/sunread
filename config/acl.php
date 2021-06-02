@@ -572,35 +572,35 @@ return [
     [
         'key'   => 'customers.address.list',
         'name'  => 'List customers address',
-        'route' => 'admin.customer.address.index',
+        'route' => 'admin.customers.address.index',
         'sort'  => 1,
         'module' => 'Customers'
     ],
     [
         'key'   => 'customers.address.store',
         'name'  => 'Create customer address',
-        'route' => 'admin.customer.address.store',
+        'route' => 'admin.customers.address.store',
         'sort'  => 2,
         'module' => 'Customers'
     ],
     [
         'key'   => 'customers.address.show',
         'name'  => 'Show Customer address',
-        'route' => 'admin.customer.address.show',
+        'route' => 'admin.customers.address.show',
         'sort'  => 3,
         'module' => 'Customers'
     ],
     [
         'key'   => 'customers.address.update',
         'name'  => 'Update Customer address',
-        'route' => 'admin.customer.address.update',
+        'route' => 'admin.customers.address.update',
         'sort'  => 4,
         'module' => 'Customers'
     ],
     [
         'key'   => 'customers.address.delete',
         'name'  => 'Delete Customer address',
-        'route' => 'admin.customer.address.delete',
+        'route' => 'admin.customers.address.delete',
         'sort'  => 5,
         'module' => 'Customers'
     ],

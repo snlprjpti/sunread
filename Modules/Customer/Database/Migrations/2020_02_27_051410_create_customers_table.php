@@ -22,6 +22,7 @@ class CreateCustomersTable extends Migration
             $table->string('email')->unique();
             $table->tinyInteger('status')->default(1);
             $table->string('password');
+            $table->string('profile_image')->nullable();
             $table->bigInteger('customer_group_id')->unsigned()->nullable();
             $table->foreign('customer_group_id')->references('id')->on('customer_groups')->onDelete('set null');
             $table->boolean('subscribed_to_news_letter')->default(0);

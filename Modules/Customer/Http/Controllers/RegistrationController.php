@@ -34,6 +34,7 @@ class RegistrationController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
+            if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
             $created = $this->repository->create($data);
 
         }
