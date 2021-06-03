@@ -142,7 +142,7 @@ class CouponController extends BaseController
         return $this->successResponse($fetched, $this->lang("fetch-success",["name"=>"Model List"]));
     }
 
-    public function changeStatus(Request $request, int $id): JsonResponse
+    public function updateStatus(Request $request, int $id): JsonResponse
     {
         try
         {
