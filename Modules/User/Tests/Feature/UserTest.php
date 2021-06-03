@@ -16,6 +16,7 @@ class UserTest extends BaseTestCase
 
         $this->model_name = "Admin";
         $this->route_prefix = "admin.users";
+        $this->hasStatusTest = true;
     }
 
     public function getCreateData(): array
