@@ -28,7 +28,7 @@ class ConfigurationRepository extends BaseRepository
     public function getConfigData(object $request): array
     {
         $fetched = $this->config_fields;
-        $checkKey = [ 'scope' => $request->scope, 'scope_id' => $request->scope_id ];
+        $checkKey = [ 'scope' => ($request->scope) ? $request->scope : 'default', 'scope_id' => ($request->scope_id) ? $request->scope_id : 0 ];
         foreach($fetched as $key => $data)
         {
             if(!isset($data['children'])) continue;
@@ -40,17 +40,19 @@ class ConfigurationRepository extends BaseRepository
                     if(!isset($subchildren['elements'])) continue;
                     foreach($subchildren['elements'] as $k => &$element)
                     {
-                        if(!in_array($request->scope, $element['showIn']))
+                        if($request->scope && !in_array($request->scope, $element['showIn']))
                         {
                             unset($subchildren['elements'][$k]);
                             continue;
                         }
                         $checkKey["path"] = $element['path'];
                         $checkKey["provider"] = $element['provider'];
-                        if ($element["default"] == "" ) $element['default'] = $this->has((object) $checkKey) ? $this->getDefaultValues((object) $checkKey) : "";
-                        if( $element['provider'] !== "") $element['value'] = ( $element['values'] === "") ? $this->cacheQuery((object) $checkKey, $element['pluck']) : $element['values'];
+
+                        $element['default'] = $this->has((object) $checkKey) ? $this->getDefaultValues((object) $checkKey) : $element['default'];
+                        if( $element['provider'] !== "") $element['values'] = $this->cacheQuery((object) $checkKey, $element['pluck']);
                         // $element['absolute_path'] = $key.'.children.'.$i.'.subChildren.'.$j.'.elements.'.$k;
-                        unset($element['values'], $element['pluck']);
+                        
+                        unset($element['pluck'], $element['provider'], $element['rules'], $element['showIn']);
                         $subchildren['elements'][$k] = $element;
                         }
                     $children['subChildren'][$j] = $subchildren;
