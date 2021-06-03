@@ -10,14 +10,14 @@ class Currency extends Model
 {
     use HasFactory;
     public static $SEARCHABLE = [ 'code', 'name', 'symbol' ];
-    protected $fillable = [ 'code', 'name', 'symbol' ];
+    protected $fillable = [ 'code', 'name', 'symbol','status' ];
 
     // Set Currency Code in Capitalized Letters
     public function setCodeAttribute($code)
     {
         $this->attributes['code'] = strtoupper($code);
     }
-    
+
     // Get Exchange rate from associated Currency
     public function CurrencyExchangeRate()
     {
