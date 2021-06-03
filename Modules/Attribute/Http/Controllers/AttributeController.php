@@ -50,8 +50,8 @@ class AttributeController extends BaseController
     {
         try
         {
-            $fetched = $this->model->allTranslations(null,["attribute_group"]);
-            // $fetched = $this->model->paginate($fetched, 1);
+            $this->validateListFiltering($request);
+            $fetched = $this->getFilteredList($request, ["translations", "attribute_group"]);
         }
         catch( Exception $exception )
         {
