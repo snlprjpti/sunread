@@ -19,6 +19,8 @@ class Attribute extends Model
 
     protected $touches = [ 'product_attributes' ];
     public $translatedAttributes = ["name"];
+    public $translatedModels = [ AttributeTranslation::class, "attribute_id" ];
+
 
     public function attribute_group(): BelongsTo
     {

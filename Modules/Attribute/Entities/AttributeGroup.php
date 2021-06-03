@@ -17,6 +17,7 @@ class AttributeGroup extends Model
     protected $fillable = [ "attribute_family_id", "name", "slug", "position", "is_user_defined" ];
 
     public $translatedAttributes = ["name"];
+    public $translatedModels = [ AttributeGroupTranslation::class, "attribute_group_id" ];
     
     public function attributes(): HasMany
     {
