@@ -24,7 +24,7 @@ return[
                             [
                                 "title" => "Allow Countries",
                                 "path" => "allow_countries",
-                                "type" => "select",
+                                "type" => "checkbox",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code", "id"],
                                 "default" => "",
@@ -188,7 +188,7 @@ return[
                             [
                                 "title" => "Use Web Server Rewrites",
                                 "path" => "use_rewrite",
-                                "type" => "select",
+                                "type" => "radio",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "1",
@@ -316,7 +316,7 @@ return[
                             [
                                 "title" => "Mask for Meta description",
                                 "path" => "catalog_meta_description",
-                                "type" => "text",
+                                "type" => "textarea",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
@@ -344,7 +344,7 @@ return[
                             [
                                 "title" => "Enable Automatic Assignment to Customer Group",
                                 "path" => "customer_auto_customer_group",
-                                "type" => "select",
+                                "type" => "radio",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "1",
