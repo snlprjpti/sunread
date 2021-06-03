@@ -19,7 +19,7 @@ trait HasTranslation
         if($translation) 
         {
             array_map(function($attribute) use($translation) {
-                parent::setAttribute($this->attributes["$attribute"], $translation->$attribute);
+                parent::setAttribute($attribute, $translation->$attribute);
                 return $this->$attribute = $translation->$attribute;
             }, $this->translatedAttributes);
         }        
@@ -28,7 +28,8 @@ trait HasTranslation
 
     public function getTranslateData()
     {
-        $relation = AttributeTranslation::where("attribute_id", $this->attributes["id"])
+        $translationModel = new $this->translatedModels[0]();
+        $relation = $translationModel::where($this->translatedModels[1], $this->attributes["id"])
         ->where('store_id', $this->getStoreId())->first();
         return $relation; 
     }

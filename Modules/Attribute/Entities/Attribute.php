@@ -17,6 +17,8 @@ class Attribute extends Model
     protected $fillable = [ "attribute_group_id", "slug", "name", "type", "position", "validation", "is_required", "is_unique", "is_filterable", "is_user_defined", "is_visible_on_front" ];
 
     public $translatedAttributes = ["name"];
+    public $translatedModels = [ AttributeTranslation::class, "attribute_id" ];
+
 
     public function attribute_group(): BelongsTo
     {
