@@ -21,7 +21,6 @@ class Attribute extends Model
     public $translatedAttributes = ["name"];
     public $translatedModels = [ AttributeTranslation::class, "attribute_id" ];
 
-
     public function attribute_group(): BelongsTo
     {
         return $this->belongsTo(AttributeGroup::class);
