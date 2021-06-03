@@ -22,6 +22,7 @@ class ProductTest extends BaseTestCase
 
         $this->model_name = "Product";
         $this->route_prefix = "admin.catalog.products";
+        $this->hasStatusTest = true;
     }
 
     public function getCreateData(): array

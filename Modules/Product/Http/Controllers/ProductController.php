@@ -83,7 +83,7 @@ class ProductController extends BaseController
 
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
-    
+
     public function update(Request $request, int $id): JsonResponse
     {
         try
@@ -122,5 +122,19 @@ class ProductController extends BaseController
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
+
+    public function updateStatus(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $updated = $this->repository->updateStatus($request, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 }

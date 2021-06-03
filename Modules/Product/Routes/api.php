@@ -5,6 +5,7 @@ Route::group(["middleware" => ["api"]], function() {
     // ADMIN PRODUCT ROUTES
     Route::group(["prefix" => "admin/catalog", "as" => "admin.catalog.", "middleware" => ["admin", "language"]], function() {
         // Catalog Product Routes
+        Route::put("/products/{product_id}/update-status", [\Modules\Product\Http\Controllers\ProductController::class, "updateStatus"])->name("products.status");
         Route::resource("products", ProductController::class)->except(["create", "edit"]);
         // Product Images Routes
         Route::group(['prefix' => 'product', 'as' => 'products.'], function() {
