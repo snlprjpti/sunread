@@ -16,6 +16,7 @@ class ReviewTest extends BaseTestCase
 
         $this->model_name = "Review";
         $this->route_prefix = "admin.reviews";
+        $this->hasStatusTest = true;
     }
 
     public function getNonMandodtaryCreateData(): array
@@ -53,7 +54,7 @@ class ReviewTest extends BaseTestCase
      public function testAdminCanVerifyResource()
     {
         $response = $this->withHeaders($this->headers)->get($this->getRoute("verify", [$this->default_resource_id]));
-        
+
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
