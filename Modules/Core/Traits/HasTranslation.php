@@ -9,10 +9,6 @@ use Modules\Attribute\Entities\AttributeTranslation;
 
 trait HasTranslation 
 {
-    protected $translationStoreID;
-
-    public $translationRelationFn;
-
     public function getAttribute($name)
     {
         $translation = $this->getTranslateData();
@@ -39,35 +35,4 @@ trait HasTranslation
 		return array_key_exists("store_id", getallheaders()) ? (int) getallheaders()["store_id"] : 0;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- }
+}
