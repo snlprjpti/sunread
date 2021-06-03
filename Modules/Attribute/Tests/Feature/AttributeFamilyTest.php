@@ -16,8 +16,9 @@ class AttributeFamilyTest extends BaseTestCase
 
         $this->model_name = "Attribute Family";
         $this->route_prefix = "admin.catalog.families";
+        $this->hasStatusTest = true;
     }
-    
+
     public function getNonMandotaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
