@@ -17,6 +17,7 @@ class CurrencyTest extends BaseTestCase
         $this->model_name = "Currency";
         $this->route_prefix = "admin.currencies";
         $this->factory_count = 2;
+        $this->hasStatusTest = true;
     }
 
     public function getInvalidCreateData(): array
