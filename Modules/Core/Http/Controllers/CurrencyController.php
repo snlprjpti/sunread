@@ -10,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\CurrencyRepository;
+use Exception;
 
 class CurrencyController extends BaseController
 {
@@ -40,7 +41,7 @@ class CurrencyController extends BaseController
             $this->validateListFiltering($request);
             $currencies = $this->getFilteredList($request);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -55,7 +56,7 @@ class CurrencyController extends BaseController
             $data = $this->repository->validateData($request);
             $currency = $this->repository->create($data);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -69,7 +70,7 @@ class CurrencyController extends BaseController
         {
             $currency = $this->model->findOrFail($id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -87,7 +88,7 @@ class CurrencyController extends BaseController
 
             $currency = $this->repository->update($data, $id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -103,11 +104,25 @@ class CurrencyController extends BaseController
             if ($this->model->count() == 1) return $this->errorResponse($this->lang('last-delete-error'));
             $this->repository->delete($id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
+
+    public function updateStatus(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $updated = $this->repository->updateStatus($request, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 }
