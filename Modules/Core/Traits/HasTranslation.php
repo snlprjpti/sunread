@@ -35,4 +35,16 @@ trait HasTranslation
 		return array_key_exists("store_id", getallheaders()) ? (int) getallheaders()["store_id"] : 0;
 	}
 
+    public function firstTranslation($store_id)
+    {
+        $translation = $this->translations()->where('store_id', $store_id)->first(); 
+        if($translation) 
+        {
+            $item = $this->toArray();
+            foreach($this->translatedAttributes as $attribute) $item[$attribute] = $translation->$attribute;
+            return $item;
+        }
+        return $this->toArray();
+    }
+
 }
