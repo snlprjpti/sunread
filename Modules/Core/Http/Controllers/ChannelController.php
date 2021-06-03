@@ -77,7 +77,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["default_store", "stores"])->findOrFail($id);
+            $fetched = $this->model->with(["default_store", "default_category", "stores", "website"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
