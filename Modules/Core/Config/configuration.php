@@ -314,7 +314,7 @@ return[
         ]
     ],
     "customer" => [
-        "title" => "Customers",
+        "title" => "Customer",
         "children" => [
             [
                 "title" => "Customer Configuration",
