@@ -6,13 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class StoreResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
@@ -22,6 +16,7 @@ class StoreResource extends JsonResource
             "locale" => $this->locale,
             "image" => $this->image_url,
             "position" => $this->position,
+            "channels" => ChannelResource::collection($this->whenLoaded("channels")),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
