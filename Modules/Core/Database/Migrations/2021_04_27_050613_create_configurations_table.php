@@ -18,7 +18,7 @@ class CreateConfigurationsTable extends Migration
             $table->string('scope');
             $table->unsignedBigInteger("scope_id");
             $table->string('path');
-            $table->string('value')->nullable();
+            $table->json('value')->nullable();
             $table->timestamps();
         });
     }

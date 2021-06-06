@@ -11,6 +11,6 @@ class Configuration extends Model
 
     public static $SEARCHABLE = [ "scope", "path", "value" ];
     protected $fillable =  [ "scope", "scope_id", "path", "value" ];
-    
-   
+    protected $casts = [ "value" => "array" ];
+
 }
