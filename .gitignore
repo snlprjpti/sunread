@@ -20,3 +20,4 @@ log
 .rnd
 /log/capistrano.log
 /log/*
+log/*.log
