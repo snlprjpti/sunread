@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Repositories;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Modules\Core\Entities\Configuration;
 use Modules\Core\Repositories\BaseRepository;
@@ -57,6 +58,7 @@ class ConfigurationRepository extends BaseRepository
                         }
                     $children['subChildren'][$j] = $subchildren;
                 }
+                $data["slug"] = Str::slug($data["title"]);
                 $data['children'][$i] = $children;
                 $data['children'][$i]['absolute_path'] =  $key.'.children.'.$i.'.subChildren.';
             }
