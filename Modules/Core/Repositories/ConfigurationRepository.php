@@ -55,12 +55,13 @@ class ConfigurationRepository extends BaseRepository
                         
                         unset($element['pluck'], $element['provider'], $element['rules'], $element['showIn']);
                         $subchildren['elements'][$k] = $element;
-                        }
+                    }
                     $children['subChildren'][$j] = $subchildren;
                 }
                 $data["slug"] = Str::slug($data["title"]);
                 $data['children'][$i] = $children;
                 $data['children'][$i]['absolute_path'] =  $key.'.children.'.$i.'.subChildren.';
+                $data["children"][$i]["slug"] = Str::slug($children["title"]);
             }
             $fetched[$key] = $data;
         }
