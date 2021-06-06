@@ -79,11 +79,11 @@ class WebsiteController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    public function relationships(int $id): JsonResponse
+    public function relationships(int $id, Request $request): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->relationships($id, ["channels.stores", "channels.default_store"]);
+            $fetched = $this->repository->relationships($id, $request);
         }
         catch( Exception $exception )
         {

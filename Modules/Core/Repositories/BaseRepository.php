@@ -9,19 +9,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class BaseRepository
 {
-    protected $model, $model_key, $rules;
+    protected $model, $model_key, $rules, $relationships;
 
     public function model(): Model
     {
         return $this->model;
     }
 
-    public function relationships(int $id, array $relationships = [], ?callable $callback = null): object
+    public function relationships(int $id, object $request, ?callable $callback = null): object
     {
         Event::dispatch("{$this->model_key}.fetch-single.before");
 
         try
         {
+            $relationships = $request->relationships ?? $this->relationships;
+            $relationships = is_array($relationships) ? $relationships : [];
+
             $fetched = $this->model->whereId($id)->with($relationships)->firstOrFail();
             if ($callback) $callback($fetched);
         }
