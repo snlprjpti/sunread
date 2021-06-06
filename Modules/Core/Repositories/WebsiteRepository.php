@@ -11,6 +11,7 @@ class WebsiteRepository extends BaseRepository
     {
         $this->model = $website;
         $this->model_key = "core.website";
+        $this->relationships = ["channels.default_store", "channels.stores"];
         $this->rules = [
             /* General */
             "code" => "required|unique:websites,code",
