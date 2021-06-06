@@ -13,6 +13,7 @@ use Modules\Category\Exceptions\CategoryAuthorizationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
+use Exception;
 
 class CategoryController extends BaseController
 {
@@ -63,7 +64,7 @@ class CategoryController extends BaseController
             // Dont fetch root category for other admin
             if (!$this->is_super_admin) $fetched = $fetched->where('parent_id', '<>', null);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -89,7 +90,7 @@ class CategoryController extends BaseController
                 $created->channels()->sync($request->channels);
             });
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -106,7 +107,7 @@ class CategoryController extends BaseController
 
             $fetched = $this->model->with(["translations"])->findOrFail($id);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -142,7 +143,7 @@ class CategoryController extends BaseController
             // get latest updated translations
             $updated->translations = $updated->translations()->get();
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -164,11 +165,25 @@ class CategoryController extends BaseController
                 if($deleted->image) Storage::delete($deleted->image);
             });
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
+
+    public function updateStatus(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $updated = $this->repository->updateStatus($request, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 }
