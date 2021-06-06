@@ -15,6 +15,7 @@ yarn-error.log
 /storage/*
 /storage/debugbar/*
 storage/*
+!storage/framework
 .requirement
 log
 .rnd
