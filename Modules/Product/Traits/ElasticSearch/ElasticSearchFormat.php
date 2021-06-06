@@ -24,7 +24,7 @@ trait ElasticSearchFormat
         
         $array['categories'] = $this->getScopeWiseCategory();
         
-        $array['channels'] = $this->channels;
+        $array['channels'] = $this->channels->toArray();
 
         $array['product_attributes'] = $this->getScopeWiseAttribute();
 
@@ -49,7 +49,7 @@ trait ElasticSearchFormat
         
         foreach($this->categories as $category)
         {
-            $data['global'][] = $category;
+            $data['global'][] = $category->toArray();
             foreach($this->getChannelWiseStoreID() as $store_id) $data['store'][$store_id][] = $category->firstTranslation($store_id);
         }
 

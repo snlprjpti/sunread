@@ -41,9 +41,8 @@ trait AttributeFormat
 
     public function getGlobalWiseAttribute()
     {
-        $data = $this->globalAttributes;
-        $this->getAttributeData($data);
-        $this->attribute_array['global'][$data->attribute->slug] = $this->attributeData;
+        $this->getAttributeData($this->globalAttributes);
+        $this->attribute_array['global'][$this->globalAttributes->attribute->slug] = $this->attributeData;
     }
 
     public function getChannelWiseAttribute()
