@@ -16,7 +16,7 @@ return[
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                             ],
@@ -27,7 +27,7 @@ return[
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code", "id"],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                             ],
@@ -38,7 +38,7 @@ return[
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code", "id"],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "nullable",
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                             ]
@@ -54,7 +54,7 @@ return[
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                             ],
@@ -70,7 +70,7 @@ return[
                                 "provider" => "Modules\Core\Entities\Store",
                                 "pluck" => ["name", "id"],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -81,7 +81,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -92,7 +92,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "sometimes|nullable",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -103,7 +103,7 @@ return[
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code", "id"],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -114,7 +114,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -125,7 +125,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required|numeric",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -136,7 +136,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -147,7 +147,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -158,7 +158,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "sometimes|nullable",
                                 "showIn" => ["channel","website","default","store"] 
                             ],
@@ -179,7 +179,10 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "1",
-                                "values" => [ 1 => "Yes", 0 => "No"],
+                                "options" => [ 
+                                    [ "value" => 1, "label" => "Yes" ],
+                                    [ "value" => 0, "label" => "No" ]
+                                ],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"]
                             ]
@@ -195,7 +198,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"]
                             ],
@@ -206,7 +209,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"]
                             ],
@@ -228,7 +231,7 @@ return[
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"]
                             ],
@@ -239,7 +242,7 @@ return[
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"]
                             ],
@@ -266,7 +269,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => 'nullable',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                             ],
@@ -277,7 +280,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => 'nullable',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                             ],
@@ -288,7 +291,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => 'nullable',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                             ],
@@ -299,7 +302,7 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => 'nullable',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                             ],
@@ -326,7 +329,10 @@ return[
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "1",
-                                "values" => [ 1 => "Yes", 0 => "No" ],
+                                "options" => [ 
+                                    [ "value" => 1, "label" => "Yes" ],
+                                    [ "value" => 0, "label" => "No" ]
+                                ],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store']
                             ],
@@ -337,7 +343,7 @@ return[
                                 "provider" => "Modules\Customer\Entities\CustomerGroup",
                                 "pluck" => ["name", "id"],
                                 "default" => "1",
-                                "values" => "",
+                                "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store']
                             ]
