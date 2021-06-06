@@ -64,10 +64,17 @@ trait Configuration
     public function cacheQuery(object $request, array $pluck): array
     {
         $resources = Cache::rememberForever($request->provider, function() use ($request) {
-           return $request->provider::get();
+           return $request->provider::get()->toArray();
         });
-
-       return $resources->pluck(isset($pluck[0]) ? $pluck[0] : "id", isset($pluck[1]) ? $pluck[1] : "id")->toArray();
+        $data = [];
+        foreach($resources as $resource)
+        {
+            array_push($data, [
+               'value' => $resource[$pluck[1]],
+               'label' => $resource[$pluck[0]]
+            ]);
+        }
+        return $data;
     }
 
     public function getValidationRules($absolute_path): array
