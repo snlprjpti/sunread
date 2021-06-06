@@ -18,7 +18,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "showIn" => ['channel', 'website', 'default', 'store']
                             ],
                             [
                                 "title" => "Allow Countries",
@@ -29,7 +29,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "showIn" => ['channel', 'website', 'default', 'store']
                             ],
                             [
                                 "title" => "Zip/Postal Code is Optional for",
@@ -40,7 +40,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "nullable",
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "showIn" => ['channel', 'website', 'default', 'store']
                             ]
                         ]
                     ],
@@ -56,7 +56,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "showIn" => ['channel', 'website', 'default', 'store']
                             ],
                         ]
                     ],
@@ -271,7 +271,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "showIn" => ['channel', 'website', 'default', 'store']
                             ],
                             [
                                 "title" => "Mask for Meta Title",
@@ -282,7 +282,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "showIn" => ['channel', 'website', 'default', 'store']
                             ],
                             [
                                 "title" => "Mask for Meta Keywords",
@@ -293,7 +293,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "showIn" => ['channel', 'website', 'default', 'store']
                             ],
                             [
                                 "title" => "Mask for Meta description",
@@ -304,7 +304,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "showIn" => ['channel', 'website', 'default', 'store']
                             ],
                         ]
 
