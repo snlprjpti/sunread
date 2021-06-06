@@ -20,7 +20,7 @@ class CategoryTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Category";
-        $this->route_prefix = "admin.catalog.categories.categories";
+        $this->route_prefix = "admin.catalog.categories";
 
         $this->model::factory(10)->create();
         $this->default_resource_id = $this->model::latest('id')->first()->id;
