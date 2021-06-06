@@ -18,7 +18,7 @@ class ReviewRepository extends BaseRepository
 
             /* General */
             "rating" => "required|numeric|min:1|max:5",
-            "ttile" => "sometimes|nullable",
+            "title" => "sometimes|nullable",
             "description" => "sometimes|nullable",
             "status" => "sometimes|boolean",
         ];
