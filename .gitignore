@@ -18,3 +18,5 @@ storage/*
 .requirement
 log
 .rnd
+/log/capistrano.log
+/log/*
