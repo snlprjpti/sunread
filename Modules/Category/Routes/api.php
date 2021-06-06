@@ -13,7 +13,7 @@
 Route::group(['middleware' => ['api']], function () {
     //ADMIN CATEGORY ROUTES
     Route::group(['prefix'=>'admin/catalog', 'as' => 'admin.catalog.categories.', 'middleware' => ['admin', 'language']], function () {
-        Route::put("/categories/{category_id}/update-status", [\Modules\Category\Http\Controllers\CategoryController::class, "updateStatus"])->name("categories.status");
+        Route::put("/categories/{category_id}/update-status", [\Modules\Category\Http\Controllers\CategoryController::class, "updateStatus"])->name("status");
         Route::resource('categories', CategoryController::class)->except(['create', 'edit']);
     });
 });
