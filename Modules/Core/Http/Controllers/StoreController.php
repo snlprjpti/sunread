@@ -60,7 +60,7 @@ class StoreController extends BaseController
                 $created->channels()->sync($request->channels);
             });
         }
-        catch(\Exception $exception)
+        catch(Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -72,9 +72,9 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->model->findOrFail($id);
+            $fetched = $this->model->with(["channels"])->findOrFail($id);
         }
-        catch(\Exception $exception)
+        catch(Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -100,7 +100,7 @@ class StoreController extends BaseController
                 $updated->channels()->sync($request->channels);
             });
         }
-        catch(\Exception $exception)
+        catch(Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -116,7 +116,7 @@ class StoreController extends BaseController
                 if($deleted->image) Storage::delete($deleted->image);
             });
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
