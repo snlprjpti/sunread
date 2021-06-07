@@ -2,7 +2,7 @@
 
 Route::group(["middleware" => ["api"]], function () {
     // Visitor channel stores
-    Route::get("channel/{id}/stores", [Modules\Core\Http\Controllers\Visitors\ChannelController::class, "stores"])->name("channel-stores.index");
+    Route::get("channels/{id}/stores", [Modules\Core\Http\Controllers\Visitors\ChannelController::class, "stores"])->name("channels.stores.index");
 
     //ADMIN ATTRIBUTE ROUTES
     Route::group(["prefix" => "admin", "middleware" => ["admin", "language"], "as" => "admin."], function () {
