@@ -15,7 +15,7 @@ class ChannelTest extends VisitorBaseTestCase
 
         parent::setUp();
         $this->model_name = "Channel";
-        $this->route_prefix = "channel-stores";
+        $this->route_prefix = "channels";
         $this->hasFilters = false;
         $this->hasIndexTest = false;
         $this->hasShowTest = false;  
@@ -34,7 +34,7 @@ class ChannelTest extends VisitorBaseTestCase
     public function testVisitorCanFetchChannelStoresResource()
     {
         $response = $this->getCreateData();
-        $response = $this->get(route($this->route_prefix.".index", [$this->default_resource_id]));
+        $response = $this->get($this->getRoute("stores.index", [$this->default_resource_id]));
 
         $response->assertOk();
         $response->assertJsonFragment([
