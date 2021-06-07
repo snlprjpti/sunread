@@ -19,12 +19,12 @@ class CategoryTranslation extends Model
     public function __construct(?array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->urlRewriteRoute = "admin.catalog.categories.categories.show";
+        $this->urlRewriteRoute = "admin.catalog.categories.show";
         $this->urlRewriteParameter = ["category_id"];
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["category"];
         $this->urlRewriteType = "Modules\Category\Entities\Category";
-        
+
     }
 
     public function store(): BelongsTo

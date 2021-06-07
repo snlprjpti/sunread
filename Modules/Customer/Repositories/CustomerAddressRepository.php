@@ -22,7 +22,7 @@ class CustomerAddressRepository extends BaseRepository
             "city" => "required",
             "postcode" => "required",
             "phone" => "required",
-            "default_address" => "required"
+            "default_address" => "sometimes|boolean"
         ];
     }
 

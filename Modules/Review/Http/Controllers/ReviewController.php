@@ -138,4 +138,18 @@ class ReviewController extends BaseController
 
         return $this->successResponse($this->resource($fetched), "Review verified successfully.", 200);
     }
+
+    public function updateStatus(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $updated = $this->repository->updateStatus($request, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
 }

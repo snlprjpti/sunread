@@ -34,13 +34,13 @@ class Category extends Model
     public function __construct(?array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->urlRewriteRoute = "admin.catalog.categories.categories.show";
+        $this->urlRewriteRoute = "admin.catalog.categories.show";
         $this->urlRewriteParameter = ["id"];
         $this->urlRewriteExtraFields = ["store_id"];
         $this->urlRewriteParameterKey = ["category"];
         $this->urlRewriteType = "Modules\Category\Entities\Category";
     }
- 
+
     public function image_url(): ?string
     {
         if (!$this->image) return null;

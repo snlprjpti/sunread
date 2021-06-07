@@ -44,7 +44,7 @@ class CustomerResetPassword extends Notification
         return (new MailMessage)
             ->subject('Reset Password')
             ->line('You are receiving this email because we received a password reset request for your account.')
-            ->action('Reset Password', route('customer.reset-password.create', $this->token))
+            ->action('Reset Password', route('customers.reset-password.create', $this->token))
             ->line('If you did not request a password reset, no further action is required.');
     }
 

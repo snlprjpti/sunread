@@ -10,18 +10,52 @@ class AdminsTableSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table("admins")->insert([
-            "first_name" => "Admin",
-            "last_name" => "example",
-            "email" => "admin@example.com",
-            "password" => bcrypt("admin123"),
-            "api_token" => Str::random(80),
-            "status" => 1,
-            "role_id" => 1,
-            "company" => "abc.co",
-            "address" => "sweden",
-            "created_at" => now(),
-            "updated_at" => now()
-        ]);
+        $default_users = [
+            [
+                "first_name" => "Admin",
+                "last_name" => "Example",
+                "email" => "admin@example.com",
+            ], [
+                "first_name" => "Vivek",
+                "last_name" => "Ghimire",
+                "email" => "vivek@admin.com",
+            ], [
+                "first_name" => "Dinesh",
+                "last_name" => "Ghimire",
+                "address" => "Nepal",
+                "email" => "dinesh@hbgdesignlab.se",
+            ], [
+                "first_name" => "Oskar",
+                "last_name" => "Jönsson",
+                "email" => "oskarj@admin.com",
+            ], [
+                "first_name" => "Oskar",
+                "last_name" => "Hertzman",
+                "email" => "oskarh@admin.com",
+            ], [
+                "first_name" => "Pierre",
+                "last_name" => "Gronberg",
+                "company" => "hdl",
+                "email" => "pierre@hbgdesignlab.se",
+            ]
+        ];
+
+        $data = array_map(function($user) {
+            return [
+                "first_name" => $user["first_name"] ?? "Admin",
+                "last_name" => $user["last_name"] ?? "example",
+                "email" => $user["email"] ?? "admin@example.com",
+                "password" => bcrypt("admin123"),
+                "api_token" => Str::random(80),
+                "status" => 1,
+                "role_id" => 1,
+                "company" => $user["company"] ?? "abc.co",
+                "address" => $user["address"] ?? "sweden",
+                "created_at" => now(),
+                "updated_at" => now()
+            ];
+        }, $default_users);
+
+        DB::table("admins")->insert($data);
     }
 }

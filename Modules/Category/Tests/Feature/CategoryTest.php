@@ -20,11 +20,12 @@ class CategoryTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Category";
-        $this->route_prefix = "admin.catalog.categories.categories";
+        $this->route_prefix = "admin.catalog.categories";
 
         $this->model::factory(10)->create();
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->root_category_id = $this->model::oldest('id')->first()->id;
+        $this->hasStatusTest = true;
     }
 
     public function getCreateData(): array
@@ -62,7 +63,7 @@ class CategoryTest extends BaseTestCase
     {
         return array_merge($this->getUpdateData(),[
             "image" => null
-        ]);   
+        ]);
     }
 
     public function basicAdminHeader()
