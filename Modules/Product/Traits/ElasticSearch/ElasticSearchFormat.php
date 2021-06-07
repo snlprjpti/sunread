@@ -15,11 +15,14 @@ trait ElasticSearchFormat
         'store' => []
     ];
 
-    protected $categoryData, $attributeData, $globalAttributes, $channelAttributes, $storeAttributes;
+    protected $categoryData, $attributeData, $globalAttributes, $channelAttributes, $storeAttributes, $mainChannels, $mainStores;
 
 
     public function documentDataStructure(): array
     {
+        $this->getChannels();
+        $this->getStores();
+
         $array = $this->toArray();
         
         $array['categories'] = $this->getScopeWiseCategory();
@@ -31,26 +34,30 @@ trait ElasticSearchFormat
         return $array;
     }
 
-    public function getChannelWiseStoreID()
+    public function getChannels(): void
     {
-        $stores = [];   
-        foreach($this->channels as $channel) foreach($channel->stores as $store) array_push($stores, $store->id);
-        return array_unique($stores);
+        $this->mainChannels = Channel::pluck('id')->toArray();
     }
 
-    public function getChannelID($store_id)
+    public function getStores(): void
+    {
+        $this->mainStores = Store::pluck('id')->toArray();
+    }
+
+    public function getChannelID($store_id): int
     {
         foreach($this->channels as $channel) if(in_array($store_id, $channel->stores->pluck('id')->toArray())) return $channel->id;
+        return 0;
     }
 
-    public function getScopeWiseCategory()
+    public function getScopeWiseCategory(): array
     {
         $data = [];
         
         foreach($this->categories as $category)
         {
             $data['global'][] = $category->toArray();
-            foreach($this->getChannelWiseStoreID() as $store_id) $data['store'][$store_id][] = $category->firstTranslation($store_id);
+            foreach($this->mainStores as $store_id) $data['store'][$store_id][] = $category->firstTranslation($store_id);
         }
 
         return $data;
