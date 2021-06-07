@@ -3,16 +3,12 @@
 namespace Modules\Page\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\HasFactory;
 
 class PageAvailabilty extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
-    
-    protected static function newFactory()
-    {
-        return \Modules\Page\Database\factories\PageAvailabiltyFactory::new();
-    }
+    protected $fillable = ["page_id","model_type","model_id","status"];
+
 }

@@ -3,16 +3,14 @@
 namespace Modules\Page\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\HasFactory;
+use Modules\Core\Traits\Sluggable;
+
 
 class Page extends Model
 {
-    use HasFactory;
+    use HasFactory, Sluggable;
 
-    protected $fillable = [];
-    
-    protected static function newFactory()
-    {
-        return \Modules\Page\Database\factories\PageFactory::new();
-    }
+    protected $fillable = ["parent_id", "slug", "title", "description","position","status", "meta_title", "meta_description", "meta_keywords" ];
+
 }

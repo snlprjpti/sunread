@@ -3,16 +3,13 @@
 namespace Modules\Page\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\HasFactory;
 
 class PageTranslation extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
-    
-    protected static function newFactory()
-    {
-        return \Modules\Page\Database\factories\PageTranslationFactory::new();
-    }
+    protected $fillable = ["store_id", "page_id", "title","description", "meta_title", "meta_description", "meta_keywords" ];
+
+
 }
