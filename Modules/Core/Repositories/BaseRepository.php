@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class BaseRepository
 {
     protected $model, $model_key, $rules, $relationships;
+    protected int $pagination_limit = 25;
 
     public function model(): Model
     {
