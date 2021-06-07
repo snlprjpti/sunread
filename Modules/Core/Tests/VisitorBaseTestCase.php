@@ -13,7 +13,7 @@ class VisitorBaseTestCase extends TestCase
 	public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route; 
 
 	public function setUp(): void
-	{
+    {
         parent::setUp();
         Schema::disableForeignKeyConstraints();
         $this->artisan("db:seed", ["--force" => true]);
@@ -22,15 +22,15 @@ class VisitorBaseTestCase extends TestCase
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->fake_resource_id = 0;
         $this->filter = [
-            "sort_by" => "id",
-            "sort_order" => "asc"
+        "sort_by" => "id",
+        "sort_order" => "asc"
         ];
 
-		$this->createFactories = true;
+        $this->createFactories = true;
         $this->hasFilters = true;
         $this->hasIndexTest = true;
         $this->hasShowTest = true;  
-	}
+    }
 
 	/*
 	 * Factory methods 
@@ -55,14 +55,14 @@ class VisitorBaseTestCase extends TestCase
 	{
         if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
-		
-		$response = $this->get($this->getRoute("index"));
-		
-		$response->assertOk();
-		$response->assertJsonFragment([
-			"status" => "success",
-			"message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
-		]);
+
+        $response = $this->get($this->getRoute("index"));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
 	}
 
 	public function testAdminCanFetchFilteredResources()

@@ -33,14 +33,13 @@ class ChannelTest extends VisitorBaseTestCase
 
     public function testVisitorCanFetchChannelStoresResource()
     {
-		$response = $this->getCreateData();
+        $response = $this->getCreateData();
+        $response = $this->get(route($this->route_prefix.".index", [$this->default_resource_id]));
 
-		$response = $this->get(route($this->route_prefix.".index", [$this->default_resource_id]));
-
-		$response->assertOk();
-		$response->assertJsonFragment([
-			"status" => "success",
-			"message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
-		]);
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
     }
 }
