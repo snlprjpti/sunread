@@ -26,7 +26,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->categoryFilterKeys = [ "category_id", "category_slug" ];
     }
 
-    public function search(object $request)
+    public function search(object $request): array
     {
         try
         {
@@ -46,13 +46,13 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $query;
     }
 
-    public function getMainSearch($request)
+    public function getMainSearch($request): void
     {
         array_push($this->allSearch, $this->queryString($this->mainSearchKeys, $request->search));
         foreach($this->mainSearchKeys as $key) array_push($this->allSearch, $this->match($key, $request->search));
     }
 
-    public function getNestedSearch($request)
+    public function getNestedSearch($request): void
     {
         $this->nestedSearchKeys = array_map(function($item){
             return "product_attributes.$this->scope.$item.value" ;
@@ -61,7 +61,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         foreach($this->nestedSearchKeys as $key) array_push($this->nestedSearch, $this->match($key, $request->search));
 
-        if(count($this->nestedSearch)>0) array_push($this->allSearch,
+        if(count($this->nestedSearch) > 0) array_push($this->allSearch,
         [
             "nested" => [
               "path" => "product_attributes.$this->path",
@@ -71,7 +71,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         ]);
     }
 
-    public function filter(object $request)
+    public function filter(object $request): array
     {
         try
         {
@@ -93,16 +93,16 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $query;
     }
 
-    public function getMainFilter($request)
+    public function getMainFilter($request): void
     {
         foreach($this->mainFilterKeys as $key) if(isset($request->$key)) array_push($this->allFilter, $this->term($key, $request->$key));
     }
 
-    public function getNestedFilter($request)
+    public function getNestedFilter($request): void
     {
         foreach($this->nestedFilterKeys as $key) if(isset($request->$key)) array_push($this->nestedFilter, $this->term("product_attributes.$this->scope.$key.value", $request->$key));
 
-        if(count($this->nestedFilter)>0) array_push($this->allFilter, [
+        if(count($this->nestedFilter) > 0) array_push($this->allFilter, [
             "nested" => [
               "path" => "product_attributes.$this->path",
               "score_mode" => "avg",
@@ -111,19 +111,19 @@ class ProductSearchRepository extends ElasticSearchRepository
         ]);
     }
 
-    public function getCategoryFilter($request)
+    public function getCategoryFilter($request): void
     {
         foreach($this->categoryFilterKeys as $key) if(isset($request->$key)) array_push($this->allFilter, $this->term("categories.$this->storeORGlobal.".substr($key,9), $request->$key));
     }
 
-    public function getProduct($request)
+    public function getProduct($request): array
     {
         $this->scope = $this->getScope($request);
         $this->path = $this->getPath($request);
         $this->storeORGlobal = $this->getStore($request);
         $data =[];
 
-        if(count($request->all())>0)
+        if(count($request->all()) > 0)
         {
             array_push($data, $this->search($request));
             array_push($data, $this->filter($request));
@@ -135,7 +135,7 @@ class ProductSearchRepository extends ElasticSearchRepository
          $fetched = $this->model->searchRaw([
             "size"=> 500,
             "_source" => $source,
-            "query"=> (count($data)>0) ? $this->whereQuery($data) : [
+            "query"=> (count($data) > 0) ? $this->whereQuery($data) : [
                 "match_all"=> (object)[]
             ],
             "sort" => [

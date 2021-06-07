@@ -6,24 +6,24 @@ class ElasticSearchRepository
 {
     protected $scope, $path, $storeORGlobal;
 
-    public function getScope($request)
+    public function getScope($request): string
     {
         return isset($request->store_id) ? "store.$request->store_id" : 
         (isset($request->channel_id) ? "channel.$request->channel_id" : "global"); 
     }
 
-    public function getPath($request)
+    public function getPath($request): string
     {
         return isset($request->store_id) ? "store" : 
         (isset($request->channel_id) ? "channel" : "global"); 
     }
 
-    public function getStore($request)
+    public function getStore($request): string
     {
         return isset($request->store_id) ? "store.$request->store_id" : "global"; 
     }
 
-    public function orwhereQuery(array $filter)
+    public function orwhereQuery(array $filter): array
     {
         return [
             "bool"=> [
@@ -32,7 +32,7 @@ class ElasticSearchRepository
         ]; 
     }
 
-    public function whereQuery(array $filter)
+    public function whereQuery(array $filter): array
     {
         return [
             "bool"=> [
@@ -41,7 +41,7 @@ class ElasticSearchRepository
         ]; 
     }
 
-    public function queryString(array $field, string $data)
+    public function queryString(array $field, string $data): array
     {
         return [
             "query_string" => [
@@ -51,7 +51,7 @@ class ElasticSearchRepository
         ];
     }
 
-    public function match(string $field, string $data)
+    public function match(string $field, string $data): array
     {
         return [
             "match" => [
@@ -60,7 +60,7 @@ class ElasticSearchRepository
         ];
     }
 
-    public function term(string $field, string $data)
+    public function term(string $field, string $data): array
     {
         return [
             "term" => [
@@ -69,7 +69,7 @@ class ElasticSearchRepository
         ];
     }
 
-    public function range(string $field, $value1, $value2)
+    public function range(string $field, $value1, $value2): array
     {
         return [
             "range"=> [

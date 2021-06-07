@@ -39,7 +39,7 @@ class ProductSearchController extends BaseController
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
-    public function reIndex($id)
+    public function reIndex($id): JsonResponse
     {
         try
         {
@@ -53,7 +53,7 @@ class ProductSearchController extends BaseController
         return $this->successResponseWithMessage("Product reindex successfully", 204);
     }
 
-    public function bulkReIndex(Request $request)
+    public function bulkReIndex(Request $request): JsonResponse
     {
         try
         {
