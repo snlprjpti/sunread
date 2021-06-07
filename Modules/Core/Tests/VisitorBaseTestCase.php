@@ -53,7 +53,7 @@ class VisitorBaseTestCase extends TestCase
 
 	public function testVisitorCanFetchResource()
 	{
-		if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
+        if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
 		
 		$response = $this->get($this->getRoute("index"));
