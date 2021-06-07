@@ -13,6 +13,7 @@ Route::group(["middleware" => ["api"]], function() {
         // Catalog Product Routes
         Route::put("/products/{product_id}/update-status", [\Modules\Product\Http\Controllers\ProductController::class, "updateStatus"])->name("products.status");
         Route::resource("products", ProductController::class)->except(["create", "edit"]);
+        Route::post('products/attributes', [\Modules\Product\Http\Controllers\ProductAttributeController::class, "store"]);
         // Product Images Routes
         Route::group(['prefix' => 'product', 'as' => 'products.'], function() {
             Route::put('image/{id}/change-main-image', [\Modules\Product\Http\Controllers\ProductImageController::class,"changeMainImage"])->name("image.change_main_image");
