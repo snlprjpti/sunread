@@ -6,14 +6,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PageAvailabiltyResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
-        return parent::toArray($request);
+        return [
+            "id" => $this->id,
+            "page" => new PageResource($this->whenLoaded("page")),
+            "model_type" => $this->model_type,
+            "model_id" => $this->model_id,
+            "status" => $this->status
+        ];
     }
 }

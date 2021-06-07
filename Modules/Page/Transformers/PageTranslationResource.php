@@ -3,17 +3,22 @@
 namespace Modules\Page\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Transformers\StoreResource;
 
 class PageTranslationResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
-        return parent::toArray($request);
+        return [
+            "id" => $this->id,
+            "title" => $this->title,
+            "description" => $this->description,
+            "page" => new PageResource($this->whenLoaded("page")),
+            "store" => new StoreResource($this->whenLoaded("store")),
+            "meta_title" => $this->meta_title,
+            "meta_description" => $this->meta_description,
+            "meta_keywords" => $this->meta_keywords,
+            "created_at" => $this->created_at->format('M d, Y H:i A')
+        ];
     }
 }

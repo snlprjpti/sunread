@@ -4,6 +4,8 @@ namespace Modules\Page\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Page\Entities\Page;
+use Modules\Page\Observers\PageObserver;
 
 class PageServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,7 @@ class PageServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObserver();
     }
 
     /**
@@ -52,6 +55,9 @@ class PageServiceProvider extends ServiceProvider
         ], 'config');
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
+        );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/model_list.php'), 'model_list'
         );
     }
 
@@ -108,5 +114,14 @@ class PageServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+    /**
+     * Register observers.
+     *
+     * @return void
+     */
+    public function registerObserver()
+    {
+        Page::observe(PageObserver::class);
     }
 }

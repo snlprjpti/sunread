@@ -6,28 +6,26 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Storage;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
 use Modules\Page\Entities\PageTranslation;
 use Modules\Page\Repositories\PageRepository;
+use Modules\Page\Repositories\PageTranslationRepository;
 use Modules\Page\Transformers\PageResource;
 use Exception;
 
 class PageController extends BaseController
 {
     protected $repository, $translation;
-    /**
-     * @var PageTranslation
-     */
-    private $pageTranslation;
 
-    public function __construct(Page $page, PageRepository $pageRepository, PageTranslation $pageTranslation)
+    private $pageTranslationRepository;
+
+    public function __construct(Page $page, PageRepository $pageRepository, PageTranslationRepository $pageTranslationRepository)
     {
         $this->model = $page;
         $this->model_name = "Page";
         $this->repository = $pageRepository;
-        $this->translation = $pageTranslation;
+        $this->pageTranslationRepository = $pageTranslationRepository;
         parent::__construct($this->model, $this->model_name);
     }
     public function collection(object $data): ResourceCollection
@@ -60,12 +58,9 @@ class PageController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
+            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->title);
             $created = $this->repository->create($data, function($created) use($request){
-                $this->translation->updateOrCreate([
-                    "store_id" => $request->translation["store_id"],
-                    "page_id" => $created->id
-                ], $request->translation);
+                $this->pageTranslationRepository->updateOrCreate($request->translation, $created);
             });
         }
         catch (Exception $exception)
@@ -97,12 +92,10 @@ class PageController extends BaseController
             $data = $this->repository->validateData($request,[
                 "slug" => "nullable|unique:pages,slug,{$id}",
             ]);
+            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->title);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request){
-                $this->translation->updateOrCreate([
-                    "store_id" => $request->translation["store_id"],
-                    "page_id" => $updated->id
-                ], $request->translation);
+                $this->pageTranslationRepository->updateOrCreate($request->translations, $updated);
             });
             $updated->translations = $updated->translations()->get();
         }

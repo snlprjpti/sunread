@@ -14,7 +14,7 @@ class PageRepository extends BaseRepository
         $this->rules = [
             // page validation
             "parent_id" => "sometimes|numeric|exists:pages,id",
-            "slug" => "nullable|unique:categories,slug",
+            "slug" => "nullable|unique:pages,slug",
             "title" => "required",
             "description" => "required",
             "position" => "sometimes|numeric",
