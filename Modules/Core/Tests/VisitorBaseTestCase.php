@@ -14,12 +14,12 @@ class VisitorBaseTestCase extends TestCase
 
 	public function setUp(): void
 	{
-		parent::setUp();
-		Schema::disableForeignKeyConstraints();
-		$this->artisan("db:seed", ["--force" => true]);
+        parent::setUp();
+        Schema::disableForeignKeyConstraints();
+        $this->artisan("db:seed", ["--force" => true]);
 
-		$this->factory_count = 2;
-		$this->default_resource_id = $this->model::latest('id')->first()->id;
+        $this->factory_count = 2;
+        $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->fake_resource_id = 0;
         $this->filter = [
             "sort_by" => "id",
