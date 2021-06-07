@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +11,11 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/page', function (Request $request) {
-    return $request->user();
+
+Route::group(['middleware' => ['api']], function () {
+    //ADMIN CATEGORY ROUTES
+    Route::group(['prefix'=>'admin', 'as' => 'admin.', 'middleware' => ['admin', 'language']], function () {
+        Route::put("/pages/{page_id}/update-status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("pages.status");
+        Route::resource('pages', PageController::class)->except(['create', 'edit']);
+    });
 });
