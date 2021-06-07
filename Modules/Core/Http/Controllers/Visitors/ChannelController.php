@@ -23,7 +23,7 @@ class ChannelController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function collection(object $data)
+    public function storeCollection(object $data)
     {
         return StoreResource::collection($data);
     }
@@ -32,13 +32,13 @@ class ChannelController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with("stores")->findOrFail($id);
+            $fetched = $this->model->with(["stores"])->findOrFail($id);
         }
         catch ( Exception $exception ) 
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched->stores), $this->lang("fetch-list-success"));
+        return $this->successResponse($this->storeCollection($fetched->stores), $this->lang("fetch-list-success"));
     }
 }
