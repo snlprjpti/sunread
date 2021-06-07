@@ -8,11 +8,11 @@ use Tests\TestCase;
 
 class VisitorBaseTestCase extends TestCase
 {
-	use RefreshDatabase;
+    use RefreshDatabase;
 
-	public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route; 
+    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route; 
 
-	public function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         Schema::disableForeignKeyConstraints();
@@ -22,8 +22,8 @@ class VisitorBaseTestCase extends TestCase
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->fake_resource_id = 0;
         $this->filter = [
-        "sort_by" => "id",
-        "sort_order" => "asc"
+            "sort_by" => "id",
+            "sort_order" => "asc"
         ];
 
         $this->createFactories = true;
@@ -32,27 +32,27 @@ class VisitorBaseTestCase extends TestCase
         $this->hasShowTest = true;  
     }
 
-	/*
-	 * Factory methods 
-	*/
-	public function getCreateData(): array { return $this->model::factory()->make()->toArray(); }
+    /*
+     * Factory methods 
+    */
+    public function getCreateData(): array { return $this->model::factory()->make()->toArray(); }
 
-	public function getRoute(string $method, ?array $parameters = null): string
+    public function getRoute(string $method, ?array $parameters = null): string
     {
         $parameters = $this->append_to_route ? array_merge([$this->append_to_route], $parameters ?? []) : $parameters;
         return route("{$this->route_prefix}.{$method}", $parameters);
     }
 
-	/*
-	 * GET tests
-	 * 1. Assert if resource list can be fetched
-	 * 2. Assert if resource list can be fetched with filter
-	 * 3. Assert if individual resouce can be fetched
-	 * 4. Assert if application returns correct error for invalid resource id
-	*/
+    /*
+     * GET tests
+     * 1. Assert if resource list can be fetched
+     * 2. Assert if resource list can be fetched with filter
+     * 3. Assert if individual resouce can be fetched
+     * 4. Assert if application returns correct error for invalid resource id
+    */
 
-	public function testVisitorCanFetchResource()
-	{
+    public function testVisitorCanFetchResource()
+    {
         if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
 
@@ -63,9 +63,9 @@ class VisitorBaseTestCase extends TestCase
             "status" => "success",
             "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
         ]);
-	}
+    }
 
-	public function testAdminCanFetchFilteredResources()
+    public function testAdminCanFetchFilteredResources()
     {
         if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
         if ( !$this->hasFilters ) $this->markTestSkipped("Filters not available.");
