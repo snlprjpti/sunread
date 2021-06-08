@@ -8,8 +8,8 @@ return [
 	"number" => "integer",
 	"select" => null,
 	"multiselect" => null,
-	"datetime" => "timestamp",
-	"date" => "timestamp",
+	"datetime" => "date",
+	"date" => "date",
 	"image" => "image",
 	"file" => "file",
 	"checkbox" => null
