@@ -15,6 +15,7 @@ class ProductAttributeFactory extends Factory
     public function definition(): array
     {
         $attribute_types = config("attribute_types");
+        unset($attribute_types["image"], $attribute_types["file"]);
         $attribute_type = array_rand($attribute_types);
         $attribute_model = $attribute_types[$attribute_type];
 
