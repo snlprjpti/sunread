@@ -13,7 +13,7 @@
 
 
 Route::group(['middleware' => ['api']], function () {
-    //ADMIN CATEGORY ROUTES
+    //ADMIN PAGES ROUTES
     Route::group(['prefix'=>'admin', 'as' => 'admin.', 'middleware' => ['admin', 'language']], function () {
         Route::group(['prefix' => 'pages', 'as' => 'pages.'], function () {
             Route::post("/{page_id}/allow-page", [\Modules\Page\Http\Controllers\PageAvailabilityController::class, "allowPage"])->name('allow_page');

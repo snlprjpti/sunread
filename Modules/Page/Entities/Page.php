@@ -18,7 +18,7 @@ class Page extends Model
 
     public function translations(): HasMany
     {
-        return $this->hasMany(PageTranslation::class, 'page_id');
+        return $this->hasMany(PageTranslation::class);
     }
 
     public function parent(): BelongsTo

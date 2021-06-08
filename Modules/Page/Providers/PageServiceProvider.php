@@ -5,6 +5,8 @@ namespace Modules\Page\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Page\Entities\Page;
+use Modules\Page\Entities\PageAvailability;
+use Modules\Page\Observers\PageAvailabilityObserver;
 use Modules\Page\Observers\PageObserver;
 
 class PageServiceProvider extends ServiceProvider
@@ -123,5 +125,6 @@ class PageServiceProvider extends ServiceProvider
     public function registerObserver()
     {
         Page::observe(PageObserver::class);
+        PageAvailability::observe(PageAvailabilityObserver::class);
     }
 }

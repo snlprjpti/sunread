@@ -28,7 +28,7 @@ class PageRepository extends BaseRepository
             "translation.meta_title" => "sometimes|nullable",
             "translation.meta_description" => "sometimes|nullable",
             "translation.meta_keywords" => "sometimes|nullable",
-            "translation.store_id" => "required|exists:stores,id"
+            "translation.store_id" => "sometimes|exists:stores,id"
         ];
     }
 }

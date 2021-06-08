@@ -8,22 +8,23 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
-use Modules\Page\Entities\PageAvailabilty;
-use Modules\Page\Repositories\PageAvailabiltyRepository;
+use Modules\Page\Entities\PageAvailability;
+use Modules\Page\Exceptions\AlreadyCreatedException;
+use Modules\Page\Repositories\PageAvailabilityRepository;
 use Exception;
-use Modules\Page\Transformers\PageAvailabiltyResource;
+use Modules\Page\Transformers\PageAvailabilityResource;
 
 class PageAvailabilityController extends BaseController
 {
     private $page;
     private $repository;
 
-    protected function __construct(PageAvailabilty $pageAvailabilty, PageAvailabiltyRepository $pageAvailabiltyRepository, Page $page)
+    public function __construct(PageAvailability $pageAvailability, PageAvailabilityRepository $pageAvailabilityRepository, Page $page)
     {
-        $this->model = $pageAvailabilty;
+        $this->model = $pageAvailability;
         $this->model_name = "Page Availability";
         $this->page = $page;
-        $this->repository = $pageAvailabiltyRepository;
+        $this->repository = $pageAvailabilityRepository;
 
         $exception_statuses = [
             AlreadyCreatedException::class => 400
@@ -35,12 +36,12 @@ class PageAvailabilityController extends BaseController
 
     public function collection(object $data): ResourceCollection
     {
-        return PageAvailabiltyResource::collection($data);
+        return PageAvailabilityResource::collection($data);
     }
 
     public function resource(object $data): JsonResource
     {
-        return new PageAvailabiltyResource($data);
+        return new PageAvailabilityResource($data);
     }
 
     public function allowPage(Request $request, int $page_id): JsonResponse
@@ -48,9 +49,9 @@ class PageAvailabilityController extends BaseController
         try
         {
             // Get requested page with Status 1
-            $coupon = $this->page->whereId($page_id)->whereStatus(1)->firstOrFail();
+            $page = $this->page->whereId($page_id)->whereStatus(1)->firstOrFail();
 
-            $data = $this->repository->getBulkData($request, $coupon);
+            $data = $this->repository->getBulkData($request, $page);
             $this->repository->insertBulkData($data);
         }
         catch( Exception $exception )
@@ -66,7 +67,7 @@ class PageAvailabilityController extends BaseController
         {
             $request->validate([
                 'ids' => 'array|required',
-                'ids.*' => 'required|exists:allow_coupons,id',
+                'ids.*' => 'required|exists:page_availabilities,id',
             ]);
 
             $deleted = $this->model->whereIn('id', $request->ids);
@@ -79,4 +80,19 @@ class PageAvailabilityController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
+
+    public function modelList(): JsonResponse
+    {
+        try
+        {
+            $fetched = config('model_list.model_types');
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang("fetch-success",["name"=>"Model List"]));
+    }
+
 }

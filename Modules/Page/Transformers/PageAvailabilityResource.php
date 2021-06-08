@@ -4,7 +4,7 @@ namespace Modules\Page\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PageAvailabiltyResource extends JsonResource
+class PageAvailabilityResource extends JsonResource
 {
     public function toArray($request): array
     {
