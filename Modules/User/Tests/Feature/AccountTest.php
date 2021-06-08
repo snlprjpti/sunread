@@ -94,11 +94,7 @@ class AccountTest extends TestCase
 
     public function testAdminCanUpdateAccountDetails()
     {
-        $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "current_password" => "password",
-            "password" => "new_password",
-            "password_confirmation" => "new_password"
-        ]);
+        $post_data = array_merge($this->model::factory()->make()->toArray());
 
         $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update"), $post_data);
 
@@ -109,20 +105,36 @@ class AccountTest extends TestCase
         ]);
     }
 
+    public function testAdminCanUpdateAccountPassword()
+    {
+        $post_data = [
+            "current_password" => "password",
+            "password" => "new_password",
+            "password_confirmation" => "new_password"
+        ];
+
+        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.password"), $post_data);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
+        ]);
+    }
+
     public function testAdminShouldNotBeAbleToUpdateAccountDetailsWithInvalidPassword()
     {
-        $post_data = array_merge($this->model::factory()->make()->toArray(), [
+        $post_data = [
             "current_password" => "invalid_password",
             "password" => "new_password",
             "password_confirmation" => "new_password"
-        ]);
+        ];
 
-        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update"), $post_data);
+        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.password"), $post_data);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonFragment([
-            "status" => "error",
-            "message" => __("core::app.users.users.incorrect-password")
+            "status" => "error"
         ]);
     }
 

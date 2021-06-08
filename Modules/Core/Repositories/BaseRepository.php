@@ -98,7 +98,7 @@ class BaseRepository
         {
             $rows = $this->model;
             if ($callback) $rows = $callback();
-            if ($with !== []) $rows->with($with);
+            if ($with !== []) $rows = $rows->with($with);
 
             $fetched = $rows->findOrFail($id);
         }

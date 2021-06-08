@@ -8,6 +8,7 @@ use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Modules\User\Transformers\AdminResource;
+use Illuminate\Validation\ValidationException;
 use Modules\User\Repositories\AdminRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
@@ -60,22 +61,32 @@ class AccountController extends BaseController
         {
             $updated = auth()->guard('admin')->user();
             $merge = ["email" => "required|email|unique:admins,email,{$updated->id}"];
-            if ( $request->has("current_password") ) {
-                $current_password_validation = $request->has("password") ? "required" : "sometimes";
-                $merge["current_password"] = "$current_password_validation|min:6|max:200";
-            }
-
             $data = $this->repository->validateData($request, $merge);
+            if ( $request->has("password") ) unset($data["password"]);
 
-            if ( $request->has("current_password") ) {
-                if (!Hash::check($request->current_password, auth()->guard('admin')->user()->password)) {
-                    throw new InvalidCredentialException(__("core::app.users.users.incorrect-password"));
-                }
+            $updated = $this->repository->update($data, $updated->id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
 
-                $data["password"] = Hash::make($request->password);
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+    }
+
+    public function password(Request $request): JsonResponse
+    {
+        try
+        {
+            $updated = auth()->guard('admin')->user();
+            $data = $this->repository->validatePassword($request);
+            $data["password"] = Hash::make($request->password);
+            unset($data["current_password"]);
+
+            if (!Hash::check($request->current_password, $updated->password)) {
+                throw ValidationException::withMessages([ "current_password" => __("core::app.users.users.incorrect-password") ]);
             }
 
-            unset($data["current_password"]);
             $updated = $this->repository->update($data, $updated->id);
         }
         catch( Exception $exception )
