@@ -33,10 +33,10 @@ trait HasTranslation
         ->where('store_id', $storeID)->first();
         return $relation; 
     }
-
-	public function getStoreId(): int
-	{
-		return array_key_exists("store_id", getallheaders()) ? (int) getallheaders()["store_id"] : 0;
+    
+    public function getStoreId(): int
+    {
+        return array_key_exists("store_id", getallheaders()) ? (int) getallheaders()["store_id"] : 0;
 	}
 
     public function firstTranslation($store_id)

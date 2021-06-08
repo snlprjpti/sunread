@@ -70,9 +70,9 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class)->orderBy("main_image", "desc")->orderBy("position");
     }
-
+    
     public function toSearchableArray()
     {
-      return $this->documentDataStructure();
+        return $this->documentDataStructure();
     }
 }

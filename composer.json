@@ -13,7 +13,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "intervention/image": "^2.5",
         "kalnoy/nestedset": "^5.0",
-        "laravel/framework": "^8.12",
+        "laravel/framework": "8.41.0",
         "laravel/tinker": "^2.5",
         "nwidart/laravel-modules": "^8.0",
         "tymon/jwt-auth": "^1.0"

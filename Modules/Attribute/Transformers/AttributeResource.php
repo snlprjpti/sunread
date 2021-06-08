@@ -13,7 +13,7 @@ class AttributeResource extends JsonResource
             "slug" => $this->slug,
             "name" => $this->name,
             "type" => $this->type,
-            "attribute_group" => new AttributeGroupResource($this->attribute_group),
+            "attribute_group" => new AttributeGroupResource($this->whenLoaded("attribute_group")),
             "validation" => $this->validation,
             "position" => $this->position,
             "is_required" => $this->is_required,
