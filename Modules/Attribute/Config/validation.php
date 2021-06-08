@@ -6,7 +6,7 @@ return [
 	"price" => "decimal",
 	"boolean" => "boolean",
 	"number" => "integer",
-	"select" => null,
+	"select" => "string",
 	"multiselect" => null,
 	"datetime" => "date",
 	"date" => "date",
