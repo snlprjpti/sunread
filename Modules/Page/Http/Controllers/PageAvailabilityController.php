@@ -25,7 +25,7 @@ class PageAvailabilityController extends BaseController
         $this->page = $page;
         $this->repository = $pageAvailabilityRepository;
         $exception_statuses = [
-            AlreadyCreatedException::class => 400
+            AlreadyCreatedException::class => 409
         ];
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);

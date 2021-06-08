@@ -12,7 +12,7 @@ class PageAvailabilityFactory extends Factory
 
     public function definition(): array
     {
-        $model_type = Arr::random(["Modules\Core\Entities\Channel", "Modules\Core\Entities\Store"]);
+        $model_type = Arr::random(config('model_list.model_types'));
         return [
             "page_id" => Page::latest()->first()->id,
             "model_type" => $model_type,
