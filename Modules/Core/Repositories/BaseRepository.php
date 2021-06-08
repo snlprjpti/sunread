@@ -34,7 +34,7 @@ class BaseRepository
                 "page.numeric" => "Page must be a number.",
                 "sort_order.in" => "Order must be 'asc' or 'desc'.",
                 "q.string" => "Search query must be string.",
-                "q.min" => "Search query must be at least 1 character.",
+                "q.min" => "Search query must be at least 1 character."
             ];
 
             $data = $request->validate($rules, $messages);
