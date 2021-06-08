@@ -6,16 +6,17 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "ext-intl": "*",
+        "babenkoivan/scout-elasticsearch-driver": "^4.3",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/framework": "8.41.0",
-        "laravel/tinker": "^2.5",
         "intervention/image": "^2.5",
         "kalnoy/nestedset": "^5.0",
+        "laravel/framework": "8.41.0",
+        "laravel/tinker": "^2.5",
         "nwidart/laravel-modules": "^8.0",
-        "tymon/jwt-auth": "^1.0",
-        "ext-intl": "*"
+        "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
