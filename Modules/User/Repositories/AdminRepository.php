@@ -115,4 +115,15 @@ class AdminRepository extends BaseRepository
 
         return $updated;
     }
+
+    public function validatePassword(object $request): array
+    {
+        $data = $request->validate([
+            "current_password" => "required",
+            "password" => "required|confirmed"
+        ]);
+
+        return $data;
+    }
+
 }
