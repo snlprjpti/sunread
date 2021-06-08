@@ -298,6 +298,7 @@ return [
             ]
         ],
         "product_attributes" =>  [
+            "dynamic" => false, 
             "type" => "nested",
             "properties" =>  [
                 "global" =>  [
@@ -397,192 +398,13 @@ return [
                 "channel" =>  [
                     "dynamic" =>  true,
                     "type" => "nested",
-                    "properties" => [
-                        "price"=> [
-                            "properties"=> [
-                                "attribute_group"=> [
-                                    "properties"=> [
-                                        "attribute_family"=> [
-                                            "properties"=> [
-                                                "id"=> [
-                                                    "type"=>  "long"
-                                                ],
-                                                "name"=> [
-                                                    "type"=>  "text",
-                                                    "fields"=> [
-                                                        "keyword"=> [
-                                                            "type"=>  "keyword",
-                                                            "ignore_above"=>  256
-                                                        ]
-                                                    ]
-                                                ],
-                                                "slug"=> [
-                                                    "type"=>  "text",
-                                                    "fields"=> [
-                                                        "keyword"=> [
-                                                            "type"=>  "keyword",
-                                                            "ignore_above"=>  256
-                                                        ]
-                                                    ]
-                                                ]
-                                            ]
-                                        ],
-                                        "id"=> [
-                                            "type"=>  "long"
-                                        ],
-                                        "name"=> [
-                                            "type"=>  "text",
-                                            "fields"=> [
-                                                "keyword"=> [
-                                                    "type"=>  "keyword",
-                                                    "ignore_above"=>  256
-                                                ]
-                                            ]
-                                        ],
-                                        "slug"=> [
-                                            "type"=>  "text",
-                                            "fields"=> [
-                                                "keyword"=> [
-                                                    "type"=>  "keyword",
-                                                    "ignore_above"=>  256
-                                                ]
-                                            ]
-                                        ]
-                                    ]
-                                ],
-                                "id"=> [
-                                    "type"=>  "long"
-                                ],
-                                "name"=> [
-                                    "type"=>  "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=>  "keyword",
-                                            "ignore_above"=>  256
-                                        ]
-                                    ]
-                                ],
-                                "slug"=> [
-                                    "type"=>  "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=>  "keyword",
-                                            "ignore_above"=>  256
-                                        ]
-                                    ]
-                                ],
-                                "type"=> [
-                                    "type"=>  "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=>  "keyword",
-                                            "ignore_above"=>  256
-                                        ]
-                                    ]
-                                ],
-                                "value"=> [
-                                    "type"=>  "long"
-                                ]
-                            ]
-                        ],
-                                       
-                    ]
                 ],
                 "store" =>  [
                     "dynamic" =>  true,
                     "type" => "nested",
-                    "properties" => [
-                        "price"=> [
-                            "properties"=> [
-                                "attribute_group"=> [
-                                    "properties"=> [
-                                        "attribute_family"=> [
-                                            "properties"=> [
-                                                "id"=> [
-                                                    "type"=>  "long"
-                                                ],
-                                                "name"=> [
-                                                    "type"=>  "text",
-                                                    "fields"=> [
-                                                        "keyword"=> [
-                                                            "type"=>  "keyword",
-                                                            "ignore_above"=>  256
-                                                        ]
-                                                    ]
-                                                ],
-                                                "slug"=> [
-                                                    "type"=>  "text",
-                                                    "fields"=> [
-                                                        "keyword"=> [
-                                                            "type"=>  "keyword",
-                                                            "ignore_above"=>  256
-                                                        ]
-                                                    ]
-                                                ]
-                                            ]
-                                        ],
-                                        "id"=> [
-                                            "type"=>  "long"
-                                        ],
-                                        "name"=> [
-                                            "type"=>  "text",
-                                            "fields"=> [
-                                                "keyword"=> [
-                                                    "type"=>  "keyword",
-                                                    "ignore_above"=>  256
-                                                ]
-                                            ]
-                                        ],
-                                        "slug"=> [
-                                            "type"=>  "text",
-                                            "fields"=> [
-                                                "keyword"=> [
-                                                    "type"=>  "keyword",
-                                                    "ignore_above"=>  256
-                                                ]
-                                            ]
-                                        ]
-                                    ]
-                                ],
-                                "id"=> [
-                                    "type"=>  "long"
-                                ],
-                                "name"=> [
-                                    "type"=>  "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=>  "keyword",
-                                            "ignore_above"=>  256
-                                        ]
-                                    ]
-                                ],
-                                "slug"=> [
-                                    "type"=>  "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=>  "keyword",
-                                            "ignore_above"=>  256
-                                        ]
-                                    ]
-                                ],
-                                "type"=> [
-                                    "type"=>  "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=>  "keyword",
-                                            "ignore_above"=>  256
-                                        ]
-                                    ]
-                                ],
-                                "value"=> [
-                                    "type"=>  "long"
-                                ]
-                            ]
-                        ],
-                                       
-                    ]
                 ]
-            ]
+            ],
+
         ],
         "status" =>  [
             "type" => "long"

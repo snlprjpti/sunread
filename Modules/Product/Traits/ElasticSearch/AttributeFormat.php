@@ -3,10 +3,6 @@
 namespace Modules\Product\Traits\ElasticSearch;
 
 use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeGroupTranslation;
-use Modules\Attribute\Entities\AttributeTranslation;
-use Modules\Category\Entities\CategoryTranslation;
-use Modules\Core\Entities\Channel;
 
 trait AttributeFormat
 {
@@ -49,14 +45,16 @@ trait AttributeFormat
     public function getGlobalWiseAttribute(): void
     {
         $this->getAttributeData($this->globalAttributes);
-        $this->attribute_array['global'][$this->globalAttributes->attribute->slug] = $this->attributeData;
+        $this->attribute_array['global'][] = $this->attributeData;
+        $this->option_attribute_array['global'][$this->globalAttributes->attribute->slug] = $this->attributeData;
     }
 
     public function getChannelWiseAttribute(): void
     {
         foreach($this->channelAttributes as $data){
             $this->getAttributeData($data);
-            $this->attribute_array['channel'][$data->channel_id][$data->attribute->slug] = $this->attributeData;
+            $this->attribute_array['channel'][$data->channel_id][] = $this->attributeData;
+            $this->option_attribute_array['channel'][$data->channel_id][$data->attribute->slug] = $this->attributeData;
         }
     }
 
@@ -64,7 +62,8 @@ trait AttributeFormat
     {
         foreach($this->storeAttributes as $data){
             $this->getAttributeData($data);
-            $this->attribute_array['store'][$data->store_id][$data->attribute->slug] = $this->attributeData; 
+            $this->attribute_array['store'][$data->store_id][] = $this->attributeData; 
+            $this->option_attribute_array['store'][$data->store_id][$data->attribute->slug] = $this->attributeData; 
         }
     }
 
@@ -86,16 +85,16 @@ trait AttributeFormat
 
     public function getOtherChannelsAttribute($attribute, $channel_diffs): void
     {
-        foreach($channel_diffs as $channel_id) $this->attribute_array['channel'] [$channel_id][$attribute->slug] = $this->attribute_array['global'][$attribute->slug] ?? [];
+        foreach($channel_diffs as $channel_id) $this->attribute_array['channel'] [$channel_id][] = $this->option_attribute_array['global'][$attribute->slug] ?? [];
     }
 
     public function getOtherStoresAttribute($attribute, $store_diffs): void
     {
         foreach($store_diffs as $store_id)
         {
-            $input = $this->attribute_array['channel'] [$this->getChannelID($store_id)] [$attribute->slug] ?? 
-            $this->attribute_array['global'][$attribute->slug] ?? [] ;
-            $this->attribute_array['store'] [$store_id][$attribute->slug] = $this->mergeAttributeData($input, $store_id, $attribute);
+            $input = $this->option_attribute_array['channel'] [$this->getChannelID($store_id)] [$attribute->slug] ?? 
+            $this->option_attribute_array['global'][$attribute->slug] ?? [] ;
+            $this->attribute_array['store'] [$store_id][] = $this->mergeAttributeData($input, $store_id, $attribute);
         }
     }
 }

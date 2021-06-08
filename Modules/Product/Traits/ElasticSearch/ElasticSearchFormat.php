@@ -15,6 +15,12 @@ trait ElasticSearchFormat
         'store' => []
     ];
 
+    protected $option_attribute_array = [
+        'global' => [],
+        'channel' => [],
+        'store' => []
+    ];
+
     protected $categoryData, $attributeData, $globalAttributes, $channelAttributes, $storeAttributes, $mainChannels, $mainStores;
 
 
