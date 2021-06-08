@@ -39,7 +39,7 @@ class Attribute extends Model
     public function generateValidation(): array
     {
         $validation = $this->is_required ? ["required"] : ["sometimes", "nullable"];
-        return array_merge($validation, [config("validation.$this->type")]);
+        return array_merge($validation, [config("validation.{$this->type}")]);
     }
 
     public function getValidationAttribute(): ?string

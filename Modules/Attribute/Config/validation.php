@@ -6,10 +6,10 @@ return [
 	"price" => "decimal",
 	"boolean" => "boolean",
 	"number" => "integer",
-	"select" => null,
+	"select" => "string",
 	"multiselect" => null,
-	"datetime" => "timestamp",
-	"date" => "timestamp",
+	"datetime" => "date",
+	"date" => "date",
 	"image" => "image",
 	"file" => "file",
 	"checkbox" => null
