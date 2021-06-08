@@ -40,6 +40,7 @@ Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], f
         Route::group(["prefix" => "account", "as" => "account."], function() {
             Route::get("/", [AccountController::class, "show"])->name("show");
             Route::put("/", [AccountController::class, "update"])->name("update");
+            Route::put("password", [AccountController::class, "password"])->name("password");
             Route::post("image", [AccountController::class, "uploadProfileImage"])->name("image.update");
             Route::delete("image", [AccountController::class, "deleteProfileImage"])->name("image.delete");
         });
