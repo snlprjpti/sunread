@@ -11,6 +11,7 @@ class ProductSearchRepository extends ElasticSearchRepository
     protected $model, $attributeToRetrieve; 
     protected $mainFilterKeys, $nestedFilterKeys, $categoryFilterKeys, $mainSearchKeys, $nestedSearchKeys;
     protected  $allFilter = [], $nestedFilter = [], $allSearch = [], $nestedSearch = [];
+    protected $nestedSearchQuery = [];
 
     public function __construct(Product $product)
     {
@@ -54,19 +55,19 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function getNestedSearch($request): void
     {
-        $this->nestedSearchKeys = array_map(function($item){
-            return "product_attributes.$this->scope.$item.value" ;
-        }, $this->nestedSearchKeys);
-        array_push($this->nestedSearch, $this->queryString($this->nestedSearchKeys, $request->search));
+        foreach($this->nestedSearchKeys as $key){
+            array_push($this->nestedSearch, $this->term("product_attributes.$this->scope.attribute.slug", $key));
+            array_push($this->nestedSearch, $this->match("product_attributes.$this->scope.value", $request->search));
+            array_push($this->nestedSearchQuery, $this->whereQuery($this->nestedSearch));
+            $this->nestedSearch = [];
+        } 
 
-        foreach($this->nestedSearchKeys as $key) array_push($this->nestedSearch, $this->match($key, $request->search));
-
-        if(count($this->nestedSearch) > 0) array_push($this->allSearch,
+        if(count($this->nestedSearchQuery) > 0) array_push($this->allSearch,
         [
             "nested" => [
               "path" => "product_attributes.$this->path",
               "score_mode" => "avg",
-              "query" => $this->orwhereQuery($this->nestedSearch)
+              "query" => $this->orwhereQuery($this->nestedSearchQuery)
             ]
         ]);
     }
