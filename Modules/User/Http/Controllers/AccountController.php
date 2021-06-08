@@ -45,21 +45,21 @@ class AccountController extends BaseController
     {
         try
         {
-            $fetched = auth()->guard('admin')->user();
+            $fetched = auth()->guard("admin")->user();
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
     public function update(Request $request): JsonResponse
     {
         try
         {
-            $updated = auth()->guard('admin')->user();
+            $updated = auth()->guard("admin")->user();
             $merge = ["email" => "required|email|unique:admins,email,{$updated->id}"];
             $data = $this->repository->validateData($request, $merge);
             if ( $request->has("password") ) unset($data["password"]);
@@ -71,14 +71,14 @@ class AccountController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
     public function password(Request $request): JsonResponse
     {
         try
         {
-            $updated = auth()->guard('admin')->user();
+            $updated = auth()->guard("admin")->user();
             $data = $this->repository->validatePassword($request);
             $data["password"] = Hash::make($request->password);
             unset($data["current_password"]);
@@ -94,14 +94,14 @@ class AccountController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang("update-success", ["name" => "Password"]));
     }
 
     public function uploadProfileImage(Request $request): JsonResponse
     {
         try
         {
-            $updated = auth()->guard('admin')->user();
+            $updated = auth()->guard("admin")->user();
             $this->repository->removeOldImage($updated->id);
             $updated = $this->repository->uploadProfileImage($request, $updated->id);
         }
@@ -117,7 +117,7 @@ class AccountController extends BaseController
     {
         try
         {
-            $updated = auth()->guard('admin')->user();
+            $updated = auth()->guard("admin")->user();
             $updated = $this->repository->removeOldImage($updated->id);
         }
         catch( Exception $exception )
