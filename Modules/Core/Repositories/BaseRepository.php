@@ -59,7 +59,7 @@ class BaseRepository
             if ($with !== []) $rows->with($with);
             if ($request->has("q")) $rows->whereLike($this->model::$SEARCHABLE, $request->q);
 
-            $resources = $rows->orderBy($sort_by, $sort_order)->paginate($limit)->appends($request->except('page'));
+            $resources = $rows->orderBy($sort_by, $sort_order)->paginate($limit)->appends($request->except("page"));
         }
         catch (Exception $exception)
         {
