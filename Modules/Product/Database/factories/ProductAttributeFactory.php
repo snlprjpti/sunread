@@ -30,7 +30,7 @@ class ProductAttributeFactory extends Factory
                 break;
         }
 
-        $item["product_id"] = Product::factory()->create()->id;
+        $item["product_id"] = Arr::random(Product::pluck('id')->toArray());
 
         for($i=0; $i < rand(1,15); $i++)
         {
