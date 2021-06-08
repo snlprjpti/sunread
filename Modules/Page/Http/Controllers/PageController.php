@@ -26,7 +26,7 @@ class PageController extends BaseController
         $this->pageTranslationRepository = $pageTranslationRepository;
         parent::__construct($this->model, $this->model_name);
     }
-    
+
     public function collection(object $data): ResourceCollection
     {
         return PageResource::collection($data);
@@ -135,6 +135,6 @@ class PageController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+        return $this->successResponse($this->resource($updated), $this->lang('status-updated'));
     }
 }

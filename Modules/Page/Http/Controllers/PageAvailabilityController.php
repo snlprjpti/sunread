@@ -87,6 +87,6 @@ class PageAvailabilityController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang("fetch-success", ["name" => "Model List"]));
+        return $this->successResponse($fetched, $this->lang('fetch-success', ["name" => "Model List"]));
     }
 }
