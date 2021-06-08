@@ -20,7 +20,7 @@ class CreatePageAvailabilitiesTable extends Migration
 
             $table->string('model_type');
             $table->bigInteger('model_id');
-            $table->boolean('status');
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }
