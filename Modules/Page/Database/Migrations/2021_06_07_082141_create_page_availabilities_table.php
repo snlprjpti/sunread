@@ -16,7 +16,7 @@ class CreatePageAvailabilitiesTable extends Migration
         Schema::create('page_availabilities', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('page_id');
-            $table->foreign('page_id')->references('id')->on('pages');
+            $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
 
             $table->string('model_type');
             $table->bigInteger('model_id');
