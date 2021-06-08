@@ -23,6 +23,7 @@ class BaseTestCase extends TestCase
         parent::setUp();
         Schema::disableForeignKeyConstraints();
         $this->artisan("db:seed", ["--force" => true]);
+        $this->artisan("scout:flush", ["model" => "Modules\Product\Entities\Product"]);
 
         $this->factory_count = 2;
         $this->append_to_route = null;
