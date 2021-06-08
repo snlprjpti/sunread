@@ -14,6 +14,8 @@ class ProductIndexConfigurator extends IndexConfigurator
      * @var array
      */
     protected $settings = [
-        "index.mapping.total_fields.limit" => 100000
+        "index.mapping.total_fields.limit" => 100000000,
+        "number_of_shards"=> 5,
+        "number_of_replicas"=> 2
     ];
 }

@@ -31,7 +31,7 @@ class ProductTableSeeder extends Seeder
                     "attribute_id" => Attribute::factory()->create(["type" => $attribute_type])->id,
                     "value_type" => $attribute_model,
                     "value_id" => $attribute_model::factory()->create()->id,
-                    "store_id" => Store::factory()->create()->id,
+                    "store_id" => null,
                     "channel_id" => null
                 ]);
             }
