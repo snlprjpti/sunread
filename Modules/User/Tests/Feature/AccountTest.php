@@ -118,7 +118,7 @@ class AccountTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
-            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
+            "message" => __("core::app.response.update-success", ["name" => "Password"])
         ]);
     }
 
