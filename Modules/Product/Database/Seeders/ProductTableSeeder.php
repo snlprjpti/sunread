@@ -11,7 +11,7 @@ class ProductTableSeeder extends Seeder
     public function run(): void
     {
         Product::factory()
-            ->has(ProductAttribute::factory(rand(3, 5)), 'product_attributes')
+            // ->has(ProductAttribute::factory(rand(3, 5)), 'product_attributes')
             ->create([
                 "parent_id" => Product::factory()->configurable()->create()->id,
                 "attribute_group_id" => 1

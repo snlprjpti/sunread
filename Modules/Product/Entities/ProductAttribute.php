@@ -38,7 +38,7 @@ class ProductAttribute extends Model
 
     public function getValueDataAttribute(): mixed
     {
-        return $this->value->value;
+        return isset($this->value->value) ? $this->value->value : "";
     }
 
     public function attribute(): BelongsTo
