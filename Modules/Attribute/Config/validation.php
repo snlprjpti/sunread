@@ -1,6 +1,6 @@
 <?php
 
-$rules = [
+return [
 	"text" => "string",
 	"textarea" => "string",
 	"price" => "decimal",
@@ -14,7 +14,3 @@ $rules = [
 	"file" => "file",
 	"checkbox" => null
 ];
-
-return array_map(function($rule) {
-	$rule;
-}, $rules);
