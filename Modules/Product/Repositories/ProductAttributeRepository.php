@@ -49,6 +49,7 @@ class ProductAttributeRepository extends ProductRepository
                 $product_attribute_value = $attribute["value_type"]::create(["value" => $attribute["value"]]);
                 $match["value_id"] = $product_attribute_value->id;
                 $items[] = ProductAttribute::create($match);
+                unset($match["value_id"]);
             }
         }
         catch (Exception $exception)
