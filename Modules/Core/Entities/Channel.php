@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
 use Modules\Core\Traits\HasFactory;
+use Modules\Product\Entities\Product;
 
 class Channel extends Model
 {
@@ -15,6 +16,8 @@ class Channel extends Model
 
     public static $SEARCHABLE = [ "code", "hostname", "name", "description", "location" ];
     protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency", "website_id", "default_category_id" ];
+
+    protected $touches = ['products'];
 
     public function default_store(): BelongsTo
     {
@@ -49,5 +52,10 @@ class Channel extends Model
     public function default_category(): BelongsTo
     {
         return $this->belongsTo(Category::class, "default_category_id");
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class);
     }
 }

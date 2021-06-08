@@ -10,6 +10,7 @@ class ProductAttributeStringObserver
 {
     public function updated(ProductAttributeString $product_attribute_string)
     {
+        $product_attribute_string->product_attribute->product->searchable();
         UrlRewrite::handleUrlRewrite($product_attribute_string->product_attribute, __FUNCTION__);
     }
 }

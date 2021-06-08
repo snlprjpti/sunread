@@ -11,18 +11,25 @@ use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Traits\HasFactory;
+use Modules\Core\Traits\HasTranslation;
 use Modules\Core\Traits\Sluggable;
+use Modules\Product\Entities\Product;
 use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Category extends Model
 {
-    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite;
+    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation;
 
     public static $SEARCHABLE = [ "translations.name", "slug" ];
     protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "status" ];
     protected $with = [ "translations" ];
 
+    public $translatedAttributes = ["name", "description", "meta_title", "meta_description", "meta_keywords"];
+    public $translatedModels = [ CategoryTranslation::class, "category_id" ];
+
     protected $appends = ['url'];
+
+    protected $touches = ['products'];
 
     public function __construct(?array $attributes = [])
     {
@@ -75,6 +82,11 @@ class Category extends Model
     public function getUrlRewriteRequestPathAttribute(): string
     {
         return $this->slug;
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class);
     }
 
 }

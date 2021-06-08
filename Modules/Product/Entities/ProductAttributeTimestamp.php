@@ -12,4 +12,9 @@ class ProductAttributeTimestamp extends Model
     public static $type = "date";
     protected $fillable = [ "value" ];
     protected $table = "product_attribute_timestamp";
+
+    public function product_attribute()
+    {
+        return $this->morphOne(ProductAttribute::class, "value");
+    }
 }

@@ -12,4 +12,9 @@ class ProductAttributeDecimal extends Model
     public static $type = "decimal";
     protected $fillable = [ "value" ];
     protected $table = "product_attribute_decimal";
+
+    public function product_attribute()
+    {
+        return $this->morphOne(ProductAttribute::class, "value");
+    }
 }

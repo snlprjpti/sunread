@@ -12,4 +12,10 @@ class ProductAttributeBoolean extends Model
     public static $type = "boolean";
     protected $fillable = [ "value" ];
     protected $table = "product_attribute_boolean";
+
+    
+    public function product_attribute()
+    {
+        return $this->morphOne(ProductAttribute::class, "value");
+    }
 }
