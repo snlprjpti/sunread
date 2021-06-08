@@ -9,7 +9,7 @@ class ProductIndexConfigurator extends IndexConfigurator
 {
     use Migratable;
 
-    protected $name = 'sail_racing';
+    protected $name = 'sailracing';
     /**
      * @var array
      */
