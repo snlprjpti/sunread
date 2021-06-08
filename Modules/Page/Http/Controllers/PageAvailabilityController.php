@@ -16,8 +16,7 @@ use Modules\Page\Transformers\PageAvailabilityResource;
 
 class PageAvailabilityController extends BaseController
 {
-    private $page;
-    private $repository;
+    private $page, $repository;
 
     public function __construct(PageAvailability $pageAvailability, PageAvailabilityRepository $pageAvailabilityRepository, Page $page)
     {
@@ -25,14 +24,12 @@ class PageAvailabilityController extends BaseController
         $this->model_name = "Page Availability";
         $this->page = $page;
         $this->repository = $pageAvailabilityRepository;
-
         $exception_statuses = [
             AlreadyCreatedException::class => 400
         ];
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
-
 
     public function collection(object $data): ResourceCollection
     {
@@ -58,6 +55,7 @@ class PageAvailabilityController extends BaseController
         {
             return $this->handleException($exception);
         }
+
         return $this->successResponseWithMessage($this->lang('create-success'), 201);
     }
 
@@ -83,16 +81,12 @@ class PageAvailabilityController extends BaseController
 
     public function modelList(): JsonResponse
     {
-        try
-        {
+        try {
             $fetched = config('model_list.model_types');
-        }
-        catch( Exception $exception )
-        {
+        } catch (Exception $exception) {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang("fetch-success",["name"=>"Model List"]));
+        return $this->successResponse($fetched, $this->lang("fetch-success", ["name" => "Model List"]));
     }
-
 }

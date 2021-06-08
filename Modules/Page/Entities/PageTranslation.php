@@ -12,16 +12,15 @@ class PageTranslation extends Model
     use HasFactory;
     public $timestamps = false;
 
-    protected $fillable = ["store_id", "page_id", "title","description", "meta_title", "meta_description", "meta_keywords" ];
+    protected $fillable = [ "store_id", "page_id", "title","description", "meta_title", "meta_description", "meta_keywords" ];
 
     public function store(): BelongsTo
     {
-        return $this->belongsTo(Store::class, 'store_id');
+        return $this->belongsTo(Store::class, "store_id");
     }
 
     public function page(): BelongsTo
     {
-        return $this->belongsTo(Page::class, 'page_id');
+        return $this->belongsTo(Page::class, "page_id");
     }
-
 }

@@ -103,6 +103,4 @@ class PageTest extends BaseTestCase
         $check_resource = PageAvailability::whereIn("id", $resource_ids)->get()->count() > 0 ? true : false;
         $this->assertFalse($check_resource);
     }
-
-
 }

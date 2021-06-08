@@ -21,4 +21,3 @@ class PageAvailabilityFactory extends Factory
         ];
     }
 }
-

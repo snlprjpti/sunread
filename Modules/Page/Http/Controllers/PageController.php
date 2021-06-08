@@ -16,9 +16,7 @@ use Exception;
 
 class PageController extends BaseController
 {
-    protected $repository, $translation;
-
-    private $pageTranslationRepository;
+    protected $repository, $translation, $pageTranslationRepository;
 
     public function __construct(Page $page, PageRepository $pageRepository, PageTranslationRepository $pageTranslationRepository)
     {
@@ -28,6 +26,7 @@ class PageController extends BaseController
         $this->pageTranslationRepository = $pageTranslationRepository;
         parent::__construct($this->model, $this->model_name);
     }
+    
     public function collection(object $data): ResourceCollection
     {
         return PageResource::collection($data);
