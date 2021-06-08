@@ -90,7 +90,7 @@ class BaseController extends Controller
         if ($with !== []) $rows->with($with);
         if ($request->has("q")) $rows->whereLike($this->model::$SEARCHABLE, $request->q);
 
-        return $rows->orderBy($sort_by, $sort_order)->paginate($limit);
+        return $rows->orderBy($sort_by, $sort_order)->paginate($limit)->appends($request->except("page"));
     }
 
     public function storeImage(object $request, string $file_name, ?string $folder = null, ?string $delete_url = null): string
