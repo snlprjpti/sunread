@@ -10,11 +10,13 @@ class ProductTableSeeder extends Seeder
 {
     public function run(): void
     {
-        Product::factory()
-            ->has(ProductAttribute::factory(), 'product_attributes')
-            ->create([
-                "parent_id" => Product::factory()->configurable()->create()->id,
-                "attribute_group_id" => 1
-            ]);
+        Product::withoutSyncingToSearch(function () {
+            Product::factory()
+                ->has(ProductAttribute::factory(), 'product_attributes')
+                ->create([
+                    "parent_id" => Product::factory()->configurable()->create()->id,
+                    "attribute_group_id" => 1
+                ]);
+        });
     }
 }
