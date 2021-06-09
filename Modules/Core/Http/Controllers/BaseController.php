@@ -45,7 +45,9 @@ class BaseController extends Controller
             "logout-success" => "users.users.logout-success",
             "token-generation-problem" => "users.token.token-generation-problem",
             "password-reset-success" => "users.reset-password.password-reset-success",
-            "status-updated" => "response.status-updated"
+            "status-updated" => "response.status-updated",
+            "reindex-success" => "response.reindex-success",
+            "bulk-reindex-success" => "response.bulk-reindex-success"
         ];
 
         // Frequently thrown excpetions

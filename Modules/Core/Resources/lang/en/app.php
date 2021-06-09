@@ -19,7 +19,10 @@ return [
         'not-found' => ':name not found.',
         'status-change-success' => 'The :name has changed successfully.',
         'status-change-failed' => 'Cannot change the status.',
-        'status-updated'=>':name status updated successfully.'
+        'status-updated' => ':name status updated successfully.',
+        'reindex-success' => ':name reindexed successfully.',
+        'bulk-reindex-success' => 'All products reindexed successfully.'
+
 
     ],
     'users' => [
