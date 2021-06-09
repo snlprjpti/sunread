@@ -15,7 +15,7 @@ use Modules\Attribute\Repositories\AttributeOptionRepository;
 use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
 use Modules\Attribute\Repositories\AttributeTranslationRepository;
 use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
-use Modules\Attribute\Exceptions\AttributeException;
+use Modules\Attribute\Exceptions\AttributeNotUserDefinedException;
 
 class AttributeController extends BaseController
 {
@@ -29,7 +29,7 @@ class AttributeController extends BaseController
         $exception_statuses = [
             AttributeTranslationDoesNotExist::class => 422,
             AttributeTranslationOptionDoesNotExist::class => 422,
-            AttributeException::class => 403
+            AttributeNotUserDefinedException::class => 403
         ];
 
         $this->translation_repository = $attributeTranslationRepository;
@@ -130,7 +130,7 @@ class AttributeController extends BaseController
         try
         {
             $this->repository->delete($id, function($deleted) {
-                if (!$deleted->is_user_defined) throw new AttributeException("Attribute delete action not authorized.");
+                if (!$deleted->is_user_defined) throw new AttributeNotUserDefinedException("Attribute delete action not authorized.");
             });
         }
         catch( Exception $exception )
@@ -145,21 +145,19 @@ class AttributeController extends BaseController
     {
         try
         {
-            $request->validate([
-                "ids" => "array|required",
-                "ids.*" => "required|exists:attributes,id",
-            ]);
-
-            $unauthorized_delete_count = $this->model->whereIn("id", $request->ids)->where("is_user_defined", 0)->count();    
-            $this->repository->bulkDelete($request, function ($query){
+            $unauthorized_delete_count = 0;
+            $this->repository->bulkDelete($request, function ($query) use ($request, &$unauthorized_delete_count){
+                $unauthorized_delete_count = $query->where("is_user_defined", 0)->count();  
                 return $query->where("is_user_defined", 1);
             });
+            
+            $message = $unauthorized_delete_count ? "Couldn't delete {$unauthorized_delete_count} items" : $this->lang('delete-success');
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
-        
-        return (!$unauthorized_delete_count) ? $this->successResponse("","Couldn't delete {$unauthorized_delete_count} items") : $this->successResponseWithMessage($this->lang('delete-success'), 204);
+
+        return $this->successResponseWithMessage($message, 204);
     }
 }
