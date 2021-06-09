@@ -43,6 +43,7 @@ class AttributeFactory extends Factory
             "is_unique" => rand(0,1),
             "validation" => null,
             "is_visible_on_front" => rand(0,1),
+            "is_user_defined" => 1,
             "attribute_group_id" => AttributeGroup::factory()->create()->id
         ];
     }
