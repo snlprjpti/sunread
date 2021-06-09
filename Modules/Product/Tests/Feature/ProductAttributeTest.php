@@ -2,15 +2,18 @@
 
 namespace Modules\Product\Tests\Feature;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Modules\Core\Entities\Store;
 use Illuminate\Http\UploadedFile;
+use Modules\Core\Entities\Channel;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
-use Modules\Attribute\Entities\Attribute;
 use Modules\Category\Entities\Category;
-use Modules\Product\Entities\ProductAttribute;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\ProductImage;
+use Modules\Product\Entities\ProductAttribute;
 
 class ProductAttributeTest extends BaseTestCase
 {
@@ -38,6 +41,33 @@ class ProductAttributeTest extends BaseTestCase
     public function testAdminCanCreateResourceWithNonMandatoryData()
     {
         $this->markTestSkipped("All data are mandatory.");
+    }
+    
+    public function getCreateData(): array
+    {
+        $scope = Arr::random(["store", "channel", ""]);
+        $scope_array = [];
+        if ( $scope !== "" ) {
+            $scope_array = [
+                "scope" => $scope,
+                "scope_id" => $scope == "store" ? Store::inRandomOrder()->first()->id : Channel::inRandomOrder()->first()->id
+            ];
+        }
+
+        $product_attribute = $this->model::factory()->make()->toArray();
+
+        return array_merge(
+            $scope_array,
+            [
+                "product_id" => Product::inRandomOrder()->first()->id,
+                "attributes" => [
+                    [
+                        "attribute_id" => $product_attribute["attribute_id"],
+                        "value" => $product_attribute["value_data"]
+                    ]
+                ]
+            ]
+        );
     }
 
     public function getInvalidCreateData(): array
