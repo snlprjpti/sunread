@@ -66,10 +66,19 @@ trait ElasticSearchFormat
         
         foreach($this->categories as $category)
         {
-            $data['global'][] = $category->toArray();
-            foreach($this->mainStores as $store_id) $data['store'][$store_id][] = $category->firstTranslation($store_id);
+            $data['global'][] = $this->getCategoryData($category->toArray());
+            foreach($this->mainStores as $store_id) $data['store'][$store_id][] = $this->getCategoryData($category->firstTranslation($store_id));
         }
 
         return $data;
+    }
+
+    public function getCategoryData(array $category): array
+    {
+        return [
+            'id' => $category["id"],
+            'slug' => $category["slug"],
+            'name' =>$category["name"]
+        ];
     }
 }

@@ -55,69 +55,6 @@ return [
                         ]
                     ]
                 ],
-                "image"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "_lft"=> [
-                    "type"=> "long"
-                ],
-                "_rgt"=> [
-                    "type"=> "long"
-                ],
-                "description"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "meta_description"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "meta_keywords"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "meta_title"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "position"=> [
-                    "type"=> "long"
-                ],
-                "created_at"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
             ]
         ],
         "product_attributes" =>  [
@@ -133,28 +70,7 @@ return [
                                 "attribute_group_id"=> [
                                     "type"=> "long"
                                 ],
-                                "created_at"=> [
-                                    "type"=> "date"
-                                ],
                                 "id"=> [
-                                    "type"=> "long"
-                                ],
-                                "is_filterable"=> [
-                                    "type"=> "long"
-                                ],
-                                "is_required"=> [
-                                    "type"=> "long"
-                                ],
-                                "is_searchable"=> [
-                                    "type"=> "long"
-                                ],
-                                "is_unique"=> [
-                                    "type"=> "long"
-                                ],
-                                "is_user_defined"=> [
-                                    "type"=> "long"
-                                ],
-                                "is_visible_on_front"=> [
                                     "type"=> "long"
                                 ],
                                 "name"=> [
@@ -170,27 +86,6 @@ return [
                                     "type"=> "long"
                                 ],
                                 "slug"=> [
-                                    "type"=> "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=> "keyword",
-                                            "ignore_above"=> 256
-                                        ]
-                                    ]
-                                ],
-                                "type"=> [
-                                    "type"=> "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=> "keyword",
-                                            "ignore_above"=> 256
-                                        ]
-                                    ]
-                                ],
-                                "updated_at"=> [
-                                    "type"=> "date"
-                                ],
-                                "validation"=> [
                                     "type"=> "text",
                                     "fields"=> [
                                         "keyword"=> [

@@ -71,19 +71,31 @@ trait AttributeFormat
     {
         $model_type = new $data->value_type();
         $type = $model_type::$type;
+
         $attribute = (!$data->store_id) ? $data->attribute->toArray() : $data->attribute->firstTranslation($data->store_id);
 
         $this->attributeData = [
-            "attribute" => $attribute,
+            "attribute" => $this->getData($attribute),
             "value" => isset($data->value->value) ? $data->value->value : "",
             "{$type}_value" => isset($data->value->value) ? $data->value->value : ""
         ];
     }
 
+    public function getData(array $attribute): array
+    {
+        return [
+            "id" => $attribute["id"],
+            "slug" => $attribute["slug"],
+            "name" => $attribute["name"],
+            "position" => $attribute["position"],
+            "attribute_group_id" => $attribute["attribute_group_id"]
+        ];
+    }
+
     public function mergeAttributeData($input, $storeID, $attribute): array
     {
-        $input["attribute"] = (!$storeID) ? $attribute : $attribute->firstTranslation($storeID);
-        return $input;
+        $input["attribute"] = (!$storeID) ? $attribute->toArray() : $attribute->firstTranslation($storeID);
+        return $this->getData($input["attribute"]);
     }
 
     public function getOtherChannelsAttribute($attribute, $channel_diffs): void
