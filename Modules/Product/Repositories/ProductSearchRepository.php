@@ -34,7 +34,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             if(isset($request->search))
             {
                 $this->getMainSearch($request);
-                $this->getNestedSearch($request);
+                // $this->getNestedSearch($request);
             }
             
             $query = $this->orwhereQuery($this->allSearch);
