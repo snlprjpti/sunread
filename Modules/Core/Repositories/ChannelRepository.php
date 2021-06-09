@@ -26,6 +26,7 @@ class ChannelRepository extends BaseRepository
             "description" => "required",
             "location" => "nullable",
             "timezone" => "nullable",
+            "status" => "sometimes|boolean",
 
             /* Branding */
             "logo" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
