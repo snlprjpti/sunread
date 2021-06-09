@@ -22,9 +22,7 @@ class AttributeTest extends BaseTestCase
 
     public function getCreateData(): array
     {
-        return array_merge($this->model::factory()->make([
-            "is_user_defined" => 1
-        ])->toArray(), [
+        return array_merge($this->model::factory()->make()->toArray(), [
             "translations" => [
                 [
                     "store_id" => Store::factory()->create()->id,
@@ -48,7 +46,7 @@ class AttributeTest extends BaseTestCase
         ]);
     }
 
-    public function testAdminCannotDeleteDefaultAttribute()
+    public function testShouldReturnErrorIfNonUserDefinedAttributeIsDeleted()
     {
         $resource_id = $this->model::factory()->create([
             "is_user_defined" => 0
