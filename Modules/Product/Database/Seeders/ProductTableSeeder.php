@@ -21,20 +21,17 @@ class ProductTableSeeder extends Seeder
 
             $attribute_types = config("attribute_types");
             unset($attribute_types["image"], $attribute_types["file"]);
- 
-            for($i = 0; $i < 4; $i++)
-            {
-                $attribute_type = array_rand($attribute_types);
-                $attribute_model = $attribute_types[$attribute_type];
-                ProductAttribute::create([
-                    "product_id" => $product->id,
-                    "attribute_id" => Attribute::factory()->create(["type" => $attribute_type])->id,
-                    "value_type" => $attribute_model,
-                    "value_id" => $attribute_model::factory()->create()->id,
-                    "store_id" => null,
-                    "channel_id" => null
-                ]);
-            }
+            $attribute_type = array_rand($attribute_types);
+            $attribute_model = $attribute_types[$attribute_type];
+            
+            ProductAttribute::create([
+                "product_id" => $product->id,
+                "attribute_id" => Attribute::factory()->create(["type" => $attribute_type])->id,
+                "value_type" => $attribute_model,
+                "value_id" => $attribute_model::factory()->create()->id,
+                "store_id" => null,
+                "channel_id" => null
+            ]);
 
     }
 }
