@@ -25,7 +25,7 @@ class CreateChannelsTable extends Migration
             $table->foreign("default_store_id")->references("id")->on("stores")->onDelete("cascade");
             $table->foreign("default_currency")->references("code")->on("currencies")->onUpdate("cascade");
             $table->foreign("website_id")->references("id")->on("websites")->onDelete("cascade");
-            $table->boolean("status")->default(true);
+            $table->boolean("status")->default(1);
             $table->timestamps();
         });
     }

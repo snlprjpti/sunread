@@ -14,7 +14,7 @@ class CreateWebsitesTable extends Migration
             $table->string("hostname")->nullable();
             $table->string("name");
             $table->text("description")->nullable();
-            $table->boolean("status")->default(true);
+            $table->boolean("status")->default(1);
             $table->timestamps();
         });
     }
