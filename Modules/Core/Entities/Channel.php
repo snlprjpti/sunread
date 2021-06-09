@@ -15,7 +15,7 @@ class Channel extends Model
     use HasFactory;
 
     public static $SEARCHABLE = [ "code", "hostname", "name", "description", "location" ];
-    protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency", "website_id", "default_category_id" ];
+    protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency", "website_id", "default_category_id", "status" ];
 
     protected $touches = ['products'];
 
