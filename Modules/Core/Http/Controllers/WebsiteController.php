@@ -3,12 +3,10 @@
 namespace Modules\Core\Http\Controllers;
 
 use Exception;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Routing\Controller;
 use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\WebsiteRepository;
 use Modules\Core\Transformers\WebsiteResource;
@@ -125,4 +123,17 @@ class WebsiteController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 
+    public function updateStatus(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $updated = $this->repository->updateStatus($request, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
 }
