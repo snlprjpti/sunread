@@ -50,7 +50,7 @@ trait ElasticSearchFormat
         $this->mainStores = Store::pluck('id')->toArray();
     }
 
-    public function getChannelID($store_id): int
+    public function getChannelID(int $store_id): int
     {
         foreach($this->channels as $channel) if(in_array($store_id, $channel->stores->pluck('id')->toArray())) return $channel->id;
         return 0;
