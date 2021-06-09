@@ -60,6 +60,7 @@ class ProductController extends BaseController
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $created);
                 $created->categories()->sync($request->get("categories"));
+                $created->channels()->sync($request->get("channels"));
             });
         }
         catch( Exception $exception )
@@ -96,6 +97,7 @@ class ProductController extends BaseController
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $updated);
                 $updated->categories()->sync($request->get("categories"));
+                $updated->channels()->sync($request->get("channels"));
             });
         }
         catch( Exception $exception )

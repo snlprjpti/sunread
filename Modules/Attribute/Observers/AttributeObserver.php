@@ -15,11 +15,17 @@ class AttributeObserver
 
     public function updated(Attribute $attribute)
     {
+        $attribute->product_attributes->map(function ($product_attribute) {
+            $product_attribute->product->searchable();
+        });
         Audit::log($attribute, __FUNCTION__);
     }
 
     public function deleted(Attribute $attribute)
     {
+        $attribute->product_attributes->map(function ($product_attribute) {
+            $product_attribute->product->searchable();
+        });
         Audit::log($attribute, __FUNCTION__);
     }
 }
