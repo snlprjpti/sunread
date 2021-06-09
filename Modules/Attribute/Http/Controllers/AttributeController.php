@@ -160,6 +160,6 @@ class AttributeController extends BaseController
             return $this->handleException($exception);
         }
         
-        return ($unauthorized_delete_count > 0) ? $this->successResponse("","Couldn't delete {$unauthorized_delete_count} items") : $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return (!$unauthorized_delete_count) ? $this->successResponse("","Couldn't delete {$unauthorized_delete_count} items") : $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
 }
