@@ -131,7 +131,7 @@ class AttributeController extends BaseController
         try
         {
             $this->repository->delete($id, function($deleted) {
-                if (!$deleted->is_user_defined) throw new AttributeNotUserDefinedException("Attribute delete action not authorized.");
+                if (!$deleted->is_user_defined) throw new AttributeNotUserDefinedException("Attribute cannot be deleted.");
             });
         }
         catch( Exception $exception )
