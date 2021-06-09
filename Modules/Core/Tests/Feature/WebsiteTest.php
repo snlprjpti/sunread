@@ -16,6 +16,7 @@ class WebsiteTest extends BaseTestCase
 
         $this->model_name = "Website";
         $this->route_prefix = "admin.websites";
+        $this->hasStatusTest = true;
     }
 
     public function getNonMandodtaryCreateData(): array

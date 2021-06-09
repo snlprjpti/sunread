@@ -18,7 +18,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "multiple" => false
                             ],
                             [
                                 "title" => "Allow Countries",
@@ -26,7 +27,7 @@ return[
                                 "type" => "checkbox",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code", "id"],
-                                "default" => "",
+                                "default" => [],
                                 "options" => [],
                                 "rules" => "required",
                                 "showIn" => ['channel', 'website', 'default', 'store']
@@ -40,7 +41,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "nullable",
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "multiple" => false
                             ]
                         ]
                     ],
@@ -52,11 +54,12 @@ return[
                                 "path" => "state_country",
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Currency",
-                                "pluck" => ["code","id"],
+                                "pluck" => ["code", "id"],
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "multiple" => false
                             ],
                         ]
                     ],
@@ -72,7 +75,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"],
+                                "multiple" => false
                             ],
                             [
                                 "title" => "Store Phone Number",
@@ -102,10 +106,11 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code", "id"],
-                                "default" => "",
+                                "default" => [],
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"],
+                                "multiple" => true
                             ],
                             [
                                 "title" => "Region/State",
@@ -116,7 +121,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"]
                             ],
                             [
                                 "title" => "Zip/Postal Code",
@@ -202,17 +207,6 @@ return[
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"]
                             ],
-                            [
-                                "title" => "Base URL",
-                                "path" => "base_url",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
-                            ],
 
                         ]
                     ]
@@ -233,7 +227,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
+                                "showIn" => ["channel","website","default","store"],
+                                "multiple" => false
                             ],
                             [
                                 "title" => "Default Display Currency",
@@ -244,7 +239,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
+                                "showIn" => ["channel","website","default","store"],
+                                "multiple" => false
                             ],
                         ]
                     ],
@@ -345,7 +341,8 @@ return[
                                 "default" => "1",
                                 "options" => [],
                                 "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "multiple" => false
                             ]
                         ]
                     ]

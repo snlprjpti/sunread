@@ -39,8 +39,7 @@ class CustomerController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["group"]);
+            $fetched = $this->repository->fetchAll($request, ["group"]);
         }
         catch (Exception $exception)
         {
@@ -56,7 +55,9 @@ class CustomerController extends BaseController
         {
             $data = $this->repository->validateData($request);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
-            $created = $this->repository->create($data);
+            $created = $this->repository->create($data, function($created) {
+                return $created->group;
+            });
         }
         catch (Exception $exception)
         {
@@ -71,7 +72,7 @@ class CustomerController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["group"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["group"]);
         }
         catch (Exception $exception)
         {
@@ -89,7 +90,9 @@ class CustomerController extends BaseController
                 "email" => "required|email|unique:customers,email,{$id}"
             ]);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function($updated) {
+                return $updated->group;
+            });
         }
         catch (Exception $exception)
         {

@@ -21,6 +21,7 @@ class StoreTest extends BaseTestCase
 
         $this->model_name = "Store";
         $this->route_prefix = "admin.stores";
+        $this->hasStatusTest = true;
     }
 
     public function getCreateData(): array

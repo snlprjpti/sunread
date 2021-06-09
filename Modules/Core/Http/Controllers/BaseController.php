@@ -45,7 +45,9 @@ class BaseController extends Controller
             "logout-success" => "users.users.logout-success",
             "token-generation-problem" => "users.token.token-generation-problem",
             "password-reset-success" => "users.reset-password.password-reset-success",
-            "status-updated" => "response.status-updated"
+            "status-updated" => "response.status-updated",
+            "reindex-success" => "response.reindex-success",
+            "bulk-reindex-success" => "response.bulk-reindex-success"
         ];
 
         // Frequently thrown excpetions
@@ -90,7 +92,7 @@ class BaseController extends Controller
         if ($with !== []) $rows->with($with);
         if ($request->has("q")) $rows->whereLike($this->model::$SEARCHABLE, $request->q);
 
-        return $rows->orderBy($sort_by, $sort_order)->paginate($limit);
+        return $rows->orderBy($sort_by, $sort_order)->paginate($limit)->appends($request->except("page"));
     }
 
     public function storeImage(object $request, string $file_name, ?string $folder = null, ?string $delete_url = null): string

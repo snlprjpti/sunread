@@ -39,8 +39,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->repository->fetchAll($request);
         }
         catch( Exception $exception )
         {
@@ -77,7 +76,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["default_store", "default_category", "stores", "website"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["default_store", "default_category", "stores", "website"]);
         }
         catch( Exception $exception )
         {
@@ -135,5 +134,19 @@ class ChannelController extends BaseController
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
+
+    public function updateStatus(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $updated = $this->repository->updateStatus($request, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 }

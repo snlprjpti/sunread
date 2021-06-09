@@ -2,14 +2,8 @@
 
 namespace Modules\Product\Entities;
 
-use Modules\Core\Traits\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class ProductAttributeText extends Model
+class ProductAttributeText extends ProductAttributeType
 {
-    use HasFactory;
-
-    public static $type = "text";
-    protected $fillable = [ "value" ];
+    public static $type = "string";
     protected $table = "product_attribute_text";
 }

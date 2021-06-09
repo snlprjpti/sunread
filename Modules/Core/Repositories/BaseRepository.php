@@ -10,15 +10,111 @@ use Illuminate\Database\Eloquent\Model;
 class BaseRepository
 {
     protected $model, $model_key, $rules, $relationships;
+    protected int $pagination_limit = 25;
 
     public function model(): Model
     {
         return $this->model;
     }
 
-    public function relationships(int $id, object $request, ?callable $callback = null): object
+    public function validateListFiltering(object $request): array
+    {
+        try
+        {
+            $rules = [
+                "limit" => "sometimes|numeric",
+                "page" => "sometimes|numeric",
+                "sort_by" => "sometimes",
+                "sort_order" => "sometimes|in:asc,desc",
+                "q" => "sometimes|string|min:1"
+            ];
+    
+            $messages = [
+                "limit.numeric" => "Limit must be a number.",
+                "page.numeric" => "Page must be a number.",
+                "sort_order.in" => "Order must be 'asc' or 'desc'.",
+                "q.string" => "Search query must be string.",
+                "q.min" => "Search query must be at least 1 character."
+            ];
+
+            $data = $request->validate($rules, $messages);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $data;
+    }
+
+    public function getFilteredList(object $request, array $with = [], ?object $rows = null): object
+    {
+        try
+        {
+            $sort_by = $request->sort_by ?? "id";
+            $sort_order = $request->sort_order ?? "desc";
+            $limit = $request->limit ?? $this->pagination_limit;
+
+            $rows = $rows ?? $this->model::query();
+            if ($with !== []) $rows->with($with);
+            if ($request->has("q")) $rows->whereLike($this->model::$SEARCHABLE, $request->q);
+
+            $resources = $rows->orderBy($sort_by, $sort_order)->paginate($limit)->appends($request->except("page"));
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $resources;
+    }
+
+    public function fetchAll(object $request, array $with = [], ?callable $callback = null): object
+    {
+        Event::dispatch("{$this->model_key}.fetch-all.before");
+
+        try
+        {
+            $this->validateListFiltering($request);
+            $rows = ($callback) ? $callback() : null;
+
+            $fetched = $this->getFilteredList($request, $with, $rows);
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.fetch-all.after", $fetched);
+
+        return $fetched;
+    }
+
+    public function fetch(int $id, array $with = [], ?callable $callback = null): object
     {
         Event::dispatch("{$this->model_key}.fetch-single.before");
+
+        try
+        {
+            $rows = $this->model;
+            if ($callback) $rows = $callback();
+            if ($with !== []) $rows = $rows->with($with);
+
+            $fetched = $rows->findOrFail($id);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.fetch-single.after", $fetched);
+
+        return $fetched;
+    }
+
+    public function relationships(int $id, object $request, ?callable $callback = null): object
+    {
+        Event::dispatch("{$this->model_key}.fetch-single-relationships.before");
 
         try
         {
@@ -33,7 +129,7 @@ class BaseRepository
             throw $exception;
         }
 
-        Event::dispatch("{$this->model_key}.fetch-single.after", $fetched);
+        Event::dispatch("{$this->model_key}.fetch-single-relationships.after", $fetched);
 
         return $fetched;
     }
