@@ -6,30 +6,21 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateWebsitesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
-        Schema::create('websites', function (Blueprint $table) {
+        Schema::create("websites", function (Blueprint $table) {
             $table->id();
-            $table->string('code');
-            $table->string('hostname')->nullable();
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->string("code");
+            $table->string("hostname")->nullable();
+            $table->string("name");
+            $table->text("description")->nullable();
+            $table->boolean("status")->default(true);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('websites');
+        Schema::dropIfExists("websites");
     }
 }
