@@ -24,16 +24,14 @@ class PageTranslationRepository
 
         try
         {
-            foreach ($data as $row){
-                $check = [
-                    "store_id" => $row["store_id"],
-                    "page_id" => $parent->id
-                ];
+            $check = [
+                "store_id" => $data["store_id"],
+                "page_id" => $parent->id
+            ];
 
-                $created = $this->model->firstorNew($check);
-                $created->fill($row);
-                $created->save();
-            }
+            $created = $this->model->firstorNew($check);
+            $created->fill($data);
+            $created->save();
         }
         catch (Exception $exception)
         {

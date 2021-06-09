@@ -70,7 +70,7 @@ class PageTest extends BaseTestCase
         ]);
     }
 
-    public function testAdminCanAllowCoupon()
+    public function testAdminCanAllowPage()
     {
         $model_type = Arr::random(["Modules\Core\Entities\Channel", "Modules\Core\Entities\Store"]);
         $post_data = [
@@ -90,7 +90,7 @@ class PageTest extends BaseTestCase
         ]);
     }
 
-    public function testAdminCanDeleteAllowCoupon()
+    public function testAdminCanDeleteAllowPage()
     {
         $resource_ids = PageAvailability::factory(2)->create()->pluck("id")->toArray();
 

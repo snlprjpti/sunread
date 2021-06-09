@@ -59,7 +59,7 @@ class PageController extends BaseController
             $data = $this->repository->validateData($request);
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->title);
             $created = $this->repository->create($data, function($created) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translations, $created);
+                $this->pageTranslationRepository->updateOrCreate($request->translation, $created);
             });
         }
         catch (Exception $exception)
@@ -94,7 +94,7 @@ class PageController extends BaseController
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->title);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translations, $updated);
+                $this->pageTranslationRepository->updateOrCreate($request->translation, $updated);
             });
             $updated->translations = $updated->translations()->get();
         }

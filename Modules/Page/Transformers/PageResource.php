@@ -19,7 +19,7 @@ class PageResource extends JsonResource
             "meta_title" => $this->meta_title,
             "meta_description" => $this->meta_description,
             "meta_keywords" => $this->meta_keywords,
-            "translations" => new PageTranslationResource($this->whenLoaded("translations")),
+            "translations" => PageTranslationResource::collection($this->whenLoaded("translations")),
             "created_at" => $this->created_at->format('M d, Y H:i A'),
         ];
     }

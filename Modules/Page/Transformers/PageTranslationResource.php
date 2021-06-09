@@ -17,8 +17,7 @@ class PageTranslationResource extends JsonResource
             "store" => new StoreResource($this->whenLoaded("store")),
             "meta_title" => $this->meta_title,
             "meta_description" => $this->meta_description,
-            "meta_keywords" => $this->meta_keywords,
-            "created_at" => $this->created_at->format('M d, Y H:i A')
+            "meta_keywords" => $this->meta_keywords
         ];
     }
 }
