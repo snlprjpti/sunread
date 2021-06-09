@@ -19,6 +19,8 @@ class ProductAttribute extends Model
 
     protected $appends = ["value_data", "url"];
 
+    protected $touches = ["product"];
+
     public function __construct(?array $attributes = [])
     {
         parent::__construct($attributes);
@@ -36,7 +38,7 @@ class ProductAttribute extends Model
 
     public function getValueDataAttribute(): mixed
     {
-        return $this->value->value;
+        return isset($this->value->value) ? $this->value->value : "";
     }
 
     public function attribute(): BelongsTo
@@ -52,5 +54,10 @@ class ProductAttribute extends Model
     public function getUrlRewriteRequestPathAttribute(): string
     {
         return (isset($this->store->slug) ? $this->store->slug . "/" : "") . $this->value->value;
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
     }
 }

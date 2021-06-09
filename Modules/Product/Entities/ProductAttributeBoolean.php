@@ -2,14 +2,8 @@
 
 namespace Modules\Product\Entities;
 
-use Modules\Core\Traits\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class ProductAttributeBoolean extends Model
+class ProductAttributeBoolean extends ProductAttributeType
 {
-    use HasFactory;
-
     public static $type = "boolean";
-    protected $fillable = [ "value" ];
     protected $table = "product_attribute_boolean";
 }

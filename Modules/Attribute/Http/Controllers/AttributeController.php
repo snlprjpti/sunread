@@ -90,7 +90,8 @@ class AttributeController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["attribute_options", "translations"])->findOrFail($id);
+            $fetched = $this->model->findOrFail($id);
+            $fetched->translations();
         }
         catch( Exception $exception )
         {

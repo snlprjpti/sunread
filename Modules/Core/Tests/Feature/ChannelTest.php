@@ -18,6 +18,7 @@ class ChannelTest extends BaseTestCase
 
         $this->model_name = "Channel";
         $this->route_prefix = "admin.channels";
+        $this->hasStatusTest = true;
     }
 
     public function getCreateData(): array

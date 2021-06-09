@@ -12,7 +12,7 @@ class Store extends Model
 {
     use Sluggable, HasFactory;
 
-    protected $fillable = [ "slug", "name", "currency", "locale", "image", "position" ];
+    protected $fillable = [ "slug", "name", "currency", "locale", "image", "position", "status" ];
 
     public function getImageUrlAttribute()
     {   
