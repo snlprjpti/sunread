@@ -25,6 +25,7 @@ class ChannelResource extends JsonResource
             "stores" => StoreResource::collection($this->whenLoaded("stores")),
             "website" => new WebsiteResource($this->whenLoaded("website")),
             "default_category" => new CategoryResource($this->whenLoaded("default_category")),
+            "status" => $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
