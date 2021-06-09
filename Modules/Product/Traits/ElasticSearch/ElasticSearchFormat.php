@@ -33,7 +33,11 @@ trait ElasticSearchFormat
         
         $array['categories'] = $this->getScopeWiseCategory();
         
-        $array['channels'] = $this->channels->toArray();
+        $array['channels'] = $this->channels->map(function($channel){
+            return [
+                'id' => $channel->id
+            ];
+        });
 
         $array['product_attributes'] = $this->getScopeWiseAttribute();
 

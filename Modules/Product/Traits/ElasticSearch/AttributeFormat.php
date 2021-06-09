@@ -69,11 +69,14 @@ trait AttributeFormat
 
     public function getAttributeData($data): void
     {
-        $attribute = (!$data->store_id) ? $data->attribute : $data->attribute->firstTranslation($data->store_id);
+        $model_type = new $data->value_type();
+        $type = $model_type::$type;
+        $attribute = (!$data->store_id) ? $data->attribute->toArray() : $data->attribute->firstTranslation($data->store_id);
 
         $this->attributeData = [
             "attribute" => $attribute,
-            "value" => isset($data->value->value) ? $data->value->value : ""
+            "value" => isset($data->value->value) ? $data->value->value : "",
+            "{$type}_value" => isset($data->value->value) ? $data->value->value : ""
         ];
     }
 

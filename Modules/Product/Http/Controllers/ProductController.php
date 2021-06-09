@@ -37,15 +37,17 @@ class ProductController extends BaseController
 
     public function index(Request $request): JsonResponse
     {
-        try
-        {
+        // try
+        // {
+            $product = Product::find(5);
+            dd($product->documentDataStructure());
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request, ["product_attributes", "images"]);
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
+        // }
+        // catch( Exception $exception )
+        // {
+        //     return $this->handleException($exception);
+        // }
 
         return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
