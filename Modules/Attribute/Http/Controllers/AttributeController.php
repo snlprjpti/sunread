@@ -148,10 +148,10 @@ class AttributeController extends BaseController
         {
             $unauthorized_delete_count = 0;
             $this->repository->bulkDelete($request, function ($query) use ($request, &$unauthorized_delete_count){
-                $unauthorized_delete_count = $query->where("is_user_defined", 0)->count();  
+                $unauthorized_delete_count = $this->model->whereIn("id", $request->ids)->where("is_user_defined", 0)->count();  
                 return $query->where("is_user_defined", 1);
             });
-            
+
             $message = $unauthorized_delete_count ? "Couldn't delete {$unauthorized_delete_count} items" : $this->lang('delete-success');
         }
         catch (Exception $exception)
@@ -159,6 +159,6 @@ class AttributeController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($message, 204);
+        return $this->successResponseWithMessage($message);
     }
 }
