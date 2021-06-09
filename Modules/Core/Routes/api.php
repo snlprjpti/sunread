@@ -14,6 +14,7 @@ Route::group(["middleware" => ["api"]], function () {
         Route::resource("locales", LocaleController::class)->except(["create", "edit"]);
 
         // Store Routes
+        Route::get("stores/{store_id}/update-status", [\Modules\Core\Http\Controllers\StoreController::class, "updateStatus"])->name("stores.status");
         Route::resource("stores", StoreController::class)->except(["create","edit"]);
 
         // Currency Routes
@@ -24,9 +25,11 @@ Route::group(["middleware" => ["api"]], function () {
         Route::resource("exchange_rates", ExchangeRateController::class)->except(["create", "edit"]);
 
         // Channels Routes
+        Route::get("channels/{channel_id}/update-status", [\Modules\Core\Http\Controllers\ChannelController::class, "updateStatus"])->name("channels.status");
         Route::resource("channels", ChannelController::class)->except(["create", "edit"]);
 
         // Websites Routes
+        Route::get("websites/{website_id}/update-status", [\Modules\Core\Http\Controllers\WebsiteController::class, "updateStatus"])->name("websites.status");
         Route::get("websites/{website_id}/relationships", [\Modules\Core\Http\Controllers\WebsiteController::class, "relationships"])->name("websites.relationships");
         Route::resource("websites", WebsiteController::class)->except(["create", "edit"]);
 
