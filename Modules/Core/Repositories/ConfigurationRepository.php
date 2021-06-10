@@ -81,7 +81,7 @@ class ConfigurationRepository extends BaseRepository
 
     public function scopeValidation(object $request)
     {
-        return (isset($request->scope) && isset($request->scope_id) && $request->scope != "default") ? [
+        return ((isset($request->scope) && $request->scope != "default") || isset($request->scope_id)) ? [
             "scope_id" => ["required", "integer", "min:0", new ConfigurationRule($request->scope)]
         ] : [];
     }
