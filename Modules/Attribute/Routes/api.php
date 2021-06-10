@@ -15,7 +15,7 @@ Route::group(['middleware' => ['api']], function () {
     //ADMIN ATTRIBUTE ROUTES
     Route::group(['prefix' => 'admin/catalog', 'as' => 'admin.catalog.', 'middleware' => ['admin', 'language']], function () {
         // Catalog Family Routes
-        Route::put("/families/{families_id}/update-status", [\Modules\Attribute\Http\Controllers\AttributeFamilyController::class, "updateStatus"])->name('families.status');
+        Route::put("/families/{families_id}/status", [\Modules\Attribute\Http\Controllers\AttributeFamilyController::class, "updateStatus"])->name('families.status');
         Route::resource('families', AttributeFamilyController::class)->except(['create', 'edit']);
 
         // Catalog Attribute Group Routes
