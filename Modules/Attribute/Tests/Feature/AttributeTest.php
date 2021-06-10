@@ -18,7 +18,6 @@ class AttributeTest extends BaseTestCase
 
         $this->model_name = "Attribute";
         $this->route_prefix = "admin.catalog.attributes";
-        $this->hasDestroyTest = false;
     }
 
     public function getCreateData(): array
