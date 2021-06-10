@@ -39,7 +39,12 @@ class ChannelController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, callback: function() use ($request) {
+                $request->validate([
+                    "website_id" => "sometimes|exists:websites,id"
+                ]);
+                return $request->website_id ? $this->model->whereWebsiteId($request->website_id) : $this->model;
+            });
         }
         catch( Exception $exception )
         {
