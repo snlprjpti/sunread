@@ -14,7 +14,7 @@ Route::group(["middleware" => ["api"]], function() {
         Route::get('products/{id}/reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "reIndex"])->name('products.reindex');
 
         // Catalog Product Routes
-        Route::put("/products/{product_id}/update-status", [\Modules\Product\Http\Controllers\ProductController::class, "updateStatus"])->name("products.status");
+        Route::put("/products/{product_id}/status", [\Modules\Product\Http\Controllers\ProductController::class, "updateStatus"])->name("products.status");
         Route::resource("products", ProductController::class)->except(["create", "edit"]);
 
         // Product Images Routes
