@@ -6,13 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoleResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
@@ -20,8 +14,15 @@ class RoleResource extends JsonResource
             "slug" => $this->slug,
             "description" => $this->description,
             "permission_type" => $this->permission_type,
-            "permissions" => $this->permissions,
+            "permissions" => $this->permission_type == "all" ? $this->getAllPermissions() : $this->permissions,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
+    }
+
+    private function getAllPermissions(): array
+    {
+        return array_map(function($item) {
+            return $item["key"];
+        }, config("acl"));
     }
 }

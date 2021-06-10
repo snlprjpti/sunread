@@ -45,7 +45,7 @@ class AccountController extends BaseController
     {
         try
         {
-            $fetched = auth()->guard("admin")->user();
+            $fetched = $this->repository->fetch(auth()->guard("admin")->user()->id, ["role"]);
         }
         catch( Exception $exception )
         {

@@ -17,7 +17,7 @@ class AdminResource extends JsonResource
             "address" => $this->address,
             "email" => $this->email,
             "status" => $this->status,
-            "role" => $this->role ? new RoleResource($this->role) : null,
+            "role" => new RoleResource($this->whenLoaded("role")),
             "profile_image" => $this->profile_image_url,
             "avatar" => $this->avatar,
             "created_at" => $this->created_at->format("M d, Y H:i A")
