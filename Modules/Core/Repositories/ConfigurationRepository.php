@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Modules\Core\Entities\Configuration;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Core\Rules\ConfigurationRule;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
 
 class ConfigurationRepository extends BaseRepository
@@ -17,11 +18,7 @@ class ConfigurationRepository extends BaseRepository
     {
         $this->model = $configuration;
         $this->model_key = "core.configuration";
-        $this->rules = [
-           /* General */
-            "scope" => [ "required", "in:default,website,channel,store" ],
-            "scope_id" => "required|integer|min:0",
-        ];
+        $this->rules = [];
         $this->config_fields = ($data = Cache::get("configurations.all")) ? $data : config("configuration");
         $this->createModel();
     }
@@ -66,5 +63,13 @@ class ConfigurationRepository extends BaseRepository
             $fetched[$key] = $data;
         }
         return $fetched;
+    }
+
+    public function scopeValidation(object $request)
+    {
+        return (isset($request->scope) && isset($request->scope_id)) ? [
+            "scope" => [ "required", "in:default,website,channel,store" ],
+            "scope_id" => ["required", "integer", "min:0", new ConfigurationRule($request->scope)]
+        ] : [];
     }
 }
