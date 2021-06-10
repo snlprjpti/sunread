@@ -113,7 +113,8 @@ return [
                             "type" => "long"
                         ],
                         "date_value" =>  [
-                            "type" => "date"
+                            "type" => "date",
+                            "format"=> "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
                         ],
                         "integer_value" =>  [
                             "type" => "date"
@@ -240,7 +241,8 @@ return [
                     "type" => "long"
                 ],
                 "date_value" =>  [
-                    "type" => "date"
+                    "type" => "date",
+                    "format"=> "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
                 ],
                 "integer_value" =>  [
                     "type" => "date"
@@ -347,7 +349,8 @@ return [
                     "type" => "long"
                 ],
                 "date_value" =>  [
-                    "type" => "date"
+                    "type" => "date",
+                    "format"=> "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
                 ],
                 "integer_value" =>  [
                     "type" => "date"

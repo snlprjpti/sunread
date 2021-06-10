@@ -6,11 +6,12 @@ use Exception;
 use Illuminate\Http\Request;
 use Modules\Core\Entities\Store;
 use Illuminate\Http\JsonResponse;
+use Modules\Core\Entities\Channel;
+use Illuminate\Support\Facades\Storage;
+use Modules\Core\Transformers\StoreResource;
+use Modules\Core\Repositories\StoreRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Storage;
-use Modules\Core\Repositories\StoreRepository;
-use Modules\Core\Transformers\StoreResource;
 
 class StoreController extends BaseController
 {
@@ -38,8 +39,27 @@ class StoreController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->repository->fetchAll($request, callback: function() use ($request) {
+                $request->validate([
+                    "website_id" => "sometimes|exists:websites,id"
+                ]);
+
+                $fetched = $this->model;
+                if ( $request->website_id ) {
+                    $channels = Channel::with(["stores"])->whereWebsiteId($request->website_id)->get();
+
+                    $get_store_ids = $channels->mapWithKeys(function($channel) {
+                        $return_ids = [];
+                        if ( $channel->default_store_id !== null ) $return_ids[] = $channel->default_store_id;
+                        if ( $channel->stores->pluck("id")->toArray() !== [] ) $return_ids[] = $channel->stores->pluck("id")->toArray();
+
+                        return $return_ids;
+                    })->flatten()->unique()->toArray();
+
+                    $fetched = $fetched->whereIn("id", $get_store_ids);
+                }
+                return $fetched;
+            });
         }
         catch( Exception $exception )
         {
@@ -72,7 +92,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["channels"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["channels"]);
         }
         catch(Exception $exception)
         {
