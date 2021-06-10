@@ -51,7 +51,7 @@ class StoreController extends BaseController
                     $get_store_ids = $channels->mapWithKeys(function($channel) {
                         $return_ids = [];
                         if ( $channel->default_store_id !== null ) $return_ids[] = $channel->default_store_id;
-                        if ( $channel->stores()->pluck("id")->toArray() !== [] ) $return_ids[] = $channel->stores()->pluck("id")->toArray();
+                        if ( $channel->stores->pluck("id")->toArray() !== [] ) $return_ids[] = $channel->stores->pluck("id")->toArray();
 
                         return $return_ids;
                     })->flatten()->unique()->toArray();
