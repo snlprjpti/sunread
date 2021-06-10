@@ -125,5 +125,4 @@ class AdminRepository extends BaseRepository
 
         return $data;
     }
-
 }
