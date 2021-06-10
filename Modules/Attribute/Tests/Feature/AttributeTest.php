@@ -18,6 +18,7 @@ class AttributeTest extends BaseTestCase
 
         $this->model_name = "Attribute";
         $this->route_prefix = "admin.catalog.attributes";
+        $this->hasDestroyTest = false;
     }
 
     public function getCreateData(): array
@@ -60,5 +61,19 @@ class AttributeTest extends BaseTestCase
         $response->assertJsonFragment([
             "status" => "error"
         ]);
+    }
+
+    public function testAdminCanDeleteResource()
+    {
+        $resource_id = $this->model::factory()->create([
+            "is_user_defined" => 1
+        ])->id; 
+
+        $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
+
+        $response->assertNoContent();
+
+        $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
+        $this->assertFalse($check_resource);
     }
 }
