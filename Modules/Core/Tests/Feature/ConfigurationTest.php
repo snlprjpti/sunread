@@ -110,7 +110,6 @@ class ConfigurationTest extends BaseTestCase
     public function testShouldReturnErrorIfScopeIdFieldIsInvalid()
     {
         $post_data = array_merge($this->model::factory()->make()->toArray(), [
-            "scope" => "default",
             "scope_id" => 10000000
         ]);
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
