@@ -50,7 +50,7 @@ class ConfigurationController extends BaseController
             });
 
             if(!isset($request->scope)) $data["scope"] = "default";
-            if(!isset($request->scope)) $data["scope_id"] = 0;
+            if(!isset($request->scope_id)) $data["scope_id"] = 0;
 
             $created_data = $this->add((object) $data);
         }
