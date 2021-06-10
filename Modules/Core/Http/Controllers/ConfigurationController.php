@@ -28,8 +28,6 @@ class ConfigurationController extends BaseController
     {
         try
         {
-            $rules = $this->repository->scopeValidation($request);
-            $this->repository->validateData($request, $rules);
             $fetched = $this->repository->getConfigData($request);
         }
         catch( Exception $exception )
