@@ -16,7 +16,7 @@ Route::group(['middleware' => ['api']], function () {
     //ADMIN CATEGORY ROUTES
     Route::group(['prefix'=>'admin', 'as' => 'admin.', 'middleware' => ['admin', 'language']], function () {
         Route::get('reviews/pending', [Modules\Review\Http\Controllers\ReviewController::class, 'pendingList'])->name('reviews.pending');
-        Route::put("/reviews/{review_id}/update-status", [\Modules\Review\Http\Controllers\ReviewController::class, "updateStatus"])->name("reviews.status");
+        Route::put("/reviews/{review_id}/status", [\Modules\Review\Http\Controllers\ReviewController::class, "updateStatus"])->name("reviews.status");
         Route::resource('reviews', ReviewController::class)->except(['create', 'edit']);
         Route::resource('review_votes', ReviewVoteController::class)->except(['create', 'edit']);
         Route::resource('review_replies', ReviewReplyController::class)->except(['create', 'edit']);
