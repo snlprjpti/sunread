@@ -159,6 +159,6 @@ class AttributeController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($message);
+        return $this->successResponseWithMessage($message, 204);
     }
 }
