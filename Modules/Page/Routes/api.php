@@ -10,7 +10,7 @@ Route::group(['middleware' => ['api']], function () {
             Route::post("/{page_id}/allow-page", [PageAvailabilityController::class, "allowPage"])->name('allow_page');
             Route::delete("/delete-allow-page", [PageAvailabilityController::class, "deleteAllowPage"])->name('delete_allow_page');
             Route::get("/model-list", [PageAvailabilityController::class, "modelList"])->name('model_list');
-            Route::put("/pages/{page_id}/update-status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
+            Route::put("/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
         });
 
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
