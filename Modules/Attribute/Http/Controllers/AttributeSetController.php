@@ -8,6 +8,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Validation\ValidationException;
+use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Attribute\Exceptions\AttributeGroupsPresent;
 use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
@@ -61,9 +63,18 @@ class AttributeSetController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
 
-            $created = $this->repository->create($data);
+            $attributes_id_array = collect($data["groups"])->pluck('attributes')->flatten(1)->toArray();
+            if(count($attributes_id_array) > count(array_unique($attributes_id_array)))
+            {
+                throw ValidationException::withMessages(["attributes" => "Different attribute groups consisting of same aatributes"]);
+            } 
+            
+            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
+            $created = $this->repository->create($data, function($created) use ($request) {
+                if(isset($request->groups)) $this->repository->updateOrCreate($request->groups, $created);
+            });
+            
         }
         catch( Exception $exception )
         {
@@ -94,9 +105,18 @@ class AttributeSetController extends BaseController
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:attribute_sets,slug,{$id}"
             ]);
+
+            $attributes_id_array = collect($data["groups"])->pluck('attributes')->flatten(1)->toArray();
+            if(count($attributes_id_array) > count(array_unique($attributes_id_array)))
+            {
+                throw ValidationException::withMessages(["attributes" => "Different attribute groups consisting of same aatributes"]);
+            } 
+
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
 
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
+                if(isset($request->groups)) $this->repository->updateOrCreate($request->groups, $updated);
+            });
         }
         catch( Exception $exception )
         {
