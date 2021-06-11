@@ -17,7 +17,7 @@ class PageAvailability extends Model
 
     public function page(): BelongsTo
     {
-        return $this->belongsTo(Page::class, "page_id");
+        return $this->belongsTo(Page::class);
     }
 
     public function model(): MorphTo
