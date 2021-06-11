@@ -55,7 +55,7 @@ class PageController extends BaseController
         try
         {
             $data = $this->repository->validateData($request,[], function ($data) {
-                $data['slug'] = $data->slug ?? $this->model->createSlug($data->title);
+                $data["slug"] = $data->slug ?? $this->model->createSlug($data->title);
                 return $data->all();
             });
             $created = $this->repository->create($data, function($created) use($request){
@@ -90,7 +90,7 @@ class PageController extends BaseController
         {
             $merge = ["slug" => "nullable|unique:pages,slug,{$id}"];
             $data = $this->repository->validateData($request,$merge, function ($data) {
-                $data['slug'] = $data->slug ?? $this->model->createSlug($data->title);
+                $data["slug"] = $data->slug ?? $this->model->createSlug($data->title);
                 return $data->all();
             });
 
