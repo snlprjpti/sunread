@@ -23,6 +23,7 @@ class ChannelResource extends JsonResource
             "default_currency" => $this->default_currency,
             "default_store" => new StoreResource($this->whenLoaded("default_store")),
             "stores" => StoreResource::collection($this->whenLoaded("stores")),
+            "stores_count" => $this->when($this->relationLoaded("stores"), $this->stores->count()),
             "website" => new WebsiteResource($this->whenLoaded("website")),
             "default_category" => new CategoryResource($this->whenLoaded("default_category")),
             "status" => $this->status,

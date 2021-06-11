@@ -16,6 +16,7 @@ class WebsiteResource extends JsonResource
             "position" => $this->position,
             "description" => $this->description,
             "channels" => ChannelResource::collection($this->whenLoaded("channels")),
+            "channels_count" => $this->when($this->relationLoaded("channels"), $this->channels->count()),
             "status" => $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
