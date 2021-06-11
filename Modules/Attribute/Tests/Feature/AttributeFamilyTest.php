@@ -15,7 +15,7 @@ class AttributeFamilyTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Attribute Family";
-        $this->route_prefix = "admin.catalog.families";
+        $this->route_prefix = "admin.attribute.sets";
         $this->hasStatusTest = true;
     }
 
