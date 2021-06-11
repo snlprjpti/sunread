@@ -28,4 +28,9 @@ class Page extends Model
     {
         return $this->belongsTo(Page::class, "parent_id");
     }
+
+    public function scopeActivePage($query)
+    {
+        return $query->whereStatus(1);
+    }
 }

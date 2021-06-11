@@ -45,8 +45,7 @@ class PageAvailabilityController extends BaseController
     {
         try
         {
-            // Get requested page with Status 1
-            $page = $this->page->whereId($page_id)->whereStatus(1)->firstOrFail();
+            $page = $this->page->whereId($page_id)->activePage(1)->firstOrFail();
 
             $data = $this->repository->getBulkData($request, $page);
             $this->repository->insertBulkData($data);
@@ -63,13 +62,7 @@ class PageAvailabilityController extends BaseController
     {
         try
         {
-            $request->validate([
-                'ids' => 'array|required',
-                'ids.*' => 'required|exists:page_availabilities,id',
-            ]);
-
-            $deleted = $this->model->whereIn('id', $request->ids);
-            $deleted->delete();
+            $this->repository->bulkDelete($request);
         }
         catch( Exception $exception )
         {
@@ -81,9 +74,12 @@ class PageAvailabilityController extends BaseController
 
     public function modelList(): JsonResponse
     {
-        try {
+        try
+        {
             $fetched = config('model_list.model_types');
-        } catch (Exception $exception) {
+        }
+        catch (Exception $exception)
+        {
             return $this->handleException($exception);
         }
 

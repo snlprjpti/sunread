@@ -24,7 +24,6 @@ class PageTest extends BaseTestCase
         $this->model_name = "Page";
         $this->route_prefix = "admin.pages";
 
-        $this->model::factory(10)->create();
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->parent_id = $this->model::oldest('id')->first()->id;
         $this->hasStatusTest = true;
@@ -72,7 +71,7 @@ class PageTest extends BaseTestCase
 
     public function testAdminCanAllowPage()
     {
-        $model_type = Arr::random(["Modules\Core\Entities\Channel", "Modules\Core\Entities\Store"]);
+        $model_type = Arr::random(config('model_list.model_types'));
         $post_data = [
             [
                 "model_type" => $model_type,
@@ -82,7 +81,6 @@ class PageTest extends BaseTestCase
         ];
 
         $response = $this->withHeaders($this->headers)->post($this->getRoute("allow_page", [$this->default_resource_id]), $post_data);
-
         $response->assertStatus(201);
         $response->assertJsonFragment([
             "status" => "success",

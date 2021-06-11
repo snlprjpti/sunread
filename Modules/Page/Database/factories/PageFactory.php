@@ -10,7 +10,7 @@ class PageFactory extends Factory
     public function definition(): array
     {
         return [
-            "parent_id" => 0,
+            "parent_id" => null,
             "slug" => $this->faker->unique()->slug(),
             "title" => $this->faker->name(),
             "description" => $this->faker->paragraph(),

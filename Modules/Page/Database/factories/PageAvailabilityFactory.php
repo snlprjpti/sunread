@@ -14,7 +14,7 @@ class PageAvailabilityFactory extends Factory
     {
         $model_type = Arr::random(config('model_list.model_types'));
         return [
-            "page_id" => Page::latest()->first()->id,
+            "page_id" => Page::factory()->create()->id,
             "model_type" => $model_type,
             "model_id" => rand(1, 10),
             "status" => 1

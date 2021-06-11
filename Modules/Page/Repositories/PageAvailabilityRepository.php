@@ -5,10 +5,11 @@ namespace Modules\Page\Repositories;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Exception;
+use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\PageAvailability;
 use Modules\Page\Exceptions\AlreadyCreatedException;
 
-class PageAvailabilityRepository
+class PageAvailabilityRepository extends BaseRepository
 {
     private $pageAvailability;
 

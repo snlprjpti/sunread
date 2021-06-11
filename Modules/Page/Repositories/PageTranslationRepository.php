@@ -2,6 +2,7 @@
 
 namespace Modules\Page\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Exception;
 use Modules\Page\Entities\PageTranslation;
@@ -19,7 +20,7 @@ class PageTranslationRepository
     public function updateOrCreate(?array $data, object $parent): void
     {
         if ( !is_array($data) ) return;
-
+        DB::beginTransaction();
         Event::dispatch("{$this->model_key}.create.before");
 
         try
@@ -35,9 +36,11 @@ class PageTranslationRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
         Event::dispatch("{$this->model_key}.create.after", $created);
+        DB::commit();
     }
 }

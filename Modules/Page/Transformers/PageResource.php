@@ -10,7 +10,7 @@ class PageResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "parent" => $this->parent ?? 0,
+            "parent" => new PageResource($this->whenLoaded("parent")),
             "slug" => $this->slug,
             "title" => $this->title,
             "position" => $this->position,
