@@ -4,8 +4,6 @@ namespace Modules\Core\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use function PHPUnit\Framework\isEmpty;
-
 class WebsiteResource extends JsonResource
 {
     public function toArray($request): array
