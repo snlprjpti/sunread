@@ -22,7 +22,7 @@ class AttributeGroup extends Model
     
     public function attributes(): BelongsToMany
     {
-        return $this->belongsToMany(Attribute::class);
+        return $this->belongsToMany(Attribute::class, "attribute_group_attributes");
     }
 
     public function attribute_set(): BelongsTo
