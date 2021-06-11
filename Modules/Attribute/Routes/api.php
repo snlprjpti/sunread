@@ -13,13 +13,13 @@
 
 Route::group(['middleware' => ['api']], function () {
     //ADMIN ATTRIBUTE ROUTES
-    Route::group(['prefix' => 'admin/catalog', 'as' => 'admin.catalog.', 'middleware' => ['admin', 'language']], function () {
+    Route::group(['prefix' => 'admin/attribute', 'as' => 'admin.attribute.', 'middleware' => ['admin', 'language']], function () {
         // Catalog Family Routes
-        Route::put("/families/{families_id}/status", [\Modules\Attribute\Http\Controllers\AttributeFamilyController::class, "updateStatus"])->name('families.status');
-        Route::resource('families', AttributeFamilyController::class)->except(['create', 'edit']);
+        Route::put("/sets/{set_id}/status", [\Modules\Attribute\Http\Controllers\AttributeFamilyController::class, "updateStatus"])->name('families.status');
+        Route::resource('sets', AttributeFamilyController::class)->except(['create', 'edit']);
 
         // Catalog Attribute Group Routes
-        Route::resource('attribute-groups', AttributeGroupController::class)->except(['create', 'edit']);
+        Route::resource('groups', AttributeGroupController::class)->except(['create', 'edit']);
 
         // Attributes Routes
         Route::delete('attributes/bulk', [\Modules\Attribute\Http\Controllers\AttributeController::class, 'bulkDelete'])->name('attributes.bulk-delete');
