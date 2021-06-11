@@ -40,8 +40,7 @@ class PageController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->repository->fetchAll($request);
         }
         catch (Exception $exception)
         {
@@ -55,8 +54,8 @@ class PageController extends BaseController
     {
         try
         {
+            $request->merge(['slug' => $request->slug ?? $this->model->createSlug($request->title)]);
             $data = $this->repository->validateData($request);
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->title);
             $created = $this->repository->create($data, function($created) use($request){
                 $this->pageTranslationRepository->updateOrCreate($request->translation, $created);
             });
@@ -73,7 +72,7 @@ class PageController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["translations"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["translations"]);
         }
         catch (Exception $exception)
         {
