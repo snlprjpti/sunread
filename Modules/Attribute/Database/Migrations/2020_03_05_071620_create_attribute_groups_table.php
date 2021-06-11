@@ -15,7 +15,6 @@ class CreateAttributeGroupsTable extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->integer('position')->nullable();
-            $table->boolean('is_user_defined')->default(1);
             $table->timestamps();
         });
     }
