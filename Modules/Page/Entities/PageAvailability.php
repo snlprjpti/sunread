@@ -10,6 +10,7 @@ use Modules\Core\Traits\HasFactory;
 class PageAvailability extends Model
 {
     use HasFactory;
+    protected $table = "page_availability";
 
     protected $fillable = [ "page_id", "model_type", "model_id", "status" ];
 

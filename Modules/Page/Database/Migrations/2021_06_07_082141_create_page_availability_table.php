@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePageAvailabilitiesTable extends Migration
+class CreatePageAvailabilityTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreatePageAvailabilitiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('page_availabilities', function (Blueprint $table) {
+        Schema::create('page_availability', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('page_id');
             $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
@@ -32,6 +32,6 @@ class CreatePageAvailabilitiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('page_availabilities');
+        Schema::dropIfExists('page_availability');
     }
 }
