@@ -21,8 +21,8 @@ return [
         'status-change-failed' => 'Cannot change the status.',
         'status-updated' => ':name status updated successfully.',
         'reindex-success' => ':name reindexed successfully.',
-        "delete-failed" => ":name could not be deleted."
-        'bulk-reindex-success' => 'All :name reindexed successfully.'
+        "delete-failed" => ":name could not be deleted.",
+        'bulk-reindex-success' => 'All :name reindexed successfully.',
 
 
     ],
