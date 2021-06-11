@@ -33,7 +33,7 @@ Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], f
         Route::resource("roles", RoleController::class);
 
         // User Routes
-        Route::put("/users/{user_id}/update-status", [\Modules\User\Http\Controllers\UserController::class, "updateStatus"])->name("users.status");
+        Route::put("/users/{user_id}/status", [\Modules\User\Http\Controllers\UserController::class, "updateStatus"])->name("users.status");
         Route::resource("users", UserController::class)->except(['create', 'edit']);
 
         // Account Routes

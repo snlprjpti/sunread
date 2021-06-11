@@ -43,7 +43,7 @@ Route::group(["middleware" => ["api"]], function () {
         Route::resource("groups", CustomerGroupController::class)->except(["create", "edit"]);
 
         // Customer Routes
-        Route::put("/customers/{customer_id}/update-status", [\Modules\Customer\Http\Controllers\CustomerController::class, "updateStatus"])->name("customers.status");
+        Route::put("/customers/{customer_id}/status", [\Modules\Customer\Http\Controllers\CustomerController::class, "updateStatus"])->name("customers.status");
         Route::resource("customers", CustomerController::class)->except(["create", "edit"]);
 
         // Customer Address Routes

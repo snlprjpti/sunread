@@ -11,7 +11,7 @@ class ProductSearchRepository extends ElasticSearchRepository
     protected $model, $attributeToRetrieve; 
     protected $mainFilterKeys, $nestedFilterKeys, $categoryFilterKeys, $mainSearchKeys, $nestedSearchKeys;
     protected  $allFilter = [], $nestedFilter = [], $allSearch = [], $nestedSearch = [];
-    protected $nestedSearchQuery = [];
+    protected $nestedSearchQuery = [], $nestedFilterQuery = [];
 
     public function __construct(Product $product)
     {
@@ -21,8 +21,8 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->mainFilterKeys = [ "brand_id", "attribute_group_id", "type" ];
         $this->mainSearchKeys = [ "sku" ];
 
-        $this->nestedFilterKeys = Attribute::where('is_filterable', 1)->pluck('slug')->toArray();
-        $this->nestedSearchKeys = Attribute::where('is_searchable', 1)->pluck('slug')->toArray();;
+        $this->nestedFilterKeys = Attribute::where('is_filterable', 1)->pluck('type', 'slug')->toArray();
+        $this->nestedSearchKeys = Attribute::where('is_searchable', 1)->pluck('type', 'slug')->toArray();;
 
         $this->categoryFilterKeys = [ "category_id", "category_slug" ];
     }
@@ -34,7 +34,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             if(isset($request->search))
             {
                 $this->getMainSearch($request);
-                // $this->getNestedSearch($request);
+                $this->getNestedSearch($request);
             }
             
             $query = $this->orwhereQuery($this->allSearch);
@@ -55,9 +55,11 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function getNestedSearch($request): void
     {
-        foreach($this->nestedSearchKeys as $key){
+        foreach($this->nestedSearchKeys as $key => $value){
+            $type = $this->getModelType($value);
+
             array_push($this->nestedSearch, $this->term("product_attributes.$this->scope.attribute.slug", $key));
-            array_push($this->nestedSearch, $this->match("product_attributes.$this->scope.value", $request->search));
+            array_push($this->nestedSearch, $this->match("product_attributes.$this->scope.{$type}_value", $request->search));
             array_push($this->nestedSearchQuery, $this->whereQuery($this->nestedSearch));
             $this->nestedSearch = [];
         } 
@@ -101,13 +103,22 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function getNestedFilter($request): void
     {
-        foreach($this->nestedFilterKeys as $key) if(isset($request->$key)) array_push($this->nestedFilter, $this->term("product_attributes.$this->scope.$key.value", $request->$key));
+        $this->nestedFilterKeys = array_intersect_key($this->nestedFilterKeys, $request->toArray());
 
-        if(count($this->nestedFilter) > 0) array_push($this->allFilter, [
+        foreach($this->nestedFilterKeys as $key => $value){
+            $type = $this->getModelType($value);
+
+            array_push($this->nestedFilter, $this->term("product_attributes.$this->scope.attribute.slug", $key));
+            array_push($this->nestedFilter, $this->term("product_attributes.$this->scope.{$type}_value", $request->$key));
+            array_push($this->nestedFilterQuery, $this->whereQuery($this->nestedFilter));
+            
+            $this->nestedFilter = [];
+        } 
+        if(count($this->nestedFilterQuery) > 0) array_push($this->allFilter, [
             "nested" => [
               "path" => "product_attributes.$this->path",
               "score_mode" => "avg",
-              "query"=> $this->whereQuery($this->nestedFilter)
+              "query"=> $this->whereQuery($this->nestedFilterQuery)
             ]
         ]);
     }
@@ -130,8 +141,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             array_push($data, $this->filter($request));
         }
 
-
-        $source = array_merge($this->attributeToRetrieve, ["product_attributes.$this->scope", "categories.$this->storeORGlobal"]);
+        $source = array_merge($this->attributeToRetrieve, ["product_attributes.$this->scope.attribute", "product_attributes.$this->scope.value", "categories.$this->storeORGlobal"]);
 
          $fetched = $this->model->searchRaw([
             "size"=> 500,
@@ -145,6 +155,13 @@ class ProductSearchRepository extends ElasticSearchRepository
         ]);
 
         return $fetched;
+    }
+
+    public function getModelType(string $value): string
+    {
+        $config = config("attribute_types.{$value}");
+        $model = new $config();
+        return $model::$type; 
     }
 
     public function reIndex(int $id, ?callable $callback = null): object
