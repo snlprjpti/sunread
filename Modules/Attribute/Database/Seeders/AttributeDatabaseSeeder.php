@@ -12,7 +12,7 @@ class AttributeDatabaseSeeder extends Seeder
         Model::unguard();
 
         $this->call(AttributeSetTableSeeder::class);
-        $this->call(AttributeGroupTableSeeder::class);
+        // $this->call(AttributeGroupTableSeeder::class);
         $this->call(AttributeTableSeeder::class);
         $this->call(AttributeOptionTableSeeder::class);
     }

@@ -48,7 +48,7 @@ class AttributeSetController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->getFilteredList($request, [ "attributeGroups.attributes" ]);
         }
         catch( Exception $exception )
         {
@@ -63,12 +63,7 @@ class AttributeSetController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-
-            $attributes_id_array = collect($data["groups"])->pluck('attributes')->flatten(1)->toArray();
-            if(count($attributes_id_array) > count(array_unique($attributes_id_array)))
-            {
-                throw ValidationException::withMessages(["attributes" => "Different attribute groups consisting of same aatributes"]);
-            } 
+            $this->repository->attributeDuplicateValidation($data);
             
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
             $created = $this->repository->create($data, function($created) use ($request) {
@@ -105,12 +100,7 @@ class AttributeSetController extends BaseController
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:attribute_sets,slug,{$id}"
             ]);
-
-            $attributes_id_array = collect($data["groups"])->pluck('attributes')->flatten(1)->toArray();
-            if(count($attributes_id_array) > count(array_unique($attributes_id_array)))
-            {
-                throw ValidationException::withMessages(["attributes" => "Different attribute groups consisting of same aatributes"]);
-            } 
+            $this->repository->attributeDuplicateValidation($data);
 
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
 

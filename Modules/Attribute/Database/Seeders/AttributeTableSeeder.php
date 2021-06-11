@@ -170,30 +170,30 @@ class AttributeTableSeeder extends Seeder
         }, $attributes);
         DB::table("attribute_translations")->insert($attribute_translations_array);
 
-        $attribute_groups = [
-            1 => [1, 2, 3, 4, 5, 6, 20, 21, 22],
-            2 => [7, 8],
-            3 => [14, 15, 16],
-            4 => [9, 10, 11, 12, 13],
-            5 => [17, 18, 19, 20]
-        ];
-        $attribute_groups_mapping = [];
-        foreach ($attribute_groups as $group_id => $group) {
-            foreach ($group as $position => $attribute_id) {
-                $attribute_groups_mapping[] = [
-                    "attribute_id" => $attribute_id,
-                    "attribute_group_id" => $group_id,
-                    "position" => $position + 1
-                ];
-            }
-        }
+        // $attribute_groups = [
+        //     1 => [1, 2, 3, 4, 5, 6, 20, 21, 22],
+        //     2 => [7, 8],
+        //     3 => [14, 15, 16],
+        //     4 => [9, 10, 11, 12, 13],
+        //     5 => [17, 18, 19, 20]
+        // ];
+        // $attribute_groups_mapping = [];
+        // foreach ($attribute_groups as $group_id => $group) {
+        //     foreach ($group as $position => $attribute_id) {
+        //         $attribute_groups_mapping[] = [
+        //             "attribute_id" => $attribute_id,
+        //             "attribute_group_id" => $group_id,
+        //             "position" => $position + 1
+        //         ];
+        //     }
+        // }
 
-        foreach ($attribute_groups_mapping as $map){
-            $attribute = Attribute::find($map["attribute_id"]);
-            if (!$attribute) continue;
+        // foreach ($attribute_groups_mapping as $map){
+        //     $attribute = Attribute::find($map["attribute_id"]);
+        //     if (!$attribute) continue;
 
-            unset($map["attribute_id"]);
-            $attribute->update($map);
-        }
+        //     unset($map["attribute_id"]);
+        //     $attribute->update($map);
+        // }
     }
 }

@@ -44,7 +44,6 @@ class AttributeFactory extends Factory
             "validation" => null,
             "is_visible_on_front" => rand(0,1),
             "is_user_defined" => rand(0,1),
-            "attribute_group_id" => AttributeGroup::factory()->create()->id
         ];
     }
 }

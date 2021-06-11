@@ -17,7 +17,9 @@ class AttributeGroupRepository extends BaseRepository
         $this->rules = [
             "slug" => "nullable|unique:attribute_groups,slug",
             "name" => "required",
-            "attribute_set_id" => "required|exists:attribute_sets,id"
+            // "attribute_set_id" => "required|exists:attribute_sets,id",
+            "attributes" => "required|array",
+            "attributes.*" => "required|exists:attributes,id",
         ];
     }
 
