@@ -15,6 +15,7 @@ use Modules\Attribute\Repositories\AttributeOptionRepository;
 use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
 use Modules\Attribute\Repositories\AttributeTranslationRepository;
 use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
+use Modules\Attribute\Exceptions\AttributeNotUserDefinedException;
 
 class AttributeController extends BaseController
 {
@@ -27,7 +28,8 @@ class AttributeController extends BaseController
         $this->model_name = "Attribute";
         $exception_statuses = [
             AttributeTranslationDoesNotExist::class => 422,
-            AttributeTranslationOptionDoesNotExist::class => 422
+            AttributeTranslationOptionDoesNotExist::class => 422,
+            AttributeNotUserDefinedException::class => 403
         ];
 
         $this->translation_repository = $attributeTranslationRepository;
@@ -128,7 +130,9 @@ class AttributeController extends BaseController
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function($deleted) {
+                if (!$deleted->is_user_defined) throw new AttributeNotUserDefinedException(__("core::app.response.delete-failed", ["name" => $this->model_name]));
+            });
         }
         catch( Exception $exception )
         {
@@ -142,13 +146,19 @@ class AttributeController extends BaseController
     {
         try
         {
-            $this->repository->bulkDelete($request);
+            $unauthorized_delete_count = 0;
+            $this->repository->bulkDelete($request, function ($query) use ($request, &$unauthorized_delete_count){
+                $unauthorized_delete_count = $this->model->whereIn("id", $request->ids)->where("is_user_defined", 0)->count();  
+                return $query->where("is_user_defined", 1);
+            });
+
+            $message = $unauthorized_delete_count ? "Couldn't delete {$unauthorized_delete_count} items" : $this->lang('delete-success');
         }
-        catch( Exception $exception )
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($message, 204);
     }
 }

@@ -22,7 +22,9 @@ class AttributeTest extends BaseTestCase
 
     public function getCreateData(): array
     {
-        return array_merge($this->model::factory()->make()->toArray(), [
+        return array_merge($this->model::factory()->make([
+            "is_user_defined" => 1
+        ])->toArray(), [
             "translations" => [
                 [
                     "store_id" => Store::factory()->create()->id,
@@ -44,5 +46,33 @@ class AttributeTest extends BaseTestCase
         return array_merge($this->getCreateData(), [
             "name" => null
         ]);
+    }
+
+    public function testShouldReturnErrorIfNonUserDefinedAttributeIsDeleted()
+    {
+        $resource_id = $this->model::factory()->create([
+            "is_user_defined" => 0
+        ])->id;
+
+        $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
+
+        $response->assertStatus(403);
+        $response->assertJsonFragment([
+            "status" => "error"
+        ]);
+    }
+
+    public function testAdminCanDeleteResource()
+    {
+        $resource_id = $this->model::factory()->create([
+            "is_user_defined" => 1
+        ])->id; 
+
+        $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
+
+        $response->assertNoContent();
+
+        $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
+        $this->assertFalse($check_resource);
     }
 }
