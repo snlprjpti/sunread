@@ -23,7 +23,7 @@ class PageRepository extends BaseRepository
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
             // translation validation
-            "translation.name" => "sometimes|required",
+            "translation.title" => "sometimes|required",
             "translation.description" => "sometimes|nullable",
             "translation.meta_title" => "sometimes|nullable",
             "translation.meta_description" => "sometimes|nullable",
