@@ -21,7 +21,7 @@ class PageAvailabilityRepository extends BaseRepository
             "page_id" => "required|numeric",
             "model_type" => "required",
             "model_id" => "required|numeric",
-            "status" => "required|boolean"
+            "status" => "sometimes|boolean"
         ];
     }
 
