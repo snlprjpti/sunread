@@ -6,7 +6,7 @@ namespace Modules\Product\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeFamily;
+use Modules\Attribute\Entities\AttributeSet;
 use Modules\Category\Entities\Category;
 
 class Product extends Model
@@ -87,9 +87,9 @@ class Product extends Model
     /**
      * Get the product attribute family that owns the product.
      */
-    public function attribute_family()
+    public function attribute_set()
     {
-        return $this->belongsTo(AttributeFamily::class);
+        return $this->belongsTo(AttributeSet::class);
     }
 
 

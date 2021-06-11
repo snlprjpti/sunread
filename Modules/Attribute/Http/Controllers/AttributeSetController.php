@@ -5,23 +5,23 @@ namespace Modules\Attribute\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Modules\Attribute\Entities\AttributeFamily;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Attribute\Entities\AttributeSet;
 use Modules\Attribute\Exceptions\AttributeGroupsPresent;
-use Modules\Attribute\Transformers\AttributeFamilyResource;
-use Modules\Attribute\Repositories\AttributeFamilyRepository;
 use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
+use Modules\Attribute\Repositories\AttributeSetRepository;
+use Modules\Attribute\Transformers\AttributeSetResource;
 
-class AttributeFamilyController extends BaseController
+class AttributeSetController extends BaseController
 {
     protected $repository;
 
-    public function __construct(AttributeFamilyRepository $attributeFamilyRepository, AttributeFamily $attribute_family)
+    public function __construct(AttributeSetRepository $attributeSetRepository, AttributeSet $attribute_set)
     {
-        $this->repository = $attributeFamilyRepository;
-        $this->model = $attribute_family;
+        $this->repository = $attributeSetRepository;
+        $this->model = $attribute_set;
         $this->model_name = "Attribute Family";
         $exception_statuses = [
             DefaultFamilyCanNotBeDeleted::class => 403,
@@ -33,12 +33,12 @@ class AttributeFamilyController extends BaseController
 
     public function collection(object $data): ResourceCollection
     {
-        return AttributeFamilyResource::collection($data);
+        return AttributeSetResource::collection($data);
     }
 
     public function resource(object $data): JsonResource
     {
-        return new AttributeFamilyResource($data);
+        return new AttributeSetResource($data);
     }
 
     public function index(Request $request): JsonResponse
@@ -92,7 +92,7 @@ class AttributeFamilyController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "slug" => "nullable|unique:attribute_families,slug,{$id}"
+                "slug" => "nullable|unique:attribute_sets,slug,{$id}"
             ]);
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
 

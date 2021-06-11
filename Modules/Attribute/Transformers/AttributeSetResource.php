@@ -4,7 +4,7 @@ namespace Modules\Attribute\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AttributeFamilyResource extends JsonResource
+class AttributeSetResource extends JsonResource
 {
     public function toArray($request): array
     {

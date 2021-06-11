@@ -1,8 +1,8 @@
 <?php
 namespace Modules\Attribute\Database\factories;
 
-use Modules\Attribute\Entities\AttributeFamily;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Attribute\Entities\AttributeSet;
 
 class AttributeGroupFactory extends Factory
 {
@@ -14,7 +14,7 @@ class AttributeGroupFactory extends Factory
         $slug = $this->faker->unique()->slug();
     
         return [
-            "attribute_family_id" => AttributeFamily::factory()->create()->id,
+            "attribute_set_id" => AttributeSet::factory()->create()->id,
             "slug" => $slug,
             "name" => $name,
             "position" => rand(1,20)

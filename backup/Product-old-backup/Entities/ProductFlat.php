@@ -27,9 +27,9 @@ class ProductFlat extends Model
     /**
      * Get the product attribute family that owns the product.
      */
-    public function getAttributeFamilyAttribute()
+    public function getAttributeSetAttribute()
     {
-        return $this->product->attribute_family;
+        return $this->product->attribute_set;
     }
 
     /**
