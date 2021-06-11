@@ -15,7 +15,7 @@ class AttributeGroupTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Attribute Group";
-        $this->route_prefix = "admin.catalog.attribute-groups";
+        $this->route_prefix = "admin.attribute.groups";
     }
 
     public function getNonMandotaryCreateData(): array
