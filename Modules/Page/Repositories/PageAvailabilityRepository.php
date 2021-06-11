@@ -79,16 +79,11 @@ class PageAvailabilityRepository extends BaseRepository
                         "model_type" => $data["model_type"],
                         "model_id" => $model_id,
                         "status" => $data["status"]
-                    ]), [
-                        "created_at" => now(),
-                        "updated_at" => now()
-                    ]);
+                    ]));
                 }
             }
 
             $filtered_data = array_filter($allow_data, function($data) {
-                unset($data["created_at"]);
-                unset($data["updated_at"]);
                 return !$this->allowedPageExist($data);
             });
             if ( count($filtered_data) == 0 ) throw new AlreadyCreatedException();

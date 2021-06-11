@@ -11,6 +11,7 @@ class PageAvailability extends Model
 {
     use HasFactory;
     protected $table = "page_availability";
+    public $timestamps = false;
 
     protected $fillable = [ "page_id", "model_type", "model_id", "status" ];
 
