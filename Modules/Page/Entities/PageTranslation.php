@@ -16,11 +16,11 @@ class PageTranslation extends Model
 
     public function store(): BelongsTo
     {
-        return $this->belongsTo(Store::class, "store_id");
+        return $this->belongsTo(Store::class);
     }
 
     public function page(): BelongsTo
     {
-        return $this->belongsTo(Page::class, "page_id");
+        return $this->belongsTo(Page::class);
     }
 }
