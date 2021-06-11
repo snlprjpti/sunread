@@ -6,6 +6,6 @@ class AlreadyCreatedException extends \Exception
 {
     public function __construct()
     {
-        parent::__construct("Requested data already created.");
+        parent::__construct(__("core::app.response.already-created"));
     }
 }
