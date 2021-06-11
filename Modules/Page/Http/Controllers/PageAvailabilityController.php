@@ -45,7 +45,7 @@ class PageAvailabilityController extends BaseController
     {
         try
         {
-            $page = $this->page->whereId($page_id)->activePage(1)->firstOrFail();
+            $page = $this->page->whereId($page_id)->published()->firstOrFail();
 
             $data = $this->repository->getBulkData($request, $page);
             $this->repository->insertBulkData($data);

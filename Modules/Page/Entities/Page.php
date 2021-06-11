@@ -26,10 +26,10 @@ class Page extends Model
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Page::class, "parent_id");
+        return $this->belongsTo(static::class, "parent_id");
     }
 
-    public function scopeActivePage($query)
+    public function scopePublished($query)
     {
         return $query->whereStatus(1);
     }
