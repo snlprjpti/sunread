@@ -4,6 +4,7 @@ namespace Modules\Attribute\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\HasTranslation;
@@ -19,9 +20,9 @@ class AttributeGroup extends Model
     public $translatedAttributes = ["name"];
     public $translatedModels = [ AttributeGroupTranslation::class, "attribute_group_id" ];
     
-    public function attributes(): HasMany
+    public function attributes(): BelongsToMany
     {
-        return $this->hasMany(Attribute::class);
+        return $this->belongsToMany(Attribute::class);
     }
 
     public function attribute_set(): BelongsTo
