@@ -6,8 +6,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Page\Entities\Page;
 use Modules\Page\Entities\PageAvailability;
+use Modules\Page\Entities\PageTranslation;
 use Modules\Page\Observers\PageAvailabilityObserver;
 use Modules\Page\Observers\PageObserver;
+use Modules\Page\Observers\PageTranslationObserver;
 
 class PageServiceProvider extends ServiceProvider
 {
@@ -126,5 +128,6 @@ class PageServiceProvider extends ServiceProvider
     {
         Page::observe(PageObserver::class);
         PageAvailability::observe(PageAvailabilityObserver::class);
+        PageTranslation::observe(PageTranslationObserver::class);
     }
 }
