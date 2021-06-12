@@ -76,7 +76,7 @@ class PageAvailabilityController extends BaseController
     {
         try
         {
-            $fetched = config('model_list.model_types');
+            $fetched = config('page.model_list');
         }
         catch (Exception $exception)
         {

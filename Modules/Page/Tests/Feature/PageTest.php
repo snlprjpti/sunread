@@ -71,7 +71,7 @@ class PageTest extends BaseTestCase
 
     public function testAdminCanAllowPage()
     {
-        $model_type = Arr::random(config('model_list.model_types'));
+        $model_type = Arr::random(config('page.model_list'));
         $post_data = [
             [
                 "model_type" => $model_type,

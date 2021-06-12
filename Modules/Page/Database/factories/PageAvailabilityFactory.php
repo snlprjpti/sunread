@@ -12,7 +12,7 @@ class PageAvailabilityFactory extends Factory
 
     public function definition(): array
     {
-        $model_type = Arr::random(config('model_list.model_types'));
+        $model_type = Arr::random(config('page.model_list'));
         return [
             "page_id" => Page::factory()->create()->id,
             "model_type" => $model_type,

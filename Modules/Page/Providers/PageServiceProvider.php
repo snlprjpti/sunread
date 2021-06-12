@@ -61,7 +61,7 @@ class PageServiceProvider extends ServiceProvider
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
         $this->mergeConfigFrom(
-            module_path($this->moduleName, 'Config/model_list.php'), 'model_list'
+            module_path($this->moduleName, 'Config/page.php'), 'model_list'
         );
     }
 
