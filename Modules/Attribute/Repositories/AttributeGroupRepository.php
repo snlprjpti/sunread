@@ -2,9 +2,14 @@
 
 namespace Modules\Attribute\Repositories;
 
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
 use Modules\Core\Repositories\BaseRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class AttributeGroupRepository extends BaseRepository
 {
@@ -41,5 +46,38 @@ class AttributeGroupRepository extends BaseRepository
         if (!$this->validateTranslationData($translations)) {
             throw new AttributeTranslationDoesNotExist("Missing attribute translation.");
         }
+    }
+
+    public function updateOrCreate($groups, $parent, $method=null): array
+    {
+        $attributes = [];
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.sync.before");
+        try
+        {
+            if($method == "update") $parent->attributeGroups()->whereNotIn('id', Arr::pluck($groups, 'id'))->delete();
+
+            foreach($groups as $group)
+            {
+                $this->validateData(new Request($group), isset($group["id"]) ? [
+                    "id" => "exists:attribute_groups,id",
+                    "slug" => "nullable|unique:attribute_groups,slug,{$group["id"]}"
+                ] : []);
+
+                $group["slug"] = $parent->slug .'_'. (!isset($group["slug"]) ? $this->model->createSlug($group["name"]) : $group["slug"]);
+                $group['attribute_set_id'] = $parent->id;
+                $data = !isset($group["id"]) ? $this->create($group) : $this->update($group, $group["id"]);
+                
+                $attributes[] = $data->attributes()->sync($group["attributes"]);
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.sync.after", $attributes);
+        DB::commit();
+        return $attributes;
     }
 }

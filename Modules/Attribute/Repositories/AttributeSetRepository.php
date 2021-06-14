@@ -6,20 +6,22 @@ use Exception;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
+use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Attribute\Transformers\AttributeGroupResource;
 use Modules\Core\Repositories\BaseRepository;
 
 class AttributeSetRepository extends BaseRepository
 {
-    protected $model, $model_key, $attributeGroupRepository;
+    protected $model, $model_key;
 
-    public function __construct(AttributeSet $attribute_set, AttributeGroupRepository $attributeGroupRepository)
+    public function __construct(AttributeSet $attribute_set)
     {
         $this->model = $attribute_set;
         $this->model_key = "catalog.attributes.attribute_set";
-        $this->attributeGroupRepository = $attributeGroupRepository;
 
         $this->rules = [
             "slug" => "nullable|unique:attribute_sets,slug",
@@ -28,41 +30,14 @@ class AttributeSetRepository extends BaseRepository
         ];
     }
 
-    public function updateOrCreate($groups, $set)
+    public function attributeValidation(array $data)
     {
-        $attributes = [];
-        DB::beginTransaction();
-        Event::dispatch("{$this->model_key}.attribute_groups.sync.before");
-        try
-        {
-            foreach($groups as $group)
-            {
-                $this->attributeGroupRepository->validateData(new Request($group), isset($group["id"]) ? [
-                    "id" => "exists:attribute_groups,id",
-                    "slug" => "nullable|unique:attribute_groups,slug,{$group["id"]}"
-                ] : []);
+        $attribute_ids_array = Arr::flatten(Arr::pluck($data["groups"], 'attributes'));
 
-                $group["slug"] = $set->slug .'_'. (!isset($group["slug"]) ? $this->model->createSlug($group["name"]) : $group["slug"]);
-                $group['attribute_set_id'] = $set->id;
-                $data = !isset($group["id"]) ? $this->attributeGroupRepository->create($group) : $this->attributeGroupRepository->update($group, $group["id"]);
-                
-                $attributes[] = $data->attributes()->sync($group["attributes"]);
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
+        if(count($attribute_ids_array) > count(array_unique($attribute_ids_array))) 
+        throw ValidationException::withMessages(["attributes" => "Different attribute groups consisting of same attributes."]);
 
-        Event::dispatch("{$this->model_key}.attribute_groups.sync.after", $attributes);
-        DB::commit();
-        return $attributes;
-    }
-
-    public function attributeDuplicateValidation(array $data)
-    {
-        $attributes_id_array = collect($data["groups"])->pluck('attributes')->flatten(1)->toArray();
-
-        if(count($attributes_id_array) > count(array_unique($attributes_id_array))) throw ValidationException::withMessages(["attributes" => "Different attribute groups consisting of same aatributes"]);
+        $default_attribute_ids = Attribute::whereIsUserDefined(0)->whereIsRequired(0)->pluck('id')->toArray();
+        if(array_diff($default_attribute_ids, $attribute_ids_array)) throw ValidationException::withMessages(["attributes" => "Default attributes are missing."]);
     }
 }

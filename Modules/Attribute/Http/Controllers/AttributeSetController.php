@@ -8,19 +8,20 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Validation\ValidationException;
-use Modules\Attribute\Entities\AttributeGroup;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Attribute\Exceptions\AttributeGroupsPresent;
 use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
+use Modules\Attribute\Repositories\AttributeGroupRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
+use Modules\Attribute\Transformers\AttributeResource;
 use Modules\Attribute\Transformers\AttributeSetResource;
 
 class AttributeSetController extends BaseController
 {
-    protected $repository;
+    protected $repository, $attributeGroupRepository;
 
-    public function __construct(AttributeSetRepository $attributeSetRepository, AttributeSet $attribute_set)
+    public function __construct(AttributeSetRepository $attributeSetRepository, AttributeSet $attribute_set, AttributeGroupRepository $attributeGroupRepository)
     {
         $this->repository = $attributeSetRepository;
         $this->model = $attribute_set;
@@ -29,6 +30,8 @@ class AttributeSetController extends BaseController
             DefaultFamilyCanNotBeDeleted::class => 403,
             AttributeGroupsPresent::class => 403
         ];
+
+        $this->attributeGroupRepository = $attributeGroupRepository;
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
@@ -63,11 +66,11 @@ class AttributeSetController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $this->repository->attributeDuplicateValidation($data);
+            $this->repository->attributeValidation($data);
             
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
             $created = $this->repository->create($data, function($created) use ($request) {
-                if(isset($request->groups)) $this->repository->updateOrCreate($request->groups, $created);
+                if(isset($request->groups)) $this->attributeGroupRepository->updateOrCreate($request->groups, $created);
             });
             
         }
@@ -83,7 +86,7 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $fetched = $this->model->findOrFail($id);
+            $fetched = $this->model->with([ "attributeGroups.attributes" ])->findOrFail($id);
         }
         catch( Exception $exception )
         {
@@ -100,12 +103,11 @@ class AttributeSetController extends BaseController
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:attribute_sets,slug,{$id}"
             ]);
-            $this->repository->attributeDuplicateValidation($data);
+            $this->repository->attributeValidation($data);
 
             if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
-
             $updated = $this->repository->update($data, $id, function($updated) use ($request) {
-                if(isset($request->groups)) $this->repository->updateOrCreate($request->groups, $updated);
+                if(isset($request->groups)) $this->attributeGroupRepository->updateOrCreate($request->groups, $updated, "update");
             });
         }
         catch( Exception $exception )
@@ -146,5 +148,24 @@ class AttributeSetController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
+
+    public function unassignedAttributes(int $id): JsonResponse
+    {
+        try
+        {
+            $data = $this->model->findOrFail($id);
+
+            $attribute_ids = $data->attributeGroups->map(function($attributeGroup){
+                return $attributeGroup->attributes->pluck('id');
+            })->flatten(1)->toArray();
+            $fetched = Attribute::whereNotIn('id', $attribute_ids)->get();
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse(AttributeResource::collection($fetched), $this->lang('fetch-success'));
     }
 }
