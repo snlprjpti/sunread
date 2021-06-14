@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Event;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AttributeOptionRepository extends BaseRepository
 {
@@ -30,6 +31,7 @@ class AttributeOptionRepository extends BaseRepository
     {
         if ( count($data) == 0 ) return;
 
+        DB::beginTransaction();
         Event::dispatch("{$this->model_key}.create.before");
         $items = [];
         try
@@ -54,5 +56,6 @@ class AttributeOptionRepository extends BaseRepository
         }
 
         Event::dispatch("{$this->model_key}.create.after", $items);
+        DB::commit();
     }
 }

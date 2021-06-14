@@ -13,12 +13,5 @@ return [
 	"date" => "date",
 	// "image" => "image",
 	// "file" => "file",
-	"checkbox" => null,
-	"input" =>[
-		"decimal_number" => "decimal",
-		"integer_number" => "integer",
-		"email" => "email",
-		"letter" => "string",
-		"letterORNUmber" => "string"
-	]
+	"checkbox" => null
 ];

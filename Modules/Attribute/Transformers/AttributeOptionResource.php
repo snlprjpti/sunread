@@ -12,7 +12,7 @@ class AttributeOptionResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "position" => $this->position,
-            "translations" => $this->translations
+            "translations" => $this->whenLoaded("translations")
         ];
     }
 }

@@ -70,10 +70,11 @@ class AttributeController extends BaseController
         try
         {
             $rules = in_array($request->type, $this->repository->non_filterable_fields) ? [ "attribute_options" => "required|array" ] : [];
-            $data = $this->repository->validateData($request, $rules);
+            $data = $this->repository->validateData($request, $rules,  function() use ($request) {
+                return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
+            });
             $this->repository->validateTranslation($request);
 
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
             if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
             if($request->type != "text") $data["validation"] = null;
             
@@ -112,11 +113,12 @@ class AttributeController extends BaseController
             $rules = in_array($request->type, $this->repository->non_filterable_fields) ? [ "attribute_options" => "required|array" ] : [];
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:attributes,slug,{$id}"
-            ]);
+            ], function() use ($request) {
+                return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
+            });
             $this->repository->validateTranslation($request);
             if($this->model->findOrFail($id)->type != $data['type']) throw new AttributeCannotChangeException(__("core::app.response.type-cannot-change"));
 
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
             if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
             if($request->type != "text") $data["validation"] = null;
 

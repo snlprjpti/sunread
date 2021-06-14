@@ -52,6 +52,7 @@ class AttributeGroupRepository extends BaseRepository
     {
         if ( !is_array($groups) || count($groups) == 0 ) return;
 
+        DB::beginTransaction();
         Event::dispatch("{$this->model_key}.sync.before");
         $attributes = [];
         try
@@ -78,5 +79,6 @@ class AttributeGroupRepository extends BaseRepository
         }
 
         Event::dispatch("{$this->model_key}.sync.after", $attributes);
+        DB::commit();
     }
 }

@@ -22,7 +22,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->mainSearchKeys = [ "sku" ];
 
         $this->nestedFilterKeys = Attribute::where('use_in_layered_navigation', 1)->pluck('type', 'slug')->toArray();
-        $this->nestedSearchKeys = Attribute::where('is_searchable', 1)->pluck('type', 'slug')->toArray();;
+        $this->nestedSearchKeys = Attribute::where('is_searchable', 1)->pluck('type', 'slug')->toArray();
 
         $this->categoryFilterKeys = [ "category_id", "category_slug" ];
     }
