@@ -36,7 +36,7 @@ class AttributeFactory extends Factory
         return [
             "slug" => $slug,
             "name" => $name,
-            "type" => "select",
+            "type" => $type,
             "scope" => "global",
             "position" => rand(1,20),
             "is_required" => rand(0,1),
