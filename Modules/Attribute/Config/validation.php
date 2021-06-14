@@ -3,6 +3,7 @@
 return [
 	"text" => "string",
 	"textarea" => "string",
+	"texteditor" => "string",
 	"price" => "decimal",
 	"boolean" => "boolean",
 	"number" => "integer",
