@@ -19,7 +19,7 @@ class AttributeOptionTranslationRepository
 
     public function updateOrCreate(?array $data, object $parent): void
     {
-        if ( !is_array($data) ) return;
+        if ( count($data) == 0 ) return;
 
         Event::dispatch("{$this->model_key}.create.before");
 

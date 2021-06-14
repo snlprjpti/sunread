@@ -23,6 +23,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('groups', AttributeGroupController::class)->except(['create', 'edit']);
 
         // Attributes Routes
+        Route::get('attributes/types', [\Modules\Attribute\Http\Controllers\AttributeController::class, 'types'])->name('attributes.types');
         Route::delete('attributes/bulk', [\Modules\Attribute\Http\Controllers\AttributeController::class, 'bulkDelete'])->name('attributes.bulk-delete');
         Route::resource('attributes', AttributeController::class)->except(['create', 'edit']);
     });
