@@ -56,7 +56,7 @@ class AttributeGroupRepository extends BaseRepository
         $attributes = [];
         try
         {
-            if($method == "update") $parent->attributeGroups()->whereNotIn('id', Arr::pluck($groups, 'id'))->delete();
+            if($method == "update") $parent->attributeGroups()->whereNotIn('id', array_filter(Arr::pluck($groups, 'id')))->delete();
 
             foreach($groups as $group)
             {
