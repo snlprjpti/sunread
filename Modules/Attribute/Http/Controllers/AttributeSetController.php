@@ -50,8 +50,7 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, [ "attributeGroups.attributes" ]);
+            $fetched = $this->repository->fetchAll($request, [ "attributeGroups.attributes" ]);
         }
         catch( Exception $exception )
         {
@@ -86,7 +85,7 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with([ "attributeGroups.attributes" ])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, [ "attributeGroups.attributes" ]);
         }
         catch( Exception $exception )
         {

@@ -54,8 +54,7 @@ class AttributeController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["translations", "attribute_options.translations"]);
+            $fetched = $this->repository->fetchAll($request, ["translations", "attribute_options.translations"]);
         }
         catch( Exception $exception )
         {
@@ -95,7 +94,7 @@ class AttributeController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["translations", "attribute_options.translations"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["translations", "attribute_options.translations"]);
             $fetched->translations();
         }
         catch( Exception $exception )
