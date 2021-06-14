@@ -16,6 +16,7 @@ use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
 use Modules\Attribute\Repositories\AttributeTranslationRepository;
 use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
 use Modules\Attribute\Exceptions\AttributeNotUserDefinedException;
+use Modules\Attribute\Exceptions\AttributeCannotChangeException;
 
 class AttributeController extends BaseController
 {
@@ -29,7 +30,8 @@ class AttributeController extends BaseController
         $exception_statuses = [
             AttributeTranslationDoesNotExist::class => 422,
             AttributeTranslationOptionDoesNotExist::class => 422,
-            AttributeNotUserDefinedException::class => 403
+            AttributeNotUserDefinedException::class => 403,
+            AttributeCannotChangeException::class => 403
         ];
 
         $this->translation_repository = $attributeTranslationRepository;
@@ -112,7 +114,7 @@ class AttributeController extends BaseController
                 "slug" => "nullable|unique:attributes,slug,{$id}"
             ]);
             $this->repository->validateTranslation($request);
-            if($this->model->find($id)->type != $data['type']) throw new Exception("Type could not be changed");
+            if($this->model->findOrFail($id)->type != $data['type']) throw new AttributeCannotChangeException(__("core::app.response.type-cannot-change"));
 
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
             if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
