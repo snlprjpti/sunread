@@ -67,12 +67,14 @@ class AttributeController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
-            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
-
+            $rules = in_array($request->type, $this->repository->non_filterable_fields) ? [ "attribute_options" => "required|array" ] : [];
+            $data = $this->repository->validateData($request, $rules);
             $this->repository->validateTranslation($request);
 
+            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
+            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
+            if($request->type != "text") $data["validation"] = null;
+            
             $created = $this->repository->create($data, function($created) use ($request) {
                 $this->translation_repository->updateOrCreate($request->translations, $created);
                 if (in_array($request->type, $this->repository->non_filterable_fields)) $this->option_repository->updateOrCreate($request->attribute_options, $created);
@@ -105,17 +107,20 @@ class AttributeController extends BaseController
     {
         try
         {
+            $rules = in_array($request->type, $this->repository->non_filterable_fields) ? [ "attribute_options" => "required|array" ] : [];
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:attributes,slug,{$id}"
             ]);
+            $this->repository->validateTranslation($request);
+            if($this->model->find($id)->type != $data['type']) throw new Exception("Type could not be changed");
+
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
             if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
-
-            $this->repository->validateTranslation($request);
+            if($request->type != "text") $data["validation"] = null;
 
             $updated = $this->repository->update($data, $id, function($updated) use ($request) {
                 $this->translation_repository->updateOrCreate($request->translations, $updated);
-                if (in_array($request->type, $this->repository->non_filterable_fields)) $this->option_repository->updateOrCreate($request->attribute_options, $updated);
+                if (in_array($request->type, $this->repository->non_filterable_fields)) $this->option_repository->updateOrCreate($request->attribute_options, $updated, "update");
             });
         }
         catch( Exception $exception )
@@ -160,5 +165,20 @@ class AttributeController extends BaseController
         }
 
         return $this->successResponseWithMessage($message, 204);
+    }
+
+    public function types()
+    {
+        try
+        {
+            $types = array_keys(config("attribute_types"));
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($types, $this->lang('fetch-list-success'));
+
     }
 }
