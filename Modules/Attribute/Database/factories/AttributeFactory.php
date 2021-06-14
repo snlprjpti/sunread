@@ -29,9 +29,8 @@ class AttributeFactory extends Factory
             "multiselect",
             "datetime",
             "date",
-            "image",
-            "file",
-            "checkbox"
+            "checkbox",
+            "texteditor"
         ]);
 
         return [

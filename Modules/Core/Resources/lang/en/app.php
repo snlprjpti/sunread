@@ -23,6 +23,8 @@ return [
         'reindex-success' => ':name reindexed successfully.',
         "delete-failed" => ":name could not be deleted.",
         'bulk-reindex-success' => 'All :name reindexed successfully.',
+        'type-cannot-change' => 'Type could not be changed',
+        'missing-data' => 'Missing :name translation.'
 
 
     ],
