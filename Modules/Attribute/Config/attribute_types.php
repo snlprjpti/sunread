@@ -11,8 +11,8 @@ $types = [
 	"multiselect" => "text",
 	"datetime" => "timestamp",
 	"date" => "timestamp",
-	"image" => "text",
-	"file" => "text",
+	// "image" => "text",
+	// "file" => "text",
 	"checkbox" => "text"
 ];
 
