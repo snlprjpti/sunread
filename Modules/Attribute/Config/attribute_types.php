@@ -3,6 +3,7 @@
 $types = [
 	"text" => "string",
 	"textarea" => "text",
+	"texteditor" => "text",
 	"price" => "decimal",
 	"boolean" => "boolean",
 	"number" => "integer",
