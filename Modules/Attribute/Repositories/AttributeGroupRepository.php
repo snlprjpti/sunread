@@ -48,11 +48,12 @@ class AttributeGroupRepository extends BaseRepository
         }
     }
 
-    public function updateOrCreate($groups, $parent, $method=null): array
+    public function updateOrCreate($groups, $parent, $method=null):void
     {
-        $attributes = [];
-        DB::beginTransaction();
+        if ( !is_array($groups) || count($groups) == 0 ) return;
+
         Event::dispatch("{$this->model_key}.sync.before");
+        $attributes = [];
         try
         {
             if($method == "update") $parent->attributeGroups()->whereNotIn('id', Arr::pluck($groups, 'id'))->delete();
@@ -77,7 +78,5 @@ class AttributeGroupRepository extends BaseRepository
         }
 
         Event::dispatch("{$this->model_key}.sync.after", $attributes);
-        DB::commit();
-        return $attributes;
     }
 }
