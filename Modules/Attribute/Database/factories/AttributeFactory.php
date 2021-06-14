@@ -29,15 +29,14 @@ class AttributeFactory extends Factory
             "multiselect",
             "datetime",
             "date",
-            "image",
-            "file",
-            "checkbox"
+            "checkbox",
+            "texteditor"
         ]);
 
         return [
             "slug" => $slug,
             "name" => $name,
-            "type" => $type,
+            "type" => "select",
             "scope" => "global",
             "position" => rand(1,20),
             "is_required" => rand(0,1),
