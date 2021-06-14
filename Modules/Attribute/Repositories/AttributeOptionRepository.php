@@ -34,7 +34,7 @@ class AttributeOptionRepository extends BaseRepository
         $items = [];
         try
         {
-            if($method == "update") $parent->attribute_options()->whereNotIn('id', Arr::pluck($data, 'id'))->delete();
+            if($method == "update") $parent->attribute_options()->whereNotIn('id', array_filter(Arr::pluck($data, 'id')))->delete();
 
             foreach ($data as $row){
                 $this->validateData(new Request($row), isset($row["id"]) ? [
