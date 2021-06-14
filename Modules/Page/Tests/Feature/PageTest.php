@@ -57,49 +57,4 @@ class PageTest extends BaseTestCase
             "title" => null
         ]);
     }
-
-    public function testAdminCanFetchModelListResources()
-    {
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("model_list"));
-
-        $response->assertStatus(200);
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.fetch-success", ["name"=>"Model List"])
-        ]);
-    }
-
-    public function testAdminCanAllowPage()
-    {
-        $model_type = Arr::random(config('page.model_list'));
-        $resource_ids = app($model_type)::factory(2)->create()->pluck("id")->toArray();
-        $post_data = [
-            [
-                "model_type" => $model_type,
-                "model_id" => $resource_ids,
-                "status" => 1
-            ]
-        ];
-
-        $response = $this->withHeaders($this->headers)->put($this->getRoute("allow_page", [$this->default_resource_id]), $post_data);
-        $response->assertStatus(201);
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.create-success", ["name" => "Page Availability"])
-        ]);
-    }
-
-    public function testAdminCanDeleteAllowPage()
-    {
-        $resource_ids = PageAvailability::factory(2)->create()->pluck("id")->toArray();
-
-        $response = $this->withHeaders($this->headers)->delete($this->getRoute("delete_allow_page"),[
-            "ids" => $resource_ids
-        ]);
-
-        $response->assertStatus(204);
-
-        $check_resource = PageAvailability::whereIn("id", $resource_ids)->get()->count() > 0 ? true : false;
-        $this->assertFalse($check_resource);
-    }
 }
