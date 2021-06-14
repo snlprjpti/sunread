@@ -72,10 +72,11 @@ class PageTest extends BaseTestCase
     public function testAdminCanAllowPage()
     {
         $model_type = Arr::random(config('page.model_list'));
+        $resource_ids = app($model_type)::factory(2)->create()->pluck("id")->toArray();
         $post_data = [
             [
                 "model_type" => $model_type,
-                "model_id" => [random_int(1,10),random_int(1,10)],
+                "model_id" => $resource_ids,
                 "status" => 1
             ]
         ];
