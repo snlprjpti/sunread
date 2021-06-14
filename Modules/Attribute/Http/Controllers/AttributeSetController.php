@@ -25,7 +25,7 @@ class AttributeSetController extends BaseController
     {
         $this->repository = $attributeSetRepository;
         $this->model = $attribute_set;
-        $this->model_name = "Attribute Family";
+        $this->model_name = "Attribute Set";
         $exception_statuses = [
             DefaultFamilyCanNotBeDeleted::class => 403,
             AttributeGroupsPresent::class => 403
