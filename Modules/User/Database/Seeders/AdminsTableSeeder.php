@@ -37,6 +37,12 @@ class AdminsTableSeeder extends Seeder
                 "last_name" => "Gronberg",
                 "company" => "hdl",
                 "email" => "pierre@hbgdesignlab.se",
+            ], [
+                "first_name" => "Bijay",
+                "last_name" => "Luitel",
+                "company" => "hdl",
+                "email" => "luitelbj@gmail.com",
+                "password" => "Alice123$"
             ]
         ];
 
@@ -45,7 +51,7 @@ class AdminsTableSeeder extends Seeder
                 "first_name" => $user["first_name"] ?? "Admin",
                 "last_name" => $user["last_name"] ?? "example",
                 "email" => $user["email"] ?? "admin@example.com",
-                "password" => bcrypt("admin123"),
+                "password" => $user["password"] ?? bcrypt("admin123"),
                 "api_token" => Str::random(80),
                 "status" => 1,
                 "role_id" => 1,
