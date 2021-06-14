@@ -9,6 +9,8 @@ use Modules\Attribute\Entities\Attribute;
 
 class AttributeTest extends BaseTestCase
 {
+    public $non_filterable_fields;
+
     public function setUp(): void
     {
         $this->model = Attribute::class;
@@ -18,6 +20,7 @@ class AttributeTest extends BaseTestCase
 
         $this->model_name = "Attribute";
         $this->route_prefix = "admin.attribute.attributes";
+        $this->non_filterable_fields = ["select", "multiselect", "checkbox"];
     }
 
     public function getCreateData(): array
@@ -74,5 +77,35 @@ class AttributeTest extends BaseTestCase
 
         $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
         $this->assertFalse($check_resource);
+    }
+
+    public function testAdminCanCreateResource()
+    {
+        $post_data = $this->getCreateData();
+        if (in_array($post_data["type"], $this->non_filterable_fields))
+        {
+            $post_data["attribute_options"] = AttributeOption::factory()->create();   
+        }
+
+        $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
+        $response->assertCreated();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testAdminCanCreateResourceWithNonMandatoryData()
+    {
+        $post_data = $this->getNonMandodtaryCreateData();
+
+
+        $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
+        dd($response);
+        $response->assertCreated();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
+        ]);
     }
 }
