@@ -3,6 +3,8 @@
 
 namespace Modules\Attribute\Repositories;
 
+use Exception;
+use Illuminate\Support\Facades\Event;
 use Modules\Attribute\Entities\AttributeOption;
 
 class AttributeOptionRepository
@@ -18,7 +20,7 @@ class AttributeOptionRepository
 
     public function updateOrCreate(?array $data, object $parent): void
     {
-        if ( !is_array($data) || count($data) ) return;
+        if ( !is_array($data) ) return;
 
         Event::dispatch("{$this->model_key}.create.before");
 
@@ -29,7 +31,6 @@ class AttributeOptionRepository
                     "attribute_option_id" => $row["attribute_option_id"],
                     "attribute_id" => $parent->id
                 ];
-    
                 $created = $this->model->firstorNew($check);
                 $created->fill($row);
                 $created->save();

@@ -69,7 +69,7 @@ class AttributeController extends BaseController
         {
             $data = $this->repository->validateData($request);
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
-            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["is_filterable"] = 0;
+            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
 
             $this->repository->validateTranslation($request);
 
@@ -109,7 +109,7 @@ class AttributeController extends BaseController
                 "slug" => "nullable|unique:attributes,slug,{$id}"
             ]);
             $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
-            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["is_filterable"] = 0;
+            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
 
             $this->repository->validateTranslation($request);
 

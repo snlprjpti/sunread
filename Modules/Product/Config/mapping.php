@@ -156,28 +156,7 @@ return [
                         "attribute_group_id"=> [
                             "type"=> "long"
                         ],
-                        "created_at"=> [
-                            "type"=> "date"
-                        ],
                         "id"=> [
-                            "type"=> "long"
-                        ],
-                        "is_filterable"=> [
-                            "type"=> "long"
-                        ],
-                        "is_required"=> [
-                            "type"=> "long"
-                        ],
-                        "is_searchable"=> [
-                            "type"=> "long"
-                        ],
-                        "is_unique"=> [
-                            "type"=> "long"
-                        ],
-                        "is_user_defined"=> [
-                            "type"=> "long"
-                        ],
-                        "is_visible_on_front"=> [
                             "type"=> "long"
                         ],
                         "name"=> [
@@ -193,27 +172,6 @@ return [
                             "type"=> "long"
                         ],
                         "slug"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "type"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "updated_at"=> [
-                            "type"=> "date"
-                        ],
-                        "validation"=> [
                             "type"=> "text",
                             "fields"=> [
                                 "keyword"=> [
@@ -259,79 +217,37 @@ return [
               "path_match"=> "product_attributes.store.*",
               "mapping"=> [
                 "properties"=> [
-                  "attribute"=> [
-                      "properties"=> [
-                          "attribute_group_id"=> [
-                              "type"=> "long"
-                          ],
-                          "created_at"=> [
-                              "type"=> "date"
-                          ],
-                          "id"=> [
-                              "type"=> "long"
-                          ],
-                          "is_filterable"=> [
-                              "type"=> "long"
-                          ],
-                          "is_required"=> [
-                              "type"=> "long"
-                          ],
-                          "is_searchable"=> [
-                              "type"=> "long"
-                          ],
-                          "is_unique"=> [
-                              "type"=> "long"
-                          ],
-                          "is_user_defined"=> [
-                              "type"=> "long"
-                          ],
-                          "is_visible_on_front"=> [
-                              "type"=> "long"
-                          ],
-                          "name"=> [
-                              "type"=> "text",
-                              "fields"=> [
-                                  "keyword"=> [
-                                      "type"=> "keyword",
-                                      "ignore_above"=> 256
-                                  ]
-                              ]
-                          ],
-                          "position"=> [
-                              "type"=> "long"
-                          ],
-                          "slug"=> [
-                              "type"=> "text",
-                              "fields"=> [
-                                  "keyword"=> [
-                                      "type"=> "keyword",
-                                      "ignore_above"=> 256
-                                  ]
-                              ]
-                          ],
-                          "type"=> [
-                              "type"=> "text",
-                              "fields"=> [
-                                  "keyword"=> [
-                                      "type"=> "keyword",
-                                      "ignore_above"=> 256
-                                  ]
-                              ]
-                          ],
-                          "updated_at"=> [
-                              "type"=> "date"
-                          ],
-                          "validation"=> [
-                              "type"=> "text",
-                              "fields"=> [
-                                  "keyword"=> [
-                                      "type"=> "keyword",
-                                      "ignore_above"=> 256
-                                  ]
-                              ]
-                          ]
-                      ]
-                  ],
+                    "attribute"=> [
+                        "properties"=> [
+                            "attribute_group_id"=> [
+                                "type"=> "long"
+                            ],
+                            "id"=> [
+                                "type"=> "long"
+                            ],
+                            "name"=> [
+                                "type"=> "text",
+                                "fields"=> [
+                                    "keyword"=> [
+                                        "type"=> "keyword",
+                                        "ignore_above"=> 256
+                                    ]
+                                ]
+                            ],
+                            "position"=> [
+                                "type"=> "long"
+                            ],
+                            "slug"=> [
+                                "type"=> "text",
+                                "fields"=> [
+                                    "keyword"=> [
+                                        "type"=> "keyword",
+                                        "ignore_above"=> 256
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
                   "value"=> [
                       "type"=> "integer",
                       "ignore_malformed"=> true

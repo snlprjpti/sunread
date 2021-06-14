@@ -16,7 +16,7 @@ class Attribute extends Model
     use Sluggable, HasFactory, HasTranslation;
 
     public static $SEARCHABLE = [ "name", "type" ];
-    protected $fillable = [ "slug", "name", "type", "position", "validation", "is_required", "is_unique", "is_filterable", "is_searchable", "is_user_defined", "is_visible_on_front", "used_in_layered_navigation" ];
+    protected $fillable = [ "slug", "name", "type", "scope", "validation", "is_required", "is_searchable", "is_user_defined", "is_visible_on_storefront", "use_in_layered_navigation", "position", "comparable_on_storefront" ];
 
     protected $touches = [ 'product_attributes' ];
     public $translatedAttributes = ["name"];

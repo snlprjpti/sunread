@@ -23,14 +23,15 @@ class AttributeRepository extends BaseRepository
             "slug" => "nullable|unique:attributes,slug",
             "name" => "required",
             "type" => "required|in:{$attribute_types}",
-            "position" => "sometimes|numeric",
+            "scope" => "required|in:global,website,channel,store",
             "is_required" => "sometimes|boolean",
-            "is_unique" => "sometimes|boolean",
+            "comparable_on_storefront" => "sometimes|boolean",
             "validation" => "nullable",
-            "is_visible_on_front" => "sometimes|boolean",
+            "is_visible_on_storefront" => "sometimes|boolean",
             "is_user_defined" => "sometimes|boolean",
-            "use_in_flat" => "sometimes|boolean",
-            "attribute_group_id" =>  "nullable|exists:attribute_groups,id",
+            "use_in_layered_navigation" => "sometimes|boolean",
+            "position" => "sometimes|numeric",
+            "is_searchable" => "sometimes|boolean",
             "translations" => "nullable"
         ];
     }
