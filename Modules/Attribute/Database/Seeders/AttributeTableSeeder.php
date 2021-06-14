@@ -18,8 +18,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Slug",
                 "type" => "text",
                 "is_required" => 1,
-                "is_searchable" => 1,
-                "is_unique" => 1
+                "is_searchable" => 1
             ],
             [
                 "name" => "Name",
@@ -61,7 +60,7 @@ class AttributeTableSeeder extends Seeder
                 "type" => "price",
                 "validation" => "decimal",
                 "is_required" => 1,
-                "is_filterable" => 1
+                "use_in_layered_navigation" => 1
             ],
             [
                 "name" => "Cost",
@@ -125,14 +124,14 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Color",
                 "type" => "select",
-                "is_filterable" => 1,
+                "use_in_layered_navigation" => 1,
                 "is_configurable" => 1,
                 "is_user_defined" => 1
             ],
             [
                 "name" => "Size",
                 "type" => "select",
-                "is_filterable" => 1,
+                "use_in_layered_navigation" => 1,
                 "is_configurable" => 1,
                 "is_user_defined" => 1
             ],
@@ -145,14 +144,14 @@ class AttributeTableSeeder extends Seeder
                 "slug" => Str::slug($attribute["name"]),
                 "name" => $attribute["name"],
                 "type" => $attribute["type"],
+                "scope" => "global",
                 "validation" => $attribute["validation"] ?? NULL,
                 "position" => ++$count,
                 "is_required" => $attribute["is_required"] ?? 0,
-                "is_unique" => $attribute["is_unique"] ?? 1,
-                "is_filterable" => $attribute["is_filterable"] ?? 1,
+                "use_in_layered_navigation" => $attribute["use_in_layered_navigation"] ?? 1,
                 "is_searchable" => $attribute["is_searchable"] ?? 0,
                 "is_user_defined" => $attribute["is_user_defined"] ?? 0,
-                "is_visible_on_front" => 0,
+                "is_visible_on_storefront" => 0,
                 "created_at" => now(),
                 "updated_at" => now()
             ];
