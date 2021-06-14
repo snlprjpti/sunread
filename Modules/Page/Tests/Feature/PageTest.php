@@ -81,7 +81,7 @@ class PageTest extends BaseTestCase
             ]
         ];
 
-        $response = $this->withHeaders($this->headers)->post($this->getRoute("allow_page", [$this->default_resource_id]), $post_data);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("allow_page", [$this->default_resource_id]), $post_data);
         $response->assertStatus(201);
         $response->assertJsonFragment([
             "status" => "success",
