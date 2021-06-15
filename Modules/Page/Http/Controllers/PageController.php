@@ -60,7 +60,7 @@ class PageController extends BaseController
             $this->repository->validateTranslation($request);
 
             $created = $this->repository->create($data, function($created) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translation, $created);
+                $this->pageTranslationRepository->updateOrCreate($request->translations, $created);
             });
         }
         catch (Exception $exception)
@@ -96,7 +96,7 @@ class PageController extends BaseController
             $this->repository->validateTranslation($request);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translation, $updated);
+                $this->pageTranslationRepository->updateOrCreate($request->translations, $updated);
             });
             $updated->translations = $updated->translations()->get();
         }

@@ -47,7 +47,7 @@ class PageRepository extends BaseRepository
 
     public function validateTranslation(object $request): void
     {
-        $translations = $request->translation;
+        $translations = $request->translations;
         if (!$this->validateTranslationData($translations)) {
             throw new PageTranslationDoesNotExist(__("core.app.response.missing-data", ["title" => "Page"]));
         }
