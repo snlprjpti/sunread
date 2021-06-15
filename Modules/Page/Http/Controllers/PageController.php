@@ -57,6 +57,7 @@ class PageController extends BaseController
             $data = $this->repository->validateData($request, callback:function ($request) {
                 return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
             });
+            $this->repository->validateTranslation($request);
 
             $created = $this->repository->create($data, function($created) use($request){
                 $this->pageTranslationRepository->updateOrCreate($request->translation, $created);

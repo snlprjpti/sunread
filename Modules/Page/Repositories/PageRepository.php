@@ -4,6 +4,7 @@ namespace Modules\Page\Repositories;
 
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
+use Modules\Page\Exceptions\PageTranslationDoesNotExist;
 
 class PageRepository extends BaseRepository
 {
@@ -30,5 +31,25 @@ class PageRepository extends BaseRepository
             "translation.meta_keywords" => "sometimes|nullable",
             "translation.store_id" => "sometimes|exists:stores,id"
         ];
+    }
+
+
+    public function validateTranslationData(?array $translations): bool
+    {
+        if (empty($translations)) return false;
+
+        foreach ($translations as $translation) {
+            if (!array_key_exists("store_id", $translation) || !array_key_exists("title", $translation)) return false;
+        }
+
+        return true;
+    }
+
+    public function validateTranslation(object $request): void
+    {
+        $translations = $request->translation;
+        if (!$this->validateTranslationData($translations)) {
+            throw new PageTranslationDoesNotExist(__("core.app.response.missing-data", ["title" => "Page"]));
+        }
     }
 }
