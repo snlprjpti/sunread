@@ -23,7 +23,7 @@ class AttributeRepository extends BaseRepository
             "slug" => "nullable|unique:attributes,slug",
             "name" => "required",
             "type" => "required|in:{$attribute_types}",
-            "scope" => "required|in:global,website,channel",
+            "scope" => "required|in:global,website,channel,store",
             "is_required" => "sometimes|boolean",
             "comparable_on_storefront" => "sometimes|boolean",
             "validation" => "nullable",

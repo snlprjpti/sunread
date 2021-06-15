@@ -32,12 +32,13 @@ class AttributeFactory extends Factory
             "checkbox",
             "texteditor"
         ]);
+        $scope = Arr::random([ "global", "website", "channel", "store"]);
 
         return [
             "slug" => $slug,
             "name" => $name,
             "type" => $type,
-            "scope" => "global",
+            "scope" => $scope,
             "position" => rand(1,20),
             "is_required" => rand(0,1),
             "validation" => null,
