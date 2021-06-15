@@ -44,7 +44,7 @@ class PageAvailabilityRepository extends BaseRepository
     {
         try
         {
-            if (!class_exists($class_name) || !in_array($class_name,config('page.model_list'))) throw ValidationException::withMessages([ "model_type" => "Requested model '{$class_name}' does not exist." ]);
+            if (!class_exists($class_name)) throw ValidationException::withMessages([ "model_type" => "Requested model '{$class_name}' does not exist." ]);
         }
         catch (Exception $exception)
         {
