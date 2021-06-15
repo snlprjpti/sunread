@@ -16,7 +16,7 @@ class AttributeSet extends Model
     public static $SEARCHABLE = [ "name" ];
     protected $fillable = [ "name", "slug", "status" ];
 
-    public function attributeGroups(): HasMany
+    public function attribute_groups(): HasMany
     {
         return $this->hasMany(AttributeGroup::class, "attribute_set_id");
     }

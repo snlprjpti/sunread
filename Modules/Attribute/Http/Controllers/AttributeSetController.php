@@ -50,7 +50,7 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, [ "attributeGroups.attributes" ]);
+            $fetched = $this->repository->fetchAll($request, [ "attribute_groups.attributes" ]);
         }
         catch( Exception $exception )
         {
@@ -85,7 +85,7 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, [ "attributeGroups.attributes" ]);
+            $fetched = $this->repository->fetch($id, [ "attribute_groups.attributes" ]);
         }
         catch( Exception $exception )
         {
@@ -122,8 +122,8 @@ class AttributeSetController extends BaseController
         try
         {
             $this->repository->delete($id, function($deleted) {
-                if ($deleted->slug == 'default') throw new DefaultFamilyCanNotBeDeleted("Default family cannot be deleted.");
-                if ( count($deleted->attributeGroups) > 0 ) throw new AttributeGroupsPresent("Attribute Groups present in family.");
+                if ($deleted->slug == 'default') throw new DefaultFamilyCanNotBeDeleted($this->lang('response.default-set-delete'));
+                if ( count($deleted->attribute_groups) > 0 ) throw new AttributeGroupsPresent($this->lang('response.attribute-groups-present'));
             });
         }
         catch( Exception $exception )
@@ -155,7 +155,7 @@ class AttributeSetController extends BaseController
         {
             $data = $this->model->findOrFail($id);
 
-            $attribute_ids = $data->attributeGroups->map(function($attributeGroup){
+            $attribute_ids = $data->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes->pluck('id');
             })->flatten(1)->toArray();
             $fetched = Attribute::whereNotIn('id', $attribute_ids)->get();
