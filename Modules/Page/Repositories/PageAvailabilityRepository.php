@@ -12,15 +12,15 @@ use Modules\Page\Exceptions\AlreadyCreatedException;
 
 class PageAvailabilityRepository extends BaseRepository
 {
-    private $pageAvailability;
-
     public function __construct(PageAvailability $pageAvailability)
     {
         $this->model = $pageAvailability;
         $this->model_key = "page-availability";
+
+        $model_types_in = implode(",", config('page.model_list'));
         $this->rules = [
             "page_id" => "required|numeric",
-            "model_type" => "required",
+            "model_type" => "required|in:{$model_types_in}",
             "model_id" => "required|numeric",
             "status" => "sometimes|boolean"
         ];
@@ -57,10 +57,8 @@ class PageAvailabilityRepository extends BaseRepository
         try
         {
             $this->checkClass($data["model_type"]);
-            $tableName = App::make($data["model_type"])->getTable();
-            $merge = [
-                "model_id" => "exists:$tableName,id"
-            ];
+            $tableName = $data["model_type"]::getTable();
+            $merge = [ "model_id" => "required|numeric|exists:$tableName,id" ];
             $validator = Validator::make($data, array_merge($this->rules, $merge));
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
         }
@@ -72,7 +70,7 @@ class PageAvailabilityRepository extends BaseRepository
         return $validator->validated();
     }
 
-    public function getBulkData(object $request, object $coupon): array
+    public function getBulkData(object $request, object $resource): array
     {
         try
         {
@@ -80,7 +78,7 @@ class PageAvailabilityRepository extends BaseRepository
             foreach ($request->all() as $data) {
                 foreach ($data["model_id"] as $model_id) {
                     $allow_data[] = array_merge($this->validateAllowData([
-                        "page_id" => $coupon->id,
+                        "page_id" => $resource->id,
                         "model_type" => $data["model_type"],
                         "model_id" => $model_id,
                         "status" => $data["status"]
