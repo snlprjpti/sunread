@@ -54,10 +54,10 @@ class PageController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request,[], function ($request) {
-                $request["slug"] = $request->slug ?? $this->model->createSlug($request->title);
-                return $request->all();
+            $data = $this->repository->validateData($request, callback:function ($request) {
+                return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
             });
+
             $created = $this->repository->create($data, function($created) use($request){
                 $this->pageTranslationRepository->updateOrCreate($request->translation, $created);
             });
@@ -89,9 +89,8 @@ class PageController extends BaseController
         try
         {
             $merge = ["slug" => "nullable|unique:pages,slug,{$id}"];
-            $data = $this->repository->validateData($request,$merge, function ($request) {
-                $request["slug"] = $request->slug ?? $this->model->createSlug($request->title);
-                return $request->all();
+            $data = $this->repository->validateData($request, $merge, function ($request) {
+                return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
             });
 
             $updated = $this->repository->update($data, $id, function($updated) use($request){
