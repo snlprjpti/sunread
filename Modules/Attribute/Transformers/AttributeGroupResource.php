@@ -13,7 +13,6 @@ class AttributeGroupResource extends JsonResource
             "name" => $this->name,
             "slug" => $this->slug,
             "position" => $this->position,
-            "is_user_defined" => $this->is_user_defined,
             "attribute_set" => new AttributeSetResource($this->whenLoaded("attribute_set")),
             "attributes" => AttributeResource::collection($this->whenLoaded("attributes")),
         ];
