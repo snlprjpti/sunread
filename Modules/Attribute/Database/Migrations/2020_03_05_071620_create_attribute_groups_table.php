@@ -10,12 +10,11 @@ class CreateAttributeGroupsTable extends Migration
     {
         Schema::create('attribute_groups', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('attribute_family_id');
-            $table->foreign('attribute_family_id')->references('id')->on('attribute_families')->onDelete('cascade');
+            $table->unsignedBigInteger('attribute_set_id');
+            $table->foreign('attribute_set_id')->references('id')->on('attribute_sets')->onDelete('cascade');
             $table->string('name');
             $table->string('slug')->unique();
             $table->integer('position')->nullable();
-            $table->boolean('is_user_defined')->default(1);
             $table->timestamps();
         });
     }

@@ -3,6 +3,7 @@
 $types = [
 	"text" => "string",
 	"textarea" => "text",
+	"texteditor" => "text",
 	"price" => "decimal",
 	"boolean" => "boolean",
 	"number" => "integer",
@@ -10,8 +11,8 @@ $types = [
 	"multiselect" => "text",
 	"datetime" => "timestamp",
 	"date" => "timestamp",
-	"image" => "text",
-	"file" => "text",
+	// "image" => "text",
+	// "file" => "text",
 	"checkbox" => "text"
 ];
 

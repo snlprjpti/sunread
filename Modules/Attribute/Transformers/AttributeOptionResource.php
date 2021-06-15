@@ -11,7 +11,8 @@ class AttributeOptionResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
-            "position" => $this->position
+            "position" => $this->position,
+            "translations" => $this->whenLoaded("translations")
         ];
     }
 }

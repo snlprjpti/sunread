@@ -3,9 +3,15 @@
 
 namespace Modules\Attribute\Repositories;
 
+use Exception;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Event;
 use Modules\Attribute\Entities\AttributeOption;
+use Modules\Core\Repositories\BaseRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class AttributeOptionRepository
+class AttributeOptionRepository extends BaseRepository
 {
     protected $model, $model_key, $translation;
 
@@ -14,27 +20,34 @@ class AttributeOptionRepository
         $this->model = $attribute_option;
         $this->translation = $attributeOptionTranslationRepository;
         $this->model_key = "catalog.attribute.options";
+        $this->rules = [
+            "name" => "required",
+            "position" => "sometimes|numeric",
+            "translations" => "nullable|array"
+        ];
     }
 
-    public function updateOrCreate(?array $data, object $parent): void
+    public function updateOrCreate(?array $data, object $parent, $method=null): void
     {
-        if ( !is_array($data) || count($data) ) return;
+        if ( count($data) == 0 ) return;
 
+        DB::beginTransaction();
         Event::dispatch("{$this->model_key}.create.before");
-
+        $items = [];
         try
         {
-            foreach ($data as $row){
-                $check = [
-                    "attribute_option_id" => $row["attribute_option_id"],
-                    "attribute_id" => $parent->id
-                ];
-    
-                $created = $this->model->firstorNew($check);
-                $created->fill($row);
-                $created->save();
+            if($method == "update") $parent->attribute_options()->whereNotIn('id', array_filter(Arr::pluck($data, 'id')))->delete();
 
-                $this->translation->updateOrCreate($data, $created);
+            foreach ($data as $row){
+                $this->validateData(new Request($row), isset($row["id"]) ? [
+                    "id" => "exists:attribute_options,id"
+                ] : []);
+                
+                $row['attribute_id'] = $parent->id;
+                $created = !isset($row["id"]) ? $this->create($row) : $this->update($row, $row["id"]);
+
+                $this->translation->updateOrCreate($row["translations"], $created);
+                $items[] = $created;
             }
         }
         catch (Exception $exception)
@@ -42,6 +55,7 @@ class AttributeOptionRepository
             throw $exception;
         }
 
-        Event::dispatch("{$this->model_key}.create.after", $created);
+        Event::dispatch("{$this->model_key}.create.after", $items);
+        DB::commit();
     }
 }

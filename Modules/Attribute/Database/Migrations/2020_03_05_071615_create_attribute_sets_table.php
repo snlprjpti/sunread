@@ -4,11 +4,11 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAttributeFamiliesTable extends Migration
+class CreateAttributeSetsTable extends Migration
 {
     public function up(): void
     {
-        Schema::create('attribute_families', function (Blueprint $table) {
+        Schema::create('attribute_sets', function (Blueprint $table) {
             $table->id();
             $table->string('slug')->unique();
             $table->string('name');
@@ -20,6 +20,6 @@ class CreateAttributeFamiliesTable extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('attribute_families');
+        Schema::dropIfExists('attribute_sets');
     }
 }

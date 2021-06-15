@@ -4,7 +4,7 @@ namespace Modules\Attribute\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AttributeFamilyResource extends JsonResource
+class AttributeSetResource extends JsonResource
 {
     public function toArray($request): array
     {
@@ -13,7 +13,8 @@ class AttributeFamilyResource extends JsonResource
             "slug" => $this->slug,
             "name" => $this->name,
             "status" => $this->status,
-            "is_user_defined" => $this->is_user_defined
+            "is_user_defined" => $this->is_user_defined,
+            "groups" => AttributeGroupResource::collection($this->whenLoaded("attribute_groups")),
         ];
     }
 }

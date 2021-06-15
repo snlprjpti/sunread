@@ -3,6 +3,7 @@
 return [
 	"text" => "string",
 	"textarea" => "string",
+	"texteditor" => "string",
 	"price" => "decimal",
 	"boolean" => "boolean",
 	"number" => "integer",
@@ -10,7 +11,7 @@ return [
 	"multiselect" => null,
 	"datetime" => "date",
 	"date" => "date",
-	"image" => "image",
-	"file" => "file",
+	// "image" => "image",
+	// "file" => "file",
 	"checkbox" => null
 ];

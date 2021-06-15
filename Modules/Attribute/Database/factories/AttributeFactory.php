@@ -29,22 +29,21 @@ class AttributeFactory extends Factory
             "multiselect",
             "datetime",
             "date",
-            "image",
-            "file",
-            "checkbox"
+            "checkbox",
+            "texteditor"
         ]);
+        $scope = Arr::random([ "global", "website", "channel", "store"]);
 
         return [
             "slug" => $slug,
             "name" => $name,
             "type" => $type,
+            "scope" => $scope,
             "position" => rand(1,20),
             "is_required" => rand(0,1),
-            "is_unique" => rand(0,1),
             "validation" => null,
-            "is_visible_on_front" => rand(0,1),
+            "is_visible_on_storefront" => rand(0,1),
             "is_user_defined" => rand(0,1),
-            "attribute_group_id" => AttributeGroup::factory()->create()->id
         ];
     }
 }

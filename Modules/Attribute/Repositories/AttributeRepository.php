@@ -23,15 +23,16 @@ class AttributeRepository extends BaseRepository
             "slug" => "nullable|unique:attributes,slug",
             "name" => "required",
             "type" => "required|in:{$attribute_types}",
-            "position" => "sometimes|numeric",
+            "scope" => "required|in:global,website,channel,store",
             "is_required" => "sometimes|boolean",
-            "is_unique" => "sometimes|boolean",
+            "comparable_on_storefront" => "sometimes|boolean",
             "validation" => "nullable",
-            "is_visible_on_front" => "sometimes|boolean",
+            "is_visible_on_storefront" => "sometimes|boolean",
             "is_user_defined" => "sometimes|boolean",
-            "use_in_flat" => "sometimes|boolean",
-            "attribute_group_id" =>  "nullable|exists:attribute_groups,id",
-            "translations" => "nullable"
+            "use_in_layered_navigation" => "sometimes|boolean",
+            "position" => "sometimes|numeric",
+            "is_searchable" => "sometimes|boolean",
+            "translations" => "nullable|array"
         ];
     }
 
@@ -50,14 +51,14 @@ class AttributeRepository extends BaseRepository
     {
         $translations = $request->translations;
         if (!$this->validateTranslationData($translations)) {
-            throw new AttributeTranslationDoesNotExist("Missing attribute translation.");
+            throw new AttributeTranslationDoesNotExist(__("core.app.response.missing-data", ["name" => "Attribute"]));
         }
 
         $options = $request->attribute_options;
         if (is_array($options) && in_array($request->type, $this->non_filterable_fields)) {
             foreach ($options as $option) {
                 if (!isset($option["translations"]) || !$this->validateTranslationData($option["translations"])) {
-                    throw new AttributeTranslationOptionDoesNotExist("Missing Attribute Option translation.");
+                    throw new AttributeTranslationOptionDoesNotExist(__("core.app.response.missing-data", ["name" => "Attribute Option"]));
                 }
             }
         }

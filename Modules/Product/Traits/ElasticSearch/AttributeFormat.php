@@ -88,7 +88,7 @@ trait AttributeFormat
             "slug" => $attribute["slug"],
             "name" => $attribute["name"],
             "position" => $attribute["position"],
-            "attribute_group_id" => $attribute["attribute_group_id"]
+            // "attribute_group_id" => $attribute["attribute_group_id"]
         ];
     }
 

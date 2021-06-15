@@ -3,9 +3,9 @@
 namespace Modules\Attribute\Contracts;
 
 /**
- * Interface AttributeFamily Interface
+ * Interface AttributeSet Interface
  */
-interface AttributeFamilyInterface
+interface AttributeSetInterface
 {
 
 }

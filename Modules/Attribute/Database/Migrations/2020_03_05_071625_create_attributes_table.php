@@ -10,20 +10,18 @@ class CreateAttributesTable extends Migration
     {
         Schema::create('attributes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('attribute_group_id')->nullable();
-            $table->foreign('attribute_group_id')->references('id')->on('attribute_groups')->onDelete('set null');
-
             $table->string('slug')->unique();
             $table->string('name');
             $table->string('type');
+            $table->string('scope');
             $table->string('validation')->nullable();
-            $table->integer('position')->nullable();
             $table->boolean('is_required')->default(0);
-            $table->boolean('is_unique')->default(0);
-            $table->boolean('is_filterable')->default(0);
+            $table->boolean('comparable_on_storefront')->default(0);
             $table->boolean('is_searchable')->default(0);
             $table->boolean('is_user_defined')->default(1);
-            $table->boolean('is_visible_on_front')->default(0);
+            $table->boolean('is_visible_on_storefront')->default(0);
+            $table->boolean('use_in_layered_navigation')->default(0);
+            $table->integer('position')->nullable();
 
             $table->timestamps();
         });

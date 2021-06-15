@@ -18,8 +18,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Slug",
                 "type" => "text",
                 "is_required" => 1,
-                "is_searchable" => 1,
-                "is_unique" => 1
+                "is_searchable" => 1
             ],
             [
                 "name" => "Name",
@@ -61,7 +60,7 @@ class AttributeTableSeeder extends Seeder
                 "type" => "price",
                 "validation" => "decimal",
                 "is_required" => 1,
-                "is_filterable" => 1
+                "use_in_layered_navigation" => 1
             ],
             [
                 "name" => "Cost",
@@ -125,14 +124,14 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Color",
                 "type" => "select",
-                "is_filterable" => 1,
+                "use_in_layered_navigation" => 1,
                 "is_configurable" => 1,
                 "is_user_defined" => 1
             ],
             [
                 "name" => "Size",
                 "type" => "select",
-                "is_filterable" => 1,
+                "use_in_layered_navigation" => 1,
                 "is_configurable" => 1,
                 "is_user_defined" => 1
             ],
@@ -145,14 +144,14 @@ class AttributeTableSeeder extends Seeder
                 "slug" => Str::slug($attribute["name"]),
                 "name" => $attribute["name"],
                 "type" => $attribute["type"],
+                "scope" => "global",
                 "validation" => $attribute["validation"] ?? NULL,
                 "position" => ++$count,
                 "is_required" => $attribute["is_required"] ?? 0,
-                "is_unique" => $attribute["is_unique"] ?? 1,
-                "is_filterable" => $attribute["is_filterable"] ?? 1,
+                "use_in_layered_navigation" => $attribute["use_in_layered_navigation"] ?? 1,
                 "is_searchable" => $attribute["is_searchable"] ?? 0,
                 "is_user_defined" => $attribute["is_user_defined"] ?? 0,
-                "is_visible_on_front" => 0,
+                "is_visible_on_storefront" => 0,
                 "created_at" => now(),
                 "updated_at" => now()
             ];
@@ -169,31 +168,5 @@ class AttributeTableSeeder extends Seeder
             ];
         }, $attributes);
         DB::table("attribute_translations")->insert($attribute_translations_array);
-
-        $attribute_groups = [
-            1 => [1, 2, 3, 4, 5, 6, 20, 21, 22],
-            2 => [7, 8],
-            3 => [14, 15, 16],
-            4 => [9, 10, 11, 12, 13],
-            5 => [17, 18, 19, 20]
-        ];
-        $attribute_groups_mapping = [];
-        foreach ($attribute_groups as $group_id => $group) {
-            foreach ($group as $position => $attribute_id) {
-                $attribute_groups_mapping[] = [
-                    "attribute_id" => $attribute_id,
-                    "attribute_group_id" => $group_id,
-                    "position" => $position + 1
-                ];
-            }
-        }
-
-        foreach ($attribute_groups_mapping as $map){
-            $attribute = Attribute::find($map["attribute_id"]);
-            if (!$attribute) continue;
-
-            unset($map["attribute_id"]);
-            $attribute->update($map);
-        }
     }
 }
