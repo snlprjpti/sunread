@@ -8,5 +8,6 @@
     "Brand": true,
     "Review": true,
     "UrlRewrite": true,
-    "Coupon": true
+    "Coupon": true,
+    "Page": true
 }
