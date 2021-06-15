@@ -29,7 +29,7 @@ class Page extends Model
         return $this->belongsTo(static::class, "parent_id");
     }
 
-    public function scopePublished($query): object
+    public function scopePublished(object $query): object
     {
         return $query->whereStatus(1);
     }
