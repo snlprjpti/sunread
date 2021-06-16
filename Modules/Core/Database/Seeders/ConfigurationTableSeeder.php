@@ -19,7 +19,7 @@ class ConfigurationTableSeeder extends Seeder
             [
                 "scope" => "global",
                 "scope_id" => 0,
-                "path" => "web/seo/use_rewrites",
+                "path" => "default_country",
                 "value" => "1",
                 "created_at" => now(),
                 "updated_at" => now()
