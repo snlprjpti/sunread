@@ -15,7 +15,7 @@ class ProductTableSeeder extends Seeder
                 ->has(ProductAttribute::factory(), 'product_attributes')
                 ->create([
                     "parent_id" => Product::factory()->configurable()->create()->id,
-                    "attribute_group_id" => 1
+                    "attribute_set_id" => 1
                 ]);
         });
     }

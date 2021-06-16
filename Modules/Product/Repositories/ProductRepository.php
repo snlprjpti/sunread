@@ -21,7 +21,7 @@ class ProductRepository extends BaseRepository
         $this->rules = [
             "parent_id" => "sometimes|nullable|exists:products,id",
             "brand_id" => "sometimes|nullable|exists:brands,id",
-            "attribute_group_id" => "required|exists:attribute_groups,id",
+            "attribute_set_id" => "required|exists:attribute_sets,id",
             "sku" => "required|unique:products,sku",
             "type" => "required|in:simple,configurable",
             "status" => "sometimes|boolean",
