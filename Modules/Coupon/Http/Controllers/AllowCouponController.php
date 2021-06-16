@@ -55,6 +55,7 @@ class AllowCouponController extends BaseController
         {
             return $this->handleException($exception);
         }
+
         return $this->successResponseWithMessage($this->lang('create-success'), 201);
     }
 
