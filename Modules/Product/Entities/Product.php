@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Attribute\Entities\AttributeGroup;
+use Modules\Attribute\Entities\AttributeSet;
 use Modules\Brand\Entities\Brand;
 use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Channel;
@@ -19,7 +20,7 @@ class Product extends Model
 {
     use HasFactory, Searchable, ElasticSearchFormat ;
 
-    protected $fillable = [ "parent_id", "brand_id", "attribute_group_id", "sku", "type", "status" ];
+    protected $fillable = [ "parent_id", "brand_id", "attribute_set_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];
 
     protected $indexConfigurator = ProductIndexConfigurator::class;
@@ -54,6 +55,11 @@ class Product extends Model
     public function attribute_group(): BelongsTo
     {
         return $this->belongsTo(AttributeGroup::class)->with(["attributes"]);
+    }
+
+    public function attribute_set(): BelongsTo
+    {
+        return $this->belongsTo(AttributeSet::class)->with(["attributes"]);
     }
 
     public function brand(): BelongsTo
