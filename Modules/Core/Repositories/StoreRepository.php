@@ -19,7 +19,8 @@ class StoreRepository extends BaseRepository
             "locale" => "required",
             "image" => "required|mimes:bmp,jpeg,jpg,png,webp",
             "position" => "sometimes|numeric",
-            "status" => "sometimes|boolean"
+            "status" => "sometimes|boolean",
+            "channel_id" => "required|exists:channels,id",
         ];
     }
 
