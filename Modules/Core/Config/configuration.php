@@ -19,7 +19,8 @@ return[
                                 "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "global"
                             ],
                             [
                                 "title" => "Allow Countries",
@@ -30,7 +31,8 @@ return[
                                 "default" => [],
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "website"
                             ],
                             [
                                 "title" => "Zip/Postal Code is Optional for",
@@ -42,7 +44,8 @@ return[
                                 "options" => [],
                                 "rules" => "nullable",
                                 "showIn" => ['channel', 'website', 'default', 'store'],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "channel"
                             ]
                         ]
                     ],
@@ -59,193 +62,207 @@ return[
                                 "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "store"
                             ],
                         ]
                     ],
-                    [
-                        "title" => "Store Information",
-                        "elements" => [
-                            [
-                                "title" => "Store Name",
-                                "path" => "store_name",
-                                "type" => "select",
-                                "provider" => "Modules\Core\Entities\Store",
-                                "pluck" => ["name", "id"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"],
-                                "multiple" => false
-                            ],
-                            [
-                                "title" => "Store Phone Number",
-                                "path" => "store_phone_number",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
-                            ],
-                            [
-                                "title" => "Store Hours of Operation",
-                                "path" => "store_hours_operation",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "sometimes|nullable",
-                                "showIn" => ["channel","website","default","store"] 
-                            ],
-                            [
-                                "title" => "Country",
-                                "path" => "store_country",
-                                "type" => "select",
-                                "provider" => "Modules\Core\Entities\Currency",
-                                "pluck" => ["code", "id"],
-                                "default" => [],
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"],
-                                "multiple" => true
-                            ],
-                            [
-                                "title" => "Region/State",
-                                "path" => "store_region",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
-                            ],
-                            [
-                                "title" => "Zip/Postal Code",
-                                "path" => "store_zip_code",
-                                "type" => "number",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required|numeric",
-                                "showIn" => ["channel","website","default","store"] 
-                            ],
-                            [
-                                "title" => "City",
-                                "path" => "store_city",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
-                            ],
-                            [
-                                "title" => "Street Address",
-                                "path" => "store_street_address",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
-                            ],
-                            [
-                                "title" => "Street Address Line 2",
-                                "path" => "store_address_line2",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "sometimes|nullable",
-                                "showIn" => ["channel","website","default","store"] 
-                            ],
-                        ]
-                    ]
+                    // [
+                    //     "title" => "Store Information",
+                    //     "elements" => [
+                    //         [
+                    //             "title" => "Store Name",
+                    //             "path" => "store_name",
+                    //             "type" => "select",
+                    //             "provider" => "Modules\Core\Entities\Store",
+                    //             "pluck" => ["name", "id"],
+                    //             "default" => "",
+                    //             "options" => [],
+                    //             "rules" => "required",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "multiple" => false,
+                    //             "scope" => "global"
+                    //         ],
+                    //         [
+                    //             "title" => "Store Phone Number",
+                    //             "path" => "store_phone_number",
+                    //             "type" => "text",
+                    //             "provider" => "",
+                    //             "pluck" => [],
+                    //             "default" => "",
+                    //             "options" => [],
+                    //             "rules" => "required",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "scope" => "channel"
+                    //         ],
+                    //         [
+                    //             "title" => "Store Hours of Operation",
+                    //             "path" => "store_hours_operation",
+                    //             "type" => "text",
+                    //             "provider" => "",
+                    //             "pluck" => [],
+                    //             "default" => "",
+                    //             "options" => [],
+                    //             "rules" => "sometimes|nullable",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "scope" => "website"
+                    //         ],
+                    //         [
+                    //             "title" => "Country",
+                    //             "path" => "store_country",
+                    //             "type" => "select",
+                    //             "provider" => "Modules\Core\Entities\Currency",
+                    //             "pluck" => ["code", "id"],
+                    //             "default" => [],
+                    //             "options" => [],
+                    //             "rules" => "required",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "multiple" => true,
+                    //             "scope" => "store"
+                    //         ],
+                    //         [
+                    //             "title" => "Region/State",
+                    //             "path" => "store_region",
+                    //             "type" => "text",
+                    //             "provider" => "",
+                    //             "pluck" => [],
+                    //             "default" => "",
+                    //             "options" => [],
+                    //             "rules" => "required",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "scope" => "global"
+                    //         ],
+                    //         [
+                    //             "title" => "Zip/Postal Code",
+                    //             "path" => "store_zip_code",
+                    //             "type" => "number",
+                    //             "provider" => "",
+                    //             "pluck" => [],
+                    //             "default" => "",
+                    //             "options" => [],
+                    //             "rules" => "required|numeric",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "scope" => "store"
+                    //         ],
+                    //         [
+                    //             "title" => "City",
+                    //             "path" => "store_city",
+                    //             "type" => "text",
+                    //             "provider" => "",
+                    //             "pluck" => [],
+                    //             "default" => "",
+                    //             "options" => [],
+                    //             "rules" => "required",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "scope" => "global"
+                    //         ],
+                    //         [
+                    //             "title" => "Street Address",
+                    //             "path" => "store_street_address",
+                    //             "type" => "text",
+                    //             "provider" => "",
+                    //             "pluck" => [],
+                    //             "default" => "",
+                    //             "options" => [],
+                    //             "rules" => "required",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "scope" => "website"
+                    //         ],
+                    //         [
+                    //             "title" => "Street Address Line 2",
+                    //             "path" => "store_address_line2",
+                    //             "type" => "text",
+                    //             "provider" => "",
+                    //             "pluck" => [],
+                    //             "default" => "",
+                    //             "options" => [],
+                    //             "rules" => "sometimes|nullable",
+                    //             "showIn" => ["channel","website","default","store"],
+                    //             "scope" => "channel"
+                    //         ],
+                    //     ]
+                    // ]
                 ]
             ],
-            [
-                "title" => "Web",
-                "subChildren" => [
-                    [
-                        "title" => "Search Engine Optimization",
-                        "elements" => [
-                            [
-                                "title" => "Use Web Server Rewrites",
-                                "path" => "use_rewrite",
-                                "type" => "radio",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "1",
-                                "options" => [ 
-                                    [ "value" => 1, "label" => "Yes" ],
-                                    [ "value" => 0, "label" => "No" ]
-                                ],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
-                            ]
-                        ]
-                    ],
-                    [
-                        "title" => "Base URLs",
-                        "elements" => [
-                            [
-                                "title" => "Base URL",
-                                "path" => "base_url",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
-                            ],
+            // [
+            //     "title" => "Web",
+            //     "subChildren" => [
+            //         [
+            //             "title" => "Search Engine Optimization",
+            //             "elements" => [
+            //                 [
+            //                     "title" => "Use Web Server Rewrites",
+            //                     "path" => "use_rewrite",
+            //                     "type" => "radio",
+            //                     "provider" => "",
+            //                     "pluck" => [],
+            //                     "default" => "1",
+            //                     "options" => [ 
+            //                         [ "value" => 1, "label" => "Yes" ],
+            //                         [ "value" => 0, "label" => "No" ]
+            //                     ],
+            //                     "rules" => "required",
+            //                     "showIn" => ["channel","website","default","store"],
+            //                     "scope" => "store"
+            //                 ]
+            //             ]
+            //         ],
+            //         [
+            //             "title" => "Base URLs",
+            //             "elements" => [
+            //                 [
+            //                     "title" => "Base URL",
+            //                     "path" => "base_url",
+            //                     "type" => "text",
+            //                     "provider" => "",
+            //                     "pluck" => [],
+            //                     "default" => "",
+            //                     "options" => [],
+            //                     "rules" => "required",
+            //                     "showIn" => ["channel","website","default","store"],
+            //                     "scope" => "website"
+            //                 ],
 
-                        ]
-                    ]
-                ]
-            ],
-            [
-                "title" => "Currency Setup",
-                "subChildren" => [
-                    [
-                        "title" => "Currency Options",
-                        "elements" => [
-                            [
-                                "title" => "Base Currency",
-                                "path" => "base_currency",
-                                "type" => "select",
-                                "provider" => "Modules\Core\Entities\Currency",
-                                "pluck" => ["code","id"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"],
-                                "multiple" => false
-                            ],
-                            [
-                                "title" => "Default Display Currency",
-                                "path" => "default_display_currency",
-                                "type" => "select",
-                                "provider" => "Modules\Core\Entities\Currency",
-                                "pluck" => ["code","id"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "required",
-                                "showIn" => ["channel","website","default","store"],
-                                "multiple" => false
-                            ],
-                        ]
-                    ],
-                ]
-            ]
+            //             ]
+            //         ]
+            //     ]
+            // ],
+            // [
+            //     "title" => "Currency Setup",
+            //     "subChildren" => [
+            //         [
+            //             "title" => "Currency Options",
+            //             "elements" => [
+            //                 [
+            //                     "title" => "Base Currency",
+            //                     "path" => "base_currency",
+            //                     "type" => "select",
+            //                     "provider" => "Modules\Core\Entities\Currency",
+            //                     "pluck" => ["code","id"],
+            //                     "default" => "",
+            //                     "options" => [],
+            //                     "rules" => "required",
+            //                     "showIn" => ["channel","website","default","store"],
+            //                     "multiple" => false,
+            //                     "scope" => "global"
+            //                 ],
+            //                 [
+            //                     "title" => "Default Display Currency",
+            //                     "path" => "default_display_currency",
+            //                     "type" => "select",
+            //                     "provider" => "Modules\Core\Entities\Currency",
+            //                     "pluck" => ["code","id"],
+            //                     "default" => "",
+            //                     "options" => [],
+            //                     "rules" => "required",
+            //                     "showIn" => ["channel","website","default","store"],
+            //                     "multiple" => false,
+            //                     "scope" => "website"
+            //                 ],
+            //             ]
+            //         ],
+            //     ]
+            // ]
 
         ]
     ],
@@ -267,7 +284,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "store"
                             ],
                             [
                                 "title" => "Mask for Meta Title",
@@ -278,7 +296,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "channel"
                             ],
                             [
                                 "title" => "Mask for Meta Keywords",
@@ -289,7 +308,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "store"
                             ],
                             [
                                 "title" => "Mask for Meta description",
@@ -300,7 +320,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "website"
                             ],
                         ]
 
@@ -330,7 +351,8 @@ return[
                                     [ "value" => 0, "label" => "No" ]
                                 ],
                                 "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "global"
                             ],
                             [
                                 "title" => "Default Customer Group",
@@ -342,7 +364,8 @@ return[
                                 "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "website"
                             ]
                         ]
                     ]
