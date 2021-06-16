@@ -11,6 +11,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 
 class ProductController extends BaseController
 {
@@ -21,8 +22,11 @@ class ProductController extends BaseController
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $productRepository;
+        $exception_statuses = [
+            ProductAttributeCannotChangeException::class => 403
+        ];
 
-        parent::__construct($this->model, $this->model_name);
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -89,6 +93,8 @@ class ProductController extends BaseController
     {
         try
         {
+            if ( $this->model::findOrFail($id)->attribute_set_id != $request->attribute_set_id ) throw new ProductAttributeCannotChangeException("Attribute set cannot be change.");
+            
             $data = $this->repository->validateData($request, [
                 "sku" => "required|unique:products,sku,{$id}"
             ]);
