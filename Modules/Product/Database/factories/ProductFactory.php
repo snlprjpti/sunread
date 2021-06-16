@@ -4,7 +4,7 @@ namespace Modules\Product\Database\factories;
 use Illuminate\Support\Arr;
 use Modules\Brand\Entities\Brand;
 use Modules\Product\Entities\Product;
-use Modules\Attribute\Entities\AttributeGroup;
+use Modules\Attribute\Entities\AttributeSet;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
@@ -16,7 +16,7 @@ class ProductFactory extends Factory
         return [
             "parent_id" => null,
             "brand_id" => Brand::factory()->create()->id,
-            "attribute_group_id" => AttributeGroup::factory()->create()->id,
+            "attribute_set_id" => AttributeSet::factory()->create()->id,
 
             "sku" => $this->faker->unique()->slug(),
             "type" => "simple",
