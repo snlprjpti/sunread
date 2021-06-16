@@ -103,6 +103,9 @@ class ConfigurationRepository extends BaseRepository
 
         foreach($request->items as $key => $val)
         {
+            if(!isset($val["absolute_path"])) throw ValidationException::withMessages(["Absolute path of $key is missing"]);
+            if(!isset($val["value"])) throw ValidationException::withMessages(["Value of $key is missing"]);
+
             $configDataArray = config('configuration.'.$val["absolute_path"]);
             if(!$configDataArray) throw ValidationException::withMessages(["Absolute path of $key doesnt exists"]);
 
