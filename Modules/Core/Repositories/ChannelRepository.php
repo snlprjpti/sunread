@@ -13,7 +13,6 @@ class ChannelRepository extends BaseRepository
         $this->model_key = "core.channel";
         $this->rules = [
             /* Foreign Keys */
-            "stores.*" => "sometimes|required|exists:stores,id",
             "default_store_id" => "nullable|exists:stores,id",
             "default_currency" => "nullable|exists:currencies,code",
             "website_id" => "required|exists:websites,id",
