@@ -49,10 +49,10 @@ class ConfigurationController extends BaseController
                 return $current_data->all();
             });
 
-            if(!isset($request->scope)) $data["scope"] = "default";
+            if(!isset($request->scope)) $data["scope"] = "global";
             if(!isset($request->scope_id)) $data["scope_id"] = 0;
 
-            $created_data = $this->add((object) $data);
+            $created_data = $this->repository->add((object) $data);
         }
         catch( Exception $exception )
         {
