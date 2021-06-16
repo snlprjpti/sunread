@@ -36,7 +36,7 @@ class ConfigurationTest extends BaseTestCase
             "items" => [
                 "optional_zip_countries" => [
                     "value" => null,
-                    "scope" => "channel"
+                    "absolute_path" => "general.children.0.subChildren.0.elements.2"
                 ],
             ]
         ]);
@@ -50,7 +50,7 @@ class ConfigurationTest extends BaseTestCase
             "items" => [
                 "optional_zip_countries" => [
                     "value" => 5,
-                    "scope" => "global"
+                    "absolute_path" => "general.children.0.subChildren.0.elements.2"
                 ]
             ]
         ]);
@@ -64,7 +64,7 @@ class ConfigurationTest extends BaseTestCase
             "items" => [
                 $this->default_resource->path => [
                     "value" => 15,
-                    "scope" => "global"
+                    "absolute_path" => "general.children.0.subChildren.0.elements.0"
                 ]
             ]
         ]);
