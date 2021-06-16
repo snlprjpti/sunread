@@ -62,13 +62,7 @@ class AllowCouponController extends BaseController
     {
         try
         {
-            $request->validate([
-                'ids' => 'array|required',
-                'ids.*' => 'required|exists:allow_coupons,id',
-            ]);
-
-            $deleted = $this->model->whereIn('id', $request->ids);
-            $deleted->delete();
+            $this->repository->bulkDelete($request);
         }
         catch( Exception $exception )
         {
