@@ -14,10 +14,11 @@ class ConfigurationFactory extends Factory
 
     public function definition(): array
     {
-        $scopes = [ "global", "website", "channel", "store" ];
-        $path = Arr::random([ "default_country", "allow_countries", "optional_zip_countries" ]);
+        $paths = [ "default_country", "allow_countries", "optional_zip_countries" ];
+        $absolute_paths = [ "general.children.0.subChildren.0.elements.0", "general.children.0.subChildren.0.elements.1", "general.children.0.subChildren.0.elements.2" ];
+        $i = rand(0,2);
         $scope_id = 0;
-        $scope = Arr::random($scopes);
+        $scope = Arr::random([ "global", "website", "channel", "store" ]);
 
         switch ($scope) {
             case "website":
@@ -37,9 +38,9 @@ class ConfigurationFactory extends Factory
             'scope' => $scope,
             'scope_id' => $scope_id,
             'items' => [
-                $path => [
+                $paths[$i] => [
                     'value' => $this->faker->name(),
-                    'scope' => Arr::random($scopes),
+                    'absolute_path' => $absolute_paths[$i],
                     'use_default_value' => rand(0,1)
                 ] 
             ]
