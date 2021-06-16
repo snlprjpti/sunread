@@ -57,9 +57,10 @@ class PageController extends BaseController
             $data = $this->repository->validateData($request, callback:function ($request) {
                 return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
             });
+            $this->repository->validateTranslation($request);
 
             $created = $this->repository->create($data, function($created) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translation, $created);
+                $this->pageTranslationRepository->updateOrCreate($request->translations, $created);
             });
         }
         catch (Exception $exception)
@@ -92,9 +93,10 @@ class PageController extends BaseController
             $data = $this->repository->validateData($request, $merge, function ($request) {
                 return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
             });
+            $this->repository->validateTranslation($request);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translation, $updated);
+                $this->pageTranslationRepository->updateOrCreate($request->translations, $updated);
             });
             $updated->translations = $updated->translations()->get();
         }

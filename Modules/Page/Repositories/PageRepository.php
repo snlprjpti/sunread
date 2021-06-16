@@ -4,6 +4,7 @@ namespace Modules\Page\Repositories;
 
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
+use Modules\Page\Exceptions\PageTranslationDoesNotExist;
 
 class PageRepository extends BaseRepository
 {
@@ -12,7 +13,6 @@ class PageRepository extends BaseRepository
         $this->model = $page;
         $this->model_key = "page";
         $this->rules = [
-            // page validation
             "parent_id" => "sometimes|numeric|exists:pages,id",
             "slug" => "nullable|unique:pages,slug",
             "title" => "required",
@@ -22,13 +22,27 @@ class PageRepository extends BaseRepository
             "meta_title" => "sometimes|nullable",
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
-            // translation validation
-            "translation.title" => "sometimes|required",
-            "translation.description" => "sometimes|nullable",
-            "translation.meta_title" => "sometimes|nullable",
-            "translation.meta_description" => "sometimes|nullable",
-            "translation.meta_keywords" => "sometimes|nullable",
-            "translation.store_id" => "sometimes|exists:stores,id"
+            "translations" => "nullable|array"
         ];
+    }
+
+
+    public function validateTranslationData(?array $translations): bool
+    {
+        if (empty($translations)) return false;
+
+        foreach ($translations as $translation) {
+            if (!array_key_exists("store_id", $translation) || !array_key_exists("title", $translation)) return false;
+        }
+
+        return true;
+    }
+
+    public function validateTranslation(object $request): void
+    {
+        $translations = $request->translations;
+        if (!$this->validateTranslationData($translations)) {
+            throw new PageTranslationDoesNotExist(__("core.app.response.missing-data", ["title" => "Page"]));
+        }
     }
 }
