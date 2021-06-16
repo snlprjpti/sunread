@@ -85,6 +85,7 @@ class CouponController extends BaseController
         {
             return $this->handleException($exception);
         }
+
         return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
@@ -154,6 +155,5 @@ class CouponController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
-
     }
 }
