@@ -13,7 +13,6 @@ class PageRepository extends BaseRepository
         $this->model = $page;
         $this->model_key = "page";
         $this->rules = [
-            // page validation
             "parent_id" => "sometimes|numeric|exists:pages,id",
             "slug" => "nullable|unique:pages,slug",
             "title" => "required",
@@ -23,13 +22,7 @@ class PageRepository extends BaseRepository
             "meta_title" => "sometimes|nullable",
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
-            // translation validation
-            "translation.title" => "sometimes|required",
-            "translation.description" => "sometimes|nullable",
-            "translation.meta_title" => "sometimes|nullable",
-            "translation.meta_description" => "sometimes|nullable",
-            "translation.meta_keywords" => "sometimes|nullable",
-            "translation.store_id" => "sometimes|exists:stores,id"
+            "translations" => "nullable|array"
         ];
     }
 
