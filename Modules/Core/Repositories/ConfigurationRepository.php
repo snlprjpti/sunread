@@ -66,7 +66,7 @@ class ConfigurationRepository extends BaseRepository
     
                             $element["default"] = $this->has((object) $checkKey) ? $this->getDefaultValues((object) $checkKey) : $element["default"];
                             if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
-                           // $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
+                            $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
                             
                             unset($element["pluck"], $element["provider"], $element["rules"], $element["showIn"]);
                             $subchildren["elements"][$k] = $element;
@@ -103,6 +103,12 @@ class ConfigurationRepository extends BaseRepository
 
         foreach($request->items as $key => $val)
         {
+            $configDataArray = config('configuration.'.$val["absolute_path"]);
+            if(!$configDataArray) throw ValidationException::withMessages(["Absolute path of $key doesnt exists"]);
+
+            if($configDataArray["path"] != $key) throw ValidationException::withMessages([$key. " doesnt exists in ". $val["absolute_path"]]);
+
+            $val["scope"] = $configDataArray["scope"];
             if(!isset($val['scope']) || !in_array($val['scope'], [ 'global', 'website', 'channel', 'store' ]) )
             throw ValidationException::withMessages(["Scope of $key doesnt exists"]);
         
@@ -189,7 +195,7 @@ class ConfigurationRepository extends BaseRepository
 
     public function createORUpdate(array $item): object
     {
-        if($this->use_default_value == 0 && $item["scope"] == $this->request_scope["scope"]  && strval($item["scope_id"]) == $this->request_scope["scope_id"]) $item["use_default_value"] = $this->use_default_value;
+        if($this->request_scope["scope"] != "global" && $this->use_default_value == 0 && $item["scope"] == $this->request_scope["scope"]  && strval($item["scope_id"]) == $this->request_scope["scope_id"]) $item["use_default_value"] = $this->use_default_value;
 
         if($configData = $this->checkCondition((object) $item)->first())
         {
