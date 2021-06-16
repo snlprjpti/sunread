@@ -65,9 +65,7 @@ class ChannelController extends BaseController
                 $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
             }
 
-            $created = $this->repository->create($data, function($created) use ($request) {
-                $created->stores()->sync($request->stores);
-            });
+            $created = $this->repository->create($data);
         }
         catch( Exception $exception )
         {
@@ -110,9 +108,7 @@ class ChannelController extends BaseController
                 $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
             }
 
-            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
-                $updated->stores()->sync($request->stores);
-            });
+            $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )
         {
