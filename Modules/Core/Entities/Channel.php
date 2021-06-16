@@ -5,6 +5,7 @@ namespace Modules\Core\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
 use Modules\Core\Traits\HasFactory;
@@ -24,9 +25,9 @@ class Channel extends Model
         return $this->belongsTo(Store::class, "default_store_id");
     }
 
-    public function stores(): BelongsToMany
+    public function stores(): HasMany
     {
-        return $this->belongsToMany(Store::class);
+        return $this->hasMany(Store::class);
     }
 
     public function website(): BelongsTo
