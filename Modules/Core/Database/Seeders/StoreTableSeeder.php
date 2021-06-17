@@ -5,6 +5,7 @@ namespace Modules\Core\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Entities\Channel;
 
 class StoreTableSeeder extends Seeder
 {
@@ -22,6 +23,7 @@ class StoreTableSeeder extends Seeder
                "slug" => "international-store",
                "locale" => "en",
                "position" => 1,
+               "channel_id" => 1,
                "created_at" => now(),
                "updated_at" => now()
            ],
@@ -31,6 +33,7 @@ class StoreTableSeeder extends Seeder
                 "slug" => "english-store",
                 "locale" => "en",
                 "position" => 2,
+                "channel_id" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
             ]

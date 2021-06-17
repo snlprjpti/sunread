@@ -12,7 +12,6 @@ class ChannelFactory extends Factory
 
     public function definition(): array
     {
-        $store = Store::factory()->create();
         $website = Website::factory()->create();
         $category = Category::factory()->create();
         $code = $this->faker->unique()->slug();
@@ -25,8 +24,8 @@ class ChannelFactory extends Factory
             "location" => $this->faker->address(),
             "timezone" => $this->faker->timezone(),
             "theme" => "default",
-            "default_store_id" => $store->id,
-            "default_currency" => $store->currency,
+            "default_store_id" => null,
+            "default_currency" => null,
             "website_id" => $website->id,
             "default_category_id" => $category->id
         ];

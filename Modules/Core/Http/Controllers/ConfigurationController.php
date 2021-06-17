@@ -49,16 +49,35 @@ class ConfigurationController extends BaseController
                 return $current_data->all();
             });
 
-            if(!isset($request->scope)) $data["scope"] = "default";
-            if(!isset($request->scope_id)) $data["scope_id"] = 0;
+            if(!$request->scope) $data["scope"] = "global";
+            if(!$request->scope_id) $data["scope_id"] = 0;
 
-            $created_data = $this->add((object) $data);
+            $created_data = $this->repository->add((object) $data);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($created_data->data, $this->lang($created_data->message), $created_data->code);
+        return $this->successResponse($created_data->data ?? [], $this->lang($created_data->message), $created_data->code);
+    }
+
+    public function getElementValue(Request $request)
+    {
+        try
+        {
+            $this->repository->validateData($request, $this->repository->scopeValidation($request));
+
+            if(!$request->scope) $request->scope = "global";
+            if(!$request->scope_id) $request->scope_id = 0;
+
+            $fetched = ($this->has((object) $request)) ? $this->repository->getValues($request) : $this->repository->getDefaultValues($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }

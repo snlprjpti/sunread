@@ -31,10 +31,13 @@ class ConfigurationTest extends BaseTestCase
     public function getNonMandodtaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "scope" => "default",
+            "scope" => "global",
             "scope_id" => 0,
             "items" => [
-                "optional_zip_countries" => null,
+                "optional_zip_countries" => [
+                    "value" => null,
+                    "absolute_path" => "general.children.0.subChildren.0.elements.2"
+                ],
             ]
         ]);
     }
@@ -42,10 +45,13 @@ class ConfigurationTest extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "scope" => "store",
+            "scope" => "invalid",
             "scope_id" => 1,
             "items" => [
-                null => 5,
+                "optional_zip_countries" => [
+                    "value" => 5,
+                    "absolute_path" => "general.children.0.subChildren.0.elements.2"
+                ]
             ]
         ]);
     }
@@ -56,21 +62,15 @@ class ConfigurationTest extends BaseTestCase
             "scope" => $this->default_resource->scope,
             "scope_id" => $this->default_resource->scope_id,
             "items" => [
-                $this->default_resource->path => 15,
+                $this->default_resource->path => [
+                    "value" => 15,
+                    "absolute_path" => "general.children.0.subChildren.0.elements.0"
+                ]
             ]
         ]);
     }
 
-    public function getNonMandodtaryUpdateData(): array
-    {
-        return array_merge($this->model::factory()->make()->toArray(), [
-            "scope" => $this->default_resource->scope,
-            "scope_id" => $this->default_resource->scope_id,
-            "items" => [
-                $this->default_resource->path => null,
-            ]
-        ]);
-    }
+
 
     /**
      * Fetch tests
@@ -100,7 +100,6 @@ class ConfigurationTest extends BaseTestCase
             "scope" => "invalid"
         ]);
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $post_data);
-
         $response->assertStatus(422);
         $response->assertJsonFragment([
             "status" => "error"

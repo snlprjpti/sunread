@@ -19,7 +19,8 @@ return[
                                 "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "global"
                             ],
                             [
                                 "title" => "Allow Countries",
@@ -30,7 +31,8 @@ return[
                                 "default" => [],
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "website"
                             ],
                             [
                                 "title" => "Zip/Postal Code is Optional for",
@@ -42,7 +44,8 @@ return[
                                 "options" => [],
                                 "rules" => "nullable",
                                 "showIn" => ['channel', 'website', 'default', 'store'],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "channel"
                             ]
                         ]
                     ],
@@ -59,7 +62,8 @@ return[
                                 "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "store"
                             ],
                         ]
                     ],
@@ -76,7 +80,8 @@ return[
                                 "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "global"
                             ],
                             [
                                 "title" => "Store Phone Number",
@@ -87,7 +92,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "channel"
                             ],
                             [
                                 "title" => "Store Hours of Operation",
@@ -98,7 +104,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "sometimes|nullable",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "website"
                             ],
                             [
                                 "title" => "Country",
@@ -110,7 +117,8 @@ return[
                                 "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"],
-                                "multiple" => true
+                                "multiple" => true,
+                                "scope" => "store"
                             ],
                             [
                                 "title" => "Region/State",
@@ -121,7 +129,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "global"
                             ],
                             [
                                 "title" => "Zip/Postal Code",
@@ -132,7 +141,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required|numeric",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "store"
                             ],
                             [
                                 "title" => "City",
@@ -143,7 +153,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "global"
                             ],
                             [
                                 "title" => "Street Address",
@@ -154,7 +165,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "website"
                             ],
                             [
                                 "title" => "Street Address Line 2",
@@ -165,7 +177,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "sometimes|nullable",
-                                "showIn" => ["channel","website","default","store"] 
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "channel"
                             ],
                         ]
                     ]
@@ -189,7 +202,8 @@ return[
                                     [ "value" => 0, "label" => "No" ]
                                 ],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "store"
                             ]
                         ]
                     ],
@@ -205,7 +219,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "required",
-                                "showIn" => ["channel","website","default","store"]
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "website"
                             ],
 
                         ]
@@ -228,7 +243,8 @@ return[
                                 "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "global"
                             ],
                             [
                                 "title" => "Default Display Currency",
@@ -240,7 +256,8 @@ return[
                                 "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "website"
                             ],
                         ]
                     ],
@@ -267,7 +284,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "store"
                             ],
                             [
                                 "title" => "Mask for Meta Title",
@@ -278,7 +296,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "channel"
                             ],
                             [
                                 "title" => "Mask for Meta Keywords",
@@ -289,7 +308,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "store"
                             ],
                             [
                                 "title" => "Mask for Meta description",
@@ -300,7 +320,8 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "website"
                             ],
                         ]
 
@@ -330,7 +351,8 @@ return[
                                     [ "value" => 0, "label" => "No" ]
                                 ],
                                 "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store']
+                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "scope" => "global"
                             ],
                             [
                                 "title" => "Default Customer Group",
@@ -342,7 +364,8 @@ return[
                                 "options" => [],
                                 "rules" => 'required',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
-                                "multiple" => false
+                                "multiple" => false,
+                                "scope" => "website"
                             ]
                         ]
                     ]
