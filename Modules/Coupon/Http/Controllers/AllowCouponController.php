@@ -16,8 +16,7 @@ use Modules\Coupon\Transformers\AllowCouponResource;
 
 class AllowCouponController extends BaseController
 {
-    private $coupon;
-    private $repository;
+    private $coupon, $repository;
 
     public function __construct(AllowCoupon $allowCoupon, Coupon $coupon, AllowCouponRepository $allowCouponRepository)
     {
@@ -27,7 +26,7 @@ class AllowCouponController extends BaseController
         $this->repository = $allowCouponRepository;
 
         $exception_statuses = [
-            AlreadyCreatedException::class => 400
+            AlreadyCreatedException::class => 409
         ];
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);
@@ -47,8 +46,7 @@ class AllowCouponController extends BaseController
     {
         try
         {
-            // Get requested coupon with Status 1
-            $coupon = $this->coupon->whereId($coupon_id)->whereStatus(1)->firstOrFail();
+            $coupon = $this->coupon->whereId($coupon_id)->published()->firstOrFail();
 
             $data = $this->repository->getBulkData($request, $coupon);
             $this->repository->insertBulkData($data);
@@ -57,6 +55,7 @@ class AllowCouponController extends BaseController
         {
             return $this->handleException($exception);
         }
+
         return $this->successResponseWithMessage($this->lang('create-success'), 201);
     }
 
@@ -64,13 +63,7 @@ class AllowCouponController extends BaseController
     {
         try
         {
-            $request->validate([
-                'ids' => 'array|required',
-                'ids.*' => 'required|exists:allow_coupons,id',
-            ]);
-
-            $deleted = $this->model->whereIn('id', $request->ids);
-            $deleted->delete();
+            $this->repository->bulkDelete($request);
         }
         catch( Exception $exception )
         {
