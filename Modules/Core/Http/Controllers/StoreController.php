@@ -12,7 +12,6 @@ use Modules\Core\Transformers\StoreResource;
 use Modules\Core\Repositories\StoreRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\DB;
 
 class StoreController extends BaseController
 {

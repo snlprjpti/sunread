@@ -171,6 +171,7 @@ class BaseTestCase extends TestCase
 
         $post_data = $this->getCreateData();
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
+        dd($response);
 
         $response->assertCreated();
         $response->assertJsonFragment([

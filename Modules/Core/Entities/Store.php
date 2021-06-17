@@ -4,7 +4,6 @@ namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;

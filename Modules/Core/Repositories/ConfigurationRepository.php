@@ -13,15 +13,14 @@ use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Rules\ConfigurationRule;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
-use Illuminate\Http\Request;
 
 class ConfigurationRepository extends BaseRepository
 {
-    protected $config_fields, $created_data, $use_default_value, $request_scope = [];
-    protected $website_model, $channel_model, $store_model;
+    protected $config_fields;
+    protected $channel_model, $store_model;
     use TraitsConfiguration;
 
-    public function __construct(Configuration $configuration, Website $website_model, Channel $channel_model, Store $store_model)
+    public function __construct(Configuration $configuration, Channel $channel_model, Store $store_model)
     {
         $this->model = $configuration;
         $this->model_key = "core.configuration";
@@ -30,8 +29,7 @@ class ConfigurationRepository extends BaseRepository
         ];
         $this->config_fields = ($data = Cache::get("configurations.all")) ? $data : config("configuration");
         $this->createModel();
-
-        $this->website_model = $website_model;
+        
         $this->channel_model = $channel_model;
         $this->store_model = $store_model;
     }
@@ -56,15 +54,18 @@ class ConfigurationRepository extends BaseRepository
                         if(!isset($subchildren["elements"])) continue;
                         foreach($subchildren["elements"] as $k => &$element)
                         {
-                            if($request->scope && !in_array($request->scope, $element["showIn"]))
+                            if($this->scopeFilter($checkKey["scope"], $element["scope"]))
                             {
                                 unset($subchildren["elements"][$k]);
                                 continue;
                             }
                             $checkKey["path"] = $element["path"];
                             $checkKey["provider"] = $element["provider"];
-    
-                            $element["default"] = $this->has((object) $checkKey) ? $this->getDefaultValues((object) $checkKey) : $element["default"];
+
+                            $existData = $this->has((object) $checkKey);
+                            if($request->scope != "global") $element["use_default_value"] = $existData ? 0 : 1;
+                            $element["default"] = $existData ? $this->getValues((object) $checkKey) : $this->getDefaultValues((object)$checkKey, $element["default"]);
+
                             if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
                             
@@ -89,6 +90,14 @@ class ConfigurationRepository extends BaseRepository
         return $fetched;
     }
 
+    public function scopeFilter(string $scope, string $element_scope): bool
+    {
+        if($scope == "website" && in_array($element_scope, ["global"])) return true;
+        if($scope == "channel" && in_array($element_scope, ["global", "website"])) return true;
+        if($scope == "store" && in_array($element_scope, ["global", "website", "channel"])) return true;
+        return false;
+    }
+
     public function scopeValidation(object $request)
     {
         return ((isset($request->scope) && $request->scope != "global") || isset($request->scope_id)) ? [
@@ -98,142 +107,65 @@ class ConfigurationRepository extends BaseRepository
 
     public function add(object $request): object
     {
-        $this->request_scope["scope"] = $request->scope;
-        $this->request_scope["scope_id"] = $request->scope_id;
-
+        $item['scope'] = $request->scope;
+        $item['scope_id'] = $request->scope_id;
         foreach($request->items as $key => $val)
         {
-            if(!isset($val["absolute_path"])) throw ValidationException::withMessages(["Absolute path of $key is missing"]);
-            if(!isset($val["value"])) throw ValidationException::withMessages(["Value of $key is missing"]);
+            if(!isset($val["absolute_path"])) throw ValidationException::withMessages([ "absolute_path" => "Absolute path of $key is missing." ]);
+            if(!array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => "Value of $key is missing." ]);
 
-            $configDataArray = config('configuration.'.$val["absolute_path"]);
-            if(!$configDataArray) throw ValidationException::withMessages(["Absolute path of $key doesnt exists"]);
+            $configDataArray = config("configuration.{$val["absolute_path"]}");
+            if(!$configDataArray) throw ValidationException::withMessages([ "absolute_path" => "Absolute path of $key doesnt exists." ]);
 
-            if($configDataArray["path"] != $key) throw ValidationException::withMessages([$key. " doesnt exists in ". $val["absolute_path"]]);
+            if($configDataArray["path"] != $key) throw ValidationException::withMessages([ "absolute_path" => "Wrong absolute path for $key"]);
 
-            $val["scope"] = $configDataArray["scope"];
-            if(!isset($val['scope']) || !in_array($val['scope'], [ 'global', 'website', 'channel', 'store' ]) )
-            throw ValidationException::withMessages(["Scope of $key doesnt exists"]);
-        
+            if($this->scopeFilter($item['scope'], $configDataArray["scope"])) continue;
+            
             $item['path'] = $key;
             $item['value'] = $val['value'];
-            $item['config_scope'] = $val['scope'];
-            $this->use_default_value = $val['use_default_value'] ?? 1;
-
-            $this->scopeWiseOperations($item);
+            
+            if($configData = $this->checkCondition((object) $item)->first())
+            {
+                if(isset($val['use_default_value'])  && $val['use_default_value'] == 1) $configData->delete();
+                else $created_data['data'][] = $this->update($item, $configData->id);
+                continue;
+            }
+            $created_data['data'][] = $this->create($item);
         }
-
-        $this->created_data['message'] = 'create-success';
-        $this->created_data['code'] = 201;
-        return (object) $this->created_data; 
+        $created_data['message'] = 'create-success';
+        $created_data['code'] = 201;
+        return (object) $created_data; 
     }
 
-    public function scopeWiseOperations(array $item): void
+    public function getValues(object $request): mixed
     {
-        switch($item['config_scope'])
+        return $this->checkCondition($request)->first()->value;
+    }
+
+    public function getDefaultValues(object $data, mixed $configValue=null): mixed
+    {
+        if($data->scope != "global")
         {
-            case "global":
-                $this->globalScope($item);
-                break;
-
-            case "website":
-                if($this->request_scope["scope"] == "global") $this->independentItem($item);
-                else{
-                    if($this->request_scope["scope"] == "website") $website = $this->website_model->find($this->request_scope["scope_id"]);
-                    if($this->request_scope["scope"] == "channel") $website = $this->channel_model->find($this->request_scope["scope_id"])->website;
-                    if($this->request_scope["scope"] == "store") $website = $this->store_model->find($this->request_scope["scope_id"])->channel->website;
-
-                    if($website) $this->websiteScope($item, $website);
-                }
-                break;
-
-            case "channel":
-                if($this->request_scope["scope"] == "global" || $this->request_scope["scope"] == "website") $this->independentItem($item);
-                else{
-                    if($this->request_scope["scope"] == "channel") $channel = $this->channel_model->find($this->request_scope["scope_id"]);
-                    if($this->request_scope["scope"] == "store") $channel = $this->store_model->find($this->request_scope["scope_id"])->channel;
-
-                    if($channel) $this->channelScope($item, $channel);
-                }
-                break;
-
-            case "store":
-                $this->independentItem($item);
-        }
-    }
-
-    public function independentItem(array $item, string $scope=null, int $scope_id=null): void
-    {
-        $item['scope'] = $scope ?? $this->request_scope["scope"];
-        $item['scope_id'] = $scope_id ?? $this->request_scope["scope_id"];
-        $this->created_data['data'][] = $this->createORUpdate($item);
-    }
-
-    public function globalScope(array $item): void
-    {
-        $item["scope"] = "global";
-        $item["scope_id"] = 0;
-        $this->created_data['data'][] = $this->createORUpdate($item);
-        foreach($this->website_model->get() as $website)
-        {
-            $this->websiteScope($item, $website); 
-        }
-    }
-
-    public function websiteScope(array $item, object $website): void
-    {
-        $item["scope"] = "website";
-        $item["scope_id"] = $website->id;
-        $this->created_data['data'][] = $this->createORUpdate($item);
-        if($website->channels) foreach($website->channels as $channel) $this->channelScope($item, $channel); 
-    }
-
-    public function channelScope(array $item, object $channel): void
-    {
-        $item["scope"] = "channel";
-        $item["scope_id"] = $channel->id;
-        $this->created_data['data'][] = $this->createORUpdate($item);
-        if($channel->stores) foreach($channel->stores as $store) $this->independentItem($item, 'store', $store->id); 
-    }
-
-    public function createORUpdate(array $item): object
-    {
-        if($this->request_scope["scope"] != "global" && $this->use_default_value == 0 && $item["scope"] == $this->request_scope["scope"]  && strval($item["scope_id"]) == $this->request_scope["scope_id"]) $item["use_default_value"] = $this->use_default_value;
-
-        if($configData = $this->checkCondition((object) $item)->first())
-        {
-            $configData->update($item);
-            return $this->configuration->findorfail($configData->id);
-        }
-        return $this->configuration->create($item);
-    }
-
-    public function getDefaultValues(object $request): mixed
-    {
-        $data = $this->checkCondition($request)->first();
-        if($data && $data->scope != "global" && $data->use_default_value == 0)
-        {
-            $input["path"] = $request->path;
+            $input["path"] = $data->path;
             switch($data->scope)
             {
                 case "store":
-                    $input['scope'] = "channel";
-                    $input['scope_id'] = $this->store_model->find($data->scope_id)->channel->id;
+                    $input["scope"] = "channel";
+                    $input["scope_id"] = $this->store_model->find($data->scope_id)->channel->id;
                     break;
                 
                 case "channel":
-                    $input['scope'] = "website";
-                    $input['scope_id'] = $this->channel_model->find($data->scope_id)->website->id;
+                    $input["scope"] = "website";
+                    $input["scope_id"] = $this->channel_model->find($data->scope_id)->website->id;
                     break;
 
                 case "website":
-                    $input['scope'] = "global";
-                    $input['scope_id'] = 0;
+                    $input["scope"] = "global";
+                    $input["scope_id"] = 0;
                     break;
             }
-            return $this->getDefaultValues((object) $input);
-            
+            return ($item = $this->checkCondition((object) $input)->first()) ? $item->value : (( $input["scope"] == "global") ? $configValue : $this->getDefaultValues((object)$input, $configValue));           
         }
-        return  ($data) ? $data->value : "";
+        return $configValue;
     }
 }

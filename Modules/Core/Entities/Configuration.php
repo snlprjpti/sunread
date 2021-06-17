@@ -10,7 +10,7 @@ class Configuration extends Model
     use HasFactory;
 
     public static $SEARCHABLE = [ "scope", "path", "value" ];
-    protected $fillable =  [ "scope", "scope_id", "path", "value", "use_default_value" ];
+    protected $fillable =  [ "scope", "scope_id", "path", "value" ];
     protected $casts = [ "value" => "array" ];
 
 }

@@ -34,6 +34,7 @@ Route::group(["middleware" => ["api"]], function () {
         Route::resource("websites", WebsiteController::class)->except(["create", "edit"]);
 
         // Configurations Routes
+        Route::get("configurations/value", [\Modules\Core\Http\Controllers\ConfigurationController::class, "getElementValue"])->name("configurations.value");
         Route::resource("configurations", ConfigurationController::class)->except(["create", "edit"]);
     });
 });
