@@ -46,17 +46,11 @@ class StoreController extends BaseController
 
                 $fetched = $this->model;
                 if ( $request->website_id ) {
-                    $channels = Channel::with(["stores"])->whereWebsiteId($request->website_id)->get();
-
-                    $get_store_ids = $channels->mapWithKeys(function($channel) {
-                        $return_ids = [];
-                        if ( $channel->default_store_id !== null ) $return_ids[] = $channel->default_store_id;
-                        if ( $channel->stores->pluck("id")->toArray() !== [] ) $return_ids[] = $channel->stores->pluck("id")->toArray();
-
-                        return $return_ids;
-                    })->flatten()->unique()->toArray();
-
-                    $fetched = $fetched->whereIn("id", $get_store_ids);
+                    $channel_ids = Channel::whereWebsiteId($request->website_id)->get()->pluck("id");
+                    $fetched = $fetched->whereIn("channel_id", $channel_ids);
+                }
+                if ( $request->channel_id ) {
+                    $fetched = $fetched->whereChannelId($request->channel_id);
                 }
                 return $fetched;
             });
