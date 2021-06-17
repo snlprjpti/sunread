@@ -13,7 +13,7 @@ class PageAvailabilityResource extends JsonResource
             "page" => new PageResource($this->whenLoaded("page")),
             "model_type" => $this->model_type,
             "model" => $this->whenLoaded("model"),
-            "status" => $this->status
+            "status" => (bool) $this->status
         ];
     }
 }

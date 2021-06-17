@@ -23,7 +23,7 @@ class CustomerResource extends JsonResource
             "gender" => $this->gender,
             "date_of_birth" => $this->date_of_birth,
             "email" => $this->email,
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "profile_image" => $this->profile_image_url,
             "group" => new CustomerGroupResource($this->whenLoaded('group')),
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,

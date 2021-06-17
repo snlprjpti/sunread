@@ -27,7 +27,7 @@ class ReviewResource extends JsonResource
                 'visible_vote_count' => $this->visible_vote_count,
             ],
             "review_replies" => ReviewReplyResource::collection($this->review_replies),
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

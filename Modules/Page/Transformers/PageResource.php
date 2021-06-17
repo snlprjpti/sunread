@@ -15,7 +15,7 @@ class PageResource extends JsonResource
             "title" => $this->title,
             "position" => $this->position,
             "description" => $this->description,
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "meta_title" => $this->meta_title,
             "meta_description" => $this->meta_description,
             "meta_keywords" => $this->meta_keywords,
