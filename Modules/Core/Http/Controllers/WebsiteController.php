@@ -37,8 +37,7 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->repository->fetchAll($request, ["channels"]);
         }
         catch( Exception $exception )
         {
@@ -67,7 +66,7 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $fetched = $this->model->findOrFail($id);
+            $fetched = $this->repository->fetch($id);
         }
         catch( Exception $exception )
         {

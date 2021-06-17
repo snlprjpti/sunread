@@ -41,7 +41,8 @@ class StoreController extends BaseController
         {
             $fetched = $this->repository->fetchAll($request, callback: function() use ($request) {
                 $request->validate([
-                    "website_id" => "sometimes|exists:websites,id"
+                    "website_id" => "sometimes|exists:websites,id",
+                    "channel_id" => "sometimes|exists:channels,id"
                 ]);
 
                 $fetched = $this->model;
