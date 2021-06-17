@@ -2,7 +2,6 @@
 
 namespace Modules\Coupon\Repositories;
 
-
 use Exception;
 use Modules\Coupon\Entities\AllowCoupon;
 use Illuminate\Support\Facades\Validator;
@@ -16,9 +15,11 @@ class AllowCouponRepository extends BaseRepository
     {
         $this->model = $allowCoupon;
         $this->model_key = "coupon-allow";
+
+        $model_types_in = implode(",", config('model_list.model_types'));
         $this->rules = [
             "coupon_id" => "required|numeric",
-            "model_type" => "required",
+            "model_type" => "required|in:{$model_types_in}",
             "model_id" => "required|numeric",
             "status" => "required|boolean"
         ];
@@ -55,6 +56,8 @@ class AllowCouponRepository extends BaseRepository
         try
         {
             $this->checkClass($data["model_type"]);
+            $tableName = app($data["model_type"])->getTable();
+            $merge = [ "model_id" => "required|numeric|exists:$tableName,id" ];
             $validator = Validator::make($data, array_merge($this->rules, $merge));
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
         }

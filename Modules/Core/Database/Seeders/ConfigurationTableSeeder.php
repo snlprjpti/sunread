@@ -17,9 +17,9 @@ class ConfigurationTableSeeder extends Seeder
     {
         DB::table('configurations')->insert([
             [
-                "scope" => "default",
+                "scope" => "global",
                 "scope_id" => 0,
-                "path" => "web/seo/use_rewrites",
+                "path" => "default_country",
                 "value" => "1",
                 "created_at" => now(),
                 "updated_at" => now()

@@ -16,7 +16,6 @@ class ChannelTableSeeder extends Seeder
     {
         DB::table('channels')->insert([
             [
-                "default_store_id" => 1,
                 "default_currency" => "USD",
                 "code" => "international",
                 "hostname" => "international",

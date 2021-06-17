@@ -30,7 +30,7 @@ class ConfigurationRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($this->scope == "default") return ($value == 0);
+        if($this->scope == "global") return ($value == 0);
 
         if($this->scope == "website") return (bool) Website::whereId($value)->first();
 
