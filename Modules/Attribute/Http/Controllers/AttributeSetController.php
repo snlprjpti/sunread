@@ -148,23 +148,4 @@ class AttributeSetController extends BaseController
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
-
-    public function unassignedAttributes(int $id): JsonResponse
-    {
-        try
-        {
-            $data = $this->model->findOrFail($id);
-
-            $attribute_ids = $data->attribute_groups->map(function($attributeGroup){
-                return $attributeGroup->attributes->pluck('id');
-            })->flatten(1)->toArray();
-            $fetched = Attribute::whereNotIn('id', $attribute_ids)->get();
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse(AttributeResource::collection($fetched), $this->lang('fetch-success'));
-    }
 }

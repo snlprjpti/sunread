@@ -17,8 +17,7 @@ Route::group(['middleware' => ['api']], function () {
         // Catalog Family Routes
         Route::put("/sets/{set_id}/status", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "updateStatus"])->name('sets.status');
         Route::resource('sets', AttributeSetController::class)->except(['create', 'edit']);
-        Route::get("sets/{set_id}/unassigned-attributes", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "unassignedAttributes"])->name('sets.unassigned.attributes');
-
+        
         // Catalog Attribute Group Routes
         Route::resource('groups', AttributeGroupController::class)->except(['create', 'edit']);
 
