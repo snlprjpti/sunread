@@ -40,8 +40,7 @@ class ConfigurationFactory extends Factory
             'items' => [
                 $paths[$i] => [
                     'value' => $this->faker->name(),
-                    'absolute_path' => $absolute_paths[$i],
-                    'use_default_value' => rand(0,1)
+                    'absolute_path' => $absolute_paths[$i]
                 ] 
             ]
         ];
