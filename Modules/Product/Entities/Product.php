@@ -59,7 +59,7 @@ class Product extends Model
 
     public function attribute_set(): BelongsTo
     {
-        return $this->belongsTo(AttributeSet::class)->with(["attributes"]);
+        return $this->belongsTo(AttributeSet::class);
     }
 
     public function brand(): BelongsTo
