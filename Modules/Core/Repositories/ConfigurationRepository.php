@@ -111,13 +111,13 @@ class ConfigurationRepository extends BaseRepository
         $item['scope_id'] = $request->scope_id;
         foreach($request->items as $key => $val)
         {
-            if(!isset($val["absolute_path"])) throw ValidationException::withMessages([ "absolute_path" => "Absolute path of $key is missing." ]);
-            if(!array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => "Value of $key is missing." ]);
+            if(!isset($val["absolute_path"])) throw ValidationException::withMessages([ "absolute_path" => __("core::app.response.absolute_path_missing", ["name" => $key]) ]);
+            if(!array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
 
             $configDataArray = config("configuration.{$val["absolute_path"]}");
-            if(!$configDataArray) throw ValidationException::withMessages([ "absolute_path" => "Absolute path of $key doesnt exists." ]);
+            if(!$configDataArray) throw ValidationException::withMessages([ "absolute_path" =>  __("core::app.response.absolute_path_not_exist", ["name" => $key]) ]);
 
-            if($configDataArray["path"] != $key) throw ValidationException::withMessages([ "absolute_path" => "Wrong absolute path for $key"]);
+            if($configDataArray["path"] != $key) throw ValidationException::withMessages([ "absolute_path" =>  __("core::app.response.wrong_absolute_path", ["name" => $key])]);
 
             if($this->scopeFilter($item['scope'], $configDataArray["scope"])) continue;
             
