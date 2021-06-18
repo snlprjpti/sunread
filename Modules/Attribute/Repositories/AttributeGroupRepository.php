@@ -77,7 +77,7 @@ class AttributeGroupRepository extends BaseRepository
     {
         try
         {
-            $this->validateData(new Request($group), isset($group["id"]) ? [
+            $item = $this->validateData(new Request($group), isset($group["id"]) ? [
                 "id" => "exists:attribute_groups,id",
                 "slug" => "nullable|unique:attribute_groups,slug,{$group['id']}"
             ] : [], function($group) use($parent) {
@@ -85,14 +85,14 @@ class AttributeGroupRepository extends BaseRepository
                 return ["slug" => "{$parent->slug}-{$slug}"];
             });
 
-            $group['attribute_set_id'] = $parent->id;
-            $data = !isset($group["id"]) ? $this->create($group) : $this->update($group, $group["id"]);
+            $item['attribute_set_id'] = $parent->id;
+            $data = !isset($item["id"]) ? $this->create($item) : $this->update($item, $item["id"]);
         }
         catch(Exception $exception)
         {
             throw $exception;
         }
 
-        return $data->attributes()->sync($group["attributes"]);
+        return $data->attributes()->sync($item["attributes"]);
     }
 }
