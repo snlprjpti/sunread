@@ -61,7 +61,7 @@ class ChannelController extends BaseController
         {
             $data = $this->repository->validateData($request);
 
-            if(isset($data['default_store_id'])) throw ValidationException::withMessages([ "default_store_id" => $this->lang('response.store_does_not_belong', ["name" => $data['name']]) ]);
+            unset($data["default_store_id"]);
 
             foreach(["logo", "favicon"] as $file_type) {
                 if ( !$request->file($file_type) ) continue;
