@@ -15,6 +15,7 @@ class ChannelRepository extends BaseRepository
     public function __construct(Channel $channel, Store $store)
     {
         $this->model = $channel;
+        $this->model_name = "Channel";
         $this->store = $store;
         $this->model_key = "core.channel";
         $this->rules = [
@@ -38,6 +39,7 @@ class ChannelRepository extends BaseRepository
             "favicon" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
             "theme" => "nullable|in:default"
         ];
+        $this->restrict_default_delete = true;
     }
 
     public function defaultStoreValidation(array $data, int $id): void
