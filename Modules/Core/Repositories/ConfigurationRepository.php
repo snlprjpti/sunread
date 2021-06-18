@@ -106,6 +106,17 @@ class ConfigurationRepository extends BaseRepository
         ] : [];
     }
 
+    public function getValidationRules(object $request): array
+    {
+        return collect(config('configuration.'.$request->absolute_path))->pluck('elements')->flatten(1)->map(function($data) {
+            return $data;
+        })->reject(function ($data) use($request) {
+            return $this->scopeFilter($request->scope ?? "global", $data["scope"]);
+        })->pluck('rules','path')->mapWithKeys(function($val, $key) {
+            return ["items.$key.value" => $val];
+        })->toArray();
+    }
+
     public function add(object $request): object
     {
         $item['scope'] = $request->scope;
