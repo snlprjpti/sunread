@@ -10,6 +10,7 @@ class WebsiteRepository extends BaseRepository
     public function __construct(Website $website)
     {
         $this->model = $website;
+        $this->model_name = "Website";
         $this->model_key = "core.website";
         $this->relationships = ["channels.default_store", "channels.stores"];
         $this->rules = [
@@ -21,5 +22,7 @@ class WebsiteRepository extends BaseRepository
             "position" => "sometimes|numeric",
             "status" => "sometimes|boolean"
         ];
+
+        $this->restrict_default_delete = true;
     }
 }

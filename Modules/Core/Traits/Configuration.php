@@ -50,11 +50,4 @@ trait Configuration
         }
         return $data;
     }
-
-    public function getValidationRules($absolute_path): array
-    {
-        return collect(config('configuration.'.$absolute_path))->pluck('elements')->flatten(1)->pluck('rules','path')->mapWithKeys(function($val, $key) {
-           return ["items.$key.value" => $val];
-        })->toArray();
-    }
 }

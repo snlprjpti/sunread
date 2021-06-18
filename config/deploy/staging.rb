@@ -38,14 +38,24 @@ end
 task :reload_supervisor do
     puts "==================restart supervisor======================"
     on roles(:all) do
-        execute :supervisorctl, "reread"
-        execute :supervisorctl, "update"
+        execute :sudo, :supervisorctl, "restart php_serve"
+        execute :sudo, :supervisorctl, "restart php_queue"
+        execute :sudo, :supervisorctl, "restart php_schedule"
+        execute :sudo, :supervisorctl, "reread"
+        execute :sudo, :supervisorctl, "update"
     end
 end
 
-after "deploy:published", "update_composer"
-# after "deploy:published", "update_composer"
-# after "deploy:published", "reload_supervisor"
+task :link_storage do
+    puts "==================link storage======================"
+    on roles(:all) do
+        execute "cd ~/api/current && php artisan storage:link"
+    end
+end
+
+after "deploy:published", "install_composer"
+after "deploy:published", "reload_supervisor"
+after "deploy:published", "link_storage"
 
 
 # server-based syntax
