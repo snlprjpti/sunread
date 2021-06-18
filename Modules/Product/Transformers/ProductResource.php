@@ -18,7 +18,7 @@ class ProductResource extends JsonResource
             "attribute_group" => new AttributeGroupResource($this->whenLoaded("attribute_group")),
             "sku" => $this->sku,
             "type" => $this->type,
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "categories" => CategoryResource::collection($this->whenLoaded("categories")),
             "attribute_values" => ProductAttributeResource::collection($this->whenLoaded("product_attributes")),
             "images" => ProductImageResource::collection($this->whenLoaded("images")),
