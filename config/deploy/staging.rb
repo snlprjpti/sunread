@@ -38,12 +38,17 @@ end
 task :reload_supervisor do
     puts "==================restart supervisor======================"
     on roles(:all) do
+        execute :supervisorctl, "restart php_serve/php_queue/php_schedule"
         execute :supervisorctl, "reread"
         execute :supervisorctl, "update"
     end
 end
 
-after "deploy:published", "update_composer"
+task :link_storage do
+    invoke 'laravel:storage_link'
+end
+
+after "deploy:published", "install_composer", "link_storage", "reload_supervisor"
 # after "deploy:published", "update_composer"
 # after "deploy:published", "reload_supervisor"
 
