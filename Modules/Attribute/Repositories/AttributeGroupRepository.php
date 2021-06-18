@@ -23,8 +23,8 @@ class AttributeGroupRepository extends BaseRepository
             "slug" => "nullable|unique:attribute_groups,slug",
             "name" => "required",
             // "attribute_set_id" => "required|exists:attribute_sets,id",
-            "attributes" => "required|array",
-            "attributes.*" => "required|exists:attributes,id",
+            "attributes" => "sometimes|array",
+            "attributes.*" => "sometimes|exists:attributes,id",
         ];
     }
 

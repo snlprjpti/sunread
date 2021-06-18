@@ -73,11 +73,12 @@ class AttributeSetController extends BaseController
             $selected_attributeSet = $this->model->find($data["attribute_set_id"]);
             
             $created = $this->repository->create($data, function($created) use ($selected_attributeSet) {
+                if($selected_attributeSet->attribute_groups) 
                 $selected_attributeSet->attribute_groups->map(function($attributeGroup) use($created){
                     $item = [
                         "name" => $attributeGroup->name,
                         "slug" => "{$created->slug}_{$attributeGroup->slug}",
-                        "attributes" => $attributeGroup->attributes->pluck('id')->toArray()
+                        "attributes" => ($attributeGroup->attributes) ? $attributeGroup->attributes->pluck('id')->toArray() : []
                     ];
                     $this->attributeGroupRepository->singleUpdateOrCreate($item, $created);
                 })->toArray();
@@ -112,11 +113,12 @@ class AttributeSetController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:attribute_sets,slug,{$id}",
-                "groups" => "required|array"
+                "groups" => "sometimes|array"
             ], function() use ($request) {
                 return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
             });
-            $this->repository->attributeValidation($data);
+            
+            if(isset($data["groups"])) $this->repository->attributeValidation($data);
 
             $updated = $this->repository->update($data, $id, function($updated) use ($request) {
                 if(isset($request->groups)) $this->attributeGroupRepository->multipleUpdateOrCreate($request->groups, $updated);
