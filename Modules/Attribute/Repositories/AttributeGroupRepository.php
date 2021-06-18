@@ -85,12 +85,12 @@ class AttributeGroupRepository extends BaseRepository
             $group["slug"] = $parent->slug .'_'. (!isset($group["slug"]) ? $this->model->createSlug($group["name"]) : $group["slug"]);
             $group['attribute_set_id'] = $parent->id;
             $data = !isset($group["id"]) ? $this->create($group) : $this->update($group, $group["id"]);
-            
-            return $data->attributes()->sync($group["attributes"]);
         }
         catch(Exception $exception)
         {
             throw $exception;
         }
+        
+        return $data->attributes()->sync($group["attributes"]);
     }
 }
