@@ -58,7 +58,7 @@ class BaseController extends Controller
             QueryException::class => 400,
             UnauthorizedHttpException::class => 401,
             SlugCouldNotBeGenerated::class => 500,
-            DeleteUnauthorized::class => 401,
+            DeleteUnauthorized::class => 401
         ], $exception_statuses);
     }
 
