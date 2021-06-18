@@ -48,7 +48,7 @@ class AttributeGroupRepository extends BaseRepository
         }
     }
 
-    public function multipleUpdateOrCreate(array $groups, object $parent, ?string $method=null):void
+    public function multipleUpdateOrCreate(array $groups, object $parent):void
     {
         if ( !is_array($groups) || count($groups) == 0 ) return;
 
@@ -57,7 +57,7 @@ class AttributeGroupRepository extends BaseRepository
         $attributes = [];
         try
         {
-            if($method == "update") $parent->attribute_groups()->whereNotIn('id', array_filter(Arr::pluck($groups, 'id')))->delete();
+            $parent->attribute_groups()->whereNotIn('id', array_filter(Arr::pluck($groups, 'id')))->delete();
 
             foreach($groups as $group)
             {  

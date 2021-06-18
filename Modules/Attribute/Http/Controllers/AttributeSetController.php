@@ -119,7 +119,7 @@ class AttributeSetController extends BaseController
             $this->repository->attributeValidation($data);
 
             $updated = $this->repository->update($data, $id, function($updated) use ($request) {
-                if(isset($request->groups)) $this->attributeGroupRepository->multipleUpdateOrCreate($request->groups, $updated, "update");
+                if(isset($request->groups)) $this->attributeGroupRepository->multipleUpdateOrCreate($request->groups, $updated);
             });
         }
         catch( Exception $exception )
