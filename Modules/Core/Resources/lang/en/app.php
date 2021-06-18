@@ -31,7 +31,7 @@ return [
         'value_missing' => 'Value of :name is missing.',
         'absolute_path_not_exist' => 'Absolute path of :name doesnt exists.',
         'wrong_absolute_path' => 'Wrong absolute path for :name',
-        'use_default_value' => 'Default Value must be 1.'
+        'use_default_value' => 'Default value must be 1.'
     ],
     'users' => [
         'forget-password' => [
