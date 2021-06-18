@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Repositories;
 
+use Exception;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
@@ -39,9 +40,16 @@ class ChannelRepository extends BaseRepository
         ];
     }
 
-    public function defaultStoreValidation(array $data, $id)
+    public function defaultStoreValidation(array $data, int $id): void
     {
-        if($this->store->find($data['default_store_id'])->channel->id != $id)
-        throw ValidationException::withMessages([ "default_store_id" =>  __("core::app.response.store_does_not_belong", ["name" => $data['name']]) ]);
+        try
+        {
+            if($this->store->find($data['default_store_id'])->channel->id != $id)
+            throw ValidationException::withMessages([ "default_store_id" =>  __("core::app.response.store_does_not_belong", ["name" => $data['name']]) ]);
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }     
     }
 }
