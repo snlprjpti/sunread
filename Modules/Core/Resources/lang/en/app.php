@@ -3,7 +3,7 @@ return [
 
     'response' => [
         'being-used' => 'This resource :name is getting used in :source',
-        'cannot-delete-default' => 'Cannot delete the default channel',
+        'cannot-delete-default' => 'Cannot delete the default :name',
         'fetch-list-success' => ':name list fetched successfully.',
         'fetch-success' => ':name fetched successfully.',
         'create-success' => ':name created successfully.',
