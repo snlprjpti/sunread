@@ -17,7 +17,7 @@ class StoreResource extends JsonResource
             "image" => $this->image_url,
             "position" => $this->position,
             "channel" => new ChannelResource($this->whenLoaded("channel")),
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
