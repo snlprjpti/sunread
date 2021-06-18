@@ -130,6 +130,7 @@ class ConfigurationRepository extends BaseRepository
                 else $created_data['data'][] = $this->update($item, $configData->id);
                 continue;
             }
+            if(isset($val['use_default_value'])  && $val['use_default_value'] == 1) continue;
             $created_data['data'][] = $this->create($item);
         }
         $created_data['message'] = 'create-success';
