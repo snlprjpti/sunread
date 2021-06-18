@@ -29,8 +29,9 @@ return [
         'attribute-groups-present' => 'Attribute Groups present in set.',
         'absolute_path_missing' => 'Absolute path of :name is missing.',
         'value_missing' => 'Value of :name is missing.',
-        'absolute_path_not_exist' => 'Absolute path of :name doesnt exists.',
+        'absolute_path_not_exist' => 'Absolute path of :name does not exists.',
         'wrong_absolute_path' => 'Wrong absolute path for :name',
+        'store_does_not_belong' => 'Store does not belong to :name channel.',
         'use_default_value' => 'Default value must be 1.'
     ],
     'users' => [

@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Repositories\ChannelRepository;
 use Modules\Core\Transformers\ChannelResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Validation\ValidationException;
 
 class ChannelController extends BaseController
 {
@@ -60,6 +61,8 @@ class ChannelController extends BaseController
         {
             $data = $this->repository->validateData($request);
 
+            unset($data["default_store_id"]);
+
             foreach(["logo", "favicon"] as $file_type) {
                 if ( !$request->file($file_type) ) continue;
                 $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
@@ -99,6 +102,8 @@ class ChannelController extends BaseController
                 "logo" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
                 "favicon" => "nullable|mimes:bmp,jpeg,jpg,png,webp"
             ]);
+
+            if(isset($data['default_store_id'])) $this->repository->defaultStoreValidation($data, $id);
 
             foreach(["logo", "favicon"] as $file_type) {
                 if ( !$request->file($file_type) ) {
