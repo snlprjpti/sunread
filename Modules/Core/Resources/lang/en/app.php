@@ -31,7 +31,7 @@ return [
         'value_missing' => 'Value of :name is missing.',
         'absolute_path_not_exist' => 'Absolute path of :name doesnt exists.',
         'wrong_absolute_path' => 'Wrong absolute path for :name',
-        'store_does_not_belong' => 'Store Id doesnt belongs to :name channel.'
+        'store_does_not_belong' => 'Store Id doesn\'t belongs to :name channel.'
     ],
     'users' => [
         'forget-password' => [
