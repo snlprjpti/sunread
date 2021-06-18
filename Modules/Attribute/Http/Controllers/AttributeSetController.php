@@ -167,4 +167,38 @@ class AttributeSetController extends BaseController
 
         return $this->successResponse(AttributeResource::collection($fetched), $this->lang('fetch-success'));
     }
+
+    public function attributeSet(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+
+            $data = $this->model->findOrFail($id);
+            $groups = [];
+
+            $attribute_groups = $data->attribute_groups->sortBy("position")->map(function ($attribute_group) use (&$groups) {                
+                $groups[] = [
+                    "group_id" => $attribute_group->id,
+                    "name" => $attribute_group->name,
+                    "position" => $attribute_group->position,
+                    "attributes" => $attribute_group->attributes->sortBy("position")->map(function ($attribute){
+                        return [
+                            "attribute_id" => $attribute->id,
+                            "name" => $attribute->name,
+                            "scope" => $attribute->scope,
+                            "position" => $attribute->position,
+                            "is_required" => $attribute->is_required,
+                            "type"=> $attribute->type
+                        ];
+                    })->toArray()
+                ];
+            });
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($groups, $this->lang("fetch-success"));
+    }
 }
