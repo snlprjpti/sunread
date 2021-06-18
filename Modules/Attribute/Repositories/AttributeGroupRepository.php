@@ -75,15 +75,22 @@ class AttributeGroupRepository extends BaseRepository
 
     public function singleUpdateOrCreate(array $group, object $parent): array
     {
-        $this->validateData(new Request($group), isset($group["id"]) ? [
-            "id" => "exists:attribute_groups,id",
-            "slug" => "nullable|unique:attribute_groups,slug,{$group["id"]}"
-        ] : []);
+        try
+        {
+            $this->validateData(new Request($group), isset($group["id"]) ? [
+                "id" => "exists:attribute_groups,id",
+                "slug" => "nullable|unique:attribute_groups,slug,{$group["id"]}"
+            ] : []);
 
-        $group["slug"] = $parent->slug .'_'. (!isset($group["slug"]) ? $this->model->createSlug($group["name"]) : $group["slug"]);
-        $group['attribute_set_id'] = $parent->id;
-        $data = !isset($group["id"]) ? $this->create($group) : $this->update($group, $group["id"]);
-        
-        return $data->attributes()->sync($group["attributes"]);
+            $group["slug"] = $parent->slug .'_'. (!isset($group["slug"]) ? $this->model->createSlug($group["name"]) : $group["slug"]);
+            $group['attribute_set_id'] = $parent->id;
+            $data = !isset($group["id"]) ? $this->create($group) : $this->update($group, $group["id"]);
+            
+            return $data->attributes()->sync($group["attributes"]);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
     }
 }
