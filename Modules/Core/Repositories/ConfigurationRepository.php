@@ -13,6 +13,7 @@ use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Rules\ConfigurationRule;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
+use Illuminate\Http\Request;
 
 class ConfigurationRepository extends BaseRepository
 {
@@ -111,8 +112,10 @@ class ConfigurationRepository extends BaseRepository
         $item['scope_id'] = $request->scope_id;
         foreach($request->items as $key => $val)
         {
+            if(isset($val["use_default_value"]) && $val["use_default_value"] != 1) throw ValidationException::withMessages([ "use_default_value" => __("core::app.response.use_default_value") ]);
+
             if(!isset($val["absolute_path"])) throw ValidationException::withMessages([ "absolute_path" => __("core::app.response.absolute_path_missing", ["name" => $key]) ]);
-            if(!array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
+            if(!isset($val["use_default_value"]) && !array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
 
             $configDataArray = config("configuration.{$val["absolute_path"]}");
             if(!$configDataArray) throw ValidationException::withMessages([ "absolute_path" =>  __("core::app.response.absolute_path_not_exist", ["name" => $key]) ]);
@@ -122,7 +125,7 @@ class ConfigurationRepository extends BaseRepository
             if($this->scopeFilter($item['scope'], $configDataArray["scope"])) continue;
             
             $item['path'] = $key;
-            $item['value'] = $val['value'];
+            if(isset($val['value']))  $item['value'] = $val['value'];
             
             if($configData = $this->checkCondition((object) $item)->first())
             {

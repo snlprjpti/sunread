@@ -30,7 +30,7 @@ return[
                                 "pluck" => ["code", "id"],
                                 "default" => [],
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                                 "scope" => "website"
                             ],
@@ -60,7 +60,7 @@ return[
                                 "pluck" => ["code", "id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => 'required',
+                                "rules" => 'nullable',
                                 "showIn" => ['channel', 'website', 'default', 'store'],
                                 "multiple" => false,
                                 "scope" => "store"
@@ -91,7 +91,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
                                 "scope" => "channel"
                             ],
@@ -115,7 +115,7 @@ return[
                                 "pluck" => ["code", "id"],
                                 "default" => [],
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => true,
                                 "scope" => "store"
@@ -140,7 +140,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required|numeric",
+                                "rules" => "nullable|numeric",
                                 "showIn" => ["channel","website","default","store"],
                                 "scope" => "store"
                             ],
@@ -164,7 +164,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
                                 "scope" => "website"
                             ],
@@ -201,7 +201,7 @@ return[
                                     [ "value" => 1, "label" => "Yes" ],
                                     [ "value" => 0, "label" => "No" ]
                                 ],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
                                 "scope" => "store"
                             ]
@@ -218,7 +218,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
                                 "scope" => "website"
                             ],
@@ -254,7 +254,7 @@ return[
                                 "pluck" => ["code","id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => false,
                                 "scope" => "website"
