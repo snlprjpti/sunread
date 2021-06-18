@@ -25,8 +25,7 @@ class AttributeSetRepository extends BaseRepository
 
         $this->rules = [
             "slug" => "nullable|unique:attribute_sets,slug",
-            "name" => "required",
-            "groups" => "required|array"
+            "name" => "required"
         ];
     }
 

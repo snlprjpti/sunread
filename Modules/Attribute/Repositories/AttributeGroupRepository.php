@@ -48,7 +48,7 @@ class AttributeGroupRepository extends BaseRepository
         }
     }
 
-    public function updateOrCreate($groups, $parent, $method=null):void
+    public function multipleUpdateOrCreate(array $groups, object $parent, ?string $method=null):void
     {
         if ( !is_array($groups) || count($groups) == 0 ) return;
 
@@ -60,17 +60,8 @@ class AttributeGroupRepository extends BaseRepository
             if($method == "update") $parent->attribute_groups()->whereNotIn('id', array_filter(Arr::pluck($groups, 'id')))->delete();
 
             foreach($groups as $group)
-            {
-                $this->validateData(new Request($group), isset($group["id"]) ? [
-                    "id" => "exists:attribute_groups,id",
-                    "slug" => "nullable|unique:attribute_groups,slug,{$group["id"]}"
-                ] : []);
-
-                $group["slug"] = $parent->slug .'_'. (!isset($group["slug"]) ? $this->model->createSlug($group["name"]) : $group["slug"]);
-                $group['attribute_set_id'] = $parent->id;
-                $data = !isset($group["id"]) ? $this->create($group) : $this->update($group, $group["id"]);
-                
-                $attributes[] = $data->attributes()->sync($group["attributes"]);
+            {  
+                $attributes[] = $this->singleUpdateOrCreate($group, $parent);
             }
         }
         catch (Exception $exception)
@@ -80,5 +71,19 @@ class AttributeGroupRepository extends BaseRepository
 
         Event::dispatch("{$this->model_key}.sync.after", $attributes);
         DB::commit();
+    }
+
+    public function singleUpdateOrCreate(array $group, object $parent): array
+    {
+        $this->validateData(new Request($group), isset($group["id"]) ? [
+            "id" => "exists:attribute_groups,id",
+            "slug" => "nullable|unique:attribute_groups,slug,{$group["id"]}"
+        ] : []);
+
+        $group["slug"] = $parent->slug .'_'. (!isset($group["slug"]) ? $this->model->createSlug($group["name"]) : $group["slug"]);
+        $group['attribute_set_id'] = $parent->id;
+        $data = !isset($group["id"]) ? $this->create($group) : $this->update($group, $group["id"]);
+        
+        return $data->attributes()->sync($group["attributes"]);
     }
 }
