@@ -26,7 +26,7 @@ class CouponResource extends JsonResource
             "single_user_uses" => $this->single_user_uses,
             "only_new_user" => $this->only_new_user,
             "scope_public" => $this->scope_public,
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
