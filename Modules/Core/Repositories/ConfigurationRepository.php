@@ -50,30 +50,29 @@ class ConfigurationRepository extends BaseRepository
                 foreach($data["children"] as $i => $children)
                 {
                     if(!isset($children["subChildren"])) continue;
-                    foreach($children["subChildren"] as $j => &$subchildren)
+                    foreach($children["subChildren"] as $j => $subchildren)
                     {
                         if(!isset($subchildren["elements"])) continue;
+
+                        $subchildren_data["elements"] = [];
                         foreach($subchildren["elements"] as $k => &$element)
                         {
-                            if($this->scopeFilter($checkKey["scope"], $element["scope"]))
-                            {
-                                unset($subchildren["elements"][$k]);
-                                continue;
-                            }
+                            if($this->scopeFilter($checkKey["scope"], $element["scope"])) continue;
+                            
                             $checkKey["path"] = $element["path"];
                             $checkKey["provider"] = $element["provider"];
 
                             $existData = $this->has((object) $checkKey);
-                            if($request->scope != "global") $element["use_default_value"] = $existData ? 0 : 1;
+                            if($checkKey["scope"] != "global") $element["use_default_value"] = $existData ? 0 : 1;
                             $element["default"] = $existData ? $this->getValues((object) $checkKey) : $this->getDefaultValues((object)$checkKey, $element["default"]);
 
                             if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
                             
                             unset($element["pluck"], $element["provider"], $element["rules"], $element["showIn"]);
-                            $subchildren["elements"][$k] = $element;
+                            $subchildren_data["elements"][] = $element;
                         }
-                        $children["subChildren"][$j] = $subchildren;
+                        $children["subChildren"][$j] = $subchildren_data;
                     }
                     $data["slug"] = Str::slug($data["title"]);
                     $data["children"][$i] = $children;
