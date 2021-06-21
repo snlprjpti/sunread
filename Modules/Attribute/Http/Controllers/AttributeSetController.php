@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Product\Entities\Product;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Attribute\Exceptions\AttributeGroupsPresent;
 use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
@@ -168,37 +169,108 @@ class AttributeSetController extends BaseController
         return $this->successResponse(AttributeResource::collection($fetched), $this->lang('fetch-success'));
     }
 
-    public function attributeSet(Request $request, int $id): JsonResponse
+    public function listAttributeSets(): JsonResponse
     {
         try
         {
-
-            $data = $this->model->findOrFail($id);
-            $groups = [];
-
-            $attribute_groups = $data->attribute_groups->sortBy("position")->map(function ($attribute_group) use (&$groups) {                
-                $groups[] = [
-                    "group_id" => $attribute_group->id,
-                    "name" => $attribute_group->name,
-                    "position" => $attribute_group->position,
-                    "attributes" => $attribute_group->attributes->sortBy("position")->map(function ($attribute){
-                        return [
-                            "attribute_id" => $attribute->id,
-                            "name" => $attribute->name,
-                            "scope" => $attribute->scope,
-                            "position" => $attribute->position,
-                            "is_required" => $attribute->is_required,
-                            "type"=> $attribute->type
-                        ];
-                    })->toArray()
-                ];
-            });
+            $fetched = $this->model::all();
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($groups, $this->lang("fetch-success"));
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
+    }
+
+    public function attributeSet(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->validate($request, [
+                "product_id" => ($request->product_id) ? "required|integer" : "nullable",
+                "attribute_set_id" => ($request->product_id) ? "nullable" : "required|integer"
+            ]);
+
+            $product = Product::find($request->product_id);
+            $data = $this->model->findOrFail($product ? $product->attribute_set_id : $request->attribute_set_id);
+            $groups = [];
+
+            $attribute_groups = $data->attribute_groups->sortBy("position")->map(function ($attribute_group) use (&$groups, $product) {                
+                $groups[] = [
+                    "group_id" => $attribute_group->id,
+                    "title" => $attribute_group->name,
+                    "position" => $attribute_group->position,
+                    "elements" => $attribute_group->attributes->sortBy("position")->map(function ($attribute) use ($product){
+                        return [
+                            "attribute_id" => $attribute->id,
+                            "name" => $attribute->name,
+                            "scope" => $attribute->scope,
+                            "position" => $attribute->position,
+                            "is_required" => $attribute->is_required,
+                            "type" => $attribute->type,
+                            "value" => $product ? $attribute->product_attributes->where("product_id", $product->id)->first()->value->value ?? '' : '' 
+                        ];
+                    })->toArray()
+                ];
+            });
+
+            $default = [
+                "general" => [
+                    [
+                        "title" => "General Details",
+                        "position" => 1,
+                        "elements" => [
+                            [
+                                "title" => "SKU",
+                                "name" => "sku",
+                                "is_required" => 1,
+                                "position" => 1,
+                                "type" => "text",
+                                "value" => $product->sku ?? '' 
+                            ],
+                            [
+                                "title" => "Type",
+                                "name" => "type",
+                                "is_required" => 1,
+                                "position" => 2,
+                                "type" => "hidden",
+                                "value" => $product->type ?? ''
+                            ],
+                            [
+                                "title" => "Attribute Set",
+                                "name" => "attribute_set_id",
+                                "is_required" => 1,
+                                "position" => 3,
+                                "type" => "select",
+                                "value" => $product ? $product->attribute_set_id : $request->attribute_set_id
+                            ]
+                        ]
+                    ]
+                ],
+                "attribute_groups" => $groups,
+                "images" => [
+                    [
+                        "title" => "Images",
+                        "position" => 1,
+                        "elements" => [
+                            [
+                                "title" => "Image",
+                                "name" => "image",
+                                "is_required" => 0,
+                                "position" => 1,
+                                "type" => "file"
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($default, $this->lang("fetch-success"));
     }
 }
