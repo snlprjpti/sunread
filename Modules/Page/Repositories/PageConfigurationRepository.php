@@ -46,13 +46,6 @@ class PageConfigurationRepository extends BaseRepository
         return (object) $created_data;
     }
 
-    public function scopeFilter(string $scope, string $element_scope): bool
-    {
-        if($scope == "website" && in_array($element_scope, ["website"])) return true;
-        if($scope == "channel" && in_array($element_scope, ["global", "website"])) return true;
-        return false;
-    }
-
     public function checkCondition(object $request): object
     {
         return $this->model->where([
@@ -60,5 +53,10 @@ class PageConfigurationRepository extends BaseRepository
             ['scope_id', $request->scope_id],
             ['path', $request->path]
         ]);
+    }
+
+    public function getValues(object $request): mixed
+    {
+        return $this->checkCondition($request)->first()->value;
     }
 }

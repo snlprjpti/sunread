@@ -43,4 +43,23 @@ class PageConfigurationController extends BaseController
 
         return $this->successResponse($created_data->data ?? [], $this->lang($created_data->message), $created_data->code);
     }
+
+    public function getValue(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->repository->validateData($request, $this->repository->scopeValidation($request));
+
+            if(!$request->scope) $request->scope = "website";
+            if(!$request->scope_id) $request->scope_id = 0;
+
+            $fetched = $this->repository->getValues($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
+    }
 }
