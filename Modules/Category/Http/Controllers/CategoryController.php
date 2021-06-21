@@ -14,6 +14,8 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
+use Modules\Category\Rules\SlugUniqueRule;
+use Modules\Category\Rules\WebsiteRule;
 
 class CategoryController extends BaseController
 {
@@ -26,7 +28,7 @@ class CategoryController extends BaseController
         $this->model = $category;
         $this->model_name = "Category";
         $this->is_super_admin = auth()->guard("admin")->check() ? auth()->guard("admin")->user()->hasRole("super-admin") : false;
-        $this->main_root_id = $this->model::oldest('id')->first()->id;
+        $this->main_root_id = $this->model::oldest("id")->first()->id;
 
         $exception_statuses = [
             CategoryAuthorizationException::class => 403
@@ -62,14 +64,14 @@ class CategoryController extends BaseController
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request);
             // Dont fetch root category for other admin
-            if (!$this->is_super_admin) $fetched = $fetched->where('parent_id', '<>', null);
+            if (!$this->is_super_admin) $fetched = $fetched->where("parent_id", "<>", null);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
     public function store(Request $request): JsonResponse
@@ -78,9 +80,15 @@ class CategoryController extends BaseController
         {
             $this->blockCategoryAuthority($request->parent_id);
 
-            $data = $this->repository->validateData($request);
-            $data['image'] = $this->storeImage($request, 'image', strtolower($this->model_name));
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
+            $rules["slug"] = [ "nullable", new SlugUniqueRule($request) ];
+            if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
+
+            $data = $this->repository->validateData($request, $rules, function() use ($request) {
+                return [
+                    "slug" => $request->slug ?? $this->model->createSlug($request->name)
+                ];
+            });
+            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
 
             $created = $this->repository->create($data, function($created) use($request){
                 $this->translation->updateOrCreate([
@@ -95,7 +103,7 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
     public function show(int $id): JsonResponse
@@ -112,7 +120,7 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -121,10 +129,15 @@ class CategoryController extends BaseController
         {
             $this->blockCategoryAuthority($request->parent_id, $id);
 
-            $data = $this->repository->validateData($request,[
-                "slug" => "nullable|unique:categories,slug,{$id}",
-                "image" => "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
-            ]);
+            $rules["slug"] = [ "nullable", new SlugUniqueRule($request) ];
+            $rules["image"] = "sometimes|nullable|mimes:jpeg,jpg,bmp,png";
+            if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
+
+            $data = $this->repository->validateData($request, $rules, function() use ($request) {
+                return [
+                    "slug" => $request->slug ?? $this->model->createSlug($request->name)
+                ];
+            });
 
             if ($request->file("image")) {
                 $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
@@ -148,7 +161,7 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
     public function destroy(int $id): JsonResponse
@@ -170,7 +183,7 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang("delete-success"), 204);
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse
