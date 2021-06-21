@@ -12,7 +12,7 @@ class PageImageFactory extends Factory
     public function definition(): array
     {
         return [
-            "product_id" => Page::latest()->first()->id,
+            "page_id" => Page::latest()->first()->id,
             "path" => Str::random(20),
         ];
     }
