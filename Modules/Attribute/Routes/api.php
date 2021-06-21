@@ -19,8 +19,8 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('sets', AttributeSetController::class)->except(['create', 'edit']);
         Route::get("sets/{set_id}/unassigned-attributes", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "unassignedAttributes"])->name('sets.unassigned.attributes');
 
-        Route::get("attribute-set/format", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "attributeSet"])->name("attribute-sets.attribute.format");
-        Route::get("attribute-sets", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "listAttributeSets"])->name("attribute-sets.list");
+        Route::get("attribute-sets/format", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "attributeSet"])->name("sets.attribute.format");
+        Route::get("attribute-sets", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "listAttributeSets"])->name("sets.list");
 
         // Catalog Attribute Group Routes
         Route::resource('groups', AttributeGroupController::class)->except(['create', 'edit']);
