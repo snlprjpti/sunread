@@ -16,7 +16,6 @@ class CategoryRepository extends BaseRepository
         $this->rules = [
             // category validation
             "name" => "required",
-            "slug" => "nullable|unique:categories,slug",
             "position" => "sometimes|numeric",
             "image" => "required|mimes:jpeg,jpg,bmp,png",
             "description" => "sometimes|nullable",
@@ -24,7 +23,9 @@ class CategoryRepository extends BaseRepository
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
             "status" => "sometimes|boolean",
-            "parent_id" => "required|numeric|exists:categories,id",
+            "include_in_menu" => "sometimes|boolean",
+            "website_id" => "required|exists:websites,id",
+            "parent_id" => "nullable|numeric|exists:categories,id",
             // translation validation
             "translation.name" => "sometimes|required",
             "translation.description" => "sometimes|nullable",

@@ -26,6 +26,8 @@ class CategoryTableSeeder extends Seeder
                 "position" => 1,
                 "image" => NULL,
                 "status" => 1,
+                "include_in_menu" => 1,
+                "website_id" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
             ]

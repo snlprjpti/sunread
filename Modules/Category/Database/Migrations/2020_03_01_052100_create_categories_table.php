@@ -18,7 +18,7 @@ class CreateCategoriesTable extends Migration
             $table->nestedSet();
 
             $table->string('name');
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->integer('position')->default(0);
             $table->string('image')->nullable();
             $table->text('description')->nullable();
@@ -27,6 +27,7 @@ class CreateCategoriesTable extends Migration
             $table->text('meta_keywords')->nullable();
 
             $table->boolean('status')->default(0);
+            $table->boolean('include_in_menu')->default(0);
             $table->timestamps();
         });
     }
