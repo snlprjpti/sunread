@@ -188,7 +188,7 @@ class AttributeSetController extends BaseController
         try
         {
             $this->validate($request, [
-                "product_id" => ($request->product_id) ? "required|integer" : "nullable",
+                "product_id" => ($request->product_id) ? "required|integer|exists:products,id" : "nullable",
                 "attribute_set_id" => ($request->product_id) ? "nullable" : "required|integer"
             ]);
 
