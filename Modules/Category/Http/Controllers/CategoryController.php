@@ -16,6 +16,7 @@ use Modules\Category\Repositories\CategoryRepository;
 use Exception;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Rules\WebsiteRule;
+use Modules\Core\Rules\ScopeRule;
 
 class CategoryController extends BaseController
 {
@@ -80,10 +81,12 @@ class CategoryController extends BaseController
         {
             $this->blockCategoryAuthority($request->parent_id);
 
-            $rules["slug"] = [ "nullable", new SlugUniqueRule($request) ];
+            $rules = [];
             if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
 
-            $data = $this->repository->validateData($request, $rules, function() use ($request) {
+            $data = $this->repository->validateData($request, array_merge($rules, [
+                "slug" => [ "nullable", new SlugUniqueRule($request) ]
+            ]), function() use ($request) {
                 return [
                     "slug" => $request->slug ?? $this->model->createSlug($request->name)
                 ];
@@ -91,10 +94,6 @@ class CategoryController extends BaseController
             $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
 
             $created = $this->repository->create($data, function($created) use($request){
-                $this->translation->updateOrCreate([
-                    "store_id" => $request->translation["store_id"],
-                    "category_id" => $created->id
-                ], $request->translation);
                 $created->channels()->sync($request->channels);
             });
         }
@@ -129,28 +128,22 @@ class CategoryController extends BaseController
         {
             $this->blockCategoryAuthority($request->parent_id, $id);
 
-            $rules["slug"] = [ "nullable", new SlugUniqueRule($request) ];
-            $rules["image"] = "sometimes|nullable|mimes:jpeg,jpg,bmp,png";
+            $rules = [];
             if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
 
-            $data = $this->repository->validateData($request, $rules, function() use ($request) {
+            $data = $this->repository->validateData($request, array_merge($rules, [
+                "slug" => [ "nullable", new SlugUniqueRule($request) ],
+                "image" =>  "sometimes|nullable|mimes:jpeg,jpg,bmp,png"
+            ]), function() use ($request) {
                 return [
                     "slug" => $request->slug ?? $this->model->createSlug($request->name)
                 ];
             });
 
-            if ($request->file("image")) {
-                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            }
-            else {
-                unset($data["image"]);
-            }
+            if ($request->file("image")) $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            else  unset($data["image"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request){
-                $this->translation->updateOrCreate([
-                    "store_id" => $request->translation["store_id"],
-                    "category_id" => $updated->id
-                ], $request->translation);
                 $updated->channels()->sync($request->channels);
             });
             // get latest updated translations
@@ -198,5 +191,35 @@ class CategoryController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
+
+    public function scopeWiseCreateOrUpdate(Request $request)
+    {
+        try
+        {
+            $this->blockCategoryAuthority($request->parent_id);
+
+            $rules = [];
+            if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
+
+            $data = $this->repository->validateData($request, array_merge($rules, [
+                "slug" => [ "nullable", new SlugUniqueRule($request) ]
+            ]), function() use ($request) {
+                return [
+                    "slug" => $request->slug ?? $this->model->createSlug($request->name)
+                ];
+            });
+            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+
+            $created = $this->repository->create($data, function($created) use($request){
+                $created->channels()->sync($request->channels);
+            });
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 }

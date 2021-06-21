@@ -9,11 +9,9 @@ use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
 use Modules\Core\Entities\Store;
-use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Core\Rules\ConfigurationRule;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
-use Illuminate\Http\Request;
+use Modules\Core\Rules\ScopeRule;
 
 class ConfigurationRepository extends BaseRepository
 {
@@ -102,7 +100,7 @@ class ConfigurationRepository extends BaseRepository
     public function scopeValidation(object $request)
     {
         return ((isset($request->scope) && $request->scope != "global") || isset($request->scope_id)) ? [
-            "scope_id" => ["required", "integer", "min:0", new ConfigurationRule($request->scope)]
+            "scope_id" => ["required", "integer", "min:0", new ScopeRule($request->scope)]
         ] : [];
     }
 

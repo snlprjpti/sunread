@@ -40,7 +40,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["stores"],  function() use ($request) {
+            $fetched = $this->repository->fetchAll($request, ["default_store", "default_category", "stores", "website"],  function() use ($request) {
                 $request->validate([
                     "website_id" => "sometimes|exists:websites,id"
                 ]);

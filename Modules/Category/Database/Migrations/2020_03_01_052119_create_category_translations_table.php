@@ -16,17 +16,18 @@ class CreateCategoryTranslationsTable extends Migration
         Schema::create('category_translations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('category_id');
-            $table->unsignedBigInteger('store_id');
+            $table->string('scope');
+            $table->unsignedBigInteger('scope_id');
 
             $table->string('name');
+            $table->string('image')->nullable();
             $table->text('description')->nullable();
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();
 
-            $table->unique(['category_id', 'store_id']);
+            $table->unique(['category_id', 'scope', 'scope_id']);
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->foreign('store_id')->references('id')->on('stores')->onDelete('cascade');
         });
     }
 

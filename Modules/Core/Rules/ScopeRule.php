@@ -7,7 +7,7 @@ use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 
-class ConfigurationRule implements Rule
+class ScopeRule implements Rule
 {
     /**
      * Create a new rule instance.
