@@ -4,11 +4,14 @@ namespace Modules\Page\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
 use Modules\Page\Entities\PageConfiguration;
 use Exception;
 use Modules\Page\Repositories\PageConfigurationRepository;
+use Modules\Page\Transformers\PageConfigurationResource;
 
 class PageConfigurationController extends BaseController
 {
@@ -23,6 +26,17 @@ class PageConfigurationController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
+
+    public function collection(object $data): ResourceCollection
+    {
+        return PageConfigurationResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new PageConfigurationResource($data);
+    }
+
     public function store(Request $request): JsonResponse
     {
         try
@@ -34,7 +48,7 @@ class PageConfigurationController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($created, $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
     public function show(Request $request): JsonResponse
