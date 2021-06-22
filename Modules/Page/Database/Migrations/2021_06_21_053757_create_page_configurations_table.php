@@ -17,8 +17,13 @@ class CreatePageConfigurationsTable extends Migration
             $table->id();
             $table->string('scope');
             $table->unsignedBigInteger("scope_id");
-            $table->string('path');
-            $table->json('value')->nullable();
+            $table->string('title');
+            $table->text('description');
+            $table->boolean('status')->default(1);
+
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->text('meta_keywords')->nullable();
             $table->timestamps();
         });
     }
