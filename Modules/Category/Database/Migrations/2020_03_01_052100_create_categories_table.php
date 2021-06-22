@@ -17,17 +17,9 @@ class CreateCategoriesTable extends Migration
             $table->bigIncrements('id');
             $table->nestedSet();
 
-            $table->string('name');
             $table->string('slug');
             $table->integer('position')->default(0);
-            $table->string('image')->nullable();
-            $table->text('description')->nullable();
-            $table->string('meta_title')->nullable();
-            $table->text('meta_description')->nullable();
-            $table->text('meta_keywords')->nullable();
-
-            $table->boolean('status')->default(0);
-            $table->boolean('include_in_menu')->default(0);
+            
             $table->timestamps();
         });
     }

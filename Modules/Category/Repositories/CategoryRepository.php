@@ -16,6 +16,8 @@ class CategoryRepository extends BaseRepository
         $this->rules = [
             // category validation
             "name" => "required",
+            "scope" => "sometimes|in:website,channel,store",
+            "scope_id" => "sometimes|integer|min:1",
             "position" => "sometimes|numeric",
             "image" => "required|mimes:jpeg,jpg,bmp,png",
             "description" => "sometimes|nullable",
@@ -25,14 +27,7 @@ class CategoryRepository extends BaseRepository
             "status" => "sometimes|boolean",
             "include_in_menu" => "sometimes|boolean",
             "website_id" => "required|exists:websites,id",
-            "parent_id" => "nullable|numeric|exists:categories,id",
-            // translation validation
-            "translation.name" => "sometimes|required",
-            "translation.description" => "sometimes|nullable",
-            "translation.meta_title" => "sometimes|nullable",
-            "translation.meta_description" => "sometimes|nullable",
-            "translation.meta_keywords" => "sometimes|nullable",
-            "translation.store_id" => "required|exists:stores,id"
+            "parent_id" => "nullable|numeric|exists:categories,id"
         ];
     }
 

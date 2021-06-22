@@ -85,13 +85,17 @@ class CategoryController extends BaseController
             if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
 
             $data = $this->repository->validateData($request, array_merge($rules, [
-                "slug" => [ "nullable", new SlugUniqueRule($request) ]
+                "slug" => [ "nullable", new SlugUniqueRule($request) ],
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
             ]), function() use ($request) {
                 return [
-                    "slug" => $request->slug ?? $this->model->createSlug($request->name)
+                    "slug" => $request->slug ?? $this->model->createSlug($request->name),
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $request->website_id
                 ];
             });
             $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            dd($data);
 
             $created = $this->repository->create($data, function($created) use($request){
                 $created->channels()->sync($request->channels);
@@ -193,33 +197,4 @@ class CategoryController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 
-    public function scopeWiseCreateOrUpdate(Request $request)
-    {
-        try
-        {
-            $this->blockCategoryAuthority($request->parent_id);
-
-            $rules = [];
-            if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
-
-            $data = $this->repository->validateData($request, array_merge($rules, [
-                "slug" => [ "nullable", new SlugUniqueRule($request) ]
-            ]), function() use ($request) {
-                return [
-                    "slug" => $request->slug ?? $this->model->createSlug($request->name)
-                ];
-            });
-            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-
-            $created = $this->repository->create($data, function($created) use($request){
-                $created->channels()->sync($request->channels);
-            });
-        }
-        catch (Exception $exception)
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
-    }
 }

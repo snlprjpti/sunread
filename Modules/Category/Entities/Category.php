@@ -21,7 +21,7 @@ class Category extends Model
     use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation;
 
     public static $SEARCHABLE = [ "translations.name", "slug" ];
-    protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "website_id", "status", "include_in_menu" ];
+    protected $fillable = [ "parent_id", "scope", "scope_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "website_id", "status", "include_in_menu" ];
     protected $with = [ "translations" ];
 
     public $translatedAttributes = ["name", "description", "meta_title", "meta_description", "meta_keywords"];

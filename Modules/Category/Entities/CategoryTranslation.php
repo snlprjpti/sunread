@@ -12,7 +12,7 @@ class CategoryTranslation extends Model
     use HasUrlRewrite;
 
     public $timestamps = false;
-    protected $fillable = [ "name", "image", "description", "meta_title", "meta_description", "meta_keywords", "scope", "scope_id", "category_id" ];
+    protected $fillable = [ "name", "description", "meta_title", "meta_description", "meta_keywords", "store_id", "category_id" ];
 
     protected $appends = ['url'];
 
