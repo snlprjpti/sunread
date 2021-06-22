@@ -13,6 +13,8 @@ class PageConfigurationResource extends JsonResource
             "page" => new PageResource($this->whenLoaded("page")),
             "scope" => $this->scope,
             "scope_id" => $this->scope_id,
+            "title" => $this->title,
+            "description" => $this->description,
             "status" => $this->status,
             "meta_title" => $this->meta_title,
             "meta_description" => $this->meta_description,
