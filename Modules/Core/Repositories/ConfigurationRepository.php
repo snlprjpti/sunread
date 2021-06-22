@@ -13,7 +13,6 @@ use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Rules\ConfigurationRule;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
-use Illuminate\Http\Request;
 
 class ConfigurationRepository extends BaseRepository
 {
@@ -112,8 +111,16 @@ class ConfigurationRepository extends BaseRepository
             return $data;
         })->reject(function ($data) use($request) {
             return $this->scopeFilter($request->scope ?? "global", $data["scope"]);
-        })->pluck('rules','path')->mapWithKeys(function($val, $key) {
-            return ["items.$key.value" => $val];
+        })->mapWithKeys(function($item) {
+            $path =  "items.{$item['path']}.value";
+            if(in_array($item["type"], ["select", "checkbox"]))
+            {
+                return [
+                    $path => $item["rules"],
+                    "$path.*" => $item["value_rules"]
+                ];
+            } 
+            return [ $path => $item["rules"] ];
         })->toArray();
     }
 
