@@ -10,7 +10,7 @@ class PageImage extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ "page_id","path"];
+    protected $fillable = [ "page_id", "path" ];
 
     public function page(): BelongsTo
     {

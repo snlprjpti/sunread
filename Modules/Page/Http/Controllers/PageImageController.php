@@ -37,11 +37,12 @@ class PageImageController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
-        try {
+        try
+        {
             $data = $this->repository->validateData($request);
-            foreach($request->file("image") as $file){
+            foreach($request->file("image") as $file) {
                 $image = $this->repository->createImage($file);
-                $data = array_merge($data,$image);
+                $data = array_merge($data, $image);
                 $created = $this->repository->create($data);
             }
         }
@@ -49,6 +50,7 @@ class PageImageController extends BaseController
         {
             return $this->handleException($exception);
         }
+
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 

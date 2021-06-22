@@ -4,7 +4,6 @@ namespace Modules\Page\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\PageImage;
 use Exception;
@@ -40,6 +39,7 @@ class PageImageRepository extends BaseRepository
             throw $exception;
         }
         DB::commit();
+
         return $data;
     }
 }
