@@ -5,7 +5,7 @@ namespace Modules\Category\Transformers;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Transformers\StoreResource;
 
-class CategoryTranslationResource extends JsonResource
+class CategoryValueResource extends JsonResource
 {
     public function toArray($request): array
     {

@@ -29,9 +29,7 @@ class SlugUniqueRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $depth = ($this->data->parent_id) ? ($this->model->withDepth()->find($this->data->parent_id)->depth) + 1 : 0;
-
-        $category_exist = $this->model->withDepth()->having('depth', '=', $depth)->whereWebsiteId($this->data->website_id)->whereSlug($value)->first();
+        $category_exist = $this->model->whereParentId($this->data->parent_id)->whereWebsiteId($this->data->website_id)->whereSlug($value)->first();
         
         return ($category_exist) ? false : true;
     }

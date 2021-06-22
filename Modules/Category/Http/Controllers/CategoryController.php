@@ -8,12 +8,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
-use Modules\Category\Entities\CategoryTranslation;
 use Modules\Category\Exceptions\CategoryAuthorizationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
+use Modules\Category\Entities\CategoryValue;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Rules\WebsiteRule;
 use Modules\Core\Rules\ScopeRule;
@@ -22,10 +22,10 @@ class CategoryController extends BaseController
 {
     protected $repository, $translation, $is_super_admin, $main_root_id;
 
-    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryTranslation $categoryTranslation)
+    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryValue $categoryValue)
     {
         $this->repository = $categoryRepository;
-        $this->translation = $categoryTranslation;
+        $this->translation = $categoryValue;
         $this->model = $category;
         $this->model_name = "Category";
         $this->is_super_admin = auth()->guard("admin")->check() ? auth()->guard("admin")->user()->hasRole("super-admin") : false;

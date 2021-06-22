@@ -29,7 +29,7 @@ class CategoryResource extends JsonResource
             "parent" => $this->parent ?? null,
 
             "created_at" => $this->created_at->format('M d, Y H:i A'),
-            "translations" => $this->whenLoaded("translations"),
+            "values" => $this->whenLoaded("values"),
             "channels" => ChannelResource::collection($this->whenLoaded("channels")),
         ];
     }

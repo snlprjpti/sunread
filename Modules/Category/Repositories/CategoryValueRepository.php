@@ -7,13 +7,13 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Category\Entities\CategoryTranslation;
+use Modules\Category\Entities\CategoryValue;
 
-class CategoryTranslationRepository
+class CategoryValueRepository
 {
     protected $model, $model_key;
 
-    public function __construct(CategoryTranslation $attribute_translation)
+    public function __construct(CategoryValue $attribute_translation)
     {
         $this->model = $attribute_translation;
         $this->model_key = "catalog.attribite.translations";

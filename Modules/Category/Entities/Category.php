@@ -20,12 +20,12 @@ class Category extends Model
 {
     use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation;
 
-    public static $SEARCHABLE = [ "translations.name", "slug" ];
+    public static $SEARCHABLE = [ "values.name", "slug" ];
     protected $fillable = [ "parent_id", "slug", "position", "website_id" ];
-    protected $with = [ "translations" ];
+    protected $with = [ "values" ];
 
     public $translatedAttributes = ["name", "description", "meta_title", "meta_description", "meta_keywords"];
-    public $translatedModels = [ CategoryTranslation::class, "category_id" ];
+    public $translatedModels = [ CategoryValue::class, "category_id" ];
 
     protected $appends = ['url'];
 
