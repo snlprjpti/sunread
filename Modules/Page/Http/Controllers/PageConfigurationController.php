@@ -22,26 +22,19 @@ class PageConfigurationController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function createOrUpdate(Request $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         try
         {
-            $scope_rules = $this->repository->scopeValidation($request);
-            $data = $this->repository->validateData($request, $scope_rules, function ($current_data) {
-                return $current_data->all();
-            });
-
-            if(!$request->scope) $data["scope"] = "website";
-            if(!$request->scope_id) $data["scope_id"] = 0;
-
-            $created_data = $this->repository->add((object) $data);
+            $data = $this->repository->validateData($request);
+            $created = $this->repository->add((object) $data) ?? [];
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($created_data->data ?? [], $this->lang($created_data->message), $created_data->code);
+        return $this->successResponse($created, $this->lang('create-success'), 201);
     }
 
     public function getValue(Request $request): JsonResponse

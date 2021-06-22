@@ -15,16 +15,14 @@ class PageConfigurationRepository extends BaseRepository
     {
         $this->model = $pageConfiguration;
         $this->model_key = "page.configuration";
+        $model_types_in = implode(",", config('page.model_config'));
         $this->rules = [
-            "scope" => [ "sometimes", "in:website,channel" ]
+            "title" => "required",
+            "description" => "required",
+            "scope" => "required|in:{$model_types_in}",
+            "scope_id" => "required|numeric",
+            "status" => "sometimes|boolean"
         ];
-    }
-
-    public function scopeValidation(object $request)
-    {
-        return ((isset($request->scope) && $request->scope != "website") || isset($request->scope_id)) ? [
-            "scope_id" => ["required", "integer", "min:0", new PageConfigurationRule($request->scope)]
-        ] : [];
     }
 
     public function add(object $request): object
@@ -32,17 +30,6 @@ class PageConfigurationRepository extends BaseRepository
         $item['scope'] = $request->scope;
         $item['scope_id'] = $request->scope_id;
 
-        foreach($request->items as $key => $val) {
-            $item['path'] = $key;
-            $item['value'] = $val;
-            if ($configData = $this->checkCondition((object)$item)->first()) {
-                $created_data['data'][] = $this->update($item, $configData->id);
-            }else{
-                $created_data['data'][] = $this->create($item);
-            }
-        }
-        $created_data['message'] = 'create-success';
-        $created_data['code'] = 201;
         return (object) $created_data;
     }
 

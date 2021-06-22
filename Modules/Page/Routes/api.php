@@ -13,8 +13,8 @@ Route::group(['middleware' => ['api']], function () {
             Route::get("/model-list", [PageAvailabilityController::class, "modelList"])->name('model_list');
             Route::put("/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
 
-            Route::post("/configurations", [PageConfigurationController::class, "createOrUpdate"])->name('configuration.add');
-            Route::get("/configurations/value", [PageConfigurationController::class, "getValue"])->name('configuration.show');
+            Route::post("/configurations", [PageConfigurationController::class, "store"])->name('configurations.store');
+            Route::get("/configurations/value", [PageConfigurationController::class, "getValue"])->name('configurations.show');
         });
 
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
