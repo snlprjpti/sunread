@@ -14,7 +14,7 @@ Route::group(['middleware' => ['api']], function () {
             Route::put("/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
 
             Route::post("/configurations", [PageConfigurationController::class, "store"])->name('configurations.store');
-            Route::get("/configurations/value", [PageConfigurationController::class, "getValue"])->name('configurations.show');
+            Route::get("/configurations/{page_config_id}", [PageConfigurationController::class, "show"])->name('configurations.show');
         });
 
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
