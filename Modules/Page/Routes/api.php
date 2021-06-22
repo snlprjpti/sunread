@@ -1,7 +1,6 @@
 <?php
 
 use Modules\Page\Http\Controllers\PageAvailabilityController;
-use Modules\Page\Http\Controllers\PageConfigurationController;
 
 Route::group(['middleware' => ['api']], function () {
     //ADMIN PAGES ROUTES
@@ -13,9 +12,8 @@ Route::group(['middleware' => ['api']], function () {
             Route::get("/model-list", [PageAvailabilityController::class, "modelList"])->name('model_list');
             Route::put("/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
 
-            Route::post("/configurations", [PageConfigurationController::class, "store"])->name('configurations.store');
-            Route::get("/configurations/{page_config_id}", [PageConfigurationController::class, "show"])->name('configurations.show');
-            Route::delete("/configurations/{page_config_id}", [PageConfigurationController::class, "destroy"])->name('configurations.destroy');
+            Route::resource("configurations", \Modules\Page\Http\Controllers\PageConfigurationController::class)->only(["store", "show", "destroy"]);
+
         });
 
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
