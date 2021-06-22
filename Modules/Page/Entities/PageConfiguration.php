@@ -9,6 +9,5 @@ class PageConfiguration extends Model
 {
     use HasFactory;
 
-    public static $SEARCHABLE = [ "scope", "path", "value" ];
-    protected $fillable =  [ "scope", "scope_id", "path", "value" ];
+    protected $fillable =  [ "scope", "scope_id", "page_id", "title", "description", "status", "meta_title", "meta_description", "meta_keywords" ];
 }
