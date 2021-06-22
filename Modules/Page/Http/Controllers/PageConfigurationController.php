@@ -31,7 +31,7 @@ class PageConfigurationController extends BaseController
                 return $current_data->all();
             });
 
-            if(!$request->scope) $data["scope"] = "global";
+            if(!$request->scope) $data["scope"] = "website";
             if(!$request->scope_id) $data["scope_id"] = 0;
 
             $created_data = $this->repository->add((object) $data);
