@@ -82,8 +82,10 @@ class AttributeOptionRepository extends BaseRepository
             foreach(Channel::get() as $channel)
             {
                 $item = [];
-                $item["id"] = $channel->id;
-                $item["name"] = $channel->name;
+                $item = [
+                    "id" =>  $channel->id,
+                    "name" => $channel->name
+                ];
             
                 foreach($channel->stores as $store)
                 {
