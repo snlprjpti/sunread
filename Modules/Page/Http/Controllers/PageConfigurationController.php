@@ -26,7 +26,6 @@ class PageConfigurationController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-
     public function collection(object $data): ResourceCollection
     {
         return PageConfigurationResource::collection($data);
