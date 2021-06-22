@@ -94,15 +94,16 @@ class AttributeController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["translations", "attribute_options.translations"]);
-            $fetched->translations();
+            $fetched = $this->repository->fetch($id)->toArray();
+            $fetched["translations"] = $this->translation_repository->show($id);
+            $fetched["attribute_options"] = $this->option_repository->show($id);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
