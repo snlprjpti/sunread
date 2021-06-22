@@ -249,21 +249,6 @@ class AttributeSetController extends BaseController
                     ]
                 ],
                 "attribute_groups" => $groups,
-                "images" => [
-                    [
-                        "title" => "Images",
-                        "position" => 1,
-                        "elements" => [
-                            [
-                                "title" => "Image",
-                                "name" => "image",
-                                "is_required" => 0,
-                                "position" => 1,
-                                "type" => "file"
-                            ]
-                        ]
-                    ]
-                ]
             ];
         }
         catch( Exception $exception )
