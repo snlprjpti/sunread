@@ -3,16 +3,14 @@
 namespace Modules\Category\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\Core\Entities\Store;
 use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
-class CategoryTranslation extends Model
+class CategoryValue extends Model
 {
     use HasUrlRewrite;
 
     public $timestamps = false;
-    protected $fillable = [ "name", "description", "meta_title", "meta_description", "meta_keywords", "store_id", "category_id" ];
+    protected $fillable = [ "scope", "scope_id", "name", "image", "description", "meta_title", "meta_description", "meta_keywords", "category_id", "status", "include_in_menu" ];
 
     protected $appends = ['url'];
 
@@ -25,11 +23,6 @@ class CategoryTranslation extends Model
         $this->urlRewriteParameterKey = ["category"];
         $this->urlRewriteType = "Modules\Category\Entities\Category";
 
-    }
-
-    public function store(): BelongsTo
-    {
-        return $this->belongsTo(Store::class, 'store_id');
     }
 
     public function getUrlRewriteRequestPathAttribute(): string
