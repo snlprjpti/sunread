@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Attribute\Entities\AttributeTranslation;
+use Modules\Core\Entities\Channel;
 
 class AttributeTranslationRepository
 {
@@ -27,6 +28,8 @@ class AttributeTranslationRepository
         try
         {
             foreach ($data as $row){
+                if(!$row["name"]) continue;
+                
                 $check = [
                     "store_id" => $row["store_id"],
                     "attribute_id" => $parent->id
@@ -43,5 +46,31 @@ class AttributeTranslationRepository
         }
 
         Event::dispatch("{$this->model_key}.create.after", $created);
+    }
+
+    public function show(int $id): array
+    {
+        $data = [];
+        foreach(Channel::get() as $channel)
+        {
+            $item = [];
+            $item = [
+                "id" =>  $channel->id,
+                "name" => $channel->name
+            ];
+            
+            foreach($channel->stores as $store)
+            {
+                if(!isset($store)) continue;
+
+                $item["stores"][] = [
+                   "id" => $store->id,
+                   "name" => $store->name,
+                   "value" => $this->model->whereAttributeId($id)->whereStoreId($store->id)->first()->name ?? null
+                ];
+            }
+            $data[] = $item;
+        }
+        return $data;
     }
 }
