@@ -13,19 +13,19 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
-use Modules\Category\Entities\CategoryValue;
+use Modules\Category\Repositories\CategoryValueRepository;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Rules\WebsiteRule;
 use Modules\Core\Rules\ScopeRule;
 
 class CategoryController extends BaseController
 {
-    protected $repository, $translation, $is_super_admin, $main_root_id;
+    protected $repository, $categoryValueRepository, $is_super_admin, $main_root_id;
 
-    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryValue $categoryValue)
+    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryValueRepository $categoryValueRepository)
     {
         $this->repository = $categoryRepository;
-        $this->translation = $categoryValue;
+        $this->categoryValueRepository = $categoryValueRepository;
         $this->model = $category;
         $this->model_name = "Category";
         $this->is_super_admin = auth()->guard("admin")->check() ? auth()->guard("admin")->user()->hasRole("super-admin") : false;
@@ -86,19 +86,20 @@ class CategoryController extends BaseController
 
             $data = $this->repository->validateData($request, array_merge($rules, [
                 "slug" => [ "nullable", new SlugUniqueRule($request) ],
+                "scope" => "sometimes|in:website",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
             ]), function() use ($request) {
                 return [
                     "slug" => $request->slug ?? $this->model->createSlug($request->name),
-                    "scope" => $request->scope ?? "website",
-                    "scope_id" => $request->scope_id ?? $request->website_id
+                    "scope" => "website",
+                    "scope_id" => $request->website_id
                 ];
             });
             $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            dd($data);
 
-            $created = $this->repository->create($data, function($created) use($request){
-                $created->channels()->sync($request->channels);
+            $created = $this->repository->create($data, function($created) use($data){
+                $this->categoryValueRepository->createOrUpdate($data, $created);
+                if(isset($data["channels"])) $created->channels()->sync($data["channels"]);
             });
         }
         catch (Exception $exception)
@@ -134,24 +135,27 @@ class CategoryController extends BaseController
 
             $rules = [];
             if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
-
             $data = $this->repository->validateData($request, array_merge($rules, [
                 "slug" => [ "nullable", new SlugUniqueRule($request) ],
-                "image" =>  "sometimes|nullable|mimes:jpeg,jpg,bmp,png"
+                "image" =>  "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request)]
             ]), function() use ($request) {
                 return [
-                    "slug" => $request->slug ?? $this->model->createSlug($request->name)
+                    "slug" => $request->slug ?? $this->model->createSlug($request->name),
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $request->website_id
                 ];
             });
 
             if ($request->file("image")) $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
             else  unset($data["image"]);
 
-            $updated = $this->repository->update($data, $id, function($updated) use($request){
-                $updated->channels()->sync($request->channels);
+            $updated = $this->repository->update($data, $id, function($updated) use($data){
+                $this->categoryValueRepository->createOrUpdate($data, $updated);
+                if(isset($data["channels"])) $updated->channels()->sync($data["channels"]);
             });
             // get latest updated translations
-            $updated->translations = $updated->translations()->get();
+            // $updated->translations = $updated->translations()->get();
         }
         catch (Exception $exception)
         {

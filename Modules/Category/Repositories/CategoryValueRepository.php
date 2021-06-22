@@ -13,10 +13,10 @@ class CategoryValueRepository
 {
     protected $model, $model_key;
 
-    public function __construct(CategoryValue $attribute_translation)
+    public function __construct(CategoryValue $category_value)
     {
-        $this->model = $attribute_translation;
-        $this->model_key = "catalog.attribite.translations";
+        $this->model = $category_value;
+        $this->model_key = "catalog.category.values";
     }
 
     public function createOrUpdate(array $data, Model $parent): void
@@ -28,16 +28,13 @@ class CategoryValueRepository
 
         try
         {
-            foreach ($data as $row){
-                $check = [
-                    "store_id" => $row["store_id"],
-                    "category_id" => $parent->id
-                ];
-    
-                $created = $this->model->firstorNew($check);
-                $created->fill($row);
-                $created->save();
-            }
+            $match = [
+                "category_id" => $parent->id,
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope_id"]
+            ];
+            unset($data["position"], $data["website_id"], $data["parent_id"], $data["slug"]);
+            $created = $this->model->updateOrCreate($match, $data);
         }
         catch (Exception $exception)
         {

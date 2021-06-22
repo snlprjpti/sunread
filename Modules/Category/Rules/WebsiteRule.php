@@ -29,7 +29,7 @@ class WebsiteRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        return (bool) $this->model->find($this->data->parent_id)->website_id != $value;
+        return (bool) !strcmp(strval($this->model->find($this->data->parent_id)->website_id), $value);
     }
 
     /**
