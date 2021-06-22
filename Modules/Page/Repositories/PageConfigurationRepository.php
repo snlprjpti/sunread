@@ -3,7 +3,10 @@
 namespace Modules\Page\Repositories;
 
 use Illuminate\Support\Facades\App;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Page\Entities\Page;
 use Modules\Page\Entities\PageConfiguration;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -11,7 +14,9 @@ use Illuminate\Validation\ValidationException;
 
 class PageConfigurationRepository extends BaseRepository
 {
-    public function __construct(PageConfiguration $pageConfiguration)
+    private $channel_model, $store_model, $page_model;
+
+    public function __construct(PageConfiguration $pageConfiguration, Channel $channel, Store $store, Page $page)
     {
         $this->model = $pageConfiguration;
         $this->model_key = "page.configuration";
@@ -27,6 +32,9 @@ class PageConfigurationRepository extends BaseRepository
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
         ];
+        $this->channel_model = $channel;
+        $this->store_model = $store;
+        $this->page_model = $page;
     }
 
     public function add(object $request): object
@@ -85,8 +93,50 @@ class PageConfigurationRepository extends BaseRepository
         ]);
     }
 
-    public function getValues(object $request): mixed
+    public function getPageDetail(object $page): object
     {
-        return $this->checkCondition($request)->first()->value;
+        try
+        {
+            $result = null;
+            if($page->scope != "website")
+            {
+                $data["page_id"] = $page->page_id;
+                switch($page->scope)
+                {
+                    case "Modules\Core\Entities\Store":
+                        $data["scope"] = "Modules\\Core\\Entities\\Channel";
+                        $data["scope_id"] = $this->store_model->find($page->scope_id)->channel->id;
+                        break;
+
+                    case "Modules\Core\Entities\Channel":
+                        $data["scope"] = "website";
+                        $data["scope_id"] = $this->channel_model->find($page->scope_id)->website->id;
+                        break;
+                }
+                $result = $this->checkCondition((object) $data)->first() ?? ($this->getPageDetail((object) $data));
+            }
+            if(!$result)
+            {
+                $result = $this->page($page);
+            }
+
+            return $result;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
+    public function page(object $data): object
+    {
+        try
+        {
+           return $this->page_model->whereId($data->page_id)->firstOrFail();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
     }
 }

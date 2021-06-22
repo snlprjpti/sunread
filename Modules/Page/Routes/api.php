@@ -12,7 +12,8 @@ Route::group(['middleware' => ['api']], function () {
             Route::get("/model-list", [PageAvailabilityController::class, "modelList"])->name('model_list');
             Route::put("/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
 
-            Route::resource("configurations", \Modules\Page\Http\Controllers\PageConfigurationController::class)->only(["store", "show", "destroy"]);
+            Route::get("configurations/page-detail", [\Modules\Page\Http\Controllers\PageConfigurationController::class, "pageDetail"]  );
+            Route::resource("configurations", PageConfigurationController::class)->only(["store", "show", "destroy"]);
 
         });
 
