@@ -10,15 +10,18 @@ use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Attribute\Entities\AttributeOptionTranslation;
+use Modules\Core\Entities\Channel;
 
 class AttributeOptionRepository extends BaseRepository
 {
-    protected $model, $model_key, $translation;
+    protected $model, $model_key, $translation, $translation_model;
 
-    public function __construct(AttributeOption $attribute_option, AttributeOptionTranslationRepository $attributeOptionTranslationRepository)
+    public function __construct(AttributeOption $attribute_option, AttributeOptionTranslation $attribute_option_translation, AttributeOptionTranslationRepository $attributeOptionTranslationRepository)
     {
         $this->model = $attribute_option;
         $this->translation = $attributeOptionTranslationRepository;
+        $this->translation_model = $attribute_option_translation;
         $this->model_key = "catalog.attribute.options";
         $this->rules = [
             "name" => "required",
@@ -57,5 +60,48 @@ class AttributeOptionRepository extends BaseRepository
 
         Event::dispatch("{$this->model_key}.create.after", $items);
         DB::commit();
+    }
+
+    public function show(int $id): array
+    {
+        $all_data = [];
+        $input = [];
+        $attribute_options = $this->model->whereAttributeId($id)->get();
+
+        if($attribute_options->count() == 0) return $all_data;
+
+        foreach($attribute_options as $attribute_option)
+        {
+            $data = [];
+            $data = [
+                "id" => $attribute_option->id,
+                "name" => $attribute_option->name,
+                "position" => $attribute_option->position,
+                "is_default" => $attribute_option->is_default
+            ];
+            foreach(Channel::get() as $channel)
+            {
+                $item = [];
+                $item = [
+                    "id" =>  $channel->id,
+                    "name" => $channel->name
+                ];
+            
+                foreach($channel->stores as $store)
+                {
+                    if(!isset($store)) continue;
+    
+                    $item["stores"][] = [
+                       "id" => $store->id,
+                       "name" => $store->name,
+                       "value" => $this->translation_model->whereStoreId($store->id)->first()->name ?? null
+                    ];
+                }
+                $data["translations"][] = $item;
+            }
+            $input[] = $data;
+        }
+        $all_data[] = $input;
+        return $all_data;
     }
 }
