@@ -5,20 +5,21 @@ namespace Modules\Page\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Page\Entities\Page;
 use Modules\Page\Entities\PageConfiguration;
 use Exception;
 use Modules\Page\Repositories\PageConfigurationRepository;
 
 class PageConfigurationController extends BaseController
 {
-    private $repository;
+    private $repository, $page;
 
-    public function __construct(PageConfiguration $pageConfiguration, PageConfigurationRepository $pageConfigurationRepository)
+    public function __construct(PageConfiguration $pageConfiguration, PageConfigurationRepository $pageConfigurationRepository, Page $page)
     {
         $this->model = $pageConfiguration;
         $this->model_name = "Page Configuration";
         $this->repository = $pageConfigurationRepository;
-
+        $this->page = $page;
         parent::__construct($this->model, $this->model_name);
     }
 
@@ -26,8 +27,7 @@ class PageConfigurationController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $created = $this->repository->add((object) $data) ?? [];
+            $created = $this->repository->add((object) $request) ?? [];
         }
         catch( Exception $exception )
         {
@@ -37,7 +37,7 @@ class PageConfigurationController extends BaseController
         return $this->successResponse($created, $this->lang('create-success'), 201);
     }
 
-    public function getValue(Request $request): JsonResponse
+    public function show(Request $request): JsonResponse
     {
         try
         {
