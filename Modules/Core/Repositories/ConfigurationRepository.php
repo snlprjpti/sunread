@@ -70,6 +70,7 @@ class ConfigurationRepository extends BaseRepository
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
                             
                             unset($element["pluck"], $element["provider"], $element["rules"], $element["showIn"]);
+                            $subchildren_data["title"] = $subchildren["title"];
                             $subchildren_data["elements"][] = $element;
                         }
                         $children["subChildren"][$j] = $subchildren_data;
