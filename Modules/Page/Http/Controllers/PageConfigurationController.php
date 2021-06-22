@@ -63,4 +63,18 @@ class PageConfigurationController extends BaseController
 
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
+
+    public function destroy(int $id): JsonResponse
+    {
+        try
+        {
+            $this->repository->delete($id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+    }
 }

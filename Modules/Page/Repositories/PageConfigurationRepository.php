@@ -59,7 +59,6 @@ class PageConfigurationRepository extends BaseRepository
         return $created;
     }
 
-
     public function validateAllowData(array $data, ?array $merge = []): array
     {
         try

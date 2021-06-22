@@ -15,6 +15,7 @@ Route::group(['middleware' => ['api']], function () {
 
             Route::post("/configurations", [PageConfigurationController::class, "store"])->name('configurations.store');
             Route::get("/configurations/{page_config_id}", [PageConfigurationController::class, "show"])->name('configurations.show');
+            Route::delete("/configurations/{page_config_id}", [PageConfigurationController::class, "destroy"])->name('configurations.destroy');
         });
 
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
