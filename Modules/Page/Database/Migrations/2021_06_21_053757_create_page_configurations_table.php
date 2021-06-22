@@ -19,8 +19,8 @@ class CreatePageConfigurationsTable extends Migration
             $table->unsignedBigInteger("scope_id");
             $table->unsignedBigInteger('page_id');
             $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
-            $table->string('title');
-            $table->text('description');
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
             $table->boolean('status')->default(1);
 
             $table->string('meta_title')->nullable();
