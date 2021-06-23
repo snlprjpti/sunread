@@ -33,7 +33,6 @@ class ProductTest extends BaseTestCase
         $category = Category::inRandomOrder()->first();
         $product = $this->model::factory()->make();
         $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();        
-
         return array_merge([
             "attributes" => [
                 [
@@ -48,12 +47,28 @@ class ProductTest extends BaseTestCase
     public function getUpdateData(): array
     {
         $category = Category::inRandomOrder()->first();
-        $product = $this->model::factory()->create();
-        // dd($product->id);
-        $this->default_resource_id = $product->id;
-        // dd($product->attribute_set);
+        $product = $this->model::find($this->default_resource_id);
+        $update_data = $product->toArray();
         $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
-             
+
+        return array_merge([
+            "attributes" => [
+                [
+                    "attribute_id" => $attribute->id,
+                    "value" => $this->value($attribute->type)
+                ]
+            ],
+            "categories" => [$category->id]
+        ], $product->toArray());
+    }
+
+    public function getNonMandodtaryUpdateData(): array
+    {
+        $category = Category::inRandomOrder()->first();
+        $product = $this->model::find($this->default_resource_id);
+        $update_data = $product->toArray();
+        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
+
         return array_merge([
             "attributes" => [
                 [
@@ -77,7 +92,7 @@ class ProductTest extends BaseTestCase
                 $value = true;
                 break;
 
-            case ($type == "datetime" || $type == "date"): 
+            case ($type == "datetime" || $type == "date"):
                 $value = now();
                 break;
 
