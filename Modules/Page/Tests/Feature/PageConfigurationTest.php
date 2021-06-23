@@ -6,9 +6,6 @@ use Illuminate\Support\Arr;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Page\Entities\Page;
 use Modules\Page\Entities\PageConfiguration;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PageConfigurationTest extends BaseTestCase
 {
@@ -49,4 +46,22 @@ class PageConfigurationTest extends BaseTestCase
         ]);
     }
 
+    public function testAdminCanFetchPageResource()
+    {
+        $scope = Arr::random(config('page.model_config'));
+        $scope_id = app($scope)::factory(1)->create()->first()->id;
+        $page_id = Page::factory(1)->create()->first()->id;
+        $get_data = [
+            "scope" => $scope,
+            "scope_id" => $scope_id,
+            "page_id" => $page_id
+        ];
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("page_detail", $get_data));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
+        ]);
+    }
 }
