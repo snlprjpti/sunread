@@ -62,6 +62,7 @@ class ProductController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
+
             $attribute_set = AttributeSet::whereId($request->attribute_set_id)->firstOrFail();
             $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes->pluck('id');
@@ -114,13 +115,13 @@ class ProductController extends BaseController
     {
         try
         {
-            $product = $this->model::findOrFail($id);
-
-            if ( $product->attribute_set_id != $request->attribute_set_id ) throw new ProductAttributeCannotChangeException("Attribute set cannot change.");
-            
+            $product = $this->model::findOrFail($id);            
             $data = $this->repository->validateData($request, [
                 "sku" => "required|unique:products,sku,{$id}"
             ]);
+            
+            if ( $product->attribute_set_id != $request->attribute_set_id ) throw new ProductAttributeCannotChangeException("Attribute set cannot change.");
+
 
             $attribute_ids = $product->attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes->pluck('id');
