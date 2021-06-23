@@ -188,12 +188,12 @@ class AttributeSetController extends BaseController
         try
         {
             $this->validate($request, [
-                "product_id" => ($request->product_id) ? "required|integer|exists:products,id" : "nullable",
-                "attribute_set_id" => ($request->product_id) ? "nullable" : "required|integer"
+                "product" => ($request->product) ? "required|integer|exists:products,id" : "nullable",
+                "attribute_set" => ($request->product) ? "nullable" : "required|integer"
             ]);
 
-            $product = Product::find($request->product_id);
-            $data = $this->model->findOrFail($product ? $product->attribute_set_id : $request->attribute_set_id);
+            $product = Product::find($request->product);
+            $data = $this->model->findOrFail($product ? $product->attribute_set_id : $request->attribute_set);
             $groups = [];
 
             $attribute_groups = $data->attribute_groups->sortBy("position")->map(function ($attribute_group) use (&$groups, $product) {                
@@ -209,7 +209,7 @@ class AttributeSetController extends BaseController
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required,
                             "type" => $attribute->type,
-                            "value" => $product ? $attribute->product_attributes->where("product_id", $product->id)->first()->value->value ?? '' : '' 
+                            "value" => $product ? $attribute->product_attributes->where("product_id", $product->id)->first()->value_data ?? '' : '' 
                         ];
                     })->toArray()
                 ];
