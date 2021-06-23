@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Attribute\Entities\AttributeTranslation;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 
 class AttributeTranslationRepository
 {
@@ -50,9 +51,14 @@ class AttributeTranslationRepository
 
     public function show(int $id): array
     {
+        $selected_stores = array_unique($this->model->whereAttributeId($id)->pluck('store_id')->toArray());
+        $selected_channels = array_unique(Store::whereIn('id', $selected_stores)->pluck('channel_id')->toArray());
+
         $data = [];
-        foreach(Channel::get() as $channel)
+        foreach($selected_channels as $selected_channel)
         {
+            $channel = Channel::find($selected_channel);
+
             $item = [];
             $item = [
                 "id" =>  $channel->id,
@@ -69,8 +75,9 @@ class AttributeTranslationRepository
                    "value" => $this->model->whereAttributeId($id)->whereStoreId($store->id)->first()->name ?? null
                 ];
             }
-            $data[] = $item;
+            $data["data"][] = $item;
         }
+        $data["selected_channels"] = $selected_channels;
         return $data;
     }
 }

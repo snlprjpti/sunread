@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Attribute\Entities\AttributeOptionTranslation;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 
 class AttributeOptionRepository extends BaseRepository
 {
@@ -79,8 +80,11 @@ class AttributeOptionRepository extends BaseRepository
                 "position" => $attribute_option->position,
                 "is_default" => $attribute_option->is_default
             ];
-            foreach(Channel::get() as $channel)
+            $selected_stores = array_unique($this->translation_model->whereAttributeOptionId($attribute_option->id)->pluck('store_id')->toArray());
+            $selected_channels = array_unique(Store::whereIn('id', $selected_stores)->pluck('channel_id')->toArray());
+            foreach($selected_channels as $selected_channel)
             {
+                $channel = Channel::find($selected_channel);
                 $item = [];
                 $item = [
                     "id" =>  $channel->id,
@@ -94,12 +98,13 @@ class AttributeOptionRepository extends BaseRepository
                     $item["stores"][] = [
                        "id" => $store->id,
                        "name" => $store->name,
-                       "value" => $this->translation_model->whereStoreId($store->id)->first()->name ?? null
+                       "value" => $this->translation_model->whereAttributeOptionId($id)->whereStoreId($store->id)->first()->name ?? null
                     ];
                 }
-                $data["translations"][] = $item;
+                $data["data"][] = $item;
             }
-            $input[] = $data;
+            $data["selected_channels"] = $selected_channels;
+            $input["translations"][] = $data;
         }
         $all_data[] = $input;
         return $all_data;

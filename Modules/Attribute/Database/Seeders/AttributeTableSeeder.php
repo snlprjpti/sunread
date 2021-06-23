@@ -18,31 +18,38 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Slug",
                 "type" => "text",
                 "is_required" => 1,
-                "is_searchable" => 1
+                "is_searchable" => 1,
+                "search_weight" => 1,
+                "is_unique" => 1
             ],
             [
                 "name" => "Name",
                 "type" => "text",
                 "is_required" => 1,
-                "is_searchable" => 1
+                "is_searchable" => 1,
+                "search_weight" => 2
             ],
             [
                 "name" => "New",
-                "type" => "boolean"
+                "type" => "boolean",
+                "default_value" => 0
             ],
             [
                 "name" => "Featured",
-                "type" => "boolean"
+                "type" => "boolean",
+                "default_value" => 0
             ],
             [
                 "name" => "Visible Individually",
                 "type" => "boolean",
-                "is_required" => 1
+                "is_required" => 1,
+                "default_value" => 0
             ],
             [
                 "name" => "Status",
                 "type" => "boolean",
-                "is_required" => 1
+                "is_required" => 1,
+                "default_value" => 0
             ],
             [
                 "name" => "Short Description",
