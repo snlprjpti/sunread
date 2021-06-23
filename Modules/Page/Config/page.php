@@ -7,6 +7,7 @@ return [
     ],
 
     'model_config' =>[
+        'Website' => 'Modules\Core\Entities\Website',
         'Channel' => 'Modules\Core\Entities\Channel'
     ]
 ];
