@@ -68,7 +68,6 @@ class ProductController extends BaseController
             })->flatten(1)->toArray();
             $attribute = Attribute::whereIn('id', $attribute_ids)->get();
 
-            // check attribute exists on attribute set
             $check_attribute = $attribute->pluck("id")->toArray();
             $attribute_ids = array_map(function($request_attribute) use ($attribute) {
                 
