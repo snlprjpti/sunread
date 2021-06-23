@@ -26,7 +26,7 @@ class AttributeRepository extends BaseRepository
             "scope" => "required|in:global,website,channel,store",
             "is_required" => "sometimes|boolean",
             "comparable_on_storefront" => "sometimes|boolean",
-            "validation" => "nullable|in:decimal,integer,email,string",
+            "validation" => "nullable",
             "is_visible_on_storefront" => "sometimes|boolean",
             "is_user_defined" => "sometimes|boolean",
             "use_in_layered_navigation" => "sometimes|boolean",
