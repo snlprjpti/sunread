@@ -32,6 +32,8 @@ class AttributeRepository extends BaseRepository
             "use_in_layered_navigation" => "sometimes|boolean",
             "position" => "sometimes|numeric",
             "is_searchable" => "sometimes|boolean",
+            "is_unique" => "sometimes|boolean",
+            "search_weight" => "required_if:is_searchable,==,1",
             "translations" => "nullable|array"
         ];
     }
@@ -51,14 +53,14 @@ class AttributeRepository extends BaseRepository
     {
         $translations = $request->translations;
         if (!$this->validateTranslationData($translations)) {
-            throw new AttributeTranslationDoesNotExist(__("core.app.response.missing-data", ["name" => "Attribute"]));
+            throw new AttributeTranslationDoesNotExist(__("core::app.response.missing-data", ["name" => "Attribute"]));
         }
 
         $options = $request->attribute_options;
         if (is_array($options) && in_array($request->type, $this->non_filterable_fields)) {
             foreach ($options as $option) {
                 if (!isset($option["translations"]) || !$this->validateTranslationData($option["translations"])) {
-                    throw new AttributeTranslationOptionDoesNotExist(__("core.app.response.missing-data", ["name" => "Attribute Option"]));
+                    throw new AttributeTranslationOptionDoesNotExist(__("core::app.response.missing-data", ["name" => "Attribute Option"]));
                 }
             }
         }

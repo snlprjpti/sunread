@@ -17,10 +17,12 @@ return[
                                 "pluck" => ["code","id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:currencies,id",
+                                "showIn" => ["channel", "website", "default", "store"],
                                 "multiple" => false,
-                                "scope" => "global"
+                                "scope" => "global",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Allow Countries",
@@ -30,9 +32,11 @@ return[
                                 "pluck" => ["code", "id"],
                                 "default" => [],
                                 "options" => [],
-                                "rules" => "required",
-                                "showIn" => ['channel', 'website', 'default', 'store'],
-                                "scope" => "website"
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:currencies,id",
+                                "showIn" => ["channel", "website", "default", "store"],
+                                "scope" => "website",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Zip/Postal Code is Optional for",
@@ -42,10 +46,12 @@ return[
                                 "pluck" => ["code", "id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "nullable",
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:currencies,id",
+                                "showIn" => ["channel", "website", "default", "store"],
                                 "multiple" => false,
-                                "scope" => "channel"
+                                "scope" => "channel",
+                                "is_required" => 1
                             ]
                         ]
                     ],
@@ -60,10 +66,12 @@ return[
                                 "pluck" => ["code", "id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:currencies,id",
+                                "showIn" => ["channel", "website", "default", "store"],
                                 "multiple" => false,
-                                "scope" => "store"
+                                "scope" => "store",
+                                "is_required" => 1
                             ],
                         ]
                     ],
@@ -78,10 +86,12 @@ return[
                                 "pluck" => ["name", "id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:stores,id",
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => false,
-                                "scope" => "global"
+                                "scope" => "global",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Store Phone Number",
@@ -91,9 +101,10 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "channel"
+                                "scope" => "channel",
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Store Hours of Operation",
@@ -105,7 +116,8 @@ return[
                                 "options" => [],
                                 "rules" => "sometimes|nullable",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "website"
+                                "scope" => "website",
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Country",
@@ -115,10 +127,12 @@ return[
                                 "pluck" => ["code", "id"],
                                 "default" => [],
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:currencies,id",
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => true,
-                                "scope" => "store"
+                                "scope" => "store",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Region/State",
@@ -130,7 +144,8 @@ return[
                                 "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "global"
+                                "scope" => "global",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Zip/Postal Code",
@@ -140,9 +155,10 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required|numeric",
+                                "rules" => "nullable|numeric",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "store"
+                                "scope" => "store",
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "City",
@@ -154,7 +170,8 @@ return[
                                 "options" => [],
                                 "rules" => "required",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "global"
+                                "scope" => "global",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Street Address",
@@ -164,9 +181,10 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "website"
+                                "scope" => "website",
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Street Address Line 2",
@@ -178,7 +196,8 @@ return[
                                 "options" => [],
                                 "rules" => "sometimes|nullable",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "channel"
+                                "scope" => "channel",
+                                "is_required" => 0
                             ],
                         ]
                     ]
@@ -201,9 +220,10 @@ return[
                                     [ "value" => 1, "label" => "Yes" ],
                                     [ "value" => 0, "label" => "No" ]
                                 ],
-                                "rules" => "required",
+                                "rules" => "nullable|in:0,1",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "store"
+                                "scope" => "store",
+                                "is_required" => 0
                             ]
                         ]
                     ],
@@ -218,9 +238,10 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "nullable",
                                 "showIn" => ["channel","website","default","store"],
-                                "scope" => "website"
+                                "scope" => "website",
+                                "is_required" => 0
                             ],
 
                         ]
@@ -241,10 +262,12 @@ return[
                                 "pluck" => ["code","id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:currencies,id",
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => false,
-                                "scope" => "global"
+                                "scope" => "global",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Default Display Currency",
@@ -254,10 +277,12 @@ return[
                                 "pluck" => ["code","id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "required",
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:currencies,id",
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => false,
-                                "scope" => "website"
+                                "scope" => "website",
+                                "is_required" => 1
                             ],
                         ]
                     ],
@@ -283,9 +308,10 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
-                                "scope" => "store"
+                                "rules" => "nullable",
+                                "showIn" => ["channel", "website", "default", "store"],
+                                "scope" => "store",
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Mask for Meta Title",
@@ -295,9 +321,10 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
-                                "scope" => "channel"
+                                "rules" => "nullable",
+                                "showIn" => ["channel", "website", "default", "store"],
+                                "scope" => "channel",
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Mask for Meta Keywords",
@@ -307,9 +334,10 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
-                                "scope" => "store"
+                                "rules" => "nullable",
+                                "showIn" => ["channel", "website", "default", "store"],
+                                "scope" => "store",
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Mask for Meta description",
@@ -319,9 +347,10 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => 'nullable',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
-                                "scope" => "website"
+                                "rules" => "nullable",
+                                "showIn" => ["channel", "website", "default", "store"],
+                                "scope" => "website",
+                                "is_required" => 0
                             ],
                         ]
 
@@ -350,9 +379,10 @@ return[
                                     [ "value" => 1, "label" => "Yes" ],
                                     [ "value" => 0, "label" => "No" ]
                                 ],
-                                "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
-                                "scope" => "global"
+                                "rules" => "required|in:0,1",
+                                "showIn" => ["channel", "website", "default", "store"],
+                                "scope" => "global",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Default Customer Group",
@@ -362,10 +392,12 @@ return[
                                 "pluck" => ["name", "id"],
                                 "default" => "1",
                                 "options" => [],
-                                "rules" => 'required',
-                                "showIn" => ['channel', 'website', 'default', 'store'],
+                                "rules" => "required|array",
+                                "value_rules" => "required|exists:customer_groups,id",
+                                "showIn" => ["channel", "website", "default", "store"],
                                 "multiple" => false,
-                                "scope" => "website"
+                                "scope" => "website",
+                                "is_required" => 1
                             ]
                         ]
                     ]

@@ -9,6 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Traits\ApiResponseFormat;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Exceptions\DeleteUnauthorized;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -56,7 +57,8 @@ class BaseController extends Controller
             ModelNotFoundException::class => 404,
             QueryException::class => 400,
             UnauthorizedHttpException::class => 401,
-            SlugCouldNotBeGenerated::class => 500
+            SlugCouldNotBeGenerated::class => 500,
+            DeleteUnauthorized::class => 401
         ], $exception_statuses);
     }
 
@@ -106,7 +108,7 @@ class BaseController extends Controller
             $file = $request->file($file_name);
             $key = \Str::random(6);
             $folder = $folder ?? "default";
-            $file_path = $file->storeAs("images/{$folder}/{$key}", $file->getClientOriginalName());
+            $file_path = $file->storeAs("images/{$folder}/{$key}", (string) $file->getClientOriginalName());
 
             // Delete old file if requested
             if ( $delete_url !== null ) Storage::delete($delete_url);

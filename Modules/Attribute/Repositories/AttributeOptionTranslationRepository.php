@@ -26,6 +26,8 @@ class AttributeOptionTranslationRepository
         try
         {
             foreach ($data as $row){
+                if(!$row["name"]) continue;
+                
                 $check = [
                     "store_id" => $row["store_id"],
                     "attribute_option_id" => $parent->id

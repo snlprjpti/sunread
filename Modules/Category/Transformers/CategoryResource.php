@@ -23,7 +23,7 @@ class CategoryResource extends JsonResource
             "meta_description" => $this->meta_description,
             "meta_keywords" => $this->meta_keywords,
 
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "_lft" => $this->_lft,
             "_rgt" => $this->_rgt,
             "parent" => $this->parent ?? null,

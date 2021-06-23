@@ -42,7 +42,7 @@ class PageRepository extends BaseRepository
     {
         $translations = $request->translations;
         if (!$this->validateTranslationData($translations)) {
-            throw new PageTranslationDoesNotExist(__("core.app.response.missing-data", ["title" => "Page"]));
+            throw new PageTranslationDoesNotExist(__("core::app.response.missing-data", ["title" => "Page"]));
         }
     }
 }

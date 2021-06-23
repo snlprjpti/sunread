@@ -16,7 +16,7 @@ class CustomerAccountResource extends JsonResource
             "gender" => $this->gender,
             "date_of_birth" => $this->date_of_birth,
             "email" => $this->email,
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "addresses" => CustomerAddressResource::collection($this->whenLoaded("addresses")),
             "profile_image" => $this->profile_image_url,
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,
