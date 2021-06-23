@@ -27,7 +27,7 @@ class Category extends Model
     public $translatedAttributes = ["name", "description", "meta_title", "meta_description", "meta_keywords"];
     public $translatedModels = [ CategoryValue::class, "category_id" ];
 
-    protected $appends = ['url'];
+    // protected $appends = ['url'];
 
     protected $touches = ['products'];
 

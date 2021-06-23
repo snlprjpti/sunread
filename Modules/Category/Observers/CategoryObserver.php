@@ -13,7 +13,7 @@ class CategoryObserver
     public function created(Category $category)
     {
         Audit::log($category, __FUNCTION__);
-        UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
+        //UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
     }
 
     public function updated(Category $category)
@@ -22,7 +22,7 @@ class CategoryObserver
             $product->searchable();
         });
         Audit::log($category, __FUNCTION__);
-        UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
+        //UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
     }
 
     public function deleted(Category $category)
@@ -31,6 +31,6 @@ class CategoryObserver
             $product->searchable();
         });
         Audit::log($category, __FUNCTION__);
-        UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
+        //UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
     }
 }

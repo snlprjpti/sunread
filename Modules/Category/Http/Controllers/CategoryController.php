@@ -13,6 +13,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
+use Illuminate\Validation\ValidationException;
 use Modules\Category\Repositories\CategoryValueRepository;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Rules\WebsiteRule;
@@ -62,10 +63,20 @@ class CategoryController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = [];
+
+            $data = $request->validate([
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope)]
+            ]);
+
+            foreach($this->model->get()->toTree() as $category)
+            {
+                $fetched[] = $this->repository->treeWiseList($data, $category);
+            }
+
             // Dont fetch root category for other admin
-            if (!$this->is_super_admin) $fetched = $fetched->where("parent_id", "<>", null);
+            //if (!$this->is_super_admin) $fetched = $fetched->where("parent_id", "<>", null);
         }
         catch (Exception $exception)
         {
@@ -79,22 +90,24 @@ class CategoryController extends BaseController
     {
         try
         {
-            $this->blockCategoryAuthority($request->parent_id);
+            // $this->blockCategoryAuthority($request->parent_id);
 
             $rules = [];
-            if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
 
-            $data = $this->repository->validateData($request, array_merge($rules, [
+            $data = $this->repository->validateData($request, [
                 "slug" => [ "nullable", new SlugUniqueRule($request) ],
                 "scope" => "sometimes|in:website",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
-            ]), function() use ($request) {
+            ], function() use ($request) {
                 return [
                     "slug" => $request->slug ?? $this->model->createSlug($request->name),
                     "scope" => "website",
                     "scope_id" => $request->website_id
                 ];
             });
+            if(isset($data["parent_id"])) if(!strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
+            throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
+
             $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
 
             $created = $this->repository->create($data, function($created) use($data){
@@ -131,14 +144,14 @@ class CategoryController extends BaseController
     {
         try
         {
-            $this->blockCategoryAuthority($request->parent_id, $id);
+            // $this->blockCategoryAuthority($request->parent_id, $id);
 
             $rules = [];
-            if($request->parent_id) $rules["website_id"] = [ "required", "exists:websites,id", new WebsiteRule($request) ];
+
             $data = $this->repository->validateData($request, array_merge($rules, [
                 "slug" => [ "nullable", new SlugUniqueRule($request) ],
                 "image" =>  "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request)]
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
             ]), function() use ($request) {
                 return [
                     "slug" => $request->slug ?? $this->model->createSlug($request->name),
@@ -146,6 +159,9 @@ class CategoryController extends BaseController
                     "scope_id" => $request->scope_id ?? $request->website_id
                 ];
             });
+
+            if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
+            throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
 
             if ($request->file("image")) $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
             else  unset($data["image"]);
