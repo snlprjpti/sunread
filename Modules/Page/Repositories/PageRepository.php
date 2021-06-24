@@ -105,11 +105,13 @@ class PageRepository extends BaseRepository
     {
         try
         {
-            return $this->model->findOrFail($data->page_id);
+            $result = $this->model->findOrFail($data->page_id);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
+
+        return $result;
     }
 }
