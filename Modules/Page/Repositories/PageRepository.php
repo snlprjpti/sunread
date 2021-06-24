@@ -13,7 +13,6 @@ use Exception;
 class PageRepository extends BaseRepository
 {
     private $pageConfiguration, $store, $channel;
-    private $repository;
 
     public function __construct(Page $page, PageConfiguration $pageConfiguration, Store $store, Channel $channel)
     {
