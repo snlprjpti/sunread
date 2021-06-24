@@ -12,11 +12,11 @@ Route::group(['middleware' => ['api']], function () {
             Route::get("/model-list", [PageAvailabilityController::class, "modelList"])->name("model_list");
             Route::put("/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
 
-            Route::get("configurations/page-detail", [\Modules\Page\Http\Controllers\PageConfigurationController::class, "pageDetail"])->name("configurations.page_detail");
             Route::resource("configurations", PageConfigurationController::class)->only(["store", "show", "destroy"]);
 
         });
 
-        Route::resource('pages', PageController::class)->except(['create', 'edit']);
+        Route::get('pages/detail', [\Modules\Page\Http\Controllers\PageController::class, "detail"])->name('pages.detail');
+        Route::resource('pages', PageController::class)->except(['create', 'edit','show']);
     });
 });

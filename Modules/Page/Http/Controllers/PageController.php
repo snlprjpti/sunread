@@ -72,11 +72,11 @@ class PageController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function show(Request $request, int $id): JsonResponse
+    public function detail(Request $request): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->getPageDetail($request, $id);
+            $fetched = $this->repository->getPageDetail($request);
         }
         catch (Exception $exception)
         {

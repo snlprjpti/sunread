@@ -56,24 +56,24 @@ class PageRepository extends BaseRepository
         }
     }
 
-    public function checkCondition(object $request, int $page_id): object
+    public function checkCondition(object $request): object
     {
         return $this->pageConfiguration->where([
             ['scope', $request->scope],
             ['scope_id', $request->scope_id],
-            ['page_id', $page_id]
+            ['page_id', $request->page_id]
         ]);
     }
 
-    public function getPageDetail(object $page, int $page_id): object
+    public function getPageDetail(object $page): object
     {
         try
         {
-            $result = $this->checkCondition($page,$page_id)->first();
+            $result = $this->checkCondition($page)->first();
             if(!$result){
-                if($page->scope != "website")
+                if($page->scope != "Modules\Core\Entities\Website")
                 {
-                    $data["page_id"] = $page_id;
+                    $data["page_id"] = $page->page_id;
                     switch($page->scope)
                     {
                         case "Modules\Core\Entities\Store":
@@ -82,11 +82,11 @@ class PageRepository extends BaseRepository
                             break;
 
                         case "Modules\Core\Entities\Channel":
-                            $data["scope"] = "website";
+                            $data["scope"] = "Modules\Core\Entities\Website";
                             $data["scope_id"] = $this->channel->find($page->scope_id)->website->id;
                             break;
                     }
-                    $result = $this->checkCondition((object) $data, (int) $page_id)->first() ?? ($this->getPageDetail((object) $data, (int) $page_id));
+                    $result = $this->checkCondition((object) $data)->first() ?? ($this->getPageDetail((object) $data));
                 }
             }
             if(!$result)
