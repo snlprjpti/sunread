@@ -6,13 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ExchangeRateResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
@@ -21,8 +15,8 @@ class ExchangeRateResource extends JsonResource
             "rate" => $this->rate,
             "updated_at" => $this->created_at,
             "created_at" => $this->updated_at,
-            'source' => $this->source,
-            'target' => $this->target
+            'source' => $this->whenLoaded("source"),
+            'target' => $this->whenLoaded("target")
         ];
     }
 }

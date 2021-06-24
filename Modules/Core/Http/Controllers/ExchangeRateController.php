@@ -38,8 +38,7 @@ class ExchangeRateController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->repository->fetchAll($request, ["source", "target"]);
         }
         catch( Exception $exception )
         {
@@ -68,7 +67,7 @@ class ExchangeRateController extends BaseController
     {
         try
         {
-            $fetched = $this->model->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["source", "target"]);
         }
         catch( Exception $exception )
         {
