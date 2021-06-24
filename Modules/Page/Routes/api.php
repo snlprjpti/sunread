@@ -1,7 +1,6 @@
 <?php
 
 use Modules\Page\Http\Controllers\PageAvailabilityController;
-use Modules\Page\Http\Controllers\PageConfigurationController;
 
 Route::group(['middleware' => ['api']], function () {
     //ADMIN PAGES ROUTES
@@ -13,8 +12,7 @@ Route::group(['middleware' => ['api']], function () {
             Route::get("/model-list", [PageAvailabilityController::class, "modelList"])->name('model_list');
             Route::put("/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
 
-            Route::post("/configurations", [PageConfigurationController::class, "createOrUpdate"])->name('configuration.add');
-            Route::get("/configurations/value", [PageConfigurationController::class, "getValue"])->name('configuration.show');
+            Route::post("/configurations", [\Modules\Page\Http\Controllers\PageConfigurationController::class, "createOrUpdate"])->name('configuration.add');
         });
 
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
