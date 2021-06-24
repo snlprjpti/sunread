@@ -12,11 +12,11 @@ class ExchangeRateResource extends JsonResource
             "id" => $this->id,
             "source_currency" => $this->source_currency,
             "target_currency" => $this->target_currency,
-            "rate" => $this->rate,
-            "updated_at" => $this->created_at,
-            "created_at" => $this->updated_at,
             'source' => $this->whenLoaded("source"),
-            'target' => $this->whenLoaded("target")
+            'target' => $this->whenLoaded("target"),
+            "rate" => $this->rate,
+            "updated_at" => $this->created_at->format("M d, Y H:i A"),
+            "created_at" => $this->updated_at->format("M d, Y H:i A")
         ];
     }
 }
