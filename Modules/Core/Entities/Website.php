@@ -18,5 +18,13 @@ class Website extends Model
     {
         return $this->hasMany(Channel::class, 'website_id');
     }
-    
+
+    public function getStoresCountAttribute(): int
+    {
+        $stores_count = $this->channels->map(function($channel) {
+            return (int) $channel->stores->count();
+        })->toArray();
+
+        return array_sum($stores_count);
+    }
 }
