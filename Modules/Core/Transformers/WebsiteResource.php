@@ -9,7 +9,7 @@ class WebsiteResource extends JsonResource
     public function toArray($request): array
     {
         $stores_count = $this->when($this->relationLoaded("channels"), function() {
-            return $this->channels->first()->relationLoaded("stores") ? $this->stores_count : false;
+            return $this->channels->first()?->relationLoaded("stores") ? $this->stores_count : 0;
         });
 
         return [

@@ -23,8 +23,8 @@ class Website extends Model
     {
         $stores_count = $this->channels->map(function($channel) {
             return (int) $channel->stores->count();
-        })->toArray();
+        })->sum();
 
-        return array_sum($stores_count);
+        return $stores_count;
     }
 }
