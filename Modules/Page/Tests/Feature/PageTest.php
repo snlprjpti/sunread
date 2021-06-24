@@ -86,6 +86,7 @@ class PageTest extends BaseTestCase
             "scope_id" => $scope_id
         ];
         $response = $this->withHeaders($this->headers)->get($this->getRoute("detail", $get_data));
+
         $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
