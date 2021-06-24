@@ -21,8 +21,8 @@ class ActivityLogResource extends JsonResource
             "description" => $this->description,
             "action" => $this->action,
             "activity" => $this->activity,
-            "subject" => $this->whenLoaded("subject"), // $this->subject ? $this->subject->toArray() : null,
-            "causer" => $this->whenLoaded("causer"), //$this->causer ? $this->causer->toArray() : null,
+            "subject" => $this->whenLoaded("subject"),
+            "causer" => $this->whenLoaded("causer"),
             "properties" => $this->properties,
             "created_at" =>  Carbon::parse($this->created_at)->format('M j\\,Y H:i A'),
         ];
