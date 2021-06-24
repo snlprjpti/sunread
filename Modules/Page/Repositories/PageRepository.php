@@ -76,7 +76,7 @@ class PageRepository extends BaseRepository
                     switch($page->scope)
                     {
                         case "Modules\Core\Entities\Store":
-                            $data["scope"] = "Modules\\Core\\Entities\\Channel";
+                            $data["scope"] = "Modules\Core\Entities\Channel";
                             $data["scope_id"] = $this->store->find($page->scope_id)->channel->id;
                             break;
 
@@ -92,13 +92,13 @@ class PageRepository extends BaseRepository
             {
                 $result = $this->page($page);
             }
-
-            return $result;
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
+
+        return $result;
     }
 
     public function page(object $data): object
