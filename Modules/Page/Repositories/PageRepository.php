@@ -2,13 +2,20 @@
 
 namespace Modules\Page\Repositories;
 
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
+use Modules\Page\Entities\PageConfiguration;
 use Modules\Page\Exceptions\PageTranslationDoesNotExist;
+use Exception;
 
 class PageRepository extends BaseRepository
 {
-    public function __construct(Page $page)
+    private $pageConfiguration, $store, $channel;
+    private $repository;
+
+    public function __construct(Page $page, PageConfiguration $pageConfiguration, Store $store, Channel $channel)
     {
         $this->model = $page;
         $this->model_key = "page";
@@ -24,6 +31,9 @@ class PageRepository extends BaseRepository
             "meta_keywords" => "sometimes|nullable",
             "translations" => "nullable|array"
         ];
+        $this->pageConfiguration = $pageConfiguration;
+        $this->store = $store;
+        $this->channel = $channel;
     }
 
 
@@ -43,6 +53,64 @@ class PageRepository extends BaseRepository
         $translations = $request->translations;
         if (!$this->validateTranslationData($translations)) {
             throw new PageTranslationDoesNotExist(__("core::app.response.missing-data", ["title" => "Page"]));
+        }
+    }
+
+    public function checkCondition(object $request, int $page_id): object
+    {
+        return $this->pageConfiguration->where([
+            ['scope', $request->scope],
+            ['scope_id', $request->scope_id],
+            ['page_id', $page_id]
+        ]);
+    }
+
+    public function getPageDetail(object $page, int $page_id): object
+    {
+        try
+        {
+            $result = $this->checkCondition($page,$page_id)->first();
+            if(!$result){
+                if($page->scope != "website")
+                {
+                    $data["page_id"] = $page_id;
+                    switch($page->scope)
+                    {
+                        case "Modules\Core\Entities\Store":
+                            $data["scope"] = "Modules\\Core\\Entities\\Channel";
+                            $data["scope_id"] = $this->store->find($page->scope_id)->channel->id;
+                            break;
+
+                        case "Modules\Core\Entities\Channel":
+                            $data["scope"] = "website";
+                            $data["scope_id"] = $this->channel->find($page->scope_id)->website->id;
+                            break;
+                    }
+                    $result = $this->checkCondition((object) $data, (int) $page_id)->first() ?? ($this->getPageDetail((object) $data, (int) $page_id));
+                }
+            }
+            if(!$result)
+            {
+                $result = $this->page($page);
+            }
+
+            return $result;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
+    public function page(object $data): object
+    {
+        try
+        {
+            return $this->model->findOrFail($data->page_id);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
         }
     }
 }

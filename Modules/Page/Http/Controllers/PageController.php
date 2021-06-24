@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
+use Modules\Page\Repositories\PageConfigurationRepository;
 use Modules\Page\Repositories\PageRepository;
 use Modules\Page\Repositories\PageTranslationRepository;
 use Modules\Page\Transformers\PageResource;
@@ -71,18 +72,18 @@ class PageController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["translations"]);
+            $fetched = $this->repository->getPageDetail($request, $id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched->toArray(), $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
