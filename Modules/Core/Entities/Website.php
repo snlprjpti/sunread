@@ -21,10 +21,8 @@ class Website extends Model
 
     public function getStoresCountAttribute(): int
     {
-        $stores_count = $this->channels->map(function($channel) {
+        return $this->channels->map(function($channel) {
             return (int) $channel->stores->count();
         })->sum();
-
-        return $stores_count;
     }
 }
