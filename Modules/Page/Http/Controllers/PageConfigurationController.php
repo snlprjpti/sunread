@@ -77,22 +77,4 @@ class PageConfigurationController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('delete-success'), 204);
     }
-
-    public function pageDetail(Request $request)
-    {
-        try
-        {
-            $fetched = $this->model->where('page_id',$request->page_id)->where('scope',$request->scope)->where('scope_id',$request->scope_id)->first();
-            if(!$fetched)
-            {
-                $fetched = $this->repository->getPageDetail((object) $request);
-            }
-        }
-        catch (Exception $exception)
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse($fetched->toArray(), $this->lang('fetch-success'));
-    }
 }

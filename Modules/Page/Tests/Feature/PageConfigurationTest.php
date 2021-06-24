@@ -45,23 +45,4 @@ class PageConfigurationTest extends BaseTestCase
             "page_id" => null,
         ]);
     }
-
-    public function testAdminCanFetchPageResource()
-    {
-        $scope = Arr::random(config('page.model_config'));
-        $scope_id = app($scope)::factory(1)->create()->first()->id;
-        $page_id = Page::factory(1)->create()->first()->id;
-        $get_data = [
-            "scope" => $scope,
-            "scope_id" => $scope_id,
-            "page_id" => $page_id
-        ];
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("page_detail", $get_data));
-
-        $response->assertOk();
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
-        ]);
-    }
 }
