@@ -3,6 +3,8 @@
 namespace Modules\Page\Repositories;
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
@@ -34,6 +36,9 @@ class PageConfigurationRepository extends BaseRepository
 
     public function add(object $request): object
     {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.add.before");
+
         try
         {
             $allow_data = array_merge($this->validateAllowData([
@@ -56,8 +61,12 @@ class PageConfigurationRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
+
+        Event::dispatch("{$this->model_key}.add.after", $created);
+        DB::commit();
 
         return $created;
     }
