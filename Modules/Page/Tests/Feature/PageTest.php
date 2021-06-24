@@ -6,8 +6,6 @@ use Illuminate\Support\Arr;
 use Modules\Core\Entities\Store;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Page\Entities\Page;
-use Modules\Page\Entities\PageAvailability;
-use Tests\TestCase;
 use Illuminate\Support\Str;
 
 class PageTest extends BaseTestCase
@@ -58,7 +56,6 @@ class PageTest extends BaseTestCase
             "title" => null
         ]);
     }
-
 
     public function testAdminCanFetchIndividualResource()
     {
