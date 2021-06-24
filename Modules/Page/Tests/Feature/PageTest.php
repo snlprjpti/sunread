@@ -60,8 +60,8 @@ class PageTest extends BaseTestCase
     public function testAdminCanFetchIndividualResource()
     {
         $scope = Arr::random(config('page.model_config'));
-        $scope_id = app($scope)::factory(1)->create()->id;
-        $page_id = Page::factory(1)->create()->id;
+        $scope_id = app($scope)::factory()->create()->id;
+        $page_id = Page::factory()->create()->id;
         $get_data = [
             "page_id" => $page_id,
             "scope" => $scope,
@@ -79,7 +79,7 @@ class PageTest extends BaseTestCase
     public function testShouldReturnErrorIfResourceDoesNotExist()
     {
         $scope = Arr::random(config('page.model_config'));
-        $scope_id = app($scope)::factory(1)->create()->id;
+        $scope_id = app($scope)::factory()->create()->id;
         $get_data = [
             "page_id" => 0,
             "scope" => $scope,
