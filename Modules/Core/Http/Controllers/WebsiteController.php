@@ -37,7 +37,7 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["channels"]);
+            $fetched = $this->repository->fetchAll($request, ["channels.stores"]);
         }
         catch( Exception $exception )
         {

@@ -38,8 +38,7 @@ class ActivityLogController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->repository->fetchAll($request, ["subject", "causer"]);
         }
         catch( Exception $exception )
         {
@@ -53,7 +52,7 @@ class ActivityLogController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["subject", "causer"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["subject", "causer"]);
         }
         catch( Exception $exception )
         {
