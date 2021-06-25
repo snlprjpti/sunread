@@ -73,7 +73,7 @@ class PageConfigurationRepository extends BaseRepository
         try
         {
             $tableName = App::make($data["scope"])->getTable();
-            $merge = [ "scope_id" => "required|numeric|exists:$tableName,id" ];
+            $merge = [ "scope_id" => "required|numeric|exists:{$tableName},id" ];
             $validator = Validator::make($data, array_merge($this->rules, $merge));
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
         }
