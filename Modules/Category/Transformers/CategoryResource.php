@@ -2,7 +2,6 @@
 
 namespace Modules\Category\Transformers;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Transformers\ChannelResource;
 
@@ -17,11 +16,12 @@ class CategoryResource extends JsonResource
 
             "_lft" => $this->_lft,
             "_rgt" => $this->_rgt,
-            "parent" => $this->parent ?? null,
-
-            "created_at" => $this->created_at->format('M d, Y H:i A'),
+            "parent" => $this->whenLoaded("parent"),
+            
             "values" => CategoryValueResource::collection($this->whenLoaded("values")),
             "channels" => ChannelResource::collection($this->whenLoaded("channels")),
+
+            "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
 }

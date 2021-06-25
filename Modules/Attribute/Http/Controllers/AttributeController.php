@@ -68,18 +68,20 @@ class AttributeController extends BaseController
     {
         try
         {
-            $rules = in_array($request->type, $this->repository->non_filterable_fields) ? [ "attribute_options" => "required|array" ] : [];
+            $type_check = in_array($request->type, $this->repository->non_filterable_fields);
+            $rules = $type_check ? [ "attribute_options" => "required|array" ] : [ "default_value" => config("validation.{$request->type}") ];
             $data = $this->repository->validateData($request, $rules,  function() use ($request) {
                 return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
             });
             $this->repository->validateTranslation($request);
 
-            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
+            if (!$type_check) $data["use_in_layered_navigation"] = 0;
+            else $data["default_value"] = null;
             if($request->type != "text") $data["validation"] = null;
             
-            $created = $this->repository->create($data, function($created) use ($request) {
+            $created = $this->repository->create($data, function($created) use ($request, $type_check) {
                 $this->translation_repository->updateOrCreate($request->translations, $created);
-                if (in_array($request->type, $this->repository->non_filterable_fields)) $this->option_repository->updateOrCreate($request->attribute_options, $created);
+                if ($type_check) $this->option_repository->updateOrCreate($request->attribute_options, $created);
             });
         }
         catch( Exception $exception )
@@ -94,22 +96,26 @@ class AttributeController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["translations", "attribute_options.translations"]);
-            $fetched->translations();
+            $fetched = $this->repository->fetch($id)->toArray();
+            if(in_array($fetched["type"], $this->repository->non_filterable_fields)) unset($fetched["default_value"]) ;
+            $fetched["translations"] = $this->translation_repository->show($id);
+            $fetched["attribute_options"] = $this->option_repository->show($id);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
     {
         try
         {
-            $rules = in_array($request->type, $this->repository->non_filterable_fields) ? [ "attribute_options" => "required|array" ] : [];
+            $type_check = in_array($request->type, $this->repository->non_filterable_fields);
+            $rules = $type_check ? [ "attribute_options" => "required|array" ] : [ "default_value" => config("validation.{$request->type}") ];
+            $rules = $type_check ? [ "attribute_options" => "required|array" ] : [];
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:attributes,slug,{$id}"
             ], function() use ($request) {
@@ -118,12 +124,12 @@ class AttributeController extends BaseController
             $this->repository->validateTranslation($request);
             if($this->model->findOrFail($id)->type != $data['type']) throw new AttributeCannotChangeException(__("core::app.response.type-cannot-change"));
 
-            if (!in_array($request->type, $this->repository->non_filterable_fields)) $data["use_in_layered_navigation"] = 0;
+            if (!$type_check) $data["use_in_layered_navigation"] = 0;
             if($request->type != "text") $data["validation"] = null;
 
-            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
+            $updated = $this->repository->update($data, $id, function($updated) use ($request, $type_check) {
                 $this->translation_repository->updateOrCreate($request->translations, $updated);
-                if (in_array($request->type, $this->repository->non_filterable_fields)) $this->option_repository->updateOrCreate($request->attribute_options, $updated, "update");
+                if ($type_check) $this->option_repository->updateOrCreate($request->attribute_options, $updated, "update");
             });
         }
         catch( Exception $exception )
@@ -147,7 +153,7 @@ class AttributeController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
     public function bulkDelete(Request $request): JsonResponse
@@ -167,7 +173,7 @@ class AttributeController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($message, 204);
+        return $this->successResponseWithMessage($message);
     }
 
     public function types()

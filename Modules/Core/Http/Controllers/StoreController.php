@@ -132,7 +132,7 @@ class StoreController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
     
     public function updateStatus(Request $request, int $id): JsonResponse

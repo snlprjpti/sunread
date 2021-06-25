@@ -111,6 +111,6 @@ class UrlRewriteController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang("delete-success"), 204);
+        return $this->successResponseWithMessage($this->lang("delete-success"));
     }
 }

@@ -73,7 +73,7 @@ class AttributeTest extends BaseTestCase
 
         $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
 
-        $response->assertNoContent();
+        $response->assertOk();
 
         $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
         $this->assertFalse($check_resource);

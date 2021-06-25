@@ -48,30 +48,30 @@ class ConfigurationRepository extends BaseRepository
                 foreach($data["children"] as $i => $children)
                 {
                     if(!isset($children["subChildren"])) continue;
-                    foreach($children["subChildren"] as $j => &$subchildren)
+                    foreach($children["subChildren"] as $j => $subchildren)
                     {
                         if(!isset($subchildren["elements"])) continue;
+
+                        $subchildren_data["elements"] = [];
                         foreach($subchildren["elements"] as $k => &$element)
                         {
-                            if($this->scopeFilter($checkKey["scope"], $element["scope"]))
-                            {
-                                unset($subchildren["elements"][$k]);
-                                continue;
-                            }
+                            if($this->scopeFilter($checkKey["scope"], $element["scope"])) continue;
+                            
                             $checkKey["path"] = $element["path"];
                             $checkKey["provider"] = $element["provider"];
 
                             $existData = $this->has((object) $checkKey);
-                            if($request->scope != "global") $element["use_default_value"] = $existData ? 0 : 1;
+                            if($checkKey["scope"] != "global") $element["use_default_value"] = $existData ? 0 : 1;
                             $element["default"] = $existData ? $this->getValues((object) $checkKey) : $this->getDefaultValues((object)$checkKey, $element["default"]);
 
                             if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
                             
                             unset($element["pluck"], $element["provider"], $element["rules"], $element["showIn"]);
-                            $subchildren["elements"][$k] = $element;
+                            $subchildren_data["title"] = $subchildren["title"];
+                            $subchildren_data["elements"][] = $element;
                         }
-                        $children["subChildren"][$j] = $subchildren;
+                        $children["subChildren"][$j] = $subchildren_data;
                     }
                     $data["slug"] = Str::slug($data["title"]);
                     $data["children"][$i] = $children;
@@ -110,8 +110,16 @@ class ConfigurationRepository extends BaseRepository
             return $data;
         })->reject(function ($data) use($request) {
             return $this->scopeFilter($request->scope ?? "global", $data["scope"]);
-        })->pluck('rules','path')->mapWithKeys(function($val, $key) {
-            return ["items.$key.value" => $val];
+        })->mapWithKeys(function($item) {
+            $path =  "items.{$item['path']}.value";
+            if(in_array($item["type"], ["select", "checkbox"]))
+            {
+                return [
+                    $path => $item["rules"],
+                    "$path.*" => $item["value_rules"]
+                ];
+            } 
+            return [ $path => $item["rules"] ];
         })->toArray();
     }
 
