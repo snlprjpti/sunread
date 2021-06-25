@@ -29,10 +29,10 @@ class PageConfigurationTest extends BaseTestCase
     public function getNonMandodtaryCreateData(): array
     {
         $scope = Arr::random(config('page.model_config'));
-        $scope_id = app($scope)::factory(1)->create()->first()->id;
+        $scope_id = app($scope["scope"])::factory(1)->create()->first()->id;
         $page_id = Page::factory(1)->create()->first()->id;
         return array_merge($this->getCreateData(), [
-            "scope" => $scope,
+            "scope" => $scope["scope"],
             "scope_id" => $scope_id,
             "page_id" => $page_id
         ]);
