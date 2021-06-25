@@ -8,6 +8,8 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeOption;
+use Modules\Attribute\Entities\AttributeTranslation;
 
 class AttributeTableSeeder extends Seeder
 {
@@ -19,114 +21,179 @@ class AttributeTableSeeder extends Seeder
                 "type" => "text",
                 "is_required" => 1,
                 "is_searchable" => 1,
-                "search_weight" => 1,
-                "is_unique" => 1
+                "search_weight" => 6,
+                "is_unique" => 1,
+                "is_visible_on_storefront" => 1,
+                "comparable_on_storefront" => 1,
+                "scope" => "global"
             ],
             [
-                "name" => "Name",
+                "name" => "Product Name",
+                "slug" => "name",
                 "type" => "text",
                 "is_required" => 1,
                 "is_searchable" => 1,
-                "search_weight" => 2
+                "search_weight" => 6,
+                "scope" => "store"
             ],
-            [
-                "name" => "New",
-                "type" => "boolean",
-                "default_value" => 0
-            ],
-            [
-                "name" => "Featured",
-                "type" => "boolean",
-                "default_value" => 0
-            ],
-            [
-                "name" => "Visible Individually",
-                "type" => "boolean",
-                "is_required" => 1,
-                "default_value" => 0
-            ],
-            [
-                "name" => "Status",
-                "type" => "boolean",
-                "is_required" => 1,
-                "default_value" => 0
-            ],
-            [
-                "name" => "Short Description",
-                "type" => "textarea",
-                "is_required" => 1,
-                "is_searchable" => 1
-            ],
-            [
-                "name" => "Description",
-                "type" => "textarea",
-                "is_required" => 1
-            ],
+            // [
+            //     "name" => "New",
+            //     "type" => "boolean",
+            //     "default_value" => 0
+            // ],
+            // [
+            //     "name" => "Featured",
+            //     "type" => "boolean",
+            //     "default_value" => 0
+            // ],
             [
                 "name" => "Price",
                 "type" => "price",
                 "validation" => "decimal",
                 "is_required" => 1,
-                "use_in_layered_navigation" => 1
+                "use_in_layered_navigation" => 1,
+                "scope" => "channel"
             ],
             [
                 "name" => "Cost",
                 "type" => "price",
                 "validation" => "decimal",
-                "value_per_channel" => 1,
-                "is_user_defined" => 1
+                "is_required" => 1,
+                "use_in_layered_navigation" => 1,
+                "scope" => "channel"
             ],
             [
                 "name" => "Special Price",
                 "type" => "price",
-                "validation" => "decimal"
+                "validation" => "decimal",
+                "scope" => "channel"
             ],
             [
-                "name" => "Special Price From",
+                "name" => "Special Price From Date",
+                "slug" => "special_from_date",
                 "type" => "date",
-                "value_per_channel" => 1
+                "scope" => "channel"
             ],
             [
-                "name" => "Special Price To",
+                "name" => "Special Price To Date",
+                "slug" => "special_to_date",
                 "type" => "date",
-                "value_per_channel" => 1
+                "scope" => "channel"
             ],
             [
-                "name" => "Meta Title",
-                "type" => "textarea"
+                "name" => "Quantity",
+                "slug" => "quantity_and_stock_status",
+                "type" => "select",
+                "options" => [ "In Stock", "Out of Stock" ],
+                "default_value" => "In Stock",
+                "scope" => "website"
             ],
             [
-                "name" => "Meta Keywords",
-                "type" => "textarea"
+                "name" => "Has Weight",
+                "type" => "boolean",
+                "default_value" => 1,
+                "scope" => "website"
             ],
-            [
-                "name" => "Meta Description",
-                "type" => "textarea",
-                "is_user_defined" => 1
-            ],
-            [
-                "name" => "Width",
-                "type" => "text",
-                "validation" => "decimal",
-                "is_user_defined" => 1
-            ],
-            [
-                "name" => "Height",
-                "type" => "text",
-                "validation" => "decimal",
-                "is_user_defined" => 1
-            ],
-            [
-                "name" => "Depth",
-                "type" => "text",
-                "validation" => "decimal",
-                "is_user_defined" => 1
-            ],
+            // [
+            //     "name" => "Width",
+            //     "type" => "text",
+            //     "validation" => "decimal",
+            //     "is_user_defined" => 1
+            // ],
+            // [
+            //     "name" => "Height",
+            //     "type" => "text",
+            //     "validation" => "decimal",
+            //     "is_user_defined" => 1
+            // ],
+            // [
+            //     "name" => "Depth",
+            //     "type" => "text",
+            //     "validation" => "decimal",
+            //     "is_user_defined" => 1
+            // ],
             [
                 "name" => "Weight",
                 "type" => "text",
                 "validation" => "decimal",
+                "scope" => "website"
+            ],
+            [
+                "name" => "Visibility",
+                "type" => "select",
+                "is_required" => 1,
+                "default_value" => "Not Visible Individually",
+                "options" => ["Not Visible Individually", "Catalog", "Search", "Catalog, Search"],
+                "scope" => "store"
+            ],
+            [
+                "name" => "Tax Class",
+                "slug" => "tax_class_id",
+                "type" => "select",
+                "is_required" => 1,
+                "default_value" => "Taxable Goods",
+                "options" => ["None", "Taxable Goods"],
+                "scope" => "channel"
+            ],
+            [
+                "name" => "Set Product as New from Date",
+                "slug" => "new_from_date",
+                "type" => "date",
+                "scope" => "channel"
+            ],
+            [
+                "name" => "Set Product as New to Date",
+                "slug" => "new_to_date",
+                "type" => "date",
+                "scope" => "channel"
+            ],
+            [
+                "name" => "Description",
+                "type" => "texteditor",
+                "scope" => "store",
+                "is_searchable" => 1,
+                "search_weight" => 1
+            ],
+            [
+                "name" => "Short Description",
+                "type" => "texteditor",
+                "scope" => "store",
+                "is_searchable" => 1,
+                "search_weight" => 1
+            ],
+            [
+                "name" => "URL key",
+                "type" => "text",
+                "scope" => "store",
+                "is_required" => 1,
+                "is_searchable" => 1,
+                "search_weight" => 1
+            ],
+            [
+                "name" => "Meta Keywords",
+                "type" => "textarea",
+                "scope" => "store",
                 "is_required" => 1
+            ],
+            [
+                "name" => "Meta Title",
+                "type" => "text",
+                "scope" => "store",
+                "is_required" => 1
+            ],
+            [
+                "name" => "Meta Description",
+                "type" => "textarea",
+                "scope" => "store",
+                "is_required" => 1
+            ],
+            [
+                "name" => "Product Status",
+                "slug" => "status",
+                "type" => "boolean",
+                "scope" => "website",
+                "is_required" => 1,
+                "default_value" => 1
             ],
             [
                 "name" => "Color",
@@ -144,36 +211,47 @@ class AttributeTableSeeder extends Seeder
             ],
         ];
 
-        $count = 0;
-        $attributes_array = array_map(function($attribute) use($count) {
-            global $count;
-            return [
-                "slug" => Str::slug($attribute["name"]),
+        array_map(function($attribute){
+            $default_value = isset($attribute["default_value"]) && !in_array($attribute["type"], ["select", "multiselect", "checkbox"]) ? $attribute["default_value"] : null;
+            $attribute_array = [
+                "slug" => $attribute["slug"] ?? Str::slug($attribute["name"]),
                 "name" => $attribute["name"],
                 "type" => $attribute["type"],
-                "scope" => "global",
-                "validation" => $attribute["validation"] ?? NULL,
-                "position" => ++$count,
+                "scope" => $attribute["scope"] ?? "global",
+                "validation" => $attribute["validation"] ?? null,
                 "is_required" => $attribute["is_required"] ?? 0,
+                "is_unique" => $attribute["is_unique"] ?? 0,
                 "use_in_layered_navigation" => $attribute["use_in_layered_navigation"] ?? 1,
+                "comparable_on_storefront" => $attribute["comparable_on_storefront"] ?? 1,
                 "is_searchable" => $attribute["is_searchable"] ?? 0,
+                "search_weight" => $attribute["search_weight"] ?? null,
                 "is_user_defined" => $attribute["is_user_defined"] ?? 0,
-                "is_visible_on_storefront" => 0,
-                "created_at" => now(),
-                "updated_at" => now()
+                "is_visible_on_storefront" => $attribute["is_visible_on_storefront"] ?? 0,
+                "default_value" => $default_value
             ];
-        }, $attributes);
-        DB::table("attributes")->insert($attributes_array);
 
-        $translation_count = 0;
-        $attribute_translations_array = array_map(function($attribute) use($translation_count) {
-            global $translation_count;
-            return [
+            $attribute_data = Attribute::create($attribute_array);
+
+            AttributeTranslation::create([
                 "store_id" => 1,
                 "name" => $attribute["name"],
-                "attribute_id" => ++$translation_count
-            ];
+                "attribute_id" => $attribute_data->id
+            ]);
+
+            if(isset($attribute["options"])) 
+            {
+                $count = 0;
+                array_map(function($attribute_option) use($attribute_data, $attribute, $count) {
+                    global $count;
+                    AttributeOption::create([
+                        "attribute_id" => $attribute_data->id,
+                        "name" => $attribute_option,
+                        "position" => ++$count,
+                        "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0
+                    ]);
+                }, $attribute["options"]);
+            }
+
         }, $attributes);
-        DB::table("attribute_translations")->insert($attribute_translations_array);
     }
 }
