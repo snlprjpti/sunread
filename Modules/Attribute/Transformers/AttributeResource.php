@@ -14,7 +14,7 @@ class AttributeResource extends JsonResource
             "name" => $this->name,
             "type" => $this->type,
             "scope" => $this->scope,
-            "validation" => $this->validation,
+            "validation" => $this->validation ?? $this->type_validation,
             "position" => $this->position,
             "is_required" => $this->is_required,
             "is_unique" => $this->is_unique,
