@@ -17,9 +17,10 @@ class PageConfigurationRepository extends BaseRepository
     {
         $this->model = $pageConfiguration;
         $this->model_key = "page.configuration";
-        $model_types_in = implode(",", config('page.model_config'));
+        $model_types_in = config('page.model_config');
+        $scope = implode(",", array_column($model_types_in, "scope"));
         $this->rules = [
-            "scope" => "required|in:{$model_types_in}",
+            "scope" => "required|in:{$scope}",
             "scope_id" => "required|numeric",
             "page_id" => "required|numeric|exists:pages,id",
             "title" => "sometimes|nullable",
