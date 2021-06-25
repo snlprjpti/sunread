@@ -13,7 +13,7 @@ class PageConfigurationFactory extends Factory
     public function definition(): array
     {
         $scope = Arr::random(config('page.model_config'));
-        $scope_id = app($scope)::factory(1)->create()->first()->id;
+        $scope_id = app($scope["scope"])::factory(1)->create()->first()->id;
         return [
             "page_id" => Page::factory()->create()->id,
             "scope" => $scope,
