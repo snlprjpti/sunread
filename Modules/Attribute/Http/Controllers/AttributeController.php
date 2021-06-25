@@ -153,7 +153,7 @@ class AttributeController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
     public function bulkDelete(Request $request): JsonResponse
@@ -173,7 +173,7 @@ class AttributeController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($message, 204);
+        return $this->successResponseWithMessage($message);
     }
 
     public function types()
