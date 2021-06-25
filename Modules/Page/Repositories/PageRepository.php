@@ -69,25 +69,33 @@ class PageRepository extends BaseRepository
         try
         {
             $result = $this->checkCondition($page)->first();
-            if(!$result){
-                if($page->scope != "Modules\Core\Entities\Website")
-                {
-                    $data["page_id"] = $page->page_id;
-                    switch($page->scope)
-                    {
-                        case "Modules\Core\Entities\Store":
-                            $data["scope"] = "Modules\Core\Entities\Channel";
-                            $data["scope_id"] = $this->store->find($page->scope_id)->channel->id;
-                            break;
+            $configValue = (config('page.model_config'));
 
-                        case "Modules\Core\Entities\Channel":
-                            $data["scope"] = "Modules\Core\Entities\Website";
-                            $data["scope_id"] = $this->channel->find($page->scope_id)->website->id;
-                            break;
+            if (!$result)
+            {
+                $result = null;
+                foreach($configValue as $key => $value)
+                {
+                    $relation = $value["parent"];
+                    if($relation != null)
+                    {
+                        if($page->scope == $value["scope"])
+                        {
+                            $data["scope_id"] = (app($value["scope"])->find($page->scope_id)->$relation->id);
+                        }
+                        else
+                        {
+                            $data["scope_id"] = $page->scope_id;
+                        }
+                        $data["page_id"] = $page->page_id;
+                        $data["scope"] = $value["parent_scope"];
+
+                        $result = $this->checkCondition((object) $data)->first();
+                        if(isset($result)) break;
                     }
-                    $result = $this->checkCondition((object) $data)->first() ?? ($this->getPageDetail((object) $data));
                 }
             }
+
             if(!$result)
             {
                 $result = $this->page($page);

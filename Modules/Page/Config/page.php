@@ -7,7 +7,20 @@ return [
     ],
 
     'model_config' =>[
-        'Website' => 'Modules\Core\Entities\Website',
-        'Channel' => 'Modules\Core\Entities\Channel'
+        'Store' => [
+            'scope' => 'Modules\Core\Entities\Store',
+            'parent' => 'channel',
+            'parent_scope' => 'Modules\Core\Entities\Channel',
+            ],
+        'Channel' => [
+            'scope' => 'Modules\Core\Entities\Channel',
+            'parent' => 'website',
+            'parent_scope' => 'Modules\Core\Entities\Website',
+        ],
+        'Website' => [
+            'scope' => 'Modules\Core\Entities\Website',
+            'parent' => null,
+            'parent_scope' => null,
+        ]
     ]
 ];
