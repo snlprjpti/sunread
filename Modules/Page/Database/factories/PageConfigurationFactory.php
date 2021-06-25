@@ -16,7 +16,7 @@ class PageConfigurationFactory extends Factory
         $scope_id = app($scope["scope"])::factory(1)->create()->first()->id;
         return [
             "page_id" => Page::factory()->create()->id,
-            "scope" => $scope,
+            "scope" => $scope["scope"],
             "scope_id" => $scope_id,
             "status" => 1,
             "title" => $this->faker->name(),
