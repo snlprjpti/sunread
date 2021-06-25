@@ -63,26 +63,9 @@ class CategoryController extends BaseController
     {
         try
         {
-<<<<<<< HEAD
-            $fetched = [];
-
-            $data = $request->validate([
-                "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope)]
-            ]);
-
-            foreach($this->model->get()->toTree() as $category)
-            {
-                $fetched[] = $this->repository->treeWiseList($data, $category);
-            }
-
-            // Dont fetch root category for other admin
-            //if (!$this->is_super_admin) $fetched = $fetched->where("parent_id", "<>", null);
-=======
             $fetched = $this->repository->fetchAll(request: $request, callback: function() {
                 return (!$this->is_super_admin) ? $this->model::where('parent_id', '<>', null) : null;
             });
->>>>>>> 87fe83c8efda85dc6c71104db8cbae2c794ced46
         }
         catch (Exception $exception)
         {
@@ -206,11 +189,7 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-<<<<<<< HEAD
-        return $this->successResponseWithMessage($this->lang("delete-success"), 204);
-=======
         return $this->successResponseWithMessage($this->lang('delete-success'));
->>>>>>> 87fe83c8efda85dc6c71104db8cbae2c794ced46
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse
