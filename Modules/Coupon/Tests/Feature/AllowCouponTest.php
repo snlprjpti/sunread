@@ -63,7 +63,7 @@ class AllowCouponTest extends BaseTestCase
             "ids" => $resource_ids
         ]);
 
-        $response->assertStatus(204);
+        $response->assertOk();
 
         $check_resource = AllowCoupon::whereIn("id", $resource_ids)->get()->count() > 0 ? true : false;
         $this->assertFalse($check_resource);
