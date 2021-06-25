@@ -16,7 +16,7 @@ class Review extends Model
 
     protected $fillable = [ "customer_id", "product_id", "rating", "title", "description", "status" ];
 
-    protected $appends = ['positive_vote_count', 'negative_vote_count', 'visible_vote_count'];
+    protected $appends = ["positive_vote_count", "negative_vote_count", "visible_vote_count"];
 
     public function customer(): BelongsTo
     {
@@ -40,16 +40,15 @@ class Review extends Model
 
     public function getPositiveVoteCountAttribute()
     {
-        return Cache::rememberForever('positive_vote_count-'.$this->id, function(){
-            return ReviewVote::where('review_id', $this->id)->where('vote_type', 0)->count();
+        return Cache::rememberForever("positive_vote_count-".$this->id, function(){
+            return $this->review_votes->where("vote_type", 0)->count();
         });
-        
     }
 
     public function getNegativeVoteCountAttribute()
     {
-        return Cache::rememberForever('negative_vote_count-'.$this->id, function(){
-            return ReviewVote::where('review_id', $this->id)->where('vote_type', 1)->count();
+        return Cache::rememberForever("negative_vote_count-".$this->id, function(){
+            return $this->review_votes->where("vote_type", 1)->count();
         });
     }
 
@@ -57,5 +56,4 @@ class Review extends Model
     {
         return $this->positive_vote_count - $this->negative_vote_count;
     }
-
 }

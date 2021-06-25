@@ -38,8 +38,7 @@ class ReviewController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->repository->fetchAll($request, ["customer", "review_votes", "review_replies"]);
         }
         catch( Exception $exception )
         {
@@ -53,9 +52,9 @@ class ReviewController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $rows = $this->model::whereStatus(0);
-            $fetched = $this->getFilteredList($request, [], $rows);
+            $fetched = $this->repository->fetchAll($request, ["customer", "review_votes", "review_replies"], function() {
+                return $this->model::whereStatus(0);
+            });
         }
         catch( Exception $exception )
         {
@@ -84,7 +83,7 @@ class ReviewController extends BaseController
     {
         try
         {
-            $fetched = $this->model->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["customer", "review_votes", "review_replies"]);
         }
         catch( Exception $exception )
         {
