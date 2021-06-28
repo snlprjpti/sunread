@@ -81,4 +81,9 @@ class Product extends Model
     {
         return $this->documentDataStructure();
     }
+
+    public function variants()
+    {
+        return $this->hasMany(static::class, 'parent_id');
+    }
 }
