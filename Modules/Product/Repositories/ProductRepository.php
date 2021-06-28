@@ -24,7 +24,7 @@ class ProductRepository extends BaseRepository
             "attribute_set_id" => "required|exists:attribute_sets,id",
             "website_id" => "required|exists:websites,id",
             "sku" => "required|unique:products,sku",
-            "type" => "required|in:simple,configurable",
+            "type" => "required|in:simple",
             "status" => "sometimes|boolean",
             "attributes" => "required|array",
             "categories" => "required|array",
