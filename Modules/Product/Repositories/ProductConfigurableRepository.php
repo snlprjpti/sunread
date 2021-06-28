@@ -17,14 +17,13 @@ class ProductConfigurableRepository extends BaseRepository
 {
 	public function __construct(Product $product)
 	{
-		$this->model = $product;
-		$this->model_key = "catalog.products";
-		$this->rules = [
-			"website_id" => "required|exists:websites,id",
-			"sku" => "required|unique:products,sku",
-			"type" => "required|in:configurable",
+        $this->model = $product;
+        $this->model_key = "catalog.products";
+        $this->rules = [
+            "website_id" => "required|exists:websites,id",
+            "sku" => "required|unique:products,sku",
             "attribute_set_id" => "required|exists:attribute_sets,id",
-		];
+        ];
 	}
 
 	public function validateAttributes(object $request): array
@@ -83,6 +82,7 @@ class ProductConfigurableRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -121,4 +121,81 @@ class ProductConfigurableRepository extends BaseRepository
 
         return true;
     }
+
+    public function createVariants(object $product, object $request)
+    {
+       try
+       {
+            //get previous variants and delete all collection variants
+            $product->variants()->delete();
+            
+            //create product-superattribute
+            $super_attributes = [];
+            foreach ($request->super_attributes as $attributeCode => $attributeOptions) {
+                $attribute = Attribute::whereSlug($attributeCode)->first();
+                $super_attributes[$attribute->id] = $attributeOptions;
+            }   
+            //generate multiple product(variant) combination on the basis of color and size for variants
+            foreach (array_permutation($super_attributes) as $permutation) {
+                $this->addVariant($product, $permutation, $request);
+            }
+       }
+       catch (Exception $exception)
+       {
+           throw $exception;
+       }
+       
+       return true;
+    }
+
+    private function addVariant(object $product, mixed $permutation, object $request): object
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.update-status.before");
+
+        try 
+        {
+            $data = [
+                "parent_id" => $product->id,
+                "website_id" => $product->website_id,
+                "brand_id" => $product->brand_id,
+                "type" => "simple",
+                "attribute_set_id" => $product->attribute_set_id,
+                "sku" => \Str::slug($product->sku) . "-variant-" . implode("-", $permutation),
+            ];
+    
+            $product_variant = $this->create($data, function ($variant) use ($product, $permutation, $request, &$product_attribute){    
+                $product_attribute = [
+                    [
+                        // Attrubute slug
+                        "attribute_id" => 1,
+                        "value" => \Str::slug($product->sku) . "-variant-" . implode("-", $permutation),
+                        "value_type" => "Modules\Product\Entities\ProductAttributeString"
+                    ],
+                    [
+                        // Attrubute name
+                        "attribute_id" => 2,
+                        "value" => $product->sku . "-variant-" . implode("-", $permutation),
+                        "value_type" => "Modules\Product\Entities\ProductAttributeString"
+                    ]
+                ];
+
+                $this->syncAttributes($product_attribute, $variant);
+                
+                $variant->categories()->sync($request->get("categories"));
+                $variant->channels()->sync($request->get("channels"));
+            });
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+        
+        Event::dispatch("{$this->model_key}.attibutes.sync.after", $product_attribute);
+        DB::commit();
+
+        return $product_variant;
+    }
+
 }

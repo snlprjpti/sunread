@@ -40,4 +40,16 @@ class AttributeSetRepository extends BaseRepository
         $default_attribute_ids = Attribute::whereIsUserDefined(0)->whereIsRequired(0)->pluck('id')->toArray();
         if(array_diff($default_attribute_ids, $attribute_ids_array)) throw ValidationException::withMessages(["attributes" => "Default attributes are missing."]);
     }
+
+    public function validateAttributeSetListing(object $request): array
+    {
+        $data = $request->validate([
+            "product" => ($request->get("product")) ? "required|integer|exists:products,id" : "nullable",
+            "attribute_set" => ($request->get("product")) ? "nullable" : "required|integer"
+        ]);
+
+        return $data;
+    }
+
+
 }

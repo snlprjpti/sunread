@@ -89,6 +89,7 @@ class ProductRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 

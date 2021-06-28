@@ -15,10 +15,10 @@ class ProductTableSeeder extends Seeder
     {
         $attribute_set_id = AttributeSet::factory()->create()->id;
         $attribute_group = AttributeGroup::factory(1)
-        ->create(["attribute_set_id" => $attribute_set_id])
-        ->each(function ($attr_group){
-            $attr_group->attributes()->attach(Attribute::factory(1)->create());
-        })->first();
+            ->create(["attribute_set_id" => $attribute_set_id])
+            ->each(function ($attr_group){
+                $attr_group->attributes()->attach(Attribute::factory(1)->create());
+            })->first();
 
         Product::withoutSyncingToSearch(function () use ($attribute_set_id){
             Product::factory()

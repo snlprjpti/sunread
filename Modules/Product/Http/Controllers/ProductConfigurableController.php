@@ -62,7 +62,8 @@ class ProductConfigurableController extends BaseController
     {
         try
         {
-            $product = $this->model::findOrFail($id);
+            $product = $this->repository->fetch($id);
+
             $data = $this->repository->validateData($request, [
                 "sku" => "required|unique:products,sku,{$id}",
                 "brand_id" => "sometimes|nullable|exists:brands,id",
@@ -72,26 +73,14 @@ class ProductConfigurableController extends BaseController
                 "categories" => "required|array",
                 "categories.*" => "required|exists:categories,id"
             ]);
-
-            if ( $product->attribute_set_id != $request->attribute_set_id ) throw new ProductAttributeCannotChangeException("Attribute set cannot change.");
-
             // check attributes and validated request attrubutes.
             $this->repository->checkAttribute($product->attribute_set_id, $request);
-            
-            //get previous keys and delete variants
-            foreach ($product->variants->pluck('id') as $variantId) $this->model::find($variantId)->delete();
 
-            $super_attributes = [];
-            //create product-superattribute
-            foreach ($request->super_attributes as $attributeCode => $attributeOptions) {
-                $attribute = Attribute::whereSlug($attributeCode)->first();
-                $super_attributes[$attribute->id] = $attributeOptions;
-            }
-            
-            //generate multiple product(variant) combination on the basis of color and size for variants
-            foreach (array_permutation($super_attributes) as $permutation) {
-                $this->createVariant($product, $permutation, $request);
-            }
+            // create product variants based on super attributes and parent product.
+            $this->repository->createVariants($product, $request);
+
+            $data["type"] = "configurable";
+            unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
@@ -108,45 +97,4 @@ class ProductConfigurableController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
-    public function createVariant(object $product, mixed $permutation, object $request): object
-    {
-        try 
-        {
-            $data = [
-                "parent_id" => $product->id,
-                "website_id" => $product->website_id,
-                "brand_id" => $product->brand_id,
-                "type" => "simple",
-                "attribute_set_id" => $product->attribute_set_id,
-                "sku" => \Str::slug($product->sku) . "-variant-" . implode("-", $permutation),
-            ];
-    
-            $product_variant = $this->repository->create($data, function ($variant) use ($product, $permutation, $request){    
-                $product_attribute = [
-                    [
-                        // Attrubute slug
-                        "attribute_id" => 1,
-                        "value" => \Str::slug($product->sku) . "-variant-" . implode("-", $permutation),
-                        "value_type" => "Modules\Product\Entities\ProductAttributeString"
-                    ],
-                    [
-                        // Attrubute name
-                        "attribute_id" => 2,
-                        "value" => $product->sku . "-variant-" . implode("-", $permutation),
-                        "value_type" => "Modules\Product\Entities\ProductAttributeString"
-                    ]
-                ];
-                $this->repository->syncAttributes($product_attribute, $variant);
-                
-                $variant->categories()->sync($request->get("categories"));
-                $variant->channels()->sync($request->get("channels"));
-            });
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $product_variant;
-    }
 }
