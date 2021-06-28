@@ -1,49 +1,48 @@
 <?php
 
-namespace Modules\Product\Http\Controllers;
+namespace Modules\Page\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Storage;
-use Modules\Core\Http\Controllers\BaseController;
-use Modules\Product\Entities\ProductImage;
-use Modules\Product\Repositories\ProductImageRepository;
-use Modules\Product\Transformers\ProductImageResource;
 use Exception;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\Page\Entities\PageImage;
+use Modules\Page\Repositories\PageImageRepository;
+use Modules\Page\Transformers\PageImageResource;
 
-class ProductImageController extends BaseController
+class PageImageController extends BaseController
 {
-    private $productImage;
     private $repository;
-    public function __construct(ProductImage $productImage, ProductImageRepository $productImageRepository)
+
+    public function __construct(PageImageRepository $pageImageRepository, PageImage $pageImage)
     {
-        $this->model = $productImage;
-        $this->model_name = "Product Image";
-        $this->repository = $productImageRepository;
+        $this->repository = $pageImageRepository;
+        $this->model = $pageImage;
+        $this->model_name = "Page Image";
         parent::__construct($this->model, $this->model_name);
     }
 
-
     public function collection(object $data): ResourceCollection
     {
-        return ProductImageResource::collection($data);
+        return PageImageResource::collection($data);
     }
 
     public function resource(object $data): JsonResource
     {
-        return new ProductImageResource($data);
+        return new PageImageResource($data);
     }
 
     public function store(Request $request): JsonResponse
     {
-        try {
-
+        try
+        {
             $data = $this->repository->validateData($request);
-            foreach($request->file("image") as $file){
+            foreach($request->file("image") as $file) {
                 $image = $this->repository->createImage($file);
-                $data = array_merge($data,$image);
+                $data = array_merge($data, $image);
                 $created = $this->repository->create($data);
             }
         }
@@ -51,6 +50,7 @@ class ProductImageController extends BaseController
         {
             return $this->handleException($exception);
         }
+
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
@@ -61,7 +61,6 @@ class ProductImageController extends BaseController
             $this->repository->delete($id, function ($deleted) {
                 if ($deleted->path){
                     Storage::delete($deleted->path);
-                    $this->repository->deleteThumbnail($deleted->path);
                 }
             });
         }
@@ -71,19 +70,5 @@ class ProductImageController extends BaseController
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
-    }
-
-    public function changeMainImage(int $id): JsonResponse
-    {
-        try
-        {
-            $fetched = $this->repository->changeMainImage($id);
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponseWithMessage($this->lang('status-change-success'));
     }
 }
