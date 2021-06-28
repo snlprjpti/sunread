@@ -4,13 +4,12 @@ namespace Modules\Page\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Page\Entities\PageImage;
 
-class PageDatabaseSeeder extends Seeder
+class PageImageTableSeeder extends Seeder
 {
     public function run(): void
     {
-        Model::unguard();
-        $this->call(PageTableSeeder::class);
-        $this->call(PageImageTableSeeder::class);
+        PageImage::factory(2)->create();
     }
 }
