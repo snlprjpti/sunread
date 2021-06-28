@@ -12,8 +12,8 @@ class PageImageResource extends JsonResource
         return [
             "id" => $this->id,
             "page" => new PageResource($this->whenLoaded("page")),
-            "path" => $this->path,
-            "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
+            "path" => $this->path_url,
+            "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
 }
