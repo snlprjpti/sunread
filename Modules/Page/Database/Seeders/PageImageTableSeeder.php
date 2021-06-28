@@ -10,6 +10,6 @@ class PageImageTableSeeder extends Seeder
 {
     public function run(): void
     {
-        PageImage::factory()->count(2)->create();
+        PageImage::factory(2)->create();
     }
 }
