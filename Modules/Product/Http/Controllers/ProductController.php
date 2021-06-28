@@ -60,27 +60,29 @@ class ProductController extends BaseController
     public function store(Request $request): JsonResponse
     {
         try
-        {
+        {  
             $data = $this->repository->validateData($request);
 
-            $attribute_set = AttributeSet::whereId($request->attribute_set_id)->firstOrFail();
-            $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
-                return $attributeGroup->attributes->pluck('id');
-            })->flatten(1)->toArray();
-            $attribute = Attribute::whereIn('id', $attribute_ids)->get();
+            if ($request->get("attributes")) {
+                $attribute_set = AttributeSet::whereId($request->attribute_set_id)->firstOrFail();
+                $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
+                    return $attributeGroup->attributes->pluck('id');
+                })->flatten(1)->toArray();
+                $attribute = Attribute::whereIn('id', $attribute_ids)->get();
 
-            $check_attribute = $attribute->pluck("id")->toArray();
-            $attribute_ids = array_map(function($request_attribute) use ($attribute) {
-                
-                // check required attribute has value.
-                $required_attribute = $attribute->where("is_required", 1);
-                if ($required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute["attribute_id"]} value is required."]);
-                
-                // check attribute exists on attribute set
                 $check_attribute = $attribute->pluck("id")->toArray();
-                if (!in_array($request_attribute["attribute_id"], $check_attribute)) throw ValidationException::withMessages([ "attributes" => "Attribute id {$request_attribute["attribute_id"]} dosen't exists on current attribute set"]);
-                return;
-            }, $request->get("attributes"));
+                $attribute_ids = array_map(function($request_attribute) use ($attribute) {
+                    
+                    // check required attribute has value.
+                    $required_attribute = $attribute->where("is_required", 1);
+                    if ($required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute["attribute_id"]} value is required."]);
+                    
+                    // check attribute exists on attribute set
+                    $check_attribute = $attribute->pluck("id")->toArray();
+                    if (!in_array($request_attribute["attribute_id"], $check_attribute)) throw ValidationException::withMessages([ "attributes" => "Attribute id {$request_attribute["attribute_id"]} dosen't exists on current attribute set"]);
+                    return;
+                }, $request->get("attributes"));                  
+            }
 
             $created = $this->repository->create($data, function($created) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
@@ -119,7 +121,6 @@ class ProductController extends BaseController
             $data = $this->repository->validateData($request, [
                 "sku" => "required|unique:products,sku,{$id}"
             ]);
-            
             if ( $product->attribute_set_id != $request->attribute_set_id ) throw new ProductAttributeCannotChangeException("Attribute set cannot change.");
 
 
