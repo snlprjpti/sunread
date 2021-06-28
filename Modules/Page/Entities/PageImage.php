@@ -21,30 +21,7 @@ class PageImage extends Model
 
     public function getPathUrlAttribute(): ?string
     {
-        return $this->getImage();
-    }
-
-    public function getImage(): ?string
-    {
         if ( !$this->path ) return null;
-        return $this->getPath();
-    }
-
-    private function getPath(): string
-    {
-        $file_array = $this->getFileNameArray();
-        return Storage::url("{$file_array['folder']}/{$file_array['file']}");
-    }
-
-    private function getFileNameArray(): array
-    {
-        $path_array = explode("/", $this->path);
-        $file_name = $path_array[count($path_array) - 1];
-        unset($path_array[count($path_array) - 1]);
-
-        return [
-            "folder" => implode("/", $path_array),
-            "file" => $file_name
-        ];
+        return Storage::url("{$this->path}");
     }
 }
