@@ -112,14 +112,23 @@ class ConfigurationRepository extends BaseRepository
             return $this->scopeFilter($request->scope ?? "global", $data["scope"]);
         })->mapWithKeys(function($item) {
             $path =  "items.{$item['path']}.value";
+            $path1 =  "items.{$item['path']}.use_default_value";
+
+            $value_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["rules"]}" : "{$item["rules"]}";
+            $default_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.value" : "";
+
             if(in_array($item["type"], ["select", "checkbox"]))
             {
                 return [
-                    $path => $item["rules"],
-                    "$path.*" => $item["value_rules"]
+                    $path => $value_rule,
+                    $path1 => $default_rule,
+                    "$path.*" => ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["value_rules"]}" : "{$item["value_rules"]}",
                 ];
             } 
-            return [ $path => $item["rules"] ];
+            return [ 
+                $path => $value_rule,
+                $path1 => $default_rule,
+            ];
         })->toArray();
     }
 
