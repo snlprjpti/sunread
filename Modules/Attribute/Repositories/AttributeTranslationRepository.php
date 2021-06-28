@@ -7,6 +7,8 @@ use Exception;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Attribute\Entities\AttributeTranslation;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 
 class AttributeTranslationRepository
 {
@@ -27,6 +29,8 @@ class AttributeTranslationRepository
         try
         {
             foreach ($data as $row){
+                if(!$row["name"]) continue;
+                
                 $check = [
                     "store_id" => $row["store_id"],
                     "attribute_id" => $parent->id
@@ -43,5 +47,37 @@ class AttributeTranslationRepository
         }
 
         Event::dispatch("{$this->model_key}.create.after", $created);
+    }
+
+    public function show(int $id): array
+    {
+        $selected_stores = array_unique($this->model->whereAttributeId($id)->pluck('store_id')->toArray());
+        $selected_channels = array_unique(Store::whereIn('id', $selected_stores)->pluck('channel_id')->toArray());
+
+        $data = [];
+        foreach($selected_channels as $selected_channel)
+        {
+            $channel = Channel::find($selected_channel);
+
+            $item = [];
+            $item = [
+                "id" =>  $channel->id,
+                "name" => $channel->name
+            ];
+            
+            foreach($channel->stores as $store)
+            {
+                if(!isset($store)) continue;
+
+                $item["stores"][] = [
+                   "id" => $store->id,
+                   "name" => $store->name,
+                   "value" => $this->model->whereAttributeId($id)->whereStoreId($store->id)->first()->name ?? null
+                ];
+            }
+            $data["data"][] = $item;
+        }
+        $data["selected_channels"] = $selected_channels;
+        return $data;
     }
 }

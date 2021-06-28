@@ -13,7 +13,6 @@ use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Rules\ConfigurationRule;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
-use Illuminate\Http\Request;
 
 class ConfigurationRepository extends BaseRepository
 {
@@ -50,30 +49,30 @@ class ConfigurationRepository extends BaseRepository
                 foreach($data["children"] as $i => $children)
                 {
                     if(!isset($children["subChildren"])) continue;
-                    foreach($children["subChildren"] as $j => &$subchildren)
+                    foreach($children["subChildren"] as $j => $subchildren)
                     {
                         if(!isset($subchildren["elements"])) continue;
+
+                        $subchildren_data["elements"] = [];
                         foreach($subchildren["elements"] as $k => &$element)
                         {
-                            if($this->scopeFilter($checkKey["scope"], $element["scope"]))
-                            {
-                                unset($subchildren["elements"][$k]);
-                                continue;
-                            }
+                            if($this->scopeFilter($checkKey["scope"], $element["scope"])) continue;
+                            
                             $checkKey["path"] = $element["path"];
                             $checkKey["provider"] = $element["provider"];
 
                             $existData = $this->has((object) $checkKey);
-                            if($request->scope != "global") $element["use_default_value"] = $existData ? 0 : 1;
+                            if($checkKey["scope"] != "global") $element["use_default_value"] = $existData ? 0 : 1;
                             $element["default"] = $existData ? $this->getValues((object) $checkKey) : $this->getDefaultValues((object)$checkKey, $element["default"]);
 
                             if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
                             
                             unset($element["pluck"], $element["provider"], $element["rules"], $element["showIn"]);
-                            $subchildren["elements"][$k] = $element;
+                            $subchildren_data["title"] = $subchildren["title"];
+                            $subchildren_data["elements"][] = $element;
                         }
-                        $children["subChildren"][$j] = $subchildren;
+                        $children["subChildren"][$j] = $subchildren_data;
                     }
                     $data["slug"] = Str::slug($data["title"]);
                     $data["children"][$i] = $children;
@@ -112,8 +111,25 @@ class ConfigurationRepository extends BaseRepository
             return $data;
         })->reject(function ($data) use($request) {
             return $this->scopeFilter($request->scope ?? "global", $data["scope"]);
-        })->pluck('rules','path')->mapWithKeys(function($val, $key) {
-            return ["items.$key.value" => $val];
+        })->mapWithKeys(function($item) {
+            $path =  "items.{$item['path']}.value";
+            $path1 =  "items.{$item['path']}.use_default_value";
+
+            $value_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["rules"]}" : "{$item["rules"]}";
+            $default_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.value" : "";
+
+            if(in_array($item["type"], ["select", "checkbox"]))
+            {
+                return [
+                    $path => $value_rule,
+                    $path1 => $default_rule,
+                    "$path.*" => ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["value_rules"]}" : "{$item["value_rules"]}",
+                ];
+            } 
+            return [ 
+                $path => $value_rule,
+                $path1 => $default_rule,
+            ];
         })->toArray();
     }
 

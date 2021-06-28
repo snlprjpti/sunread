@@ -32,6 +32,8 @@ class AttributeRepository extends BaseRepository
             "use_in_layered_navigation" => "sometimes|boolean",
             "position" => "sometimes|numeric",
             "is_searchable" => "sometimes|boolean",
+            "is_unique" => "sometimes|boolean",
+            "search_weight" => "required_if:is_searchable,==,1",
             "translations" => "nullable|array"
         ];
     }

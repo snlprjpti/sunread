@@ -16,12 +16,15 @@ class CreateAttributesTable extends Migration
             $table->string('scope');
             $table->string('validation')->nullable();
             $table->boolean('is_required')->default(0);
+            $table->boolean('is_unique')->default(0);
             $table->boolean('comparable_on_storefront')->default(0);
             $table->boolean('is_searchable')->default(0);
+            $table->integer('search_weight')->nullable();
             $table->boolean('is_user_defined')->default(1);
             $table->boolean('is_visible_on_storefront')->default(0);
             $table->boolean('use_in_layered_navigation')->default(0);
             $table->integer('position')->nullable();
+            $table->string('default_value')->nullable();
 
             $table->timestamps();
         });

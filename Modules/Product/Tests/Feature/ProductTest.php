@@ -112,7 +112,7 @@ class ProductTest extends BaseTestCase
         $product_image_id = ProductImage::factory()->create()->id;
         $response = $this->withHeaders($this->headers)->delete($this->getRoute("image.destroy", [$product_image_id]));
 
-        $response->assertStatus(204);
+        $response->assertOk();
     }
 
     public function testShouldReturnErrorIfDeleteProductImageDoesNotExist()

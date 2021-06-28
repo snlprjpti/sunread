@@ -57,8 +57,8 @@ class BaseRepository
             $limit = $request->limit ?? $this->pagination_limit;
 
             $rows = $rows ?? $this->model::query();
-            if ($with !== []) $rows->with($with);
-            if ($request->has("q")) $rows->whereLike($this->model::$SEARCHABLE, $request->q);
+            if ($with !== []) $rows = $rows->with($with);
+            if ($request->has("q")) $rows = $rows->whereLike($this->model::$SEARCHABLE, $request->q);
 
             $resources = $rows->orderBy($sort_by, $sort_order)->paginate($limit)->appends($request->except("page"));
         }

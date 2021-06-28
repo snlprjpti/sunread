@@ -11,12 +11,10 @@ class AttributeGroupTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $groups = ["General", "Description", "Meta Description", "Price", "Shipping"];
+        $groups = ["Product Details", "Content", "Search Engine Optimization"];
         $attribute_group_attributes = [
-             [1, 2, 3, 4, 5, 6, 20, 21, 22],
-             [7, 8],
-             [14, 15, 16],
-             [9, 10, 11, 12, 13],
+             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 21],
+             [15, 16],
              [17, 18, 19, 20]
         ];
         foreach($groups as $count => $data)

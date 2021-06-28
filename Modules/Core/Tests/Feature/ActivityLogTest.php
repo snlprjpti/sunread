@@ -112,7 +112,7 @@ class ActivityLogTest extends TestCase
         // Admin Can Delete Individual resource
         $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.destroy", $resource_id));
 
-        $response->assertStatus(204);
+        $response->assertOk();
 
         $check_resource = $this->model::whereId($resource_id)->first() ? true : false;
         $this->assertFalse($check_resource);
@@ -123,7 +123,7 @@ class ActivityLogTest extends TestCase
             "ids" => $resource_ids
         ]);
 
-        $response->assertStatus(204);
+        $response->assertOk();
 
         $check_resource = $this->model::whereIn("id", $resource_ids)->get()->count() > 0 ? true : false;
         $this->assertFalse($check_resource);

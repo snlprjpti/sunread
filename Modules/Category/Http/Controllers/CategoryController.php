@@ -59,10 +59,9 @@ class CategoryController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
-            // Dont fetch root category for other admin
-            if (!$this->is_super_admin) $fetched = $fetched->where('parent_id', '<>', null);
+            $fetched = $this->repository->fetchAll(request: $request, callback: function() {
+                return (!$this->is_super_admin) ? $this->model::where('parent_id', '<>', null) : null;
+            });
         }
         catch (Exception $exception)
         {
@@ -102,10 +101,10 @@ class CategoryController extends BaseController
     {
         try
         {
-            $category = $this->model->findOrFail($id);
-            $this->blockCategoryAuthority($category->parent_id, $id);
-
-            $fetched = $this->model->with(["translations"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, callback: function() use ($id) {
+                $this->blockCategoryAuthority($this->model->findOrFail($id)->parent_id, $id);
+                return $this->model;
+            });
         }
         catch (Exception $exception)
         {
@@ -170,7 +169,7 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse
