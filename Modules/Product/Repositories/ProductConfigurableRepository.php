@@ -1,0 +1,92 @@
+<?php
+
+namespace Modules\Product\Repositories;
+
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Modules\Product\Entities\Product;
+use Illuminate\Support\Facades\Validator;
+use Modules\Attribute\Entities\Attribute;
+use Modules\Core\Repositories\BaseRepository;
+use Illuminate\Validation\ValidationException;
+use Modules\Product\Entities\ProductAttribute;
+
+class ProductConfigurableRepository extends BaseRepository
+{
+	public function __construct(Product $product)
+	{
+		$this->model = $product;
+		$this->model_key = "catalog.products";
+		$this->rules = [
+			"website_id" => "required|exists:websites,id",
+			"sku" => "required|unique:products,sku",
+			"type" => "required|in:configurable"
+		];
+	}
+
+	public function validateAttributes(object $request): array
+    {
+        try
+        {
+			$attributes = Attribute::all();
+			$product_attributes = array_map(function($product_attribute) use ($attributes) {
+				if ( !is_array($product_attribute) ) throw ValidationException::withMessages([ "attributes" => "Invalid attributes format." ]);
+				$attribute = $attributes->where("id", $product_attribute["attribute_id"])->first() ?? null;
+				if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute["attribute_id"]} does not exist." ]);
+
+				$validator = Validator::make($product_attribute, [
+					"store_id" => "sometimes|nullable|exists:stores,id",
+					"channel_id" => "sometimes|nullable|exists:channels,id",
+					"value" => $attribute->validation
+				]);
+				if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+
+				$attribute_type = config("attribute_types")[$attribute->type ?? "string"];
+				return array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid());
+			}, $request->get("attributes"));
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $product_attributes;
+    }
+
+    public function syncAttributes(array $data, object $product): bool
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.attibutes.sync.before");
+
+        try
+        {
+            foreach($data as $attribute) {
+                $match = ["product_id" => $product->id];
+                foreach (["attribute_id", "store_id", "channel_id"] as $field) {
+                    if (isset($attribute[$field])) $match[$field] = $attribute[$field];
+                }
+
+                $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
+
+                if ( $product_attribute->value_id != null ) {
+                    $product_attribute->value()->each(function($attribute_value) use($attribute){
+                        $attribute_value->update(["value" => $attribute["value"]]);
+                    });
+                    continue;
+                }
+
+                $product_attribute->update(["value_id" => $attribute["value_type"]::create(["value" => $attribute["value"]])->id]);
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.attibutes.sync.after", $product_attribute);
+        DB::commit();
+
+        return true;
+    }
+}
