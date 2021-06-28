@@ -7,8 +7,6 @@ use Modules\Customer\Entities\CustomerGroup;
 
 class CustomerGroupRepository extends BaseRepository
 {
-    protected $model, $model_key;
-
     public function __construct(CustomerGroup $customer_group)
     {
         $this->model = $customer_group;
@@ -18,5 +16,4 @@ class CustomerGroupRepository extends BaseRepository
             "slug" => "nullable|unique:customer_groups,slug"
         ];
     }
-
 }
