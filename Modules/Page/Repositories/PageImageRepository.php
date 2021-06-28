@@ -28,9 +28,9 @@ class PageImageRepository extends BaseRepository
         {
             $key = \Str::random(6);
             $file_name = $file->getClientOriginalName();
-            $data['path'] = $file->storeAs("images/pages/{$key}", $file_name);
-
             $path = "images/pages/{$key}";
+            $data['path'] = $file->storeAs($path, $file_name);
+
             if(!Storage::has($path)) Storage::makeDirectory($path, 0777, true, true);
         }
         catch (Exception $exception)
