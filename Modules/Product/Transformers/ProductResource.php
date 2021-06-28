@@ -11,7 +11,8 @@ class ProductResource extends JsonResource
 {
     public function toArray($request): array
     {
-        return [
+        $variants = ($this->variants->count() > 0) ? ["variants" => ProductResource::collection($this->variants)] : [];
+        return array_merge([
             "id" => $this->id,
             "parent" => new ProductResource($this->whenLoaded("parent")),
             "brand" => new BrandResource($this->whenLoaded("brand")),
@@ -23,6 +24,6 @@ class ProductResource extends JsonResource
             "attribute_values" => ProductAttributeResource::collection($this->whenLoaded("product_attributes")),
             "images" => ProductImageResource::collection($this->whenLoaded("images")),
             "created_at" => $this->created_at->format("M d, Y H:i A")
-        ];
+        ], $variants);
     }
 }
