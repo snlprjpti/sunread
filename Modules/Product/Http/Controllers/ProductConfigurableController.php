@@ -14,6 +14,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\JsonResponse;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Validation\ValidationException;
+use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
+use Exception;
 
 class ProductConfigurableController extends BaseController
 {
@@ -24,8 +26,11 @@ class ProductConfigurableController extends BaseController
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $productRepository;
+        $exception_statuses = [
+            ProductAttributeCannotChangeException::class => 403
+        ];
 
-        parent::__construct($this->model, $this->model_name);
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -57,26 +62,32 @@ class ProductConfigurableController extends BaseController
     {
         try
         {
-
             $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
                 "sku" => "required|unique:products,sku,{$id}",
+                "brand_id" => "sometimes|nullable|exists:brands,id",
+                "website_id" => "required|exists:websites,id",
                 "super_attributes" => "required|array",
                 "attributes" => "required|array",
                 "categories" => "required|array",
                 "categories.*" => "required|exists:categories,id"
             ]);
-            //get previous keys
-            foreach ($product->variants->pluck('id') as $variantId) {
-                $variant = $this->model::find($variantId);
-                $variant->delete();
-            }
+
+            if ( $product->attribute_set_id != $request->attribute_set_id ) throw new ProductAttributeCannotChangeException("Attribute set cannot change.");
+
+            // check attributes and validated request attrubutes.
+            $this->repository->checkAttribute($product->attribute_set_id, $request);
+            
+            //get previous keys and delete variants
+            foreach ($product->variants->pluck('id') as $variantId) $this->model::find($variantId)->delete();
+
             $super_attributes = [];
             //create product-superattribute
             foreach ($request->super_attributes as $attributeCode => $attributeOptions) {
                 $attribute = Attribute::whereSlug($attributeCode)->first();
                 $super_attributes[$attribute->id] = $attributeOptions;
             }
+            
             //generate multiple product(variant) combination on the basis of color and size for variants
             foreach (array_permutation($super_attributes) as $permutation) {
                 $this->createVariant($product, $permutation, $request);
@@ -131,7 +142,7 @@ class ProductConfigurableController extends BaseController
                 $variant->channels()->sync($request->get("channels"));
             });
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             throw $exception;
         }

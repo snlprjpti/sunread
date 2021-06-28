@@ -20,8 +20,6 @@ class ProductConfigurableTest extends BaseTestCase
         $this->hasFilters = false;
         $this->hasIndexTest = false;
         $this->hasShowTest = false;
-        $this->hasStoreTest = true;
-        $this->hasUpdateTest = true;
         $this->hasDestroyTest = false;
         $this->hasBulkDestroyTest = false;
         $this->hasStatusTest = false;
@@ -48,6 +46,13 @@ class ProductConfigurableTest extends BaseTestCase
             ],
             "categories" => [$category->id]
         ], $product->toArray());
+    }
+
+    public function getInvalidCreateData(): array
+    {
+        return array_merge($this->getCreateData(), [
+            "sku" => null
+        ]);
     }
 
 
