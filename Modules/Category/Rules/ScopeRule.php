@@ -3,6 +3,7 @@
 namespace Modules\Category\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
+use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
@@ -16,9 +17,9 @@ class ScopeRule implements Rule
      */
     public $scope; 
 
-    public function __construct($scope)
+    public function __construct($data)
     {
-        $this->scope = $scope;
+        $this->data = $data;
     }
 
     /**
@@ -30,11 +31,11 @@ class ScopeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($this->scope == "website") return (bool) Website::whereId($value)->first();
+        if($this->data->scope == "website") return (bool) Website::whereId($value)->first();
 
-        if($this->scope == "channel")  return (bool) Channel::whereId($value)->first();
+        if($this->data->scope == "channel")  return (bool) Channel::whereId($value)->first() && in_array($value, Website::find($this->data->website_id)->channels->pluck('id')->toArray());
 
-        if($this->scope == "store")  return (bool) Store::whereId($value)->first();
+        if($this->data->scope == "store")  return (bool) Store::whereId($value)->first();
         
     }
 

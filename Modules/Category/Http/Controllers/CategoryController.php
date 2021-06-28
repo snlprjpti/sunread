@@ -14,10 +14,12 @@ use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
 use Illuminate\Validation\ValidationException;
+use Modules\Category\Entities\CategoryValue;
 use Modules\Category\Repositories\CategoryValueRepository;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Rules\WebsiteRule;
-use Modules\Core\Rules\ScopeRule;
+use Modules\Category\Transformers\CategoryValueResource;
+use Modules\Category\Rules\ScopeRule;
 
 class CategoryController extends BaseController
 {
@@ -46,7 +48,7 @@ class CategoryController extends BaseController
 
     public function resource(object $data): JsonResource
     {
-        return new CategoryResource($data);
+        return new CategoryValueResource($data);
     }
 
     private function blockCategoryAuthority(?int $parent_id, ?int $main_root_id = null): bool
@@ -63,9 +65,15 @@ class CategoryController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll(request: $request, callback: function() {
-                return (!$this->is_super_admin) ? $this->model::where('parent_id', '<>', null) : null;
-            });
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)],
+                "website_id" => "sometimes|exists:websites,id"
+            ]);
+            $fetched = $this->repository->fetchAll(request: $request, callback: function() use($request) {
+                // return (!$this->is_super_admin) ? $this->model::where('parent_id', '<>', null) : null;
+                return $this->model->whereWebsiteId($request->website_id);
+            })->toTree();
         }
         catch (Exception $exception)
         {
@@ -112,21 +120,23 @@ class CategoryController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetch($id, callback: function() use ($id) {
-                $this->blockCategoryAuthority($this->model->findOrFail($id)->parent_id, $id);
-                return $this->model;
-            });
+            $request->validate([
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request, $id)]
+            ]);
+
+            $fetched = $this->repository->show($request, $id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
+        return $this->successResponse($fetched, $this->lang("fetch-success"));
     }
 
     public function update(Request $request, int $id): JsonResponse

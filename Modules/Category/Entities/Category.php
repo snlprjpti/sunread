@@ -22,7 +22,6 @@ class Category extends Model
 
     public static $SEARCHABLE = [ "values.name", "slug" ];
     protected $fillable = [ "parent_id", "slug", "position", "website_id" ];
-    protected $with = [ "values" ];
 
     public $translatedAttributes = ["name", "description", "meta_title", "meta_description", "meta_keywords"];
     public $translatedModels = [ CategoryValue::class, "category_id" ];
