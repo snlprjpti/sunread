@@ -11,12 +11,13 @@ use Modules\Category\Entities\CategoryValue;
 
 class CategoryValueRepository
 {
-    protected $model, $model_key;
+    protected $model, $model_key, $repository;
 
-    public function __construct(CategoryValue $category_value)
+    public function __construct(CategoryValue $category_value, CategoryRepository $category_repository)
     {
         $this->model = $category_value;
         $this->model_key = "catalog.category.values";
+        $this->repository = $category_repository;
     }
 
     public function createOrUpdate(array $data, Model $parent): void
@@ -34,7 +35,11 @@ class CategoryValueRepository
                 "scope_id" => $data["scope_id"]
             ];
             unset($data["position"], $data["website_id"], $data["parent_id"], $data["slug"]);
-            $created = $this->model->updateOrCreate($match, $data);
+            foreach($data["attributes"][0] as $key => $attribute){
+                // if($this->repository->scopeFilter($data['scope'], $configDataArray["scope"])) continue;
+                $input[$key] = ($data["scope"] != "website" && $attribute["use_in_default"] == 1) ? $this->repository->scopeFilter($data) : $attribute["value"];
+            }
+            $created = $this->model->updateOrCreate($match, $input);
         }
         catch (Exception $exception)
         {

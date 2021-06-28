@@ -15,7 +15,7 @@ class ScopeRule implements Rule
      *
      * @return void
      */
-    public $scope; 
+    public $data; 
 
     public function __construct($data)
     {
@@ -31,11 +31,17 @@ class ScopeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($this->data->scope == "website") return (bool) Website::whereId($value)->first();
+        if($this->data->category_id) $website_id = Category::find($this->data->category_id)->website_id;
 
-        if($this->data->scope == "channel")  return (bool) Channel::whereId($value)->first() && in_array($value, Website::find($this->data->website_id)->channels->pluck('id')->toArray());
+        if($this->data->website_id) $website_id = $this->data->website_id;
 
-        if($this->data->scope == "store")  return (bool) Store::whereId($value)->first();
+        if($this->data->scope == "website") return (bool) Website::whereId($value)->first() && isset($website_id) ? $website_id == $value : true;
+
+        if($this->data->scope == "channel")  return (bool) Channel::whereId($value)->first() && isset($website_id) ? in_array($value, Website::find($website_id)->channels->pluck('id')->toArray()) : true;
+
+        if($this->data->scope == "store")  return (bool) Store::whereId($value)->first() && isset($website_id) ? in_array($value, Website::find($website_id)->channels->mapWithKeys(function($channel){
+            return $channel->stores->pluck('id');
+        })->toArray()) : true;
         
     }
 

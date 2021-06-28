@@ -58,7 +58,7 @@ class CategoryServiceProvider extends ServiceProvider
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
         $this->mergeConfigFrom(
-            module_path($this->moduleName, 'Config/scope.php'), $this->moduleNameLower
+            module_path($this->moduleName, 'Config/category.php'), "category"
         );
     }
 

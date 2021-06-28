@@ -91,21 +91,22 @@ class CategoryController extends BaseController
 
             $rules = [];
 
-            $data = $this->repository->validateData($request, [
+            $data = $this->repository->validateData($request, array_merge([
                 "slug" => [ "nullable", new SlugUniqueRule($request) ],
                 "scope" => "sometimes|in:website",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
-            ], function() use ($request) {
+                "scope_id" => "sometimes|integer|min:1|exists:websites,id"
+            ], $this->repository->getValidationRules($request)), function() use ($request) {
                 return [
                     "slug" => $request->slug ?? $this->model->createSlug($request->name),
                     "scope" => "website",
                     "scope_id" => $request->website_id
                 ];
             });
-            if(isset($data["parent_id"])) if(!strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
+
+            if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
             throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
 
-            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            //$data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
 
             $created = $this->repository->create($data, function($created) use($data){
                 $this->categoryValueRepository->createOrUpdate($data, $created);
@@ -120,16 +121,17 @@ class CategoryController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
-    public function show(Request $request, int $id): JsonResponse
+    public function attributes(Request $request): JsonResponse
     {
         try
         {
-            $request->validate([
-                "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request, $id)]
+            $data = $request->validate([
+                "category_id" => "required_with:scope,scope_id|exists:categories,id",
+                "scope" => "required_with:category_id,scope_id|in:website,channel,store",
+                "scope_id" => [ "required_with:scope,category_id", "integer", "min:1", new ScopeRule($request)]
             ]);
 
-            $fetched = $this->repository->show($request, $id);
+            $fetched = $this->repository->show($data);
         }
         catch (Exception $exception)
         {
@@ -215,5 +217,4 @@ class CategoryController extends BaseController
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
-
 }
