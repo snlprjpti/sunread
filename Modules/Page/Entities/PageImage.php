@@ -22,6 +22,6 @@ class PageImage extends Model
     public function getPathUrlAttribute(): ?string
     {
         if ( !$this->path ) return null;
-        return Storage::url("{$this->path}");
+        return Storage::url($this->path);
     }
 }
