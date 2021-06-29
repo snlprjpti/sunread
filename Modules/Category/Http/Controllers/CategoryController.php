@@ -32,8 +32,6 @@ class CategoryController extends BaseController
         $this->categoryValueRepository = $categoryValueRepository;
         $this->model = $category;
         $this->model_name = "Category";
-        $this->is_super_admin = auth()->guard("admin")->check() ? auth()->guard("admin")->user()->hasRole("super-admin") : false;
-        $this->main_root_id = $this->model::oldest("id")->first()->id;
 
         $exception_statuses = [
             CategoryAuthorizationException::class => 403
@@ -57,16 +55,6 @@ class CategoryController extends BaseController
         return new CategoryResource($data);
     }
 
-    private function blockCategoryAuthority(?int $parent_id, ?int $main_root_id = null): bool
-    {
-        $parent_id_authority = (!$this->is_super_admin && $parent_id == $this->main_root_id);
-        $main_root_id_authority = $main_root_id ? $main_root_id == $this->main_root_id : false;
-
-        if ( $parent_id_authority || $main_root_id_authority ) throw new CategoryAuthorizationException("Action not authorized.");
-
-        return false;
-    }
-
     public function index(Request $request): JsonResponse
     {
         try
@@ -77,7 +65,7 @@ class CategoryController extends BaseController
                 "website_id" => "sometimes|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll(request: $request, callback: function() use($request) {
-                return $request->website_id ? $this->model->whereWebsiteId($request->website_id) : $this->model;
+                return $this->model->whereWebsiteId($request->website_id);
             })->toTree();
         }
         catch (Exception $exception)
@@ -104,8 +92,6 @@ class CategoryController extends BaseController
 
             if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
             throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
-
-            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
 
             $created = $this->repository->create($data, function($created) use($data){
                 $this->categoryValueRepository->createOrUpdate($data, $created);
@@ -155,8 +141,6 @@ class CategoryController extends BaseController
             });
 
             unset($data["website_id"], $data["parent_id"]);
-            if ($request->file("image")) $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            else  unset($data["image"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($data){
                 $this->categoryValueRepository->createOrUpdate($data, $updated);
@@ -178,10 +162,9 @@ class CategoryController extends BaseController
             $category = $this->model->findOrFail($id);
 
             $this->repository->delete($id, function($deleted){
-                $deleted->translations()->each(function($translation){
-                    $translation->delete();
+                $deleted->values()->each(function($value){
+                    $value->delete();
                 });
-                if($deleted->image) Storage::delete($deleted->image);
             });
         }
         catch (Exception $exception)
