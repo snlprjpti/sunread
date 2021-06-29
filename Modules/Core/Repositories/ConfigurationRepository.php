@@ -107,32 +107,37 @@ class ConfigurationRepository extends BaseRepository
 
     public function getValidationRules(object $request): array
     {
+        $scope = $request->scope ?? "global";
         return collect(config('configuration.'.$request->absolute_path))->pluck('elements')->flatten(1)->map(function($data) {
             return $data;
-        })->reject(function ($data) use($request) {
-            return $this->scopeFilter($request->scope ?? "global", $data["scope"]);
-        })->mapWithKeys(function($item) {
+        })->reject(function ($data) use($scope) {
+            return $this->scopeFilter($scope, $data["scope"]);
+        })->mapWithKeys(function($item) use($scope) {
             $path =  "items.{$item['path']}.value";
             $path1 =  "items.{$item['path']}.use_default_value";
             $absolutePath = "items.{$item['path']}.absolute_path";
 
-            $value_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["rules"]}" : "{$item["rules"]}";
-            $default_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.value" : "";
+            $value_rule = ($item["is_required"] == 1) ? (($scope == "global") ? "required|{$item["rules"]}" : "required_without:$path1|{$item["rules"]}") : "{$item["rules"]}";
+            if($scope != "global") $default_rule = ($item["is_required"] == 1) ? "required_without:$path" : "";
 
             if(($item["type"] == "select" && $item["multiple"]) || $item["type"] == "checkbox")
             {
-                return [
+                $multiple_return = [
                     $path => $value_rule,
-                    $path1 => $default_rule,
-                    "$path.*" => ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["value_rules"]}" : "{$item["value_rules"]}",
+                    "$path.*" => ($item["is_required"]==1) ? "required_without:$path1|{$item["value_rules"]}" : "{$item["value_rules"]}",
                     $absolutePath => "required"
                 ];
+                return ($scope != "global") ? array_merge($multiple_return, [
+                    $path1 => $default_rule
+                ]) : $multiple_return;
             } 
-            return [ 
+            $single_return = [
                 $path => $value_rule,
-                $path1 => $default_rule,
                 $absolutePath => "required"
             ];
+            return ($scope != "global") ? array_merge($single_return, [
+                $path1 => $default_rule
+            ]) : $single_return;
         })->toArray();
     }
 
