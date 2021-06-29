@@ -1,47 +1,76 @@
 <?php 
 return [
     "attributes" => [
-        "name" => [
-            "title" => "name",
-            "scope" => "website",
-            "rules" => "",
-            "is_required" => 1
+        "general" => [
+            "title" => "General Details",
+            "elements" => [
+                [
+                    "title" => "name",
+                    "scope" => "store",
+                    "rules" => "",
+                    "is_required" => 1,
+                    "value" => ""
+                ],
+                [
+                    "title" => "status",
+                    "scope" => "store",
+                    "rules" => "boolean",
+                    "is_required" => 1,
+                    "value" => ""
+                ],
+                [
+                    "title" => "include_in_menu",
+                    "scope" => "store",
+                    "rules" => "boolean",
+                    "is_required" => 0,
+                    "value" => ""
+                ]
+            ]
         ],
-        "description" => [
-            "title" => "description",
-            "scope" => "store",
-            "rules" => "nullable",
-            "is_required" => 0
+        "content" => [
+            "title" => "Content",
+            "elements" => [
+                [
+                    "title" => "image",
+                    "scope" => "store",
+                    "rules" => "mimes:jpeg,jpg,bmp,png",
+                    "is_required" => 0,
+                    "value" => ""
+                ],
+                [
+                    "title" => "description",
+                    "scope" => "store",
+                    "rules" => "nullable",
+                    "is_required" => 0,
+                    "value" => ""
+                ]
+            ]
         ],
-        "meta_title" => [
-            "title" => "meta_title",
-            "scope" => "website",
-            "rules" => "nullable",
-            "is_required" => 1
+        "search_engine_optimization" => [
+            "title" => "Search Engine Optimization",
+            "elements" => [
+                [
+                    "title" => "meta_title",
+                    "scope" => "website",
+                    "rules" => "nullable",
+                    "is_required" => 1,
+                    "value" => ""
+                ],
+                [
+                    "title" => "meta_keywords",
+                    "scope" => "channel",
+                    "rules" => "nullable",
+                    "is_required" => 1,
+                    "value" => ""
+                ],
+                [
+                    "title" => "meta_description",
+                    "scope" => "store",
+                    "rules" => "nullable",
+                    "is_required" => 1,
+                    "value" => ""
+                ]
+            ]
         ],
-        "meta_keywords" => [
-            "title" => "meta_keywords",
-            "scope" => "channel",
-            "rules" => "nullable",
-            "is_required" => 1
-        ],
-        "meta_description" => [
-            "title" => "meta_description",
-            "scope" => "store",
-            "rules" => "nullable",
-            "is_required" => 1
-        ],
-        "status" => [
-            "title" => "status",
-            "scope" => "channel",
-            "rules" => "boolean",
-            "is_required" => 1
-        ],
-        "include_in_menu" => [
-            "title" => "include_in_menu",
-            "scope" => "website",
-            "rules" => "boolean",
-            "is_required" => 1
-        ]
     ]
 ];
