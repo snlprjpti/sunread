@@ -13,6 +13,7 @@ class Website extends Model
 
     public static $SEARCHABLE = [ "code", "hostname", "name", "description" ];
     protected $fillable = [ "code", "hostname", "name", "description", "position", "status" ];
+    protected $with = [ "channels" ];
 
     public function channels(): HasMany
     {
