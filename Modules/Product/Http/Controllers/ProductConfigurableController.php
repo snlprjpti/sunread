@@ -62,8 +62,6 @@ class ProductConfigurableController extends BaseController
     {
         try
         {
-            $product = $this->repository->fetch($id);
-
             $data = $this->repository->validateData($request, [
                 "sku" => "required|unique:products,sku,{$id}",
                 "brand_id" => "sometimes|nullable|exists:brands,id",
@@ -71,8 +69,12 @@ class ProductConfigurableController extends BaseController
                 "super_attributes" => "required|array",
                 "attributes" => "required|array",
                 "categories" => "required|array",
-                "categories.*" => "required|exists:categories,id"
-            ]);
+                "categories.*" => "required|exists:categories,id",
+                "attribute_set_id" => "sometimes|nullable"
+            ]);  
+
+            $product = $this->repository->fetch($id);
+            
             // check attributes and validated request attrubutes.
             $this->repository->checkAttribute($product->attribute_set_id, $request);
 
