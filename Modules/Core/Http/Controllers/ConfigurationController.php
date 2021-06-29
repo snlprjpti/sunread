@@ -45,9 +45,7 @@ class ConfigurationController extends BaseController
             $rules = isset($request->absolute_path) ? $this->repository->getValidationRules($request) : ["items"=>[]];
             $scope_rules = $this->repository->scopeValidation($request);
             $rules = array_merge($scope_rules, $rules);
-            $data = $this->repository->validateData($request, $rules, function ($current_data) {
-                return $current_data->all();
-            });
+            $data = $this->repository->validateData($request, $rules);
 
             if(!$request->scope) $data["scope"] = "global";
             if(!$request->scope_id) $data["scope_id"] = 0;

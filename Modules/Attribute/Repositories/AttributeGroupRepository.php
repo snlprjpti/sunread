@@ -13,8 +13,6 @@ use Illuminate\Support\Arr;
 
 class AttributeGroupRepository extends BaseRepository
 {
-    protected $model, $model_key;
-
     public function __construct(AttributeGroup $attribute_group)
     {
         $this->model = $attribute_group;

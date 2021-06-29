@@ -7,8 +7,6 @@ use Modules\Customer\Entities\CustomerAddress;
 
 class CustomerAddressRepository extends BaseRepository
 {
-    protected $model, $model_key;
-
     public function __construct(CustomerAddress $customer_address)
     {
         $this->model = $customer_address;
@@ -25,5 +23,4 @@ class CustomerAddressRepository extends BaseRepository
             "default_address" => "sometimes|boolean"
         ];
     }
-
 }
