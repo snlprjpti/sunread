@@ -23,7 +23,7 @@ class CategoryRepository extends BaseRepository
         
         $this->rules = [
             // category validation
-            "position" => "sometimes|numeric",
+            "position" => "sometimes|nullable|numeric",
 
             "parent_id" => "nullable|numeric|exists:categories,id",
             "website_id" => "required|exists:websites,id",
