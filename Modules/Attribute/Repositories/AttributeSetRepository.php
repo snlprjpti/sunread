@@ -43,12 +43,10 @@ class AttributeSetRepository extends BaseRepository
 
     public function validateAttributeSetListing(object $request): array
     {
-        $data = $request->validate([
+        return $request->validate([
             "product" => ($request->get("product")) ? "required|integer|exists:products,id" : "nullable",
             "attribute_set" => ($request->get("product")) ? "nullable" : "required|integer"
-        ]);
-
-        return $data;
+        ]); 
     }
 
 
