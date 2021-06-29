@@ -31,7 +31,7 @@ class ProductConfigurableRepository extends BaseRepository
         try
         {
 			$attributes = Attribute::all();
-			$product_attributes = array_map(function($product_attribute) use ($attributes) {
+			$product_attributes = array_map(function ($product_attribute) use ($attributes) {
 				if ( !is_array($product_attribute) ) throw ValidationException::withMessages([ "attributes" => "Invalid attributes format." ]);
 				$attribute = $attributes->where("id", $product_attribute["attribute_id"])->first() ?? null;
 				if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute['attribute_id']} does not exist." ]);
@@ -104,7 +104,7 @@ class ProductConfigurableRepository extends BaseRepository
             $attributes = Attribute::whereIn('id', $attribute_ids)->get();
             $check_attribute = $attributes->pluck("id")->toArray();
 
-            array_map(function($request_attribute) use ($attributes, $check_attribute) {
+            array_map(function ($request_attribute) use ($attributes, $check_attribute) {
                 // check required attribute has value.
                 $required_attribute = $attributes->where("is_required", 1);
                 if ($required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute['attribute_id']} value is required."]);
@@ -127,11 +127,11 @@ class ProductConfigurableRepository extends BaseRepository
        try
        {
             //get previous variants and delete all collection variants
-            $product->variants()->delete();
+            if ($product->variants->count() > 0) $product->variants()->delete();
             
             //create product-superattribute
             $super_attributes = [];
-            foreach ($request->super_attributes as $attributeCode => $attributeOptions) {
+            foreach ($request->get("super_attributes") as $attributeCode => $attributeOptions) {
                 $attribute = Attribute::whereSlug($attributeCode)->first();
                 if ($attribute->is_user_defined == 0) continue;
                 $super_attributes[$attribute->id] = $attributeOptions;
@@ -171,13 +171,13 @@ class ProductConfigurableRepository extends BaseRepository
                     [
                         // Attrubute slug
                         "attribute_id" => 1,
-                        "value" => \Str::slug($product->sku) . "-variant-" . implode("-", $permutation),
+                        "value" => \Str::slug($product->sku)."-variant-".implode("-", $permutation),
                         "value_type" => "Modules\Product\Entities\ProductAttributeString"
                     ],
                     [
                         // Attrubute name
                         "attribute_id" => 2,
-                        "value" => $product->sku . "-variant-" . implode("-", $permutation),
+                        "value" => $product->sku."-variant-".implode("-", $permutation),
                         "value_type" => "Modules\Product\Entities\ProductAttributeString"
                     ]
                 ];
