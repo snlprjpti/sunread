@@ -133,8 +133,10 @@ class ProductConfigurableRepository extends BaseRepository
             $super_attributes = [];
             foreach ($request->super_attributes as $attributeCode => $attributeOptions) {
                 $attribute = Attribute::whereSlug($attributeCode)->first();
+                if ($attribute->is_user_defined == 0) continue;
                 $super_attributes[$attribute->id] = $attributeOptions;
-            }   
+            }
+
             //generate multiple product(variant) combination on the basis of color and size for variants
             foreach (array_permutation($super_attributes) as $permutation) {
                 $this->addVariant($product, $permutation, $request);
