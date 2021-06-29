@@ -96,7 +96,7 @@ class ProductConfigurableRepository extends BaseRepository
     {
         try
         {
-            $attribute_set = AttributeSet::whereId($attribute_set_id)->firstOrFail();
+            $attribute_set = AttributeSet::whereId($attribute_set_id)->with(["attribute_groups"])->firstOrFail();
             $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes->pluck('id');
             })->flatten(1)->toArray();
