@@ -193,7 +193,7 @@ class CategoryController extends BaseController
 
             $data = [
                 "scope" => $request->scope ?? "website", 
-                "scope_id" => $request->scope_id ?? $request->category_id ? $this->model->find($request->category_id)->website_id : null,
+                "scope_id" => $request->scope_id ?? ($request->category_id ? $this->model->find($request->category_id)->website_id : null),
                 "category_id" => $request->category_id ?? null
             ];
 

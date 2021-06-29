@@ -30,17 +30,15 @@ class CategoryScopeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($this->data->category_id) $website_id = ($category = Category::find($this->data->category_id)) ? $category->website_id : null;
+        if($this->data->category_id) $website_id = Category::findOrFail($this->data->category_id)->website_id ;
 
         if(!isset($website_id) && $this->data->website_id) $website_id = $this->data->website_id;
-
-        $website_id = null;
         
-        if($this->data->scope == "website" && $website_id) return (bool) $website_id == $value;
+        if($this->data->scope == "website" && isset($website_id)) return (bool) $website_id == $value;
 
-        if($this->data->scope == "channel" && $website_id)  return (bool) in_array($value, $this->website_model->find($website_id)->channels->pluck('id')->toArray());
+        if($this->data->scope == "channel" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->pluck('id')->toArray());
 
-        if($this->data->scope == "store" && $website_id)  return (bool) in_array($value, $this->website_model->find($website_id)->channels->mapWithKeys(function($channel){
+        if($this->data->scope == "store" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->mapWithKeys(function($channel){
             return $channel->stores->pluck('id');
         })->toArray());
 
