@@ -35,7 +35,7 @@ class ScopeRule implements Rule
         if($this->data->category_id) $category = Category::find($this->data->category_id);
         if(isset($category)) $website_id = $category->website_id;
 
-        if($this->data->website_id) $website_id = $this->data->website_id;
+        if(!isset($website_id) && $this->data->website_id) $website_id = $this->data->website_id;
 
         if($this->data->scope == "website") return (bool) $this->website_model->whereId($value)->first() && isset($website_id) ? $website_id == $value : true;
 
