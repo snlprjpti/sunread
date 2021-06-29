@@ -19,6 +19,9 @@ class CreatePageImagesTable extends Migration
             $table->foreign("page_id")->references("id")->on("pages")->onDelete("cascade");
 
             $table->string('path');
+            $table->boolean("is_banner")->default(0);
+            $table->boolean("is_slider")->default(0);
+
             $table->timestamps();
         });
     }
