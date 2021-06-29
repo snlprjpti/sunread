@@ -14,13 +14,11 @@ use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
 use Illuminate\Validation\ValidationException;
-use Modules\Category\Entities\CategoryValue;
 use Modules\Category\Transformers\List\CategoryResource as ListCategoryResource;
 use Modules\Category\Repositories\CategoryValueRepository;
+use Modules\Category\Rules\CategoryScopeRule;
 use Modules\Category\Rules\SlugUniqueRule;
-use Modules\Category\Rules\WebsiteRule;
-use Modules\Category\Transformers\CategoryValueResource;
-use Modules\Category\Rules\ScopeRule;
+use Modules\Core\Rules\ScopeRule;
 
 class CategoryController extends BaseController
 {
@@ -61,7 +59,7 @@ class CategoryController extends BaseController
         {
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request)],
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request), new CategoryScopeRule($request)],
                 "website_id" => "sometimes|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll(request: $request, callback: function() use($request) {
@@ -106,24 +104,18 @@ class CategoryController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
-    public function attributes(Request $request): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try
         {
-            $data = $request->validate([
-                "category_id" => "required_with:scope,scope_id|exists:categories,id",
-                "scope" => "required_with:category_id,scope_id|in:website,channel,store",
-                "scope_id" => [ "required_with:scope,category_id", "integer", "min:1", new ScopeRule($request)]
-            ]);
-
-            $fetched = $this->repository->show($data);
+            $fetched = $this->repository->fetch($id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang("fetch-success"));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -133,14 +125,14 @@ class CategoryController extends BaseController
             $data = $this->repository->validateData($request, array_merge([
                 "slug" => [ "nullable", new SlugUniqueRule($request, $id) ],
                 "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request)]
-            ], $this->repository->getValidationRules($request, "updated")), function() use ($request, $id) {
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
+            ], $this->repository->getValidationRules($request)), function() use ($request, $id) {
                 return [
-                    "slug" => $request->slug ?? $this->model->createSlug($request->name)
+                    "slug" => $request->slug ?? $this->model->createSlug($request->name),
+                    "parent_id" => $this->model->findOrFail($id)->parent_id,
+                    "website_id" => $this->model->findOrFail($id)->website_id
                 ];
             });
-
-            unset($data["website_id"], $data["parent_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($data){
                 $this->categoryValueRepository->createOrUpdate($data, $updated);
@@ -187,5 +179,31 @@ class CategoryController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
+
+    public function format(Request $request): JsonResponse
+    {
+        try
+        {
+            $request->validate([
+                "category_id" => "required_with:scope|exists:categories,id",
+                "scope" => "required_with:scope_id|in:website,channel,store",
+                "scope_id" => [ "required_with:scope", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
+            ]);
+
+            $data = [
+                "scope" => $request->scope ?? "website", 
+                "scope_id" => $request->scope_id ?? $request->category_id ? $this->model->find($request->category_id)->website_id : null,
+                "category_id" => $request->category_id ?? null
+            ];
+
+            $fetched = $this->repository->getConfigData($data);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang("fetch-success"));
     }
 }
