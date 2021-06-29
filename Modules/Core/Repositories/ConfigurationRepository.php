@@ -118,7 +118,7 @@ class ConfigurationRepository extends BaseRepository
             $value_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["rules"]}" : "{$item["rules"]}";
             $default_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.value" : "";
 
-            if(in_array($item["type"], ["select", "checkbox"]))
+            if(($item["type"] == "select" && $item["multiple"]) || $item["type"] == "checkbox")
             {
                 return [
                     $path => $value_rule,
