@@ -18,7 +18,8 @@ use ScoutElastic\Searchable;
 
 class Product extends Model
 {
-    use HasFactory, Searchable, ElasticSearchFormat ;
+    use HasFactory, Searchable;
+    // use ElasticSearchFormat;
 
     protected $fillable = [ "parent_id", "brand_id", "attribute_set_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];
@@ -79,7 +80,8 @@ class Product extends Model
     
     public function toSearchableArray()
     {
-        return $this->documentDataStructure();
+        return $this->toArray();
+        // return $this->documentDataStructure();
     }
 
     public function variants()
