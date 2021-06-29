@@ -109,6 +109,7 @@ class BaseTestCase extends TestCase
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
 
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index"));
+        dd($response);
 
         $response->assertOk();
         $response->assertJsonFragment([
@@ -149,6 +150,7 @@ class BaseTestCase extends TestCase
         if ( !$this->hasShowTest ) $this->markTestSkipped("Show method not available.");
 
         $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->fake_resource_id]));
+        dd($response);
 
         $response->assertNotFound();
         $response->assertJsonFragment([

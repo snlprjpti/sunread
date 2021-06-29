@@ -25,6 +25,17 @@ class CategoryValueTableSeeder extends Seeder
                 "include_in_menu" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
+            ],
+            [
+                "category_id" => 2,
+                "scope" => "website",
+                "scope_id" => 2,
+                "name" => "Root",
+                "image" => NULL,
+                "status" => 1,
+                "include_in_menu" => 1,
+                "created_at" => now(),
+                "updated_at" => now()
             ]
         ]);
     }

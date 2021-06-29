@@ -15,6 +15,7 @@ use Modules\Category\Repositories\CategoryRepository;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\CategoryValue;
+use Modules\Category\Transformers\List\CategoryResource as ListCategoryResource;
 use Modules\Category\Repositories\CategoryValueRepository;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Rules\WebsiteRule;
@@ -46,9 +47,14 @@ class CategoryController extends BaseController
         return CategoryResource::collection($data);
     }
 
+    public function listCollection(object $data): ResourceCollection
+    {
+        return ListCategoryResource::collection($data);
+    }
+
     public function resource(object $data): JsonResource
     {
-        return new CategoryValueResource($data);
+        return new CategoryResource($data);
     }
 
     private function blockCategoryAuthority(?int $parent_id, ?int $main_root_id = null): bool
@@ -67,12 +73,11 @@ class CategoryController extends BaseController
         {
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)],
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request)],
                 "website_id" => "sometimes|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll(request: $request, callback: function() use($request) {
-                // return (!$this->is_super_admin) ? $this->model::where('parent_id', '<>', null) : null;
-                return $this->model->whereWebsiteId($request->website_id);
+                return $request->website_id ? $this->model->whereWebsiteId($request->website_id) : $this->model;
             })->toTree();
         }
         catch (Exception $exception)
@@ -80,21 +85,15 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
+        return $this->successResponse($this->listCollection($fetched), $this->lang("fetch-list-success"));
     }
 
     public function store(Request $request): JsonResponse
     {
         try
         {
-            // $this->blockCategoryAuthority($request->parent_id);
-
-            $rules = [];
-
             $data = $this->repository->validateData($request, array_merge([
-                "slug" => [ "nullable", new SlugUniqueRule($request) ],
-                "scope" => "sometimes|in:website",
-                "scope_id" => "sometimes|integer|min:1|exists:websites,id"
+                "slug" => [ "nullable", new SlugUniqueRule($request) ]
             ], $this->repository->getValidationRules($request)), function() use ($request) {
                 return [
                     "slug" => $request->slug ?? $this->model->createSlug($request->name),
@@ -106,7 +105,7 @@ class CategoryController extends BaseController
             if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
             throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
 
-            //$data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
+            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
 
             $created = $this->repository->create($data, function($created) use($data){
                 $this->categoryValueRepository->createOrUpdate($data, $created);
@@ -145,25 +144,17 @@ class CategoryController extends BaseController
     {
         try
         {
-            // $this->blockCategoryAuthority($request->parent_id, $id);
-
-            $rules = [];
-
-            $data = $this->repository->validateData($request, array_merge($rules, [
-                "slug" => [ "nullable", new SlugUniqueRule($request) ],
-                "image" =>  "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
-            ]), function() use ($request) {
+            $data = $this->repository->validateData($request, array_merge([
+                "slug" => [ "nullable", new SlugUniqueRule($request, $id) ],
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request)]
+            ], $this->repository->getValidationRules($request, "updated")), function() use ($request, $id) {
                 return [
-                    "slug" => $request->slug ?? $this->model->createSlug($request->name),
-                    "scope" => $request->scope ?? "website",
-                    "scope_id" => $request->scope_id ?? $request->website_id
+                    "slug" => $request->slug ?? $this->model->createSlug($request->name)
                 ];
             });
 
-            if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
-            throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
-
+            unset($data["website_id"], $data["parent_id"]);
             if ($request->file("image")) $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
             else  unset($data["image"]);
 
@@ -171,8 +162,6 @@ class CategoryController extends BaseController
                 $this->categoryValueRepository->createOrUpdate($data, $updated);
                 if(isset($data["channels"])) $updated->channels()->sync($data["channels"]);
             });
-            // get latest updated translations
-            // $updated->translations = $updated->translations()->get();
         }
         catch (Exception $exception)
         {
@@ -187,7 +176,6 @@ class CategoryController extends BaseController
         try
         {
             $category = $this->model->findOrFail($id);
-            $this->blockCategoryAuthority($category->parent_id, $id);
 
             $this->repository->delete($id, function($deleted){
                 $deleted->translations()->each(function($translation){

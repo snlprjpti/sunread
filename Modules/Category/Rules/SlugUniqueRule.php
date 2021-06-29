@@ -12,11 +12,12 @@ class SlugUniqueRule implements Rule
      *
      * @return void
      */
-    public $data; 
+    public $data, $id; 
 
-    public function __construct($data)
+    public function __construct($data, $id=null)
     {
         $this->data = $data;
+        $this->id = $id;
         $this->model = new Category();
     }
 
@@ -30,8 +31,7 @@ class SlugUniqueRule implements Rule
     public function passes($attribute, $value)
     {
         $category_exist = $this->model->whereParentId($this->data->parent_id)->whereWebsiteId($this->data->website_id)->whereSlug($value)->first();
-        
-        return ($category_exist) ? false : true;
+        return ($category_exist) ? ($this->id == $category_exist->id ? true : false) : true;
     }
 
     /**

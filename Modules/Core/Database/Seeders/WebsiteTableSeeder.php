@@ -24,6 +24,15 @@ class WebsiteTableSeeder extends Seeder
                 "position" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
+            ],
+            [
+                "code" => "national",
+                "hostname" => "national",
+                "name" => "national",
+                "description" => "Not for all countries",
+                "position" => 2,
+                "created_at" => now(),
+                "updated_at" => now()
             ]
         ]);
     }

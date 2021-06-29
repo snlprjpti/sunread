@@ -26,6 +26,16 @@ class CategoryTableSeeder extends Seeder
                 "website_id" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
+            ],
+            [
+                "parent_id" => NULL,
+                "_lft" => 15,
+                "_rgt" => 30,
+                "slug" => "root",
+                "position" => 2,
+                "website_id" => 2,
+                "created_at" => now(),
+                "updated_at" => now()
             ]
         ]);
     }

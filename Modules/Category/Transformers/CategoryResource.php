@@ -8,16 +8,18 @@ use Modules\Core\Transformers\ChannelResource;
 class CategoryResource extends JsonResource
 {
     public function toArray($request): array
-    {
-        $scopeValue = $this->values()->whereScope($request->scope ?? "website")->whereScopeId($request->scope_id ?? $request->website_id)->first();
-        
+    {    
         return [
             "id" => $this->id,
             "slug" => $this->slug,
-            "name" => $scopeValue->name,
-            "status" => $scopeValue->status,
-            "include_in_menu" => $scopeValue->include_in_menu,
-            "children" => CategoryResource::collection($this->children)
+            "position" => $this->position,
+            "parent" => $this->whenLoaded("parent"),
+            "website" => $this->website,
+
+            "values" => $this->values,
+            "channels" => ChannelResource::collection($this->whenLoaded("channels")),
+
+            "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
 }

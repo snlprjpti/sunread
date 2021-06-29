@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Store;
 use Modules\Core\Tests\BaseTestCase;
+use Illuminate\Support\Str;
+use Modules\Core\Entities\Website;
 
 class CategoryTest extends BaseTestCase
 {
@@ -22,6 +24,10 @@ class CategoryTest extends BaseTestCase
         $this->model_name = "Category";
         $this->route_prefix = "admin.catalog.categories";
 
+        $this->filter = [
+            "website_id" => Website::inRandomOrder()->first()->id
+        ];
+
         $this->model::factory(10)->create();
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->root_category_id = $this->model::oldest('id')->first()->id;
@@ -33,13 +39,35 @@ class CategoryTest extends BaseTestCase
         Storage::fake();
         $store = Store::factory()->create();
 
-        return array_merge($this->model::factory()->make([
-            "image" => UploadedFile::fake()->image("image.png")
-        ])->toArray(), [
-            "parent_id" => $this->root_category_id,
-            "translation" => [
-                "store_id" => $store->id,
-                "name" => "Test"
+
+        return array_merge($this->model::factory()->make()->toArray(), [
+            "attributes" => [
+                [
+                    "name" => [
+                        "value" => Str::random(10),
+                    ],
+                    "image" => [
+                        "value" => UploadedFile::fake()->image("image.png")
+                    ],
+                    "description" => [
+                        "value" => Str::random(20),
+                    ],
+                    "meta_title" => [
+                        "value" => Str::random(11),
+                    ],
+                    "meta_description" => [
+                        "value" => Str::random(15),
+                    ],
+                    "meta_keywords" => [
+                        "value" => Str::random(13),
+                    ],
+                    "status" => [
+                        "value" => rand(0,1)
+                    ],
+                    "include_in_menu" => [
+                        "value" => rand(0,1)
+                    ]
+                ]
             ]
         ]);
     }
@@ -63,54 +91,6 @@ class CategoryTest extends BaseTestCase
     {
         return array_merge($this->getUpdateData(),[
             "image" => null
-        ]);
-    }
-
-    public function basicAdminHeader()
-    {
-        $this->createAdmin(["role_slug" => "basic-admin"]);
-        return $this->headers;
-    }
-
-    public function testShouldReturnErrorIfBasicAdminTryToStoreRootCategory()
-    {
-        $post_data = $this->getCreateData();
-        $response = $this->withHeaders($this->basicAdminHeader())->post(route("{$this->route_prefix}.store"), $post_data);
-
-        $response->assertStatus(403);
-        $response->assertJsonFragment([
-            "status" => "error"
-        ]);
-    }
-
-    public function testShouldReturnErrorIfBasicAdminTryToUpdateRootCategory()
-    {
-        $post_data = array_merge($this->getUpdateData(), ["parent_id" => $this->default_resource_id]);
-        $response = $this->withHeaders($this->basicAdminHeader())->put(route("{$this->route_prefix}.update", $this->root_category_id), $post_data);
-
-        $response->assertStatus(403);
-        $response->assertJsonFragment([
-            "status" => "error"
-        ]);
-    }
-
-    public function testShouldReturnErrorIfBasicAdminTryToFetchRootCategory()
-    {
-        $response = $this->withHeaders($this->basicAdminHeader())->get(route("{$this->route_prefix}.show", $this->root_category_id));
-
-        $response->assertStatus(403);
-        $response->assertJsonFragment([
-            "status" => "error"
-        ]);
-    }
-
-    public function testShouldReturnErrorIfBasicAdminTryToDeleteRootCategory()
-    {
-        $response = $this->withHeaders($this->basicAdminHeader())->delete(route("{$this->route_prefix}.destroy", $this->root_category_id));
-
-        $response->assertStatus(403);
-        $response->assertJsonFragment([
-            "status" => "error"
         ]);
     }
 }

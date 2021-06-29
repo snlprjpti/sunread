@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
+use Modules\Category\Traits\HasScope;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Website;
 use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\HasTranslation;
 use Modules\Core\Traits\Sluggable;
@@ -18,7 +20,7 @@ use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Category extends Model
 {
-    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation;
+    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation, HasScope;
 
     public static $SEARCHABLE = [ "values.name", "slug" ];
     protected $fillable = [ "parent_id", "slug", "position", "website_id" ];
@@ -64,6 +66,11 @@ class Category extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function website(): BelongsTo
+    {
+        return $this->belongsTo(Website::class);
     }
 
     public function channels(): BelongsToMany

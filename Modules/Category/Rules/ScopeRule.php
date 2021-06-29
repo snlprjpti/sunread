@@ -15,11 +15,12 @@ class ScopeRule implements Rule
      *
      * @return void
      */
-    public $data; 
+    public $data, $website_model; 
 
     public function __construct($data)
     {
         $this->data = $data;
+        $this->website_model = new Website();
     }
 
     /**
@@ -31,15 +32,16 @@ class ScopeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($this->data->category_id) $website_id = Category::find($this->data->category_id)->website_id;
+        if($this->data->category_id) $category = Category::find($this->data->category_id);
+        if(isset($category)) $website_id = $category->website_id;
 
         if($this->data->website_id) $website_id = $this->data->website_id;
 
-        if($this->data->scope == "website") return (bool) Website::whereId($value)->first() && isset($website_id) ? $website_id == $value : true;
+        if($this->data->scope == "website") return (bool) $this->website_model->whereId($value)->first() && isset($website_id) ? $website_id == $value : true;
 
-        if($this->data->scope == "channel")  return (bool) Channel::whereId($value)->first() && isset($website_id) ? in_array($value, Website::find($website_id)->channels->pluck('id')->toArray()) : true;
+        if($this->data->scope == "channel")  return (bool) Channel::whereId($value)->first() && isset($website_id) ? in_array($value, $this->website_model->find($website_id)->channels->pluck('id')->toArray()) : true;
 
-        if($this->data->scope == "store")  return (bool) Store::whereId($value)->first() && isset($website_id) ? in_array($value, Website::find($website_id)->channels->mapWithKeys(function($channel){
+        if($this->data->scope == "store")  return (bool) Store::whereId($value)->first() && isset($website_id) ? in_array($value, $this->website_model->find($website_id)->channels->mapWithKeys(function($channel){
             return $channel->stores->pluck('id');
         })->toArray()) : true;
         
@@ -52,6 +54,6 @@ class ScopeRule implements Rule
      */
     public function message()
     {
-        return 'Scope Id doesnt exists';
+        return 'Invalid Scope Id';
     }
 }
