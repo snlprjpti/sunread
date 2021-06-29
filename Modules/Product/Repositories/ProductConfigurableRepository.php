@@ -34,7 +34,7 @@ class ProductConfigurableRepository extends BaseRepository
 			$product_attributes = array_map(function($product_attribute) use ($attributes) {
 				if ( !is_array($product_attribute) ) throw ValidationException::withMessages([ "attributes" => "Invalid attributes format." ]);
 				$attribute = $attributes->where("id", $product_attribute["attribute_id"])->first() ?? null;
-				if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute["attribute_id"]} does not exist." ]);
+				if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute['attribute_id']} does not exist." ]);
 
 				$validator = Validator::make($product_attribute, [
 					"store_id" => "sometimes|nullable|exists:stores,id",
@@ -104,13 +104,13 @@ class ProductConfigurableRepository extends BaseRepository
             $attribute = Attribute::whereIn('id', $attribute_ids)->get();
             $check_attribute = $attribute->pluck("id")->toArray();
 
-            $attribute_ids = array_map(function($request_attribute) use ($attribute, $check_attribute) {
+            array_map(function($request_attribute) use ($attribute, $check_attribute) {
                 // check required attribute has value.
                 $required_attribute = $attribute->where("is_required", 1);
-                if ($required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute["attribute_id"]} value is required."]);
+                if ($required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute['attribute_id']} value is required."]);
                 // check attribute exists on attribute set
                 $check_attribute = $attribute->pluck("id")->toArray();
-                if (!in_array($request_attribute["attribute_id"], $check_attribute)) throw ValidationException::withMessages([ "attributes" => "Attribute id {$request_attribute["attribute_id"]} dosen't exists on current attribute set"]);
+                if (!in_array($request_attribute["attribute_id"], $check_attribute)) throw ValidationException::withMessages([ "attributes" => "Attribute id {$request_attribute['attribute_id']} dosen't exists on current attribute set"]);
                 return;
             }, $request->get("attributes"));
         }

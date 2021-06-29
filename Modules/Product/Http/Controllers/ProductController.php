@@ -64,6 +64,7 @@ class ProductController extends BaseController
             $data = $this->repository->validateData($request);
             $this->repository->checkAttribute($request->attribute_set_id, $request);
             
+            $data["type"] = "simple";
             $created = $this->repository->create($data, function($created) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $created);
@@ -101,9 +102,9 @@ class ProductController extends BaseController
             $data = $this->repository->validateData($request, [
                 "sku" => "required|unique:products,sku,{$id}"
             ]);
-            if ( $product->attribute_set_id != $request->attribute_set_id ) throw new ProductAttributeCannotChangeException("Attribute set cannot change.");
 
             $this->repository->checkAttribute($product->attribute_set_id, $request);
+            unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
