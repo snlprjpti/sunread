@@ -73,23 +73,15 @@ class PageRepository extends BaseRepository
 
             if (!$result)
             {
-                $result = null;
                 foreach($configValue as $key => $value)
                 {
+                    $scopeId = $data["scope_id"] ?? $page->scope_id;
                     $relation = $value["parent"];
-                    if($relation != null)
+                    if($relation != null && $page->scope != $value["parent_scope"])
                     {
-                        if($page->scope == $value["scope"])
-                        {
-                            $data["scope_id"] = (app($value["scope"])->find($page->scope_id)->$relation->id);
-                        }
-                        else
-                        {
-                            $data["scope_id"] = $page->scope_id;
-                        }
+                        $data["scope_id"] = (app($value["scope"])->find($scopeId)->$relation->id);
                         $data["page_id"] = $page->page_id;
                         $data["scope"] = $value["parent_scope"];
-
                         $result = $this->checkCondition((object) $data)->first();
                         if(isset($result)) break;
                     }
