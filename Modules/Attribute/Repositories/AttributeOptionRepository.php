@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Modules\Attribute\Repositories;
 
 use Exception;
@@ -16,7 +15,7 @@ use Modules\Core\Entities\Store;
 
 class AttributeOptionRepository extends BaseRepository
 {
-    protected $model, $model_key, $translation, $translation_model;
+    protected $translation, $translation_model;
 
     public function __construct(AttributeOption $attribute_option, AttributeOptionTranslation $attribute_option_translation, AttributeOptionTranslationRepository $attributeOptionTranslationRepository)
     {
