@@ -114,6 +114,7 @@ class ConfigurationRepository extends BaseRepository
         })->mapWithKeys(function($item) {
             $path =  "items.{$item['path']}.value";
             $path1 =  "items.{$item['path']}.use_default_value";
+            $absolutePath = "items.{$item['path']}.absolute_path";
 
             $value_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["rules"]}" : "{$item["rules"]}";
             $default_rule = ($item["is_required"]==1) ? "required_without:items.{$item['path']}.value" : "";
@@ -124,11 +125,13 @@ class ConfigurationRepository extends BaseRepository
                     $path => $value_rule,
                     $path1 => $default_rule,
                     "$path.*" => ($item["is_required"]==1) ? "required_without:items.{$item['path']}.use_default_value|{$item["value_rules"]}" : "{$item["value_rules"]}",
+                    $absolutePath => "required"
                 ];
             } 
             return [ 
                 $path => $value_rule,
                 $path1 => $default_rule,
+                $absolutePath => "required"
             ];
         })->toArray();
     }
@@ -141,7 +144,6 @@ class ConfigurationRepository extends BaseRepository
         {
             if(isset($val["use_default_value"]) && $val["use_default_value"] != 1) throw ValidationException::withMessages([ "use_default_value" => __("core::app.response.use_default_value") ]);
 
-            if(!isset($val["absolute_path"])) throw ValidationException::withMessages([ "absolute_path" => __("core::app.response.absolute_path_missing", ["name" => $key]) ]);
             if(!isset($val["use_default_value"]) && !array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
 
             $configDataArray = config("configuration.{$val["absolute_path"]}");
@@ -152,7 +154,7 @@ class ConfigurationRepository extends BaseRepository
             if($this->scopeFilter($item['scope'], $configDataArray["scope"])) continue;
             
             $item['path'] = $key;
-            if(isset($val['value']))  $item['value'] = $val['value'];
+            $item['value'] = isset($val['value']) ? $val['value'] : null;
             
             if($configData = $this->checkCondition((object) $item)->first())
             {
