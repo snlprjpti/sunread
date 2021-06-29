@@ -17,6 +17,8 @@ class PageImageRepository extends BaseRepository
         $this->rules = [
             "page_id" => "required|exists:pages,id",
             "image.*" => "required|mimes:bmp,jpeg,jpg,png",
+            "is_banner" => "sometimes|boolean",
+            "is_slider" => "sometimes|boolean",
         ];
     }
 
