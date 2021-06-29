@@ -7,13 +7,6 @@ return [
             "rules" => "",
             "is_required" => 1
         ],
-        "image" => [
-            "title" => "image",
-            "scope" => "store",
-            // "rules" => "mimes:jpeg,jpg,bmp,png",
-            "rules" => "",
-            "is_required" => 1
-        ],
         "description" => [
             "title" => "description",
             "scope" => "store",
