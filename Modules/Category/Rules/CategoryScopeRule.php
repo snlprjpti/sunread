@@ -1,0 +1,59 @@
+<?php
+
+namespace Modules\Category\Rules;
+
+use Illuminate\Contracts\Validation\Rule;
+use Modules\Category\Entities\Category;
+use Modules\Core\Entities\Website;
+
+class CategoryScopeRule implements Rule
+{
+    /**
+     * Create a new rule instance.
+     *
+     * @return void
+     */
+    public $data, $website_model; 
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+        $this->website_model = new Website();
+    }
+
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function passes($attribute, $value)
+    {
+        if($this->data->category_id) $website_id = ($category = Category::find($this->data->category_id)) ? $category->website_id : null;
+
+        if(!isset($website_id) && $this->data->website_id) $website_id = $this->data->website_id;
+
+        $website_id = null;
+        
+        if($this->data->scope == "website" && $website_id) return (bool) $website_id == $value;
+
+        if($this->data->scope == "channel" && $website_id)  return (bool) in_array($value, $this->website_model->find($website_id)->channels->pluck('id')->toArray());
+
+        if($this->data->scope == "store" && $website_id)  return (bool) in_array($value, $this->website_model->find($website_id)->channels->mapWithKeys(function($channel){
+            return $channel->stores->pluck('id');
+        })->toArray());
+
+        return true;       
+    }
+
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
+    {
+        return 'Scope Id does not belong to this category';
+    }
+}
