@@ -13,7 +13,7 @@ class CategoryRepository extends BaseRepository
 {
     use HasScope;
 
-    protected $repository;
+    protected $repository, $config_fields;
 
     public function __construct(Category $category, CategoryValue $categoryValue)
     {
@@ -29,51 +29,57 @@ class CategoryRepository extends BaseRepository
             "website_id" => "required|exists:websites,id",
         ];
 
+        $this->config_fields = config('category.attributes');
+
         $this->createModel();
     }
 
-    public function show(array $data): array
+    public function getConfigData(array $data): array
     {
-        $values = [];
-        $config_arrays = config("category.attributes");
-        foreach($config_arrays as $config_array){
-            $key = $config_array["title"];
+        $fetched = $this->config_fields;
+       
+        foreach($fetched as $key => $children){
+            if(!isset($children["elements"])) continue;
+            $children_data = [];
 
-            if(count($data)){
-                if($this->scopeFilter($data["scope"], $config_array["scope"])) continue;
-                $exist_data = $this->checkCondition($data) ? $this->getValues($data) : $this->getDefaultValues($data);
-                $exist_data = $exist_data->toArray();
+            foreach($children["elements"] as &$element){
+                if($this->scopeFilter($data["scope"], $element["scope"])) continue;
+
+                if(isset($data["category_id"])){
+                    $element_title = $element["title"];
+                    $existData = $this->checkCondition($data);
+                    if($data["scope"] != "website") $element["use_default_value"] = $existData ? 0 : 1;
+                    $element["value"] = $existData ? $this->getValues($data)->$element_title : $this->getDefaultValues($data)->$element_title;
+                }
+                unset($element["rules"]);
+
+                $children_data["title"] = $children["title"];
+                $children_data["elements"][] = $element;
             }
-
-            $values[$key]["value"] = isset($exist_data) ? $exist_data[$key] : null;
-            $values[$key]["use_in_default"] = isset($exist_data) ? (($data["scope"] != "website" && $exist_data[$key] == $this->getDefaultValues($data)->$key) ? 1  : 0) : 0;
+            $fetched[$key] = $children_data;
         }
-        $item["attributes"]  = $values;
-        return isset($data["category_id"]) ? array_merge($this->model->find($data["category_id"])->toArray(), $item) : $item;
+        return $fetched;
     }
 
-    public function getValidationRules(object $request, ?string $method = null): array
+    public function getValidationRules(object $request): array
     {
-        return collect(config('category.attributes'))->map(function($data) {
+        $scope = $request->scope ?? "website";
+        return collect(config('category.attributes'))->pluck('elements')->flatten(1)->map(function($data) {
             return $data;
-        })->reject(function ($data) use($request) {
-            return $this->scopeFilter($request->scope ?? "website", $data["scope"]);
-        })->mapWithKeys(function($item) use($method) {
-            $key = "attributes.0";
-            $path =  "$key.{$item['title']}.value";
-            $value_rule = ( $item["is_required"] == 1 ) ? (($method == "updated") ? "required_without:$key.{$item['title']}.use_default_value|{$item["rules"]}" : "required|{$item["rules"]}") : "{$item["rules"]}";
+        })->reject(function ($data) use($scope) {
+            return $this->scopeFilter($scope, $data["scope"]);
+        })->mapWithKeys(function($item) use($scope) {
+            $prefix = "attributes.0";
+            $value_path = "$prefix.{$item['title']}.value";
+            $default_path = "$prefix.{$item['title']}.use_default_value";
 
-            if($method == "updated"){
-                $path1 =  "$key.{$item['title']}.use_default_value";
-                $default_rule = ( $item["is_required"] == 1 ) ? "required_without:$key.{$item['title']}.value" : "boolean";
-                return [ 
-                    $path => $value_rule,
-                    $path1 => $default_rule,
-                ];
-            }
-            return [ 
-                $path => $value_rule
+            $value_rule = ($item["is_required"] == 1) ? (($scope != "website") ? "required_without:$default_path|{$item['rules']}" : "required|{$item['rules']}") : $item['rules'];
+            if($scope != "website") $default_rule = ($item["is_required"] == 1) ? "required_without:$value_path|{$item['rules']}" : "boolean";
+
+            $rules = [
+                $value_path => $value_rule
             ];
+            return isset($default_rule) ? array_merge($rules, [ $default_path => $default_rule ]) : $rules;
         })->toArray();
     }
 }
