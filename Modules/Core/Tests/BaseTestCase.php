@@ -109,7 +109,6 @@ class BaseTestCase extends TestCase
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
 
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index"));
-        dd($response);
 
         $response->assertOk();
         $response->assertJsonFragment([

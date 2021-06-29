@@ -36,7 +36,6 @@ class CategoryTest extends BaseTestCase
         $this->default_resource_id = $this->default_resource->id;
         $this->root_category_id = $this->model::oldest('id')->first()->id;
         $this->hasStatusTest = true;
-        $this->hasIndexTest = false;
         $this->hasFilters = false;
         $this->hasShowTest = false;
         $this->hasStatusTest = false;
@@ -86,7 +85,7 @@ class CategoryTest extends BaseTestCase
     {
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
 
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("index"));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
 
         $response->assertOk();
         $response->assertJsonFragment([
