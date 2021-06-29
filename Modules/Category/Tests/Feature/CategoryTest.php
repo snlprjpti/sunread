@@ -37,29 +37,32 @@ class CategoryTest extends BaseTestCase
         $this->root_category_id = $this->model::oldest('id')->first()->id;
         $this->hasStatusTest = true;
         $this->hasFilters = false;
-        $this->hasShowTest = false;
         $this->hasStatusTest = false;
     }
 
     public function getCreateData(): array
     {
+        Storage::fake();
         return array_merge($this->model::factory()->make()->toArray(), [
             "attributes" => [
                 [
                     "name" => [
-                        "value" => Str::random(10),
+                        "value" => Str::random(10)
+                    ],
+                    "image" => [
+                        "value" => UploadedFile::fake()->image("image.png")
                     ],
                     "description" => [
-                        "value" => Str::random(20),
+                        "value" => Str::random(20)
                     ],
                     "meta_title" => [
-                        "value" => Str::random(11),
+                        "value" => Str::random(11)
                     ],
                     "meta_description" => [
-                        "value" => Str::random(15),
+                        "value" => Str::random(15)
                     ],
                     "meta_keywords" => [
-                        "value" => Str::random(13),
+                        "value" => Str::random(13)
                     ],
                     "status" => [
                         "value" => rand(0,1)
@@ -76,8 +79,7 @@ class CategoryTest extends BaseTestCase
     {
         return array_merge($this->getCreateData(), [
             "scope" => "website",
-            "scope_id" => $this->default_resource->website_id,
-            "website_id" => $this->default_resource->website_id
+            "scope_id" => $this->default_resource->website_id
         ]); 
     }
 
@@ -92,11 +94,6 @@ class CategoryTest extends BaseTestCase
             "status" => "success",
             "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
         ]);
-    }
-
-    public function testAdminCanFetchFilteredResources()
-    {
-        $this->markTestSkipped("Index method not available.");
     }
 
     public function getNonMandotaryCreateData(): array

@@ -149,7 +149,6 @@ class BaseTestCase extends TestCase
         if ( !$this->hasShowTest ) $this->markTestSkipped("Show method not available.");
 
         $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->fake_resource_id]));
-        dd($response);
 
         $response->assertNotFound();
         $response->assertJsonFragment([
