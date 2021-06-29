@@ -106,15 +106,15 @@ class ProductRepository extends BaseRepository
             $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes->pluck('id');
             })->flatten(1)->toArray();
-            $attribute = Attribute::whereIn('id', $attribute_ids)->get();
+            $attributes = Attribute::whereIn('id', $attribute_ids)->get();
 
-            $check_attribute = $attribute->pluck("id")->toArray();
-            array_map(function($request_attribute) use ($attribute) {
+            $check_attribute = $attributes->pluck("id")->toArray();
+            array_map(function($request_attribute) use ($attributes) {
                 // check required attribute has value.
-                $required_attribute = $attribute->where("is_required", 1);
+                $required_attribute = $attributes->where("is_required", 1);
                 if ($required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute['attribute_id']} value is required."]);
                 // check attribute exists on attribute set
-                $check_attribute = $attribute->pluck("id")->toArray();
+                $check_attribute = $attributes->pluck("id")->toArray();
                 if (!in_array($request_attribute["attribute_id"], $check_attribute)) throw ValidationException::withMessages([ "attributes" => "Attribute id {$request_attribute['attribute_id']} dosen't exists on current attribute set"]);
                 return;
             }, $request->get("attributes"));
