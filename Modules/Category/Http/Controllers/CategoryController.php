@@ -59,7 +59,7 @@ class CategoryController extends BaseController
         {
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request), new CategoryScopeRule($request)],
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)],
                 "website_id" => "sometimes|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll(request: $request, callback: function() use($request) {
