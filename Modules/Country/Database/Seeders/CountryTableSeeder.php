@@ -19,7 +19,9 @@ class CountryTableSeeder extends Seeder
                 "iso_2_code" => "AF",
                 "iso_3_code" => "AFG",
                 "dialing_code" => "+93",
-                "name" => "Afghanistan"
+                "name" => "Afghanistan",
+                "created_at" => now(),
+                "updated_at" => now()
             ],
             [
                 "alpha_2_code" => "NP",
@@ -28,7 +30,9 @@ class CountryTableSeeder extends Seeder
                 "iso_2_code" => "NP",
                 "iso_3_code" => "NPL",
                 "dialing_code" => "+977",
-                "name" => "Nepal"
+                "name" => "Nepal",
+                "created_at" => now(),
+                "updated_at" => now()
             ],
             [
                 "alpha_2_code" => "IN",
@@ -37,7 +41,9 @@ class CountryTableSeeder extends Seeder
                 "iso_2_code" => "IN",
                 "iso_3_code" => "IND",
                 "dialing_code" => "+91",
-                "name" => "India"
+                "name" => "India",
+                "created_at" => now(),
+                "updated_at" => now()
             ]
         ];
 
