@@ -16,7 +16,7 @@ class WebsiteFactory extends Factory
             'code' => $code,
             'name' => $name,
             'description' => $this->faker->paragraph(),
-            'hostname' => "$code.com",
+            'hostname' => $this->faker->domainName(),
             "position" => $this->faker->randomDigit()
         ];
     }
