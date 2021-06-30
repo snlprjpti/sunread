@@ -37,7 +37,9 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["channels.stores"]);
+            $fetched = $this->repository->fetchAll($request, ["channels.stores"], function() use ($request) {
+                return $this->model->orderBy('position');
+            });
         }
         catch( Exception $exception )
         {
