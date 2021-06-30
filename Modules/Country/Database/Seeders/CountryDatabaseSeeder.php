@@ -10,6 +10,6 @@ class CountryDatabaseSeeder extends Seeder
     public function run(): void
     {
         Model::unguard();
-         $this->call(CountryTableSeeder::class);
+        $this->call(CountryTableSeeder::class);
     }
 }
