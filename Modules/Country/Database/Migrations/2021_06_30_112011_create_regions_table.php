@@ -18,7 +18,7 @@ class CreateRegionsTable extends Migration
             $table->unsignedBigInteger("country_id");
             $table->foreign("country_id")->references("id")->on("countries")->onDelete("cascade");
             $table->string('code')->unique();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->timestamps();
         });
     }
