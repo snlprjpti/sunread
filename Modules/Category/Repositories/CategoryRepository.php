@@ -40,8 +40,10 @@ class CategoryRepository extends BaseRepository
        
         foreach($fetched as $key => $children){
             if(!isset($children["elements"])) continue;
-            $children_data = [];
 
+            $children_data["title"] = $children["title"];
+            $children_data["elements"] = [];
+            
             foreach($children["elements"] as &$element){
                 if($this->scopeFilter($data["scope"], $element["scope"])) continue;
 
@@ -53,7 +55,6 @@ class CategoryRepository extends BaseRepository
                 }
                 unset($element["rules"]);
 
-                $children_data["title"] = $children["title"];
                 $children_data["elements"][] = $element;
             }
             $fetched[$key] = $children_data;

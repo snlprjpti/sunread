@@ -49,7 +49,7 @@ class CategoryValueRepository
                     continue;
                 }
                 $val = isset($data["attributes"][0][$key]) ? $data["attributes"][0][$key] : null;
-                if($key == "image" && isset($val["value"]))
+                if($config_array["type"] == "file" && isset($val["value"]))
                 {
                     $input[$key] = $this->storeImage($val["value"], strtolower($this->model_name));
                     continue;
