@@ -68,9 +68,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, [], function() use ($request) {
-                return ['code' => $request->code ?? $this->model->createSlug($request->name)];
-            });
+            $data = $this->repository->validateData($request);
             $created = $this->repository->create($data);
         }
         catch(Exception $exception)
@@ -99,10 +97,8 @@ class StoreController extends BaseController
         try
         {
             $data = $this->repository->validateData($request,[
-                "code" => "nullable|unique:stores,code,{$id}"
-            ], function() use ($request) {
-                return ['code' => $request->code ?? $this->model->createSlug($request->name)];
-            });
+                "code" => "required|unique:stores,code,{$id}"
+            ]);
             
             $updated = $this->repository->update($data, $id);
         }
