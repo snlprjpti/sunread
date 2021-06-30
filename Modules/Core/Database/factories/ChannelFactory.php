@@ -21,13 +21,8 @@ class ChannelFactory extends Factory
             "hostname" => $code,
             "name" => $this->faker->company(),
             "description" => $this->faker->paragraph(),
-            "location" => $this->faker->address(),
-            "timezone" => $this->faker->timezone(),
-            "theme" => "default",
             "default_store_id" => null,
-            "default_currency" => null,
-            "website_id" => $website->id,
-            "default_category_id" => $category->id
+            "website_id" => $website->id
         ];
     }
 }

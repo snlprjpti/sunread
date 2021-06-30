@@ -15,8 +15,8 @@ class Channel extends Model
 {
     use HasFactory;
 
-    public static $SEARCHABLE = [ "code", "hostname", "name", "description", "location" ];
-    protected $fillable = [ "code", "hostname", "name", "description", "location", "timezone", "logo", "favicon", "theme", "default_store_id", "default_currency", "website_id", "default_category_id", "status" ];
+    public static $SEARCHABLE = [ "code", "hostname", "name", "description" ];
+    protected $fillable = [ "code", "hostname", "name", "description", "default_store_id", "website_id", "status" ];
 
     protected $touches = ['products'];
 
@@ -38,21 +38,6 @@ class Channel extends Model
     private function get_url(?string $path): ?string
     {
         return $path ? Storage::url($path) : null;
-    }
-
-    public function getLogoUrlAttribute(): ?string
-    {
-        return $this->get_url($this->logo);
-    }
-
-    public function getFaviconUrlAttribute(): ?string
-    {
-        return $this->get_url($this->favicon);
-    }
-
-    public function default_category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class, "default_category_id");
     }
 
     public function products(): BelongsToMany
