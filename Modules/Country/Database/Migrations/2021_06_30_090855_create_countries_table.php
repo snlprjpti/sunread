@@ -18,8 +18,8 @@ class CreateCountriesTable extends Migration
             $table->char('alpha_2_code',2)->unique();
             $table->char('alpha_3_code',3)->unique();
             $table->smallInteger('numeric_code')->unique();
-            $table->string('iso_2_code')->unique();
-            $table->string('iso_3_code')->unique();
+            $table->string('iso_2_code')->nullable();
+            $table->string('iso_3_code')->nullable();
             $table->string('dialing_code')->unique();
             $table->string('name')->unique();
             $table->timestamps();
