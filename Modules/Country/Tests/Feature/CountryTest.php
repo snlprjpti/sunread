@@ -21,8 +21,6 @@ class CountryTest extends BaseTestCase
         $this->hasStoreTest = false;
         $this->hasUpdateTest = false;
         $this->hasDestroyTest = false;
-        $this->hasBulkDestroyTest = false;
-        $this->hasStatusTest = false;
     }
 
 }
