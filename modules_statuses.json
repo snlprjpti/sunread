@@ -10,5 +10,6 @@
     "UrlRewrite": true,
     "Coupon": true,
     "Page": true,
+    "Tax": true,
     "Country": true
 }
