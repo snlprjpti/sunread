@@ -21,16 +21,6 @@ class ChannelTest extends BaseTestCase
         $this->hasStatusTest = true;
     }
 
-    public function getCreateData(): array
-    {
-        Storage::fake();
-
-        return $this->model::factory()->make([
-            "logo" => UploadedFile::fake()->image("logo.png"),
-            "favicon" => UploadedFile::fake()->image("favicon.png")
-        ])->toArray();
-    }
-
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
