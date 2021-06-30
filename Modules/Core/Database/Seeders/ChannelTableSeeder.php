@@ -18,7 +18,7 @@ class ChannelTableSeeder extends Seeder
             [
                 "name" => "International",
                 "code" => "international",
-                "hostname" => "international/xyz.co",
+                "hostname" => "international.xyz.co",
                 "description" => "For all countries",
                 "website_id" => 1,
                 "created_at" => now(),
