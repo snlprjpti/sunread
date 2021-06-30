@@ -53,7 +53,7 @@ class StoreController extends BaseController
                 if ( $request->channel_id ) {
                     $fetched = $fetched->whereChannelId($request->channel_id);
                 }
-                return $fetched;
+                return $fetched->orderBy('position');
             });
         }
         catch( Exception $exception )
@@ -68,9 +68,9 @@ class StoreController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
+            $data = $this->repository->validateData($request, [], function() use ($request) {
+                return ['code' => $request->code ?? $this->model->createSlug($request->name)];
+            });
             $created = $this->repository->create($data);
         }
         catch(Exception $exception)
@@ -99,15 +99,10 @@ class StoreController extends BaseController
         try
         {
             $data = $this->repository->validateData($request,[
-                "slug" => "nullable|unique:stores,slug,{$id}",
-                "image" => "sometimes|nullable|mimes:bmp,jpeg,jpg,png,webp"
-            ]);
-
-            if ($request->file("image")) {
-                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            } else {
-                unset($data["image"]);
-            }
+                "code" => "nullable|unique:stores,code,{$id}"
+            ], function() use ($request) {
+                return ['code' => $request->code ?? $this->model->createSlug($request->name)];
+            });
             
             $updated = $this->repository->update($data, $id);
         }
