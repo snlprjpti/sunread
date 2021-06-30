@@ -10,11 +10,9 @@ class CountryResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "alpha_2_code" => $this->alpha_2_code,
-            "alpha_3_code" => $this->alpha_3_code,
-            "numeric_code" => $this->numeric_code,
             "iso_2_code" => $this->iso_2_code,
             "iso_3_code" => $this->iso_3_code,
+            "numeric_code" => $this->numeric_code,
             "dialing_code" => $this->dialing_code,
             "name" => $this->name,
             "created_at" => $this->created_at->format('M d, Y H:i A'),
