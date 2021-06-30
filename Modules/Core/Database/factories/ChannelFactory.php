@@ -15,7 +15,7 @@ class ChannelFactory extends Factory
 
         return [
             "code" => $code,
-            "hostname" => $this->faker->domainName(),
+            "hostname" => $this->faker->unique()->domainName(),
             "name" => $this->faker->company(),
             "description" => $this->faker->paragraph(),
             "default_store_id" => null,
