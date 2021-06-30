@@ -11,26 +11,35 @@ class CountryTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $default_countries = [
+        $data = [
             [
-                "name" => "Nepal",
+                "alpha_2_code" => "AF",
+                "alpha_3_code" => "AFG",
+                "numeric_code" => "004",
+                "iso_2_code" => "AF",
+                "iso_3_code" => "AFG",
+                "dialing_code" => "+93",
+                "name" => "Afghanistan"
+            ],
+            [
+                "alpha_2_code" => "NP",
+                "alpha_3_code" => "NPL",
+                "numeric_code" => "524",
+                "iso_2_code" => "NP",
+                "iso_3_code" => "NPL",
+                "dialing_code" => "+977",
+                "name" => "Nepal"
+            ],
+            [
+                "alpha_2_code" => "IN",
+                "alpha_3_code" => "IND",
+                "numeric_code" => "356",
+                "iso_2_code" => "IN",
+                "iso_3_code" => "IND",
+                "dialing_code" => "+91",
+                "name" => "India"
             ]
         ];
-
-
-        $data = array_map(function($country) {
-            return [
-                "alpha_2_code" => Str::random(10),
-                "alpha_3_code" => Str::random(10),
-                "numeric_code" => rand(1,5),
-                "iso_2_code" => Str::random(10),
-                "iso_3_code" => Str::random(10),
-                "dialing_code" => Str::random(10),
-                "name" => $country["name"] ?? "Nepal",
-                "created_at" => now(),
-                "updated_at" => now()
-            ];
-        }, $default_countries);
 
         DB::table("countries")->insert($data);
     }
