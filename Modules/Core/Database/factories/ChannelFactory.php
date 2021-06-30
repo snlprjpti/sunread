@@ -1,9 +1,7 @@
 <?php
 namespace Modules\Core\Database\factories;
 
-use Modules\Core\Entities\Store;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Website;
 
 class ChannelFactory extends Factory
@@ -13,12 +11,11 @@ class ChannelFactory extends Factory
     public function definition(): array
     {
         $website = Website::factory()->create();
-        $category = Category::factory()->create();
         $code = $this->faker->unique()->slug();
 
         return [
             "code" => $code,
-            "hostname" => $code,
+            "hostname" => "$code.com",
             "name" => $this->faker->company(),
             "description" => $this->faker->paragraph(),
             "default_store_id" => null,
