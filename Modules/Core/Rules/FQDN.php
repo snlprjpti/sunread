@@ -6,14 +6,10 @@ use Illuminate\Contracts\Validation\Rule;
 
 class FQDN implements Rule
 {
-    /**
-     * Create a new rule instance.
-     *
-     * @return void
-     */ 
 
     public function __construct()
     {
+
     }
 
     /**
@@ -23,9 +19,9 @@ class FQDN implements Rule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes($attribute, $value): bool
     {
-        return preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/i', $value);
+        return preg_match("/^([a-zA-Z0-9][a-zA-Z0-9-_]*\.)*[a-zA-Z0-9]*[a-zA-Z0-9-_]*[[a-zA-Z0-9]+$/", $value);
     }
 
     /**
@@ -33,7 +29,7 @@ class FQDN implements Rule
      *
      * @return string
      */
-    public function message()
+    public function message(): string
     {
         return 'Invalid Hostname';
     }
