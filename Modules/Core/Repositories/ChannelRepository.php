@@ -28,7 +28,7 @@ class ChannelRepository extends BaseRepository
             "code" => "required|unique:channels,code",
             "hostname" => [ "nullable", "unique:websites,hostname", "unique:channels,hostname", new FQDN()],
             "name" => "required",
-            "description" => "required",
+            "description" => "nullable",
             "status" => "sometimes|boolean"
         ];
         $this->restrict_default_delete = true;
