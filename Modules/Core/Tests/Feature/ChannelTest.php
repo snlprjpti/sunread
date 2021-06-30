@@ -31,8 +31,7 @@ class ChannelTest extends BaseTestCase
     public function getNonMandodtaryUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
-            "logo" => null,
-            "favicon" => null
+            "description" => null
         ]);
     }
 }

@@ -30,11 +30,4 @@ class StoreTest extends BaseTestCase
             "name" => null
         ]);
     }
-
-    public function getNonMandodtaryUpdateData(): array
-    {
-        return array_merge($this->getUpdateData(), [
-            "image" => null
-        ]);
-    }
 }
