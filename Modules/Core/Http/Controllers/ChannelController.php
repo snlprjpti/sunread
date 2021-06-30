@@ -78,7 +78,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["default_store", "default_category", "stores", "website"]);
+            $fetched = $this->repository->fetch($id, ["default_store", "stores", "website"]);
         }
         catch( Exception $exception )
         {
