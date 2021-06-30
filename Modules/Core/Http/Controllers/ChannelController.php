@@ -12,6 +12,7 @@ use Modules\Core\Repositories\ChannelRepository;
 use Modules\Core\Transformers\ChannelResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Rules\FQDN;
 
 class ChannelController extends BaseController
 {
@@ -63,11 +64,6 @@ class ChannelController extends BaseController
 
             unset($data["default_store_id"]);
 
-            foreach(["logo", "favicon"] as $file_type) {
-                if ( !$request->file($file_type) ) continue;
-                $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
-            }
-
             $created = $this->repository->create($data);
         }
         catch( Exception $exception )
@@ -98,20 +94,10 @@ class ChannelController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "code" => "required|unique:channels,code,{$id}",
-                "hostname" => "required|unique:channels,hostname,{$id}",
-                "logo" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
-                "favicon" => "nullable|mimes:bmp,jpeg,jpg,png,webp"
+                "hostname" => [ "nullable", "unique:websites,hostname", "unique:channels,hostname,{$id}", new FQDN()]
             ]);
 
             if(isset($data['default_store_id'])) $this->repository->defaultStoreValidation($data, $id);
-
-            foreach(["logo", "favicon"] as $file_type) {
-                if ( !$request->file($file_type) ) {
-                    unset($data[$file_type]);
-                    continue;
-                }
-                $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
-            }
 
             $updated = $this->repository->update($data, $id);
         }
@@ -127,12 +113,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted) {
-                foreach(["logo", "favicon"] as $file_type) {
-                    if ( !$deleted->{$file_type} ) continue;
-                    Storage::delete($deleted->{$file_type});
-                }
-            });
+            $this->repository->delete($id);
         }
         catch( Exception $exception )
         {

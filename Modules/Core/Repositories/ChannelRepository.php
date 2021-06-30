@@ -7,6 +7,7 @@ use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Core\Rules\FQDN;
 
 class ChannelRepository extends BaseRepository
 {
@@ -21,23 +22,14 @@ class ChannelRepository extends BaseRepository
         $this->rules = [
             /* Foreign Keys */
             "default_store_id" => "nullable|exists:stores,id",
-            "default_currency" => "nullable|exists:currencies,code",
             "website_id" => "required|exists:websites,id",
-            "default_category_id" => "nullable|exists:categories,id",
 
             /* General */
             "code" => "required|unique:channels,code",
-            "hostname" => "nullable|unique:channels,hostname",
+            "hostname" => [ "nullable", "unique:websites,hostname", "unique:channels,hostname", new FQDN()],
             "name" => "required",
             "description" => "required",
-            "location" => "nullable",
-            "timezone" => "nullable",
-            "status" => "sometimes|boolean",
-
-            /* Branding */
-            "logo" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
-            "favicon" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
-            "theme" => "nullable|in:default"
+            "status" => "sometimes|boolean"
         ];
         $this->restrict_default_delete = true;
     }
