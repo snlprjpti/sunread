@@ -104,7 +104,7 @@ class AttributeSetRepository extends BaseRepository
                 "attribute_groups" => $groups,
             ];
         }
-        catch( Exception $exception )
+        catch( \Exception $exception )
         {
             throw $exception;
         }
