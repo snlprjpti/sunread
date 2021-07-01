@@ -15,9 +15,7 @@ class AttributeFactory extends Factory
     {
         while(true) {
             $name = $this->faker->name();
-            $slug = Str::slug($name);
-            $old_attribute = $this->model::whereSlug($slug)->first();
-            if(!$old_attribute) break;
+            $slug = $this->faker->unique()->slug();
         }
 
         $type = Arr::random([
@@ -44,6 +42,7 @@ class AttributeFactory extends Factory
             "validation" => null,
             "is_visible_on_storefront" => rand(0,1),
             "is_user_defined" => rand(0,1),
+            "default_value" => null
         ];
     }
 }
