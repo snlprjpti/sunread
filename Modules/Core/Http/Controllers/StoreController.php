@@ -39,7 +39,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, callback: function() use ($request) {
+            $fetched = $this->repository->fetchAll($request, callback: function () use ($request) {
                 $request->validate([
                     "website_id" => "sometimes|exists:websites,id",
                     "channel_id" => "sometimes|exists:channels,id"
@@ -114,7 +114,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted){
+            $this->repository->delete($id, function ($deleted){
                 if($deleted->image) Storage::delete($deleted->image);
             });
         }
