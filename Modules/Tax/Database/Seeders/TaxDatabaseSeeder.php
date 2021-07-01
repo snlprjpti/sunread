@@ -7,15 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class TaxDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         Model::unguard();
 
         $this->call(TaxRateTableSeeder::class);
+        $this->call(CustomerTaxGroupTableSeeder::class);
+        $this->call(ProductTaxGroupTableSeeder::class);
     }
 }
