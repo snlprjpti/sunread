@@ -187,7 +187,7 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $this->repository->validateAttributeSetListing($request);
+            $this->repository->validateAttributeSetListing($request); 
 
             $product = Product::find($request->product);
             $data = $this->model->findOrFail($product ? $product->attribute_set_id : $request->attribute_set);
