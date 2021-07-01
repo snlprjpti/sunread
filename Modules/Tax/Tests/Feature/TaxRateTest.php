@@ -7,8 +7,6 @@ use Modules\Tax\Entities\TaxRate;
 
 class TaxRateTest extends BaseTestCase
 {
-    public $non_filterable_fields;
-
     public function setUp(): void
     {
         $this->model = TaxRate::class;
