@@ -14,7 +14,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class TaxRateController extends BaseController
 {
-    protected $repository, $translation_repository, $option_repository;
+    protected $repository;
 
     public function __construct(TaxRate $taxRate, TaxRateRepository $taxRateRepository)
     {
