@@ -16,7 +16,6 @@ class AttributeSetRepository extends BaseRepository
         $this->model_key = "catalog.attributes.attribute_set";
 
         $this->rules = [
-            "slug" => "nullable|unique:attribute_sets,slug",
             "name" => "required"
         ];
     }
