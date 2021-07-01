@@ -14,7 +14,7 @@ class FQDN implements Rule
 
     public function passes($attribute, $value): bool
     {
-        return preg_match("/^([a-zA-Z0-9][a-zA-Z0-9-_]*\.)*[a-zA-Z0-9]*[a-zA-Z0-9-_]*[[a-zA-Z0-9]+$/", $value);
+        return preg_match('/(?=^.{1,254}$)(^(?:(?!\d|-)[a-z0-9\-]{1,63}(?<!-)\.)+(?:[a-z]{2,})$)/i', $value);
     }
 
     public function message(): string
