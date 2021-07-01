@@ -45,7 +45,7 @@ class StoreController extends BaseController
                     "channel_id" => "sometimes|exists:channels,id"
                 ]);
 
-                $fetched = $this->model;
+                $fetched = $this->model->orderBy('position');
                 if ( $request->website_id ) {
                     $channel_ids = Channel::whereWebsiteId($request->website_id)->get()->pluck("id");
                     $fetched = $fetched->whereIn("channel_id", $channel_ids);
@@ -53,7 +53,7 @@ class StoreController extends BaseController
                 if ( $request->channel_id ) {
                     $fetched = $fetched->whereChannelId($request->channel_id);
                 }
-                return $fetched->orderBy('position');
+                return $fetched;
             });
         }
         catch( Exception $exception )
