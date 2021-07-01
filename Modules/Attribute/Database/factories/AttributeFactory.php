@@ -13,10 +13,8 @@ class AttributeFactory extends Factory
 
     public function definition(): array
     {
-        while(true) {
-            $name = $this->faker->name();
-            $slug = $this->faker->unique()->slug();
-        }
+        $name = $this->faker->name();
+        $slug = $this->faker->unique()->slug();
 
         $type = Arr::random([
             "text",
