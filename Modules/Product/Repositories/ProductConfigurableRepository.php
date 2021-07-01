@@ -39,7 +39,7 @@ class ProductConfigurableRepository extends BaseRepository
                 $validator = Validator::make($product_attribute, [
                     "store_id" => "sometimes|nullable|exists:stores,id",
                     "channel_id" => "sometimes|nullable|exists:channels,id",
-                    "value" => $attribute->validation
+                    "value" => $attribute->type_validation
                 ]);
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
 
