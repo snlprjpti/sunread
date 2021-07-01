@@ -146,4 +146,33 @@ class AttributeSetController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
+
+    public function listAttributeSets(): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->model::all();
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
+    }
+
+    public function attributeSet(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->repository->validateAttributeSetListing($request); 
+            $fetched = $this->repository->generateFormat($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang("fetch-success"));
+    }
 }

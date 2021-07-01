@@ -4,6 +4,7 @@ namespace Modules\Core\Repositories;
 
 use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Core\Rules\FQDN;
 
 class WebsiteRepository extends BaseRepository
 {
@@ -16,7 +17,7 @@ class WebsiteRepository extends BaseRepository
         $this->rules = [
             /* General */
             "code" => "required|unique:websites,code",
-            "hostname" => "nullable|unique:websites,hostname",
+            "hostname" => [ "required", "unique:websites,hostname", "unique:channels,hostname", new FQDN()],
             "name" => "required",
             "description" => "nullable",
             "position" => "sometimes|numeric",

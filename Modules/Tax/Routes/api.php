@@ -1,18 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
-Route::middleware('auth:api')->get('/tax', function (Request $request) {
-    return $request->user();
+Route::group(["middleware" => ["api"]], function () {
+    // ADMIN TAX RATE ROUTES
+    Route::group(["prefix" => "admin/taxes", "as" => "admin.taxes.", "middleware" => ["admin", "language"]], function () {
+        Route::resource("tax-rates", TaxRateController::class)->except(["create", "edit"]);
+    });
 });
