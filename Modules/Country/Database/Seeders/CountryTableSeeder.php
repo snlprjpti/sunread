@@ -20,6 +20,13 @@ class CountryTableSeeder extends Seeder
                 "dialing_code" => "93"
             ],
             [
+                "name" => "Aland Islands",
+                "iso_2_code" => "AX",
+                "iso_3_code" => "ALA",
+                "numeric_code" => "248",
+                "dialing_code" => "358-18"
+            ],
+            [
                 "name" => "Albania",
                 "iso_2_code" => "AL",
                 "iso_3_code" => "ALB",
@@ -41,7 +48,7 @@ class CountryTableSeeder extends Seeder
                 "dialing_code" => "1684"
             ],
             [
-                "name" => "andorra",
+                "name" => "Andorra",
                 "iso_2_code" => "AD",
                 "iso_3_code" => "AND",
                 "numeric_code" => "020",
@@ -231,7 +238,7 @@ class CountryTableSeeder extends Seeder
                 "iso_2_code" => "BV",
                 "iso_3_code" => "BVT",
                 "numeric_code" => "074",
-                "dialing_code" => "0"
+                "dialing_code" => "0055"
             ],
 
             [
@@ -316,7 +323,7 @@ class CountryTableSeeder extends Seeder
             ],
 
             [
-                "name" => "Cayman Islands (The)",
+                "name" => "Cayman Islands",
                 "iso_2_code" => "KY",
                 "iso_3_code" => "CYM",
                 "numeric_code" => "136",
@@ -496,7 +503,7 @@ class CountryTableSeeder extends Seeder
                 "name" => "East Timor",
                 "iso_2_code" => "TL",
                 "iso_3_code" => "TLS",
-                "numeric_code" => "0",
+                "numeric_code" => "626",
                 "dialing_code" => "670"
             ],
 
@@ -617,7 +624,7 @@ class CountryTableSeeder extends Seeder
                 "iso_2_code" => "TF",
                 "iso_3_code" => "ATF",
                 "numeric_code" => "260",
-                "dialing_code" => "0"
+                "dialing_code" => "262"
             ],
 
             [
@@ -761,7 +768,7 @@ class CountryTableSeeder extends Seeder
                 "iso_2_code" => "HM",
                 "iso_3_code" => "HMD",
                 "numeric_code" => "334",
-                "dialing_code" => "0"
+                "dialing_code" => "672"
             ],
 
             [
@@ -1163,6 +1170,13 @@ class CountryTableSeeder extends Seeder
                 "numeric_code" => "496",
                 "dialing_code" => "976"
             ],
+            [
+                "name" => "Montenegro",
+                "iso_2_code" => "ME",
+                "iso_3_code" => "MNE",
+                "numeric_code" => "499",
+                "dialing_code" => "382"
+            ],
 
             [
                 "name" => "Montserrat",
@@ -1223,9 +1237,9 @@ class CountryTableSeeder extends Seeder
             ],
 
             [
-                "name" => "Netherlands Antilles",
-                "iso_2_code" => "AN",
-                "iso_3_code" => "ANT",
+                "name" => "Bonaire, Sint Eustatius and Saba",
+                "iso_2_code" => "BQ",
+                "iso_3_code" => "BES",
                 "numeric_code" => "530",
                 "dialing_code" => "599"
             ],
@@ -1387,7 +1401,7 @@ class CountryTableSeeder extends Seeder
                 "iso_2_code" => "PN",
                 "iso_3_code" => "PCN",
                 "numeric_code" => "612",
-                "dialing_code" => "0"
+                "dialing_code" => "64"
             ],
 
             [
@@ -1487,7 +1501,6 @@ class CountryTableSeeder extends Seeder
             ],
 
             [
-
                 "name" => "Saint Vincent and The Grenadines",
                 "iso_2_code" => "VC",
                 "iso_3_code" => "VCT",
@@ -1496,11 +1509,27 @@ class CountryTableSeeder extends Seeder
             ],
 
             [
+                "name" => "Saint-Barthelemy",
+                "iso_2_code" => "BL",
+                "iso_3_code" => "BLM",
+                "numeric_code" => "652",
+                "dialing_code" => "590"
+            ],
+
+            [
+                "name" => "Saint-Martin (French part)",
+                "iso_2_code" => "MF",
+                "iso_3_code" => "MAF",
+                "numeric_code" => "663",
+                "dialing_code" => "590"
+            ],
+
+            [
                 "name" => "Samoa",
                 "iso_2_code" => "WS",
                 "iso_3_code" => "WSM",
                 "numeric_code" => "882",
-                "dialing_code" => "684"
+                "dialing_code" => "685"
             ],
 
             [
@@ -1612,7 +1641,7 @@ class CountryTableSeeder extends Seeder
                 "iso_2_code" => "GS",
                 "iso_3_code" => "SGS",
                 "numeric_code" => "239",
-                "dialing_code" => "0"
+                "dialing_code" => "500"
             ],
 
             [
@@ -1936,14 +1965,6 @@ class CountryTableSeeder extends Seeder
             ],
 
             [
-                "name" => "Yugoslavia",
-                "iso_2_code" => "YU",
-                "iso_3_code" => "YUG",
-                "numeric_code" => "891",
-                "dialing_code" => "38"
-            ],
-
-            [
                 "name" => "Zambia",
                 "iso_2_code" => "ZM",
                 "iso_3_code" => "ZMB",
@@ -1957,6 +1978,30 @@ class CountryTableSeeder extends Seeder
                 "iso_3_code" => "ZWE",
                 "numeric_code" => "716",
                 "dialing_code" => "263"
+            ],
+
+            [
+                "name" => "Kosovo",
+                "iso_2_code" => "XK",
+                "iso_3_code" => "XK",
+                "numeric_code" => "926",
+                "dialing_code" => "383"
+            ],
+
+            [
+                "name" => "Curaçao",
+                "iso_2_code" => "CW",
+                "iso_3_code" => "CUW",
+                "numeric_code" => "531",
+                "dialing_code" => "599"
+            ],
+
+            [
+                "name" => "Sint Maarten (Dutch part)",
+                "iso_2_code" => "SX",
+                "iso_3_code" => "SXM",
+                "numeric_code" => "534",
+                "dialing_code" => "1721"
             ]
 
         ];
