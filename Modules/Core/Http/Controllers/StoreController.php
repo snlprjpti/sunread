@@ -39,24 +39,19 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, callback: function() use ($request) {
+            $fetched = $this->repository->fetchAll($request, callback: function () use ($request) {
                 $request->validate([
-                    "website_id" => "sometimes|exists:websites,id"
+                    "website_id" => "sometimes|exists:websites,id",
+                    "channel_id" => "sometimes|exists:channels,id"
                 ]);
 
-                $fetched = $this->model;
+                $fetched = $this->model->orderBy('position');
                 if ( $request->website_id ) {
-                    $channels = Channel::with(["stores"])->whereWebsiteId($request->website_id)->get();
-
-                    $get_store_ids = $channels->mapWithKeys(function($channel) {
-                        $return_ids = [];
-                        if ( $channel->default_store_id !== null ) $return_ids[] = $channel->default_store_id;
-                        if ( $channel->stores->pluck("id")->toArray() !== [] ) $return_ids[] = $channel->stores->pluck("id")->toArray();
-
-                        return $return_ids;
-                    })->flatten()->unique()->toArray();
-
-                    $fetched = $fetched->whereIn("id", $get_store_ids);
+                    $channel_ids = Channel::whereWebsiteId($request->website_id)->get()->pluck("id");
+                    $fetched = $fetched->whereIn("channel_id", $channel_ids);
+                }
+                if ( $request->channel_id ) {
+                    $fetched = $fetched->whereChannelId($request->channel_id);
                 }
                 return $fetched;
             });
@@ -74,11 +69,7 @@ class StoreController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
-            $created = $this->repository->create($data, function($created) use ($request) {
-                $created->channels()->sync($request->channels);
-            });
+            $created = $this->repository->create($data);
         }
         catch(Exception $exception)
         {
@@ -92,7 +83,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["channels"]);
+            $fetched = $this->repository->fetch($id, ["channel"]);
         }
         catch(Exception $exception)
         {
@@ -106,19 +97,10 @@ class StoreController extends BaseController
         try
         {
             $data = $this->repository->validateData($request,[
-                "slug" => "nullable|unique:stores,slug,{$id}",
-                "image" => "sometimes|nullable|mimes:bmp,jpeg,jpg,png,webp"
+                "code" => "required|unique:stores,code,{$id}"
             ]);
-
-            if ($request->file("image")) {
-                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            } else {
-                unset($data["image"]);
-            }
             
-            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
-                $updated->channels()->sync($request->channels);
-            });
+            $updated = $this->repository->update($data, $id);
         }
         catch(Exception $exception)
         {
@@ -132,7 +114,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted){
+            $this->repository->delete($id, function ($deleted){
                 if($deleted->image) Storage::delete($deleted->image);
             });
         }
@@ -141,7 +123,7 @@ class StoreController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
     
     public function updateStatus(Request $request, int $id): JsonResponse

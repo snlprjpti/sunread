@@ -3,7 +3,7 @@
 namespace Modules\Core\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Traits\HasFactory;
 use Modules\Core\Traits\Sluggable;
@@ -12,15 +12,10 @@ class Store extends Model
 {
     use Sluggable, HasFactory;
 
-    protected $fillable = [ "slug", "name", "currency", "locale", "image", "position", "status" ];
+    protected $fillable = [ "code", "name", "position", "status", "channel_id" ];
 
-    public function getImageUrlAttribute()
-    {   
-        return Storage::url($this->image);
-    }
-
-    public function channels(): BelongsToMany
+    public function channel(): BelongsTo
     {
-        return $this->belongsToMany(Channel::class);
+        return $this->belongsTo(Channel::class);
     }
 }

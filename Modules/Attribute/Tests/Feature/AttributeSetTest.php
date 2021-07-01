@@ -24,11 +24,18 @@ class AttributeSetTest extends BaseTestCase
     public function getCreateData(): array
     {
         return $this->model::factory()->make([
+            "attribute_set_id" => AttributeSet::latest('id')->first()->id
+        ])->toArray();
+    }
+
+    public function getUpdateData(): array
+    {
+        return $this->model::factory()->make([
             "groups" => [
                 [
                     "name" => Str::random(10),
                     "position" => 1,
-                    "attributes" => Attribute::whereIsUserDefined(0)->whereIsRequired(0)->pluck('id')->toArray()
+                    "attributes" => Attribute::whereIsUserDefined(0)->pluck('id')->toArray()
                 ]
             ]
         ])->toArray();

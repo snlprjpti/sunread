@@ -33,4 +33,9 @@ class Page extends Model
     {
         return $query->whereStatus(1);
     }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(PageImage::class);
+    }
 }

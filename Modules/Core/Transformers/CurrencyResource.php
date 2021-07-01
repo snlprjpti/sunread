@@ -19,7 +19,7 @@ class CurrencyResource extends JsonResource
             "code" => $this->code,
             "name" => $this->name,
             "symbol" => $this->symbol,
-            "status" => $this->status,
+            "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

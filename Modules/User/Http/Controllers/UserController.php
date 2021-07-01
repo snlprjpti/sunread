@@ -68,7 +68,7 @@ class UserController extends BaseController
             ]);
             $data["password"] = Hash::make($data["password"]);
 
-            $created = $this->repository->create($data);
+            $created = $this->repository->create($data)->with(["role"])->first();
         }
         catch (\Exception $exception)
         {
@@ -108,7 +108,7 @@ class UserController extends BaseController
                 $data["password"] = Hash::make($data["password"]);
             }
 
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id)->with(["role"])->first();
         }
         catch (\Exception $exception)
         {
@@ -133,14 +133,14 @@ class UserController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse
     {
         try
         {
-            $updated = $this->repository->updateStatus($request, $id);
+            $updated = $this->repository->updateStatus($request, $id)->with(["role"])->first();
         }
         catch (\Exception $exception)
         {

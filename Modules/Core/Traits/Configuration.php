@@ -35,32 +35,6 @@ trait Configuration
         ]);  
     }
 
-    public function add(object $request): object
-    {
-        $item['scope'] = $request->scope;
-        $item['scope_id'] = $request->scope_id;
-        foreach($request->items as $key => $val)
-        {
-            $item['path'] = $key;
-            $item['value'] = $val;
-            if($configData = $this->checkCondition((object) $item)->first())
-            {
-                $configData->update($item);
-                $created_data['data'][] = $this->configuration->findorfail($configData->id);
-                continue;
-            }
-            $created_data['data'][] = $this->configuration->create($item);
-        }
-        $created_data['message'] = 'create-success';
-        $created_data['code'] = 201;
-        return (object) $created_data; 
-    }
-
-    public function getDefaultValues(object $request): mixed
-    {
-        return $this->checkCondition($request)->first()->value;
-    }
-
     public function cacheQuery(object $request, array $pluck): array
     {
         $resources = Cache::rememberForever($request->provider, function() use ($request) {
@@ -75,12 +49,5 @@ trait Configuration
             ]);
         }
         return $data;
-    }
-
-    public function getValidationRules($absolute_path): array
-    {
-        return collect(config('configuration.'.$absolute_path))->pluck('elements')->flatten(1)->pluck('rules','path')->mapWithKeys(function($val, $key) {
-           return ['items.'.$key => $val];
-        })->toArray();
     }
 }

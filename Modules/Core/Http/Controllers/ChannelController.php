@@ -11,6 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Repositories\ChannelRepository;
 use Modules\Core\Transformers\ChannelResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Validation\ValidationException;
+use Modules\Core\Rules\FQDN;
 
 class ChannelController extends BaseController
 {
@@ -39,7 +41,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, callback: function() use ($request) {
+            $fetched = $this->repository->fetchAll($request, ["stores"],  function () use ($request) {
                 $request->validate([
                     "website_id" => "sometimes|exists:websites,id"
                 ]);
@@ -60,14 +62,9 @@ class ChannelController extends BaseController
         {
             $data = $this->repository->validateData($request);
 
-            foreach(["logo", "favicon"] as $file_type) {
-                if ( !$request->file($file_type) ) continue;
-                $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
-            }
+            unset($data["default_store_id"]);
 
-            $created = $this->repository->create($data, function($created) use ($request) {
-                $created->stores()->sync($request->stores);
-            });
+            $created = $this->repository->create($data);
         }
         catch( Exception $exception )
         {
@@ -81,7 +78,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["default_store", "default_category", "stores", "website"]);
+            $fetched = $this->repository->fetch($id, ["default_store", "stores", "website"]);
         }
         catch( Exception $exception )
         {
@@ -97,22 +94,12 @@ class ChannelController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "code" => "required|unique:channels,code,{$id}",
-                "hostname" => "required|unique:channels,hostname,{$id}",
-                "logo" => "nullable|mimes:bmp,jpeg,jpg,png,webp",
-                "favicon" => "nullable|mimes:bmp,jpeg,jpg,png,webp"
+                "hostname" => [ "nullable", "unique:websites,hostname", "unique:channels,hostname,{$id}", new FQDN()]
             ]);
 
-            foreach(["logo", "favicon"] as $file_type) {
-                if ( !$request->file($file_type) ) {
-                    unset($data[$file_type]);
-                    continue;
-                }
-                $data[$file_type] = $this->storeImage($request, $file_type, strtolower($this->model_name));
-            }
+            if(isset($data['default_store_id'])) $this->repository->defaultStoreValidation($data, $id);
 
-            $updated = $this->repository->update($data, $id, function($updated) use ($request) {
-                $updated->stores()->sync($request->stores);
-            });
+            $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )
         {
@@ -126,19 +113,14 @@ class ChannelController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted) {
-                foreach(["logo", "favicon"] as $file_type) {
-                    if ( !$deleted->{$file_type} ) continue;
-                    Storage::delete($deleted->{$file_type});
-                }
-            });
+            $this->repository->delete($id);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse

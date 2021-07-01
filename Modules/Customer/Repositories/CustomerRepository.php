@@ -12,7 +12,7 @@ use Intervention\Image\Facades\Image;
 
 class CustomerRepository extends BaseRepository
 {
-    protected $model, $model_key, $main_image_dimensions, $gallery_image_dimensions;
+    protected $main_image_dimensions, $gallery_image_dimensions;
 
     public function __construct(Customer $customer)
     {

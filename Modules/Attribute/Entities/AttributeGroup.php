@@ -16,6 +16,7 @@ class AttributeGroup extends Model
 
     public static $SEARCHABLE = [ "name", "slug" ];
     protected $fillable = [ "attribute_set_id", "name", "slug", "position" ];
+    protected $with = [ "attributes" ];
 
     public $translatedAttributes = ["name"];
     public $translatedModels = [ AttributeGroupTranslation::class, "attribute_group_id" ];

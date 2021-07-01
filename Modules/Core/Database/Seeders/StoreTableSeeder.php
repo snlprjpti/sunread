@@ -5,6 +5,7 @@ namespace Modules\Core\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Entities\Channel;
 
 class StoreTableSeeder extends Seeder
 {
@@ -17,20 +18,18 @@ class StoreTableSeeder extends Seeder
     {
         DB::table('stores')->insert([
            [
-               "currency" => "USD",
                "name" => "International Store",
-               "slug" => "international-store",
-               "locale" => "en",
+               "code" => "international-store",
                "position" => 1,
+               "channel_id" => 1,
                "created_at" => now(),
                "updated_at" => now()
            ],
             [
-                "currency" => "EUR",
                 "name" => "English Store",
-                "slug" => "english-store",
-                "locale" => "en",
+                "code" => "english-store",
                 "position" => 2,
+                "channel_id" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
             ]

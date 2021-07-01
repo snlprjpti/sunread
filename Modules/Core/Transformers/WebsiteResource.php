@@ -8,6 +8,10 @@ class WebsiteResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $stores_count = $this->when($this->relationLoaded("channels"), function() {
+            return $this->channels->first()?->relationLoaded("stores") ? $this->stores_count : 0;
+        });
+
         return [
             "id" => $this->id,
             "code" => $this->code,
@@ -17,7 +21,8 @@ class WebsiteResource extends JsonResource
             "description" => $this->description,
             "channels" => ChannelResource::collection($this->whenLoaded("channels")),
             "channels_count" => $this->when($this->relationLoaded("channels"), $this->channels->count()),
-            "status" => $this->status,
+            "stores_count" => $this->when(($stores_count !== false), $stores_count),
+            "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

@@ -12,8 +12,8 @@ class AllowCouponResource extends JsonResource
             "id" => $this->id,
             "coupon" => new CouponResource($this->whenLoaded("coupon")),
             "model_type" => $this->model_type,
-            "model_id" => $this->model_id,
-            "status" => $this->status,
+            "model" => $this->whenLoaded("model"),
+            "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

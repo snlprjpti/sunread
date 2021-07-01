@@ -10,14 +10,11 @@ class StoreResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "currency" => $this->currency,
             "name" => $this->name,
-            "slug" => $this->slug,
-            "locale" => $this->locale,
-            "image" => $this->image_url,
+            "code" => $this->code,
             "position" => $this->position,
-            "channels" => ChannelResource::collection($this->whenLoaded("channels")),
-            "status" => $this->status,
+            "channel" => new ChannelResource($this->whenLoaded("channel")),
+            "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

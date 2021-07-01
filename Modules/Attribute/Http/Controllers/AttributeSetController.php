@@ -65,12 +65,24 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $this->repository->attributeValidation($data);
+            $data = $this->repository->validateData($request, [
+                "attribute_set_id" => "required|exists:attribute_sets,id"
+            ], function() use ($request) {
+                return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
+            });
             
-            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
-            $created = $this->repository->create($data, function($created) use ($request) {
-                if(isset($request->groups)) $this->attributeGroupRepository->updateOrCreate($request->groups, $created);
+            $selected_attributeSet = $this->model->find($data["attribute_set_id"]);
+            
+            $created = $this->repository->create($data, function($created) use ($selected_attributeSet) {
+                if($selected_attributeSet->attribute_groups) 
+                $selected_attributeSet->attribute_groups->map(function($attributeGroup) use($created){
+                    $item = [
+                        "name" => $attributeGroup->name,
+                        "slug" => "{$created->slug}_{$attributeGroup->slug}",
+                        "attributes" => ($attributeGroup->attributes) ? $attributeGroup->attributes->pluck('id')->toArray() : []
+                    ];
+                    $this->attributeGroupRepository->singleUpdateOrCreate($item, $created);
+                })->toArray();
             });
             
         }
@@ -101,13 +113,16 @@ class AttributeSetController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "slug" => "nullable|unique:attribute_sets,slug,{$id}"
-            ]);
-            $this->repository->attributeValidation($data);
+                "slug" => "nullable|unique:attribute_sets,slug,{$id}",
+                "groups" => "sometimes|array"
+            ], function() use ($request) {
+                return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
+            });
+            
+            if(isset($data["groups"])) $this->repository->attributeValidation($data);
 
-            if ( $request->slug == null ) $data["slug"] = $this->model->createSlug($request->name);
             $updated = $this->repository->update($data, $id, function($updated) use ($request) {
-                if(isset($request->groups)) $this->attributeGroupRepository->updateOrCreate($request->groups, $updated, "update");
+                if(isset($request->groups)) $this->attributeGroupRepository->multipleUpdateOrCreate($request->groups, $updated);
             });
         }
         catch( Exception $exception )
@@ -132,7 +147,7 @@ class AttributeSetController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
 

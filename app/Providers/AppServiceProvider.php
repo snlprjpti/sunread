@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -26,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // 
+        // Macro for whereLike
         Builder::macro('whereLike', function ($attributes, string $searchTerm) {
             $this->where(function (Builder $query) use ($attributes, $searchTerm) {
                 foreach (Arr::wrap($attributes) as $attribute) {
@@ -48,5 +49,8 @@ class AppServiceProvider extends ServiceProvider
 
             return $this;
         });
+
+        // Prevent Lazyloading
+        Model::preventLazyLoading( !app()->isProduction() );
     }
 }

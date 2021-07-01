@@ -22,6 +22,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::get("attribute-sets/format", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "attributeSet"])->name("sets.attribute.format");
         Route::get("attribute-sets", [\Modules\Attribute\Http\Controllers\AttributeSetController::class, "listAttributeSets"])->name("sets.list");
 
+        
         // Catalog Attribute Group Routes
         Route::resource('groups', AttributeGroupController::class)->except(['create', 'edit']);
 
