@@ -20,7 +20,7 @@ class TaxRateRepository extends BaseRepository
             "zip_code" => "sometimes|nullable",
             "postal_code_from" => "sometimes|nullable",
             "postal_code_to" => "sometimes|nullable",
-            "tax_rate" => "required|float"
+            "tax_rate" => "required|decimal"
         ];
     }
 }

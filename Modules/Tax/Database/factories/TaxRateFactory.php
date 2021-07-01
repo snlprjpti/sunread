@@ -23,7 +23,7 @@ class TaxRateFactory extends Factory
             "zip_code" => "*",
             "postal_code_from" => null,
             "postal_code_to" => null,
-            "tax_rate" => $this->faker->randomFloat(min: 5, max: 20)
+            "tax_rate" => $this->faker->randomFloat(2, min: 5, max: 20)
         ];
     }
 }
