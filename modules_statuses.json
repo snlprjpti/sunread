@@ -9,5 +9,6 @@
     "Review": true,
     "UrlRewrite": true,
     "Coupon": true,
-    "Page": true
+    "Page": true,
+    "Inventory": true
 }
