@@ -12,12 +12,7 @@ class Store extends Model
 {
     use Sluggable, HasFactory;
 
-    protected $fillable = [ "slug", "name", "currency", "locale", "image", "position", "status", "channel_id" ];
-
-    public function getImageUrlAttribute()
-    {   
-        return Storage::url($this->image);
-    }
+    protected $fillable = [ "code", "name", "position", "status", "channel_id" ];
 
     public function channel(): BelongsTo
     {
