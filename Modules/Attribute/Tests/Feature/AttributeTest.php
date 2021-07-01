@@ -9,7 +9,7 @@ use Modules\Attribute\Entities\Attribute;
 
 class AttributeTest extends BaseTestCase
 {
-    public $non_filterable_fields;
+    public $non_filterable_fields, $default_resource;
 
     public function setUp(): void
     {
@@ -21,13 +21,13 @@ class AttributeTest extends BaseTestCase
         $this->model_name = "Attribute";
         $this->route_prefix = "admin.attribute.attributes";
         $this->non_filterable_fields = ["select", "multiselect", "checkbox"];
+        $this->default_resource = $this->model::latest('id')->first();
+        $this->default_resource_id = $this->default_resource->id;
     }
 
     public function getCreateData(): array
     {
-        return array_merge($this->model::factory()->make([
-            "is_user_defined" => 1
-        ])->toArray(), [
+        return array_merge($this->model::factory()->make()->toArray(), [
             "translations" => [
                 [
                     "store_id" => Store::factory()->create()->id,
@@ -35,6 +35,25 @@ class AttributeTest extends BaseTestCase
                 ]
             ]
         ]);
+    }
+
+    public function getUpdateData(): array
+    {
+        $translations = [
+            "translations" => [
+                [
+                    "store_id" => Store::factory()->create()->id,
+                    "name" => Str::random(10)
+                ]
+            ]
+        ];
+        return $this->default_resource->is_user_defined ? 
+        array_merge($this->model::factory()->make([
+            'type' => $this->default_resource->type,
+            'slug' => $this->default_resource->slug
+        ])->toArray(), $translations) : array_merge($this->default_resource->toArray(), [
+            'name' => Str::random(10)
+        ], $translations);
     }
 
     public function getNonMandotaryCreateData(): array
@@ -51,6 +70,13 @@ class AttributeTest extends BaseTestCase
         ]);
     }
 
+    public function getNonMandodtaryUpdateData(): array
+    {
+        return array_merge($this->getUpdateData(), [
+            "validation" => null
+        ]); 
+    }
+
     public function testShouldReturnErrorIfNonUserDefinedAttributeIsDeleted()
     {
         $resource_id = $this->model::factory()->create([
@@ -58,6 +84,20 @@ class AttributeTest extends BaseTestCase
         ])->id;
 
         $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
+
+        $response->assertStatus(403);
+        $response->assertJsonFragment([
+            "status" => "error"
+        ]);
+    }
+
+    public function testShouldReturnErrorIfSomeFieldOfUserDefinedAttributeIsUpdated()
+    {
+        $post_data = $this->getCreateData();
+
+        $post_data = $this->addAttributeOptionIfNecessary($post_data);
+
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
         $response->assertStatus(403);
         $response->assertJsonFragment([
@@ -110,12 +150,10 @@ class AttributeTest extends BaseTestCase
     public function testAdminCanUpdateResource()
     {
         $post_data = $this->getUpdateData();
-        $post_data["type"] = $this->model::findOrFail($this->default_resource_id)->type;
-
         $post_data = $this->addAttributeOptionIfNecessary($post_data);
 
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
-        
+
         $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
@@ -125,16 +163,29 @@ class AttributeTest extends BaseTestCase
 
     public function testAdminCanUpdateResourceWithNonMandatoryData()
     {
-        $post_data = $this->getNonMandodtaryUpdateData();
-        $post_data["type"] = $this->model::findOrFail($this->default_resource_id)->type;
-
+        $post_data = $this->getUpdateData();
         $post_data = $this->addAttributeOptionIfNecessary($post_data);
+
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
         $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testShouldReturnErrorIfUpdateResourceDoesNotExist()
+    {
+        if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
+
+        $post_data = $this->getCreateData();
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->fake_resource_id]), $post_data);
+
+        $response->assertNotFound();
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
         ]);
     }
 
