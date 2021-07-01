@@ -68,7 +68,7 @@ class UserController extends BaseController
             ]);
             $data["password"] = Hash::make($data["password"]);
 
-            $created = $this->repository->create($data);
+            $created = $this->repository->create($data)->with(["role"])->first();
         }
         catch (\Exception $exception)
         {
@@ -108,7 +108,7 @@ class UserController extends BaseController
                 $data["password"] = Hash::make($data["password"]);
             }
 
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id)->with(["role"])->first();
         }
         catch (\Exception $exception)
         {
@@ -140,7 +140,7 @@ class UserController extends BaseController
     {
         try
         {
-            $updated = $this->repository->updateStatus($request, $id);
+            $updated = $this->repository->updateStatus($request, $id)->with(["role"])->first();
         }
         catch (\Exception $exception)
         {
