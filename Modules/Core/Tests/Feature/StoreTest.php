@@ -24,26 +24,10 @@ class StoreTest extends BaseTestCase
         $this->hasStatusTest = true;
     }
 
-    public function getCreateData(): array
-    {
-        Storage::fake();
-
-        return $this->model::factory()->make([
-            "image" => UploadedFile::fake()->image("image.png")
-        ])->toArray();
-    }
-
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "name" => null
-        ]);
-    }
-
-    public function getNonMandodtaryUpdateData(): array
-    {
-        return array_merge($this->getUpdateData(), [
-            "image" => null
         ]);
     }
 }
