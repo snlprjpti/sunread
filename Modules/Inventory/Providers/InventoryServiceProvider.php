@@ -4,6 +4,10 @@ namespace Modules\Inventory\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Inventory\Observers\CatalogInventoryObserver;
+use Modules\Inventory\Observers\CatalogInventoryItemObserver;
+use Modules\Inventory\Entities\CatalogInventory;
+use Modules\Inventory\Entities\CatalogInventoryItem;
 
 class InventoryServiceProvider extends ServiceProvider
 {
@@ -28,6 +32,7 @@ class InventoryServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObserver();
     }
 
     /**
@@ -108,5 +113,11 @@ class InventoryServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    private function registerObserver(): void
+    {
+        CatalogInventory::observer(CatalogInventoryObserver::class);
+        CatalogInventoryItem::observer(CatalogInventoryItem::class);
     }
 }
