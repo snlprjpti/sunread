@@ -39,7 +39,7 @@ class CatalogInventoryController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, ["catalog_inventory_items"]);
         }
         catch (Exception $exception)
         {
@@ -54,7 +54,10 @@ class CatalogInventoryController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $created = $this->repository->create($data);
+            unset($data["quantity"]);
+            $created = $this->repository->create($data, function($created) use($request) {
+                $this->repository->syncItem($created, $request);
+            });
         }
         catch( Exeption $exception )
         {
@@ -83,7 +86,10 @@ class CatalogInventoryController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $updated = $this->repository->update($data, $id);
+            unset($data["quantity"]);
+            $updated = $this->repository->update($data, $id, function ($updated) use($request) {
+                if ($request->adjustment_type) $this->repository->syncItem($updated, $request, "updated");
+            });
         }
         catch( Exception $exception )
         {
@@ -93,11 +99,11 @@ class CatalogInventoryController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
-    public function destory(int $id): jsonResponse
+    public function destroy(int $id): jsonResponse
     {
         try
         {
-            $this->respository->delete($id);
+            $this->repository->delete($id);
         }
         catch( Exception $exception )
         {
