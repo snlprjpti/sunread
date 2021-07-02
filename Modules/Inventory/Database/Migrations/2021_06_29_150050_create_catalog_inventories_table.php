@@ -17,7 +17,7 @@ class CreateCatalogInventoriesTable extends Migration
             $table->id();
             $table->unsignedBigInteger("product_id");
             $table->unsignedBigInteger("website_id");
-            $table->integer("quantity");
+            $table->integer("quantity")->nullable();
             $table->boolean("is_in_stock")->nullable();
             $table->boolean("manage_stock")->nullable();
             $table->boolean("use_config_manage_stock")->nullable();
