@@ -52,7 +52,7 @@ class CountryController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["regions"]);
+            $fetched = $this->repository->fetch($id, [ "regions", "regions.cities" ]);
         }
         catch (Exception $exception)
         {
