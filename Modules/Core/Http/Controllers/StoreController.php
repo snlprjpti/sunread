@@ -39,7 +39,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, callback: function () use ($request) {
+            $fetched = $this->repository->fetchAll($request, ["channel.website"], callback: function () use ($request) {
                 $request->validate([
                     "website_id" => "sometimes|exists:websites,id",
                     "channel_id" => "sometimes|exists:channels,id"
@@ -83,7 +83,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["channel"]);
+            $fetched = $this->repository->fetch($id, ["channel.website"]);
         }
         catch(Exception $exception)
         {
