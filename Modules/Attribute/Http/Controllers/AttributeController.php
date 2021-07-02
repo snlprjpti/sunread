@@ -78,7 +78,7 @@ class AttributeController extends BaseController
             $this->repository->validateTranslation($request);
 
             if(!$type_check) $data["use_in_layered_navigation"] = 0;
-            else $data["default_value"] = null;
+            if($type_check) $data["default_value"] = null;
             
             if($request->type != "text") $data["validation"] = null;
             
@@ -131,7 +131,7 @@ class AttributeController extends BaseController
             $this->repository->validateTranslation($request);
 
             if(!$type_check) $data["use_in_layered_navigation"] = 0;
-            else $data["default_value"] = null;
+            if($type_check) $data["default_value"] = null;
 
             if($request->type != "text") $data["validation"] = null;
 
