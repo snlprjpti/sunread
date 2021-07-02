@@ -14,7 +14,7 @@ class AddPositionFieldOnStoresTable extends Migration
     public function up()
     {
         Schema::table('stores', function (Blueprint $table) {
-            $table->integer('position')->default(0)->after('image');
+            $table->integer('position')->default(0)->after('code');
         });
     }
 

@@ -18,7 +18,7 @@ class WebsiteTableSeeder extends Seeder
         DB::table('websites')->insert([
             [
                 "code" => "international",
-                "hostname" => "international",
+                "hostname" => "international.co",
                 "name" => "International",
                 "description" => "For all countries",
                 "position" => 1,

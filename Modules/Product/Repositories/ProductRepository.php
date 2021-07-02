@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Validator;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
 use Modules\Product\Entities\ProductAttribute;
@@ -21,9 +22,9 @@ class ProductRepository extends BaseRepository
         $this->rules = [
             "parent_id" => "sometimes|nullable|exists:products,id",
             "brand_id" => "sometimes|nullable|exists:brands,id",
-            "attribute_group_id" => "required|exists:attribute_groups,id",
+            "attribute_set_id" => "required|exists:attribute_sets,id",
+            "website_id" => "required|exists:websites,id",
             "sku" => "required|unique:products,sku",
-            "type" => "required|in:simple,configurable",
             "status" => "sometimes|boolean",
             "attributes" => "required|array",
             "categories" => "required|array",
@@ -87,6 +88,7 @@ class ProductRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -95,4 +97,33 @@ class ProductRepository extends BaseRepository
 
         return true;
     }
+
+    public function checkAttribute(int $attribute_set_id, object $request): bool
+    {
+        try
+        {
+            $attribute_set = AttributeSet::whereId($attribute_set_id)->firstOrFail();
+            $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
+                return $attributeGroup->attributes->pluck('id');
+            })->flatten(1)->toArray();
+            $attributes = Attribute::whereIn('id', $attribute_ids)->get();
+
+            $check_attribute = $attributes->pluck("id")->toArray();
+            array_map(function($request_attribute) use ($attributes) {
+                // check required attribute has value.
+                $required_attribute = $attributes->where("is_required", 1);
+                if ($required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute['attribute_id']} value is required."]);
+                // check attribute exists on attribute set
+                $check_attribute = $attributes->pluck("id")->toArray();
+                if (!in_array($request_attribute["attribute_id"], $check_attribute)) throw ValidationException::withMessages([ "attributes" => "Attribute id {$request_attribute['attribute_id']} dosen't exists on current attribute set"]);
+                return;
+            }, $request->get("attributes"));
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+        return true;
+    }
+
 }

@@ -8,8 +8,11 @@ use Modules\Core\Tests\BaseTestCase;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeSet;
+use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Category\Entities\Category;
 use Modules\Product\Entities\ProductImage;
+use Modules\Core\Entities\Website;
 
 class ProductTest extends BaseTestCase
 {
@@ -27,18 +30,81 @@ class ProductTest extends BaseTestCase
 
     public function getCreateData(): array
     {
-        $attribute = Attribute::whereType("text")->inRandomOrder()->first();
         $category = Category::inRandomOrder()->first();
-
-        return $this->model::factory()->make([
+        $product = $this->model::factory()->make();
+        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();        
+        return array_merge([
             "attributes" => [
                 [
                     "attribute_id" => $attribute->id,
-                    "value" => Str::random(10)
+                    "value" => $this->value($attribute->type)
                 ]
             ],
             "categories" => [$category->id]
-        ])->toArray();
+        ], $product->toArray());
+    }
+
+    public function getUpdateData(): array
+    {
+        $category = Category::inRandomOrder()->first();
+        $product = $this->model::find($this->default_resource_id);
+        $update_data = $product->toArray();
+        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
+
+        return array_merge([
+            "attributes" => [
+                [
+                    "attribute_id" => $attribute->id,
+                    "value" => $this->value($attribute->type)
+                ]
+            ],
+            "categories" => [$category->id]
+        ], $product->toArray());
+    }
+
+    public function getNonMandodtaryUpdateData(): array
+    {
+        $category = Category::inRandomOrder()->first();
+        $product = $this->model::find($this->default_resource_id);
+        $update_data = $product->toArray();
+        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
+
+        return array_merge([
+            "attributes" => [
+                [
+                    "attribute_id" => $attribute->id,
+                    "value" => $this->value($attribute->type)
+                ]
+            ],
+            "categories" => [$category->id]
+        ], $product->toArray());
+    }
+
+    public function value(string $type): mixed
+    {
+        switch($type)
+        {
+            case "price" : 
+                $value = 1000.1;
+                break;
+
+            case "boolean" : 
+                $value = true;
+                break;
+
+            case ($type == "datetime" || $type == "date"):
+                $value = now();
+                break;
+
+            case "number":
+                $value = rand(1,1000);
+                break;
+
+            default:
+                $value = Str::random(10);
+                break;
+        }
+        return $value;
     }
 
     public function getNonMandodtaryCreateData(): array

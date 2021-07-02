@@ -15,6 +15,7 @@ class CreateAttributeGroupsTable extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->integer('position')->nullable();
+            $table->unique(['attribute_set_id', 'slug'], 'attribute_group_slug_unique');
             $table->timestamps();
         });
     }

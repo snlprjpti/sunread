@@ -18,7 +18,6 @@ class AttributeSetTest extends BaseTestCase
 
         $this->model_name = "Attribute Set";
         $this->route_prefix = "admin.attribute.sets";
-        $this->hasStatusTest = true;
     }
 
     public function getCreateData(): array
@@ -39,13 +38,6 @@ class AttributeSetTest extends BaseTestCase
                 ]
             ]
         ])->toArray();
-    }
-
-    public function getNonMandotaryCreateData(): array
-    {
-        return array_merge($this->getCreateData(), [
-            "slug" => null
-        ]);
     }
 
     public function getInvalidCreateData(): array

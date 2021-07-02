@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Modules\Coupon\Database\Seeders\CouponDatabaseSeeder::class);
         $this->call(\Modules\Page\Database\Seeders\PageDatabaseSeeder::class);
         $this->call(\Modules\Country\Database\Seeders\CountryDatabaseSeeder::class);
+        $this->call(\Modules\Tax\Database\Seeders\TaxDatabaseSeeder::class);
     }
 }
