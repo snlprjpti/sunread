@@ -11,9 +11,9 @@ use Modules\User\Transformers\AdminResource;
 use Modules\User\Repositories\AdminRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\UserExceptions\CannotDeleteSelfException;
+use Modules\User\Exceptions\CannotDeleteSelfException;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\UserExceptions\CannotDeleteSuperAdminException;
+use Modules\User\Exceptions\CannotDeleteSuperAdminException;
 
 class UserController extends BaseController
 {
