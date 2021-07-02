@@ -2,6 +2,7 @@
 
 namespace Modules\Attribute\Repositories;
 
+use Exception;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Exceptions\AttributeCannotChangeException;
 use Modules\Attribute\Exceptions\AttributeTranslationDoesNotExist;
@@ -70,12 +71,19 @@ class AttributeRepository extends BaseRepository
 
     public function validateFieldOnUpdate(array $data, int $id): void
     {
-        $model_data = $this->model->findOrFail($id);
-        $type = ($model_data->is_user_defined) ?  "user" : "system";
-        $key = "non_updatable_fields_for_$type" ;
-        
-        foreach($this->$key as $field){
-            if(isset($data[$field]) && $data[$field] != $model_data->$field) throw new AttributeCannotChangeException(__("core::app.response.attribute-cannot-change", [ "field" => $field, "type" => $type ]));
+        try
+        {
+            $model_data = $this->model->findOrFail($id);
+            $type = ($model_data->is_user_defined) ?  "user" : "system";
+            $key = "non_updatable_fields_for_$type" ;
+            
+            foreach($this->$key as $field){
+                if(isset($data[$field]) && $data[$field] != $model_data->$field) throw new AttributeCannotChangeException(__("core::app.response.attribute-cannot-change", [ "field" => $field, "type" => $type ]));
+            }
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
         }
     }
 }
