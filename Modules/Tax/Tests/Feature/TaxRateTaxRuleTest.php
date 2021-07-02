@@ -14,7 +14,7 @@ class TaxRateTaxRuleTest extends BaseTestCase
         parent::setUp();
         $this->admin = $this->createAdmin();
 
-        $this->model_name = "Tax Rate Tax Rule";
+        $this->model_name = "Tax Rate Rule";
         $this->route_prefix = "admin.taxes.tax-rates-tax-rules";
     }
 
