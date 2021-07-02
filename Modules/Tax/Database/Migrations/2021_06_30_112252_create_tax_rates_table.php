@@ -11,11 +11,11 @@ class CreateTaxRatesTable extends Migration
         Schema::create('tax_rates', function (Blueprint $table) {
             $table->id();
 
-            $table->bigInteger("country_id")->nullable();
-            // $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
+            $table->unsignedbigInteger("country_id")->nullable();
+            $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
 
-            $table->bigInteger("region_id")->nullable();
-            // $table->foreign('region_id')->references('id')->on('regions')->onDelete('cascade');
+            $table->unsignedbigInteger("region_id")->nullable();
+            $table->foreign('region_id')->references('id')->on('regions')->onDelete('cascade');
 
             $table->string("identifier")->unique();
             $table->boolean("use_zip_range");

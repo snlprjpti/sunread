@@ -1,6 +1,7 @@
 <?php
 namespace Modules\Tax\Database\factories;
 
+use Modules\Country\Entities\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TaxRateFactory extends Factory
@@ -9,11 +10,9 @@ class TaxRateFactory extends Factory
 
     public function definition(): array
     {
-        // $country = Country::inRandomOrder()->first();
-        // $country_id = $country->id;
-        // $region_id = $country->regions()->inRandomOrder()->first()->id;
-        $country_id = null;
-        $region_id = null;
+        $country = Country::inRandomOrder()->first();
+        $country_id = $country->id;
+        $region_id = $country->regions()->inRandomOrder()->first()?->id;
 
         return [
             "country_id" => $country_id,
