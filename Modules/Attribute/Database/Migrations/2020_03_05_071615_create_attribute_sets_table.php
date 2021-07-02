@@ -10,9 +10,7 @@ class CreateAttributeSetsTable extends Migration
     {
         Schema::create('attribute_sets', function (Blueprint $table) {
             $table->id();
-            $table->string('slug')->unique();
             $table->string('name');
-            $table->boolean('status')->default(1);
             $table->boolean('is_user_defined')->default(1);
             $table->timestamps();
         });
