@@ -19,16 +19,10 @@ class CreateCategoryValuesTable extends Migration
             $table->string('scope');
             $table->unsignedBigInteger('scope_id');
 
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->string('image')->nullable();
-            $table->string('meta_title')->nullable();
-            $table->text('meta_description')->nullable();
-            $table->text('meta_keywords')->nullable();
-            $table->boolean('status')->default(0);
-            $table->boolean('include_in_menu')->default(0);
+            $table->string('attribute');
+            $table->string('value')->nullable();
 
-            $table->unique(['category_id', 'scope', 'scope_id']);
+            $table->unique(['category_id', 'scope', 'scope_id', 'attribute']);
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
 
             $table->timestamps();
