@@ -4,6 +4,7 @@ namespace Modules\Tax\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaxRateTaxRule extends Model
 {
@@ -11,4 +12,14 @@ class TaxRateTaxRule extends Model
     public $timestamps = false;
 
     protected $fillable = [ "tax_rate_id", "tax_rule_id" ];
+
+    public function tax_rate(): BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class);
+    }
+
+    public function tax_rule(): BelongsTo
+    {
+        return $this->belongsTo(TaxRule::class);
+    }
 }

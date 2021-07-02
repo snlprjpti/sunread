@@ -9,5 +9,6 @@ Route::group(["middleware" => ["api"]], function () {
 
         Route::put("/tax-rules/{tax_rule_id}/status", [\Modules\Tax\Http\Controllers\TaxRuleController::class, "updateStatus"])->name("tax-rules.status");
         Route::resource('tax-rules', TaxRuleController::class)->except(['create', 'edit']);
+        Route::resource('tax-rates-tax-rules', TaxRateTaxRuleController::class)->except(['create', 'edit']);
     });
 });
