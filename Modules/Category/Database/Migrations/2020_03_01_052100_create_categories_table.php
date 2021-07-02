@@ -17,9 +17,7 @@ class CreateCategoriesTable extends Migration
             $table->bigIncrements('id');
             $table->nestedSet();
 
-            $table->string('slug');
             $table->integer('position')->default(0);
-            
             $table->timestamps();
         });
     }
