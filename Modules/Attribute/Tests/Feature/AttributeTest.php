@@ -179,7 +179,9 @@ class AttributeTest extends BaseTestCase
     {
         if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
 
-        $post_data = $this->getCreateData();
+        $post_data = array_merge($this->getCreateData(), [
+            "slug" => Str::random(10)
+        ]);
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->fake_resource_id]), $post_data);
 
         $response->assertNotFound();
