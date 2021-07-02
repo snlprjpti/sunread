@@ -31,9 +31,9 @@ class CatalogInventoryItemController extends BaseController
         return CatalogInventoryItemResource::collection($data);
     }
 
-    public function resource(object $data): JsonResponse
+    public function resource(object $data): JsonResource
     {
-        return new CatalogInventoryItem($data);
+        return new CatalogInventoryItemResource($data);
     }
 
     public function index(Request $request): JsonResponse
@@ -54,15 +54,20 @@ class CatalogInventoryItemController extends BaseController
     {
         try
         {
+
             $data = $this->repository->validateData($request);
-            $created = $this->repository->create($data);
+            $created = $this->repository->create($data, function($created) use($id) {
+
+                $this->repository->adustment($created);
+                dd($created->adjustment_type);
+            });
         }
         catch( Exeption $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($data), $this->lang("create-success"), 201);
+        return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
     public function show(int $id): JsonResponse
@@ -76,7 +81,7 @@ class CatalogInventoryItemController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($data), $this->lang("fetch-success"));
+        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -94,11 +99,11 @@ class CatalogInventoryItemController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
-    public function destory(int $id): jsonResponse
+    public function destroy(int $id): jsonResponse
     {
         try
         {
-            $this->respository->delete($id);
+            $this->repository->delete($id);
         }
         catch( Exception $exception )
         {
