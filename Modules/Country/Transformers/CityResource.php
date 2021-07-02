@@ -10,7 +10,7 @@ class CityResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "state" =>  new RegionResource($this->whenLoaded("region")),
+            "region" =>  new RegionResource($this->whenLoaded("region")),
             "postal_code" => $this->postal_code,
             "code" => $this->code,
             "name" => $this->name,
