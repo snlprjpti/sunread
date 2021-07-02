@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Core\Traits\HasFactory;
 use Modules\Product\Entities\Product;
+use Modules\User\Entities\Admin;
 
 class CatalogInventoryItem extends Model
 {
@@ -21,5 +22,10 @@ class CatalogInventoryItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class); 
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, "adjusted_by");
     }
 }
