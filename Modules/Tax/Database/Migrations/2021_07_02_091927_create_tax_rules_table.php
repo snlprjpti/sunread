@@ -22,7 +22,7 @@ class CreateTaxRulesTable extends Migration
             $table->string('name');
             $table->integer('position');
             $table->integer('priority');
-            $table->decimal('subtotal');
+            $table->decimal('subtotal')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
         });
