@@ -3,7 +3,7 @@
 namespace Modules\Tax\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaxRateTaxRule extends Model
