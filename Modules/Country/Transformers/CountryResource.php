@@ -15,6 +15,7 @@ class CountryResource extends JsonResource
             "numeric_code" => $this->numeric_code,
             "dialing_code" => $this->dialing_code,
             "name" => $this->name,
+            "regions" => RegionResource::collection($this->whenLoaded("regions")),
             "created_at" => $this->created_at->format('M d, Y H:i A'),
         ];
     }
