@@ -8,7 +8,7 @@ use Modules\Tax\Entities\TaxRule;
 
 class TaxRuleTableSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         Model::unguard();
         TaxRule::factory()->create();
