@@ -2,78 +2,63 @@
 
 namespace Modules\Country\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\Country\Entities\Country;
+use Exception;
+use Modules\Country\Repositories\CountryRepository;
+use Modules\Country\Transformers\CountryResource;
 
-class CountryController extends Controller
+class CountryController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    private $repository;
+
+    public function __construct(Country $country, CountryRepository $countryRepository)
     {
-        return view('country::index');
+        $this->model = $country;
+        $this->model_name = "Country";
+        parent::__construct($this->model, $this->model_name);
+        $this->repository = $countryRepository;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function collection(object $data): ResourceCollection
     {
-        return view('country::create');
+        return CountryResource::collection($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
+    public function resource(object $data): JsonResource
     {
-        //
+        return new CountryResource($data);
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
+    public function index(Request $request): JsonResponse
     {
-        return view('country::show');
+        try
+        {
+            $fetched = $this->repository->fetchAll($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
+    public function show(int $id): JsonResponse
     {
-        return view('country::edit');
-    }
+        try
+        {
+            $fetched = $this->repository->fetch($id, [ "regions", "regions.cities" ]);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 }

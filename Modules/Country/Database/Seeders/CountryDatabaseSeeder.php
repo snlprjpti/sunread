@@ -7,15 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class CountryDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         Model::unguard();
-
-        // $this->call("OthersTableSeeder");
+        $this->call(CountryTableSeeder::class);
+        $this->call(RegionTableSeeder::class);
+        $this->call(CityTableSeeder::class);
     }
 }
