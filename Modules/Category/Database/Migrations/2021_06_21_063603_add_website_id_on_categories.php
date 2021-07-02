@@ -15,7 +15,6 @@ class AddWebsiteIdOnCategories extends Migration
     {
         Schema::table('categories', function (Blueprint $table) {
             $table->unsignedBigInteger('website_id');
-            $table->unique(['website_id', 'slug', 'parent_id']);
             $table->foreign('website_id')->references('id')->on('websites')->onDelete('cascade');
         });
     }
