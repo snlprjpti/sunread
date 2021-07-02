@@ -47,8 +47,7 @@ class UserController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["role"]);
+            $fetched = $this->repository->fetchAll($request, ["role"]);
         }
         catch (Exception $exception)
         {
@@ -85,7 +84,7 @@ class UserController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["role"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["role"]);
         }
         catch (Exception $exception)
         {
