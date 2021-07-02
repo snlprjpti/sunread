@@ -23,7 +23,7 @@ return [
         'reindex-success' => ':name reindexed successfully.',
         "delete-failed" => ":name could not be deleted.",
         'bulk-reindex-success' => 'All :name reindexed successfully.',
-        'type-cannot-change' => 'Type could not be changed.',
+        'attribute-cannot-change' => ':field could not be changed for :type defined attribute.',
         'missing-data' => 'Missing :name translation.',
         'default-set-delete' => 'Default set cannot be deleted.',
         'attribute-groups-present' => 'Attribute Groups present in set.',

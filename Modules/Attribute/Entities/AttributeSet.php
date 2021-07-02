@@ -14,7 +14,7 @@ class AttributeSet extends Model
     use Sluggable, HasFactory;
 
     public static $SEARCHABLE = [ "name" ];
-    protected $fillable = [ "name", "slug", "status" ];
+    protected $fillable = [ "name" ];
 
     public function attribute_groups(): HasMany
     {

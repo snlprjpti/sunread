@@ -195,6 +195,19 @@ return[
                                 "scope" => "channel",
                                 "is_required" => 0
                             ],
+                            [
+                                "title" => "Store Image",
+                                "path" => "store_image",
+                                "type" => "file",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "showIn" => ["channel","website","default","store"],
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
                         ]
                     ]
                 ]

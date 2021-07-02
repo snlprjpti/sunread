@@ -11,6 +11,10 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
+use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeSet;
+use Illuminate\Validation\ValidationException;
 
 class ProductController extends BaseController
 {
@@ -21,8 +25,11 @@ class ProductController extends BaseController
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $productRepository;
+        $exception_statuses = [
+            ProductAttributeCannotChangeException::class => 403
+        ];
 
-        parent::__construct($this->model, $this->model_name);
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -53,9 +60,11 @@ class ProductController extends BaseController
     public function store(Request $request): JsonResponse
     {
         try
-        {
+        {  
             $data = $this->repository->validateData($request);
-
+            $this->repository->checkAttribute($request->attribute_set_id, $request);
+            
+            $data["type"] = "simple";
             $created = $this->repository->create($data, function($created) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $created);
@@ -89,9 +98,13 @@ class ProductController extends BaseController
     {
         try
         {
+            $product = $this->model::findOrFail($id);            
             $data = $this->repository->validateData($request, [
                 "sku" => "required|unique:products,sku,{$id}"
             ]);
+
+            $this->repository->checkAttribute($product->attribute_set_id, $request);
+            unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);

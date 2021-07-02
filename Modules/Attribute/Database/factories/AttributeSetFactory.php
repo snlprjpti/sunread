@@ -10,10 +10,7 @@ class AttributeSetFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->name();
-        $slug = $this->faker->unique()->slug();
-    
         return [
-            "slug" => $slug,
             "name" => $name
         ];
     }

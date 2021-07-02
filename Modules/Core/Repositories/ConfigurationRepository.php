@@ -5,6 +5,7 @@ namespace Modules\Core\Repositories;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
@@ -19,7 +20,7 @@ class ConfigurationRepository extends BaseRepository
     protected $channel_model, $store_model;
     use TraitsConfiguration;
 
-    public function __construct(Configuration $configuration, Channel $channel_model, Store $store_model)
+    public function __construct(Configuration $configuration, Website $website_model, Channel $channel_model, Store $store_model)
     {
         $this->model = $configuration;
         $this->model_key = "core.configuration";
@@ -28,7 +29,8 @@ class ConfigurationRepository extends BaseRepository
         ];
         $this->config_fields = ($data = Cache::get("configurations.all")) ? $data : config("configuration");
         $this->createModel();
-        
+
+        $this->website_model = $website_model;
         $this->channel_model = $channel_model;
         $this->store_model = $store_model;
     }
@@ -41,6 +43,7 @@ class ConfigurationRepository extends BaseRepository
     
             $fetched = $this->config_fields;
             $checkKey = [ "scope" => $request->scope ?? "global", "scope_id" => $request->scope_id ?? 0 ];
+            if($checkKey["scope"] != "global") $fetched_data['entity'] = $this->getEntityData($checkKey);
 
             foreach($fetched as $key => $data)
             {
@@ -52,7 +55,9 @@ class ConfigurationRepository extends BaseRepository
                     {
                         if(!isset($subchildren["elements"])) continue;
 
+                        $subchildren_data["title"] = $subchildren["title"];
                         $subchildren_data["elements"] = [];
+
                         foreach($subchildren["elements"] as $k => &$element)
                         {
                             if($this->scopeFilter($checkKey["scope"], $element["scope"])) continue;
@@ -68,7 +73,6 @@ class ConfigurationRepository extends BaseRepository
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
                             
                             unset($element["pluck"], $element["provider"], $element["rules"], $element["showIn"]);
-                            $subchildren_data["title"] = $subchildren["title"];
                             $subchildren_data["elements"][] = $element;
                         }
                         $children["subChildren"][$j] = $subchildren_data;
@@ -78,7 +82,7 @@ class ConfigurationRepository extends BaseRepository
                     $data["children"][$i]["absolute_path"] = "{$key}.children.{$i}.subChildren";
                     $data["children"][$i]["slug"] = Str::slug($children["title"]);
                 }
-                $fetched[$key] = $data;
+                $fetched_data['config'][$key] = $data;
             }
         }
         catch ( Exception $exception )
@@ -86,7 +90,32 @@ class ConfigurationRepository extends BaseRepository
             throw $exception;
         }
         
-        return $fetched;
+        return $fetched_data;
+    }
+
+    public function getEntityData(array $data): array
+    {
+        $input = [];
+        switch($data["scope"])
+        {
+            case "website":
+                $input["name"] = $this->website_model->findorFail($data["scope_id"])->name;
+                break;
+            
+            case "channel":
+                $channel = $this->channel_model->findorFail($data["scope_id"]);
+                $input["name"] = $channel->name;
+                $input["website_id"] = $channel->website_id;
+                break;
+
+            case "store":
+                $store = $this->store_model->findorFail($data["scope_id"]);
+                $input["name"] = $store->name;
+                $input["website_id"] = $store->channel->website_id;
+                break;
+        }
+        return $input;
+        
     }
 
     public function scopeFilter(string $scope, string $element_scope): bool
@@ -112,31 +141,34 @@ class ConfigurationRepository extends BaseRepository
         })->reject(function ($data) use($scope) {
             return $this->scopeFilter($scope, $data["scope"]);
         })->mapWithKeys(function($item) use($scope) {
-            $path =  "items.{$item['path']}.value";
-            $path1 =  "items.{$item['path']}.use_default_value";
-            $absolutePath = "items.{$item['path']}.absolute_path";
+            $prefix = "items.{$item['path']}";
+            $value_path =  "$prefix.value";
+            $default_path =  "$prefix.use_default_value";
+            $absolutePath = "$prefix.absolute_path";
 
-            $value_rule = ($item["is_required"] == 1) ? (($scope == "global") ? "required|{$item["rules"]}" : "required_without:$path1|{$item["rules"]}") : "{$item["rules"]}";
-            if($scope != "global") $default_rule = ($item["is_required"] == 1) ? "required_without:$path" : "";
+            $value_rule = ($item["is_required"] == 1) ? (($scope == "global") ? "required" : "required_without:$default_path") : "nullable";
+            $value_rule = "$value_rule|{$item["rules"]}";
+
+            if($scope != "global") $default_rule = ($item["is_required"] == 1) ? "boolean|required_without:$value_path" : "boolean";
+
+            $return_rules = [
+                $value_path => $value_rule,
+                $absolutePath => "required"
+            ];
 
             if(($item["type"] == "select" && $item["multiple"]) || $item["type"] == "checkbox")
             {
-                $multiple_return = [
-                    $path => $value_rule,
-                    "$path.*" => ($item["is_required"]==1) ? "required_without:$path1|{$item["value_rules"]}" : "{$item["value_rules"]}",
-                    $absolutePath => "required"
-                ];
-                return ($scope != "global") ? array_merge($multiple_return, [
-                    $path1 => $default_rule
-                ]) : $multiple_return;
+                $child_rule = ($item["is_required"] == 1) ? "required_without:$default_path" : "nullable";
+                $child_rule = "$child_rule|{$item["value_rules"]}";
+
+                $return_rules = array_merge($return_rules, [
+                    "$value_path.*" => $child_rule
+                ]);
             } 
-            $single_return = [
-                $path => $value_rule,
-                $absolutePath => "required"
-            ];
-            return ($scope != "global") ? array_merge($single_return, [
-                $path1 => $default_rule
-            ]) : $single_return;
+            return ($scope != "global") ? array_merge($return_rules, [
+                $default_path => $default_rule
+            ]) : $return_rules
+            ;
         })->toArray();
     }
 
@@ -158,7 +190,7 @@ class ConfigurationRepository extends BaseRepository
             if($this->scopeFilter($item['scope'], $configDataArray["scope"])) continue;
             
             $item['path'] = $key;
-            $item['value'] = isset($val['value']) ? $val['value'] : null;
+            $item['value'] = isset($val['value']) ? (($configDataArray["type"] == "file" ) ? $this->storeImage($val['value'], "configuration") : $val['value']) : null;
             
             if($configData = $this->checkCondition((object) $item)->first())
             {
@@ -205,4 +237,26 @@ class ConfigurationRepository extends BaseRepository
         }
         return $configValue;
     }
+
+    public function storeImage(object $request, ?string $folder = null, ?string $delete_url = null): string
+    {
+        try
+        {
+            // Store File
+            $file = $request;
+            $key = Str::random(6);
+            $folder = $folder ?? "default";
+            $file_path = $file->storeAs("images/{$folder}/{$key}", (string) $file->getClientOriginalName());
+
+            // Delete old file if requested
+            if ( $delete_url !== null ) Storage::delete($delete_url);
+        }
+        catch (\Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $file_path;
+    }
+
 }

@@ -13,12 +13,8 @@ class AttributeFactory extends Factory
 
     public function definition(): array
     {
-        while(true) {
-            $name = $this->faker->name();
-            $slug = Str::slug($name);
-            $old_attribute = $this->model::whereSlug($slug)->first();
-            if(!$old_attribute) break;
-        }
+        $name = $this->faker->name();
+        $slug = $this->faker->unique()->slug();
 
         $type = Arr::random([
             "text",
@@ -44,6 +40,7 @@ class AttributeFactory extends Factory
             "validation" => null,
             "is_visible_on_storefront" => rand(0,1),
             "is_user_defined" => rand(0,1),
+            "default_value" => null
         ];
     }
 }

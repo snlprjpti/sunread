@@ -18,20 +18,16 @@ class StoreTableSeeder extends Seeder
     {
         DB::table('stores')->insert([
            [
-               "currency" => "USD",
                "name" => "International Store",
-               "slug" => "international-store",
-               "locale" => "en",
+               "code" => "international-store",
                "position" => 1,
                "channel_id" => 1,
                "created_at" => now(),
                "updated_at" => now()
            ],
             [
-                "currency" => "EUR",
                 "name" => "English Store",
-                "slug" => "english-store",
-                "locale" => "en",
+                "code" => "english-store",
                 "position" => 2,
                 "channel_id" => 1,
                 "created_at" => now(),

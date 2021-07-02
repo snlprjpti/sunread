@@ -69,14 +69,17 @@ class AttributeController extends BaseController
         try
         {
             $type_check = in_array($request->type, $this->repository->non_filterable_fields);
-            $rules = $type_check ? [ "attribute_options" => "required|array" ] : [ "default_value" => config("validation.{$request->type}") ];
+            $rules = $type_check ? [ "attribute_options" => "required|array" ] : [ "default_value" => [ "nullable", config("validation.{$request->type}") ] ];
             $data = $this->repository->validateData($request, $rules,  function() use ($request) {
-                return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
+                return [
+                    'slug' => $request->slug ?? $this->model->createSlug($request->name)
+                ];
             });
             $this->repository->validateTranslation($request);
 
-            if (!$type_check) $data["use_in_layered_navigation"] = 0;
-            else $data["default_value"] = null;
+            if(!$type_check) $data["use_in_layered_navigation"] = 0;
+            if($type_check) $data["default_value"] = null;
+            
             if($request->type != "text") $data["validation"] = null;
             
             $created = $this->repository->create($data, function($created) use ($request, $type_check) {
@@ -114,17 +117,22 @@ class AttributeController extends BaseController
         try
         {
             $type_check = in_array($request->type, $this->repository->non_filterable_fields);
-            $rules = $type_check ? [ "attribute_options" => "required|array" ] : [ "default_value" => config("validation.{$request->type}") ];
-            $rules = $type_check ? [ "attribute_options" => "required|array" ] : [];
-            $data = $this->repository->validateData($request, [
+            $rules = $type_check ? [ "attribute_options" => "required|array" ] : [ "default_value" => [ "nullable", config("validation.{$request->type}") ] ];
+            
+            $data = $this->repository->validateData($request, array_merge($rules, [
                 "slug" => "nullable|unique:attributes,slug,{$id}"
-            ], function() use ($request) {
-                return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
+            ]), function() use ($request) {
+                return [
+                    'slug' => $request->slug ?? $this->model->createSlug($request->name)
+                ];
             });
-            $this->repository->validateTranslation($request);
-            if($this->model->findOrFail($id)->type != $data['type']) throw new AttributeCannotChangeException(__("core::app.response.type-cannot-change"));
 
-            if (!$type_check) $data["use_in_layered_navigation"] = 0;
+            $this->repository->validateFieldOnUpdate($data, $id);
+            $this->repository->validateTranslation($request);
+
+            if(!$type_check) $data["use_in_layered_navigation"] = 0;
+            if($type_check) $data["default_value"] = null;
+
             if($request->type != "text") $data["validation"] = null;
 
             $updated = $this->repository->update($data, $id, function($updated) use ($request, $type_check) {
