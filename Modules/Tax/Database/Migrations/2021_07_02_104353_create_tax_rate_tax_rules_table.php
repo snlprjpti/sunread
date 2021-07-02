@@ -13,8 +13,7 @@ class CreateTaxRateTaxRulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('tax_rate_tax_rules', function (Blueprint $table) {
-            $table->id();
+        Schema::create('tax_rate_tax_rule', function (Blueprint $table) {
             $table->unsignedBigInteger('tax_rate_id');
             $table->foreign('tax_rate_id')->references('id')->on('tax_rates')->onDelete('cascade');
             $table->unsignedBigInteger('tax_rule_id');
