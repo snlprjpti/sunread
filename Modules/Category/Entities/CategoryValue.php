@@ -11,7 +11,7 @@ class CategoryValue extends Model
     use HasUrlRewrite;
 
     public $timestamps = true;
-    protected $fillable = [ "scope", "scope_id", "name", "image", "description", "meta_title", "meta_description", "meta_keywords", "category_id", "status", "include_in_menu" ];
+    protected $fillable = [ "scope", "scope_id", "category_id", "attribute", "value" ];
 
     protected $appends = ['url'];
 

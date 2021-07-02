@@ -19,24 +19,20 @@ class CategoryValueTableSeeder extends Seeder
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
-                "name" => "Root",
-                "image" => NULL,
-                "status" => 1,
-                "include_in_menu" => 1,
+                "attribute" => "name",
+                "value" => "Root",
                 "created_at" => now(),
                 "updated_at" => now()
             ],
             [
-                "category_id" => 2,
+                "category_id" => 1,
                 "scope" => "website",
-                "scope_id" => 2,
-                "name" => "Root",
-                "image" => NULL,
-                "status" => 1,
-                "include_in_menu" => 1,
+                "scope_id" => 1,
+                "attribute" => "description",
+                "value" => null,
                 "created_at" => now(),
                 "updated_at" => now()
-            ]
+            ],
         ]);
     }
 }
