@@ -77,7 +77,9 @@ class AttributeController extends BaseController
             });
             $this->repository->validateTranslation($request);
 
-            !$type_check ? $data["use_in_layered_navigation"] = 0 : $data["default_value"] = null;
+            if(!$type_check) $data["use_in_layered_navigation"] = 0;
+            else $data["default_value"] = null;
+            
             if($request->type != "text") $data["validation"] = null;
             
             $created = $this->repository->create($data, function($created) use ($request, $type_check) {
@@ -128,7 +130,9 @@ class AttributeController extends BaseController
             $this->repository->validateFieldOnUpdate($data, $id);
             $this->repository->validateTranslation($request);
 
-            !$type_check ? $data["use_in_layered_navigation"] = 0 : $data["default_value"] = null;
+            if(!$type_check) $data["use_in_layered_navigation"] = 0;
+            else $data["default_value"] = null;
+
             if($request->type != "text") $data["validation"] = null;
 
             $updated = $this->repository->update($data, $id, function($updated) use ($request, $type_check) {
