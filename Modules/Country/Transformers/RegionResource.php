@@ -13,6 +13,7 @@ class RegionResource extends JsonResource
             "country" =>  new CountryResource($this->whenLoaded("country")),
             "code" => $this->code,
             "name" => $this->name,
+            "cities" => CityResource::collection($this->whenLoaded("cities")),
             "created_at" => $this->created_at->format('M d, Y H:i A'),
         ];
     }

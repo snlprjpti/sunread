@@ -52,7 +52,7 @@ class RegionController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id);
+            $fetched = $this->repository->fetch($id, [ "cities" ]);
         }
         catch (Exception $exception)
         {
