@@ -47,13 +47,14 @@ class AttributeTest extends BaseTestCase
                 ]
             ]
         ];
-        return $this->default_resource->is_user_defined ? 
-        array_merge($this->model::factory()->make([
-            'type' => $this->default_resource->type,
-            'slug' => $this->default_resource->slug
-        ])->toArray(), $translations) : array_merge($this->default_resource->toArray(), [
-            'name' => Str::random(10)
-        ], $translations);
+        return $this->default_resource->is_user_defined 
+            ? array_merge($this->model::factory()->make([
+                'type' => $this->default_resource->type,
+                'slug' => $this->default_resource->slug
+            ])->toArray(), $translations) 
+            : array_merge($this->default_resource->toArray(), [
+                'name' => Str::random(10)
+            ], $translations);
     }
 
     public function getNonMandotaryCreateData(): array
