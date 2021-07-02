@@ -4,10 +4,10 @@ namespace Modules\Inventory\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
-use Modules\Inventory\Observers\CatalogInventoryObserver;
-use Modules\Inventory\Observers\CatalogInventoryItemObserver;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Entities\CatalogInventoryItem;
+use Modules\Inventory\Observers\CatalogInventoryObserver;
+use Modules\Inventory\Observers\CatalogInventoryItemObserver;
 
 class InventoryServiceProvider extends ServiceProvider
 {
@@ -117,7 +117,7 @@ class InventoryServiceProvider extends ServiceProvider
 
     private function registerObserver(): void
     {
-        CatalogInventory::observer(CatalogInventoryObserver::class);
-        CatalogInventoryItem::observer(CatalogInventoryItem::class);
+        // CatalogInventory::observer(CatalogInventoryObserver::class);
+        // CatalogInventoryItem::observer(CatalogInventoryItemObserver::class);
     }
 }
