@@ -13,8 +13,8 @@ class TaxRateRepository extends BaseRepository
         $this->model_key = "tax-rates";
 
         $this->rules = [
-            "country_id" => "sometimes|nullable", // "sometimes|nullable|exists:countries,id"
-            "region_id" => "sometimes|nullable", // "sometimes|nullable|exists:regions,id"
+            "country_id" => "sometimes|nullable|exists:countries,id",
+            "region_id" => "sometimes|nullable|exists:regions,id",
             "identifier" => "required|unique:tax_rates,identifier",
             "use_zip_range" => "required|boolean",
             "zip_code" => "sometimes|nullable",
