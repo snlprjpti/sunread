@@ -11,12 +11,10 @@ class TaxRateFactory extends Factory
     public function definition(): array
     {
         $country = Country::inRandomOrder()->first();
-        $country_id = $country->id;
-        $region_id = $country->regions()->inRandomOrder()->first()?->id;
 
         return [
-            "country_id" => $country_id,
-            "region_id" => $region_id,
+            "country_id" => $country->id,
+            "region_id" => $country->regions()->inRandomOrder()->first()?->id,
             "identifier" => $this->faker->unique()->slug(),
             "use_zip_range" => 0,
             "zip_code" => "*",
