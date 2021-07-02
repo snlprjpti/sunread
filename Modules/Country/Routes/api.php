@@ -6,5 +6,6 @@ Route::group(['middleware' => ['api']], function () {
 
         Route::resource('country', CountryController::class)->only(['index', 'show']);
         Route::resource('regions', RegionController::class)->only(['index', 'show']);
+        Route::resource('cities', CityController::class)->only(['index', 'show']);
     });
 });
