@@ -3,19 +3,19 @@
 namespace Modules\Country\Tests\Feature;
 
 use Modules\Core\Tests\BaseTestCase;
-use Modules\Country\Entities\Country;
+use Modules\Country\Entities\City;
 
-class CountryTest extends BaseTestCase
+class CityTest extends BaseTestCase
 {
     public function setUp(): void
     {
-        $this->model = Country::class;
+        $this->model = City::class;
 
         parent::setUp();
         $this->admin = $this->createAdmin();
 
-        $this->model_name = "Country";
-        $this->route_prefix = "admin.country";
+        $this->model_name = "City";
+        $this->route_prefix = "admin.cities";
 
         $this->createFactories = false;
         $this->hasStoreTest = false;
