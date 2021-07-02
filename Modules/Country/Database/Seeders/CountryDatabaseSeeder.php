@@ -12,5 +12,6 @@ class CountryDatabaseSeeder extends Seeder
         Model::unguard();
         $this->call(CountryTableSeeder::class);
         $this->call(RegionTableSeeder::class);
+        $this->call(CityTableSeeder::class);
     }
 }
