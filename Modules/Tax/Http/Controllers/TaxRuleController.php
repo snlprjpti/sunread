@@ -54,7 +54,9 @@ class TaxRuleController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $created = $this->repository->create($data);
+            $created = $this->repository->create($data, function($created) use($request) {
+                $created->tax_rates()->sync($request->get("tax_rates"));
+            });
         }
         catch( Exception $exception )
         {
@@ -83,7 +85,9 @@ class TaxRuleController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function($updated) use($request) {
+                $updated->tax_rates()->sync($request->get("tax_rates"));
+            });
         }
         catch( Exception $exception )
         {
