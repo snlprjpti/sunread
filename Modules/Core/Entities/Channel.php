@@ -16,6 +16,7 @@ class Channel extends Model
 
     public static $SEARCHABLE = [ "code", "hostname", "name", "description" ];
     protected $fillable = [ "code", "hostname", "name", "description", "default_store_id", "website_id", "status" ];
+    protected $with = [ "stores" ];
 
     protected $touches = ['products'];
 
