@@ -22,7 +22,7 @@ class Category extends Model
 {
     use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation, HasScope;
 
-    public static $SEARCHABLE = [ "values.name", "slug" ];
+    public static $SEARCHABLE = [];
     protected $fillable = [ "parent_id", "slug", "position", "website_id" ];
     protected $with = [ "website", "values" ];
 
