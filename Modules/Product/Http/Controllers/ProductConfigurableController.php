@@ -48,6 +48,7 @@ class ProductConfigurableController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
+            $data["type"] = "configurable";
             $created = $this->repository->create($data);
         }
         catch(Exception $exception)
@@ -81,7 +82,6 @@ class ProductConfigurableController extends BaseController
             // create product variants based on super attributes and parent product.
             $this->repository->createVariants($product, $request);
 
-            $data["type"] = "configurable";
             unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
