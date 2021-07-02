@@ -12,8 +12,8 @@ class TaxRuleRepository extends BaseRepository
         $this->model = $taxRule;
         $this->model_key = "tax-rules";
         $this->rules = [
-            "customer_group_class" => "required|exists:customer_tax_groups,id",
-            "product_taxable_class" => "required|exists:product_tax_groups,id",
+            "customer_group_class" => "nullable|exists:customer_tax_groups,id",
+            "product_taxable_class" => "nullable|exists:product_tax_groups,id",
             "name" => "required",
             "position" => "required|numeric",
             "priority" => "required|numeric",
