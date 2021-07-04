@@ -2,6 +2,8 @@
 
 namespace Modules\Inventory\Repositories;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Core\Repositories\BaseRepository;
 
@@ -24,11 +26,14 @@ class CatalogInventoryRepository extends BaseRepository
 
 	public function syncItem(object $inventory, object $request, string $method = "store"): object
 	{
+		DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.create.before");
+		
 		try
 		{
 			$data = [
 				"product_id" => $inventory->product_id,
-				"event"  => ($method == "store") ? "Created Inventory" : "Updated Inventory",
+				"event"  => ($method == "store") ? "Created" : "Updated",
 				"adjusted_by" => auth()->guard("admin")->check() ? auth()->guard("admin")->id() : null,
 				"adjustment_type" => $this->adjustment($request, $inventory),
 				"quantity" => $request->quantity,
@@ -37,8 +42,12 @@ class CatalogInventoryRepository extends BaseRepository
 		} 
 		catch (\Exception $exception)
 		{
+			DB::rollBack();
 			throw $exception;
 		}
+
+        Event::dispatch("{$this->model_key}.create.after", $Inventoryitem);
+        DB::commit();
 
 		return $Inventoryitem;
 	}
