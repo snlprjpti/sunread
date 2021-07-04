@@ -59,7 +59,7 @@ class CatalogInventoryController extends BaseController
                 $this->repository->syncItem($created, $request);
             });
         }
-        catch( Exeption $exception )
+        catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
