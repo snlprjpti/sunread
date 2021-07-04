@@ -2,6 +2,8 @@
 
 namespace Modules\Inventory\Repositories;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Inventory\Entities\CatalogInventoryItem;
 use Modules\Core\Repositories\BaseRepository;
 
@@ -23,16 +25,35 @@ class CatalogInventoryItemRepository extends BaseRepository
 		];
 	}
 
-	public function adustment(object $catalogInventoryItem)
+	public function adjustment(object $inventoryItem, object $request): ?bool
 	{
+		DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.create.before");
+
 		try
 		{
-			dd($catalogInventoryItem);
+			foreach ($inventoryItem->catalog_inventories()->get() as $key => $inventory)
+			{
+				if ($request->adjustment_type == "deduction")
+				{
+					$value = ($inventory->quantity - $request->quantity);
+					if ((substr(strval($value), 0, 1) == "-")) throw new \Exception("Couldn't deduct. Stock quantity is {$inventoryItem->quantity}");
+					$inventory->update(["quantity" => $value]);
+				}
+				else
+				{
+					$inventory->update(["quantity" => ($inventoryItem->quantity + $request->quantity)]);
+				}
+			}
 		}
-		catch (Exception $exception)
+		catch (\Exception $exception)
 		{
-			
+			DB::rollBack();
+			throw $exception;
 		}
+
+		Event::dispatch("{$this->model_key}.create.after", $inventory);
+        DB::commit();
 
 		return true;
 	}
