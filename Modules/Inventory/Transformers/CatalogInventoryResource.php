@@ -19,7 +19,7 @@ class CatalogInventoryResource extends JsonResource
             "manage_stock" => (bool) $this->manage_stock,
             "is_in_stock" => (bool) $this->is_in_stock,
             "use_config_manage_stock" => (bool) $this->use_config_manage_stock,
-            "catalog_inventory_items" => $this->when( !(empty($this->catalog_inventory_items)), CatalogInventoryItemResource::collection($this->whenLoaded("catalog_inventory_items")) ),
+            "catalog_inventory_items" => CatalogInventoryItemResource::collection($this->whenLoaded("catalog_inventory_items")),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

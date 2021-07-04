@@ -3,6 +3,7 @@
 namespace Modules\Inventory\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Product\Transformers\ProductResource;
 use Modules\User\Transformers\AdminResource;
 
@@ -17,6 +18,7 @@ class CatalogInventoryItemResource extends JsonResource
             "adjustment_type" => $this->adjustment_type,
             "quantity" => $this->quantity,
             // "product" => $this->when( ($this->product), new ProductResource($this->whenLoaded("product")) ),
+            "catalog_inventories" => CatalogInventoryResource::collection($this->whenLoaded("catalog_inventories")),
             "adjusted_by" => $this->when( ($this->admin()), new AdminResource($this->whenLoaded("admin")) ),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
