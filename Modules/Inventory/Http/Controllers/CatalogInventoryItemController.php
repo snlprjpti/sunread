@@ -88,7 +88,10 @@ class CatalogInventoryItemController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function($updated) use($request) {
+                $updated->catalog_inventories()->sync($request->get("catalog_inventories"));
+                $this->repository->adjustment($updated, $request);
+            });
         }
         catch( Exception $exception )
         {
