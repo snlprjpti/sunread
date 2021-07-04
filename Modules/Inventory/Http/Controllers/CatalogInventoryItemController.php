@@ -56,13 +56,12 @@ class CatalogInventoryItemController extends BaseController
         {
 
             $data = $this->repository->validateData($request);
-            $created = $this->repository->create($data, function($created) use($id) {
-
-                $this->repository->adustment($created);
-                dd($created->adjustment_type);
+            $created = $this->repository->create($data, function($created) use($request){
+                $created->catalog_inventories()->sync($request->get("catalog_inventories"));
+                $this->repository->adjustment($created, $request);
             });
         }
-        catch( Exeption $exception )
+        catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
