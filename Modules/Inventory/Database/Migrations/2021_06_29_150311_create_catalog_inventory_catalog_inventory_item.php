@@ -6,12 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateCatalogInventoryCatalogInventoryItem extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('catalog_inventory_catalog_inventory_item', function (Blueprint $table) {
             $table->unsignedBigInteger("catalog_inventory_id");
@@ -24,12 +19,7 @@ class CreateCatalogInventoryCatalogInventoryItem extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('catalog_inventory_catalog_inventory_item');
     }
