@@ -3,6 +3,7 @@
 namespace Modules\Inventory\Tests\Feature;
 
 use Modules\Core\Tests\BaseTestCase;
+use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Entities\CatalogInventoryItem;
 
 class CatalogInventoryItemTest extends BaseTestCase
@@ -18,6 +19,12 @@ class CatalogInventoryItemTest extends BaseTestCase
         $this->route_prefix = "admin.catalog.inventory-items";
     }
 
+    public function getCreateData(): array
+    {
+        $inventory = CatalogInventory::inRandomOrder()->first();
+        return $this->model::factory()->make(["catalog_inventories" => [$inventory->id]])->toArray();
+    }
+    
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
@@ -25,10 +32,10 @@ class CatalogInventoryItemTest extends BaseTestCase
         ]);
     }
 
-    // public function getNonMandodtaryCreateData(): array
-    // {
-    //     return array_merge($this->getCreateData(), [
-    //         "event" => null
-    //     ]);
-    // }
+    public function getNonMandodtaryCreateData(): array
+    {
+        return array_merge($this->getCreateData(), [
+            "event" => null
+        ]);
+    }
 }

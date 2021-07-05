@@ -18,17 +18,15 @@ class CatalogInventoryTest extends BaseTestCase
         $this->route_prefix = "admin.catalog.inventories";
     }
 
+    public function getCreateData(): array
+    {
+        return $this->model::factory()->make(["is_in_stock" => true])->toArray();
+    }
+
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "product_id" => null
-        ]);
-    }
-
-    public function getNonMandodtaryCreateData(): array
-    {
-        return array_merge($this->getCreateData(), [
-            "is_in_stock" => null
         ]);
     }
 }
