@@ -6,12 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateCatalogInventoryItemsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('catalog_inventory_items', function (Blueprint $table) {
             $table->id();
@@ -23,16 +18,13 @@ class CreateCatalogInventoryItemsTable extends Migration
             $table->string("adjustment_type")->nullable();
 
             $table->foreign("product_id")->references("id")->on("products")->onDelete("cascade");
+            $table->foreign("adjusted_by")->references("id")->on("admins")->onDelete("cascade");
+
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('catalog_inventory_items');
     }
