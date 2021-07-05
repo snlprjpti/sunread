@@ -15,7 +15,6 @@ class CatalogInventoryItemFactory extends Factory
             "event" => "Default Adjustment",
             "adjusted_by" => 1,
             "quantity" => 5,
-            "adjusted_by" => 1,
             "adjustment_type" => "addition",
             "created_at" => now(),
             "updated_at" => now()
