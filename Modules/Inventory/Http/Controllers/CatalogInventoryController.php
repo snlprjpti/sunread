@@ -39,7 +39,7 @@ class CatalogInventoryController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["catalog_inventory_items"]);
+            $fetched = $this->repository->fetchAll($request, ["catalog_inventory_items", "product", "website"]);
         }
         catch (Exception $exception)
         {
@@ -71,7 +71,7 @@ class CatalogInventoryController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id);
+            $fetched = $this->repository->fetch($id, ["catalog_inventory_items", "product", "website"]);
         }
         catch( Exception $exception )
         {
