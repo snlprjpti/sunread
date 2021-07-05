@@ -19,7 +19,8 @@ class TaxRuleRepository extends BaseRepository
             "priority" => "required|numeric",
             "subtotal" => "sometimes|nullable",
             "status" => "sometimes|boolean",
-            "tax_rates" => "sometimes|exists:tax_rates,id"
+            "tax_rates" => "sometimes|array",
+            "tax_rates.*" => "exists:tax_rates,id"
         ];
     }
 }
