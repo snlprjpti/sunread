@@ -12,7 +12,7 @@ class CreateCatalogInventoryItemsTable extends Migration
             $table->id();
             $table->unsignedBigInteger("product_id")->nullable();
             $table->integer("order_id")->nullable();
-            $table->integer("adjusted_by")->nullable();
+            $table->unsignedBigInteger("adjusted_by")->nullable();
             $table->integer("quantity");
             $table->string("event")->nullable();
             $table->string("adjustment_type")->nullable();
