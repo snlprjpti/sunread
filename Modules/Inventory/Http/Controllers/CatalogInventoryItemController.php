@@ -56,9 +56,13 @@ class CatalogInventoryItemController extends BaseController
         {
 
             $data = $this->repository->validateData($request);
+            $data["adjusted_by"] = auth()->guard("admin")->check() ? auth()->guard("admin")->id() : null;
             $created = $this->repository->create($data, function($created) use($request){
-                $created->catalog_inventories()->sync($request->get("catalog_inventories"));
-                $this->repository->adjustment($created, $request);
+                if ($request->catalog_inventories)
+                {
+                    $created->catalog_inventories()->sync($request->get("catalog_inventories"));
+                    $this->repository->adjustment($created, $request);
+                }
             });
         }
         catch( Exception $exception )
@@ -88,9 +92,13 @@ class CatalogInventoryItemController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
+            $data["adjusted_by"] = auth()->guard("admin")->check() ? auth()->guard("admin")->id() : null;
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
-                $updated->catalog_inventories()->sync($request->get("catalog_inventories"));
-                $this->repository->adjustment($updated, $request);
+                if ($request->catalog_inventories)
+                {
+                    $updated->catalog_inventories()->sync($request->get("catalog_inventories"));
+                    $this->repository->adjustment($updated, $request);
+                }
             });
         }
         catch( Exception $exception )
@@ -112,6 +120,6 @@ class CatalogInventoryItemController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang("delete-success"), 204);
+        return $this->successResponseWithMessage($this->lang("delete-success"));
     }
 }

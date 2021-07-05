@@ -56,7 +56,7 @@ class CatalogInventoryController extends BaseController
             $data = $this->repository->validateData($request);
             unset($data["quantity"]);
             $created = $this->repository->create($data, function($created) use($request) {
-                $this->repository->syncItem($created, $request);
+                if ($request->adjustment_type) $this->repository->syncItem($created, $request);
             });
         }
         catch( Exception $exception )
@@ -110,6 +110,6 @@ class CatalogInventoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang("delete-success"), 204);
+        return $this->successResponseWithMessage($this->lang("delete-success"));
     }
 }
