@@ -7,12 +7,12 @@ use Modules\Inventory\Entities\CatalogInventoryItem;
 
 class CatalogInventoryItemObserver
 {
-	public function created(CatalogInventoryItem $catalogInventoryItem)
-	{
+    public function created(CatalogInventoryItem $catalogInventoryItem)
+    {
         Audit::log($catalogInventoryItem, __FUNCTION__);
-	}
+    }
 
-	public function updated(CatalogInventoryItem $catalogInventoryItem)
+    public function updated(CatalogInventoryItem $catalogInventoryItem)
     {
         Audit::log($catalogInventoryItem, __FUNCTION__);
     }

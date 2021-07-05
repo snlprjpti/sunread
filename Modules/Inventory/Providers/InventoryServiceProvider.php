@@ -117,7 +117,7 @@ class InventoryServiceProvider extends ServiceProvider
 
     private function registerObserver(): void
     {
-        // CatalogInventory::observer(CatalogInventoryObserver::class);
-        // CatalogInventoryItem::observer(CatalogInventoryItemObserver::class);
+        CatalogInventory::observe(CatalogInventoryObserver::class);
+        CatalogInventoryItem::observe(CatalogInventoryItemObserver::class);
     }
 }
