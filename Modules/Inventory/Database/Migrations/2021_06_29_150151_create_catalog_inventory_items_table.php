@@ -17,8 +17,8 @@ class CreateCatalogInventoryItemsTable extends Migration
             $table->string("event")->nullable();
             $table->string("adjustment_type")->nullable();
 
-            $table->foreign("product_id")->references("id")->on("products")->onDelete("cascade");
             $table->foreign("adjusted_by")->references("id")->on("admins")->onDelete("cascade");
+            $table->foreign("product_id")->references("id")->on("products")->onDelete("cascade");
 
             $table->timestamps();
         });
