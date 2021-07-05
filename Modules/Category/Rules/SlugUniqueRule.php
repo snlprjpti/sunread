@@ -4,9 +4,11 @@ namespace Modules\Category\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Modules\Category\Entities\Category;
+use Modules\Category\Traits\HasScope;
 
 class SlugUniqueRule implements Rule
 {
+    use HasScope;
     /**
      * Create a new rule instance.
      *
@@ -30,7 +32,7 @@ class SlugUniqueRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $category_exist = $this->model->whereParentId($this->data->parent_id)->whereWebsiteId($this->data->website_id)->whereSlug($value)->first();
+        $category_exist = $this->checkSlug($this->data, $value);
         return ($category_exist) ? ($this->id == $category_exist->id ? true : false) : true;
     }
 

@@ -13,6 +13,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Transformers\List\CategoryResource as ListCategoryResource;
 use Modules\Category\Repositories\CategoryValueRepository;
@@ -78,11 +79,13 @@ class CategoryController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, array_merge([
-                "slug" => [ "nullable", new SlugUniqueRule($request) ]
-            ], $this->repository->getValidationRules($request)), function() use ($request) {
+            $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
+                "items.slug.value" => new SlugUniqueRule($request)
+            ]), function () use ($request) {
+                $items = $request->items;
+                $items["slug"]["value"] = $items["slug"] ?? $this->repository->createUniqueSlug($request);
                 return [
-                    "slug" => $request->slug ?? $this->model->createSlug($request->name),
+                    "items" => $items,
                     "scope" => "website",
                     "scope_id" => $request->website_id
                 ];

@@ -50,4 +50,11 @@ trait HasScope
     {
         return (bool) $this->value_model->whereCategoryId($data["category_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->count();
     }
+
+    public function checkSlug(object $request, string $slug): ?object
+    {
+        return $this->model->whereParentId($request->parent_id)->whereWebsiteId($request->website_id)->whereHas("values", function ($query) use($slug) {
+            $query->whereAttribute("slug")->whereValue($slug);
+        })->first();
+    }
 }

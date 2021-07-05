@@ -5,28 +5,32 @@ return [
             "title" => "General Details",
             "elements" => [
                 [
-                    "title" => "name",
+                    "title" => "Name",
+                    "slug" => "name",
                     "type" => "text",
+                    "value" => "",
                     "scope" => "store",
-                    "rules" => "",
-                    "is_required" => 1,
-                    "value" => ""
+                    "rules" => "string",
+                    "is_required" => 1
                 ],
                 [
-                    "title" => "status",
+                    "title" => "Status",
+                    "slug" => "status",
                     "type" => "boolean",
+                    "value" => "",
                     "scope" => "store",
-                    "rules" => "boolean",
-                    "is_required" => 1,
-                    "value" => ""
+                    "rules" => "nullable|boolean",
+                    "is_required" => 0
                 ],
                 [
-                    "title" => "include_in_menu",
+                    "title" => "Include In Menu",
+                    "slug" => "include_in_menu",
                     "type" => "boolean",
+                    "value" => "",
                     "scope" => "store",
-                    "rules" => "boolean",
-                    "is_required" => 0,
-                    "value" => ""
+                    "rules" => "nullable|boolean",
+                    "is_required" => 0
+                    
                 ]
             ]
         ],
@@ -34,20 +38,23 @@ return [
             "title" => "Content",
             "elements" => [
                 [
-                    "title" => "image",
+                    "title" => "Image",
+                    "slug" => "image",
                     "type" => "file",
+                    "value" => "",
                     "scope" => "store",
-                    "rules" => "mimes:jpeg,jpg,bmp,png",
-                    "is_required" => 0,
-                    "value" => ""
+                    "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                    "is_required" => 0            
                 ],
                 [
-                    "title" => "description",
+                    "title" => "Description",
+                    "slug" => "description",
                     "type" => "textarea",
+                    "value" => "",
                     "scope" => "store",
-                    "rules" => "nullable",
-                    "is_required" => 0,
-                    "value" => ""
+                    "rules" => "nullable|string",
+                    "is_required" => 0
+                    
                 ]
             ]
         ],
@@ -59,28 +66,44 @@ return [
             "title" => "Search Engine Optimization",
             "elements" => [
                 [
-                    "title" => "meta_title",
+                    "title" => "Slug",
+                    "slug" => "slug",
                     "type" => "text",
+                    "value" => "",
+                    "scope" => "website",
+                    "rules" => "string",
+                    "is_required" => 1
+                    
+                ],
+                [
+                    "title" => "Meta Title",
+                    "slug" => "meta_title",
+                    "type" => "text",
+                    "value" => "",
                     "scope" => "website",
                     "rules" => "nullable",
-                    "is_required" => 1,
-                    "value" => ""
+                    "is_required" => 0
+                    
                 ],
                 [
-                    "title" => "meta_keywords",
+                    "title" => "Meta KeyWords", 
+                    "slug" => "meta_keywords",
                     "type" => "text",
+                    "value" => "",
                     "scope" => "channel",
                     "rules" => "nullable",
-                    "is_required" => 1,
-                    "value" => ""
+                    "is_required" => 0
+                    
                 ],
                 [
-                    "title" => "meta_description",
+                    "title" => "Meta Description",
+                    "slug" => "meta_description",
                     "type" => "textarea",
+                    "value" => "",
                     "scope" => "store",
                     "rules" => "nullable",
-                    "is_required" => 1,
-                    "value" => ""
+                    "is_required" => 0
+                    
                 ]
             ]
         ],
