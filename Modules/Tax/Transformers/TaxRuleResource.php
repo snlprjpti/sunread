@@ -12,7 +12,7 @@ class TaxRuleResource extends JsonResource
             "id" => $this->id,
             "customer_group" => new CustomerTaxGroupResource($this->whenLoaded("customer_group")),
             "product_taxable" => new ProductTaxGroupResource($this->whenLoaded("product_taxable")),
-            "tax_rates" => $this->whenLoaded("tax_rates"),
+            "tax_rates" => TaxRateResource::collection($this->whenLoaded("tax_rates")),
             "name" => $this->name,
             "position" => (int) $this->position,
             "priority" => (int) $this->priority,
