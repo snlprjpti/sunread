@@ -62,7 +62,7 @@ class BaseRepository
         {
             $sort_by = $request->sort_by ?? "id";
             $sort_order = $request->sort_order ?? "desc";
-            $limit = $request->limit ?? $this->pagination_limit;
+            $limit = (int) $request->limit ?? $this->pagination_limit;
 
             $rows = $rows ?? $this->model::query();
             if ($with !== []) $rows = $rows->with($with);

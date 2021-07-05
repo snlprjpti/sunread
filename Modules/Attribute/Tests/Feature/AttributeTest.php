@@ -178,11 +178,9 @@ class AttributeTest extends BaseTestCase
 
     public function testShouldReturnErrorIfUpdateResourceDoesNotExist()
     {
-        if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
-
-        $post_data = array_merge($this->getCreateData(), [
-            "slug" => null
-        ]);
+        $post_data = $this->getCreateData();
+        $post_data = $this->addAttributeOptionIfNecessary($post_data);
+        
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->fake_resource_id]), $post_data);
 
         $response->assertNotFound();
