@@ -16,12 +16,11 @@ class CatalogInventoryItemRepository extends BaseRepository
 		$this->rules = [
 			"product_id" => "required|exists:products,id",
 			"event" => "sometimes|nullable",
-			"order_id" => "required", // [To::do] include exists rule 
-			"adjusted_by" => "required",
+			"order_id" => "sometimes", // [To::do] include exists rule 
 			"adjustment_type" => "required|in:addition,deduction",
 			"quantity" => "required",
-			"catalog_inventories" => "required|array",
-			"catalog_inventories.*" => "required|exists:catalog_inventories,id"
+			"catalog_inventories" => "sometimes|array",
+			"catalog_inventories.*" => "sometimes|exists:catalog_inventories,id"
 		];
 	}
 

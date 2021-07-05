@@ -17,7 +17,7 @@ class CatalogInventoryRepository extends BaseRepository
 			"product_id" => "required|integer|exists:products,id",
 			"website_id" => "required|integer|exists:websites,id",
 			"quantity" => "required|numeric",
-			"is_in_stock" => "sometimes|boolean",
+			"is_in_stock" => "required|boolean",
 			"manage_stock" => "sometimes|boolean",
 			"use_config_manage_stock" => "sometimes|boolean",
 			"adjustment_type" => "sometimes|in:addition,deduction",
