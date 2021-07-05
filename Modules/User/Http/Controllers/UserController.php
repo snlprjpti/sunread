@@ -2,16 +2,17 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 use Modules\User\Transformers\AdminResource;
 use Modules\User\Repositories\AdminRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
-use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Hash;
 use Modules\User\Exceptions\CannotDeleteSelfException;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\User\Exceptions\CannotDeleteSuperAdminException;
 
 class UserController extends BaseController
@@ -46,10 +47,9 @@ class UserController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["role"]);
+            $fetched = $this->repository->fetchAll($request, ["role"]);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -68,9 +68,11 @@ class UserController extends BaseController
             ]);
             $data["password"] = Hash::make($data["password"]);
 
-            $created = $this->repository->create($data);
+            $created = $this->repository->create($data, function ($created) {
+                $created->load("role");
+            });
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -82,9 +84,9 @@ class UserController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["role"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["role"]);
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -108,9 +110,11 @@ class UserController extends BaseController
                 $data["password"] = Hash::make($data["password"]);
             }
 
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function ($updated) {
+                $updated->load("role");
+            });
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
@@ -128,21 +132,23 @@ class UserController extends BaseController
                 $this->repository->removeOldImage($deleted->id);
             });
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse
     {
         try
         {
-            $updated = $this->repository->updateStatus($request, $id);
+            $updated = $this->repository->updateStatus($request, $id, function ($updated) {
+                $updated->load("role");
+            });
         }
-        catch (\Exception $exception)
+        catch (Exception $exception)
         {
             return $this->handleException($exception);
         }

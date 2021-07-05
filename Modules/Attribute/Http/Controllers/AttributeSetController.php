@@ -9,9 +9,11 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Attribute\Exceptions\AttributeGroupsPresent;
 use Modules\Attribute\Exceptions\DefaultFamilyCanNotBeDeleted;
+use Modules\Attribute\Exceptions\DefaultSetCanNotBeDeleted;
 use Modules\Attribute\Repositories\AttributeGroupRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Attribute\Transformers\AttributeResource;
@@ -19,12 +21,13 @@ use Modules\Attribute\Transformers\AttributeSetResource;
 
 class AttributeSetController extends BaseController
 {
-    protected $repository, $attributeGroupRepository;
+    protected $repository, $attributeGroupRepository, $group_model;
 
-    public function __construct(AttributeSetRepository $attributeSetRepository, AttributeSet $attribute_set, AttributeGroupRepository $attributeGroupRepository)
+    public function __construct(AttributeSetRepository $attributeSetRepository, AttributeSet $attribute_set, AttributeGroupRepository $attributeGroupRepository, AttributeGroup $attribute_group)
     {
         $this->repository = $attributeSetRepository;
         $this->model = $attribute_set;
+        $this->group_model = $attribute_group;
         $this->model_name = "Attribute Set";
         $exception_statuses = [
             DefaultFamilyCanNotBeDeleted::class => 403,
@@ -66,9 +69,7 @@ class AttributeSetController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "attribute_set_id" => "required|exists:attribute_sets,id"
-            ], function() use ($request) {
-                return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
-            });
+            ]);
             
             $selected_attributeSet = $this->model->find($data["attribute_set_id"]);
             
@@ -77,7 +78,7 @@ class AttributeSetController extends BaseController
                 $selected_attributeSet->attribute_groups->map(function($attributeGroup) use($created){
                     $item = [
                         "name" => $attributeGroup->name,
-                        "slug" => "{$created->slug}_{$attributeGroup->slug}",
+                        "slug" => "{$this->group_model->createSlug($created->name)}-{$attributeGroup->slug}",
                         "attributes" => ($attributeGroup->attributes) ? $attributeGroup->attributes->pluck('id')->toArray() : []
                     ];
                     $this->attributeGroupRepository->singleUpdateOrCreate($item, $created);
@@ -112,11 +113,8 @@ class AttributeSetController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "slug" => "nullable|unique:attribute_sets,slug,{$id}",
                 "groups" => "sometimes|array"
-            ], function() use ($request) {
-                return ['slug' => $request->slug ?? $this->model->createSlug($request->name)];
-            });
+            ]);
             
             if(isset($data["groups"])) $this->repository->attributeValidation($data);
 
@@ -137,8 +135,8 @@ class AttributeSetController extends BaseController
         try
         {
             $this->repository->delete($id, function($deleted) {
-                if ($deleted->slug == 'default') throw new DefaultFamilyCanNotBeDeleted($this->lang('response.default-set-delete'));
-                if ( count($deleted->attribute_groups) > 0 ) throw new AttributeGroupsPresent($this->lang('response.attribute-groups-present'));
+                if (!$deleted->is_user_defined) throw new DefaultSetCanNotBeDeleted($this->lang('response.default-set-delete'));
+                //if ( count($deleted->attribute_groups) > 0 ) throw new AttributeGroupsPresent($this->lang('response.attribute-groups-present'));
             });
         }
         catch( Exception $exception )
@@ -146,21 +144,35 @@ class AttributeSetController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
-
-    public function updateStatus(Request $request, int $id): JsonResponse
+    public function listAttributeSets(): JsonResponse
     {
         try
         {
-            $updated = $this->repository->updateStatus($request, $id);
+            $fetched = $this->model::all();
         }
-        catch (Exception $exception)
+        catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
+    }
+
+    public function attributeSet(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->repository->validateAttributeSetListing($request); 
+            $fetched = $this->repository->generateFormat($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang("fetch-success"));
     }
 }

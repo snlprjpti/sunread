@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Modules\Attribute\Repositories;
 
 use Exception;
@@ -16,7 +15,7 @@ use Modules\Core\Entities\Store;
 
 class AttributeOptionRepository extends BaseRepository
 {
-    protected $model, $model_key, $translation, $translation_model;
+    protected $translation, $translation_model;
 
     public function __construct(AttributeOption $attribute_option, AttributeOptionTranslation $attribute_option_translation, AttributeOptionTranslationRepository $attributeOptionTranslationRepository)
     {
@@ -65,11 +64,10 @@ class AttributeOptionRepository extends BaseRepository
 
     public function show(int $id): array
     {
-        $all_data = [];
         $input = [];
         $attribute_options = $this->model->whereAttributeId($id)->get();
 
-        if($attribute_options->count() == 0) return $all_data;
+        if($attribute_options->count() == 0) return $input;
 
         foreach($attribute_options as $attribute_option)
         {
@@ -98,15 +96,14 @@ class AttributeOptionRepository extends BaseRepository
                     $item["stores"][] = [
                        "id" => $store->id,
                        "name" => $store->name,
-                       "value" => $this->translation_model->whereAttributeOptionId($id)->whereStoreId($store->id)->first()->name ?? null
+                       "value" => $this->translation_model->whereAttributeOptionId($attribute_option->id)->whereStoreId($store->id)->first()->name ?? null
                     ];
                 }
-                $data["data"][] = $item;
+                $data["translations"]["data"][] = $item;
             }
-            $data["selected_channels"] = $selected_channels;
-            $input["translations"][] = $data;
+            if(count($selected_channels)>0) $data["translations"]["selected_channels"] = $selected_channels;
+            $input[] = $data;
         }
-        $all_data[] = $input;
-        return $all_data;
+        return $input;
     }
 }

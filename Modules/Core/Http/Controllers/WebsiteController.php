@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\WebsiteRepository;
+use Modules\Core\Rules\FQDN;
 use Modules\Core\Transformers\WebsiteResource;
 
 class WebsiteController extends BaseController
@@ -37,7 +38,9 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["channels.stores"]);
+            $fetched = $this->repository->fetchAll($request, ["channels.stores"], function (){
+                return $this->model->orderBy('position');
+            });
         }
         catch( Exception $exception )
         {
@@ -96,7 +99,7 @@ class WebsiteController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "code" => "required|unique:websites,code,{$id}",
-                "hostname" => "required|unique:websites,hostname,{$id}"
+                "hostname" => [ "required", "unique:websites,hostname,{$id}", "unique:channels,hostname", new FQDN()],
             ]);
             $updated = $this->repository->update($data, $id);
         }
@@ -119,7 +122,7 @@ class WebsiteController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
     public function updateStatus(Request $request, int $id): JsonResponse

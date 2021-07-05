@@ -13,6 +13,7 @@ Route::group(['middleware' => ['api']], function () {
             Route::put("/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("status");
 
             Route::resource("configurations", PageConfigurationController::class)->only(["store", "show", "destroy"]);
+            Route::resource('images', PageImageController::class)->only(['store', 'destroy']);
         });
 
         Route::get('pages/detail', [\Modules\Page\Http\Controllers\PageController::class, "detail"])->name('pages.detail');

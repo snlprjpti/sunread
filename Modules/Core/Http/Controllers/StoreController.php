@@ -39,13 +39,13 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, callback: function() use ($request) {
+            $fetched = $this->repository->fetchAll($request, ["channel.website"], callback: function () use ($request) {
                 $request->validate([
                     "website_id" => "sometimes|exists:websites,id",
                     "channel_id" => "sometimes|exists:channels,id"
                 ]);
 
-                $fetched = $this->model;
+                $fetched = $this->model->orderBy('position');
                 if ( $request->website_id ) {
                     $channel_ids = Channel::whereWebsiteId($request->website_id)->get()->pluck("id");
                     $fetched = $fetched->whereIn("channel_id", $channel_ids);
@@ -69,8 +69,6 @@ class StoreController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
             $created = $this->repository->create($data);
         }
         catch(Exception $exception)
@@ -85,7 +83,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["channel"]);
+            $fetched = $this->repository->fetch($id, ["channel.website"]);
         }
         catch(Exception $exception)
         {
@@ -99,15 +97,8 @@ class StoreController extends BaseController
         try
         {
             $data = $this->repository->validateData($request,[
-                "slug" => "nullable|unique:stores,slug,{$id}",
-                "image" => "sometimes|nullable|mimes:bmp,jpeg,jpg,png,webp"
+                "code" => "required|unique:stores,code,{$id}"
             ]);
-
-            if ($request->file("image")) {
-                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            } else {
-                unset($data["image"]);
-            }
             
             $updated = $this->repository->update($data, $id);
         }
@@ -123,7 +114,7 @@ class StoreController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted){
+            $this->repository->delete($id, function ($deleted){
                 if($deleted->image) Storage::delete($deleted->image);
             });
         }
@@ -132,7 +123,7 @@ class StoreController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'), 204);
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
     
     public function updateStatus(Request $request, int $id): JsonResponse

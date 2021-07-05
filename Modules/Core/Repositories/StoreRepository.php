@@ -14,11 +14,8 @@ class StoreRepository extends BaseRepository
         $this->model_name = "Store";
         $this->model_key = "core.stores";
         $this->rules = [
-            "currency" => "required|exists:currencies,code",
             "name" => "required",
-            "slug" => "nullable|unique:stores,slug",
-            "locale" => "required",
-            "image" => "required|mimes:bmp,jpeg,jpg,png,webp",
+            "code" => "required|unique:stores,code",
             "position" => "sometimes|numeric",
             "status" => "sometimes|boolean",
             "channel_id" => "required|exists:channels,id",

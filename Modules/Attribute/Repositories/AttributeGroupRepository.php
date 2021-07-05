@@ -13,14 +13,12 @@ use Illuminate\Support\Arr;
 
 class AttributeGroupRepository extends BaseRepository
 {
-    protected $model, $model_key;
-
     public function __construct(AttributeGroup $attribute_group)
     {
         $this->model = $attribute_group;
         $this->model_key = "catalog.attributes.attribute_group";
         $this->rules = [
-            "slug" => "nullable|unique:attribute_groups,slug",
+            "slug" => "nullable|unique:attribute_groups,slug,attribute_set_id",
             "name" => "required",
             // "attribute_set_id" => "required|exists:attribute_sets,id",
             "attributes" => "sometimes|array",
@@ -82,7 +80,9 @@ class AttributeGroupRepository extends BaseRepository
                 "slug" => "nullable|unique:attribute_groups,slug,{$group['id']}"
             ] : [], function($group) use($parent) {
                 $slug = $group->slug ?? $this->model->createSlug($group->name);
-                return ["slug" => "{$parent->slug}-{$slug}"];
+                return [
+                    "slug" => "{$this->model->createSlug($parent->name)}-{$slug}"
+                ];
             });
 
             $item['attribute_set_id'] = $parent->id;
