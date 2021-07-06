@@ -12,7 +12,7 @@ class UrlRewriteFactory extends Factory
 
     public function definition(): array
     {
-        $types = [ "Product", "Category" ];
+        $types = [ "Product" ];
         $type = Arr::random($types);
 
         switch ($type) {
