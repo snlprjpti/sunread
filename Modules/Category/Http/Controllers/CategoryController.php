@@ -6,14 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
-use Modules\Category\Exceptions\CategoryAuthorizationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Transformers\List\CategoryResource as ListCategoryResource;
 use Modules\Category\Repositories\CategoryValueRepository;
@@ -35,11 +32,7 @@ class CategoryController extends BaseController
 
         $this->product_model = $product_model;
 
-        $exception_statuses = [
-            CategoryAuthorizationException::class => 403
-        ];
-
-        parent::__construct($this->model, $this->model_name, $exception_statuses);
+        parent::__construct($this->model, $this->model_name);
     }
 
     public function collection(object $data): ResourceCollection
@@ -66,7 +59,7 @@ class CategoryController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)],
                 "website_id" => "sometimes|exists:websites,id"
             ]);
-            $fetched = $this->repository->fetchAll(request: $request, callback: function () use($request) {
+            $fetched = $this->repository->fetchAll(request: $request, callback: function () use ($request) {
                 return $this->model->whereWebsiteId($request->website_id);
             })->toTree();
         }
@@ -94,9 +87,9 @@ class CategoryController extends BaseController
             if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
 
             if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
-            throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
+            throw ValidationException::withMessages(["website_id" => $this->lang("response.no_parent_belong_to_website")]);
 
-            $created = $this->repository->create($data, function ($created) use($data){
+            $created = $this->repository->create($data, function ($created) use ($data) {
                 $this->categoryValueRepository->createOrUpdate($data, $created);
                 if(isset($data["channels"])) $created->channels()->sync($data["channels"]);
                 if(isset($data["products"])) $created->products()->sync($data["products"]);
@@ -141,7 +134,7 @@ class CategoryController extends BaseController
             
             if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
 
-            $updated = $this->repository->update($data, $id, function ($updated) use($data){
+            $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->categoryValueRepository->createOrUpdate($data, $updated);
                 if(isset($data["channels"])) $updated->channels()->sync($data["channels"]);
                 if(isset($data["products"])) $updated->products()->sync($data["products"]);
