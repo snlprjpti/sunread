@@ -82,14 +82,13 @@ class CategoryController extends BaseController
             $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
                 "items.slug.value" => new SlugUniqueRule($request)
             ]), function () use ($request) {
-                $items = $request->items;
-                $items["slug"]["value"] = $items["slug"] ?? $this->repository->createUniqueSlug($request);
                 return [
-                    "items" => $items,
                     "scope" => "website",
                     "scope_id" => $request->website_id
                 ];
             });
+
+            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
 
             if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
             throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
@@ -125,17 +124,18 @@ class CategoryController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, array_merge([
-                "slug" => [ "nullable", new SlugUniqueRule($request, $id) ],
+            $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
+                "items.slug.value" => new SlugUniqueRule($request, $id),
                 "scope" => "required|in:website,channel,store",
                 "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
-            ], $this->repository->getValidationRules($request)), function() use ($request, $id) {
+            ]), function() use ($id, $request) {
                 return [
-                    "slug" => $request->slug ?? $this->model->createSlug($request->name),
-                    "parent_id" => $this->model->findOrFail($id)->parent_id,
+                    "parent_id" => $request->parent_id ?? null,
                     "website_id" => $this->model->findOrFail($id)->website_id
                 ];
             });
+            
+            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
 
             $updated = $this->repository->update($data, $id, function($updated) use($data){
                 $this->categoryValueRepository->createOrUpdate($data, $updated);
