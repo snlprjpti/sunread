@@ -14,12 +14,12 @@ class CatalogInventoryItemResource extends JsonResource
         return [
             "id" => $this->id,
             "event" => $this->event,
-            "order_id" => $this->when( ($this->order_id), $this->order_id ), // [TO::DO] include order resource 
+            "order_id" => $this->order_id, // [TO::DO] include order resource 
             "adjustment_type" => $this->adjustment_type,
             "quantity" => $this->quantity,
-            "product" => $this->when( ($this->product()), new ProductResource($this->whenLoaded("product")) ),
+            "product" => new ProductResource($this->whenLoaded("product")),
             "catalog_inventories" => CatalogInventoryResource::collection($this->whenLoaded("catalog_inventories")),
-            "adjusted_by" => $this->when( ($this->admin()), new AdminResource($this->whenLoaded("admin")) ),
+            "adjusted_by" => new AdminResource($this->whenLoaded("admin")),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
