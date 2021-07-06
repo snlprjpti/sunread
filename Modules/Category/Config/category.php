@@ -70,9 +70,9 @@ return [
                     "slug" => "slug",
                     "type" => "text",
                     "value" => "",
-                    "scope" => "website",
+                    "scope" => "store",
                     "rules" => "string",
-                    "is_required" => 1
+                    "is_required" => 0
                     
                 ],
                 [
@@ -107,5 +107,16 @@ return [
                 ]
             ]
         ],
+    ],
+    "absolute_path" => [
+        "name" => "general.elements.0",
+        "status" => "general.elements.1",
+        "include_in_menu" => "general.elements.2",
+        "image" => "content.elements.0",
+        "description" => "content.elements.1",
+        "slug" => "search_engine_optimization.elements.0",
+        "meta_title" => "search_engine_optimization.elements.1",
+        "meta_keywords" => "search_engine_optimization.elements.2",
+        "meta_description" => "search_engine_optimization.elements.3"
     ]
 ];
