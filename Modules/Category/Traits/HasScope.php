@@ -17,26 +17,30 @@ trait HasScope
         $this->value_model = new CategoryValue();
     }
 
-    public function getDefaultValues(array $data): object
+    public function getDefaultValues(array $data): ?object
     {
-        switch($data["scope"])
+        if($data["scope"] != "website")
         {
-            case "store":
-                $data["scope"] = "channel";
-                $data["scope_id"] = $this->store_model->find($data["scope_id"])->channel->id;
-                break;
-                        
-            case "channel":
-                $data["scope"] = "website";
-                $data["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
-                break;
+            switch($data["scope"])
+            {
+                case "store":
+                    $data["scope"] = "channel";
+                    $data["scope_id"] = $this->store_model->find($data["scope_id"])->channel->id;
+                    break;
+                            
+                case "channel":
+                    $data["scope"] = "website";
+                    $data["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
+                    break;
+            }
+            return $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
         }
-        return $this->checkCondition($data) ? $this->getValues($data) : $this->getDefaultValues($data);
+        return $this->has($data) ? $this->getValues($data) : null;
     }
 
     public function getValues(array $data): object
     {
-        return $this->value_model->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereCategoryId($data["category_id"])->first();
+        return $this->checkCondition($data)->first();
     }
 
     public function scopeFilter(string $scope, string $element_scope): bool
@@ -46,14 +50,20 @@ trait HasScope
         return false;
     }
 
-    public function checkCondition(array $data)
+    public function has(array $data)
     {
-        return (bool) $this->value_model->whereCategoryId($data["category_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->count();
+        return (boolean) $this->checkCondition($data)->count();
     }
 
-    public function checkSlug(object $request, string $slug): ?object
+    public function checkCondition(array $data): object
     {
-        return $this->model->whereParentId($request->parent_id)->whereWebsiteId($request->website_id)->whereHas("values", function ($query) use($slug) {
+        return $this->value_model->whereCategoryId($data["category_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);  
+    }
+
+    public function checkSlug(object $request, ?string $slug, ?int $id = null): ?object
+    {
+        return $this->model->whereParentId($request->parent_id)->whereWebsiteId($request->website_id)->whereHas("values", function ($query) use($slug, $request, $id) {
+            if($id) $query = $query->where('category_id', '!=', $id);
             $query->whereAttribute("slug")->whereValue($slug);
         })->first();
     }
