@@ -17,8 +17,7 @@ class CatalogInventoryItemResource extends JsonResource
             "order_id" => $this->order_id, // [TO::DO] include order resource 
             "adjustment_type" => $this->adjustment_type,
             "quantity" => $this->quantity,
-            "product" => new ProductResource($this->whenLoaded("product")),
-            "catalog_inventories" => CatalogInventoryResource::collection($this->whenLoaded("catalog_inventories")),
+            "catalog_inventory" => new CatalogInventoryResource($this->whenLoaded("catalog_inventory")),
             "adjusted_by" => new AdminResource($this->whenLoaded("admin")),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
