@@ -12,13 +12,15 @@ class CreateCatalogInventoriesTable extends Migration
             $table->id();
             $table->unsignedBigInteger("product_id");
             $table->unsignedBigInteger("website_id");
-            $table->integer("quantity")->nullable();
+            $table->decimal("quantity")->nullable();
             $table->boolean("is_in_stock")->nullable();
             $table->boolean("manage_stock")->nullable();
             $table->boolean("use_config_manage_stock")->nullable();
 
             $table->foreign("product_id")->references("id")->on("products")->onDelete("cascade");
             $table->foreign("website_id")->references("id")->on("websites")->onDelete("cascade");
+
+            $table->unique(["product_id", "website_id"], "inventory_compound");
 
             $table->timestamps();
         });
