@@ -303,10 +303,9 @@ class BaseRepository
         try
         {
             // Store File
-            $file = $request;
             $key = Str::random(6);
             $folder = $folder ?? "default";
-            $file_path = $file->storeAs("images/{$folder}/{$key}", (string) $file->getClientOriginalName());
+            $file_path = $request->storeAs("images/{$folder}/{$key}", (string) $request->getClientOriginalName());
 
             // Delete old file if requested
             if ( $delete_url !== null ) Storage::delete($delete_url);
