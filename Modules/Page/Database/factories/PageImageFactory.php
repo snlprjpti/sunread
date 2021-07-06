@@ -15,6 +15,8 @@ class PageImageFactory extends Factory
         return [
             "page_id" => Page::factory()->create()->id,
             "path" => Str::random(20),
+            "is_banner" => 0,
+            "is_slider" => 0,
         ];
     }
 }

@@ -11,7 +11,7 @@ class PageImage extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ "page_id", "path" ];
+    protected $fillable = [ "page_id", "path", "is_banner", "is_slider" ];
     protected $appends = [ "path_url" ];
 
     public function page(): BelongsTo

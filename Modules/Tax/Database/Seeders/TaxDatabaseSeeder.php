@@ -14,5 +14,6 @@ class TaxDatabaseSeeder extends Seeder
         $this->call(TaxRateTableSeeder::class);
         $this->call(CustomerTaxGroupTableSeeder::class);
         $this->call(ProductTaxGroupTableSeeder::class);
+        $this->call(TaxRuleTableSeeder::class);
     }
 }
