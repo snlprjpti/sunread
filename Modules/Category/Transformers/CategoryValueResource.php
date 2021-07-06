@@ -13,14 +13,8 @@ class CategoryValueResource extends JsonResource
             "id" => $this->id,
             "scope" => $this->scope,
             "scope_id" => $this->scope_id,
-            "name" => $this->name,
-            "image" => $this->image_url,
-            "description" => $this->description,
-            "meta_title" => $this->meta_title,
-            "meta_description" => $this->meta_description,
-            "meta_keywords" => $this->meta_keywords,
-            "status" => $this->status,
-            "include_in_menu" => $this->include_in_menu,
+            "attribute" => $this->attribute,
+            "value" => $this->value,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
