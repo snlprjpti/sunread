@@ -49,10 +49,13 @@ class CategoryRepository extends BaseRepository
                 if($this->scopeFilter($data["scope"], $element["scope"])) continue;
 
                 if(isset($data["category_id"])){
-                    $element_title = $element["title"];
-                    $existData = $this->checkCondition($data);
+                    $data["attribute"] = $element["slug"];
+
+                    $existData = $this->has($data);
+                    
                     if($data["scope"] != "website") $element["use_default_value"] = $existData ? 0 : 1;
-                    $element["value"] = $existData ? $this->getValues($data)->$element_title : $this->getDefaultValues($data)->$element_title;
+                    $elementValue = $existData ? $this->getValues($data) : $this->getDefaultValues($data);
+                    $element["value"] = $elementValue ? $elementValue->value : null;
                 }
                 unset($element["rules"]);
 
@@ -75,7 +78,8 @@ class CategoryRepository extends BaseRepository
             $value_path = "$prefix.value";
             $default_path = "$prefix.use_default_value";
 
-            $value_rule = ($item["is_required"] == 1) ? (($scope != "website") ? "required_without:$default_path|{$item['rules']}" : "required|{$item['rules']}") : $item['rules'];
+            $value_rule = ($item["is_required"] == 1) ? (($scope != "website") ? "required_without:$default_path" : "required") : "nullable";
+            $value_rule = "$value_rule|{$item['rules']}";
             if($scope != "website") $default_rule = ($item["is_required"] == 1) ? "required_without:$value_path|{$item['rules']}" : "boolean";
 
             $rules = [
@@ -85,14 +89,14 @@ class CategoryRepository extends BaseRepository
         })->toArray();
     }
 
-    public function createUniqueSlug($request)
+    public function createUniqueSlug(object $request, ?int $id = null)
     {
         $slug = Str::slug($request->items["name"]["value"]);
         $original_slug = $slug;
 
         $count = 1;
 
-        while ($this->checkSlug($request, $slug)) {
+        while ($this->checkSlug($request, $slug, $id)) {
             $slug = "{$original_slug}-{$count}";
             $count++;
         }
