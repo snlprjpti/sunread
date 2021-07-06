@@ -11,7 +11,7 @@ class CreateCatalogInventoryItemsTable extends Migration
         Schema::create('catalog_inventory_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("catalog_inventory_id");
-            $table->integer("order_id")->nullable();
+            $table->unsignedBigInteger("order_id")->nullable();
             $table->unsignedBigInteger("adjusted_by")->nullable();
             $table->decimal("quantity");
             $table->string("event");
