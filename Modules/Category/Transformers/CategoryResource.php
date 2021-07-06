@@ -11,10 +11,9 @@ class CategoryResource extends JsonResource
     {    
         return [
             "id" => $this->id,
-            "slug" => $this->slug,
             "position" => $this->position,
-            "parent" => $this->whenLoaded("parent"),
-            "website" => $this->website,
+            "website_id" => $this->website_id,
+            "parent_id" => $this->parent_id,
 
             "values" => $this->values,
             "channels" => ChannelResource::collection($this->whenLoaded("channels")),
