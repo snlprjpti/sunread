@@ -4,7 +4,7 @@ namespace Modules\Inventory\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Inventory\Entities\CatalogInventoryItem;
 use Modules\Core\Traits\HasFactory;
 use Modules\Product\Entities\Product;
@@ -16,9 +16,9 @@ class CatalogInventory extends Model
 
     protected $fillable = ["product_id", "website_id", "quantity", "is_in_stock", "manage_stock", "use_config_manage_stock"];
 
-    public function catalog_inventory_items(): BelongsToMany
+    public function catalog_inventory_items(): HasMany
     {
-        return $this->belongsToMany(CatalogInventoryItem::class);
+        return $this->hasMany(CatalogInventoryItem::class);
     }
 
     public function product(): BelongsTo
