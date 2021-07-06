@@ -62,7 +62,7 @@ trait HasScope
 
     public function checkSlug(object $request, ?string $slug, ?int $id = null): ?object
     {
-        return $this->model->whereParentId($request->parent_id)->whereWebsiteId($request->website_id)->whereHas("values", function ($query) use($slug, $request, $id) {
+        return $this->model->whereParentId($request->parent_id)->whereWebsiteId($request->website_id)->whereHas("values", function ($query) use ($slug, $request, $id) {
             if($id) $query = $query->where('category_id', '!=', $id);
             $query->whereAttribute("slug")->whereValue($slug);
         })->first();
