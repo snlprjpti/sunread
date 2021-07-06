@@ -57,7 +57,7 @@ class CatalogInventoryController extends BaseController
             $data = $this->repository->validateData($request);
             unset($data["quantity"]);
             $created = $this->repository->create($data, function($inventory) {
-                event(new InventoryItemEvent($inventory, __FUNCTION__));
+                event(new InventoryItemEvent($inventory, "store"));
             });
         }
         catch( Exception $exception )
@@ -89,7 +89,7 @@ class CatalogInventoryController extends BaseController
             $data = $this->repository->validateData($request);
             unset($data["quantity"]);
             $updated = $this->repository->update($data, $id, function($inventory) {
-                event(new InventoryItemEvent($inventory, __FUNCTION__));
+                event(new InventoryItemEvent($inventory, "update"));
             });
         }
         catch( Exception $exception )
