@@ -13,7 +13,7 @@ class CategoryValue extends Model
     public $timestamps = true;
     protected $fillable = [ "scope", "scope_id", "category_id", "attribute", "value" ];
 
-    protected $appends = ['url'];
+    //protected $appends = ['url'];
 
     public function __construct(?array $attributes = [])
     {
