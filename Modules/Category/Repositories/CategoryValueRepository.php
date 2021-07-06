@@ -7,13 +7,13 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\CategoryValue;
+use Modules\Category\Traits\HasScope;
 
 class CategoryValueRepository
 {
+    use HasScope;
     protected $model, $model_key, $repository, $model_name;
 
     public function __construct(CategoryValue $category_value, CategoryRepository $category_repository)
@@ -22,6 +22,8 @@ class CategoryValueRepository
         $this->model_key = "catalog.category.values";
         $this->repository = $category_repository;
         $this->model_name = "Category";
+
+        $this->createModel();
     }
 
     public function createOrUpdate(array $data, Model $parent): void
@@ -33,31 +35,36 @@ class CategoryValueRepository
 
         try
         {
+            $created_data = [];
             $match = [
                 "category_id" => $parent->id,
                 "scope" => $data["scope"],
                 "scope_id" => $data["scope_id"]
             ];
 
-            $config_arrays = collect(config('category.attributes'))->pluck('elements')->flatten(1)->toArray();
+            foreach($data["items"] as $key => $val)
+            {
+                if(isset($val["use_default_value"]) && $val["use_default_value"] != 1) throw ValidationException::withMessages([ "use_default_value" => __("core::app.response.use_default_value") ]);
+    
+                if(!isset($val["use_default_value"]) && !array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
 
-            foreach($config_arrays as $config_array){
-                $key = $config_array["title"];
+                $absolute_path = config("category.absolute_path.$key");
+                $configDataArray = config("category.attributes.$absolute_path");
 
-                if($this->repository->scopeFilter($data['scope'], $config_array["scope"])) {
-                    $input[$key] = $this->repository->getDefaultValues($match)->$key;
-                    continue;
-                }
-                $val = isset($data["attributes"][0][$key]) ? $data["attributes"][0][$key] : null;
-                if($config_array["type"] == "file" && isset($val["value"]))
+                if($this->scopeFilter($match['scope'], $configDataArray["scope"])) continue;
+                
+                $match['attribute'] = $key;
+                $match['value'] = isset($val['value']) ? (($configDataArray["type"] == "file" ) ? $this->repository->storeScopeImage($val['value'], "configuration") : $val['value']) : null;
+
+                if($configData = $this->checkCondition($match)->first())
                 {
-                    $input[$key] = $this->storeImage($val["value"], strtolower($this->model_name));
+                    if(isset($val['use_default_value'])  && $val['use_default_value'] == 1) $configData->delete();
+                    else $created_data['data'][] = $configData->update($match);
                     continue;
                 }
-                if($val && isset($val["use_default_value"]) && $val["use_default_value"] != 1) throw ValidationException::withMessages([ "use_default_value" => __("core::app.response.use_default_value") ]);
-                if($val) $input[$key] = (isset($val["use_default_value"]) && $val["use_default_value"] == 1) ? $this->repository->getDefaultValues($match)->toArray()[$key] : $val["value"];            
+                if(isset($val['use_default_value'])  && $val['use_default_value'] == 1) continue;
+                $created_data['data'][] = $this->model->create($match);
             }
-            $created = $this->model->updateOrCreate($match, $input);
         }
         catch (Exception $exception)
         {
@@ -65,28 +72,7 @@ class CategoryValueRepository
             throw $exception;
         }
 
-        Event::dispatch("{$this->model_key}.create.after", $created);
+        Event::dispatch("{$this->model_key}.create.after", $created_data);
         DB::commit();
-    }
-
-    public function storeImage(object $request, ?string $folder = null, ?string $delete_url = null): string
-    {
-        try
-        {
-            // Store File
-            $file = $request;
-            $key = Str::random(6);
-            $folder = $folder ?? "default";
-            $file_path = $file->storeAs("images/{$folder}/{$key}", (string) $file->getClientOriginalName());
-
-            // Delete old file if requested
-            if ( $delete_url !== null ) Storage::delete($delete_url);
-        }
-        catch (\Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $file_path;
     }
 }
