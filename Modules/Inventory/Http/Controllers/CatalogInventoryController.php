@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Request;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Inventory\Entities\CatalogInventory;
+use Modules\Inventory\Events\InventoryItemEvent;
 use Modules\Inventory\Transformers\CatalogInventoryResource;
 use Modules\Inventory\Repositories\CatalogInventoryRepository;
 
@@ -55,8 +56,8 @@ class CatalogInventoryController extends BaseController
         {
             $data = $this->repository->validateData($request);
             unset($data["quantity"]);
-            $created = $this->repository->create($data, function($created) use($request) {
-                if ($request->adjustment_type) $this->repository->syncItem($created, $request);
+            $created = $this->repository->create($data, function($inventory) {
+                event(new InventoryItemEvent($inventory, __FUNCTION__));
             });
         }
         catch( Exception $exception )
@@ -87,8 +88,8 @@ class CatalogInventoryController extends BaseController
         {
             $data = $this->repository->validateData($request);
             unset($data["quantity"]);
-            $updated = $this->repository->update($data, $id, function ($updated) use($request) {
-                if ($request->adjustment_type) $this->repository->syncItem($updated, $request, "updated");
+            $updated = $this->repository->update($data, $id, function($inventory) {
+                event(new InventoryItemEvent($inventory, __FUNCTION__));
             });
         }
         catch( Exception $exception )
