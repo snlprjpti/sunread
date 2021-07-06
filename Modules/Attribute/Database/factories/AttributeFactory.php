@@ -39,7 +39,7 @@ class AttributeFactory extends Factory
             "is_required" => rand(0,1),
             "validation" => null,
             "is_visible_on_storefront" => rand(0,1),
-            "is_user_defined" => rand(0,1),
+            "is_user_defined" => 1,
             "default_value" => null
         ];
     }
