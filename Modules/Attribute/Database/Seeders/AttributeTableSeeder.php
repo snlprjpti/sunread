@@ -64,6 +64,7 @@ class AttributeTableSeeder extends Seeder
             ],
             [
                 "name" => "Special Price",
+                "slug" => "special_price",
                 "type" => "price",
                 "validation" => "decimal",
                 "scope" => "channel"
@@ -90,6 +91,7 @@ class AttributeTableSeeder extends Seeder
             ],
             [
                 "name" => "Has Weight",
+                "slug" => "has_weight",
                 "type" => "boolean",
                 "default_value" => 1,
                 "scope" => "website"
@@ -156,6 +158,7 @@ class AttributeTableSeeder extends Seeder
             ],
             [
                 "name" => "Short Description",
+                "slug" => "short_description",
                 "type" => "texteditor",
                 "scope" => "store",
                 "is_searchable" => 1,
@@ -163,6 +166,7 @@ class AttributeTableSeeder extends Seeder
             ],
             [
                 "name" => "URL key",
+                "slug" => "url_key",
                 "type" => "text",
                 "scope" => "store",
                 "is_required" => 1,
@@ -171,18 +175,21 @@ class AttributeTableSeeder extends Seeder
             ],
             [
                 "name" => "Meta Keywords",
+                "slug" => "meta_keywords",
                 "type" => "textarea",
                 "scope" => "store",
                 "is_required" => 1
             ],
             [
                 "name" => "Meta Title",
+                "slug" => "meta_title",
                 "type" => "text",
                 "scope" => "store",
                 "is_required" => 1
             ],
             [
                 "name" => "Meta Description",
+                "slug" => "meta_description",
                 "type" => "textarea",
                 "scope" => "store",
                 "is_required" => 1
