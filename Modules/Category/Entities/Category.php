@@ -13,21 +13,17 @@ use Modules\Category\Traits\HasScope;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Core\Traits\HasFactory;
-use Modules\Core\Traits\HasTranslation;
 use Modules\Core\Traits\Sluggable;
 use Modules\Product\Entities\Product;
 use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Category extends Model
 {
-    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation, HasScope;
+    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasScope;
 
     public static $SEARCHABLE = [];
     protected $fillable = [ "parent_id", "position", "website_id" ];
     protected $with = [ "values" ];
-
-    public $translatedAttributes = ["name", "description", "meta_title", "meta_description", "meta_keywords"];
-    public $translatedModels = [ CategoryValue::class, "category_id" ];
 
     // protected $appends = ['url'];
 
