@@ -38,7 +38,7 @@ class CategoryScopeRule implements Rule
 
         if($this->data->scope == "channel" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->pluck('id')->toArray());
 
-        if($this->data->scope == "store" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->mapWithKeys(function($channel){
+        if($this->data->scope == "store" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->mapWithKeys(function ($channel) {
             return $channel->stores->pluck('id');
         })->toArray());
 
