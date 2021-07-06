@@ -15,7 +15,7 @@ class InventoryItemListener
         $this->syncItem($inventory->catalogInventory, request(), $inventory->event);
     }
 
-    public function syncItem(object $inventory, object $request, string $method = "store"): object
+    public function syncItem(object $inventory, object $request, string $method = "created"): object
     {
         DB::beginTransaction();
         Event::dispatch("CatalogInventories.create.before");
@@ -24,7 +24,7 @@ class InventoryItemListener
         {
             $data = [
                 "product_id" => $inventory->product_id,
-                "event"  => ($method == "store") ? "Created" : "Updated",
+                "event"  => ($method == "created") ? "Created" : "Updated",
                 "adjusted_by" => auth()->guard("admin")->id(),
                 "adjustment_type" => $this->adjustment($request, $inventory),
                 "quantity" => $request->quantity,
