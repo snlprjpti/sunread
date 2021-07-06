@@ -27,7 +27,7 @@ return [
                     "slug" => "include_in_menu",
                     "type" => "boolean",
                     "value" => "",
-                    "scope" => "store",
+                    "scope" => "website",
                     "rules" => "nullable|boolean",
                     "is_required" => 0
                     
@@ -80,7 +80,7 @@ return [
                     "slug" => "meta_title",
                     "type" => "text",
                     "value" => "",
-                    "scope" => "website",
+                    "scope" => "store",
                     "rules" => "nullable",
                     "is_required" => 0
                     
@@ -90,7 +90,7 @@ return [
                     "slug" => "meta_keywords",
                     "type" => "text",
                     "value" => "",
-                    "scope" => "channel",
+                    "scope" => "store",
                     "rules" => "nullable",
                     "is_required" => 0
                     
