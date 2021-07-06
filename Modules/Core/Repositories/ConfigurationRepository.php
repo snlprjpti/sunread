@@ -10,9 +10,10 @@ use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
 use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Core\Traits\Configuration as TraitsConfiguration;
 use Modules\Core\Rules\ScopeRule;
+use Modules\Core\Traits\Configuration as TraitsConfiguration;
 
 class ConfigurationRepository extends BaseRepository
 {
