@@ -32,8 +32,7 @@ class SlugUniqueRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $category_exist = $this->checkSlug($this->data, $value);
-        return ($category_exist) ? ($this->id == $category_exist->id ? true : false) : true;
+        return (bool) !$this->checkSlug($this->data, $value, $this->id);
     }
 
     /**
