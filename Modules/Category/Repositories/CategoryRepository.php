@@ -28,6 +28,9 @@ class CategoryRepository extends BaseRepository
 
             "parent_id" => "nullable|numeric|exists:categories,id",
             "website_id" => "required|exists:websites,id",
+
+            "products" => "sometimes|array",
+            "products.*" => "sometimes|exists:products,id"
         ];
 
         $this->config_fields = config('category.attributes');

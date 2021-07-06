@@ -20,17 +20,20 @@ use Modules\Category\Repositories\CategoryValueRepository;
 use Modules\Category\Rules\CategoryScopeRule;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Core\Rules\ScopeRule;
+use Modules\Product\Entities\Product;
 
 class CategoryController extends BaseController
 {
-    protected $repository, $categoryValueRepository, $is_super_admin, $main_root_id;
+    protected $repository, $categoryValueRepository, $is_super_admin, $main_root_id, $product_model;
 
-    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryValueRepository $categoryValueRepository)
+    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryValueRepository $categoryValueRepository, Product $product_model)
     {
         $this->repository = $categoryRepository;
         $this->categoryValueRepository = $categoryValueRepository;
         $this->model = $category;
         $this->model_name = "Category";
+
+        $this->product_model = $product_model;
 
         $exception_statuses = [
             CategoryAuthorizationException::class => 403
@@ -63,7 +66,7 @@ class CategoryController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)],
                 "website_id" => "sometimes|exists:websites,id"
             ]);
-            $fetched = $this->repository->fetchAll(request: $request, callback: function() use($request) {
+            $fetched = $this->repository->fetchAll(request: $request, callback: function () use($request) {
                 return $this->model->whereWebsiteId($request->website_id);
             })->toTree();
         }
@@ -93,9 +96,10 @@ class CategoryController extends BaseController
             if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
             throw ValidationException::withMessages(["website_id" => "Patent Category does not belong to this website"]);
 
-            $created = $this->repository->create($data, function($created) use($data){
+            $created = $this->repository->create($data, function ($created) use($data){
                 $this->categoryValueRepository->createOrUpdate($data, $created);
                 if(isset($data["channels"])) $created->channels()->sync($data["channels"]);
+                if(isset($data["products"])) $created->products()->sync($data["products"]);
             });
         }
         catch (Exception $exception)
@@ -128,7 +132,7 @@ class CategoryController extends BaseController
                 "items.slug.value" => new SlugUniqueRule($request, $id),
                 "scope" => "required|in:website,channel,store",
                 "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
-            ]), function() use ($id, $request) {
+            ]), function () use ($id, $request) {
                 return [
                     "parent_id" => $request->parent_id ?? null,
                     "website_id" => $this->model->findOrFail($id)->website_id
@@ -137,9 +141,10 @@ class CategoryController extends BaseController
             
             if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
 
-            $updated = $this->repository->update($data, $id, function($updated) use($data){
+            $updated = $this->repository->update($data, $id, function ($updated) use($data){
                 $this->categoryValueRepository->createOrUpdate($data, $updated);
                 if(isset($data["channels"])) $updated->channels()->sync($data["channels"]);
+                if(isset($data["products"])) $updated->products()->sync($data["products"]);
             });
         }
         catch (Exception $exception)
@@ -156,8 +161,8 @@ class CategoryController extends BaseController
         {
             $category = $this->model->findOrFail($id);
 
-            $this->repository->delete($id, function($deleted){
-                $deleted->values()->each(function($value){
+            $this->repository->delete($id, function ($deleted){
+                $deleted->values()->each(function ($value){
                     $value->delete();
                 });
             });
