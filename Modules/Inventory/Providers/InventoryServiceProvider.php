@@ -3,11 +3,8 @@
 namespace Modules\Inventory\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 use Modules\Inventory\Entities\CatalogInventory;
-use Modules\Inventory\Entities\CatalogInventoryItem;
 use Modules\Inventory\Observers\CatalogInventoryObserver;
-use Modules\Inventory\Observers\CatalogInventoryItemObserver;
 
 class InventoryServiceProvider extends ServiceProvider
 {
@@ -43,7 +40,6 @@ class InventoryServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
-        $this->app->register(EventServiceProvider::class);
     }
 
     /**
@@ -119,6 +115,5 @@ class InventoryServiceProvider extends ServiceProvider
     private function registerObserver(): void
     {
         CatalogInventory::observe(CatalogInventoryObserver::class);
-        CatalogInventoryItem::observe(CatalogInventoryItemObserver::class);
     }
 }
