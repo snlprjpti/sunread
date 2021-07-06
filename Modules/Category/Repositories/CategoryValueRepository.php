@@ -48,22 +48,22 @@ class CategoryValueRepository
     
                 if(!isset($val["use_default_value"]) && !array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
 
-                $absolute_path = config("category.absolute_path.$key");
-                $configDataArray = config("category.attributes.$absolute_path");
+                $absolute_path = config("category.absolute_path.{$key}");
+                $configDataArray = config("category.attributes.{$absolute_path}");
 
-                if($this->scopeFilter($match['scope'], $configDataArray["scope"])) continue;
+                if($this->scopeFilter($match["scope"], $configDataArray["scope"])) continue;
                 
-                $match['attribute'] = $key;
-                $match['value'] = isset($val['value']) ? (($configDataArray["type"] == "file" ) ? $this->repository->storeScopeImage($val['value'], "configuration") : $val['value']) : null;
+                $match["attribute"] = $key;
+                $match["value"] = isset($val["value"]) ? (($configDataArray["type"] == "file" ) ? $this->repository->storeScopeImage($val["value"], "configuration") : $val["value"]) : null;
 
                 if($configData = $this->checkCondition($match)->first())
                 {
-                    if(isset($val['use_default_value'])  && $val['use_default_value'] == 1) $configData->delete();
-                    else $created_data['data'][] = $configData->update($match);
+                    if(isset($val["use_default_value"])  && $val["use_default_value"] == 1) $configData->delete();
+                    else $created_data["data"][] = $configData->update($match);
                     continue;
                 }
-                if(isset($val['use_default_value'])  && $val['use_default_value'] == 1) continue;
-                $created_data['data'][] = $this->model->create($match);
+                if(isset($val["use_default_value"])  && $val["use_default_value"] == 1) continue;
+                $created_data["data"][] = $this->model->create($match);
             }
         }
         catch (Exception $exception)
