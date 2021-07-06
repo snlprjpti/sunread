@@ -12,10 +12,13 @@ class CatalogInventoryTableSeeder extends Seeder
 {
     public function run(): void
     {
-        CatalogInventory::factory()
-        ->create()
-        ->each(function ($catalog_inventory){
-            $catalog_inventory->catalog_inventory_items()->attach(CatalogInventoryItem::factory(2)->create());
+        CatalogInventory::withoutEvents(function () {
+            CatalogInventory::factory()
+            ->create()
+            ->each(function ($catalog_inventory){
+                $catalog_inventory->catalog_inventory_items()->attach(CatalogInventoryItem::factory(2)->create());
+            });
         });
+
     }
 }
