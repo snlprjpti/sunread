@@ -56,13 +56,10 @@ class CatalogInventoryItemController extends BaseController
         {
 
             $data = $this->repository->validateData($request);
-            $data["adjusted_by"] = auth()->guard("admin")->check() ? auth()->guard("admin")->id() : null;
+            $data["adjusted_by"] = auth()->guard("admin")->id();
             $created = $this->repository->create($data, function($created) use($request){
-                if ($request->catalog_inventories)
-                {
-                    $created->catalog_inventories()->sync($request->get("catalog_inventories"));
-                    $this->repository->adjustment($created, $request);
-                }
+                $created->catalog_inventories()->sync($request->get("catalog_inventories"));
+                $this->repository->adjustment($created, $request);
             });
         }
         catch( Exception $exception )
@@ -92,13 +89,9 @@ class CatalogInventoryItemController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $data["adjusted_by"] = auth()->guard("admin")->check() ? auth()->guard("admin")->id() : null;
+            $data["adjusted_by"] = auth()->guard("admin")->id();
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
-                if ($request->catalog_inventories)
-                {
-                    $updated->catalog_inventories()->sync($request->get("catalog_inventories"));
-                    $this->repository->adjustment($updated, $request);
-                }
+                $this->repository->adjustment($updated, $request);
             });
         }
         catch( Exception $exception )
