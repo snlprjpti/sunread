@@ -23,8 +23,8 @@ class Category extends Model
     use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation, HasScope;
 
     public static $SEARCHABLE = [];
-    protected $fillable = [ "parent_id", "slug", "position", "website_id" ];
-    protected $with = [ "website", "values" ];
+    protected $fillable = [ "parent_id", "position", "website_id" ];
+    protected $with = [ "values" ];
 
     public $translatedAttributes = ["name", "description", "meta_title", "meta_description", "meta_keywords"];
     public $translatedModels = [ CategoryValue::class, "category_id" ];
