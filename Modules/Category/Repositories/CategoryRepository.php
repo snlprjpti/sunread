@@ -33,7 +33,7 @@ class CategoryRepository extends BaseRepository
             "products.*" => "sometimes|exists:products,id"
         ];
 
-        $this->config_fields = config('category.attributes');
+        $this->config_fields = config("category.attributes");
 
         $this->createModel();
     }
@@ -72,18 +72,18 @@ class CategoryRepository extends BaseRepository
     public function getValidationRules(object $request): array
     {
         $scope = $request->scope ?? "website";
-        return collect(config('category.attributes'))->pluck('elements')->flatten(1)->map(function($data) {
+        return collect(config("category.attributes"))->pluck("elements")->flatten(1)->map(function($data) {
             return $data;
-        })->reject(function ($data) use($scope) {
+        })->reject(function ($data) use ($scope) {
             return $this->scopeFilter($scope, $data["scope"]);
-        })->mapWithKeys(function($item) use($scope) {
-            $prefix = "items.{$item['slug']}";
-            $value_path = "$prefix.value";
-            $default_path = "$prefix.use_default_value";
+        })->mapWithKeys(function ($item) use ($scope) {
+            $prefix = "items.{$item["slug"]}";
+            $value_path = "{$prefix}.value";
+            $default_path = "{$prefix}.use_default_value";
 
-            $value_rule = ($item["is_required"] == 1) ? (($scope != "website") ? "required_without:$default_path" : "required") : "nullable";
-            $value_rule = "$value_rule|{$item['rules']}";
-            if($scope != "website") $default_rule = ($item["is_required"] == 1) ? "required_without:$value_path|{$item['rules']}" : "boolean";
+            $value_rule = ($item["is_required"] == 1) ? (($scope != "website") ? "required_without:{$default_path}" : "required") : "nullable";
+            $value_rule = "$value_rule|{$item["rules"]}";
+            if($scope != "website") $default_rule = ($item["is_required"] == 1) ? "required_without:{$value_path}|{$item["rules"]}" : "boolean";
 
             $rules = [
                 $value_path => $value_rule
