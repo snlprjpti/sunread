@@ -18,9 +18,7 @@ class AttributeGroupRepository extends BaseRepository
         $this->model = $attribute_group;
         $this->model_key = "catalog.attributes.attribute_group";
         $this->rules = [
-            "slug" => "nullable|unique:attribute_groups,slug,attribute_set_id",
             "name" => "required",
-            // "attribute_set_id" => "required|exists:attribute_sets,id",
             "attributes" => "sometimes|array",
             "attributes.*" => "sometimes|exists:attributes,id",
         ];
@@ -76,14 +74,8 @@ class AttributeGroupRepository extends BaseRepository
         try
         {
             $item = $this->validateData(new Request($group), isset($group["id"]) ? [
-                "id" => "exists:attribute_groups,id",
-                "slug" => "nullable|unique:attribute_groups,slug,{$group['id']}"
-            ] : [], function($group) use($parent) {
-                $slug = $group->slug ?? $this->model->createSlug($group->name);
-                return [
-                    "slug" => "{$this->model->createSlug($parent->name)}-{$slug}"
-                ];
-            });
+                "id" => "exists:attribute_groups,id"
+            ] : []);
 
             $item['attribute_set_id'] = $parent->id;
             $data = !isset($item["id"]) ? $this->create($item) : $this->update($item, $item["id"]);
