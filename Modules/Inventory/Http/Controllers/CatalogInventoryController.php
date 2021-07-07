@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Request;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Inventory\Entities\CatalogInventory;
+use Modules\Inventory\Exceptions\InventoryCannotBeLessThanZero;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Inventory\Transformers\CatalogInventoryResource;
 use Modules\Inventory\Repositories\CatalogInventoryRepository;
@@ -24,7 +25,11 @@ class CatalogInventoryController extends BaseController
         $this->model_name = "Catalog Inventory";
         $this->model_key = "catalog.inventories";
         $this->repository = $catalogInventoryRepository;
-        parent::__construct($this->model, $this->model_name);
+        $exception_statuses = [
+            InventoryCannotBeLessThanZero::class => 403
+        ];
+        
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
