@@ -8,6 +8,8 @@ class AttributeResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $configOptions = $this->getConfigOption();
+
         return [
             "id" => $this->id,
             "slug" => $this->slug,
@@ -26,7 +28,7 @@ class AttributeResource extends JsonResource
             "is_visible_on_storefront" => (bool) $this->is_visible_on_storefront,
             "is_user_defined" => (bool) $this->is_user_defined,
             "comparable_on_storefront" => $this->comparable_on_storefront,
-            "options" => AttributeOptionResource::collection($this->whenLoaded("attribute_options")),
+            "options" => $configOptions ?? AttributeOptionResource::collection($this->whenLoaded("attribute_options")),
             "translations" => $this->whenLoaded("translations"),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
