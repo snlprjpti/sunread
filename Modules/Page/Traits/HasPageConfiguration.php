@@ -26,12 +26,37 @@ trait HasPageConfiguration
 
     public function getConfigData($params)
     {
+        $result = $this->checkCondition($params);
+
+        if (!$result)
+        {
+            $configValue = (config('page.model_config'));
+            foreach($configValue as $key => $value)
+            {
+                $scopeId = $data["scope_id"] ?? $params["scope_id"];
+                $params["scope"] = $data["scope"] ?? $params["scope"];
+                $relation = $value["parent"];
+                if($relation != null && $params["scope"] == $value["scope"])
+                {
+                    $data["scope_id"] = (app($value["scope"])->find($scopeId)->$relation->id);
+                    $data["scope"] = $value["parent_scope"];
+                    $result = $this->checkCondition($data);
+                    if(isset($result)) break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function checkCondition($params)
+    {
         $model = new $this->configModels[0]();
-        $relations = $model::where([
+        $result = $model::where([
             ['scope', $params["scope"] ?? null],
             ['scope_id', $params["scope_id"] ?? null]
         ])->first();
-        return $relations;
+        return $result;
     }
 
     public function getURL()
