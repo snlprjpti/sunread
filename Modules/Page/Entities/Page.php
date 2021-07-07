@@ -20,9 +20,10 @@ class Page extends Model
 
     public function getAttribute($name)
     {
-        if( array_key_exists("store_id", getallheaders())){
+        if( array_key_exists("store_id", getallheaders())) {
             return $this->getAttributeTranslate($name);
-        }else{
+        }
+        else {
             return $this->getAttributeConfig($name);
         }
     }
@@ -34,7 +35,7 @@ class Page extends Model
     public $translatedModels = [ PageTranslation::class, "page_id" ];
 
     public $configAttributes = [ "title", "description", "status", "meta_title", "meta_description", "meta_keywords" ];
-    public $configModels = [ PageConfiguration::class];
+    public $configModels = [ PageConfiguration::class ];
 
     public function translations(): HasMany
     {
