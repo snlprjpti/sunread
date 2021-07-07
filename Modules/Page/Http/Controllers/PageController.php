@@ -72,18 +72,18 @@ class PageController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function detail(Request $request): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->getPageDetail($request);
+            $fetched = $this->repository->fetch($id);
         }
-        catch (Exception $exception)
+        catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched->toArray(), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse

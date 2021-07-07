@@ -16,7 +16,6 @@ Route::group(['middleware' => ['api']], function () {
             Route::resource('images', PageImageController::class)->only(['store', 'destroy']);
         });
 
-        Route::get('pages/detail', [\Modules\Page\Http\Controllers\PageController::class, "detail"])->name('pages.detail');
         Route::resource('pages', PageController::class)->except(['create', 'edit','show']);
     });
 });
