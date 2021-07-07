@@ -120,14 +120,6 @@ class AttributeSetRepository extends BaseRepository
                         "position" => 1,
                         "elements" => [
                             [
-                                "name" => "SKU",
-                                "slug" => "sku",
-                                "is_required" => 1,
-                                "position" => 1,
-                                "type" => "text",
-                                "value" => $product->sku ?? '' 
-                            ],
-                            [
                                 "name" => "Type",
                                 "slug" => "type",
                                 "is_required" => 1,
@@ -142,14 +134,6 @@ class AttributeSetRepository extends BaseRepository
                                 "position" => 3,
                                 "type" => "select",
                                 "value" => $product ? $product->attribute_set_id : $request->attribute_set_id
-                            ],
-                            [
-                                "name" => "Status",
-                                "name" => "status",
-                                "is_required" => 1,
-                                "position" => 4,
-                                "type" => "boolean",
-                                "value" => $product->status ?? ''
                             ]
                         ]
                     ]
