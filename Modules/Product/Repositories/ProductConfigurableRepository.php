@@ -194,10 +194,12 @@ class ProductConfigurableRepository extends BaseRepository
             throw $exception;
         }
         
-        Event::dispatch("{$this->model_key}.attibutes.sync.after", $product_attribute);
+        Event::dispatch("{$this->model_key}.attibutes.sync.after", $product_variant);
         DB::commit();
 
         return $product_variant;
     }
+
+    
 
 }
