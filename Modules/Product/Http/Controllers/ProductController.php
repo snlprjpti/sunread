@@ -58,11 +58,11 @@ class ProductController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, $this->repository->extra_rules($request));
+            $data = $this->repository->validateData($request);
             $this->repository->checkAttribute($request->attribute_set_id, $request);      
             $data["type"] = "simple";
-            $created = $this->repository->create($data, function($created) use($request) {
-                $this->repository->catalogInventory($created, $request);
+            $created = $this->repository->create($data, function(&$created) use($request) {
+                if ($request->quantity_and_stock_status) $this->repository->catalogInventory($created, $request);
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $created);
                 $created->categories()->sync($request->get("categories"));
@@ -81,7 +81,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images"])->findOrFail($id);
+            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images", "website", "catalog_inventory.catalog_inventory_items"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
@@ -104,6 +104,7 @@ class ProductController extends BaseController
             unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
+                if ($request->quantity_and_stock_status) $this->repository->catalogInventory($updated, $request, "update");
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $updated);
                 $updated->categories()->sync($request->get("categories"));
