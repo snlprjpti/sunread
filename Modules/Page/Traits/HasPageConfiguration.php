@@ -33,10 +33,10 @@ trait HasPageConfiguration
             $configValue = (config('page.model_config'));
             foreach($configValue as $key => $value)
             {
-                $scopeId = $data["scope_id"] ?? $params["scope_id"];
-                $params["scope"] = $data["scope"] ?? $params["scope"];
+                $scopeId = isset($data["scope_id"]) ? $data["scope_id"] : $params["scope_id"] ?? null;
+                $params["scope"] = isset($data["scope"]) ? $data["scope"] : $params["scope"] ?? null;
                 $relation = $value["parent"];
-                if($relation != null && $params["scope"] == $value["scope"])
+                if($relation != null && $params["scope"] == $value["scope"] && $scopeId != null)
                 {
                     $data["scope_id"] = (app($value["scope"])->find($scopeId)->$relation->id);
                     $data["scope"] = $value["parent_scope"];
