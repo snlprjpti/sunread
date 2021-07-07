@@ -17,7 +17,7 @@ class AttributeTableSeeder extends Seeder
     {
         $attributes = [
             [
-                "name" => "Slug",
+                "name" => "SKU",
                 "type" => "text",
                 "is_required" => 1,
                 "is_searchable" => 1,
@@ -138,6 +138,12 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "channel"
             ],
             [
+                "name" => "Categories",
+                "slug" => "category_ids",
+                "type" => "text",
+                "scope" => "website"
+            ],
+            [
                 "name" => "Set Product as New from Date",
                 "slug" => "new_from_date",
                 "type" => "date",
@@ -194,14 +200,14 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "store",
                 "is_required" => 1
             ],
-            // [
-            //     "name" => "Product Status",
-            //     "slug" => "status",
-            //     "type" => "boolean",
-            //     "scope" => "website",
-            //     "is_required" => 1,
-            //     "default_value" => 1
-            // ],
+            [
+                "name" => "Product Status",
+                "slug" => "status",
+                "type" => "boolean",
+                "scope" => "website",
+                "is_required" => 1,
+                "default_value" => 1
+            ],
             [
                 "name" => "Color",
                 "type" => "select",
