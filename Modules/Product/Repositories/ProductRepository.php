@@ -126,4 +126,32 @@ class ProductRepository extends BaseRepository
         return true;
     }
 
+    public function extra_rules(object $request): array
+    {
+        if ($request->quantity_and_stock_status)
+        {
+            $rule = [
+                "quantity_and_stock_status.manage_stock" => "required|boolean",
+                "quantity_and_stock_status.is_in_stock" => "required|boolean",
+                "quantity_and_stock_status.quantity" => "required|decimal",
+                "quantity_and_stock_status.use_config_manage_stock" => "required|boolean"
+            ];
+        }
+        return $rule ?? [];
+    }
+
+    public function catalogInventory(object $product, object $request)
+    {
+        try
+        {
+            dd($product);
+            
+        }
+        catch ( Exception $exception )
+        {
+
+        }
+
+        return true;
+    }
 }
