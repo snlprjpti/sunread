@@ -82,7 +82,7 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "channel"
             ],
             [
-                "name" => "Quantity",
+                "name" => "Quantity And Stock Status",
                 "slug" => "quantity_and_stock_status",
                 "type" => "select",
                 "options" => [ "In Stock", "Out of Stock" ],
