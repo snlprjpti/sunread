@@ -17,7 +17,9 @@ use Modules\Product\Entities\ProductAttribute;
 
 class ProductRepository extends BaseRepository
 {
-    public function __construct(Product $product)
+    protected $attribute;
+    
+    public function __construct(Product $product, Attribute $attribute)
     {
         $this->model = $product;
         $this->model_key = "catalog.products";
@@ -32,16 +34,21 @@ class ProductRepository extends BaseRepository
             "categories" => "required|array",
             "categories.*" => "required|exists:categories,id"
         ];
+        $this->attribute = $attribute;
     }
 
     public function validateAttributes(object $request): array
     {
         try
         {
-            $attributes = Attribute::all();
-            $product_attributes = array_map(function($product_attribute) use ($attributes) {
+            $attributes = $this->attribute::all();
+
+            $product_attributes = [];
+            foreach ( $request->get("attributes") as $product_attribute)
+            {
                 if ( !is_array($product_attribute) ) throw ValidationException::withMessages([ "attributes" => "Invalid attributes format." ]);
                 $attribute = $attributes->where("id", $product_attribute["attribute_id"])->first() ?? null;
+                
                 if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute["attribute_id"]} does not exist." ]);
 
                 $validator = Validator::make($product_attribute, [
@@ -52,8 +59,9 @@ class ProductRepository extends BaseRepository
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
 
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
-                return array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid());
-            }, $request->get("attributes"));
+                $product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid());
+            }
+            $product_attributes = $this->unsetter($product_attributes);
         }
         catch (Exception $exception)
         {
@@ -108,7 +116,7 @@ class ProductRepository extends BaseRepository
             $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes->pluck('id');
             })->flatten(1)->toArray();
-            $attributes = Attribute::whereIn('id', $attribute_ids)->get();
+            $attributes = $this->attribute::whereIn('id', $attribute_ids)->get();
 
             $check_attribute = $attributes->pluck("id")->toArray();
             array_map(function($request_attribute) use ($attributes) {
@@ -130,13 +138,12 @@ class ProductRepository extends BaseRepository
 
     public function validataInventoryData(object $request): array
     {
+        
         try
         {
             $validator = Validator::make($request->all(), [
-                "quantity_and_stock_status.manage_stock" => "required|boolean",
-                "quantity_and_stock_status.is_in_stock" => "required|boolean",
-                "quantity_and_stock_status.quantity" => "required|decimal",
-                "quantity_and_stock_status.use_config_manage_stock" => "required|boolean"
+                "catalog_inventory.quantity" => "required|decimal",
+                "catalog_inventory.use_config_manage_stock" => "required|boolean"
             ]);
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
         }
@@ -145,34 +152,47 @@ class ProductRepository extends BaseRepository
             throw $exception;
         }
 
-        return $validator->validated()["quantity_and_stock_status"];
+        return $validator->validated()["catalog_inventory"];
     }
 
-    public function catalogInventory(object $product, object $request, string $method = "store"): object
+    public function catalogInventory(object $product, object $request, string $method = "store"): bool
     {
+
         DB::beginTransaction();
 
         try
-        {
-            $data = $this->validataInventoryData($request);
-            $data["product_id"] = $product->id;
-            $data["website_id"] = $product->website_id;
-            $match = [
-                "product_id" => $product->id,
-                "website_id" => $product->website_id
-            ];
-            unset($data["quantity"]); 
-            $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
-            $original_quantity = (float) $catalog_inventory->quantity;
-            $adjustment_type = (($request->quantity_and_stock_status["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
-            LogCatalogInventoryItem::dispatchSync([
-                "product_id" => $catalog_inventory->product_id,
-                "website_id" => $catalog_inventory->website_id,
-                "event" => ($method == "store") ? "{$this->model_key}.store" : "{$this->model_key}.{$adjustment_type}",
-                "adjustment_type" => ($method == "store") ? "addition" : $adjustment_type,
-                "adjusted_by" => auth()->guard("admin")->id(),
-                "quantity" => ($method == "store") ? $request->quantity_and_stock_status["quantity"] : (float) abs($original_quantity - $request->quantity_and_stock_status["quantity"])
-            ]);
+        {  
+            $inventory_id = $this->attribute::whereSlug("quantity_and_stock_status")->first()->id;
+            array_map(function ($request_attribute) use(&$is_in_stock, $inventory_id) {
+                if ($request_attribute["attribute_id"] == $inventory_id) $is_in_stock = $request_attribute["value"];
+            }, $request->get("attributes"));
+            
+            if (isset($is_in_stock))
+            {                
+                $data = $this->validataInventoryData($request);
+                $data["product_id"] = $product->id;
+                $data["website_id"] = $product->website_id;
+                $data["manage_stock"] = 1;
+                $data["is_in_stock"] = $is_in_stock;
+                $match = [
+                    "product_id" => $product->id,
+                    "website_id" => $product->website_id
+                ];
+
+                unset($data["quantity"]); 
+                $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
+      
+                $original_quantity = (float) $catalog_inventory->quantity;
+                $adjustment_type = (($request->catalog_inventory["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
+                LogCatalogInventoryItem::dispatchSync([
+                    "product_id" => $catalog_inventory->product_id,
+                    "website_id" => $catalog_inventory->website_id,
+                    "event" => ($method == "store") ? "{$this->model_key}.store" : "{$this->model_key}.{$adjustment_type}",
+                    "adjustment_type" => ($method == "store") ? "addition" : $adjustment_type,
+                    "adjusted_by" => auth()->guard("admin")->id(),
+                    "quantity" => ($method == "store") ? $request->catalog_inventory["quantity"] : (float) abs($original_quantity - $request->catalog_inventory["quantity"])
+                ]);
+            }
         }
         catch ( Exception $exception )
         {
@@ -182,6 +202,25 @@ class ProductRepository extends BaseRepository
 
         DB::commit();
         
-        return $catalog_inventory;
+        return true;
+    }
+
+    public function unsetter(array $product_attributes): array
+    {
+        try
+        {
+            $inventory_id = $this->attribute::whereSlug("quantity_and_stock_status")->first()->id;
+            foreach ( $product_attributes as $key => $product_attribute )
+            {
+                if ( $product_attribute["attribute_id"] == $inventory_id ) $unset_keys = $key;
+            }
+            if (isset($unset_keys)) unset($product_attributes[$unset_keys]);
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $product_attributes;
     }
 }
