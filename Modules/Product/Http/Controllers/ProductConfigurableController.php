@@ -85,6 +85,7 @@ class ProductConfigurableController extends BaseController
             unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
+                if ($request->quantity_and_stock_status) $this->repository->catalogInventory($updated, $request, "update");
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $updated);
                 $updated->categories()->sync($request->get("categories"));
