@@ -4,6 +4,13 @@ return [
     [
         'key'   => 'dashboard',
         'name'  => 'Dashboard',
+        'route' => null,
+        'sort'  => 1,
+        "module"=>'Dashboard'
+    ],
+    [
+        'key'   => 'dashboard.dashboard',
+        'name'  => 'Dashboard',
         'route' => 'admin.dashboard.index',
         'sort'  => 1,
         "module"=>'Dashboard'
