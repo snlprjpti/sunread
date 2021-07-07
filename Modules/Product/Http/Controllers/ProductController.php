@@ -61,9 +61,10 @@ class ProductController extends BaseController
             $data = $this->repository->validateData($request);
             $this->repository->checkAttribute($request->attribute_set_id, $request);      
             $data["type"] = "simple";
+            
             $created = $this->repository->create($data, function(&$created) use($request) {
-                if ($request->quantity_and_stock_status) $this->repository->catalogInventory($created, $request);
                 $attributes = $this->repository->validateAttributes($request);
+                $this->repository->catalogInventory($created, $request);
                 $this->repository->syncAttributes($attributes, $created);
                 $created->categories()->sync($request->get("categories"));
                 $created->channels()->sync($request->get("channels"));
@@ -104,8 +105,8 @@ class ProductController extends BaseController
             unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
-                if ($request->quantity_and_stock_status) $this->repository->catalogInventory($updated, $request, "update");
                 $attributes = $this->repository->validateAttributes($request);
+                $this->repository->catalogInventory($updated, $request, "update");
                 $this->repository->syncAttributes($attributes, $updated);
                 $updated->categories()->sync($request->get("categories"));
                 $updated->channels()->sync($request->get("channels"));
