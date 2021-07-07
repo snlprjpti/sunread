@@ -32,7 +32,8 @@ return [
         'absolute_path_not_exist' => 'Absolute path of :name does not exists.',
         'wrong_absolute_path' => 'Wrong absolute path for :name',
         'store_does_not_belong' => 'Store does not belong to :name channel.',
-        'use_default_value' => 'Default value must be 1.'
+        'use_default_value' => 'Default value must be 1.',
+        'inventory_cannot_be_zero' => 'Inventory quantity cannot be less than zero'
     ],
     'users' => [
         'forget-password' => [
