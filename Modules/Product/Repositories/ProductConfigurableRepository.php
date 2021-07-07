@@ -11,6 +11,8 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
+use Modules\Inventory\Entities\CatalogInventory;
+use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Product\Entities\ProductAttribute;
 
 class ProductConfigurableRepository extends BaseRepository
@@ -200,6 +202,61 @@ class ProductConfigurableRepository extends BaseRepository
         return $product_variant;
     }
 
-    
+    public function validataInventoryData(object $request): array
+    {
+        try
+        {
+            $validator = Validator::make($request->all(), [
+                "quantity_and_stock_status.manage_stock" => "required|boolean",
+                "quantity_and_stock_status.is_in_stock" => "required|boolean",
+                "quantity_and_stock_status.quantity" => "required|decimal",
+                "quantity_and_stock_status.use_config_manage_stock" => "required|boolean"
+            ]);
+            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $validator->validated()["quantity_and_stock_status"];
+    }
+
+    public function catalogInventory(object $product, object $request, string $method = "store"): object
+    {
+        DB::beginTransaction();
+
+        try
+        {
+            $data = $this->validataInventoryData($request);
+            $data["product_id"] = $product->id;
+            $data["website_id"] = $product->website_id;
+            $match = [
+                "product_id" => $product->id,
+                "website_id" => $product->website_id
+            ];
+            unset($data["quantity"]); 
+            $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
+            $original_quantity = (float) $catalog_inventory->quantity;
+            $adjustment_type = (($request->quantity_and_stock_status["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
+            LogCatalogInventoryItem::dispatchSync([
+                "product_id" => $catalog_inventory->product_id,
+                "website_id" => $catalog_inventory->website_id,
+                "event" => ($method == "store") ? "{$this->model_key}.store" : "{$this->model_key}.{$adjustment_type}",
+                "adjustment_type" => ($method == "store") ? "addition" : $adjustment_type,
+                "adjusted_by" => auth()->guard("admin")->id(),
+                "quantity" => ($method == "store") ? $request->quantity_and_stock_status["quantity"] : (float) abs($original_quantity - $request->quantity_and_stock_status["quantity"])
+            ]);
+        }
+        catch ( Exception $exception )
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
+        
+        return $catalog_inventory;
+    }
 
 }
