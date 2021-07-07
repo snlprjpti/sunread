@@ -12,9 +12,6 @@ use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
-use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeSet;
-use Illuminate\Validation\ValidationException;
 
 class ProductController extends BaseController
 {
@@ -60,12 +57,12 @@ class ProductController extends BaseController
     public function store(Request $request): JsonResponse
     {
         try
-        {  
-            $data = $this->repository->validateData($request);
-            $this->repository->checkAttribute($request->attribute_set_id, $request);
-            
+        {
+            $data = $this->repository->validateData($request, $this->repository->extra_rules($request));
+            $this->repository->checkAttribute($request->attribute_set_id, $request);      
             $data["type"] = "simple";
             $created = $this->repository->create($data, function($created) use($request) {
+                $this->repository->catalogInventory($created, $request);
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->syncAttributes($attributes, $created);
                 $created->categories()->sync($request->get("categories"));
