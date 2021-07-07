@@ -11,5 +11,6 @@
     "Coupon": true,
     "Page": true,
     "Tax": true,
-    "Country": true
+    "Country": true,
+    "Inventory": true
 }
