@@ -134,7 +134,7 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "is_required" => 1,
                 "default_value" => "Taxable Goods",
-                "options" => ["None", "Taxable Goods"],
+                "options" => [],
                 "scope" => "channel"
             ],
             [
@@ -194,14 +194,14 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "store",
                 "is_required" => 1
             ],
-            [
-                "name" => "Product Status",
-                "slug" => "status",
-                "type" => "boolean",
-                "scope" => "website",
-                "is_required" => 1,
-                "default_value" => 1
-            ],
+            // [
+            //     "name" => "Product Status",
+            //     "slug" => "status",
+            //     "type" => "boolean",
+            //     "scope" => "website",
+            //     "is_required" => 1,
+            //     "default_value" => 1
+            // ],
             [
                 "name" => "Color",
                 "type" => "select",
