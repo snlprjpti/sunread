@@ -152,4 +152,24 @@ class ProductController extends BaseController
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
+
+    public function categoryWiseProducts(Request $request, $category_id): JsonResponse
+    {
+        try
+        {
+            $this->validateListFiltering($request);
+            $allData = $this->getFilteredList($request);
+            foreach($allData as &$data)
+            {
+                $data->selected = in_array($category_id, $data->categories()->pluck('id')->toArray()) ? 1 : 0;
+                $fetched[] = $data;
+            }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+    }
 }
