@@ -121,11 +121,11 @@ class CategoryTest extends BaseTestCase
     public function testAdminCanFetchResourceFormat()
     {
         $category = Category::inRandomOrder()->first();
-        $websiteId = $category->website_id;
+        $website = Website::find($category->website_id);
 
-        $this->filter = array_merge($this->getScope($websiteId), [
+        $this->filter = $website ? array_merge($this->getScope($website->id), [
             "category_id" => $category->id
-        ]);
+        ]) : [];
 
         $response = $this->withHeaders($this->headers)->get($this->getRoute("format", $this->filter));
 
