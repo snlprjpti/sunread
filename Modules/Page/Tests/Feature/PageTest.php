@@ -25,7 +25,6 @@ class PageTest extends BaseTestCase
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->parent_id = $this->model::oldest('id')->first()->id;
         $this->hasStatusTest = true;
-        $this->hasShowTest = false;
     }
 
     public function getCreateData(): array
@@ -54,43 +53,6 @@ class PageTest extends BaseTestCase
     {
         return array_merge($this->getCreateData(), [
             "title" => null
-        ]);
-    }
-
-    public function testAdminCanFetchIndividualResource()
-    {
-        $scope = Arr::random(config('page.model_config'));
-        $scope_id = app($scope["scope"])::factory()->create()->id;
-        $page_id = Page::factory()->create()->id;
-        $get_data = [
-            "page_id" => $page_id,
-            "scope" => $scope["scope"],
-            "scope_id" => $scope_id
-        ];
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("detail", $get_data));
-
-        $response->assertOk();
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
-        ]);
-    }
-
-    public function testShouldReturnErrorIfResourceDoesNotExist()
-    {
-        $scope = Arr::random(config('page.model_config'));
-        $scope_id = app($scope["scope"])::factory()->create()->id;
-        $get_data = [
-            "page_id" => 0,
-            "scope" => $scope["scope"],
-            "scope_id" => $scope_id
-        ];
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("detail", $get_data));
-
-        $response->assertNotFound();
-        $response->assertJsonFragment([
-            "status" => "error",
-            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
         ]);
     }
 }
