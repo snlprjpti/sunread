@@ -35,7 +35,7 @@ trait HasPageConfiguration
                 $relation = $value["parent"];
                 if($relation != null && $params["scope"] == $value["scope"] && $scopeId != null)
                 {
-                    $data["scope_id"] = (app($value["scope"])->find($scopeId)->$relation->id) ?? 0;
+                    $data["scope_id"] = (app($value["scope"])->find($scopeId)->$relation->id) ?? null;
                     $data["scope"] = $value["parent_scope"];
                     $result = $this->checkCondition($data);
                     if(isset($result)) break;
@@ -53,6 +53,7 @@ trait HasPageConfiguration
             ['scope', $params["scope"] ?? null],
             ['scope_id', $params["scope_id"] ?? null]
         ])->first();
+
         return $result;
     }
 
@@ -64,6 +65,7 @@ trait HasPageConfiguration
             parse_str($url_components['query'], $params);
             return $params;
         }
+
         return false;
     }
 }
