@@ -32,7 +32,7 @@ class AttributeOptionRepository extends BaseRepository
 
     public function updateOrCreate(?array $data, object $parent, $method=null): void
     {
-        if ( count($data) == 0 ) return;
+        if ( count($data) == 0 && $parent->checkOption()) return;
 
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.create.before");
