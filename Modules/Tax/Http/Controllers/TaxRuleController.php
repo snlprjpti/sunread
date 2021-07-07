@@ -39,7 +39,7 @@ class TaxRuleController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, [ "customer_group", "product_taxable", "tax_rates" ]);
         }
         catch( Exception $exception )
         {
