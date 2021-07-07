@@ -2,9 +2,6 @@
 
 namespace Modules\Page\Traits;
 
-use Illuminate\Http\Request;
-use Modules\Page\Entities\PageConfiguration;
-
 trait HasPageConfiguration
 {
     public function getAttribute($name)
@@ -38,7 +35,7 @@ trait HasPageConfiguration
                 $relation = $value["parent"];
                 if($relation != null && $params["scope"] == $value["scope"] && $scopeId != null)
                 {
-                    $data["scope_id"] = (app($value["scope"])->find($scopeId)->$relation->id);
+                    $data["scope_id"] = (app($value["scope"])->find($scopeId)->$relation->id) ?? 0;
                     $data["scope"] = $value["parent_scope"];
                     $result = $this->checkCondition($data);
                     if(isset($result)) break;

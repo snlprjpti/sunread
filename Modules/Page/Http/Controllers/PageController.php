@@ -8,7 +8,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
-use Modules\Page\Repositories\PageConfigurationRepository;
 use Modules\Page\Repositories\PageRepository;
 use Modules\Page\Repositories\PageTranslationRepository;
 use Modules\Page\Transformers\PageResource;
