@@ -86,6 +86,7 @@ class ProductConfigurableController extends BaseController
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
+                $this->repository->catalogInventory($updated, $request);
                 $this->repository->syncAttributes($attributes, $updated);
                 $updated->categories()->sync($request->get("categories"));
                 $updated->channels()->sync($request->get("channels"));

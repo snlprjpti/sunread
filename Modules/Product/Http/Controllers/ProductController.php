@@ -12,9 +12,6 @@ use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
-use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeSet;
-use Illuminate\Validation\ValidationException;
 
 class ProductController extends BaseController
 {
@@ -60,13 +57,14 @@ class ProductController extends BaseController
     public function store(Request $request): JsonResponse
     {
         try
-        {  
+        {
             $data = $this->repository->validateData($request);
-            $this->repository->checkAttribute($request->attribute_set_id, $request);
-            
+            $this->repository->checkAttribute($request->attribute_set_id, $request);      
             $data["type"] = "simple";
-            $created = $this->repository->create($data, function($created) use($request) {
+            
+            $created = $this->repository->create($data, function(&$created) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
+                $this->repository->catalogInventory($created, $request);
                 $this->repository->syncAttributes($attributes, $created);
                 $created->categories()->sync($request->get("categories"));
                 $created->channels()->sync($request->get("channels"));
@@ -84,7 +82,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images"])->findOrFail($id);
+            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images", "website", "catalog_inventories.catalog_inventory_items"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
@@ -108,6 +106,7 @@ class ProductController extends BaseController
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
+                $this->repository->catalogInventory($updated, $request, "update");
                 $this->repository->syncAttributes($attributes, $updated);
                 $updated->categories()->sync($request->get("categories"));
                 $updated->channels()->sync($request->get("channels"));

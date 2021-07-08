@@ -15,7 +15,7 @@ class CatalogInventoryResource extends JsonResource
             "id" => $this->id,
             "product" => new ProductResource($this->whenLoaded("product")),
             "website" => new WebsiteResource($this->whenLoaded("website")),
-            "quantity" => $this->quantity,
+            "quantity" => (float) $this->quantity,
             "manage_stock" => (bool) $this->manage_stock,
             "is_in_stock" => (bool) $this->is_in_stock,
             "use_config_manage_stock" => (bool) $this->use_config_manage_stock,
