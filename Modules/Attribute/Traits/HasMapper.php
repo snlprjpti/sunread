@@ -2,7 +2,6 @@
 
 namespace Modules\Attribute\Traits;
 
-use Exception;
 
 trait HasMapper
 {
@@ -38,6 +37,26 @@ trait HasMapper
             return ($this->mapper[$this->slug]["options"] == 1);
         }
         return false;
+    }
+
+    public function checkCreateOrUpdate(): bool
+    {
+        if($this->checkMapper()){
+            return ($this->mapper[$this->slug]["create-update"] == 1);
+        }
+        return false;
+    }
+
+    public static function attributeMapper(): array
+    {
+        $attribute_mapper_ids = []; 
+        foreach ( (new self)->attributeMapperSlug as $map)
+        {
+            $attribute = (new self)::whereSlug($map)->first();
+            $attribute_mapper_ids[$attribute->slug] = $attribute->id;
+        }
+
+        return $attribute_mapper_ids;
     }
 
 }
