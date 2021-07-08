@@ -99,10 +99,11 @@ class AttributeController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id)->toArray();
+            $modelData = $this->repository->fetch($id);
+            $fetched = $modelData->toArray();
             if(in_array($fetched["type"], $this->repository->non_filterable_fields)) unset($fetched["default_value"]) ;
             $fetched["translations"] = $this->translation_repository->show($id);
-            $fetched["attribute_options"] = $this->option_repository->show($id);
+            $fetched["attribute_options"] = $modelData->getConfigOption() ?? $this->option_repository->show($id);
         }
         catch( Exception $exception )
         {
