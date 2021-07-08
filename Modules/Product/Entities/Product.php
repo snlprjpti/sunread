@@ -97,11 +97,6 @@ class Product extends Model
         return $this->hasMany(CatalogInventory::class);
     }
 
-    public function catalog_inventory(): HasOne
-    {
-        return $this->hasOne(CatalogInventory::class);
-    }
-
     public function website(): BelongsTo
     {
         return $this->belongsTo(Website::class);

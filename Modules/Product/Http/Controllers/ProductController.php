@@ -82,7 +82,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images", "website", "catalog_inventory.catalog_inventory_items"])->findOrFail($id);
+            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images", "website", "catalog_inventories.catalog_inventory_items"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
