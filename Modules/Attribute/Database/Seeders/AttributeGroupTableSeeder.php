@@ -21,7 +21,6 @@ class AttributeGroupTableSeeder extends Seeder
         {
             $attribute_group_data = [
                 "name" => $data,
-                "slug"=> Str::slug($data),
                 "position" => $count + 1,
                 "attribute_set_id" => 1,
                 "created_at" => now(),

@@ -11,7 +11,6 @@ class AttributeGroupResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
-            "slug" => $this->slug,
             "position" => $this->position,
             "attribute_set" => new AttributeSetResource($this->whenLoaded("attribute_set")),
             "attributes" => AttributeResource::collection($this->whenLoaded("attributes")),

@@ -13,9 +13,7 @@ class CreateAttributeGroupsTable extends Migration
             $table->unsignedBigInteger('attribute_set_id');
             $table->foreign('attribute_set_id')->references('id')->on('attribute_sets')->onDelete('cascade');
             $table->string('name');
-            $table->string('slug')->unique();
             $table->integer('position')->nullable();
-            $table->unique(['attribute_set_id', 'slug'], 'attribute_group_slug_unique');
             $table->timestamps();
         });
     }

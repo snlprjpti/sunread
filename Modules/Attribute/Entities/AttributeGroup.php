@@ -14,8 +14,8 @@ class AttributeGroup extends Model
 {
     use Sluggable, HasFactory, HasTranslation;
 
-    public static $SEARCHABLE = [ "name", "slug" ];
-    protected $fillable = [ "attribute_set_id", "name", "slug", "position" ];
+    public static $SEARCHABLE = [ "name" ];
+    protected $fillable = [ "attribute_set_id", "name", "position" ];
     protected $with = [ "attributes" ];
 
     public $translatedAttributes = ["name"];
