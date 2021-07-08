@@ -19,7 +19,7 @@ class ProductRepository extends BaseRepository
 {
     protected $attribute;
     
-    public function __construct(Product $product, Attribute $attribute)
+    public function __construct(Product $product)
     {
         $this->model = $product;
         $this->model_key = "catalog.products";
@@ -34,14 +34,13 @@ class ProductRepository extends BaseRepository
             "categories" => "required|array",
             "categories.*" => "required|exists:categories,id"
         ];
-        $this->attribute = $attribute;
     }
 
     public function validateAttributes(object $request): array
     {
         try
         {
-            $attributes = $this->attribute::all();
+            $attributes = Attribute::all();
 
             $product_attributes = [];
             foreach ( $request->get("attributes") as $product_attribute)
@@ -116,7 +115,7 @@ class ProductRepository extends BaseRepository
             $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes->pluck('id');
             })->flatten(1)->toArray();
-            $attributes = $this->attribute::whereIn('id', $attribute_ids)->get();
+            $attributes = Attribute::whereIn('id', $attribute_ids)->get();
 
             $check_attribute = $attributes->pluck("id")->toArray();
             array_map(function($request_attribute) use ($attributes) {
@@ -162,7 +161,7 @@ class ProductRepository extends BaseRepository
 
         try
         {  
-            $inventory_id = $this->attribute::whereSlug("quantity_and_stock_status")->first()->id;
+            $inventory_id = Attribute::whereSlug("quantity_and_stock_status")->first()->id;
             array_map(function ($request_attribute) use(&$is_in_stock, $inventory_id) {
                 if ($request_attribute["attribute_id"] == $inventory_id) $is_in_stock = $request_attribute["value"];
             }, $request->get("attributes"));
@@ -209,7 +208,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $inventory_id = $this->attribute::whereSlug("quantity_and_stock_status")->first()->id;
+            $inventory_id = Attribute::whereSlug("quantity_and_stock_status")->first()->id;
             foreach ( $product_attributes as $key => $product_attribute )
             {
                 if ( $product_attribute["attribute_id"] == $inventory_id ) $unset_keys = $key;
