@@ -76,7 +76,9 @@ class CategoryTest extends BaseTestCase
     public function getUpdateData(): array
     {
         $websiteId = $this->default_resource->website_id;
-        return array_merge($this->getCreateData(), $this->getScope($websiteId)); 
+        $updateData = $this->getCreateData();
+        unset($updateData["website_id"]);
+        return array_merge($updateData, $this->getScope($websiteId)); 
     }
 
     public function testAdminCanFetchResources()
