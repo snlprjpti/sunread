@@ -17,7 +17,7 @@ class AttributeSetResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "is_user_defined" => $this->is_user_defined,
-            "groups" => AttributeGroupResource::collection($this->whenLoaded("attribute_groups")),
+            "groups" => AttributeGroupResource::collection($this->whenLoaded("attribute_groups")->sortBy('position')),
             "unassigned_attributes" => AttributeResource::collection(Attribute::whereNotIn('id', $attribute_ids)->get())
         ];
     }

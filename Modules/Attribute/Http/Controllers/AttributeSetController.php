@@ -78,7 +78,6 @@ class AttributeSetController extends BaseController
                 $selected_attributeSet->attribute_groups->map(function($attributeGroup) use($created){
                     $item = [
                         "name" => $attributeGroup->name,
-                        "slug" => "{$this->group_model->createSlug($created->name)}-{$attributeGroup->slug}",
                         "attributes" => ($attributeGroup->attributes) ? $attributeGroup->attributes->pluck('id')->toArray() : []
                     ];
                     $this->attributeGroupRepository->singleUpdateOrCreate($item, $created);
