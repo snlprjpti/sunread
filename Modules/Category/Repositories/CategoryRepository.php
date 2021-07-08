@@ -27,7 +27,6 @@ class CategoryRepository extends BaseRepository
             "position" => "sometimes|nullable|numeric",
 
             "parent_id" => "nullable|numeric|exists:categories,id",
-            "website_id" => "required|exists:websites,id",
 
             "products" => "sometimes|array",
             "products.*" => "sometimes|exists:products,id"

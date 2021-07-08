@@ -76,7 +76,8 @@ class CategoryController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
-                "items.slug.value" => new SlugUniqueRule($request)
+                "items.slug.value" => new SlugUniqueRule($request),
+                "website_id" => "required|exists:websites,id"
             ]), function () use ($request) {
                 return [
                     "scope" => "website",
@@ -135,7 +136,7 @@ class CategoryController extends BaseController
             $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
                 "items.slug.value" => new SlugUniqueRule($request, $id),
                 "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
             ]), function () use ($id, $request) {
                 return [
                     "parent_id" => $request->parent_id ?? null,
