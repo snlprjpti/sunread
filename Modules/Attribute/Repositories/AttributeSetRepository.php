@@ -157,11 +157,11 @@ class AttributeSetRepository extends BaseRepository
 
             $options = $configOptions ?? $attribute->attribute_options;
             return $options->map( function ($option) {
-                        return [
-                            "value" => $option->id,
-                            "label" => $option->name
-                        ];
-                    });
+                return [
+                    "value" => $option->id,
+                    "label" => $option->namespace
+                ];
+            });
         }
         catch( \Exception $exception )
         {
