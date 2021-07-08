@@ -21,7 +21,7 @@ class AttributeGroupRepository extends BaseRepository
             "name" => "required",
             "attributes" => "sometimes|array",
             "attributes.*" => "sometimes|exists:attributes,id",
-            "position" => "required|numeric"
+            "position" => "nullable|numeric"
         ];
     }
 
