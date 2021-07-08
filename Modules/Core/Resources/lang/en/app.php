@@ -33,7 +33,8 @@ return [
         'wrong_absolute_path' => 'Wrong absolute path for :name',
         'store_does_not_belong' => 'Store does not belong to :name channel.',
         'use_default_value' => 'Default value must be 1.',
-        'no_parent_belong_to_website' => "Patent Category does not belong to this website"
+        'no_parent_belong_to_website' => "Patent Category does not belong to this website",
+        'inventory_cannot_be_zero' => 'Inventory quantity cannot be less than zero'
     ],
     'users' => [
         'forget-password' => [

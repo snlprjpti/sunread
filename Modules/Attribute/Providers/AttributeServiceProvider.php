@@ -65,6 +65,9 @@ class AttributeServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/validation.php'), "validation"
         );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/mapper.php'), "mapper"
+        );
     }
 
     /**
