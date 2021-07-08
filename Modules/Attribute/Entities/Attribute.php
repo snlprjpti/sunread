@@ -20,6 +20,8 @@ class Attribute extends Model
     protected $appends = [ 'type_validation' ];
     protected $with = [ "attribute_options" ];
 
+    public $attributeMapperSlug = [ "quantity_and_stock_status", "sku", "status", "category_ids", "base_image", "small_image", "thumbnail_image" ];
+
     protected $touches = [ 'product_attributes' ];
     public $translatedAttributes = ["name"];
     public $translatedModels = [ AttributeTranslation::class, "attribute_id" ];
