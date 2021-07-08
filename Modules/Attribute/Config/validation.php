@@ -11,7 +11,7 @@ return [
 	"multiselect" => null,
 	"datetime" => "date",
 	"date" => "date",
-	// "image" => "image",
-	// "file" => "file",
+	"image" => "mimes:jpeg,jpg,bmp,png",
+	"file" => "file",
 	"checkbox" => null
 ];
