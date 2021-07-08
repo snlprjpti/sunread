@@ -64,9 +64,9 @@ class ProductController extends BaseController
             
             $created = $this->repository->create($data, function(&$created) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
-                $this->repository->catalogInventory($created, $request);
+                $this->repository->attributeMapperSync($created, $request);
+
                 $this->repository->syncAttributes($attributes, $created);
-                $created->categories()->sync($request->get("categories"));
                 $created->channels()->sync($request->get("channels"));
             });
         }
@@ -97,18 +97,15 @@ class ProductController extends BaseController
         try
         {
             $product = $this->model::findOrFail($id);            
-            $data = $this->repository->validateData($request, [
-                "sku" => "required|unique:products,sku,{$id}"
-            ]);
+            $data = $this->repository->validateData($request);
 
             $this->repository->checkAttribute($product->attribute_set_id, $request);
             unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
-                $this->repository->catalogInventory($updated, $request, "update");
+                $this->repository->attributeMapperSync($updated, $request, "update");
                 $this->repository->syncAttributes($attributes, $updated);
-                $updated->categories()->sync($request->get("categories"));
                 $updated->channels()->sync($request->get("channels"));
             });
         }
