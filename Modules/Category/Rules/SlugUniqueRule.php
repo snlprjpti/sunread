@@ -42,6 +42,6 @@ class SlugUniqueRule implements Rule
      */
     public function message()
     {
-        return 'Slug has already taken';
+        return 'Slug has already been taken';
     }
 }
