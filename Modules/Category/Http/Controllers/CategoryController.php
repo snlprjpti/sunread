@@ -76,7 +76,8 @@ class CategoryController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
-                "items.slug.value" => new SlugUniqueRule($request)
+                "items.slug.value" => new SlugUniqueRule($request),
+                "website_id" => "required|exists:websites,id"
             ]), function () use ($request) {
                 return [
                     "scope" => "website",
@@ -103,18 +104,29 @@ class CategoryController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetch($id);
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
+            ]);
+
+            $data = [
+                "scope" => $request->scope ?? "website", 
+                "scope_id" => $request->scope_id ?? $this->model->findOrFail($id)->website_id,
+                "category_id" => $id 
+            ];
+
+            $fetched = $this->repository->getConfigData($data);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -124,7 +136,7 @@ class CategoryController extends BaseController
             $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
                 "items.slug.value" => new SlugUniqueRule($request, $id),
                 "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
             ]), function () use ($id, $request) {
                 return [
                     "parent_id" => $request->parent_id ?? null,
@@ -182,23 +194,17 @@ class CategoryController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 
-    public function format(Request $request): JsonResponse
+    public function attributes(Request $request): JsonResponse
     {
         try
         {
             $request->validate([
-                "category_id" => "required_with:scope|exists:categories,id",
-                "scope" => "required_with:scope_id|in:website,channel,store",
-                "scope_id" => [ "required_with:scope", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
+                "scope" => "sometimes|in:website,channel,store"
             ]);
 
-            $data = [
-                "scope" => $request->scope ?? "website", 
-                "scope_id" => $request->scope_id ?? ($request->category_id ? $this->model->find($request->category_id)->website_id : null),
-                "category_id" => $request->category_id ?? null
-            ];
-
-            $fetched = $this->repository->getConfigData($data);
+            $fetched = $this->repository->getConfigData([
+                "scope" => $request->scope ?? "website"
+            ]);
         }
         catch (Exception $exception)
         {
