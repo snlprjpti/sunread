@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Modules\Core\Exceptions\DeleteUnauthorized;
 
 class BaseRepository
@@ -294,5 +296,25 @@ class BaseRepository
         $append_data = $callback ? $callback($request) : [];
 
         return array_merge($data, $append_data);
+    }
+
+    public function storeScopeImage(object $request, ?string $folder = null, ?string $delete_url = null): string
+    {
+        try
+        {
+            // Store File
+            $key = Str::random(6);
+            $folder = $folder ?? "default";
+            $file_path = $request->storeAs("images/{$folder}/{$key}", (string) $request->getClientOriginalName());
+
+            // Delete old file if requested
+            if ( $delete_url !== null ) Storage::delete($delete_url);
+        }
+        catch (\Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $file_path;
     }
 }

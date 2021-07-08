@@ -2,6 +2,7 @@
 namespace Modules\Category\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Core\Entities\Website;
 
 class CategoryFactory extends Factory
 {
@@ -9,14 +10,11 @@ class CategoryFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->name();
-        $slug = $this->faker->unique()->slug();
 
         return [
-            "slug" => $slug,
-            "name" => $name,
             "position" => $this->faker->randomDigit(),
-            "status" => 1 
+            "parent_id" => null,
+            "website_id" => Website::factory()->create()->id
         ];
     }
 }

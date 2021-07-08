@@ -9,24 +9,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Kalnoy\Nestedset\NodeTrait;
+use Modules\Category\Traits\HasScope;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Website;
 use Modules\Core\Traits\HasFactory;
-use Modules\Core\Traits\HasTranslation;
 use Modules\Core\Traits\Sluggable;
 use Modules\Product\Entities\Product;
 use Modules\UrlRewrite\Traits\HasUrlRewrite;
 
 class Category extends Model
 {
-    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasTranslation;
+    use NodeTrait, Sluggable, HasFactory, HasUrlRewrite, HasScope;
 
-    public static $SEARCHABLE = [ "translations.name", "slug" ];
-    protected $fillable = [ "parent_id", "name", "slug", "image", "position", "description", "meta_title", "meta_description", "meta_keywords", "status" ];
+    public static $SEARCHABLE = [];
+    protected $fillable = [ "parent_id", "position", "website_id" ];
+    protected $with = [ "values" ];
 
-    public $translatedAttributes = ["name", "description", "meta_title", "meta_description", "meta_keywords"];
-    public $translatedModels = [ CategoryTranslation::class, "category_id" ];
-
-    protected $appends = ['url'];
+    // protected $appends = ['url'];
 
     protected $touches = ['products'];
 
@@ -56,14 +55,19 @@ class Category extends Model
         return Category::where('parent_id', null)->get();
     }
 
-    public function translations(): HasMany
+    public function values(): HasMany
     {
-        return $this->hasMany(CategoryTranslation::class, 'category_id');
+        return $this->hasMany(CategoryValue::class, 'category_id');
     }
 
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function website(): BelongsTo
+    {
+        return $this->belongsTo(Website::class);
     }
 
     public function channels(): BelongsToMany

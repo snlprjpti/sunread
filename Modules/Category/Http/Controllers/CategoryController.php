@@ -6,33 +6,33 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
-use Modules\Category\Entities\CategoryTranslation;
-use Modules\Category\Exceptions\CategoryAuthorizationException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
+use Illuminate\Validation\ValidationException;
+use Modules\Category\Transformers\List\CategoryResource as ListCategoryResource;
+use Modules\Category\Repositories\CategoryValueRepository;
+use Modules\Category\Rules\CategoryScopeRule;
+use Modules\Category\Rules\SlugUniqueRule;
+use Modules\Core\Rules\ScopeRule;
+use Modules\Product\Entities\Product;
 
 class CategoryController extends BaseController
 {
-    protected $repository, $translation, $is_super_admin, $main_root_id;
+    protected $repository, $categoryValueRepository, $is_super_admin, $main_root_id, $product_model;
 
-    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryTranslation $categoryTranslation)
+    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryValueRepository $categoryValueRepository, Product $product_model)
     {
         $this->repository = $categoryRepository;
-        $this->translation = $categoryTranslation;
+        $this->categoryValueRepository = $categoryValueRepository;
         $this->model = $category;
         $this->model_name = "Category";
-        $this->is_super_admin = auth()->guard("admin")->check() ? auth()->guard("admin")->user()->hasRole("super-admin") : false;
-        $this->main_root_id = $this->model::oldest('id')->first()->id;
 
-        $exception_statuses = [
-            CategoryAuthorizationException::class => 403
-        ];
+        $this->product_model = $product_model;
 
-        parent::__construct($this->model, $this->model_name, $exception_statuses);
+        parent::__construct($this->model, $this->model_name);
     }
 
     public function collection(object $data): ResourceCollection
@@ -40,53 +40,59 @@ class CategoryController extends BaseController
         return CategoryResource::collection($data);
     }
 
+    public function listCollection(object $data): ResourceCollection
+    {
+        return ListCategoryResource::collection($data);
+    }
+
     public function resource(object $data): JsonResource
     {
         return new CategoryResource($data);
-    }
-
-    private function blockCategoryAuthority(?int $parent_id, ?int $main_root_id = null): bool
-    {
-        $parent_id_authority = (!$this->is_super_admin && $parent_id == $this->main_root_id);
-        $main_root_id_authority = $main_root_id ? $main_root_id == $this->main_root_id : false;
-
-        if ( $parent_id_authority || $main_root_id_authority ) throw new CategoryAuthorizationException("Action not authorized.");
-
-        return false;
     }
 
     public function index(Request $request): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetchAll(request: $request, callback: function() {
-                return (!$this->is_super_admin) ? $this->model::where('parent_id', '<>', null) : null;
-            });
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)],
+                "website_id" => "sometimes|exists:websites,id"
+            ]);
+            $fetched = $this->repository->fetchAll(request: $request, callback: function () use ($request) {
+                return $this->model->whereWebsiteId($request->website_id);
+            })->toTree();
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->listCollection($fetched), $this->lang("fetch-list-success"));
     }
 
     public function store(Request $request): JsonResponse
     {
         try
         {
-            $this->blockCategoryAuthority($request->parent_id);
+            $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
+                "items.slug.value" => new SlugUniqueRule($request)
+            ]), function () use ($request) {
+                return [
+                    "scope" => "website",
+                    "scope_id" => $request->website_id
+                ];
+            });
 
-            $data = $this->repository->validateData($request);
-            $data['image'] = $this->storeImage($request, 'image', strtolower($this->model_name));
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
+            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
 
-            $created = $this->repository->create($data, function($created) use($request){
-                $this->translation->updateOrCreate([
-                    "store_id" => $request->translation["store_id"],
-                    "category_id" => $created->id
-                ], $request->translation);
-                $created->channels()->sync($request->channels);
+            if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
+            throw ValidationException::withMessages(["website_id" => $this->lang("response.no_parent_belong_to_website")]);
+
+            $created = $this->repository->create($data, function ($created) use ($data) {
+                $this->categoryValueRepository->createOrUpdate($data, $created);
+                if(isset($data["channels"])) $created->channels()->sync($data["channels"]);
+                if(isset($data["products"])) $created->products()->sync($data["products"]);
             });
         }
         catch (Exception $exception)
@@ -94,17 +100,14 @@ class CategoryController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
     public function show(int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetch($id, callback: function() use ($id) {
-                $this->blockCategoryAuthority($this->model->findOrFail($id)->parent_id, $id);
-                return $this->model;
-            });
+            $fetched = $this->repository->fetch($id);
         }
         catch (Exception $exception)
         {
@@ -118,36 +121,31 @@ class CategoryController extends BaseController
     {
         try
         {
-            $this->blockCategoryAuthority($request->parent_id, $id);
-
-            $data = $this->repository->validateData($request,[
-                "slug" => "nullable|unique:categories,slug,{$id}",
-                "image" => "sometimes|nullable|mimes:jpeg,jpg,bmp,png",
-            ]);
-
-            if ($request->file("image")) {
-                $data["image"] = $this->storeImage($request, "image", strtolower($this->model_name));
-            }
-            else {
-                unset($data["image"]);
-            }
-
-            $updated = $this->repository->update($data, $id, function($updated) use($request){
-                $this->translation->updateOrCreate([
-                    "store_id" => $request->translation["store_id"],
-                    "category_id" => $updated->id
-                ], $request->translation);
-                $updated->channels()->sync($request->channels);
+            $data = $this->repository->validateData($request, array_merge($this->repository->getValidationRules($request), [
+                "items.slug.value" => new SlugUniqueRule($request, $id),
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
+            ]), function () use ($id, $request) {
+                return [
+                    "parent_id" => $request->parent_id ?? null,
+                    "website_id" => $this->model->findOrFail($id)->website_id
+                ];
             });
-            // get latest updated translations
-            $updated->translations = $updated->translations()->get();
+            
+            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
+
+            $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
+                $this->categoryValueRepository->createOrUpdate($data, $updated);
+                if(isset($data["channels"])) $updated->channels()->sync($data["channels"]);
+                if(isset($data["products"])) $updated->products()->sync($data["products"]);
+            });
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+        return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
     public function destroy(int $id): JsonResponse
@@ -155,13 +153,11 @@ class CategoryController extends BaseController
         try
         {
             $category = $this->model->findOrFail($id);
-            $this->blockCategoryAuthority($category->parent_id, $id);
 
-            $this->repository->delete($id, function($deleted){
-                $deleted->translations()->each(function($translation){
-                    $translation->delete();
+            $this->repository->delete($id, function ($deleted){
+                $deleted->values()->each(function ($value){
+                    $value->delete();
                 });
-                if($deleted->image) Storage::delete($deleted->image);
             });
         }
         catch (Exception $exception)
@@ -184,5 +180,31 @@ class CategoryController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
+
+    public function format(Request $request): JsonResponse
+    {
+        try
+        {
+            $request->validate([
+                "category_id" => "required_with:scope|exists:categories,id",
+                "scope" => "required_with:scope_id|in:website,channel,store",
+                "scope_id" => [ "required_with:scope", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)]
+            ]);
+
+            $data = [
+                "scope" => $request->scope ?? "website", 
+                "scope_id" => $request->scope_id ?? ($request->category_id ? $this->model->find($request->category_id)->website_id : null),
+                "category_id" => $request->category_id ?? null
+            ];
+
+            $fetched = $this->repository->getConfigData($data);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang("fetch-success"));
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCategoriesTable extends Migration
+class AddWebsiteIdOnCategories extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,9 @@ class CreateCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->nestedSet();
-
-            $table->integer('position')->default(0);
-            $table->timestamps();
+        Schema::table('categories', function (Blueprint $table) {
+            $table->unsignedBigInteger('website_id');
+            $table->foreign('website_id')->references('id')->on('websites')->onDelete('cascade');
         });
     }
 
@@ -30,8 +27,8 @@ class CreateCategoriesTable extends Migration
     public function down()
     {
         Schema::table('categories', function (Blueprint $table) {
-            $table->dropNestedSet();
+            $table->dropColumn('website_id');
+            $table->dropForeign('website_id');
         });
-        Schema::dropIfExists('categories');
     }
 }

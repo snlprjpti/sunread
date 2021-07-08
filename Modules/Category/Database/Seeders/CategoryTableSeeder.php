@@ -21,11 +21,8 @@ class CategoryTableSeeder extends Seeder
                 "parent_id" => NULL,
                 "_lft" => 1,
                 "_rgt" => 14,
-                "name" => "Root",
-                "slug" => "root",
                 "position" => 1,
-                "image" => NULL,
-                "status" => 1,
+                "website_id" => 1,
                 "created_at" => now(),
                 "updated_at" => now()
             ]

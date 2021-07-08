@@ -8,26 +8,13 @@ use Modules\Core\Transformers\ChannelResource;
 class CategoryResource extends JsonResource
 {
     public function toArray($request): array
-    {
+    {    
         return [
             "id" => $this->id,
-            "name" => $this->name,
-            "slug" => $this->slug,
-            "position" => $this->position,
-            "image" => $this->image_url,
-            "description" => $this->description,
-            "default_url" => $this->url,
+            "website_id" => $this->website_id,
+            "parent_id" => $this->parent_id,
 
-            "meta_title" => $this->meta_title,
-            "meta_description" => $this->meta_description,
-            "meta_keywords" => $this->meta_keywords,
-
-            "status" => (bool) $this->status,
-            "_lft" => $this->_lft,
-            "_rgt" => $this->_rgt,
-            "parent" => $this->whenLoaded("parent"),
-
-            "translations" => $this->whenLoaded("translations"),
+            "values" => $this->values,
             "channels" => ChannelResource::collection($this->whenLoaded("channels")),
 
             "created_at" => $this->created_at->format('M d, Y H:i A')

@@ -3,14 +3,20 @@
 namespace Modules\Category\Tests\Feature;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Store;
 use Modules\Core\Tests\BaseTestCase;
+use Illuminate\Support\Str;
+use Modules\Category\Entities\CategoryValue;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Website;
 
 class CategoryTest extends BaseTestCase
 {
     protected int $root_category_id;
+    protected $default_resource;
 
     public function setUp(): void
     {
@@ -23,94 +29,138 @@ class CategoryTest extends BaseTestCase
         $this->route_prefix = "admin.catalog.categories";
 
         $this->model::factory(10)->create();
-        $this->default_resource_id = $this->model::latest('id')->first()->id;
+        $this->default_resource = $this->model::latest('id')->first();
+        $this->default_resource_id = $this->default_resource->id;
         $this->root_category_id = $this->model::oldest('id')->first()->id;
         $this->hasStatusTest = true;
+        $this->hasFilters = false;
+        $this->hasStatusTest = false;
     }
 
     public function getCreateData(): array
     {
         Storage::fake();
-        $store = Store::factory()->create();
-
-        return array_merge($this->model::factory()->make([
-            "image" => UploadedFile::fake()->image("image.png")
-        ])->toArray(), [
-            "parent_id" => $this->root_category_id,
-            "translation" => [
-                "store_id" => $store->id,
-                "name" => "Test"
+        return array_merge($this->model::factory()->make()->toArray(), [
+            "items" => [
+                "name" => [
+                    "value" => Str::random(10)
+                ],
+                "image" => [
+                    "value" => UploadedFile::fake()->image("image.png")
+                ],
+                "slug" => [
+                    "value" => null
+                ],
+                "description" => [
+                    "value" => Str::random(20)
+                ],
+                "meta_title" => [
+                    "value" => Str::random(11)
+                ],
+                "meta_description" => [
+                    "value" => Str::random(15)
+                ],
+                "meta_keywords" => [
+                    "value" => Str::random(13)
+                ],
+                "status" => [
+                    "value" => rand(0,1)
+                ],
+                "include_in_menu" => [
+                    "value" => rand(0,1)
+                ]
             ]
+        ]);
+    }
+
+    public function getUpdateData(): array
+    {
+        $websiteId = $this->default_resource->website_id;
+        return array_merge($this->getCreateData(), $this->getScope($websiteId)); 
+    }
+
+    public function testAdminCanFetchResources()
+    {
+        if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
+
+        $websiteId = Website::inRandomOrder()->first()->id;
+        $this->filter = array_merge($this->getScope($websiteId), [
+            "website_id" => $websiteId
+        ]);
+
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
         ]);
     }
 
     public function getNonMandotaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "position" => null
+            "parent_id" => null
         ]);
     }
 
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "name" => null,
-            "parent_id" => null
+            "website_id" => null
         ]);
     }
 
     public function getNonMandodtaryUpdateData(): array
     {
         return array_merge($this->getUpdateData(),[
-            "image" => null
+            "parent_id" => null
         ]);
     }
 
-    public function basicAdminHeader()
+    public function testAdminCanFetchResourceFormat()
     {
-        $this->createAdmin(["role_slug" => "basic-admin"]);
-        return $this->headers;
-    }
+        $category = Category::inRandomOrder()->first();
+        $website = Website::find($category->website_id);
 
-    public function testShouldReturnErrorIfBasicAdminTryToStoreRootCategory()
-    {
-        $post_data = $this->getCreateData();
-        $response = $this->withHeaders($this->basicAdminHeader())->post(route("{$this->route_prefix}.store"), $post_data);
+        $this->filter = $website ? array_merge($this->getScope($website->id), [
+            "category_id" => $category->id
+        ]) : [];
 
-        $response->assertStatus(403);
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("format", $this->filter));
+
+        $response->assertOk();
         $response->assertJsonFragment([
-            "status" => "error"
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
         ]);
     }
 
-    public function testShouldReturnErrorIfBasicAdminTryToUpdateRootCategory()
+    public function getScope($websiteId)
     {
-        $post_data = array_merge($this->getUpdateData(), ["parent_id" => $this->default_resource_id]);
-        $response = $this->withHeaders($this->basicAdminHeader())->put(route("{$this->route_prefix}.update", $this->root_category_id), $post_data);
+        $scope = Arr::random([ "website", "channel", "store" ]);
+        $channels = Website::find($websiteId)->channels;
+        if(count($channels) > 0 ){
+            switch($scope)
+            {
+                case "website":
+                    $scope_id = $websiteId;
+                    break; 
+    
+                case "channel":
+                    $scope_id = $channels->first()->id;
+                    break;
+    
+                case "store":
+                    $stores = $channels->first()->stores;
+                    $scope_id = (count($stores) > 0) ? $stores->first()->id : $this->getScope("channel", $websiteId);
+                    break;
+            }
+        }
+        return [
+            "scope" => isset($scope_id) ? $scope : "website",
+            "scope_id" => isset($scope_id) ? $scope_id : $websiteId
+        ];
 
-        $response->assertStatus(403);
-        $response->assertJsonFragment([
-            "status" => "error"
-        ]);
-    }
-
-    public function testShouldReturnErrorIfBasicAdminTryToFetchRootCategory()
-    {
-        $response = $this->withHeaders($this->basicAdminHeader())->get(route("{$this->route_prefix}.show", $this->root_category_id));
-
-        $response->assertStatus(403);
-        $response->assertJsonFragment([
-            "status" => "error"
-        ]);
-    }
-
-    public function testShouldReturnErrorIfBasicAdminTryToDeleteRootCategory()
-    {
-        $response = $this->withHeaders($this->basicAdminHeader())->delete(route("{$this->route_prefix}.destroy", $this->root_category_id));
-
-        $response->assertStatus(403);
-        $response->assertJsonFragment([
-            "status" => "error"
-        ]);
     }
 }
