@@ -118,16 +118,13 @@ class CategoryTest extends BaseTestCase
         ]);
     }
 
-    public function testAdminCanFetchResourceFormat()
+    public function testAdminCanFetchResourceAttribute()
     {
-        $category = Category::inRandomOrder()->first();
-        $website = Website::find($category->website_id);
+        $this->filter = [
+            "scope" => Arr::random([ "website", "channel", "store" ])
+        ];
 
-        $this->filter = $website ? array_merge($this->getScope($website->id), [
-            "category_id" => $category->id
-        ]) : [];
-
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("format", $this->filter));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("attributes", $this->filter));
 
         $response->assertOk();
         $response->assertJsonFragment([
