@@ -68,7 +68,7 @@ class TaxRateController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id);
+            $fetched = $this->repository->fetch($id, ["country", "region"]);
         }
         catch( Exception $exception )
         {
