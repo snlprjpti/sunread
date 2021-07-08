@@ -208,6 +208,27 @@ class AttributeTableSeeder extends Seeder
                 "default_value" => 1
             ],
             [
+                "name" => "Base Image",
+                "slug" => "base_image",
+                "type" => "image",
+                "scope" => "global",
+                "is_required" => 0
+            ],
+            [
+                "name" => "Small Image",
+                "slug" => "small_image",
+                "type" => "image",
+                "scope" => "global",
+                "is_required" => 0
+            ],
+            [
+                "name" => "Thumbnail Image",
+                "slug" => "thumbnail_image",
+                "type" => "image",
+                "scope" => "global",
+                "is_required" => 0
+            ],
+            [
                 "name" => "Color",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
