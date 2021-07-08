@@ -2,13 +2,19 @@
 
 namespace Modules\Page\Repositories;
 
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
+use Modules\Page\Entities\PageConfiguration;
 use Modules\Page\Exceptions\PageTranslationDoesNotExist;
+use Exception;
 
 class PageRepository extends BaseRepository
 {
-    public function __construct(Page $page)
+    private $pageConfiguration, $store, $channel;
+
+    public function __construct(Page $page, PageConfiguration $pageConfiguration, Store $store, Channel $channel)
     {
         $this->model = $page;
         $this->model_key = "page";
@@ -24,6 +30,9 @@ class PageRepository extends BaseRepository
             "meta_keywords" => "sometimes|nullable",
             "translations" => "nullable|array"
         ];
+        $this->pageConfiguration = $pageConfiguration;
+        $this->store = $store;
+        $this->channel = $channel;
     }
 
 

@@ -75,9 +75,9 @@ class PageController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["translations"]);
+            $fetched = $this->repository->fetch($id);
         }
-        catch (Exception $exception)
+        catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
