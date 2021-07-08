@@ -64,13 +64,11 @@ class ProductConfigurableController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "sku" => "required|unique:products,sku,{$id}",
+                "sku" => "sometimes",
                 "brand_id" => "sometimes|nullable|exists:brands,id",
                 "website_id" => "required|exists:websites,id",
                 "super_attributes" => "required|array",
                 "attributes" => "required|array",
-                "categories" => "required|array",
-                "categories.*" => "required|exists:categories,id",
                 "attribute_set_id" => "sometimes|nullable"
             ]);  
 
@@ -86,9 +84,9 @@ class ProductConfigurableController extends BaseController
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
-                $this->repository->catalogInventory($updated, $request);
+                $this->repository->attributeMapperSync($updated, $request, "update");
+
                 $this->repository->syncAttributes($attributes, $updated);
-                $updated->categories()->sync($request->get("categories"));
                 $updated->channels()->sync($request->get("channels"));
             });
         }
