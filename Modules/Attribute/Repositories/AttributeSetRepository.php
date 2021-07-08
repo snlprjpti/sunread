@@ -2,12 +2,13 @@
 
 namespace Modules\Attribute\Repositories;
 
+use Exception;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\ValidationException;
-use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\Product;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Repositories\BaseRepository;
+use Illuminate\Validation\ValidationException;
 
 class AttributeSetRepository extends BaseRepository
 {
@@ -141,7 +142,7 @@ class AttributeSetRepository extends BaseRepository
                 "attribute_groups" => array_merge($groups, [ $images ])
             ];
         }
-        catch( \Exception $exception )
+        catch( Exception $exception )
         {
             throw $exception;
         }
@@ -163,11 +164,9 @@ class AttributeSetRepository extends BaseRepository
                 ];
             });
         }
-        catch( \Exception $exception )
+        catch( Exception $exception )
         {
             throw $exception;
         }
     }
-
-
 }
