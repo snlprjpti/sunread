@@ -15,9 +15,10 @@ class CategoryScopeRule implements Rule
      */
     public $data, $website_model; 
 
-    public function __construct($data)
+    public function __construct($data, $id = null)
     {
         $this->data = $data;
+        $this->id = $id;
         $this->website_model = new Website();
     }
 
@@ -30,7 +31,7 @@ class CategoryScopeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($this->data->category_id) $website_id = Category::findOrFail($this->data->category_id)->website_id ;
+        if($this->id) $website_id = Category::findOrFail($this->id)->website_id ;
 
         if(!isset($website_id) && $this->data->website_id) $website_id = $this->data->website_id;
         
