@@ -27,7 +27,6 @@ class ProductConfigurableTest extends BaseTestCase
 
     public function getUpdateData(): array
     {
-        $category = Category::inRandomOrder()->first();
         $product = $this->model::find($this->default_resource_id);
         $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
 
@@ -38,7 +37,6 @@ class ProductConfigurableTest extends BaseTestCase
                     "value" => $this->value($attribute->type)
                 ]
             ],
-            "categories" => [$category->id],
             "super_attributes" => [
                 "size" => ["L", "XL"],
                 "color" => ["red", "blue"]
@@ -54,6 +52,7 @@ class ProductConfigurableTest extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
+            "attribute_set_id" => null,
             "sku" => null
         ]);
     }

@@ -118,7 +118,7 @@ class ProductTest extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "sku" => null
+            "attribute_set_id" => null
         ]);
     }
 
