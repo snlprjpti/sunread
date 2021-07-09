@@ -18,6 +18,7 @@ use Modules\Attribute\Repositories\AttributeGroupRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Attribute\Transformers\AttributeResource;
 use Modules\Attribute\Transformers\AttributeSetResource;
+use Modules\Attribute\Transformers\List\AttributeSetResource as ListAttributeSetResource;
 
 class AttributeSetController extends BaseController
 {
@@ -44,6 +45,11 @@ class AttributeSetController extends BaseController
         return AttributeSetResource::collection($data);
     }
 
+    public function listCollection(object $data): ResourceCollection
+    {
+        return ListAttributeSetResource::collection($data);
+    }
+
     public function resource(object $data): JsonResource
     {
         return new AttributeSetResource($data);
@@ -60,7 +66,7 @@ class AttributeSetController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->listCollection($fetched), $this->lang('fetch-list-success'));
     }
 
     public function store(Request $request): JsonResponse
