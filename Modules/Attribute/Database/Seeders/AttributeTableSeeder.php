@@ -17,6 +17,15 @@ class AttributeTableSeeder extends Seeder
     {
         $attributes = [
             [
+                "name" => "Product Name",
+                "slug" => "name",
+                "type" => "text",
+                "is_required" => 1,
+                "is_searchable" => 1,
+                "search_weight" => 6,
+                "scope" => "store"
+            ],
+            [
                 "name" => "SKU",
                 "type" => "text",
                 "is_required" => 1,
@@ -26,15 +35,6 @@ class AttributeTableSeeder extends Seeder
                 "is_visible_on_storefront" => 1,
                 "comparable_on_storefront" => 1,
                 "scope" => "global"
-            ],
-            [
-                "name" => "Product Name",
-                "slug" => "name",
-                "type" => "text",
-                "is_required" => 1,
-                "is_searchable" => 1,
-                "search_weight" => 6,
-                "scope" => "store"
             ],
             // [
             //     "name" => "New",
