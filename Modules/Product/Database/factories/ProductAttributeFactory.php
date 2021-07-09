@@ -17,8 +17,8 @@ class ProductAttributeFactory extends Factory
 
         return [
             "attribute_id" => Attribute::factory()->create(["type" => $attribute_type])->id,
-            "channel_id" => null,
-            "store_id" => null,
+            "scope" => "website",
+            "scope_id" => 1,
             "value_type" => $attribute_model,
             "value_id" => $attribute_model::factory()->create()->id
         ];

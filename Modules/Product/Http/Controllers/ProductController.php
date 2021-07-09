@@ -11,6 +11,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Rules\ScopeRule;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 
 class ProductController extends BaseController
@@ -58,15 +59,27 @@ class ProductController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, [
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
+            ], function ($request) {
+                return [
+                    "scope" => $request->scope ?? "global",
+                    "scope_id" => $request->scope_id ?? 0
+                ];
+            });
             $this->repository->checkAttribute($request->attribute_set_id, $request);      
             $data["type"] = "simple";
+
+            $scope = [
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope"]
+            ];
             
-            $created = $this->repository->create($data, function(&$created) use($request) {
+            $created = $this->repository->create($data, function(&$created) use($request, $scope) {
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->attributeMapperSync($created, $request);
 
-                $this->repository->syncAttributes($attributes, $created);
+                $this->repository->syncAttributes($attributes, $created, $scope);
                 $created->channels()->sync($request->get("channels"));
             });
         }
@@ -97,15 +110,27 @@ class ProductController extends BaseController
         try
         {
             $product = $this->model::findOrFail($id);            
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, [
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
+            ], function ($request) {
+                return [
+                    "scope" => $request->scope ?? "global",
+                    "scope_id" => $request->scope_id ?? 0
+                ];
+            });
 
             $this->repository->checkAttribute($product->attribute_set_id, $request);
             unset($data["attribute_set_id"]);
 
-            $updated = $this->repository->update($data, $id, function($updated) use($request) {
+            $scope = [
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope"]
+            ];
+
+            $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
                 $attributes = $this->repository->validateAttributes($request);
                 $this->repository->attributeMapperSync($updated, $request, "update");
-                $this->repository->syncAttributes($attributes, $updated);
+                $this->repository->syncAttributes($attributes, $updated, $scope);
                 $updated->channels()->sync($request->get("channels"));
             });
         }

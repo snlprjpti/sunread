@@ -31,6 +31,7 @@ class ProductRepository extends BaseRepository
             "attribute_set_id" => "required|exists:attribute_sets,id",
             "website_id" => "required|exists:websites,id",
             "attributes" => "required|array",
+            "scope" => "sometimes|in:global,website,channel,store"
         ];
     }
 
@@ -67,18 +68,23 @@ class ProductRepository extends BaseRepository
         return $product_attributes;
     }
 
-    public function syncAttributes(array $data, object $product): bool
+    public function syncAttributes(array $data, object $product, array $scope): bool
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.attibutes.sync.before");
 
         try
         {
-            foreach($data as $attribute) {                
-                $match = ["product_id" => $product->id];
-                foreach (["attribute_id", "store_id", "channel_id"] as $field) {
-                    if (isset($attribute[$field])) $match[$field] = $attribute[$field];
-                }
+            foreach($data as $attribute) { 
+                $attributeData = Attribute::find($attribute['attribute_id']);
+                if($this->scopeFilter($scope["scope"], $attributeData->scope)) continue; 
+
+                $match = [
+                    "product_id" => $product->id,
+                    "scope" => $scope["scope"],
+                    "scope_id" => $scope["scope_id"],
+                    "attribute_id" => $attribute['attribute_id']
+                ];
 
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
 
@@ -318,6 +324,14 @@ class ProductRepository extends BaseRepository
         DB::commit();
 
         return true;
+    }
+
+    public function scopeFilter(string $scope, string $element_scope): bool
+    {
+        if($scope == "website" && in_array($element_scope, ["global"])) return true;
+        if($scope == "channel" && in_array($element_scope, ["global", "website"])) return true;
+        if($scope == "store" && in_array($element_scope, ["global", "website", "channel"])) return true;
+        return false;
     }
 
 }
