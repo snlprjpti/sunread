@@ -57,7 +57,7 @@ class AttributeSetRepository extends BaseRepository
                     "name" => $attribute_group->name,
                     "position" => $attribute_group->position,
                     "attributes" => $attribute_group->attributes->map(function ($attribute) {
-                        $attrinutesData = [
+                        $attributesData = [
                             "id" => $attribute->id,
                             "name" => $attribute->name,
                             "slug" => $attribute->slug,
@@ -66,8 +66,8 @@ class AttributeSetRepository extends BaseRepository
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required
                         ];
-                        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attrinutesData["options"] = $this->getAttributeOption($attribute);
-                        return $attrinutesData;
+                        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributesData["options"] = $this->getAttributeOption($attribute);
+                        return $attributesData;
                     })->toArray()
                 ];
             })->toArray();
