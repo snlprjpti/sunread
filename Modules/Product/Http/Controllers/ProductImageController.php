@@ -44,10 +44,11 @@ class ProductImageController extends BaseController
             foreach($request->file("image") as $file){
                 $image = $this->repository->createImage($file);
                 $data = array_merge($data,$image);
+                dd($data);
                 $created = $this->repository->create($data);
             }
         }
-        catch (Exception $exception)
+        catch ( Exception $exception )
         {
             return $this->handleException($exception);
         }

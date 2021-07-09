@@ -59,11 +59,12 @@ class ProductController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-            $this->repository->checkAttribute($request->attribute_set_id, $request);      
+
+            $this->repository->checkAttribute($request->attribute_set_id, $request);
             $data["type"] = "simple";
-            
             $created = $this->repository->create($data, function(&$created) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
+
                 $this->repository->attributeMapperSync($created, $request);
 
                 $this->repository->syncAttributes($attributes, $created);
