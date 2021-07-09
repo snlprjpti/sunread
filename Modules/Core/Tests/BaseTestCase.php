@@ -16,14 +16,19 @@ class BaseTestCase extends TestCase
     use DatabaseTransactions;
 
     protected array $headers;
+    protected static $seederRun = false;
+
     public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route;
     public $createFactories, $hasFilters, $hasIndexTest, $hasShowTest, $hasStoreTest, $hasUpdateTest, $hasDestroyTest, $hasBulkDestroyTest, $hasStatusTest;
 
     public function setUp(): void
     {
         parent::setUp();
-        // Schema::disableForeignKeyConstraints();
-        // $this->artisan("db:seed", ["--force" => true]);
+        if (!static::$seederRun) {
+            $this->artisan("migrate:fresh");
+             $this->artisan("db:seed", ["--force" => true]);
+            static::$seederRun = true;
+        }
 
         $this->factory_count = 2;
         $this->append_to_route = null;
@@ -70,7 +75,7 @@ class BaseTestCase extends TestCase
             "password" => Hash::make($password),
             "role_id" => $role->id
         ];
-        
+
         $admin = Admin::factory()->create($data);
         $token = $this->createToken($admin->email, $password);
         $this->headers["Authorization"] = "Bearer {$token}";
@@ -97,7 +102,7 @@ class BaseTestCase extends TestCase
 
     /**
      * GET tests
-     * 
+     *
      * 1. Assert if resource list can be fetched
      * 2. Assert if resource list can be fetched with filter
      * 3. Assert if individual resource can be fetched
@@ -160,7 +165,7 @@ class BaseTestCase extends TestCase
 
     /**
      * POST tests
-     * 
+     *
      * 1. Assert if resource can be created
      * 2. Assert if resource can be created with non mandatory data
      * 3. Assert if application returns correct error for invalid data
@@ -193,7 +198,7 @@ class BaseTestCase extends TestCase
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
-    
+
     public function testShouldReturnErrorIfCreateDataIsInvalid()
     {
         if ( !$this->hasStoreTest ) $this->markTestSkipped("Store method not available.");
@@ -209,7 +214,7 @@ class BaseTestCase extends TestCase
 
     /**
      * PUT tests
-     * 
+     *
      * 1. Assert if resource can be updated
      * 2. Assert if resource can be updated with non mandatory data
      * 3. Assert if application returns correct error for invalid data
@@ -243,7 +248,7 @@ class BaseTestCase extends TestCase
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
         ]);
     }
-    
+
     public function testShouldReturnErrorIfUpdateDataIsInvalid()
     {
         if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
@@ -273,11 +278,11 @@ class BaseTestCase extends TestCase
 
     /**
      * DELETE tests
-     * 
+     *
      * 1. Assert if resource can be deleted
      * 2. Assert if application returns correct error when trying to delete non-existent data
      */
-    
+
     public function testAdminCanDeleteResource()
     {
         if ( !$this->hasDestroyTest ) $this->markTestSkipped("Destroy method not available.");
@@ -306,7 +311,7 @@ class BaseTestCase extends TestCase
 
     /**
      * STATUS tests
-     * 
+     *
      * 1. Assert if reource's status can be updated
      * 2. Assert if application returns correct error when trying to update non-existent data
      */
