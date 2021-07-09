@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Tests;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Modules\User\Entities\Role;
 use Modules\User\Entities\Admin;
@@ -12,7 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BaseTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected array $headers;
     public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route;
@@ -21,8 +22,8 @@ class BaseTestCase extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
-        $this->artisan("db:seed", ["--force" => true]);
+        // Schema::disableForeignKeyConstraints();
+        // $this->artisan("db:seed", ["--force" => true]);
 
         $this->factory_count = 2;
         $this->append_to_route = null;

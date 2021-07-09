@@ -2,6 +2,7 @@
 
 namespace Modules\Customer\Tests\Feature;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class CustomerAccountTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     
     protected array $headers;
 
@@ -22,10 +23,10 @@ class CustomerAccountTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
+        // Schema::disableForeignKeyConstraints();
+        // $this->artisan("db:seed", ["--force" => true]);
+
         $this->model = Customer::class;
-        
-        $this->artisan("db:seed", ["--force" => true]);
         $this->customer = $this->createCustomer();
         $this->model_name = "Customer";
         $this->route_prefix = "customers.account";

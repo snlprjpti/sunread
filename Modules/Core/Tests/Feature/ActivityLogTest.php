@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Tests\Feature;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class ActivityLogTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected object $admin;
     protected array $headers;
@@ -21,8 +22,8 @@ class ActivityLogTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
-        $this->artisan("db:seed", ["--force" => true]);
+        // Schema::disableForeignKeyConstraints();
+        // $this->artisan("db:seed", ["--force" => true]);
 
         $this->admin = $this->createAdmin();
 
