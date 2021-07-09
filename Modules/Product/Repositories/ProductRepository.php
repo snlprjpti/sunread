@@ -255,13 +255,16 @@ class ProductRepository extends BaseRepository
         try
         {
             $sku = $this->getValue($request, "sku");
-            $id = ($method == "update") ? $product->id : "";
-            $validator = Validator::make(["sku" => $sku ], [
-                "sku" => "required|unique:products,sku,".$id
-            ]);
-            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
-            
-            $product->update($validator->validated());
+            if (isset($sku))
+            {
+                $id = ($method == "update") ? $product->id : "";
+                $validator = Validator::make(["sku" => $sku ], [
+                    "sku" => "required|unique:products,sku,".$id
+                ]);
+    
+                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+                $product->update($validator->validated());
+            }
         }
         catch ( Exception $exception )
         {
@@ -280,7 +283,7 @@ class ProductRepository extends BaseRepository
         try
         {
             $status = $this->getValue($request, "status");
-            $product->update(["status" => $status]);
+            if (isset($status)) $product->update(["status" => $status]);
         }
         catch ( Exception $exception )
         {
@@ -301,13 +304,16 @@ class ProductRepository extends BaseRepository
         {
             $categories = explode(",", $this->getValue($request, "category_ids"));
             
-            $validator = Validator::make(["categories" => $categories ], [
-                "categories" => "required|array",
-                "categories.*" => "required|exists:categories,id"
-            ]);
-            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
-
-            $product->categories()->sync($validator->validated()["categories"]);
+            if (isset($categories) && !in_array("", $categories))
+            {
+                $validator = Validator::make(["categories" => $categories ], [
+                    "categories" => "required|array",
+                    "categories.*" => "required|exists:categories,id"
+                ]);
+                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+    
+                $product->categories()->sync($validator->validated()["categories"]);
+            }
         }
         catch ( Exception $exception )
         {
