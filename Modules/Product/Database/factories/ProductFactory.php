@@ -17,7 +17,10 @@ class ProductFactory extends Factory
     {
         $attribute_set_id = AttributeSet::factory()->create()->id;
         $attribute_group = AttributeGroup::factory(1)
-            ->create(["attribute_set_id" => $attribute_set_id])
+            ->create([
+                "attribute_set_id" => $attribute_set_id,
+                "position" => 1
+            ])
             ->each(function ($attr_group){
                 $attr_group->attributes()->attach(Attribute::factory(1)->create());
             })->first();
