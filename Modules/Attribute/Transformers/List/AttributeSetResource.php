@@ -10,14 +10,14 @@ class AttributeSetResource extends JsonResource
     {
         $attribute_counts = $this->attribute_groups->map(function($attributeGroup){
             return $attributeGroup->attributes;
-        })->flatten(1)->toArray();
+        })->flatten(1)->count();
         
         return [
             "id" => $this->id,
             "name" => $this->name,
             "is_user_defined" => $this->is_user_defined,
             "attribute_groups_count" => $this->attribute_groups->count(),
-            "attributes_count" => count($attribute_counts)
+            "attributes_count" => $attribute_counts
         ];
     }
 }
