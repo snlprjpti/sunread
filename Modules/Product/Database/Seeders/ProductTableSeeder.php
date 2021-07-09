@@ -14,7 +14,7 @@ class ProductTableSeeder extends Seeder
     public function run(): void
     {
         $attribute_set_id = AttributeSet::factory()->create()->id;
-        $attribute_group = AttributeGroup::factory(1)
+        $attribute_group = AttributeGroup::factory()
             ->create([
                 "attribute_set_id" => $attribute_set_id,
                 "position" => 1
