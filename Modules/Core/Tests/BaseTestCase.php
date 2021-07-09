@@ -24,11 +24,11 @@ class BaseTestCase extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        if (!static::$seederRun) {
-            $this->artisan("migrate:fresh");
-             $this->artisan("db:seed", ["--force" => true]);
-            static::$seederRun = true;
-        }
+        // if (!static::$seederRun) {
+        //     $this->artisan("migrate:fresh");
+        //     $this->artisan("db:seed", ["--force" => true]);
+        //     static::$seederRun = true;
+        // }
 
         $this->factory_count = 2;
         $this->append_to_route = null;
