@@ -64,13 +64,13 @@ class ProductConfigurableController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "sku" => "sometimes",
+                "sku" => "sometimes|nullable",
                 "brand_id" => "sometimes|nullable|exists:brands,id",
                 "website_id" => "required|exists:websites,id",
                 "super_attributes" => "required|array",
                 "attributes" => "required|array",
                 "attribute_set_id" => "sometimes|nullable"
-            ]);  
+            ]);
 
             $product = $this->repository->fetch($id);
             
@@ -80,7 +80,7 @@ class ProductConfigurableController extends BaseController
             // create product variants based on super attributes and parent product.
             $this->repository->createVariants($product, $request);
 
-            unset($data["attribute_set_id"]);
+            unset($data["attribute_set_id"], $data["sku"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $attributes = $this->repository->validateAttributes($request);
