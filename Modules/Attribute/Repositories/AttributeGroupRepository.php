@@ -20,8 +20,7 @@ class AttributeGroupRepository extends BaseRepository
         $this->rules = [
             "name" => "required",
             "attributes" => "sometimes|array",
-            "attributes.*" => "sometimes|exists:attributes,id",
-            "position" => "nullable|numeric"
+            "attributes.*" => "sometimes|exists:attributes,id"
         ];
     }
 
@@ -55,10 +54,12 @@ class AttributeGroupRepository extends BaseRepository
         try
         {
             $parent->attribute_groups()->whereNotIn('id', array_filter(Arr::pluck($groups, 'id')))->delete();
+            $count = 1;
 
             foreach($groups as $group)
             {  
-                $attributes[] = $this->singleUpdateOrCreate($group, $parent);
+                $attributes[] = $this->singleUpdateOrCreate($group, $parent, $count);
+                ++$count;
             }
         }
         catch (Exception $exception)
@@ -70,13 +71,17 @@ class AttributeGroupRepository extends BaseRepository
         DB::commit();
     }
 
-    public function singleUpdateOrCreate(array $group, object $parent): array
+    public function singleUpdateOrCreate(array $group, object $parent, int $count = 0): array
     {
         try
         {
             $item = $this->validateData(new Request($group), isset($group["id"]) ? [
                 "id" => "exists:attribute_groups,id"
-            ] : []);
+            ] : [], function ($group) use($count) {
+                return [
+                    "position" => ($count > 0) ? $count : $group->position
+                ];
+            });
 
             $item['attribute_set_id'] = $parent->id;
             $data = !isset($item["id"]) ? $this->create($item) : $this->update($item, $item["id"]);

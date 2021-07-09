@@ -84,6 +84,7 @@ class AttributeSetController extends BaseController
                 $selected_attributeSet->attribute_groups->map(function($attributeGroup) use($created){
                     $item = [
                         "name" => $attributeGroup->name,
+                        "position" => $attributeGroup->position,
                         "attributes" => ($attributeGroup->attributes) ? $attributeGroup->attributes->pluck('id')->toArray() : []
                     ];
                     $this->attributeGroupRepository->singleUpdateOrCreate($item, $created);
@@ -156,22 +157,21 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $fetched = $this->model::all();
+            $fetched = $this->model->get()->toArray();
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
+        return $this->successResponse($fetched, $this->lang("fetch-list-success"));
     }
 
-    public function attributeSet(Request $request): JsonResponse
+    public function attributes(int $id): JsonResponse
     {
         try
-        {
-            $this->repository->validateAttributeSetListing($request); 
-            $fetched = $this->repository->generateFormat($request);
+        { 
+            $fetched = $this->repository->generateFormat($id);
         }
         catch( Exception $exception )
         {
