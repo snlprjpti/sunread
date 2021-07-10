@@ -59,11 +59,9 @@ class ProductController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-
-            $this->repository->checkAttribute($request->attribute_set_id, $request);
             $data["type"] = "simple";
             $created = $this->repository->create($data, function(&$created) use($request) {
-                $attributes = $this->repository->validateAttributes($request);
+                $attributes = $this->repository->validateAttributes($created, $request);
 
                 $this->repository->attributeMapperSync($created, $request);
 
@@ -100,11 +98,11 @@ class ProductController extends BaseController
             $product = $this->model::findOrFail($id);            
             $data = $this->repository->validateData($request);
 
-            $this->repository->checkAttribute($product->attribute_set_id, $request);
+            // $this->repository->checkAttribute($product->attribute_set_id, $request);
             unset($data["attribute_set_id"]);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
-                $attributes = $this->repository->validateAttributes($request);
+                $attributes = $this->repository->validateAttributes($updated, $request);
                 $this->repository->attributeMapperSync($updated, $request, "update");
                 $this->repository->syncAttributes($attributes, $updated);
                 $updated->channels()->sync($request->get("channels"));

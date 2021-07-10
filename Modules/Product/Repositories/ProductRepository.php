@@ -3,6 +3,8 @@
 namespace Modules\Product\Repositories;
 
 use Exception;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -31,41 +33,50 @@ class ProductRepository extends BaseRepository
             "brand_id" => "sometimes|nullable|exists:brands,id",
             "attribute_set_id" => "required|exists:attribute_sets,id",
             "website_id" => "required|exists:websites,id",
-            "attributes" => "required|array",
+            "attributes" => "required|array"
         ];
     }
 
-    public function validateAttributes(object $request): array
+    public function validateAttributes(object $product, object $request): array
     {
         try
         {
-            $attributes = Attribute::all();
-            $product_attributes = [];
-            foreach ( $request->get("attributes") as $product_attribute)
+            $attribute_set = AttributeSet::whereId($product->attribute_set_id)->firstOrFail();
+            
+            $attributes = $attribute_set->attribute_groups->map(function($attributeGroup){
+                return $attributeGroup->attributes;
+            })->flatten(1);
+
+            $request_attribute_ids = array_map( function ($request_attribute) {
+                return $request_attribute["attribute_id"];
+            }, $request->get("attributes"));
+
+            $request_attribute_collection = collect($request->get("attributes"));
+
+            $all_product_attributes = [];
+            $product_attribute = [];
+            
+            foreach ( $attributes as $attribute)
             {
-                if ( !is_array($product_attribute) ) throw ValidationException::withMessages([ "attributes" => "Invalid attributes format." ]);
-                $attribute = $attributes->where("id", $product_attribute["attribute_id"])->first() ?? null;
-                
-                if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute["attribute_id"]} does not exist." ]);
+                $product_attribute["attribute_id"] = $attribute->id;
+                $product_attribute["value"] = in_array($attribute->id, $request_attribute_ids) ? $request_attribute_collection->where('attribute_id', $attribute->id)->pluck("value")->first() : null;
 
                 $validator = Validator::make($product_attribute, [
-                    "store_id" => "sometimes|nullable|exists:stores,id",
-                    "channel_id" => "sometimes|nullable|exists:channels,id",
                     "value" => $attribute->type_validation
                 ]);
-                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+                if ( $validator->fails() ) throw ValidationException::withMessages([$attribute->name => $validator->errors()->toArray()]);
 
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
-                $product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid());
+                $all_product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid()); 
             }
-            $product_attributes = $this->unsetter($product_attributes);
+            $all_product_attributes = $this->unsetter($all_product_attributes, $request_attribute_ids);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
         
-        return $product_attributes;
+        return $all_product_attributes;
     }
 
     public function syncAttributes(array $data, object $product): bool
@@ -105,34 +116,6 @@ class ProductRepository extends BaseRepository
         return true;
     }
 
-    public function checkAttribute(int $attribute_set_id, object $request): bool
-    {
-        try
-        {
-            $attribute_set = AttributeSet::whereId($attribute_set_id)->firstOrFail();
-            $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
-                return $attributeGroup->attributes->pluck('id');
-            })->flatten(1)->toArray();
-            $attributes = Attribute::whereIn('id', $attribute_ids)->get();
-
-            $check_attribute = $attributes->pluck("id")->toArray();
-            array_map(function($request_attribute) use ($attributes) {
-                // check required attribute has value.
-                $required_attribute = $attributes->where("is_required", 1);
-                if (array_key_exists("value", $request_attribute) && $required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute['attribute_id']} value is required."]);
-                // check attribute exists on attribute set
-                $check_attribute = $attributes->pluck("id")->toArray();
-                if (!in_array($request_attribute["attribute_id"], $check_attribute)) throw ValidationException::withMessages([ "attributes" => "Attribute id {$request_attribute['attribute_id']} dosen't exists on current attribute set"]);
-                return;
-            }, $request->get("attributes"));
-        }
-        catch(Exception $exception)
-        {
-            throw $exception;
-        }
-        return true;
-    }
-
     public function attributeMapperSync(object $product, object $request, string $method = "store"): bool
     {
         try
@@ -151,13 +134,13 @@ class ProductRepository extends BaseRepository
         return true;
     }
 
-    public function unsetter(array $product_attributes): array
+    public function unsetter(array $product_attributes, array $requestIds): array
     {
         try
         {
             foreach ( $product_attributes as $key => $product_attribute )
             {
-                if ( in_array($product_attribute["attribute_id"], Attribute::attributeMapper()) ) unset($product_attributes[$key]);
+                if ( in_array($product_attribute["attribute_id"], Attribute::attributeMapper()) || !in_array($product_attribute["attribute_id"], $requestIds) ) unset($product_attributes[$key]);       
             }
         }
         catch ( Exception $exception )
