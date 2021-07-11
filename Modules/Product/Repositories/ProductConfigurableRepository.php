@@ -5,6 +5,8 @@ namespace Modules\Product\Repositories;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Validator;
 use Modules\Attribute\Entities\Attribute;
@@ -14,6 +16,7 @@ use Illuminate\Validation\ValidationException;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Product\Entities\ProductAttribute;
+use Modules\Product\Entities\ProductImage;
 
 class ProductConfigurableRepository extends BaseRepository
 {
@@ -216,9 +219,10 @@ class ProductConfigurableRepository extends BaseRepository
         try
         {
             $this->sku($product, $request, $method);
-            $this->status($product, $request, $method);
-            $this->categories($product, $request, $method);
             $this->catalogInventory($product, $request, $method);
+            $this->status($product, $request);
+            $this->categories($product, $request);
+            $this->images($product, $request);
         }
         catch ( Exception $exception )
         {
@@ -249,9 +253,9 @@ class ProductConfigurableRepository extends BaseRepository
     {
         try
         {
-            foreach ( $request->get("attributes") as $attribute)
+            foreach ( $request["attributes"] as $attribute)
             {
-                if (array_key_exists($attribute_mapper_slug, Attribute::attributeMapper()) && $attribute["attribute_id"] == Attribute::attributeMapper()[$attribute_mapper_slug]) $value = $attribute["value"];
+                if (array_key_exists($attribute_mapper_slug, Attribute::attributeMapper()) && $attribute["attribute_id"] == Attribute::attributeMapper()[$attribute_mapper_slug]) $value = array_key_exists("value", $attribute) ? $attribute["value"] : null;
                 continue;
             }
         }
@@ -355,7 +359,7 @@ class ProductConfigurableRepository extends BaseRepository
         return true;
     }
 
-    public function status(object $product, object $request, string $method = "store"): bool
+    public function status(object $product, object $request): bool
     {
         DB::beginTransaction();
 
@@ -375,7 +379,7 @@ class ProductConfigurableRepository extends BaseRepository
         return true;
     }
 
-    public function categories(object $product, object $request, string $method = "store"): bool
+    public function categories(object $product, object $request): bool
     {
         DB::beginTransaction();
 
@@ -392,6 +396,91 @@ class ProductConfigurableRepository extends BaseRepository
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
     
                 $product->categories()->sync($validator->validated()["categories"]);
+            }
+        }
+        catch ( Exception $exception )
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
+
+        return true;
+    }
+
+    public function images(object $product, object $request): bool
+    {
+        try
+        {
+            $this->storeImages($product, $this->getValue($request, "base_image"), "base_image");
+            $this->storeImages($product, $this->getValue($request, "small_image"), "small_image");
+            $this->storeImages($product, $this->getValue($request, "thumbnail_image"), "thumbnail_image");  
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return true; 
+    }
+
+    public function storeImages(object $product, ?array $images, string $image_type): bool
+    {
+        DB::beginTransaction();
+
+        try
+        {
+
+            if ( is_array($images) )
+            {
+                $data = [];
+                $image_dimensions = config("product_image.image_dimensions.product_{$image_type}");
+                $position = 1;
+
+                $validator = Validator::make(["image" =>  $images], [
+                    "image.*" => "required|mimes:bmp,jpeg,jpg,png"
+                ]);
+                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+    
+                foreach ( $images as $index => $image )
+                {
+                    $position += $index;
+                    $key = \Str::random(6);
+                    $file_name = $image->getClientOriginalName();
+                    $data["path"] = $image->storeAs("images/products/{$key}", $file_name);
+                    foreach ( $image_dimensions as $dimension )
+                    {
+                        $width = $dimension["width"];
+                        $height = $dimension["height"];
+                        $path = "images/products/{$key}/{$image_type}";
+                        if(!Storage::has($path)) Storage::makeDirectory($path, 0777, true, true);
+    
+                        $image = Image::make($image)
+                            ->fit($width, $height, function($constraint) {
+                                $constraint->upsize();
+                            })->encode('jpg', 80);
+                    }
+                    $data["position"] = $position;
+                    $data["product_id"] = $product->id;
+                    
+                    switch ( $image_type )
+                    {
+                        case "base_image" :
+                            $data["main_image"] = 1;
+                        break;
+    
+                        case "small_image" :
+                            $data["small_image"] = 1;
+                        break;
+    
+                        case "thumbnail_image" :
+                            $data["thumbnail"] = 1;
+                        break;
+                    }
+
+                    ProductImage::create($data);
+                }
             }
         }
         catch ( Exception $exception )

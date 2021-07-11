@@ -57,8 +57,8 @@ class ProductController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
-        try
-        {
+        // try
+        // {
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
             ], function ($request) {
@@ -67,26 +67,26 @@ class ProductController extends BaseController
                     "scope_id" => $request->scope_id ?? 0
                 ];
             });
-            $this->repository->checkAttribute($request->attribute_set_id, $request);      
+            
             $data["type"] = "simple";
-
             $scope = [
                 "scope" => $data["scope"],
-                "scope_id" => $data["scope"]
+                "scope_id" => $data["scope_id"]
             ];
-            
+
             $created = $this->repository->create($data, function(&$created) use($request, $scope) {
-                $attributes = $this->repository->validateAttributes($request);
+                $attributes = $this->repository->validateAttributes($created, $request);
+
                 $this->repository->attributeMapperSync($created, $request);
 
                 $this->repository->syncAttributes($attributes, $created, $scope);
                 $created->channels()->sync($request->get("channels"));
             });
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
+        // }
+        // catch( Exception $exception )
+        // {
+        //     return $this->handleException($exception);
+        // }
 
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
@@ -119,7 +119,7 @@ class ProductController extends BaseController
                 ];
             });
 
-            $this->repository->checkAttribute($product->attribute_set_id, $request);
+            // $this->repository->checkAttribute($product->attribute_set_id, $request);
             unset($data["attribute_set_id"]);
 
             $scope = [
@@ -128,7 +128,7 @@ class ProductController extends BaseController
             ];
 
             $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
-                $attributes = $this->repository->validateAttributes($request);
+                $attributes = $this->repository->validateAttributes($updated, $request);
                 $this->repository->attributeMapperSync($updated, $request, "update");
                 $this->repository->syncAttributes($attributes, $updated, $scope);
                 $updated->channels()->sync($request->get("channels"));

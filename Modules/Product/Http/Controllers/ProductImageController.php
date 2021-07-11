@@ -47,7 +47,7 @@ class ProductImageController extends BaseController
                 $created = $this->repository->create($data);
             }
         }
-        catch (Exception $exception)
+        catch ( Exception $exception )
         {
             return $this->handleException($exception);
         }
