@@ -63,7 +63,7 @@ class UserController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "password" => "required|confirmed",
-                "status" => "required|boolean",
+                "status" => "sometimes|boolean",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
             $data["password"] = Hash::make($data["password"]);
@@ -101,7 +101,7 @@ class UserController extends BaseController
             $data = $this->repository->validateData($request, [
                 "email" => "required|email|unique:admins,email,{$id}",
                 "password" => is_null($request->password) ? "sometimes|nullable" : "required|confirmed",
-                "status" => "required|boolean",
+                "status" => "sometimes|boolean",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
             if ( is_null($request->password) ) {
