@@ -3,8 +3,6 @@
 namespace Modules\Product\Repositories;
 
 use Exception;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +13,10 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
+use Modules\Attribute\Repositories\AttributeRepository;
+use Modules\Attribute\Repositories\AttributeSetRepository;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Product\Entities\ProductAttribute;
@@ -22,9 +24,9 @@ use Modules\Product\Entities\ProductImage;
 
 class ProductRepository extends BaseRepository
 {
-    protected $attribute;
+    protected $attribute, $attribute_set_repository, $channel_model, $store_model;
     
-    public function __construct(Product $product)
+    public function __construct(Product $product, AttributeSetRepository $attribute_set_repository, AttributeRepository $attribute_repository, Channel $channel_model, Store $store_model)
     {
         $this->model = $product;
         $this->model_key = "catalog.products";
@@ -36,9 +38,15 @@ class ProductRepository extends BaseRepository
             "attributes" => "required|array",
             "scope" => "sometimes|in:global,website,channel,store"
         ];
+
+        $this->attribute_set_repository = $attribute_set_repository;
+        $this->attribute_repository = $attribute_repository;
+        $this->channel_model = $channel_model;
+        $this->store_model = $store_model;
+
     }
 
-    public function validateAttributes(object $product, object $request): array
+    public function validateAttributes(object $product, object $request, array $scope): array
     {
         try
         {
@@ -55,19 +63,30 @@ class ProductRepository extends BaseRepository
             $request_attribute_collection = collect($request->get("attributes"));
 
             $all_product_attributes = [];
-            $product_attribute = [];
             
             foreach ( $attributes as $attribute)
             {
+                $product_attribute = [];
+                if($this->scopeFilter($scope["scope"], $attribute->scope)) continue; 
+
+                $single_attribute_collection = $request_attribute_collection->where('attribute_id', $attribute->id);
+                $default_value_exist = $single_attribute_collection->pluck("use_default_value")->first();
+
                 $product_attribute["attribute_id"] = $attribute->id;
-                $product_attribute["value"] = in_array($attribute->id, $request_attribute_ids) ? $request_attribute_collection->where('attribute_id', $attribute->id)->pluck("value")->first() : null;
+                if($default_value_exist == 1)
+                {
+                    $product_attribute["use_default_value"] = 1;
+                    $all_product_attributes[] = $product_attribute;
+                    continue;
+                }
+                $product_attribute["value"] = in_array($attribute->id, $request_attribute_ids) ? $single_attribute_collection->pluck("value")->first() : null;
+                $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 
                 $validator = Validator::make($product_attribute, [
                     "value" => $attribute->type_validation
                 ]);
                 if ( $validator->fails() ) throw ValidationException::withMessages([$attribute->name => $validator->errors()->toArray()]);
 
-                $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
                 $all_product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid()); 
             }
             $all_product_attributes = $this->unsetter($all_product_attributes, $request_attribute_ids);
@@ -88,8 +107,6 @@ class ProductRepository extends BaseRepository
         try
         {
             foreach($data as $attribute) { 
-                $attributeData = Attribute::find($attribute['attribute_id']);
-                if($this->scopeFilter($scope["scope"], $attributeData->scope)) continue; 
 
                 $match = [
                     "product_id" => $product->id,
@@ -97,6 +114,13 @@ class ProductRepository extends BaseRepository
                     "scope_id" => $scope["scope_id"],
                     "attribute_id" => $attribute['attribute_id']
                 ];
+
+                if(isset($attribute["use_default_value"]))
+                {
+                    $product_attribute = ProductAttribute::where($match)->first();
+                    if($product_attribute) $product_attribute->delete();
+                    continue;
+                }
 
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
 
@@ -116,7 +140,7 @@ class ProductRepository extends BaseRepository
             throw $exception;
         }
 
-        Event::dispatch("{$this->model_key}.attibutes.sync.after", $product_attribute);
+        if($product_attribute) Event::dispatch("{$this->model_key}.attibutes.sync.after", $product_attribute);
         DB::commit();
 
         return true;
@@ -293,7 +317,7 @@ class ProductRepository extends BaseRepository
 
         try
         {
-            $categories = explode(",", $this->getValue($request, "category_ids"));
+            $categories = $this->getValue($request, "category_ids");
             
             if (isset($categories) && !in_array("", $categories))
             {
@@ -339,8 +363,7 @@ class ProductRepository extends BaseRepository
 
         try
         {
-
-            if ( is_array($images) )
+            if ( isset($images) && is_array($images) )
             {
                 $data = [];
                 $image_dimensions = config("product_image.image_dimensions.product_{$image_type}");
@@ -408,6 +431,93 @@ class ProductRepository extends BaseRepository
         if($scope == "channel" && in_array($element_scope, ["global", "website"])) return true;
         if($scope == "store" && in_array($element_scope, ["global", "website", "channel"])) return true;
         return false;
+    }
+
+    public function getData(int $id, array $scope): array
+    {
+        try
+        {
+            $product = $this->model->with([ "parent", "brand", "website" ])->findOrFail($id);
+        
+            $attribute_set = AttributeSet::findOrFail($product->attribute_set_id);
+    
+            $groups = $attribute_set->attribute_groups->sortBy("position")->map(function ($attribute_group) use ($product, $scope)  { 
+                return [
+                    "id" => $attribute_group->id,
+                    "name" => $attribute_group->name,
+                    "position" => $attribute_group->position,
+                    "attributes" => $attribute_group->attributes->map(function ($attribute) use ($product, $scope) {
+                        $match = [
+                            "attribute_id" => $attribute->id,
+                            "scope" => $scope["scope"],
+                            "scope_id" => $scope["scope_id"]
+                        ];
+
+                        $existAttributeData = $product->product_attributes()->where($match)->first();
+                        $attributesData = [
+                            "id" => $attribute->id,
+                            "name" => $attribute->name,
+                            "slug" => $attribute->slug,
+                            "type" => $attribute->type,
+                            "scope" => $attribute->scope,
+                            "position" => $attribute->position,
+                            "is_required" => $attribute->is_required,
+                            "use_default_value" =>  $existAttributeData ? 0 : 1
+                        ];
+
+                        $attributesData["value"] = $attribute->checkMapper() && !$attribute->checkOption() ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value->value : $this->getDefaultValues($product, $match));
+                        
+
+                        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
+                        return $attributesData;
+                    })->toArray()
+                ];
+            })->toArray();
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+        return array_merge($product->toArray(), [
+            "groups" => $groups
+        ]);
+    }
+
+    public function getDefaultValues(object $product, array $data): mixed
+    {
+        if($data["scope"] != "global")
+        {
+            $input["attribute_id"] = $data["attribute_id"];
+            $input["product_id"] = $product->id;
+            switch($data["scope"])
+            {
+                case "store":
+                    $input["scope"] = "channel";
+                    $input["scope_id"] = $this->store_model->find($data["scope_id"])->channel->id;
+                    break;
+                
+                case "channel":
+                    $input["scope"] = "website";
+                    $input["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
+                    break;
+
+                case "website":
+                    $input["scope"] = "global";
+                    $input["scope_id"] = 0;
+                    break;
+            }
+            return ($item = $product->product_attributes()->where($input)->first()) ? $item->value->value : (( $input["scope"] == "global") ? null : $this->getDefaultValues($product, $input));           
+        }
+        return null;
+    }
+
+    public function getMapperValue($attribute, $product)
+    {
+        $modelName = $attribute->getMapperModule();
+        $model = new $modelName();
+        $model = $model->where($attribute->getMapperField(), $product->id)->first();
+        $pluckAttribute = $attribute->getMapperAttribute();
+        return $model ? $model->$pluckAttribute : null;
     }
 
 }

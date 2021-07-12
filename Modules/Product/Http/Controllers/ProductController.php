@@ -57,8 +57,8 @@ class ProductController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
-        // try
-        // {
+        try
+        {
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
             ], function ($request) {
@@ -75,41 +75,52 @@ class ProductController extends BaseController
             ];
 
             $created = $this->repository->create($data, function(&$created) use($request, $scope) {
-                $attributes = $this->repository->validateAttributes($created, $request);
+                $attributes = $this->repository->validateAttributes($created, $request, $scope);
 
                 $this->repository->attributeMapperSync($created, $request);
 
                 $this->repository->syncAttributes($attributes, $created, $scope);
                 $created->channels()->sync($request->get("channels"));
             });
-        // }
-        // catch( Exception $exception )
-        // {
-        //     return $this->handleException($exception);
-        // }
-
-        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
-    }
-
-    public function show(int $id): JsonResponse
-    {
-        try
-        {
-            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images", "website", "catalog_inventories.catalog_inventory_items"])->findOrFail($id);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+    }
+
+    public function show(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $request->validate([
+                "scope" => "sometimes|in:global,website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
+            ]);
+
+            $scope = [
+                "scope" => $request->scope ?? "global",
+                "scope_id" => $request->scope_id ?? 0
+
+            ];
+
+            $fetched = $this->repository->getData($id, $scope);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
     {
         try
         {
-            $product = $this->model::findOrFail($id);            
+            // $product = $this->model::findOrFail($id);            
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
             ], function ($request) {
@@ -118,17 +129,15 @@ class ProductController extends BaseController
                     "scope_id" => $request->scope_id ?? 0
                 ];
             });
-
-            // $this->repository->checkAttribute($product->attribute_set_id, $request);
             unset($data["attribute_set_id"]);
 
             $scope = [
                 "scope" => $data["scope"],
-                "scope_id" => $data["scope"]
+                "scope_id" => $data["scope_id"]
             ];
 
             $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
-                $attributes = $this->repository->validateAttributes($updated, $request);
+                $attributes = $this->repository->validateAttributes($updated, $request, $scope);
                 $this->repository->attributeMapperSync($updated, $request, "update");
                 $this->repository->syncAttributes($attributes, $updated, $scope);
                 $updated->channels()->sync($request->get("channels"));
