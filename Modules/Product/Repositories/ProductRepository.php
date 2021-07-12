@@ -513,11 +513,13 @@ class ProductRepository extends BaseRepository
 
     public function getMapperValue($attribute, $product)
     {
-        $modelName = $attribute->getMapperModule();
-        $model = new $modelName();
-        $model = $model->where($attribute->getMapperField(), $product->id)->first();
-        $pluckAttribute = $attribute->getMapperAttribute();
-        return $model ? $model->$pluckAttribute : null;
+        if($attribute->slug == "sku") return $product->sku;
+        if($attribute->slug == "status") return $product->status;
+        if($attribute->slug == "category_ids") return $product->categories()->pluck('category_id')->toArray();
+        if($attribute->slug == "base_image") return $product->images()->where('main_image', 1)->pluck('path')->toArray();
+        if($attribute->slug == "small_image") return $product->images()->where('small_image', 1)->pluck('path')->toArray();
+        if($attribute->slug == "thumbnail_image") return $product->images()->where('thumbnail', 1)->pluck('path')->toArray();
+        if($attribute->slug == "quantity_and_stock_status") return $product->catalog_inventories()->first()->is_in_stock;
     }
 
 }

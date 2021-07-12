@@ -13,6 +13,7 @@ use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Rules\ScopeRule;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
+use Modules\Product\Transformers\List\ProductResource as ListProductResource;
 
 class ProductController extends BaseController
 {
@@ -35,6 +36,11 @@ class ProductController extends BaseController
         return ProductResource::collection($data);
     }
 
+    public function listCollection(object $data): ResourceCollection
+    {
+        return ListProductResource::collection($data);
+    }
+
     public function resource(object $data): JsonResource
     {
         return new ProductResource($data);
@@ -44,15 +50,19 @@ class ProductController extends BaseController
     {
         try
         {
+            $request->validate([
+                "scope" => "sometimes|in:global,website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
+            ]);
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["product_attributes", "images"]);
+            $fetched = $this->getFilteredList($request, [ "categories" ]);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->listCollection($fetched), $this->lang('fetch-list-success'));
     }
 
     public function store(Request $request): JsonResponse
