@@ -3,8 +3,6 @@
 namespace Modules\Core\Tests;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class VisitorBaseTestCase extends TestCase
@@ -16,8 +14,6 @@ class VisitorBaseTestCase extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        // Schema::disableForeignKeyConstraints();
-        // $this->artisan("db:seed", ["--force" => true]);
 
         $this->factory_count = 2;
         $this->default_resource_id = $this->model::latest('id')->first()->id;

@@ -8,8 +8,6 @@ use Modules\User\Entities\Role;
 use Modules\User\Entities\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BaseTestCase extends TestCase
 {
@@ -24,11 +22,6 @@ class BaseTestCase extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        // if (!static::$seederRun) {
-        //     $this->artisan("migrate:fresh");
-        //     $this->artisan("db:seed", ["--force" => true]);
-        //     static::$seederRun = true;
-        // }
 
         $this->factory_count = 2;
         $this->append_to_route = null;

@@ -3,11 +3,9 @@
 namespace Modules\Customer\Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Modules\Customer\Entities\Customer;
 use Tests\TestCase;
@@ -23,8 +21,6 @@ class CustomerAccountTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        // Schema::disableForeignKeyConstraints();
-        // $this->artisan("db:seed", ["--force" => true]);
 
         $this->model = Customer::class;
         $this->customer = $this->createCustomer();
