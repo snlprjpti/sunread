@@ -12,9 +12,11 @@ class PreparingTest extends TestCase
     {
         parent::setUp();
 
-        $this->artisan("migrate:fresh");
-        Schema::disableForeignKeyConstraints();
-        $this->artisan("db:seed", ["--force" => true]);
+        if ( app()->environment() !== "ci" ) {
+            Schema::disableForeignKeyConstraints();
+            $this->artisan("migrate:fresh");
+            $this->artisan("db:seed", ["--force" => true]);
+        }
     }
 
     public function testDbHasTables(): void

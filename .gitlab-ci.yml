@@ -18,7 +18,7 @@ variables:
   SCOUT_DRIVER: elastic
   SCOUT_ELASTIC_HOST: 94.237.111.68:9200
   QUEUE_CONNECTION: database
-  APP_ENV: testing
+  APP_ENV: ci
 cache:
   key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
 

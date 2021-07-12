@@ -9,7 +9,7 @@ class CityTableSeeder extends Seeder
 {
     public function run(): void
     {
-        if ( app()->environment() == "testing" ) {
+        if ( in_array(app()->environment(), ["testing", "ci"]) ) {
             $cities = include("data/testing/cities.php");
         } else {
             $cities = include("data/cities.php");
