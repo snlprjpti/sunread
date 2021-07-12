@@ -139,7 +139,7 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Categories",
                 "slug" => "category_ids",
-                "type" => "text",
+                "type" => "multiselect",
                 "scope" => "website"
             ],
             [
@@ -210,21 +210,21 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Base Image",
                 "slug" => "base_image",
-                "type" => "image",
+                "type" => "multiselect",
                 "scope" => "global",
                 "is_required" => 0
             ],
             [
                 "name" => "Small Image",
                 "slug" => "small_image",
-                "type" => "image",
+                "type" => "multiselect",
                 "scope" => "global",
                 "is_required" => 0
             ],
             [
                 "name" => "Thumbnail Image",
                 "slug" => "thumbnail_image",
-                "type" => "image",
+                "type" => "multiselect",
                 "scope" => "global",
                 "is_required" => 0
             ],
