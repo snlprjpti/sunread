@@ -16,16 +16,19 @@ use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Validation\ValidationException;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 use Exception;
+use Modules\Core\Rules\ScopeRule;
+use Modules\Product\Repositories\ProductRepository;
 
 class ProductConfigurableController extends BaseController
 {
-    protected $repository;
+    protected $repository, $product_repository;
 
-    public function __construct(Product $product, ProductConfigurableRepository $productRepository)
+    public function __construct(Product $product, ProductConfigurableRepository $productConfigurableRepository, ProductRepository $product_repository)
     {
         $this->model = $product;
         $this->model_name = "Product";
-        $this->repository = $productRepository;
+        $this->repository = $productConfigurableRepository;
+        $this->product_repository = $product_repository;
         $exception_statuses = [
             ProductAttributeCannotChangeException::class => 403
         ];
@@ -47,9 +50,33 @@ class ProductConfigurableController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $data["type"] = "configurable";
-            $created = $this->repository->create($data);
+            $data = $this->repository->validateData($request, [
+                "website_id" => "required|exists:websites,id",
+                "attribute_set_id" => "required|exists:attribute_sets,id",
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
+            ], function ($request) {
+                return [
+                    "scope" => $request->scope ?? "global",
+                    "scope_id" => $request->scope_id ?? 0,
+                    "type" => "configurable"
+                ];
+            });
+            
+            $scope = [
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope_id"]
+            ];
+
+            $created = $this->repository->create($data, function (&$created) use ($request, $scope) {
+                $attributes = $this->repository->validateAttributes($created, $request, $scope);
+                $this->repository->syncAttributes($attributes, $created, $scope);
+
+                $this->repository->attributeMapperSync($created, $request);
+
+                $created->channels()->sync($request->get("channels"));
+
+                $this->repository->createVariants($created, $request, $scope, $attributes);
+            });
         }
         catch(Exception $exception)
         {
@@ -64,30 +91,29 @@ class ProductConfigurableController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "sku" => "sometimes|nullable",
-                "brand_id" => "sometimes|nullable|exists:brands,id",
-                "website_id" => "required|exists:websites,id",
-                "super_attributes" => "required|array",
-                "attributes" => "required|array",
-                "attribute_set_id" => "sometimes|nullable"
-            ]);
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
+            ], function ($request) {
+                return [
+                    "scope" => $request->scope ?? "global",
+                    "scope_id" => $request->scope_id ?? 0,
+                    "type" => "configurable"
+                ];
+            });
 
-            $product = $this->repository->fetch($id);
-            
-            // check attributes and validated request attrubutes.
-            $this->repository->checkAttribute($product->attribute_set_id, $request);
+            $scope = [
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope_id"]
+            ];
 
-            // create product variants based on super attributes and parent product.
-            $this->repository->createVariants($product, $request);
+            $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
+                $attributes = $this->repository->validateAttributes($updated, $request, $scope);
+                $this->repository->syncAttributes($attributes, $updated, $scope);
 
-            unset($data["attribute_set_id"], $data["sku"]);
+                $this->repository->attributeMapperSync($updated, $request);
 
-            $updated = $this->repository->update($data, $id, function($updated) use($request) {
-                $attributes = $this->repository->validateAttributes($request);
-                $this->repository->attributeMapperSync($updated, $request, "update");
-
-                $this->repository->syncAttributes($attributes, $updated);
                 $updated->channels()->sync($request->get("channels"));
+
+                $this->repository->createVariants($updated, $request, $scope, $attributes);
             });
         }
         catch(Exception $exception)
