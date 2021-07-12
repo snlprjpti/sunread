@@ -68,8 +68,11 @@ class UserController extends BaseController
             ]);
             $data["password"] = Hash::make($data["password"]);
 
-            $created = $this->repository->create($data, function ($created) {
+            $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
+                if ( $request->is_invite == true ) {
+                    // Send an email for invite
+                }
             });
         }
         catch (Exception $exception)
