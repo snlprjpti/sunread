@@ -8,10 +8,10 @@ return [
 	"boolean" => "boolean",
 	"number" => "integer",
 	"select" => "string",
-	"multiselect" => null,
+	"multiselect" => "array",
 	"datetime" => "date",
 	"date" => "date",
-	"image" => "mimes:jpeg,jpg,bmp,png",
+	"image" => "mimes:bmp,jpeg,jpg,png",
 	"file" => "file",
 	"checkbox" => null
 ];
