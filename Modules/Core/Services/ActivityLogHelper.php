@@ -4,6 +4,7 @@ namespace Modules\Core\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Entities\ActivityLog;
 use Modules\Review\Entities\ReviewVote;
 
@@ -31,9 +32,11 @@ class ActivityLogHelper {
         $properties = [];
 
         if($model_name == "ReviewVote") $this->reviewVoteCache($model);
+
+        if( $model_name == "AttributeSet" || "Attribute" || "Product"  ) $this->attributeCache($model);
         
         if(Cache::get($model::class)) $this->modelCache($model);
-        
+
         if ( $event == "updated" ) {
             $newValues = $model->getChanges();
             $oldValues = collect($newValues)->mapWithKeys(function($value, $key) use ($model) {
@@ -75,6 +78,18 @@ class ActivityLogHelper {
         Cache::forget('negative_vote_count-'.$model->review_id);
         Cache::rememberForever('negative_vote_count-'.$model->review_id, function() use($model){
             return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 1)->count();
+        });
+    }
+
+    private function attributeCache(object $model): void
+    {
+        Cache::forget("attribute_set_attributes-{$model->attribute_set_id}");
+        Cache::rememberForever("attribute_set_attributes-{$model->attribute_set_id}", function () use ($model) {
+            $attribute_set = AttributeSet::whereId($model->attribute_set_id)->first();
+            $attributes = $attribute_set->attribute_groups->map(function($attributeGroup) {
+                return $attributeGroup->attributes;
+            })->flatten(1);
+            return $attributes;
         });
     }
 
