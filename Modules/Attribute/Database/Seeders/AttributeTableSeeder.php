@@ -232,13 +232,15 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Color",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "is_configurable" => 1
+                "default_value" => "Red",
+                "options" => ["Red", "Green", "Yellow", "Blue"],
             ],
             [
                 "name" => "Size",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "is_configurable" => 1
+                "default_value" => "S",
+                "options" => ["S", "M", "L", "XL"],
             ],
         ];
 
