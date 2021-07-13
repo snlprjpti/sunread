@@ -3,6 +3,7 @@
 namespace Modules\Product\Repositories;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -24,7 +25,7 @@ use Modules\Product\Entities\ProductImage;
 
 class ProductRepository extends BaseRepository
 {
-    protected $attribute, $attribute_set_repository, $channel_model, $store_model, $attributeMapperSlug, $functionMapper;
+    protected $attribute, $attribute_set_repository, $channel_model, $store_model, $attributeMapperSlug, $functionMapper, $non_required_attributes;
     
     public function __construct(Product $product, AttributeSetRepository $attribute_set_repository, AttributeRepository $attribute_repository, Channel $channel_model, Store $store_model)
     {
@@ -51,10 +52,11 @@ class ProductRepository extends BaseRepository
             "small_image" => "small_image",
             "thumbnail_image" => "thumbnail_image"
         ];
+        $this->non_required_attributes = [ "price", "cost", "quantity_and_stock_status" ];
 
     }
 
-    public function validateAttributes(object $product, object $request, array $scope): array
+    public function validateAttributes(object $product, object $request, array $scope, ?string $product_type = null): array
     {
         try
         {
@@ -62,7 +64,7 @@ class ProductRepository extends BaseRepository
             
             $attributes = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes;
-            })->flatten(1);
+            })->first();
 
             $request_attribute_ids = array_map( function ($request_attribute) {
                 return $request_attribute["attribute_id"];
@@ -71,11 +73,14 @@ class ProductRepository extends BaseRepository
             $request_attribute_collection = collect($request->get("attributes"));
 
             $all_product_attributes = [];
+
+            if($product_type) $super_attributes = Arr::pluck($request->super_attributes, 'attribute_id');
             
             foreach ( $attributes as $attribute)
             {
                 $product_attribute = [];
                 if($this->scopeFilter($scope["scope"], $attribute->scope)) continue; 
+                if(isset($super_attributes) && (in_array($attribute->id, $super_attributes))) continue;
 
                 $single_attribute_collection = $request_attribute_collection->where('attribute_id', $attribute->id);
                 $default_value_exist = $single_attribute_collection->pluck("use_default_value")->first();
@@ -102,11 +107,10 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-        
-        return $all_product_attributes;
+        return collect($all_product_attributes)->where("value", "!=", null)->toArray();
     }
 
-    public function syncAttributes(array $data, object $product, array $scope, object $request, string $method = "store"): bool
+    public function syncAttributes(array $data, object $product, array $scope, object $request, string $method = "store", ?string $product_type = null): bool
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.attibutes.sync.before");
@@ -114,6 +118,8 @@ class ProductRepository extends BaseRepository
         try
         {
             foreach($data as $attribute) { 
+
+                if($product_type && in_array($attribute['attribute_slug'], $this->non_required_attributes)) continue;
 
                 if( in_array($attribute["attribute_slug"], $this->attributeMapperSlug) )
                 {
@@ -126,9 +132,9 @@ class ProductRepository extends BaseRepository
                     "product_id" => $product->id,
                     "scope" => $scope["scope"],
                     "scope_id" => $scope["scope_id"],
-                    "attribute_id" => Attribute::whereSlug($attribute['attribute_slug'])->firstOrFail()->id
+                    "attribute_id" => Attribute::whereSlug($attribute['attribute_slug'])->first()->id
                 ];
-                if(isset($attribute["use_default_value"]))
+                if(isset($attribute["use_default_value"]) && $attribute["use_default_value"] == 1)
                 {
                     $product_attribute = ProductAttribute::where($match)->first();
                     if($product_attribute) $product_attribute->delete();
@@ -143,8 +149,9 @@ class ProductRepository extends BaseRepository
                     });
                     continue;
                 }
-
+    
                 $product_attribute->update(["value_id" => $attribute["value_type"]::create(["value" => $attribute["value"]])->id]);
+
             }
 
         }

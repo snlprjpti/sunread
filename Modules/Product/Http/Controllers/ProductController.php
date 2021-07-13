@@ -13,6 +13,7 @@ use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Rules\ScopeRule;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
+use Modules\Product\Rules\WebsiteWiseScopeRule;
 use Modules\Product\Transformers\List\ProductResource as ListProductResource;
 
 class ProductController extends BaseController
@@ -71,12 +72,11 @@ class ProductController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "website_id" => "required|exists:websites,id",
-                "attribute_set_id" => "required|exists:attribute_sets,id",
-                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
+                "attribute_set_id" => "required|exists:attribute_sets,id"
             ], function ($request) {
                 return [
-                    "scope" => $request->scope ?? "website",
-                    "scope_id" => $request->scope_id ?? $request->website_id,
+                    "scope" => "website",
+                    "scope_id" => $request->website_id,
                     "type" => "simple"
                 ];
             });
@@ -105,18 +105,17 @@ class ProductController extends BaseController
     {
         try
         {
+            $product = $this->model::findOrFail($id);
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
             ]);
 
             $scope = [
                 "scope" => $request->scope ?? "website",
-                "scope_id" => $request->scope_id ?? $this->model::findOrFail($id)->website_id,
+                "scope_id" => $request->scope_id ??  $product->website_id,
 
             ];
-
-            $product = Product::findOrFail($id);
 
             $fetched = [];
             $fetched = [
@@ -136,13 +135,15 @@ class ProductController extends BaseController
     public function update(Request $request, int $id): JsonResponse
     {
         try
-        {           
+        {        
+            $product = $this->model::findOrFail($id);   
             $data = $this->repository->validateData($request, [
-                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
-            ], function ($request) use($id) {
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+            ], function ($request) use($product) {
                 return [
                     "scope" => $request->scope ?? "website",
-                    "scope_id" => $request->scope_id ?? $this->model::findOrFail($id)->website_id,
+                    "scope_id" => $request->scope_id ?? $product->website_id,
+                    "type" => "simple"
                 ];
             });
 

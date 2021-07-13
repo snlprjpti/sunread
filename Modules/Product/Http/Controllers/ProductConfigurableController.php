@@ -18,6 +18,7 @@ use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 use Exception;
 use Modules\Core\Rules\ScopeRule;
 use Modules\Product\Repositories\ProductRepository;
+use Modules\Product\Rules\WebsiteWiseScopeRule;
 
 class ProductConfigurableController extends BaseController
 {
@@ -52,12 +53,11 @@ class ProductConfigurableController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "website_id" => "required|exists:websites,id",
-                "attribute_set_id" => "required|exists:attribute_sets,id",
-                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
+                "attribute_set_id" => "required|exists:attribute_sets,id"
             ], function ($request) {
                 return [
-                    "scope" => $request->scope ?? "website",
-                    "scope_id" => $request->scope_id ?? $request->website_id,
+                    "scope" => "website",
+                    "scope_id" => $request->website_id,
                     "type" => "configurable"
                 ];
             });
@@ -68,10 +68,8 @@ class ProductConfigurableController extends BaseController
             ];
 
             $created = $this->repository->create($data, function (&$created) use ($request, $scope) {
-                $attributes = $this->repository->validateAttributes($created, $request, $scope);
-                $this->repository->syncAttributes($attributes, $created, $scope);
-
-                $this->repository->attributeMapperSync($created, $request);
+                $attributes = $this->product_repository->validateAttributes($created, $request, $scope, "configurable");
+                $this->product_repository->syncAttributes($attributes, $created, $scope, $request, "store", "configurable");
 
                 $created->channels()->sync($request->get("channels"));
 
@@ -90,12 +88,13 @@ class ProductConfigurableController extends BaseController
     {
         try
         {
+            $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
-                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
-            ], function ($request) use($id) {
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+            ], function ($request) use($product) {
                 return [
                     "scope" => $request->scope ?? "website",
-                    "scope_id" => $request->scope_id ?? $this->model::findOrFail($id)->website_id,
+                    "scope_id" => $request->scope_id ?? $product->website_id,
                     "type" => "configurable"
                 ];
             });
@@ -106,10 +105,8 @@ class ProductConfigurableController extends BaseController
             ];
 
             $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
-                $attributes = $this->repository->validateAttributes($updated, $request, $scope);
-                $this->repository->syncAttributes($attributes, $updated, $scope);
-
-                $this->repository->attributeMapperSync($updated, $request);
+                $attributes = $this->product_repository->validateAttributes($updated, $request, $scope, "configurable");
+                $this->product_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
 
                 $updated->channels()->sync($request->get("channels"));
 
