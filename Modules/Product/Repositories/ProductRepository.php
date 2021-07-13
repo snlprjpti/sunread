@@ -454,6 +454,8 @@ class ProductRepository extends BaseRepository
                         ];
 
                         $existAttributeData = $product->product_attributes()->where($match)->first();
+                        $mapper = $attribute->checkMapper() && !$attribute->checkOption();
+
                         $attributesData = [
                             "id" => $attribute->id,
                             "name" => $attribute->name,
@@ -462,14 +464,16 @@ class ProductRepository extends BaseRepository
                             "scope" => $attribute->scope,
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required,
-                            "use_default_value" =>  $existAttributeData ? 0 : 1
+                            "use_default_value" =>  $mapper ? 0 : ($existAttributeData ? 0 : 1)
                         ];
 
-                        $attributesData["value"] = $attribute->checkMapper() && !$attribute->checkOption() ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value->value : $this->getDefaultValues($product, $match));
+                        $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value->value : $this->getDefaultValues($product, $match));
                         
 
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
                         return $attributesData;
+                    })->reject(function ($item) use($scope){
+                        return $this->scopeFilter($scope["scope"], $item['scope']); 
                     })->toArray()
                 ];
             })->toArray();
@@ -519,7 +523,7 @@ class ProductRepository extends BaseRepository
         if($attribute->slug == "base_image") return $product->images()->where('main_image', 1)->pluck('path')->toArray();
         if($attribute->slug == "small_image") return $product->images()->where('small_image', 1)->pluck('path')->toArray();
         if($attribute->slug == "thumbnail_image") return $product->images()->where('thumbnail', 1)->pluck('path')->toArray();
-        if($attribute->slug == "quantity_and_stock_status") return $product->catalog_inventories()->first()->is_in_stock;
+        if($attribute->slug == "quantity_and_stock_status") return ($data = $product->catalog_inventories()->first()) ? $data->is_in_stock : null;
     }
 
 }
