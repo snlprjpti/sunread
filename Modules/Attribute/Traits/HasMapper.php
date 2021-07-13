@@ -46,16 +46,4 @@ trait HasMapper
         }
         return false;
     }
-
-    public static function attributeMapper(): array
-    {
-        $attribute_mapper_ids = []; 
-        foreach ( (new self)->attributeMapperSlug as $map)
-        {
-            $attribute = (new self)::whereSlug($map)->first();
-            $attribute_mapper_ids[$attribute->slug] = $attribute->id;
-        }
-
-        return $attribute_mapper_ids;
-    }
 }

@@ -19,9 +19,7 @@ class Attribute extends Model
     protected $fillable = [ "slug", "name", "type", "scope", "validation", "is_required", "is_unique", "is_searchable", "search_weight", "is_user_defined", "is_visible_on_storefront", "use_in_layered_navigation", "position", "comparable_on_storefront", "default_value" ];
     protected $appends = [ 'type_validation' ];
     protected $with = [ "attribute_options" ];
-
-    public $attributeMapperSlug = [ "quantity_and_stock_status", "sku", "status", "category_ids", "base_image", "small_image", "thumbnail_image" ];
-
+    
     protected $touches = [ 'product_attributes' ];
     public $translatedAttributes = ["name"];
     public $translatedModels = [ AttributeTranslation::class, "attribute_id" ];
