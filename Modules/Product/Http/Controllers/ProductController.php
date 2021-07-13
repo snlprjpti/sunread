@@ -51,7 +51,7 @@ class ProductController extends BaseController
         try
         {
             $request->validate([
-                "scope" => "sometimes|in:global,website,channel,store",
+                "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
             ]);
             $this->validateListFiltering($request);
@@ -70,15 +70,17 @@ class ProductController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
+                "website_id" => "required|exists:websites,id",
+                "attribute_set_id" => "required|exists:attribute_sets,id",
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
             ], function ($request) {
                 return [
-                    "scope" => $request->scope ?? "global",
-                    "scope_id" => $request->scope_id ?? 0
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $request->website_id,
+                    "type" => "simple"
                 ];
             });
-            
-            $data["type"] = "simple";
+
             $scope = [
                 "scope" => $data["scope"],
                 "scope_id" => $data["scope_id"]
@@ -106,13 +108,13 @@ class ProductController extends BaseController
         try
         {
             $request->validate([
-                "scope" => "sometimes|in:global,website,channel,store",
+                "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
             ]);
 
             $scope = [
-                "scope" => $request->scope ?? "global",
-                "scope_id" => $request->scope_id ?? 0
+                "scope" => $request->scope ?? "website",
+                "scope_id" => $request->scope_id ?? $this->model::findOrFail($id)->website_id,
 
             ];
 
@@ -136,17 +138,15 @@ class ProductController extends BaseController
     public function update(Request $request, int $id): JsonResponse
     {
         try
-        {
-            // $product = $this->model::findOrFail($id);            
+        {           
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
-            ], function ($request) {
+            ], function ($request) use($id) {
                 return [
-                    "scope" => $request->scope ?? "global",
-                    "scope_id" => $request->scope_id ?? 0
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $this->model::findOrFail($id)->website_id,
                 ];
             });
-            unset($data["attribute_set_id"]);
 
             $scope = [
                 "scope" => $data["scope"],

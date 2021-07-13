@@ -56,8 +56,8 @@ class ProductConfigurableController extends BaseController
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
             ], function ($request) {
                 return [
-                    "scope" => $request->scope ?? "global",
-                    "scope_id" => $request->scope_id ?? 0,
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $request->website_id,
                     "type" => "configurable"
                 ];
             });
@@ -92,10 +92,10 @@ class ProductConfigurableController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
-            ], function ($request) {
+            ], function ($request) use($id) {
                 return [
-                    "scope" => $request->scope ?? "global",
-                    "scope_id" => $request->scope_id ?? 0,
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $this->model::findOrFail($id)->website_id,
                     "type" => "configurable"
                 ];
             });

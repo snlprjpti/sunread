@@ -33,10 +33,8 @@ class ProductRepository extends BaseRepository
         $this->rules = [
             "parent_id" => "sometimes|nullable|exists:products,id",
             "brand_id" => "sometimes|nullable|exists:brands,id",
-            "attribute_set_id" => "required|exists:attribute_sets,id",
-            "website_id" => "required|exists:websites,id",
             "attributes" => "required|array",
-            "scope" => "sometimes|in:global,website,channel,store"
+            "scope" => "sometimes|in:website,channel,store"
         ];
 
         $this->attribute_set_repository = $attribute_set_repository;
@@ -427,9 +425,8 @@ class ProductRepository extends BaseRepository
 
     public function scopeFilter(string $scope, string $element_scope): bool
     {
-        if($scope == "website" && in_array($element_scope, ["global"])) return true;
-        if($scope == "channel" && in_array($element_scope, ["global", "website"])) return true;
-        if($scope == "store" && in_array($element_scope, ["global", "website", "channel"])) return true;
+        if($scope == "channel" && in_array($element_scope, ["website"])) return true;
+        if($scope == "store" && in_array($element_scope, ["website", "channel"])) return true;
         return false;
     }
 
@@ -465,7 +462,7 @@ class ProductRepository extends BaseRepository
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required
                         ];
-                        if($match["scope"] != "global") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
+                        if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value->value : $this->getDefaultValues($product, $match));
                         
 
@@ -486,30 +483,25 @@ class ProductRepository extends BaseRepository
 
     public function getDefaultValues(object $product, array $data): mixed
     {
-        if($data["scope"] != "global")
+        if($data["scope"] != "website")
         {
-            $input["attribute_id"] = $data["attribute_id"];
-            $input["product_id"] = $product->id;
+            $data["attribute_id"] = $data["attribute_id"];
+            $data["product_id"] = $product->id;
             switch($data["scope"])
             {
                 case "store":
-                    $input["scope"] = "channel";
-                    $input["scope_id"] = $this->store_model->find($data["scope_id"])->channel->id;
+                    $data["scope"] = "channel";
+                    $data["scope_id"] = $this->store_model->find($data["scope_id"])->channel->id;
                     break;
                 
                 case "channel":
-                    $input["scope"] = "website";
-                    $input["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
-                    break;
-
-                case "website":
-                    $input["scope"] = "global";
-                    $input["scope_id"] = 0;
+                    $data["scope"] = "website";
+                    $data["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
                     break;
             }
-            return ($item = $product->product_attributes()->where($input)->first()) ? $item->value->value : (( $input["scope"] == "global") ? null : $this->getDefaultValues($product, $input));           
+            return ($item = $product->product_attributes()->where($data)->first()) ? $item->value->value : $this->getDefaultValues($product, $data);           
         }
-        return null;
+        return ($item = $product->product_attributes()->where($data)->first()) ? $item->value->value : null;
     }
 
     public function getMapperValue($attribute, $product)

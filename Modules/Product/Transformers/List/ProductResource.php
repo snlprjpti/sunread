@@ -17,7 +17,7 @@ class ProductResource extends JsonResource
     {
         $attributeIdforName = Attribute::whereSlug("name")->first()->id;
         $attributeIdforVisibility = Attribute::whereSlug("visibility")->first()->id;
-        $product_attributes = $this->product_attributes()->whereScope($request->scope ?? "global")->whereScopeId($request->scope_id ?? 0);
+        $product_attributes = $this->product_attributes()->whereScope($request->scope ?? "website")->whereScopeId($request->scope_id ?? $this->website_id);
         $name = $product_attributes->whereAttributeId($attributeIdforName)->first();
         $visibility = $product_attributes->whereAttributeId($attributeIdforVisibility)->first();
         $images = $this->images()->where('main_image', 1)->first();

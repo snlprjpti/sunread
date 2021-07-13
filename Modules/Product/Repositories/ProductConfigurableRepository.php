@@ -34,7 +34,7 @@ class ProductConfigurableRepository extends BaseRepository
             "brand_id" => "sometimes|nullable|exists:brands,id",
             "super_attributes" => "required|array",
             "attributes" => "required|array",
-            "scope" => "sometimes|in:global,website,channel,store"
+            "scope" => "sometimes|in:website,channel,store"
         ];
         $this->attribute = $attribute;
         $this->product_repository = $product_repository;
