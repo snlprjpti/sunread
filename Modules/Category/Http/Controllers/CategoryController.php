@@ -59,9 +59,7 @@ class CategoryController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)],
                 "website_id" => "sometimes|exists:websites,id"
             ]);
-            $fetched = $this->repository->fetchAll(request: $request, callback: function () use ($request) {
-                return $this->model->whereWebsiteId($request->website_id);
-            })->toTree();
+            $fetched = $this->model->whereWebsiteId($request->website_id)->get()->toTree();
         }
         catch (Exception $exception)
         {
