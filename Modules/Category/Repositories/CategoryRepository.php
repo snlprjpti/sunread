@@ -40,6 +40,13 @@ class CategoryRepository extends BaseRepository
     public function getConfigData(array $data): array
     {
         $fetched = $this->config_fields;
+        $fetched_data = [];
+
+        $category = Category::findOrFail($data["category_id"]);
+        $fetched_data = [
+            "parent_id" => $category->parent_id,
+            "website_id" => $category->website_id,
+        ];
        
         foreach($fetched as $key => $children){
             if(!isset($children["elements"])) continue;
@@ -63,9 +70,9 @@ class CategoryRepository extends BaseRepository
 
                 $children_data["elements"][] = $element;
             }
-            $fetched[$key] = $children_data;
+            $fetched_data["attributes"][$key] = $children_data;
         }
-        return $fetched;
+        return $fetched_data;
     }
 
     public function getValidationRules(object $request): array
