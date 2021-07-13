@@ -30,54 +30,24 @@ class ProductTest extends BaseTestCase
 
     public function getCreateData(): array
     {
-        $category = Category::inRandomOrder()->first();
         $product = $this->model::factory()->make();
-        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();        
-        return array_merge([
-            "attributes" => [
-                [
+        $merge_product = $product->toArray(); 
+
+        $attributes = [];
+
+        foreach ( $product->attribute_set->attribute_groups as $attribute_group )
+        {
+            foreach ($attribute_group->attributes as $attribute)
+            {
+                if (in_array($attribute->slug, ["category_ids", "base_image", "small_image", "thumbnail_image", "quantity_and_stock_status"])) continue;
+                $attributes[] = [
                     "attribute_id" => $attribute->id,
                     "value" => $this->value($attribute->type)
-                ]
-            ],
-            "categories" => [$category->id]
-        ], $product->toArray());
-    }
+                ];
+            }
+        }
 
-    public function getUpdateData(): array
-    {
-        $category = Category::inRandomOrder()->first();
-        $product = $this->model::find($this->default_resource_id);
-        $update_data = $product->toArray();
-        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
-
-        return array_merge([
-            "attributes" => [
-                [
-                    "attribute_id" => $attribute->id,
-                    "value" => $this->value($attribute->type)
-                ]
-            ],
-            "categories" => [$category->id]
-        ], $product->toArray());
-    }
-
-    public function getNonMandodtaryUpdateData(): array
-    {
-        $category = Category::inRandomOrder()->first();
-        $product = $this->model::find($this->default_resource_id);
-        $update_data = $product->toArray();
-        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
-
-        return array_merge([
-            "attributes" => [
-                [
-                    "attribute_id" => $attribute->id,
-                    "value" => $this->value($attribute->type)
-                ]
-            ],
-            "categories" => [$category->id]
-        ], $product->toArray());
+        return array_merge($merge_product, ["attributes" => $attributes]);
     }
 
     public function value(string $type): mixed
@@ -120,6 +90,11 @@ class ProductTest extends BaseTestCase
         return array_merge($this->getCreateData(), [
             "attribute_set_id" => null
         ]);
+    }
+
+    public function testShouldReturnErrorIfUpdateDataIsInvalid()
+    {
+        $this->markTestSkipped("Invalid Update method not available.");
     }
 
     /**
