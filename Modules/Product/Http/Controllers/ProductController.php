@@ -116,7 +116,14 @@ class ProductController extends BaseController
 
             ];
 
-            $fetched = $this->repository->getData($id, $scope);
+            $product = Product::findOrFail($id);
+
+            $fetched = [];
+            $fetched = [
+                "parent_id" => $product->id,
+                "website_id" => $product->website_id
+            ];
+            $fetched["attributes"] = $this->repository->getData($id, $scope);
         }
         catch( Exception $exception )
         {

@@ -463,10 +463,9 @@ class ProductRepository extends BaseRepository
                             "type" => $attribute->type,
                             "scope" => $attribute->scope,
                             "position" => $attribute->position,
-                            "is_required" => $attribute->is_required,
-                            "use_default_value" =>  $mapper ? 0 : ($existAttributeData ? 0 : 1)
+                            "is_required" => $attribute->is_required
                         ];
-
+                        if($match["scope"] != "global") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value->value : $this->getDefaultValues($product, $match));
                         
 
@@ -482,9 +481,7 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-        return array_merge($product->toArray(), [
-            "groups" => $groups
-        ]);
+        return $groups;
     }
 
     public function getDefaultValues(object $product, array $data): mixed
