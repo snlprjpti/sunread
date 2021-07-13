@@ -88,10 +88,8 @@ class ProductController extends BaseController
 
             $created = $this->repository->create($data, function(&$created) use($request, $scope) {
                 $attributes = $this->repository->validateAttributes($created, $request, $scope);
+                $this->repository->syncAttributes($attributes, $created, $scope, $request);
 
-                $this->repository->attributeMapperSync($created, $request);
-
-                $this->repository->syncAttributes($attributes, $created, $scope);
                 $created->channels()->sync($request->get("channels"));
             });
         }
@@ -155,8 +153,8 @@ class ProductController extends BaseController
 
             $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
                 $attributes = $this->repository->validateAttributes($updated, $request, $scope);
-                $this->repository->attributeMapperSync($updated, $request, "update");
-                $this->repository->syncAttributes($attributes, $updated, $scope);
+                $this->repository->syncAttributes($attributes, $updated, $scope, $request, "update");
+
                 $updated->channels()->sync($request->get("channels"));
             });
         }
