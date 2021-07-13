@@ -14,14 +14,19 @@ class ProductTableSeeder extends Seeder
     public function run(): void
     {
         $attribute_set_id = AttributeSet::factory()->create()->id;
-        $attribute_group = AttributeGroup::factory(1)
+
+        
+        $system_defined_attributes = Attribute::whereIsUserDefined(0)->pluck('id')->toArray();
+        $user_defined_attributes = Attribute::factory()->create()->id;
+
+        $attribute_group = AttributeGroup::factory()
             ->create([
                 "attribute_set_id" => $attribute_set_id,
                 "position" => 1
             ])
-            ->each(function ($attr_group){
-                $attr_group->attributes()->attach(Attribute::factory(1)->create());
-            })->first();
+            ->each(function ($attr_group) use ( $system_defined_attributes, $user_defined_attributes ) {
+                $attr_group->attributes()->sync(array_merge($system_defined_attributes, [ $user_defined_attributes ]));
+            });
 
         Product::withoutSyncingToSearch(function () use ($attribute_set_id){
             Product::factory()
