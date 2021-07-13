@@ -22,7 +22,6 @@ class AttributeFactory extends Factory
             "price",
             "boolean",
             "select",
-            "multiselect",
             "datetime",
             "date",
             "checkbox",
