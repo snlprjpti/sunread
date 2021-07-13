@@ -2,17 +2,16 @@
 
 namespace Modules\Customer\Tests\Feature;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Schema;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerGroup;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SessionTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected object $customer, $fake_customer;
     protected array $headers;
@@ -20,8 +19,6 @@ class SessionTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
-        $this->artisan("db:seed", ["--force" => true]);
 
         $this->customer = $this->createCustomer();
         $this->fake_customer = Customer::factory()->make();

@@ -9,7 +9,7 @@ class RegionTableSeeder extends Seeder
 {
     public function run(): void
     {
-        if ( app()->environment() == "testing" ) {
+        if ( in_array(app()->environment(), ["testing", "ci"]) ) {
             $regions = include("data/testing/regions.php");
         } else {
             $regions = include("data/regions.php");

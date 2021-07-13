@@ -2,18 +2,16 @@
 
 namespace Modules\Customer\Tests\Feature;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 
 class CustomerAddressAccountTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
     
     protected array $headers;
 
@@ -22,10 +20,9 @@ class CustomerAddressAccountTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
+
         $this->model = CustomerAddress::class;
         $this->customer_id = 1;
-        $this->artisan("db:seed", ["--force" => true]);
         $this->customer = $this->createCustomer();
         $this->default_resource_id = 1;
         $this->model_name = "Customer Address";

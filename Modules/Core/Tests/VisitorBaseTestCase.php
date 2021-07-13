@@ -2,21 +2,18 @@
 
 namespace Modules\Core\Tests;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class VisitorBaseTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route; 
 
     public function setUp(): void
     {
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
-        $this->artisan("db:seed", ["--force" => true]);
 
         $this->factory_count = 2;
         $this->default_resource_id = $this->model::latest('id')->first()->id;
