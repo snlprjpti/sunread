@@ -9,7 +9,7 @@ class CountryTableSeeder extends Seeder
 {
     public function run(): void
     {
-        if ( app()->environment() == "testing" ) {
+        if ( in_array(app()->environment(), ["testing", "ci"]) ) {
             $countries = include("data/testing/countries.php");
         } else {
             $countries = include("data/countries.php");

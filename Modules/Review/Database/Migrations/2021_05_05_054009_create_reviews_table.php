@@ -15,10 +15,10 @@ class CreateReviewsTable extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("customer_id");
-            $table->foreign("customer_id")->references("id")->on("customers");
-            $table->unsignedBigInteger("product_id");
-            $table->foreign("product_id")->references("id")->on("products");
+            $table->unsignedBigInteger("customer_id")->nullable();
+            $table->foreign("customer_id")->references("id")->on("customers")->onDelete('set null');
+            $table->unsignedBigInteger("product_id")->nullable();
+            $table->foreign("product_id")->references("id")->on("products")->onDelete('set null');
             $table->tinyInteger('rating');
             $table->string('title')->nullable();
             $table->text('description')->nullable();

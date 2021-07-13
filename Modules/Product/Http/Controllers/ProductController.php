@@ -13,6 +13,7 @@ use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Rules\ScopeRule;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
+use Modules\Product\Transformers\List\ProductResource as ListProductResource;
 
 class ProductController extends BaseController
 {
@@ -35,6 +36,11 @@ class ProductController extends BaseController
         return ProductResource::collection($data);
     }
 
+    public function listCollection(object $data): ResourceCollection
+    {
+        return ListProductResource::collection($data);
+    }
+
     public function resource(object $data): JsonResource
     {
         return new ProductResource($data);
@@ -44,15 +50,19 @@ class ProductController extends BaseController
     {
         try
         {
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
+            ]);
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["product_attributes", "images"]);
+            $fetched = $this->getFilteredList($request, [ "categories" ]);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->listCollection($fetched), $this->lang('fetch-list-success'));
     }
 
     public function store(Request $request): JsonResponse
@@ -60,15 +70,17 @@ class ProductController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
+                "website_id" => "required|exists:websites,id",
+                "attribute_set_id" => "required|exists:attribute_sets,id",
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
             ], function ($request) {
                 return [
-                    "scope" => $request->scope ?? "global",
-                    "scope_id" => $request->scope_id ?? 0
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $request->website_id,
+                    "type" => "simple"
                 ];
             });
-            
-            $data["type"] = "simple";
+
             $scope = [
                 "scope" => $data["scope"],
                 "scope_id" => $data["scope_id"]
@@ -96,17 +108,24 @@ class ProductController extends BaseController
         try
         {
             $request->validate([
-                "scope" => "sometimes|in:global,website,channel,store",
+                "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
             ]);
 
             $scope = [
-                "scope" => $request->scope ?? "global",
-                "scope_id" => $request->scope_id ?? 0
+                "scope" => $request->scope ?? "website",
+                "scope_id" => $request->scope_id ?? $this->model::findOrFail($id)->website_id,
 
             ];
 
-            $fetched = $this->repository->getData($id, $scope);
+            $product = Product::findOrFail($id);
+
+            $fetched = [];
+            $fetched = [
+                "parent_id" => $product->id,
+                "website_id" => $product->website_id
+            ];
+            $fetched["attributes"] = $this->repository->getData($id, $scope);
         }
         catch( Exception $exception )
         {
@@ -119,17 +138,15 @@ class ProductController extends BaseController
     public function update(Request $request, int $id): JsonResponse
     {
         try
-        {
-            // $product = $this->model::findOrFail($id);            
+        {           
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope)]
-            ], function ($request) {
+            ], function ($request) use($id) {
                 return [
-                    "scope" => $request->scope ?? "global",
-                    "scope_id" => $request->scope_id ?? 0
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $this->model::findOrFail($id)->website_id,
                 ];
             });
-            unset($data["attribute_set_id"]);
 
             $scope = [
                 "scope" => $data["scope"],

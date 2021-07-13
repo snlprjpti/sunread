@@ -3,37 +3,27 @@ return [
     "base_image" => [
         "module" => "Modules\Product\Entities\ProductImage",
         "options" => 0,
-        "pluck" => [],
-        "attribute" => "path",
-        "field" => "product_id"
+        "pluck" => []
     ],
     "small_image" => [
         "module" => "Modules\Product\Entities\ProductImage",
         "options" => 0,
-        "pluck" => [],
-        "attribute" => "path",
-        "field" => "product_id"
+        "pluck" => []
     ],
     "thumbnail_image" => [
         "module" => "Modules\Product\Entities\ProductImage",
         "options" => 0,
-        "pluck" => [],
-        "attribute" => "path",
-        "field" => "product_id"
+        "pluck" => []
     ],
     "sku" => [
         "module" => "Modules\Product\Entities\Product",
         "options" => 0,
-        "pluck" => [],
-        "attribute" => "sku",
-        "field" => "id"
+        "pluck" => []
     ],
     "status" => [
         "module" => "Modules\Product\Entities\Product",
         "options" => 0,
-        "pluck" => [],
-        "attribute" => "status",
-        "field" => "id"
+        "pluck" => []
     ],
     "tax_class_id" => [
         "module" => "Modules\Tax\Entities\ProductTaxGroup",
@@ -43,15 +33,11 @@ return [
     "quantity_and_stock_status" => [
         "module" => "Modules\Inventory\Entities\CatalogInventory",
         "options" => 0,
-        "pluck" => [],
-        "attribute" => "is_in_stock",
-        "field" => "product_id"
+        "pluck" => []
     ],
     "category_ids" => [
         "module" => "Modules\Inventory\Entities\CatalogInventory",
         "options" => 0,
-        "pluck" => [],
-        "attribute" => "is_in_stock",
-        "field" => "product_id"
+        "pluck" => []
     ]
 ];

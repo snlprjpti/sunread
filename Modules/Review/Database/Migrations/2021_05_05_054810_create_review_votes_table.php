@@ -15,11 +15,11 @@ class CreateReviewVotesTable extends Migration
     {
         Schema::create('review_votes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("customer_id");
-            $table->unsignedBigInteger("review_id");
+            $table->unsignedBigInteger("customer_id")->nullable();
+            $table->unsignedBigInteger("review_id")->nullable();
             $table->unique(['customer_id', 'review_id'], "review_vote_compound_unique");
-            $table->foreign("customer_id")->references("id")->on("customers");
-            $table->foreign("review_id")->references("id")->on("reviews");
+            $table->foreign("customer_id")->references("id")->on("customers")->onDelete('set null');
+            $table->foreign("review_id")->references("id")->on("reviews")->onDelete('set null');
             $table->boolean('vote_type');
             $table->timestamps();
         });

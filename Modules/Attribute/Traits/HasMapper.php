@@ -58,19 +58,4 @@ trait HasMapper
 
         return $attribute_mapper_ids;
     }
-
-    public function getMapperModule()
-    {
-        return $this->mapper[$this->slug]["module"];
-    }
-
-    public function getMapperField()
-    {
-        return $this->mapper[$this->slug]["field"];
-    }
-
-    public function getMapperAttribute()
-    {
-        return $this->mapper[$this->slug]["attribute"];
-    }
 }

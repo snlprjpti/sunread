@@ -34,7 +34,7 @@ class AttributeTableSeeder extends Seeder
                 "is_unique" => 1,
                 "is_visible_on_storefront" => 1,
                 "comparable_on_storefront" => 1,
-                "scope" => "global"
+                "scope" => "website"
             ],
             // [
             //     "name" => "New",
@@ -211,36 +211,34 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Base Image",
                 "slug" => "base_image",
                 "type" => "multiselect",
-                "scope" => "global",
+                "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Small Image",
                 "slug" => "small_image",
                 "type" => "multiselect",
-                "scope" => "global",
+                "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Thumbnail Image",
                 "slug" => "thumbnail_image",
                 "type" => "multiselect",
-                "scope" => "global",
+                "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Color",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "is_configurable" => 1,
-                "is_user_defined" => 1
+                "is_configurable" => 1
             ],
             [
                 "name" => "Size",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "is_configurable" => 1,
-                "is_user_defined" => 1
+                "is_configurable" => 1
             ],
         ];
 
@@ -250,7 +248,7 @@ class AttributeTableSeeder extends Seeder
                 "slug" => $attribute["slug"] ?? Str::slug($attribute["name"]),
                 "name" => $attribute["name"],
                 "type" => $attribute["type"],
-                "scope" => $attribute["scope"] ?? "global",
+                "scope" => $attribute["scope"] ?? "website",
                 "validation" => $attribute["validation"] ?? null,
                 "is_required" => $attribute["is_required"] ?? 0,
                 "is_unique" => $attribute["is_unique"] ?? 0,

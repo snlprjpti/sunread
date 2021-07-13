@@ -2,19 +2,18 @@
 
 namespace Modules\User\Tests\Feature;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Modules\User\Entities\Role;
 use Modules\User\Entities\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class AccountTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected object $admin, $fake_admin;
     protected array $headers;
@@ -25,8 +24,7 @@ class AccountTest extends TestCase
         $this->model = Admin::class;
 
         parent::setUp();
-        Schema::disableForeignKeyConstraints();
-        $this->artisan("db:seed", ["--force" => true]);
+
         $this->admin = $this->createAdmin();
         $this->fake_admin = $this->model::factory()->make();
 

@@ -113,13 +113,19 @@ class CategoryController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
             ]);
 
+            $category = $this->model->findOrFail($id);
             $data = [
                 "scope" => $request->scope ?? "website", 
-                "scope_id" => $request->scope_id ?? $this->model->findOrFail($id)->website_id,
+                "scope_id" => $request->scope_id ?? $category->website_id,
                 "category_id" => $id 
             ];
 
-            $fetched = $this->repository->getConfigData($data);
+            $fetched = [];
+            $fetched = [
+                "parent_id" => $category->parent_id,
+                "website_id" => $category->website_id
+            ];
+            $fetched["attributes"] = $this->repository->getConfigData($data);
         }
         catch (Exception $exception)
         {
