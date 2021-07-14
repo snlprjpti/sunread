@@ -18,7 +18,7 @@ class CreateCatalogInventoryItemsTable extends Migration
             $table->string("adjustment_type");
 
             $table->foreign("adjusted_by")->references("id")->on("admins");
-            $table->foreign("catalog_inventory_id")->references("id")->on("catalog_inventories");
+            $table->foreign("catalog_inventory_id")->references("id")->on("catalog_inventories")->onDelete("cascade");
 
             $table->timestamps();
         });
