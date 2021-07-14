@@ -59,8 +59,8 @@ class CategoryRepository extends BaseRepository
                     
                     if($data["scope"] != "website") $element["use_default_value"] = $existData ? 0 : 1;
                     $elementValue = $existData ? $this->getValues($data) : $this->getDefaultValues($data);
-                    $elementValue = $elementValue ? $elementValue->value : null;
-                    $element["value"] = $elementValue ? (($element["type"] == "file") ? Storage::url($elementValue) : $elementValue) : null;
+                    $element["value"] = $elementValue?->value ?? null;
+                    if ($element["type"] == "file" && $element["value"]) $element["value"] = Storage::url($element["value"]);
                 }
                 unset($element["rules"]);
 
