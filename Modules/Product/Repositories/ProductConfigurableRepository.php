@@ -2,25 +2,17 @@
 
 namespace Modules\Product\Repositories;
 
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
 use Modules\Product\Entities\Product;
-use Illuminate\Support\Facades\Validator;
 use Modules\Attribute\Entities\Attribute;
 use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
-use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\AttributeOption;
-use Modules\Inventory\Entities\CatalogInventory;
-use Modules\Inventory\Jobs\LogCatalogInventoryItem;
-use Modules\Product\Entities\ProductAttribute;
-use Modules\Product\Entities\ProductImage;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Modules\Attribute\Entities\AttributeSet;
 
 class ProductConfigurableRepository extends BaseRepository
 {
@@ -39,6 +31,45 @@ class ProductConfigurableRepository extends BaseRepository
         $this->attribute = $attribute;
         $this->product_repository = $product_repository;
         $this->non_required_attributes = [ "price", "cost", "quantity_and_stock_status" ];
+        $this->asd = $this->attributeCache();
+    }
+
+    public function attributeCache(): Collection
+    {
+        try
+        {
+            if ( !Cache::has("attributes"))
+            {
+                Cache::remember("attributes", Carbon::now()->addDays(2) ,function () {
+                    return Attribute::with([ "attribute_options" ])->get();
+                });
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return Cache::get("attributes");
+    }
+
+    public function attributeOptionsCache(): Collection
+    {
+        try
+        {
+            if(!Cache::has("attribute_options"))
+            {
+                Cache::remember("attribute_options", Carbon::now()->addDays(2) ,function () {
+                    return AttributeOption::with([ "attribute" ])->get();
+                });
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return Cache::get("attribute_options");
     }
 
     public function createVariants(object $product, object $request, array $scope, array $request_attributes)
@@ -52,7 +83,7 @@ class ProductConfigurableRepository extends BaseRepository
             $super_attributes = [];
             
             foreach ($request->get("super_attributes") as $super_attribute) {
-                $attribute = Attribute::findorFail($super_attribute['attribute_id']);
+                $attribute = $this->attributeCache()->find($super_attribute['attribute_id']);
                 if ($attribute->is_user_defined == 1 && $attribute->type != "select") continue;
                 $super_attributes[$attribute->id] = $super_attribute["value"];
             }
@@ -61,7 +92,7 @@ class ProductConfigurableRepository extends BaseRepository
                 return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku"));
             })->toArray();
 
-            //generate multiple product(variant) combination on the basis of color and size for variants
+            //generate multiple product(variant) combination on the basis of color, size (super_attributes/system_define attributes) for variants
             foreach (array_permutation($super_attributes) as $permutation) {
                 $this->addVariant($product, $permutation, $request, $productAttributes, $scope);
             }
@@ -81,7 +112,7 @@ class ProductConfigurableRepository extends BaseRepository
 
         try 
         {
-            $permutation_modify = AttributeOption::whereIn('id', $permutation)->get()->pluck('name')->toArray();
+            $permutation_modify = $this->attributeOptionsCache()->whereIn('id', $permutation)->pluck('name')->toArray();
             $data = [
                 "parent_id" => $product->id,
                 "website_id" => $product->website_id,
@@ -94,12 +125,13 @@ class ProductConfigurableRepository extends BaseRepository
 
             $variant_options = collect($permutation)->map(function ($option, $key) {
                 return [
-                    "attribute_slug" => Attribute::find($key)->slug,
+                    "attribute_slug" => $this->attributeCache()->find($key)->slug,
                     "value" => $option,
-                    "value_type" => config("attribute_types")[(Attribute::findOrFail($key)->type) ?? "string"]
+                    "value_type" => config("attribute_types")[($this->attributeCache()->find($key)->type) ?? "string"]
                 ];
             })->toArray();
 
+            // create variant simple product
             $product_variant = $this->create($data, function ($variant) use ($product, $permutation_modify, $request, &$product_attributes, $productAttributes, $scope, $variant_options){    
                 
                 $product_attributes = array_merge([
