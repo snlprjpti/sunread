@@ -70,7 +70,7 @@ class ProductRepository extends BaseRepository
                 return $request_attribute["attribute_id"];
             }, $request->get("attributes"));
 
-            $request_attribute_collection = collect($request->get("attributes"));
+            $request_attribute_collection = collect($request["attributes"]);
 
             $all_product_attributes = [];
 
@@ -474,9 +474,15 @@ class ProductRepository extends BaseRepository
         if($attribute->slug == "sku") return $product->sku;
         if($attribute->slug == "status") return $product->status;
         if($attribute->slug == "category_ids") return $product->categories()->pluck('category_id')->toArray();
-        if($attribute->slug == "base_image") return $product->images()->where('main_image', 1)->pluck('path')->toArray();
-        if($attribute->slug == "small_image") return $product->images()->where('small_image', 1)->pluck('path')->toArray();
-        if($attribute->slug == "thumbnail_image") return $product->images()->where('thumbnail', 1)->pluck('path')->toArray();
+        if($attribute->slug == "base_image") return $product->images()->where('main_image', 1)->pluck('path')->map(function ($base_image) {
+            return Storage::url($base_image);
+        })->toArray();
+        if($attribute->slug == "small_image") return $product->images()->where('small_image', 1)->pluck('path')->map(function ($small_image) {
+            return Storage::url($small_image);
+        })->toArray();
+        if($attribute->slug == "thumbnail_image") return $product->images()->where('thumbnail', 1)->pluck('path')->map(function ($thumbnail) {
+            return Storage::url($thumbnail);
+        })->toArray();
         if($attribute->slug == "quantity_and_stock_status") return ($data = $product->catalog_inventories()->first()) ? $data->is_in_stock : null;
     }
 
