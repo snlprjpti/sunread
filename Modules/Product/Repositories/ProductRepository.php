@@ -2,8 +2,10 @@
 
 namespace Modules\Product\Repositories;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -53,14 +55,33 @@ class ProductRepository extends BaseRepository
             "thumbnail_image" => "thumbnail_image"
         ];
         $this->non_required_attributes = [ "price", "cost", "quantity_and_stock_status" ];
+    }
 
+    public function attributeSetCache()
+    {
+        try
+        {
+            if (!Cache::has("attributes_attribute_set"))
+            {
+                Cache::remember("attributes_attribute_set", Carbon::now()->addDays(2) ,function () {
+                    return AttributeSet::with([ "attribute_groups.attributes" ])->get();
+                });
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return Cache::get("attributes_attribute_set");
     }
 
     public function validateAttributes(object $product, object $request, array $scope, ?string $product_type = null): array
     {
         try
         {
-            $attribute_set = AttributeSet::whereId($product->attribute_set_id)->firstOrFail();
+            $attribute_set = $this->attributeSetCache()->where("id", 1)->first();
+            // $attribute_set = AttributeSet::whereId($product->attribute_set_id)->firstOrFail();
             
             $attributes = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes;

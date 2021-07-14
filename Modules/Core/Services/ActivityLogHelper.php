@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Services;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Modules\Attribute\Entities\AttributeSet;
@@ -32,7 +33,9 @@ class ActivityLogHelper {
         $properties = [];
 
         if($model_name == "ReviewVote") $this->reviewVoteCache($model);
-        
+
+        if ($model_name == "Attribute" || $model_name == "AttributeSet") $this->attributeCache($model);
+
         if(Cache::get($model::class)) $this->modelCache($model);
 
         if ( $event == "updated" ) {
@@ -76,6 +79,14 @@ class ActivityLogHelper {
         Cache::forget('negative_vote_count-'.$model->review_id);
         Cache::rememberForever('negative_vote_count-'.$model->review_id, function() use($model){
             return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 1)->count();
+        });
+    }
+
+    public function attributeCache($model): void
+    {
+        Cache::forget("attributes_attribute_set");
+        Cache::remember("attributes_attribute_set", Carbon::now()->addDays(2), function () {
+            return AttributeSet::with([ "attribute_groups.attributes" ])->get();     
         });
     }
 
