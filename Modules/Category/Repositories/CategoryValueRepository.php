@@ -54,7 +54,9 @@ class CategoryValueRepository
                 if($this->scopeFilter($match["scope"], $configDataArray["scope"])) continue;
                 
                 $match["attribute"] = $key;
-                $match["value"] = isset($val["value"]) ? (($configDataArray["type"] == "file" ) ? $this->repository->storeScopeImage($val["value"], "configuration") : $val["value"]) : null;
+                
+                $value = $val["value"] ?? null;
+                $match["value"] = ($configDataArray["type"] == "file" && $value) ? $this->repository->storeScopeImage($value, "category") : $value;
 
                 if($configData = $this->checkCondition($match)->first())
                 {
