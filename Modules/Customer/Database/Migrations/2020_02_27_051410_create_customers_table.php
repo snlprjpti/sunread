@@ -16,15 +16,20 @@ class CreateCustomersTable extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('first_name');
+            $table->string('middle_name')->nullable();
             $table->string('last_name')->nullable();
+            $table->string('email');
             $table->string('gender')->nullable();
             $table->date('date_of_birth')->nullable();
-            $table->string('email')->unique();
             $table->tinyInteger('status')->default(1);
+            $table->tinyInteger('is_lock')->default(0);
             $table->string('password');
             $table->string('profile_image')->nullable();
+            $table->string('tax_number')->nullable();
+
             $table->bigInteger('customer_group_id')->unsigned()->nullable();
             $table->foreign('customer_group_id')->references('id')->on('customer_groups')->onDelete('set null');
+
             $table->boolean('subscribed_to_news_letter')->default(0);
             $table->rememberToken();
             $table->timestamps();

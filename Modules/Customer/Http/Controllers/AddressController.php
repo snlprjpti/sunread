@@ -57,6 +57,14 @@ class AddressController extends BaseController
             $customer = Customer::findOrFail($customer_id);
             $data = $this->repository->validateData($request);
             $data["customer_id"] = $customer->id;
+            if($data["default_billing_address"] == 1 || $data["default_shipping_address"] == 1)
+            {
+                $customer->addresses->map(function ($item) use ($data) {
+                    if($data["default_billing_address"] == 1) $item->default_billing_address = 0;
+                    if($data["default_shipping_address"] == 1) $item->default_shipping_address = 0;
+                    $item->save();
+                });
+            }
             $created = $this->repository->create($data);
         }
         catch (Exception $exception)
@@ -86,12 +94,19 @@ class AddressController extends BaseController
     public function update(Request $request, int $customer_id, int $address_id): JsonResponse
     {
         try {
-            Customer::with("addresses")
-                ->findOrFail($customer_id)
-                ->addresses()
-                ->findOrFail($address_id);
+            $customer = Customer::findOrFail($customer_id);
 
             $data = $this->repository->validateData($request);
+
+            if($data["default_billing_address"] == 1 || $data["default_shipping_address"] == 1)
+            {
+                $customer->addresses->map(function ($item) use ($data) {
+                    if($data["default_billing_address"] == 1) $item->default_billing_address = 0;
+                    if($data["default_shipping_address"] == 1) $item->default_shipping_address = 0;
+                    $item->save();
+                });
+            }
+
             $updated = $this->repository->update($data, $address_id);
         }
         catch (Exception $exception)

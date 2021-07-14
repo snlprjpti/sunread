@@ -13,14 +13,22 @@ class CustomerAddressRepository extends BaseRepository
         $this->model_key = "customers.addresses";
 
         $this->rules = [
+            "first_name" => "required|min:2|max:200",
+            "middle_name" => "sometimes|min:2|max:200",
+            "last_name" => "required|min:2|max:200",
+
             "address1" => "required|min:2|max:500",
             "address2" => "sometimes",
-            "country" => "required",
-            "state" => "required",
-            "city" => "required",
+            "address3" => "sometimes",
+
+            "country_id" => "required|exists:countries,id",
+            "region_id" => "required|exists:regions,id",
+            "city_id" => "required|exists:cities,id",
             "postcode" => "required",
             "phone" => "required",
-            "default_address" => "sometimes|boolean"
+            "vat_number" => "sometimes",
+            "default_billing_address" => "sometimes|boolean",
+            "default_shipping_address" => "sometimes|boolean"
         ];
     }
 }
