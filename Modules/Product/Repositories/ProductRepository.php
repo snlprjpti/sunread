@@ -67,13 +67,24 @@ class ProductRepository extends BaseRepository
                     return AttributeSet::with([ "attribute_groups.attributes" ])->get();
                 });
             }
+            elseif(Cache::has("attributes_attribute_set"))
+            {
+                if ( Cache::get("attributes_attribute_set")->first()->attribute_groups->count() <= 0)
+                {
+                    Cache::forget("attributes_attribute_set");
+                    Cache::remember("attributes_attribute_set", Carbon::now()->addDays(2) ,function () {
+                        return AttributeSet::with([ "attribute_groups.attributes" ])->get();
+                    }); 
+                }
+            }
+
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
         
-        return Cache::get("attributes_attribute_set");
+        return Cache::get("attributes_attribute_set");;
     }
 
     public function validateAttributes(object $product, object $request, array $scope, ?string $product_type = null): array
@@ -81,8 +92,6 @@ class ProductRepository extends BaseRepository
         try
         {
             $attribute_set = $this->attributeSetCache()->where("id", 1)->first();
-            // $attribute_set = AttributeSet::whereId($product->attribute_set_id)->firstOrFail();
-            
             $attributes = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes;
             })->first();
