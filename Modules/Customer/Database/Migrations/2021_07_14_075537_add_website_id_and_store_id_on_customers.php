@@ -14,11 +14,11 @@ class AddWebsiteIdAndStoreIdOnCustomers extends Migration
     public function up()
     {
         Schema::table('customers', function (Blueprint $table) {
-            $table->unsignedBigInteger('website_id');
-            $table->foreign('website_id')->references('id')->on('websites')->onDelete('cascade');
+            $table->unsignedBigInteger('website_id')->nullable();
+            $table->foreign('website_id')->references('id')->on('websites')->onDelete("set null");
 
             $table->unsignedBigInteger('store_id')->nullable();
-            $table->foreign('store_id')->references('id')->on('stores')->onDelete('cascade');
+            $table->foreign('store_id')->references('id')->on('stores')->onDelete("set null");
 
             $table->unique([ "email", "website_id" ], 'customer_email_unique');
         });
