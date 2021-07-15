@@ -32,7 +32,7 @@ class CustomerAddressRepository extends BaseRepository
         ];
     }
 
-    public function regionAndCityValidation(object $request): array
+    public function regionAndCityRules(object $request): array
     {
         return [
             "region_id" => "sometimes|nullable|exists:regions,id,country_id,{$request->country_id}",
@@ -40,13 +40,13 @@ class CustomerAddressRepository extends BaseRepository
         ];
     }
 
-    public function unsetOtherAddresses(object $parent, array $data): void
+    public function unsetOtherAddresses(object $customer, int $address_id): void
     {
-        if($data["default_billing_address"] == 1) $parent->customer->addresses()->where("id", "<>", $parent->id)->update([
+        if(isset($data["default_billing_address"]) && $data["default_billing_address"] == 1) $customer->addresses()->where("id", "<>", $address_id)->update([
             "default_billing_address" => 0
         ]);
 
-        if($data["default_shipping_address"] == 1) $parent->customer->addresses()->where("id", "<>", $parent->id)->update([
+        if(isset($data["default_shipping_address"]) && $data["default_shipping_address"] == 1) $customer->addresses()->where("id", "<>", $address_id)->update([
             "default_shipping_address" => 0
         ]);
     }

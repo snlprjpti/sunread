@@ -54,14 +54,14 @@ class AddressController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityValidation($request), function () use($customer_id) {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use($customer_id) {
                 return [
                     "customer_id" => Customer::findOrFail($customer_id)->id
                 ];
             });
 
-            $created = $this->repository->create($data, function($created) use($data) {
-                $this->repository->unsetOtherAddresses($created, $data);
+            $created = $this->repository->create($data, function($created) {
+                $this->repository->unsetOtherAddresses($created->customer, $created->id);
             });
         }
         catch (Exception $exception)
@@ -92,14 +92,14 @@ class AddressController extends BaseController
     {
         try {
 
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityValidation($request), function () use($customer_id) {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use($customer_id) {
                 return [
                     "customer_id" => $customer_id
                 ];
             });
 
-            $updated = $this->repository->update($data, $address_id, function($updated) use($data) {
-                $this->repository->unsetOtherAddresses($updated, $data);
+            $updated = $this->repository->update($data, $address_id, function($updated) {
+                $this->repository->unsetOtherAddresses($updated->customer, $updated->id);
             });
         }
         catch (Exception $exception)
@@ -144,13 +144,7 @@ class AddressController extends BaseController
             $fetched->fill($data);
             $fetched->save();
             
-            if(isset($data["default_billing_address"]) && $data["default_billing_address"] == 1) $customer->addresses()->where("id", "<>", $address_id)->update([
-                "default_billing_address" => 0
-            ]);
-
-            if(isset($data["default_shipping_address"]) && $data["default_shipping_address"] == 1) $customer->addresses()->where("id", "<>", $address_id)->update([
-                "default_shipping_address" => 0
-            ]);
+            $this->repository->unsetOtherAddresses($customer, $address_id);
         }
         catch (Exception $exception)
         {

@@ -13,6 +13,7 @@ use Modules\Customer\Repositories\CustomerRepository;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Modules\Customer\Transformers\CustomerAddressResource;
 
 class CustomerController extends BaseController
 {
@@ -160,8 +161,9 @@ class CustomerController extends BaseController
                 "Account Created in" =>	$data->store->name,
                 "Customer Group" => $data->group->name
             ];
-            
-            $fetched["default_billing_address"] = new CustomerResource($data->addresses()->whereDefaultBillingAddress(1)->first());
+
+            $address = $data->addresses()->whereDefaultBillingAddress(1)->first();
+            if($address) $fetched["default_billing_address"] = new CustomerAddressResource($address);
         }
         catch (Exception $exception)
         {
