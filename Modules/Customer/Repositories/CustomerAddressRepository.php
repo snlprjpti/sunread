@@ -22,8 +22,8 @@ class CustomerAddressRepository extends BaseRepository
             "address3" => "sometimes",
 
             "country_id" => "required|exists:countries,id",
-            "region_id" => "required|exists:regions,id",
-            "city_id" => "required|exists:cities,id",
+            "region_id" => "sometimes|nullable|exists:regions,id",
+            "city_id" => "sometimes|nullable|exists:cities,id",
             "postcode" => "required",
             "phone" => "required",
             "vat_number" => "sometimes",

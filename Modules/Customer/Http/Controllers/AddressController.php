@@ -56,8 +56,8 @@ class AddressController extends BaseController
         {
             $customer = Customer::findOrFail($customer_id);
             $data = $this->repository->validateData($request, [
-                "region_id" => "required|exists:regions,id,country_id,{$request->country_id}",
-                "city_id" => "required|exists:cities,id,region_id,{$request->region_id}",
+                "region_id" => "sometimes|nullable|exists:regions,id,country_id,{$request->country_id}",
+                "city_id" => "sometimes|nullable|exists:cities,id,region_id,{$request->region_id}",
             ], function () use($customer) {
                 return [
                     "customer_id" => $customer->id
@@ -104,8 +104,8 @@ class AddressController extends BaseController
             $customer = Customer::findOrFail($customer_id);
 
             $data = $this->repository->validateData($request, [
-                "region_id" => "required|exists:regions,id,country_id,{$request->country_id}",
-                "city_id" => "required|exists:cities,id,region_id,{$request->region_id}",
+                "region_id" => "sometimes|nullable|exists:regions,id,country_id,{$request->country_id}",
+                "city_id" => "sometimes|nullable|exists:cities,id,region_id,{$request->region_id}",
             ], function () use($customer) {
                 return [
                     "customer_id" => $customer->id
