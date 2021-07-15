@@ -30,6 +30,7 @@ class CustomerResource extends JsonResource
             "tax_number" => $this->tax_number,
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,
             "status" => (bool) $this->status,
+            "is_lock" => (bool) $this->is_lock,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
