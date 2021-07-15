@@ -3,11 +3,8 @@
 namespace Modules\Product\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttribute;
-use Modules\Attribute\Entities\AttributeSet;
-use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Attribute\Entities\Attribute;
 
 class ProductTableSeeder extends Seeder
@@ -35,6 +32,7 @@ class ProductTableSeeder extends Seeder
                     "attribute_set_id" => 1,
                     "sku" => "dell-laptop",
                     "type" => "simple",
+                    "website_id" => 1,
                     "created_at" => now(),
                     "updated_at" => now()
                 ]);
