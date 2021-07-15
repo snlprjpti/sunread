@@ -37,7 +37,8 @@ class ProductRepository extends BaseRepository
             "parent_id" => "sometimes|nullable|exists:products,id",
             "brand_id" => "sometimes|nullable|exists:brands,id",
             "attributes" => "required|array",
-            "scope" => "sometimes|in:website,channel,store"
+            "scope" => "sometimes|in:website,channel,store",
+            "website_id" => "required|exists:websites,id"
         ];
 
         $this->attribute_set_repository = $attribute_set_repository;
@@ -508,6 +509,77 @@ class ProductRepository extends BaseRepository
             return Storage::url($thumbnail);
         })->toArray();
         if($attribute->slug == "quantity_and_stock_status") return ($data = $product->catalog_inventories()->first()) ? $data->is_in_stock : null;
+    }
+
+    public function getFilterProducts(object $request): mixed
+    {
+        try
+        {
+            $product = Product::query();
+
+            if (isset($request["filter"]))
+            {
+                $validator = Validator::make( $request["filter"], [
+                    "product_name" => "sometimes|string",
+                    "sku" => "sometimes|string",
+                    "attribute_set_id" => "sometimes|exists:attribute_sets,id",
+                    "status" => "sometimes|boolean",
+                    "visibility" => "sometimes",
+                    "type" => "sometimes|in:simple,configurable"
+                ]);
+    
+                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
+            }
+
+            if (isset($request["filter"]["product_name"]))
+            {
+                $product_attributes = ProductAttribute::whereAttributeId(1)
+                ->whereScope($request->scope ?? "website")
+                ->whereScopeId($request->scope_id ?? 1)
+                ->get();
+
+                $product_ids = [];
+                foreach ( $product_attributes as $product_attribute )
+                {
+                    $value = $product_attribute->value()->query();
+                    $matched = $value->whereLike("value", $request["filter"]["product_name"])->get();
+                    if(count($matched) > 0) $product_ids[] = $product_attribute->product()->pluck("id");
+                }
+                $product = $product->whereIn("id", Arr::flatten($product_ids));
+            }
+
+            if (isset($request["filter"]["visibility"]))
+            {
+                $product_attributes = ProductAttribute::whereAttributeId(1)
+                ->whereScope($request->scope ?? "website")
+                ->whereScopeId($request->scope_id ?? 1)
+                ->get();
+
+                $product_ids = [];
+                foreach ( $product_attributes as $product_attribute )
+                {
+                    $value = $product_attribute->value()->query();
+                    $matched = $value->whereLike("value", $request["filter"]["visibility"])->get();
+                    if(count($matched) > 0) $product_ids[] = $product_attribute->product()->pluck("id"); 
+                }
+                $product = $product->whereIn("id",Arr::flatten($product_ids));
+            }
+
+            if (isset($request["filter"]["type"])) $product->where('type', $request["filter"]["type"]); 
+
+            if (isset($request["filter"]["sku"])) $product->whereLike("sku", $request["filter"]["sku"]);
+
+            if (isset($request["filter"]["attribute_set_id"])) $product->where("attribute_set_id", $request["filter"]["attribute_set_id"]);
+
+            if (isset($request["filter"]["status"])) $product->where('status',$request["filter"]["status"]);
+
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $product;
     }
 
 }
