@@ -17,19 +17,22 @@ use Modules\Core\Entities\Website;
 
 class ProductTest extends BaseTestCase
 {
-    public $default_resource;
+    public $default_resource, $filter;
     public function setUp(): void
     {
         $this->model = Product::class;
-
         parent::setUp();
         $this->admin = $this->createAdmin();
 
+        $this->filter = [
+            "website_id" => 1
+        ];
         $this->model_name = "Product";
         $this->route_prefix = "admin.catalog.products";
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
         $this->hasStatusTest = true;
+         
     }
 
     public function getCreateData(): array
@@ -106,6 +109,17 @@ class ProductTest extends BaseTestCase
     public function testShouldReturnErrorIfUpdateDataIsInvalid()
     {
         $this->markTestSkipped("Invalid Update method not available.");
+    }
+
+    public function testAdminCanFetchResources()
+    {
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
     }
 
     /**
