@@ -17,15 +17,21 @@ class CreateCustomerAddressesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name')->nullable();
+
             $table->string('address1');
             $table->string('address2')->nullable();
-            $table->string('country');
-            $table->string('state');
-            $table->string('city');
+            $table->string('address3')->nullable();
+
             $table->integer('postcode');
             $table->string('phone');
-            $table->boolean('default_address')->default(0);
-            $table->string('name')->nullable();
+            $table->string('vat_number')->nullable();
+            
+            $table->boolean('default_billing_address')->default(0);
+            $table->boolean('default_shipping_address')->default(0);
             $table->timestamps();
         });
     }

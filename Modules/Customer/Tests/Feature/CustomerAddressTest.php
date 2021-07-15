@@ -33,4 +33,19 @@ class CustomerAddressTest extends BaseTestCase
             "address1" => null
         ]);
     }
+
+    public function testAdminCanUpdateResourceWithDefaultAddress()
+    {
+        $post_data = [
+            "default_shipping_address" => 1,
+            "default_billing_address" => 1
+        ];
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("defaultAddress", [$this->default_resource_id]), $post_data);
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
+        ]);
+    }
 }

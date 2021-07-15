@@ -23,12 +23,16 @@ class CustomerRepository extends BaseRepository
 
         $this->rules = [
             "first_name" => "required|min:2|max:200",
+            "middle_name" => "sometimes|min:2|max:200",
             "last_name" => "required|min:2|max:200",
             "email" => "required|email|unique:customers,email",
             "gender" => "sometimes|in:male,female",
             "date_of_birth" => "date|before:today",
             "status" => "sometimes|boolean",
+            "is_lock" => "sometimes|boolean",
             "customer_group_id" => "nullable|exists:customer_groups,id",
+            "website_id" => "required|exists:websites,id",
+            "store_id" => "nullable|exists:stores,id",
             "subscribed_to_news_letter" => "sometimes|boolean",
             "password" => "sometimes|min:6|confirmed"
         ];
