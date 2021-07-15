@@ -53,7 +53,8 @@ class ProductController extends BaseController
         {
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)],
+                "website_id" => "required|exists:websites,id"
             ]);
             $this->validateListFiltering($request);
             $fetched = $this->getFilteredList($request, [ "categories" ], $this->repository->getFilterProducts($request));
