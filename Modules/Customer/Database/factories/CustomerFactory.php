@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Modules\Core\Entities\Website;
 use Modules\Customer\Entities\CustomerGroup;
 
 class CustomerFactory extends Factory
@@ -16,6 +17,7 @@ class CustomerFactory extends Factory
         $gender = Arr::random([ "male", "female", "other" ]);
         return [
             "customer_group_id" => CustomerGroup::factory()->create()->id,
+            "website_id" => Website::factory()->create()->id,
             "first_name" => $this->faker->firstName(),
             "last_name" => $this->faker->lastName(),
             "gender" => $gender,

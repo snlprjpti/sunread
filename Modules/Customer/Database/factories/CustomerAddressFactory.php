@@ -2,6 +2,9 @@
 namespace Modules\Customer\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Country\Entities\City;
+use Modules\Country\Entities\Country;
+use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
 
 class CustomerAddressFactory extends Factory
@@ -10,17 +13,24 @@ class CustomerAddressFactory extends Factory
 
     public function definition(): array
     {
+        $country = Country::orderBy("created_at", "desc")->first();
+        $region = Region::whereCountryId($country->id)->first();
+        $city = City::whereRegionId($region->id)->first();
+
         return [
             "customer_id" => Customer::inRandomOrder()->first()->id,
+            "first_name" => $this->faker->firstName(),
+            "last_name" => $this->faker->lastName(),
             "address1" => $this->faker->address(),
             "address2" => $this->faker->address(),
-            "country" => $this->faker->country(),
-            "state" => $this->faker->state(),
-            "city" => $this->faker->city(),
-            "postcode" => $this->faker->numerify('#####'),
+            "address3" => $this->faker->address(),
+            "country_id" => $country->id,
+            "region_id" => $region ? $region->id : null,
+            "city_id" => $city ? $city->id : null,
+            "postcode" => $this->faker->numerify("#####"),
             "phone" => $this->faker->phoneNumber(),
-            "default_address" => 1,
-            "name" => $this->faker->name(),
+            "default_billing_address" => 1,
+            "default_shipping_address" => 1
         ];
     }
 }

@@ -14,13 +14,13 @@ class AddCountryIdOnCustomerAddresses extends Migration
     public function up()
     {
         Schema::table('customer_addresses', function (Blueprint $table) {
-            $table->unsignedBigInteger('country_id');
+            $table->unsignedBigInteger('country_id')->nullable();
             $table->foreign('country_id')->references('id')->on('countries')->onDelete('cascade');
 
-            $table->unsignedBigInteger('region_id');
+            $table->unsignedBigInteger('region_id')->nullable();
             $table->foreign('region_id')->references('id')->on('regions')->onDelete('cascade');
 
-            $table->unsignedBigInteger('city_id');
+            $table->unsignedBigInteger('city_id')->nullable();
             $table->foreign('city_id')->references('id')->on('cities')->onDelete('cascade');
         });
     }
