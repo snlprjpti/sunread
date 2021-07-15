@@ -11,6 +11,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Category\Transformers\CategoryResource;
 use Modules\Category\Repositories\CategoryRepository;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Transformers\List\CategoryResource as ListCategoryResource;
 use Modules\Category\Repositories\CategoryValueRepository;
@@ -60,7 +61,7 @@ class CategoryController extends BaseController
                 "website_id" => "sometimes|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll(request: $request, callback: function () use ($request) {
-                return $this->model->whereWebsiteId($request->website_id);
+                return $this->model->whereWebsiteId($request->website_id)->orderBy("position", "asc");
             })->toTree();
         }
         catch (Exception $exception)
@@ -218,5 +219,28 @@ class CategoryController extends BaseController
         }
 
         return $this->successResponse($fetched, $this->lang("fetch-success"));
+    }
+
+    public function updatePosition(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            DB::beginTransaction();
+            $data = $request->validate([
+                "parent_id" => "nullable|numeric|exists:categories,id",
+                "position" => "required|numeric"
+            ]);
+            $category = $this->model->findOrFail($id);
+            $fetched = $category->update($data);
+
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            return $this->handleException($exception);
+        }
+
+        DB::commit();
+        return $this->successResponse($this->resource($category), $this->lang("update-success"));
     }
 }

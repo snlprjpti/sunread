@@ -24,7 +24,8 @@ class CategoryResource extends JsonResource
             "id" => $this->id,
             "slug" => $slugValue ? $slugValue->value : null,
             "name" => $nameValue ? $nameValue->value : null,
-            "children" => CategoryResource::collection($this->children)
+            "position" => $this->position,
+            "children" => CategoryResource::collection($this->children->sortBy('position'))
         ];
     }
 }
