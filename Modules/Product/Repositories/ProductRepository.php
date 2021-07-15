@@ -515,7 +515,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $product = Product::query();
+            $product = Product::whereWebsiteId($request->website_id);
 
             if (isset($request["filter"]))
             {
@@ -535,7 +535,7 @@ class ProductRepository extends BaseRepository
             {
                 $product_attributes = ProductAttribute::whereAttributeId(1)
                 ->whereScope($request->scope ?? "website")
-                ->whereScopeId($request->scope_id ?? 1)
+                ->whereScopeId($request->scope_id ?? $request->website_id)
                 ->get();
 
                 $product_ids = [];
@@ -552,17 +552,17 @@ class ProductRepository extends BaseRepository
             {
                 $product_attributes = ProductAttribute::whereAttributeId(1)
                 ->whereScope($request->scope ?? "website")
-                ->whereScopeId($request->scope_id ?? 1)
+                ->whereScopeId($request->scope_id ?? $request->website_id)
                 ->get();
 
                 $product_ids = [];
                 foreach ( $product_attributes as $product_attribute )
                 {
                     $value = $product_attribute->value()->query();
-                    $matched = $value->whereLike("value", $request["filter"]["visibility"])->get();
+                    $matched = $value->where("value", $request["filter"]["visibility"])->get();
                     if(count($matched) > 0) $product_ids[] = $product_attribute->product()->pluck("id"); 
                 }
-                $product = $product->whereIn("id",Arr::flatten($product_ids));
+                $product = $product->whereIn("id", Arr::flatten($product_ids));
             }
 
             if (isset($request["filter"]["type"])) $product->where('type', $request["filter"]["type"]); 
