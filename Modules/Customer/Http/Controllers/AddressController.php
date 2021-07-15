@@ -150,25 +150,32 @@ class AddressController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
-    public function updateAddress(int $customer_id, int $address_id, int $address_type)
+    public function updateAddress(Request $request, int $customer_id, int $address_id)
     {
         try
         {
-            $fetched = Customer::with("addresses")
-                ->findOrFail($customer_id)
-                ->addresses()
-                ->findOrFail($address_id);
+            $data = $request->validate([
+                "default_billing_address" => "required_without:default_shipping_address|in:1",
+                "default_shipping_address" => "required_without:default_billing_address|in:1",
+            ]);
 
-            if($address_type == 1) $fetched->default_billing_address = 1;
-            if($address_type == 2) $fetched->default_shipping_address = 1;
+            $customer = Customer::with("addresses")->findOrFail($customer_id);
+
+            $fetched = $customer->addresses()->findOrFail($address_id);
             
-            $fetched->save();
+            $customer->addresses->map(function ($item) use ($data) {
+                if(isset($data["default_billing_address"])) $item->default_billing_address = 0;
+                if(isset($data["default_shipping_address"])) $item->default_shipping_address = 0;
+                $item->save();
+            });
+            
+            $fetched->update($data);
 
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('update-success'));
     }
 }
