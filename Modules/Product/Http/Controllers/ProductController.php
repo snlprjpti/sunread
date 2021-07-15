@@ -56,7 +56,7 @@ class ProductController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
             ]);
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, [ "categories" ]);
+            $fetched = $this->getFilteredList($request, [ "categories" ], $this->repository->getFilterProducts($request));
         }
         catch( Exception $exception )
         {
