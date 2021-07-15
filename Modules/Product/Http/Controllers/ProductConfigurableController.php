@@ -104,13 +104,15 @@ class ProductConfigurableController extends BaseController
                 "scope_id" => $data["scope_id"]
             ];
 
-            $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
+            $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope) {
                 $attributes = $this->product_repository->validateAttributes($updated, $request, $scope, "configurable");
                 $this->product_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
 
                 $updated->channels()->sync($request->get("channels"));
 
                 $this->repository->createVariants($updated, $request, $scope, $attributes);
+
+                $updated->load("variants");
             });
         }
         catch(Exception $exception)
