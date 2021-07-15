@@ -13,9 +13,9 @@ class CustomerAddressFactory extends Factory
 
     public function definition(): array
     {
-        $country = Country::orderBy("created_at", "desc")->first();
-        $region = $country ? Region::whereCountryId($country->id)->first() : null;
-        $city = $region ? City::whereRegionId($region->id)->first() : null;
+        $country = Country::latest()->first();
+        $region = $country?->regions()->first();
+        $city = $region?->cities()->first();
 
         return [
             "customer_id" => Customer::inRandomOrder()->first()->id,
@@ -25,8 +25,8 @@ class CustomerAddressFactory extends Factory
             "address2" => $this->faker->address(),
             "address3" => $this->faker->address(),
             "country_id" => $country->id,
-            "region_id" => $region ? $region->id : null,
-            "city_id" => $city ? $city->id : null,
+            "region_id" => $region?->id,
+            "city_id" => $city?->id,
             "postcode" => $this->faker->numerify("#####"),
             "phone" => $this->faker->phoneNumber(),
             "default_billing_address" => 1,
