@@ -2,6 +2,10 @@
 
 namespace Modules\Customer\Repositories;
 
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
 
@@ -40,14 +44,54 @@ class CustomerAddressRepository extends BaseRepository
         ];
     }
 
-    public function unsetOtherAddresses(object $customer, int $address_id): void
+    public function unsetDefaultAddresses(array $data, int $customer_id, int $address_id): void
     {
-        if(isset($data["default_billing_address"]) && $data["default_billing_address"] == 1) $customer->addresses()->where("id", "<>", $address_id)->update([
-            "default_billing_address" => 0
-        ]);
+        DB::beginTransaction();
+        
+        try
+        {
+            $customer = Customer::findOrFail($customer_id);
 
-        if(isset($data["default_shipping_address"]) && $data["default_shipping_address"] == 1) $customer->addresses()->where("id", "<>", $address_id)->update([
-            "default_shipping_address" => 0
-        ]);
+            foreach (["default_billing_address", "default_shipping_address"] as $address_type) {
+                if ( !isset($data[$address_type]) ) continue;
+                if ( $data[$address_type] != 1 ) continue;
+
+                $customer->addresses()->where("id", "<>", $address_id)->update([
+                    $address_type => 0
+                ]);
+            }
+        }
+        catch(Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
+    }
+
+    public function updateDefaultAddress(array $data, int $customer_id, int $address_id, ?callable $callback = null): object
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.updated-default.before");
+
+        try
+        {
+            $updated = $this->model::whereCustomerId($customer_id)->whereId($address_id)->firstOrFail();
+            $updated->fill($data);
+            $updated->save();
+
+            if ($callback) $callback($updated);
+        }
+        catch(Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }        
+
+        Event::dispatch("{$this->model_key}.updated-default.after", $updated);
+        DB::commit();
+
+        return $updated;
     }
 }

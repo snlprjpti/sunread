@@ -64,4 +64,14 @@ class Customer extends Authenticatable implements  JWTSubject
     {
         $this->notify(new CustomerResetPassword($token));
     }
+
+    public function getDefaultBillingAddressAttribute(): ?object
+    {
+        return $this->addresses->where("default_billing_address", 1)->first();
+    }
+
+    public function getDefaultShippingAddressAttribute(): ?object
+    {
+        return $this->addresses->where("default_shipping_address", 1)->first();
+    }
 }

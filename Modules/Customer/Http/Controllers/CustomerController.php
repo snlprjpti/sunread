@@ -14,6 +14,7 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Modules\Customer\Transformers\CustomerAddressResource;
+use Modules\Customer\Transformers\CustomerViewResource;
 
 class CustomerController extends BaseController
 {
@@ -152,24 +153,13 @@ class CustomerController extends BaseController
     {
         try
         {
-            $data = $this->repository->fetch($id, [ "group", "website", "store" ]);
-            $fetched["personal_info"] = [
-                "Last Logged In" => "",
-                "Account Lock" => $data->is_lock,	
-                "Confirmed email" => "",
-                "Account Created" => $data->created_at->format('M d, Y H:i A'),
-                "Account Created in" =>	$data->store->name,
-                "Customer Group" => $data->group->name
-            ];
-
-            $address = $data->addresses()->whereDefaultBillingAddress(1)->first();
-            if($address) $fetched["default_billing_address"] = new CustomerAddressResource($address);
+            $fetched = $this->repository->fetch($id, [ "group", "store", "addresses" ]);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang("fetch-success"));
+        return $this->successResponse(new CustomerViewResource($fetched), $this->lang("fetch-success"));
     }
 }
