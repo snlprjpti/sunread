@@ -30,13 +30,15 @@ class ProductTableSeeder extends Seeder
         ];
         
         $product = Product::withoutSyncingToSearch(function () {
-            return Product::create([
-                "attribute_set_id" => 1,
-                "sku" => "dell-laptop",
-                "type" => "simple",
-                "created_at" => now(),
-                "updated_at" => now()
-            ]);
+            return Product::withoutEvents( function () {
+                return Product::create([
+                    "attribute_set_id" => 1,
+                    "sku" => "dell-laptop",
+                    "type" => "simple",
+                    "created_at" => now(),
+                    "updated_at" => now()
+                ]);
+            });
         });
 
         foreach($attributes as $attributeData)

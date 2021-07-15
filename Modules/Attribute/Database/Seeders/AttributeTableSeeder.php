@@ -263,7 +263,9 @@ class AttributeTableSeeder extends Seeder
                 "default_value" => $default_value
             ];
 
-            $attribute_data = Attribute::create($attribute_array);
+            $attribute_data = Attribute::withoutEvents( function () use ($attribute_array) {
+                return Attribute::create($attribute_array);
+            });
 
             AttributeTranslation::create([
                 "store_id" => 1,
@@ -276,12 +278,14 @@ class AttributeTableSeeder extends Seeder
                 $count = 0;
                 array_map(function($attribute_option) use($attribute_data, $attribute, $count) {
                     global $count;
-                    AttributeOption::create([
-                        "attribute_id" => $attribute_data->id,
-                        "name" => $attribute_option,
-                        "position" => ++$count,
-                        "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0
-                    ]);
+                    AttributeOption::withoutEvents( function () use ( $attribute_data, $count, $attribute_option, $attribute ) {
+                        AttributeOption::create([
+                            "attribute_id" => $attribute_data->id,
+                            "name" => $attribute_option,
+                            "position" => ++$count,
+                            "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0
+                        ]);
+                    });
                 }, $attribute["options"]);
             }
 
