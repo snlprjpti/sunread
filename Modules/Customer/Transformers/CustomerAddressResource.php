@@ -20,7 +20,10 @@ class CustomerAddressResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "name" => $this->name,
+            "full_name" => $this->name,
+            "first_name" => $this->first_name,
+            "middle_name" => $this->middle_name,
+            "last_name" => $this->last_name,
             "address1" => $this->address1,
             "address2" => $this->address2,
             "address3" => $this->address3,
@@ -30,8 +33,8 @@ class CustomerAddressResource extends JsonResource
             "postcode" => $this->postcode,
             "phone" => $this->phone,
             "vat_number" => $this->vat_number,
-            "default_billing_address" => $this->default_billing_address,
-            "default_shipping_address" => $this->default_shipping_address,
+            "default_billing_address" => (bool) $this->default_billing_address,
+            "default_shipping_address" => (bool) $this->default_shipping_address,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }

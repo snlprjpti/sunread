@@ -19,7 +19,10 @@ class CustomerResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "name" => $this->name,
+            "full_name" => $this->name,
+            "first_name" => $this->first_name,
+            "middle_name" => $this->middle_name,
+            "last_name" => $this->last_name,
             "email" => $this->email,
             "group" => new CustomerGroupResource($this->whenLoaded('group')),
             "website" => new WebsiteResource($this->whenLoaded('website')),
