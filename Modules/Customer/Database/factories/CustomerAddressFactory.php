@@ -24,7 +24,7 @@ class CustomerAddressFactory extends Factory
             "address1" => $this->faker->address(),
             "address2" => $this->faker->address(),
             "address3" => $this->faker->address(),
-            "country_id" => $country->id,
+            "country_id" => $country?->id,
             "region_id" => $region?->id,
             "city_id" => $city?->id,
             "postcode" => $this->faker->numerify("#####"),
