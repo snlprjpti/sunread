@@ -42,13 +42,12 @@ class CustomerAddressRepository extends BaseRepository
 
     public function unsetOtherAddresses(object $parent, array $data): void
     {
-        if($data["default_billing_address"] == 1 || $data["default_shipping_address"] == 1)
-        {
-            $parent->customer->addresses->where("id", "!=", $parent->id)->map(function ($item) use ($data) {
-                if($data["default_billing_address"] == 1) $item->default_billing_address = 0;
-                if($data["default_shipping_address"] == 1) $item->default_shipping_address = 0;
-                $item->save();
-            });
-        }
+        if($data["default_billing_address"] == 1) $parent->customer->addresses()->where("id", "<>", $parent->id)->update([
+            "default_billing_address" => 0
+        ]);
+
+        if($data["default_shipping_address"] == 1) $parent->customer->addresses()->where("id", "<>", $parent->id)->update([
+            "default_shipping_address" => 0
+        ]);
     }
 }

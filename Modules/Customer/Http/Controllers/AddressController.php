@@ -141,15 +141,16 @@ class AddressController extends BaseController
             $customer = Customer::with("addresses")->findOrFail($customer_id);
 
             $fetched = $customer->addresses()->findOrFail($address_id);
+            $fetched->fill($data);
+            $fetched->save();
             
-            $customer->addresses->map(function ($item) use ($data) {
-                if(isset($data["default_billing_address"])) $item->default_billing_address = 0;
-                if(isset($data["default_shipping_address"])) $item->default_shipping_address = 0;
-                $item->save();
-            });
-            
-            $fetched->update($data);
+            if(isset($data["default_billing_address"]) && $data["default_billing_address"] == 1) $customer->addresses()->where("id", "<>", $address_id)->update([
+                "default_billing_address" => 0
+            ]);
 
+            if(isset($data["default_shipping_address"]) && $data["default_shipping_address"] == 1) $customer->addresses()->where("id", "<>", $address_id)->update([
+                "default_shipping_address" => 0
+            ]);
         }
         catch (Exception $exception)
         {
