@@ -149,4 +149,26 @@ class AddressController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
+
+    public function updateAddress(int $customer_id, int $address_id, int $address_type)
+    {
+        try
+        {
+            $fetched = Customer::with("addresses")
+                ->findOrFail($customer_id)
+                ->addresses()
+                ->findOrFail($address_id);
+
+            if($address_type == 1) $fetched->default_billing_address = 1;
+            if($address_type == 2) $fetched->default_shipping_address = 1;
+            
+            $fetched->save();
+
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
 }
