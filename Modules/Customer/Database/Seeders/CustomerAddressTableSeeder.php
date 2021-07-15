@@ -5,17 +5,28 @@ namespace Modules\Customer\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Modules\Customer\Entities\Customer;
-use Modules\Customer\Entities\CustomerAddress;
 
 class CustomerAddressTableSeeder extends Seeder
 {
     public function run(): void
     {
-        // DB::table("customer_addresses")->insert(
-        //     array_merge(CustomerAddress::factory()->make([
-        //         "customer_id" => Customer::latest("id")->first()->id,
-        //     ])->toArray(), ["created_at" => now(),
-        //     "updated_at" => now()])
-        // );
+        DB::table("customer_addresses")->insert(
+            [
+                "customer_id" => Customer::inRandomOrder()->first()->id,
+                "first_name" => "John",
+                "middle_name" => "Nic",
+                "last_name" => "Doe",
+                "address1" => "Tmerico",
+                "country_id" => null,
+                "region_id" => null,
+                "city_id" => null,
+                "postcode" => "12345",
+                "phone" => "987654321",
+                "default_billing_address" => 1,
+                "default_shipping_address" => 1,
+                "created_at" => now(),
+                "updated_at" => now()
+            ]
+        );
     }
 }
