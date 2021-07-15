@@ -161,17 +161,7 @@ class CustomerController extends BaseController
                 "Customer Group" => $data->group->name
             ];
             
-            $address = $data->addresses()->whereDefaultBillingAddress(1)->first();
-            if($address) $fetched["default_billing_address"] = [
-                "name" => $address->name,
-                "address1" => $address->address1,
-                "country" => $address->country?->name ?? null,
-                "region" => $address->region?->name ?? null,
-                "city" => $address->city?->name ?? null,
-                "postcode" => $address->postcode,
-                "phone" => $address->phone,
-                "vat_number" => $address->vat_number,
-            ];
+            $fetched["default_billing_address"] = new CustomerResource($data->addresses()->whereDefaultBillingAddress(1)->first());
         }
         catch (Exception $exception)
         {
