@@ -67,35 +67,27 @@ class ProductRepository extends BaseRepository
                     return AttributeSet::with([ "attribute_groups.attributes" ])->get();
                 });
             }
-            elseif(Cache::has("attributes_attribute_set"))
-            {
-                if ( Cache::get("attributes_attribute_set")->first()->attribute_groups->count() <= 0)
-                {
-                    Cache::forget("attributes_attribute_set");
-                    Cache::remember("attributes_attribute_set", Carbon::now()->addDays(2) ,function () {
-                        return AttributeSet::with([ "attribute_groups.attributes" ])->get();
-                    }); 
-                }
-            }
-
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
         
-        return Cache::get("attributes_attribute_set");;
+        return Cache::get("attributes_attribute_set");
     }
 
     public function validateAttributes(object $product, object $request, array $scope, ?string $product_type = null): array
     {
         try
         {
+
             $attribute_set = $this->attributeSetCache()->where("id", 1)->first();
+
             $attributes = $attribute_set->attribute_groups->map(function($attributeGroup){
                 return $attributeGroup->attributes;
             })->first();
 
+            // get all request attribute id
             $request_attribute_ids = array_map( function ($request_attribute) {
                 return $request_attribute["attribute_id"];
             }, $request->get("attributes"));
@@ -153,6 +145,7 @@ class ProductRepository extends BaseRepository
 
                 if( in_array($attribute["attribute_slug"], $this->attributeMapperSlug) )
                 {
+                    // store mapped attributes on respective function. ( sku, categories.)
                     $function_name = $this->functionMapper[$attribute["attribute_slug"]];
                     $this->$function_name($product, $request, $method, $attribute["value"]);
                     continue;
@@ -164,6 +157,7 @@ class ProductRepository extends BaseRepository
                     "scope_id" => $scope["scope_id"],
                     "attribute_id" => Attribute::whereSlug($attribute['attribute_slug'])->first()->id
                 ];
+
                 if(isset($attribute["use_default_value"]) && $attribute["use_default_value"] == 1)
                 {
                     $product_attribute = ProductAttribute::where($match)->first();
@@ -179,7 +173,7 @@ class ProductRepository extends BaseRepository
                     });
                     continue;
                 }
-    
+                // store attribute value on attribute type table
                 $product_attribute->update(["value_id" => $attribute["value_type"]::create(["value" => $attribute["value"]])->id]);
 
             }
@@ -296,7 +290,7 @@ class ProductRepository extends BaseRepository
         {           
             if ($value)
             {
-                $validator = Validator::make(["categories" => $value ], [
+                $validator = Validator::make(["categories" => $value], [
                     "categories" => "required|array",
                     "categories.*" => "required|exists:categories,id"
                 ]);
