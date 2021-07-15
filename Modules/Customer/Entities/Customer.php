@@ -32,7 +32,7 @@ class Customer extends Authenticatable implements  JWTSubject
 
     public function getNameAttribute(): ?string
     {
-        return ucwords("{$this->first_name} {$this->middle_name} {$this->last_name}");
+        return ucwords(preg_replace('/\s+/', ' ', "{$this->first_name} {$this->middle_name} {$this->last_name}"));
     }
 
     public function getProfileImageUrlAttribute(): ?string
