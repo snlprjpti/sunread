@@ -17,7 +17,7 @@ class Customer extends Authenticatable implements  JWTSubject
     use Notifiable, HasFactory;
 
     public static $SEARCHABLE =  [ "first_name", "last_name", "email" ];
-    protected $fillable = [ "first_name", "middle_name", "last_name", "gender", "date_of_birth", "email", "phone", "password", "api_token", "customer_group_id", "subscribed_to_news_letter", "is_verified",  "status" , "profile_image", "website_id", "store_id", "is_lock"];
+    protected $fillable = [ "first_name", "middle_name", "last_name", "gender", "date_of_birth", "email", "tax_number", "password", "customer_group_id", "subscribed_to_news_letter", "status" , "profile_image", "website_id", "store_id", "is_lock"];
     protected $hidden = [ "password", "api_token", "remember_token" ];
 
     public function getJWTIdentifier(): ?string

@@ -13,7 +13,12 @@ class CustomerAddress extends Model
 {
     use HasFactory;
     protected $fillable = [ "customer_id", "first_name", "middle_name", "last_name", "address1", "address2", "address3", "country_id", "region_id", "city_id", "postcode", "phone", "vat_number", "default_billing_address", "default_shipping_address" ];
+    protected $with = [ "country", "region", "city" ];
 
+    public function getNameAttribute(): ?string
+    {
+        return ucwords("{$this->first_name} {$this->middle_name} {$this->last_name}");
+    }
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
