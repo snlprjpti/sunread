@@ -55,8 +55,15 @@ class AddressController extends BaseController
         try
         {
             $customer = Customer::findOrFail($customer_id);
-            $data = $this->repository->validateData($request);
-            $data["customer_id"] = $customer->id;
+            $data = $this->repository->validateData($request, [
+                "region_id" => "required|exists:regions,id,country_id,{$request->country_id}",
+                "city_id" => "required|exists:cities,id,region_id,{$request->region_id}",
+            ], function () use($customer) {
+                return [
+                    "customer_id" => $customer->id
+                ];
+            });
+
             if($data["default_billing_address"] == 1 || $data["default_shipping_address"] == 1)
             {
                 $customer->addresses->map(function ($item) use ($data) {
@@ -96,7 +103,14 @@ class AddressController extends BaseController
         try {
             $customer = Customer::findOrFail($customer_id);
 
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, [
+                "region_id" => "required|exists:regions,id,country_id,{$request->country_id}",
+                "city_id" => "required|exists:cities,id,region_id,{$request->region_id}",
+            ], function () use($customer) {
+                return [
+                    "customer_id" => $customer->id
+                ];
+            });
 
             if($data["default_billing_address"] == 1 || $data["default_shipping_address"] == 1)
             {
