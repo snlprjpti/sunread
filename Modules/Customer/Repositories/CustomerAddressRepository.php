@@ -31,4 +31,24 @@ class CustomerAddressRepository extends BaseRepository
             "default_shipping_address" => "sometimes|boolean"
         ];
     }
+
+    public function regionAndCityValidation(object $request): array
+    {
+        return [
+            "region_id" => "sometimes|nullable|exists:regions,id,country_id,{$request->country_id}",
+            "city_id" => "sometimes|nullable|exists:cities,id,region_id,{$request->region_id}",
+        ];
+    }
+
+    public function unsetOtherAddresses(object $parent, array $data): void
+    {
+        if($data["default_billing_address"] == 1 || $data["default_shipping_address"] == 1)
+        {
+            $parent->customer->addresses->where("id", "!=", $parent->id)->map(function ($item) use ($data) {
+                if($data["default_billing_address"] == 1) $item->default_billing_address = 0;
+                if($data["default_shipping_address"] == 1) $item->default_shipping_address = 0;
+                $item->save();
+            });
+        }
+    }
 }

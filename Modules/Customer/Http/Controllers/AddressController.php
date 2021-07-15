@@ -54,25 +54,15 @@ class AddressController extends BaseController
     {
         try
         {
-            $customer = Customer::findOrFail($customer_id);
-            $data = $this->repository->validateData($request, [
-                "region_id" => "sometimes|nullable|exists:regions,id,country_id,{$request->country_id}",
-                "city_id" => "sometimes|nullable|exists:cities,id,region_id,{$request->region_id}",
-            ], function () use($customer) {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityValidation($request), function () use($customer_id) {
                 return [
-                    "customer_id" => $customer->id
+                    "customer_id" => Customer::findOrFail($customer_id)->id
                 ];
             });
 
-            if($data["default_billing_address"] == 1 || $data["default_shipping_address"] == 1)
-            {
-                $customer->addresses->map(function ($item) use ($data) {
-                    if($data["default_billing_address"] == 1) $item->default_billing_address = 0;
-                    if($data["default_shipping_address"] == 1) $item->default_shipping_address = 0;
-                    $item->save();
-                });
-            }
-            $created = $this->repository->create($data);
+            $created = $this->repository->create($data, function($created) use($data) {
+                $this->repository->unsetOtherAddresses($created, $data);
+            });
         }
         catch (Exception $exception)
         {
@@ -101,27 +91,16 @@ class AddressController extends BaseController
     public function update(Request $request, int $customer_id, int $address_id): JsonResponse
     {
         try {
-            $customer = Customer::findOrFail($customer_id);
 
-            $data = $this->repository->validateData($request, [
-                "region_id" => "sometimes|nullable|exists:regions,id,country_id,{$request->country_id}",
-                "city_id" => "sometimes|nullable|exists:cities,id,region_id,{$request->region_id}",
-            ], function () use($customer) {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityValidation($request), function () use($customer_id) {
                 return [
-                    "customer_id" => $customer->id
+                    "customer_id" => $customer_id
                 ];
             });
 
-            if($data["default_billing_address"] == 1 || $data["default_shipping_address"] == 1)
-            {
-                $customer->addresses->map(function ($item) use ($data) {
-                    if($data["default_billing_address"] == 1) $item->default_billing_address = 0;
-                    if($data["default_shipping_address"] == 1) $item->default_shipping_address = 0;
-                    $item->save();
-                });
-            }
-
-            $updated = $this->repository->update($data, $address_id);
+            $updated = $this->repository->update($data, $address_id, function($updated) use($data) {
+                $this->repository->unsetOtherAddresses($updated, $data);
+            });
         }
         catch (Exception $exception)
         {
@@ -155,8 +134,8 @@ class AddressController extends BaseController
         try
         {
             $data = $request->validate([
-                "default_billing_address" => "required_without:default_shipping_address|in:1",
-                "default_shipping_address" => "required_without:default_billing_address|in:1",
+                "default_billing_address" => "required_without:default_shipping_address|boolean",
+                "default_shipping_address" => "required_without:default_billing_address|boolean",
             ]);
 
             $customer = Customer::with("addresses")->findOrFail($customer_id);
