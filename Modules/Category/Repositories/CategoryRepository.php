@@ -2,6 +2,7 @@
 
 namespace Modules\Category\Repositories;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
@@ -15,6 +16,7 @@ class CategoryRepository extends BaseRepository
     use HasScope;
 
     protected $repository, $config_fields;
+    protected bool $without_pagination = true;
 
     public function __construct(Category $category, CategoryValue $categoryValue)
     {
@@ -57,7 +59,8 @@ class CategoryRepository extends BaseRepository
                     
                     if($data["scope"] != "website") $element["use_default_value"] = $existData ? 0 : 1;
                     $elementValue = $existData ? $this->getValues($data) : $this->getDefaultValues($data);
-                    $element["value"] = $elementValue ? $elementValue->value : null;
+                    $element["value"] = $elementValue?->value ?? null;
+                    if ($element["type"] == "file" && $element["value"]) $element["value"] = Storage::url($element["value"]);
                 }
                 unset($element["rules"]);
 
