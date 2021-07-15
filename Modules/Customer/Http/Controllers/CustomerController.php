@@ -62,7 +62,7 @@ class CustomerController extends BaseController
                 })]
             ]);
 
-            $data["password"] = Hash::make("password");
+            $data["password"] = Hash::make($data["password"]);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
 
             $created = $this->repository->create($data, function($created) {
