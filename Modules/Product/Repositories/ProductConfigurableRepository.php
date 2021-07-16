@@ -2,137 +2,78 @@
 
 namespace Modules\Product\Repositories;
 
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Modules\Product\Entities\Product;
-use Illuminate\Support\Facades\Validator;
 use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeSet;
+use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
-use Illuminate\Validation\ValidationException;
-use Modules\Inventory\Entities\CatalogInventory;
-use Modules\Inventory\Jobs\LogCatalogInventoryItem;
-use Modules\Product\Entities\ProductAttribute;
+use Modules\Attribute\Entities\AttributeOption;
 
 class ProductConfigurableRepository extends BaseRepository
 {
-    protected $attribute;
+    protected $attribute, $product_repository, $non_required_attributes;
 
-    public function __construct(Product $product, Attribute $attribute)
+    public function __construct(Product $product, Attribute $attribute, ProductRepository $product_repository)
     {
         $this->model = $product;
         $this->model_key = "catalog.products";
         $this->rules = [
-            "website_id" => "required|exists:websites,id",
-            "sku" => "required|unique:products,sku",
-            "attribute_set_id" => "required|exists:attribute_sets,id",
+            "brand_id" => "sometimes|nullable|exists:brands,id",
+            "super_attributes" => "required|array",
+            "attributes" => "required|array",
+            "scope" => "sometimes|in:website,channel,store",
+            "website_id" => "required|exists:websites,id"
         ];
         $this->attribute = $attribute;
+        $this->product_repository = $product_repository;
+        $this->non_required_attributes = [ "price", "cost", "quantity_and_stock_status" ];
+        $this->asd = $this->attributeCache();
     }
 
-    public function validateAttributes(object $request): array
+    public function attributeCache(): Collection
     {
         try
         {
-            $attributes = $this->attribute::all();
-
-            $product_attributes = [];
-            foreach ( $request->get("attributes") as $product_attribute)
+            if ( !Cache::has("attributes"))
             {
-                if ( !is_array($product_attribute) ) throw ValidationException::withMessages([ "attributes" => "Invalid attributes format." ]);
-                $attribute = $attributes->where("id", $product_attribute["attribute_id"])->first() ?? null;
-                
-                if ( !$attribute ) throw ValidationException::withMessages([ "attributes" => "Attribute with id {$product_attribute["attribute_id"]} does not exist." ]);
-
-                $validator = Validator::make($product_attribute, [
-                    "store_id" => "sometimes|nullable|exists:stores,id",
-                    "channel_id" => "sometimes|nullable|exists:channels,id",
-                    "value" => $attribute->type_validation
-                ]);
-                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
-
-                $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
-                $product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid());
+                Cache::remember("attributes", Carbon::now()->addDays(2) ,function () {
+                    return Attribute::with([ "attribute_options" ])->get();
+                });
             }
-            $product_attributes = $this->unsetter($product_attributes);
         }
-        catch (Exception $exception)
+        catch ( Exception $exception )
         {
             throw $exception;
         }
-        
-        return $product_attributes;
+
+        return Cache::get("attributes");
     }
 
-    public function syncAttributes(array $data, object $product): bool
-    {
-        DB::beginTransaction();
-        Event::dispatch("{$this->model_key}.attibutes.sync.before");
-
-        try
-        {
-            foreach($data as $attribute) {
-                $match = ["product_id" => $product->id];
-                foreach (["attribute_id", "store_id", "channel_id"] as $field) {
-                    if (isset($attribute[$field])) $match[$field] = $attribute[$field];
-                }
-
-                $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
-
-                if ( $product_attribute->value_id != null ) {
-                    $product_attribute->value()->each(function($attribute_value) use($attribute){
-                        $attribute_value->update(["value" => $attribute["value"]]);
-                    });
-                    continue;
-                }
-
-                $product_attribute->update(["value_id" => $attribute["value_type"]::create(["value" => $attribute["value"]])->id]);
-            }
-        }
-        catch (Exception $exception)
-        {
-            DB::rollBack();
-            throw $exception;
-        }
-
-        Event::dispatch("{$this->model_key}.attibutes.sync.after", $product_attribute);
-        DB::commit();
-
-        return true;
-    }
-
-    public function checkAttribute(int $attribute_set_id, object $request): bool
+    public function attributeOptionsCache(): Collection
     {
         try
         {
-            $attribute_set = AttributeSet::whereId($attribute_set_id)->with(["attribute_groups"])->firstOrFail();
-            $attribute_ids = $attribute_set->attribute_groups->map(function($attributeGroup){
-                return $attributeGroup->attributes->pluck('id');
-            })->flatten(1)->toArray();
-
-            $attributes = Attribute::whereIn('id', $attribute_ids)->get();
-            $check_attribute = $attributes->pluck("id")->toArray();
-
-            array_map(function ($request_attribute) use ($attributes, $check_attribute) {
-                // check required attribute has value.
-                $required_attribute = $attributes->where("is_required", 1);
-                if ($required_attribute->count() > 0 && $request_attribute["value"] == "") throw ValidationException::withMessages([ "attributes" => "The Attribute id {$request_attribute['attribute_id']} value is required."]);
-                // check attribute exists on attribute set
-                $check_attribute = $attributes->pluck("id")->toArray();
-                if (!in_array($request_attribute["attribute_id"], $check_attribute)) throw ValidationException::withMessages([ "attributes" => "Attribute id {$request_attribute['attribute_id']} dosen't exists on current attribute set"]);
-                return;
-            }, $request->get("attributes"));
+            if(!Cache::has("attribute_options"))
+            {
+                Cache::remember("attribute_options", Carbon::now()->addDays(2) ,function () {
+                    return AttributeOption::with([ "attribute" ])->get();
+                });
+            }
         }
-        catch(Exception $exception)
+        catch ( Exception $exception )
         {
             throw $exception;
         }
 
-        return true;
+        return Cache::get("attribute_options");
     }
 
-    public function createVariants(object $product, object $request)
+    public function createVariants(object $product, object $request, array $scope, array $request_attributes)
     {
        try
        {
@@ -141,15 +82,20 @@ class ProductConfigurableRepository extends BaseRepository
             
             //create product-superattribute
             $super_attributes = [];
-            foreach ($request->get("super_attributes") as $attributeCode => $attributeOptions) {
-                $attribute = Attribute::whereSlug($attributeCode)->first();
-                if ($attribute->is_user_defined == 0) continue;
-                $super_attributes[$attribute->id] = $attributeOptions;
+            
+            foreach ($request->get("super_attributes") as $super_attribute) {
+                $attribute = $this->attributeCache()->find($super_attribute['attribute_id']);
+                if ($attribute->is_user_defined == 1 && $attribute->type != "select") continue;
+                $super_attributes[$attribute->id] = $super_attribute["value"];
             }
 
-            //generate multiple product(variant) combination on the basis of color and size for variants
+            $productAttributes = collect($request_attributes)->reject(function ($item) {
+                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku"));
+            })->toArray();
+
+            //generate multiple product(variant) combination on the basis of color, size (super_attributes/system_define attributes) for variants
             foreach (array_permutation($super_attributes) as $permutation) {
-                $this->addVariant($product, $permutation, $request);
+                $this->addVariant($product, $permutation, $request, $productAttributes, $scope);
             }
        }
        catch ( Exception $exception )
@@ -160,41 +106,51 @@ class ProductConfigurableRepository extends BaseRepository
        return true;
     }
 
-    private function addVariant(object $product, mixed $permutation, object $request): object
+    private function addVariant(object $product, mixed $permutation, object $request, array $productAttributes, array $scope): object
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.update-status.before");
 
         try 
         {
+            $permutation_modify = $this->attributeOptionsCache()->whereIn('id', $permutation)->pluck('name')->toArray();
             $data = [
                 "parent_id" => $product->id,
                 "website_id" => $product->website_id,
                 "brand_id" => $product->brand_id,
                 "type" => "simple",
-                "attribute_set_id" => $product->attribute_set_id,
-                "sku" => \Str::slug($product->sku) . "-variant-" . implode("-", $permutation)."-".$product->id,
+                "attribute_set_id" => $product->attribute_set_id
             ];
-    
-            $product_variant = $this->create($data, function ($variant) use ($product, $permutation, $request, &$product_attribute){    
-                $product_attribute = [
+            $product_attributes = [];
+
+
+            $variant_options = collect($permutation)->map(function ($option, $key) {
+                return [
+                    "attribute_slug" => $this->attributeCache()->find($key)->slug,
+                    "value" => $option,
+                    "value_type" => config("attribute_types")[($this->attributeCache()->find($key)->type) ?? "string"]
+                ];
+            })->toArray();
+
+            // create variant simple product
+            $product_variant = $this->create($data, function ($variant) use ($product, $permutation_modify, $request, &$product_attributes, $productAttributes, $scope, $variant_options){    
+                
+                $product_attributes = array_merge([
                     [
-                        // Attrubute slug
-                        "attribute_id" => 1,
-                        "value" => \Str::slug($product->sku)."-variant-".implode("-", $permutation),
+                        // Attrubute name
+                        "attribute_slug" => "name",
+                        "value" => $product->sku."-variant-".implode("-", $permutation_modify),
                         "value_type" => "Modules\Product\Entities\ProductAttributeString"
                     ],
                     [
-                        // Attrubute name
-                        "attribute_id" => 2,
-                        "value" => $product->sku."-variant-".implode("-", $permutation),
+                        //Attribute slug
+                        "attribute_slug" => "sku",
+                        "value" => Str::slug($product->sku)."-variant-".implode("-", $permutation_modify),
                         "value_type" => "Modules\Product\Entities\ProductAttributeString"
                     ]
-                ];
+                ], $productAttributes, $variant_options);
 
-                $this->syncAttributes($product_attribute, $variant);
-                
-                $variant->categories()->sync($request->get("categories"));
+                $this->product_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
                 $variant->channels()->sync($request->get("channels"));
             });
         }
@@ -209,93 +165,4 @@ class ProductConfigurableRepository extends BaseRepository
 
         return $product_variant;
     }
-
-    public function validataInventoryData(object $request): array
-    {
-        
-        try
-        {
-            $validator = Validator::make($request->all(), [
-                "catalog_inventory.quantity" => "required|decimal",
-                "catalog_inventory.use_config_manage_stock" => "required|boolean"
-            ]);
-            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return $validator->validated()["catalog_inventory"];
-    }
-
-    public function catalogInventory(object $product, object $request, string $method = "store"): bool
-    {
-
-        DB::beginTransaction();
-
-        try
-        {  
-            $inventory_id = $this->attribute::whereSlug("quantity_and_stock_status")->first()->id;
-            array_map(function ($request_attribute) use(&$is_in_stock, $inventory_id) {
-                if ($request_attribute["attribute_id"] == $inventory_id) $is_in_stock = $request_attribute["value"];
-            }, $request->get("attributes"));
-            
-            if (isset($is_in_stock))
-            {                
-                $data = $this->validataInventoryData($request);
-                $data["product_id"] = $product->id;
-                $data["website_id"] = $product->website_id;
-                $data["manage_stock"] = 1;
-                $data["is_in_stock"] = $is_in_stock;
-                $match = [
-                    "product_id" => $product->id,
-                    "website_id" => $product->website_id
-                ];
-
-                unset($data["quantity"]); 
-                $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
-      
-                $original_quantity = (float) $catalog_inventory->quantity;
-                $adjustment_type = (($request->catalog_inventory["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
-                LogCatalogInventoryItem::dispatchSync([
-                    "product_id" => $catalog_inventory->product_id,
-                    "website_id" => $catalog_inventory->website_id,
-                    "event" => ($method == "store") ? "{$this->model_key}.store" : "{$this->model_key}.{$adjustment_type}",
-                    "adjustment_type" => ($method == "store") ? "addition" : $adjustment_type,
-                    "adjusted_by" => auth()->guard("admin")->id(),
-                    "quantity" => ($method == "store") ? $request->catalog_inventory["quantity"] : (float) abs($original_quantity - $request->catalog_inventory["quantity"])
-                ]);
-            }
-        }
-        catch ( Exception $exception )
-        {
-            DB::rollBack();
-            throw $exception;
-        }
-
-        DB::commit();
-        
-        return true;
-    }
-
-    public function unsetter(array $product_attributes): array
-    {
-        try
-        {
-            $inventory_id = $this->attribute::whereSlug("quantity_and_stock_status")->first()->id;
-            foreach ( $product_attributes as $key => $product_attribute )
-            {
-                if ( $product_attribute["attribute_id"] == $inventory_id ) $unset_keys = $key;
-            }
-            if (isset($unset_keys)) unset($product_attributes[$unset_keys]);
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return $product_attributes;
-    }
-
 }

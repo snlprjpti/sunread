@@ -16,16 +16,20 @@ use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Validation\ValidationException;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 use Exception;
+use Modules\Core\Rules\ScopeRule;
+use Modules\Product\Repositories\ProductRepository;
+use Modules\Product\Rules\WebsiteWiseScopeRule;
 
 class ProductConfigurableController extends BaseController
 {
-    protected $repository;
+    protected $repository, $product_repository;
 
-    public function __construct(Product $product, ProductConfigurableRepository $productRepository)
+    public function __construct(Product $product, ProductConfigurableRepository $productConfigurableRepository, ProductRepository $product_repository)
     {
         $this->model = $product;
         $this->model_name = "Product";
-        $this->repository = $productRepository;
+        $this->repository = $productConfigurableRepository;
+        $this->product_repository = $product_repository;
         $exception_statuses = [
             ProductAttributeCannotChangeException::class => 403
         ];
@@ -47,9 +51,30 @@ class ProductConfigurableController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $data["type"] = "configurable";
-            $created = $this->repository->create($data);
+            $data = $this->repository->validateData($request, [
+                "website_id" => "required|exists:websites,id",
+                "attribute_set_id" => "required|exists:attribute_sets,id"
+            ], function ($request) {
+                return [
+                    "scope" => "website",
+                    "scope_id" => $request->website_id,
+                    "type" => "configurable"
+                ];
+            });
+            
+            $scope = [
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope_id"]
+            ];
+
+            $created = $this->repository->create($data, function (&$created) use ($request, $scope) {
+                $attributes = $this->product_repository->validateAttributes($created, $request, $scope, "configurable");
+                $this->product_repository->syncAttributes($attributes, $created, $scope, $request, "store", "configurable");
+
+                $created->channels()->sync($request->get("channels"));
+
+                $this->repository->createVariants($created, $request, $scope, $attributes);
+            });
         }
         catch(Exception $exception)
         {
@@ -63,33 +88,31 @@ class ProductConfigurableController extends BaseController
     {
         try
         {
+            $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
-                "sku" => "required|unique:products,sku,{$id}",
-                "brand_id" => "sometimes|nullable|exists:brands,id",
-                "website_id" => "required|exists:websites,id",
-                "super_attributes" => "required|array",
-                "attributes" => "required|array",
-                "categories" => "required|array",
-                "categories.*" => "required|exists:categories,id",
-                "attribute_set_id" => "sometimes|nullable"
-            ]);  
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+            ], function ($request) use($product) {
+                return [
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $product->website_id,
+                    "type" => "configurable"
+                ];
+            });
 
-            $product = $this->repository->fetch($id);
-            
-            // check attributes and validated request attrubutes.
-            $this->repository->checkAttribute($product->attribute_set_id, $request);
+            $scope = [
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope_id"]
+            ];
 
-            // create product variants based on super attributes and parent product.
-            $this->repository->createVariants($product, $request);
+            $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope) {
+                $attributes = $this->product_repository->validateAttributes($updated, $request, $scope, "configurable");
+                $this->product_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
 
-            unset($data["attribute_set_id"]);
-
-            $updated = $this->repository->update($data, $id, function($updated) use($request) {
-                $attributes = $this->repository->validateAttributes($request);
-                $this->repository->catalogInventory($updated, $request);
-                $this->repository->syncAttributes($attributes, $updated);
-                $updated->categories()->sync($request->get("categories"));
                 $updated->channels()->sync($request->get("channels"));
+
+                $this->repository->createVariants($updated, $request, $scope, $attributes);
+
+                $updated->load("variants");
             });
         }
         catch(Exception $exception)

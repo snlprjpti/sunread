@@ -14,7 +14,7 @@ class ProductAttribute extends Model
 {
     use HasFactory, HasUrlRewrite;
 
-    protected $fillable = [ "attribute_id", "channel_id", "product_id", "store_id", "value_type", "value_id" ];
+    protected $fillable = [ "attribute_id", "product_id", "scope", "scope_id", "value_type", "value_id" ];
     public $timestamps = false;
 
     protected $appends = ["value_data", "url"];
@@ -46,10 +46,10 @@ class ProductAttribute extends Model
         return $this->belongsTo(Attribute::class);
     }
 
-    public function store(): BelongsTo
-    {
-        return $this->belongsTo(Store::class);
-    }
+    // public function store(): BelongsTo
+    // {
+    //     return $this->belongsTo(Store::class);
+    // }
 
     public function getUrlRewriteRequestPathAttribute(): string
     {

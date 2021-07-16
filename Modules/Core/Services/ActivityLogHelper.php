@@ -2,8 +2,12 @@
 
 namespace Modules\Core\Services;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeOption;
+use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Entities\ActivityLog;
 use Modules\Review\Entities\ReviewVote;
 
@@ -31,9 +35,11 @@ class ActivityLogHelper {
         $properties = [];
 
         if($model_name == "ReviewVote") $this->reviewVoteCache($model);
-        
+
+        if ($model_name == "Attribute" || $model_name == "AttributeSet" || $model_name == "AttributeOption") $this->attributeCache($model);
+
         if(Cache::get($model::class)) $this->modelCache($model);
-        
+
         if ( $event == "updated" ) {
             $newValues = $model->getChanges();
             $oldValues = collect($newValues)->mapWithKeys(function($value, $key) use ($model) {
@@ -75,6 +81,24 @@ class ActivityLogHelper {
         Cache::forget('negative_vote_count-'.$model->review_id);
         Cache::rememberForever('negative_vote_count-'.$model->review_id, function() use($model){
             return ReviewVote::where('review_id', $model->review_id)->where('vote_type', 1)->count();
+        });
+    }
+
+    public function attributeCache(): void
+    {
+        Cache::forget("attributes_attribute_set");
+        Cache::remember("attributes_attribute_set", Carbon::now()->addDays(2), function () {
+            return AttributeSet::with([ "attribute_groups.attributes" ])->get();     
+        });
+
+        Cache::forget("attribute_options");
+        Cache::remember("attribute_options", Carbon::now()->addDays(2) ,function () {
+            return AttributeOption::with([ "attribute" ])->get();
+        });
+
+        Cache::forget("attributes");
+        Cache::remember("attributes", Carbon::now()->addDays(2) ,function () {
+            return Attribute::with([ "attribute_options" ])->get();
         });
     }
 

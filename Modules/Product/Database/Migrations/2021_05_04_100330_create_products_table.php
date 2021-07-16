@@ -11,7 +11,8 @@ class CreateProductsTable extends Migration
         Schema::create("products", function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("parent_id")->nullable();
-            $table->unsignedBigInteger("website_id")->nullable();
+            $table->unsignedBigInteger("website_id");
+            
             $table->foreign("website_id")->references("id")->on("websites")->onDelete("cascade");
             $table->foreign("parent_id")->references("id")->on("products")->onDelete("cascade");
             $table->unsignedBigInteger("brand_id")->nullable();
@@ -19,7 +20,7 @@ class CreateProductsTable extends Migration
             $table->unsignedBigInteger("attribute_set_id")->nullable();
             $table->foreign("attribute_set_id")->references("id")->on("attribute_sets")->onDelete("cascade");
 
-            $table->string("sku")->unique();
+            $table->string("sku")->unique()->nullable();
             $table->string("type")->default("simple");
             $table->boolean("status")->default(1);
 

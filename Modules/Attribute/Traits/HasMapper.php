@@ -2,7 +2,6 @@
 
 namespace Modules\Attribute\Traits;
 
-use Exception;
 
 trait HasMapper
 {
@@ -40,4 +39,11 @@ trait HasMapper
         return false;
     }
 
+    public function checkCreateOrUpdate(): bool
+    {
+        if($this->checkMapper()){
+            return ($this->mapper[$this->slug]["create-update"] == 1);
+        }
+        return false;
+    }
 }

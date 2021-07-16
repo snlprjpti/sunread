@@ -11,7 +11,10 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Rules\ScopeRule;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
+use Modules\Product\Rules\WebsiteWiseScopeRule;
+use Modules\Product\Transformers\List\ProductResource as ListProductResource;
 
 class ProductController extends BaseController
 {
@@ -34,6 +37,11 @@ class ProductController extends BaseController
         return ProductResource::collection($data);
     }
 
+    public function listCollection(object $data): ResourceCollection
+    {
+        return ListProductResource::collection($data);
+    }
+
     public function resource(object $data): JsonResource
     {
         return new ProductResource($data);
@@ -43,30 +51,42 @@ class ProductController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request, ["product_attributes", "images"]);
+            $fetched = $this->repository->fetchAll($request, ["categories"], function () use ($request) {
+                return $this->repository->getFilterProducts($request);
+            });
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->listCollection($fetched), $this->lang('fetch-list-success'));
     }
 
     public function store(Request $request): JsonResponse
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $this->repository->checkAttribute($request->attribute_set_id, $request);      
-            $data["type"] = "simple";
-            
-            $created = $this->repository->create($data, function(&$created) use($request) {
-                $attributes = $this->repository->validateAttributes($request);
-                $this->repository->catalogInventory($created, $request);
-                $this->repository->syncAttributes($attributes, $created);
-                $created->categories()->sync($request->get("categories"));
+            $data = $this->repository->validateData($request, [
+                "website_id" => "required|exists:websites,id",
+                "attribute_set_id" => "required|exists:attribute_sets,id"
+            ], function ($request) {
+                return [
+                    "scope" => "website",
+                    "scope_id" => $request->website_id,
+                    "type" => "simple"
+                ];
+            });
+
+            $scope = [
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope_id"]
+            ];
+
+            $created = $this->repository->create($data, function(&$created) use($request, $scope) {
+                $attributes = $this->repository->validateAttributes($created, $request, $scope);
+                $this->repository->syncAttributes($attributes, $created, $scope, $request);
+
                 $created->channels()->sync($request->get("channels"));
             });
         }
@@ -78,11 +98,11 @@ class ProductController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->model->with(["parent", "brand", "attribute_group", "product_attributes", "categories", "images", "website", "catalog_inventories.catalog_inventory_items"])->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ["categories", "parent", "brand", "website", "product_attributes", "catalog_inventories", "variants"]);
         }
         catch( Exception $exception )
         {
@@ -95,20 +115,27 @@ class ProductController extends BaseController
     public function update(Request $request, int $id): JsonResponse
     {
         try
-        {
-            $product = $this->model::findOrFail($id);            
+        {        
+            $product = $this->model::findOrFail($id);   
             $data = $this->repository->validateData($request, [
-                "sku" => "required|unique:products,sku,{$id}"
-            ]);
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+            ], function ($request) use($product) {
+                return [
+                    "scope" => $request->scope ?? "website",
+                    "scope_id" => $request->scope_id ?? $product->website_id,
+                    "type" => "simple"
+                ];
+            });
 
-            $this->repository->checkAttribute($product->attribute_set_id, $request);
-            unset($data["attribute_set_id"]);
+            $scope = [
+                "scope" => $data["scope"],
+                "scope_id" => $data["scope_id"]
+            ];
 
-            $updated = $this->repository->update($data, $id, function($updated) use($request) {
-                $attributes = $this->repository->validateAttributes($request);
-                $this->repository->catalogInventory($updated, $request, "update");
-                $this->repository->syncAttributes($attributes, $updated);
-                $updated->categories()->sync($request->get("categories"));
+            $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
+                $attributes = $this->repository->validateAttributes($updated, $request, $scope);
+                $this->repository->syncAttributes($attributes, $updated, $scope, $request, "update");
+
                 $updated->channels()->sync($request->get("channels"));
             });
         }
@@ -170,5 +197,35 @@ class ProductController extends BaseController
         }
 
         return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+    }
+
+    public function product_attributes(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $product = $this->model::findOrFail($id);
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+            ]);
+
+            $scope = [
+                "scope" => $request->scope ?? "website",
+                "scope_id" => $request->scope_id ??  $product->website_id,
+            ];
+
+            $fetched = [];
+            $fetched = [
+                "parent_id" => $product->id,
+                "website_id" => $product->website_id
+            ];
+            $fetched["attributes"] = $this->repository->getData($id, $scope);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }

@@ -4,6 +4,7 @@ namespace Modules\Product\Tests\Feature;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
@@ -16,68 +17,51 @@ use Modules\Core\Entities\Website;
 
 class ProductTest extends BaseTestCase
 {
+    public $default_resource, $filter;
     public function setUp(): void
     {
         $this->model = Product::class;
-
         parent::setUp();
         $this->admin = $this->createAdmin();
 
+        $this->filter = [
+            "website_id" => 1
+        ];
         $this->model_name = "Product";
         $this->route_prefix = "admin.catalog.products";
+        $this->default_resource = $this->model::latest('id')->first();
+        $this->default_resource_id = $this->default_resource->id;
         $this->hasStatusTest = true;
+         
     }
 
     public function getCreateData(): array
     {
-        $category = Category::inRandomOrder()->first();
         $product = $this->model::factory()->make();
-        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();        
-        return array_merge([
-            "attributes" => [
-                [
+        $merge_product = $product->toArray(); 
+
+        $attributes = [];
+
+        foreach ( $product->attribute_set->attribute_groups as $attribute_group )
+        {
+            foreach ($attribute_group->attributes as $attribute)
+            {
+                if (in_array($attribute->slug, ["category_ids", "base_image", "small_image", "thumbnail_image", "quantity_and_stock_status"])) continue;
+                $attributes[] = [
                     "attribute_id" => $attribute->id,
                     "value" => $this->value($attribute->type)
-                ]
-            ],
-            "categories" => [$category->id]
-        ], $product->toArray());
+                ];
+            }
+        }
+
+        return array_merge($merge_product, ["attributes" => $attributes]);
     }
 
     public function getUpdateData(): array
     {
-        $category = Category::inRandomOrder()->first();
-        $product = $this->model::find($this->default_resource_id);
-        $update_data = $product->toArray();
-        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
-
-        return array_merge([
-            "attributes" => [
-                [
-                    "attribute_id" => $attribute->id,
-                    "value" => $this->value($attribute->type)
-                ]
-            ],
-            "categories" => [$category->id]
-        ], $product->toArray());
-    }
-
-    public function getNonMandodtaryUpdateData(): array
-    {
-        $category = Category::inRandomOrder()->first();
-        $product = $this->model::find($this->default_resource_id);
-        $update_data = $product->toArray();
-        $attribute = $product->attribute_set->attribute_groups->first()->attributes->first();
-
-        return array_merge([
-            "attributes" => [
-                [
-                    "attribute_id" => $attribute->id,
-                    "value" => $this->value($attribute->type)
-                ]
-            ],
-            "categories" => [$category->id]
-        ], $product->toArray());
+        $websiteId = $this->default_resource->website_id;
+        $updateData = $this->getCreateData();
+        return array_merge($updateData, $this->getScope($websiteId)); 
     }
 
     public function value(string $type): mixed
@@ -118,7 +102,25 @@ class ProductTest extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "sku" => null
+            "attribute_set_id" => null
+        ]);
+    }
+
+    public function getInvalidUpdateData(): array
+    {
+        return array_merge($this->getUpdateData(), [
+            "website_id" => null
+        ]);
+    }
+
+    public function testAdminCanFetchResources()
+    {
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
         ]);
     }
 
@@ -190,5 +192,33 @@ class ProductTest extends BaseTestCase
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => "Product Image"])
         ]);
+    }
+
+    public function getScope($websiteId)
+    {
+        $scope = Arr::random([ "website", "channel", "store" ]);
+        $channels = Website::find($websiteId)->channels;
+        if(count($channels) > 0 ){
+            switch($scope)
+            {
+                case "website":
+                    $scope_id = $websiteId;
+                    break; 
+    
+                case "channel":
+                    $scope_id = $channels->first()->id;
+                    break;
+    
+                case "store":
+                    $stores = $channels->first()->stores;
+                    $scope_id = (count($stores) > 0) ? $stores->first()->id : $this->getScope("channel", $websiteId);
+                    break;
+            }
+        }
+        return [
+            "scope" => isset($scope_id) ? $scope : "website",
+            "scope_id" => isset($scope_id) ? $scope_id : $websiteId
+        ];
+
     }
 }

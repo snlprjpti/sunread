@@ -16,23 +16,25 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         $attribute_set_id = AttributeSet::factory()->create()->id;
-        $attribute_group = AttributeGroup::factory(1)
-            ->create([
-                "attribute_set_id" => $attribute_set_id,
-                "position" => 1
-            ])
-            ->each(function ($attr_group){
-                $attr_group->attributes()->attach(Attribute::factory(1)->create());
-            })->first();
+
+        $system_defined_attributes = Attribute::whereIsUserDefined(0)->pluck('id')->toArray();
+        $user_defined_attributes = Attribute::factory()->create()->id;
+
+        AttributeGroup::factory()
+        ->create([
+            "attribute_set_id" => $attribute_set_id,
+            "position" => 1
+        ])
+        ->each(function ($attr_group) use ( $system_defined_attributes, $user_defined_attributes ) {
+            $attr_group->attributes()->sync(array_merge($system_defined_attributes, [ $user_defined_attributes ]));
+        });
 
         return [
             "parent_id" => null,
             "brand_id" => Brand::factory()->create()->id,
             "website_id" => Website::factory()->create()->id,
             "attribute_set_id" => $attribute_set_id,
-            "sku" => $this->faker->unique()->slug(),
-            "type" => "simple",
-            "status" => 1
+            "type" => "simple"
         ];
     }
 

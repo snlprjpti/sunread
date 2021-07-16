@@ -29,5 +29,15 @@ return [
         "module" => "Modules\Tax\Entities\ProductTaxGroup",
         "options" => 1,
         "pluck" => [ "id", "name" ]
+    ],
+    "quantity_and_stock_status" => [
+        "module" => "Modules\Inventory\Entities\CatalogInventory",
+        "options" => 0,
+        "pluck" => []
+    ],
+    "category_ids" => [
+        "module" => "Modules\Inventory\Entities\CatalogInventory",
+        "options" => 0,
+        "pluck" => []
     ]
 ];

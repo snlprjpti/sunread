@@ -139,7 +139,7 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Categories",
                 "slug" => "category_ids",
-                "type" => "text",
+                "type" => "multiselect",
                 "scope" => "website"
             ],
             [
@@ -210,21 +210,21 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Base Image",
                 "slug" => "base_image",
-                "type" => "image",
+                "type" => "multiselect",
                 "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Small Image",
                 "slug" => "small_image",
-                "type" => "image",
+                "type" => "multiselect",
                 "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Thumbnail Image",
                 "slug" => "thumbnail_image",
-                "type" => "image",
+                "type" => "multiselect",
                 "scope" => "website",
                 "is_required" => 0
             ],
@@ -232,15 +232,15 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Color",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "is_configurable" => 1,
-                "is_user_defined" => 1
+                "default_value" => "Red",
+                "options" => ["Red", "Green", "Yellow", "Blue"],
             ],
             [
                 "name" => "Size",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "is_configurable" => 1,
-                "is_user_defined" => 1
+                "default_value" => "S",
+                "options" => ["S", "M", "L", "XL"],
             ],
         ];
 
@@ -263,7 +263,9 @@ class AttributeTableSeeder extends Seeder
                 "default_value" => $default_value
             ];
 
-            $attribute_data = Attribute::create($attribute_array);
+            $attribute_data = Attribute::withoutEvents( function () use ($attribute_array) {
+                return Attribute::create($attribute_array);
+            });
 
             AttributeTranslation::create([
                 "store_id" => 1,
@@ -276,12 +278,14 @@ class AttributeTableSeeder extends Seeder
                 $count = 0;
                 array_map(function($attribute_option) use($attribute_data, $attribute, $count) {
                     global $count;
-                    AttributeOption::create([
-                        "attribute_id" => $attribute_data->id,
-                        "name" => $attribute_option,
-                        "position" => ++$count,
-                        "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0
-                    ]);
+                    AttributeOption::withoutEvents( function () use ( $attribute_data, $count, $attribute_option, $attribute ) {
+                        AttributeOption::create([
+                            "attribute_id" => $attribute_data->id,
+                            "name" => $attribute_option,
+                            "position" => ++$count,
+                            "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0
+                        ]);
+                    });
                 }, $attribute["options"]);
             }
 

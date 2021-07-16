@@ -12,17 +12,17 @@ class CreateProductAttributesTable extends Migration
             $table->id();
             $table->unsignedBigInteger("attribute_id");
             $table->foreign("attribute_id")->references("id")->on("attributes")->onDelete("cascade");
-            $table->unsignedBigInteger("channel_id")->nullable();
-            $table->foreign("channel_id")->references("id")->on("channels")->onDelete("cascade");
+            
             $table->unsignedBigInteger("product_id");
             $table->foreign("product_id")->references("id")->on("products")->onDelete("cascade");
-            $table->unsignedBigInteger("store_id")->nullable();
-            $table->foreign("store_id")->references("id")->on("stores")->onDelete("cascade");
+
+            $table->string('scope');
+            $table->unsignedBigInteger('scope_id');
 
             $table->string("value_type");
             $table->unsignedBigInteger("value_id")->nullable();
 
-            $table->unique(["attribute_id", "channel_id", "product_id", "store_id", "value_type"], "attribute_compound_unique");
+            $table->unique(["attribute_id", "scope", "scope_id", "product_id", "value_type"], "attribute_compound_unique");
         });
     }
 

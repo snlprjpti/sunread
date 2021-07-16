@@ -10,7 +10,7 @@ class CreateCatalogInventoryItemsTable extends Migration
     {
         Schema::create('catalog_inventory_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("catalog_inventory_id");
+            $table->unsignedBigInteger("catalog_inventory_id")->nullable();
             $table->unsignedBigInteger("order_id")->nullable();
             $table->unsignedBigInteger("adjusted_by")->nullable();
             $table->decimal("quantity");
@@ -18,7 +18,7 @@ class CreateCatalogInventoryItemsTable extends Migration
             $table->string("adjustment_type");
 
             $table->foreign("adjusted_by")->references("id")->on("admins");
-            $table->foreign("catalog_inventory_id")->references("id")->on("catalog_inventories");
+            $table->foreign("catalog_inventory_id")->references("id")->on("catalog_inventories")->onDelete("set null");
 
             $table->timestamps();
         });
