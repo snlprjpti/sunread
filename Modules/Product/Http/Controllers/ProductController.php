@@ -51,7 +51,9 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->getFilteredList($request, [ "categories" ], $this->repository->getFilterProducts($request));
+            $fetched = $this->repository->fetchAll($request, ["categories"], function () use ($request) {
+                return $this->repository->getFilterProducts($request);
+            });
         }
         catch( Exception $exception )
         {
