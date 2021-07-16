@@ -2,13 +2,14 @@
 
 namespace Modules\Category\Repositories;
 
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
 use Modules\Category\Traits\HasScope;
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
 
 class CategoryRepository extends BaseRepository
@@ -106,6 +107,38 @@ class CategoryRepository extends BaseRepository
             $count++;
         }
         return $slug;
+    }
+
+    public function updatePosition(array $data, int $id)
+    {
+        try
+        {
+            DB::beginTransaction();
+            Event::dispatch("{$this->model_key}.update.before");
+
+            $category = $this->model->findOrFail($id);
+            if($data["parent_id"] != $category->parent_id) $category->update(["parent_id" => $data["parent_id"]]);
+
+            $parent = $this->model->findOrFail($data["parent_id"]);
+            if($data["position"] > count($parent->children)) $data["position"] = count($parent->children);
+            
+            $allnodes = $parent->children->sortBy('_lft')->values();
+            $position_category = $allnodes->get(($data["position"]-1));
+            $key = key(collect($allnodes)->where('id', $id)->toArray()) + 1;
+            
+            ($position_category->_lft < $category->_lft) ? $category->up($key-$data["position"]) : $category->down($data["position"]-$key);
+
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.update.after", $category);
+        DB::commit();
+
+        return $category;
     }
 }
 

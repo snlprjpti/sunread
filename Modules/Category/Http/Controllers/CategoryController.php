@@ -61,7 +61,7 @@ class CategoryController extends BaseController
                 "website_id" => "sometimes|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll(request: $request, callback: function () use ($request) {
-                return $this->model->whereWebsiteId($request->website_id)->orderBy("position", "asc");
+                return $this->model->whereWebsiteId($request->website_id)->orderBy("_lft", "asc");
             })->toTree();
         }
         catch (Exception $exception)
@@ -225,14 +225,12 @@ class CategoryController extends BaseController
     {
         try
         {
-            DB::beginTransaction();
             $data = $request->validate([
-                "parent_id" => "nullable|numeric|exists:categories,id",
+                "parent_id" => "required|numeric|exists:categories,id",
                 "position" => "required|numeric"
             ]);
-            $category = $this->model->findOrFail($id);
-            $fetched = $category->update($data);
 
+            $category = $this->repository->updatePosition($data, $id);
         }
         catch (Exception $exception)
         {
