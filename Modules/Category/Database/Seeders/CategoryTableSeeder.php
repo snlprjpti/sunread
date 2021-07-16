@@ -20,7 +20,7 @@ class CategoryTableSeeder extends Seeder
             [
                 "parent_id" => NULL,
                 "_lft" => 1,
-                "_rgt" => 14,
+                "_rgt" => 2,
                 "position" => 1,
                 "website_id" => 1,
                 "created_at" => now(),

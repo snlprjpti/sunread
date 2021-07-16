@@ -135,6 +135,21 @@ class CategoryTest extends BaseTestCase
         ]);
     }
 
+    public function testAdminCanUpdateResourceWithPosition()
+    {
+        $post_data = [
+            "parent_id" => Category::inRandomOrder()->first()->id,
+            "position" => rand(1,10)
+        ];
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("position", [$this->default_resource_id]), $post_data);
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
+        ]);
+    }
+
     public function getScope($websiteId)
     {
         $scope = Arr::random([ "website", "channel", "store" ]);
