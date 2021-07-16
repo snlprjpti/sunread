@@ -20,6 +20,7 @@ use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
+use Modules\Core\Rules\ScopeRule;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Product\Entities\ProductAttribute;
@@ -515,6 +516,14 @@ class ProductRepository extends BaseRepository
     {
         try
         {
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)],
+                "website_id" => "required|exists:websites,id"
+            ]);
+
+            $this->validateListFiltering($request);
+            
             $product = Product::whereWebsiteId($request->website_id);
 
             if (isset($request["filter"]))
