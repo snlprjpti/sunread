@@ -106,9 +106,11 @@ class ProductTest extends BaseTestCase
         ]);
     }
 
-    public function testShouldReturnErrorIfUpdateDataIsInvalid()
+    public function getInvalidUpdateData(): array
     {
-        $this->markTestSkipped("Invalid Update method not available.");
+        return array_merge($this->getUpdateData(), [
+            "website_id" => null
+        ]);
     }
 
     public function testAdminCanFetchResources()
