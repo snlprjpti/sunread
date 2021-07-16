@@ -234,11 +234,9 @@ class CategoryController extends BaseController
         }
         catch (Exception $exception)
         {
-            DB::rollBack();
             return $this->handleException($exception);
         }
 
-        DB::commit();
         return $this->successResponse($this->resource($category), $this->lang("update-success"));
     }
 }
