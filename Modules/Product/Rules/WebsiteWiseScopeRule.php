@@ -48,6 +48,6 @@ class WebsiteWiseScopeRule implements Rule
      */
     public function message()
     {
-        return 'Scope Id does not belong to this product';
+        return 'Scope does not belongs to this product.';
     }
 }
