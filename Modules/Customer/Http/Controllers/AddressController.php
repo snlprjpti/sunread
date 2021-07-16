@@ -12,6 +12,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerAddressResource;
 use Modules\Customer\Repositories\CustomerAddressRepository;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AddressController extends BaseController
 {
@@ -36,11 +37,13 @@ class AddressController extends BaseController
         return new CustomerAddressResource($data);
     }
 
-    public function index(int $customer_id): JsonResponse
+    public function index(Request $request, int $customer_id): JsonResponse
     {
         try
         {
-            $fetched = Customer::with('addresses')->findOrFail($customer_id)->addresses;
+            $fetched = $this->repository->fetchAll($request, callback: function() use ($customer_id) {
+                return $this->model::whereCustomerId($customer_id);
+            });
         }
         catch (Exception $exception)
         {
@@ -54,10 +57,15 @@ class AddressController extends BaseController
     {
         try
         {
-            $customer = Customer::findOrFail($customer_id);
-            $data = $this->repository->validateData($request);
-            $data["customer_id"] = $customer->id;
-            $created = $this->repository->create($data);
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
+                return [
+                    "customer_id" => Customer::findOrFail($customer_id)->id
+                ];
+            });
+
+            $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
+                $this->repository->unsetDefaultAddresses($data, $customer_id, $created->id);
+            });
         }
         catch (Exception $exception)
         {
@@ -71,28 +79,31 @@ class AddressController extends BaseController
     {
         try
         {
-            $fetched = Customer::with("addresses")
-                ->findOrFail($customer_id)
-                ->addresses()
-                ->findOrFail($address_id);
+            $fetched = $this->repository->fetch($address_id, callback: function() use ($customer_id) {
+                return $this->model::whereCustomerId($customer_id);
+            });
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
+
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $customer_id, int $address_id): JsonResponse
     {
-        try {
-            Customer::with("addresses")
-                ->findOrFail($customer_id)
-                ->addresses()
-                ->findOrFail($address_id);
+        try
+        {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
+                return [
+                    "customer_id" => Customer::findOrFail($customer_id)->id
+                ];
+            });
 
-            $data = $this->repository->validateData($request);
-            $updated = $this->repository->update($data, $address_id);
+            $updated = $this->repository->update($data, $address_id, function($updated) use ($data, $customer_id) {
+                $this->repository->unsetDefaultAddresses($data, $customer_id, $updated->id);
+            });
         }
         catch (Exception $exception)
         {
@@ -106,12 +117,9 @@ class AddressController extends BaseController
     {
         try
         {
-            $deleted = Customer::with("addresses")
-                ->findOrFail($customer_id)
-                ->addresses()
-                ->findOrFail($address_id);
-
-            $deleted->delete();
+            $deleted = $this->repository->delete($address_id, function($deleted) use ($customer_id) {
+                if ( $deleted->customer_id != $customer_id ) throw new ModelNotFoundException($this->lang("not-found"));
+            });
         }
         catch (Exception $exception)
         {
@@ -119,5 +127,26 @@ class AddressController extends BaseController
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
+    }
+
+    public function updateAddress(Request $request, int $customer_id, int $address_id)
+    {
+        try
+        {
+            $data = $request->validate([
+                "default_billing_address" => "required_without:default_shipping_address|boolean",
+                "default_shipping_address" => "required_without:default_billing_address|boolean",
+            ]);
+
+            $updated = $this->repository->updateDefaultAddress($data, $customer_id, $address_id, function($updated) use ($data, $customer_id) {
+                $this->repository->unsetDefaultAddresses($data, $customer_id, $updated->id);
+            });
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 }

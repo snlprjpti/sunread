@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Website;
 use Modules\Customer\Notifications\CustomerResetPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Modules\Core\Traits\HasFactory;
@@ -15,7 +17,7 @@ class Customer extends Authenticatable implements  JWTSubject
     use Notifiable, HasFactory;
 
     public static $SEARCHABLE =  [ "first_name", "last_name", "email" ];
-    protected $fillable = [ "first_name", "last_name", "gender", "date_of_birth", "email", "phone", "password", "api_token", "customer_group_id", "subscribed_to_news_letter", "is_verified",  "status" , "profile_image"];
+    protected $fillable = [ "first_name", "middle_name", "last_name", "gender", "date_of_birth", "email", "tax_number", "password", "customer_group_id", "subscribed_to_news_letter", "status" , "profile_image", "website_id", "store_id", "is_lock"];
     protected $hidden = [ "password", "api_token", "remember_token" ];
 
     public function getJWTIdentifier(): ?string
@@ -30,7 +32,7 @@ class Customer extends Authenticatable implements  JWTSubject
 
     public function getNameAttribute(): ?string
     {
-        return ucwords("{$this->first_name} {$this->last_name}");
+        return ucwords(preg_replace('/\s+/', ' ', "{$this->first_name} {$this->middle_name} {$this->last_name}"));
     }
 
     public function getProfileImageUrlAttribute(): ?string
@@ -43,6 +45,16 @@ class Customer extends Authenticatable implements  JWTSubject
         return $this->belongsTo(CustomerGroup::class, "customer_group_id");
     }
 
+    public function website(): BelongsTo
+    {
+        return $this->belongsTo(Website::class);
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
+
     public function addresses(): HasMany
     {
         return $this->hasMany(CustomerAddress::class ,"customer_id");
@@ -51,5 +63,15 @@ class Customer extends Authenticatable implements  JWTSubject
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new CustomerResetPassword($token));
+    }
+
+    public function getDefaultBillingAddressAttribute(): ?object
+    {
+        return $this->addresses->where("default_billing_address", 1)->first();
+    }
+
+    public function getDefaultShippingAddressAttribute(): ?object
+    {
+        return $this->addresses->where("default_shipping_address", 1)->first();
     }
 }
