@@ -109,13 +109,13 @@ class CategoryRepository extends BaseRepository
         return $slug;
     }
 
-    public function updatePosition(array $data, int $id)
-    {
+    public function updatePosition(array $data, int $id): object
+    {        
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.update.before");
+
         try
         {
-            DB::beginTransaction();
-            Event::dispatch("{$this->model_key}.update.before");
-
             $category = $this->model->findOrFail($id);
             if($data["parent_id"] != $category->parent_id) $category->update(["parent_id" => $data["parent_id"]]);
 
