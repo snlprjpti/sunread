@@ -4,9 +4,11 @@ namespace Modules\User\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Modules\User\Notifications\InvitationNotification;
 use Modules\User\Transformers\AdminResource;
 use Modules\User\Repositories\AdminRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -14,6 +16,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Exceptions\CannotDeleteSelfException;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\User\Exceptions\CannotDeleteSuperAdminException;
+use Illuminate\Notifications\Notification;
 
 class UserController extends BaseController
 {
@@ -62,16 +65,20 @@ class UserController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "password" => "required|confirmed",
+                "password" => "nullable|confirmed",
                 "status" => "sometimes|boolean",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
-            $data["password"] = Hash::make($data["password"]);
 
+            $data["password"] = Hash::make($data["password"]);
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
                 if ( $request->is_invite == true ) {
-                    // Send an email for invite
+                    $token = Str::random(60);
+                    $created->notify(new InvitationNotification($token));
+                    $created->password = Hash::make(Str::random(20));
+                    $created->invitation_token = $token;
+                    $created->save();
                 }
             });
         }
