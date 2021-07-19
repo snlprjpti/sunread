@@ -19,6 +19,7 @@ class CustomerGroupResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "slug" => $this->slug,
+            "customer_tax_group_id" => $this->whenLoaded("tax_group"),
             "is_user_defined" => $this->is_user_defined,
             "created_at" => Carbon::parse($this->created_at)->format('M j\\,Y H:i A')
         ];

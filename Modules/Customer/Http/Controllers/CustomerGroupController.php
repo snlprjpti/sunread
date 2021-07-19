@@ -39,8 +39,7 @@ class CustomerGroupController extends BaseController
     {
         try
         {
-            $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);
+            $fetched = $this->repository->fetchAll($request, [ "tax_group" ]);
         }
         catch (Exception $exception)
         {
@@ -70,7 +69,7 @@ class CustomerGroupController extends BaseController
     {
         try
         {
-            $fetched = $this->model->findOrFail($id);
+            $fetched = $this->repository->fetch($id, [ "tax_group" ]);
         }
         catch (Exception $exception)
         {

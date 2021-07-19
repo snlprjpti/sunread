@@ -13,7 +13,8 @@ class CustomerGroupRepository extends BaseRepository
         $this->model_key = "customers.groups";
         $this->rules = [
             "name" => "required|min:2|max:100",
-            "slug" => "nullable|unique:customer_groups,slug"
+            "slug" => "nullable|unique:customer_groups,slug",
+            "customer_tax_group_id" => "required|exists:customer_tax_groups,id"
         ];
     }
 }
