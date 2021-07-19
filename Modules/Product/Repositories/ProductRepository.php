@@ -535,12 +535,12 @@ class ProductRepository extends BaseRepository
                     "status" => "sometimes|boolean",
                     "visibility" => "sometimes",
                     "type" => "sometimes|in:simple,configurable",
-                    "price" => "sometimes|array",
-                    "price.from" => "sometimes|decimal",
-                    "price.to" => "sometimes|decimal",
-                    "id" => "sometimes|array",
-                    "id.from" => "sometimes|numeric",
-                    "id.to" => "sometimes|numeric"
+                    "prices" => "sometimes|array",
+                    "prices.from" => "sometimes|decimal",
+                    "prices.to" => "sometimes|decimal",
+                    "ids" => "sometimes|array",
+                    "ids.from" => "sometimes|numeric",
+                    "ids.to" => "sometimes|numeric"
                 ]);
     
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
@@ -580,9 +580,9 @@ class ProductRepository extends BaseRepository
                 $product->whereIn("id", Arr::flatten($product_ids));
             }
 
-            if (isset($request["filter"]["price"]))
+            if (isset($request["filter"]["prices"]))
             {
-                if (array_key_exists("from", $request["filter"]["price"]) && array_key_exists("to", $request["filter"]["price"])){
+                if (array_key_exists("from", $request["filter"]["prices"]) && array_key_exists("to", $request["filter"]["prices"])){
                     $product_attributes = ProductAttribute::whereAttributeId(3)
                     ->whereScope($request->scope ?? "website")
                     ->whereScopeId($request->scope_id ?? $request->website_id)
@@ -592,26 +592,26 @@ class ProductRepository extends BaseRepository
                     foreach ( $product_attributes as $product_attribute )
                     {
                         $value = $product_attribute->value()->query();
-                        $matched = $value->whereBetween("value", [$request["filter"]["price"]["from"], $request["filter"]["price"]["to"]])->get();
+                        $matched = $value->whereBetween("value", [$request["filter"]["prices"]["from"], $request["filter"]["prices"]["to"]])->get();
                         if(count($matched) > 0) $product_ids[] = $product_attribute->product()->pluck("id");
                     }
                     $product->whereIn("id", Arr::flatten($product_ids));
                 }
                 else
                 {
-                    throw ValidationException::withMessages(["price" => "price range from and to is required"]);
+                    throw ValidationException::withMessages(["prices" => __("core::app.response.range-required", ["name" => "prices"])]);
                 }
             }
 
-            if (isset($request["filter"]["id"]))
+            if (isset($request["filter"]["ids"]))
             {
-                if (array_key_exists("from", $request["filter"]["id"]) && array_key_exists("to", $request["filter"]["id"]))
+                if (array_key_exists("from", $request["filter"]["ids"]) && array_key_exists("to", $request["filter"]["ids"]))
                 {
-                    $product->whereBetween("id", [$request["filter"]["id"]["from"], $request["filter"]["id"]["to"]]);
+                    $product->whereBetween("ids", [$request["filter"]["ids"]["from"], $request["filter"]["ids"]["to"]]);
                 }
                 else
                 {
-                    throw ValidationException::withMessages(["id" => "Id range from and to is required"]);
+                    throw ValidationException::withMessages(["ids" => __("core::app.response.range-required", ["name" => "ids"])]);
                 }
             }
 
