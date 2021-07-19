@@ -15,7 +15,7 @@ class TaxRuleTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Tax Rule";
-        $this->route_prefix = "admin.taxes.tax-rules";
+        $this->route_prefix = "admin.taxes.rules";
         $this->hasStatusTest = true;
     }
 

@@ -15,7 +15,7 @@ class TaxRateTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Tax Rate";
-        $this->route_prefix = "admin.taxes.tax-rates";
+        $this->route_prefix = "admin.taxes.rates";
     }
 
     public function getNonMandotaryCreateData(): array

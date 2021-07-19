@@ -15,7 +15,8 @@ class CustomerTaxGroupTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Customer Tax Group";
-        $this->route_prefix = "admin.taxes.customer-tax-groups";
+        $this->route_prefix = "admin.taxes.groups.customers";
+        $this->hasAllTest= true;
     }
 
     public function getInvalidCreateData(): array
