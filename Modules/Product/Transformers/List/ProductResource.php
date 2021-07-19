@@ -22,6 +22,7 @@ class ProductResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $name->value_data,
+            "type" => $this->type,
             "sku" => $this->sku,           
             "stock" => $stock ? $stock->quantity : null,
             "status" => (bool) $this->status,
