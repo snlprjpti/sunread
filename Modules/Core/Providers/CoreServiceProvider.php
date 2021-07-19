@@ -73,6 +73,9 @@ class CoreServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/configuration.php'), "configuration"
         );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/website.php'), "website"
+        );
     }
 
     /**
