@@ -117,12 +117,13 @@ class CategoryRepository extends BaseRepository
         try
         {
             $category = $this->model->findOrFail($id);
-            if($data["parent_id"] != $category->parent_id) $category->update(["parent_id" => $data["parent_id"]]);
+            $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : null;
+            if($parent_id != $category->parent_id) $category->update(["parent_id" => $parent_id]);
 
-            $parent = $this->model->findOrFail($data["parent_id"]);
-            if($data["position"] > count($parent->children)) $data["position"] = count($parent->children);
+            $all_category = $parent_id ? $this->model->findOrFail($parent_id)->children : $this->model->whereParentId(null)->get();
+            if($data["position"] > count($all_category)) $data["position"] = count($all_category);
             
-            $allnodes = $parent->children->sortBy('_lft')->values();
+            $allnodes = $all_category->sortBy('_lft')->values();
             $position_category = $allnodes->get(($data["position"]-1));
             $key = key(collect($allnodes)->where('id', $id)->toArray()) + 1;
             
