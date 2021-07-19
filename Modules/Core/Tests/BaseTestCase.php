@@ -17,7 +17,7 @@ class BaseTestCase extends TestCase
     protected static $seederRun = false;
 
     public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route;
-    public $createFactories, $hasFilters, $hasIndexTest, $hasShowTest, $hasStoreTest, $hasUpdateTest, $hasDestroyTest, $hasBulkDestroyTest, $hasStatusTest;
+    public $createFactories, $hasFilters, $hasIndexTest, $hasAllTest, $hasShowTest, $hasStoreTest, $hasUpdateTest, $hasDestroyTest, $hasBulkDestroyTest, $hasStatusTest;
 
     public function setUp(): void
     {
@@ -36,6 +36,7 @@ class BaseTestCase extends TestCase
         $this->createFactories = true;
         $this->hasFilters = true;
         $this->hasIndexTest = true;
+        $this->hasAllTest= false;
         $this->hasShowTest = true;
         $this->hasStoreTest = true;
         $this->hasUpdateTest = true;
@@ -122,6 +123,18 @@ class BaseTestCase extends TestCase
         if ( !$this->hasFilters ) $this->markTestSkipped("Filters not available.");
 
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testAdminCanFetchResourcesWithoutPagination(): void
+    {
+        if ( !$this->hasAllTest ) $this->markTestSkipped("All method not available.");
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("all"));
 
         $response->assertOk();
         $response->assertJsonFragment([
