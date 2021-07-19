@@ -58,5 +58,4 @@ class UserInvitationController extends BaseController
 
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
-
 }
