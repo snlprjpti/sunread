@@ -4,6 +4,7 @@ use Modules\User\Http\Controllers\AccountController;
 use Modules\User\Http\Controllers\SessionController;
 use Modules\User\Http\Controllers\ResetPasswordController;
 use Modules\User\Http\Controllers\ForgotPasswordController;
+use Modules\User\Http\Controllers\UserInvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,4 +46,6 @@ Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], f
             Route::delete("image", [AccountController::class, "deleteProfileImage"])->name("image.delete");
         });
     });
+
+    Route::post("/accept-invitation", [UserInvitationController::class, "acceptInvitation"])->name("accept-invitation");
 });
