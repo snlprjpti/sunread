@@ -599,7 +599,7 @@ class ProductRepository extends BaseRepository
                 }
                 else
                 {
-                    throw ValidationException::withMessages(["prices" => __("core::app.response.range-required", ["name" => "prices"])]);
+                    throw ValidationException::withMessages(["prices" => __("core::app.response.range-required", ["name" => "Prices"])]);
                 }
             }
 
@@ -611,7 +611,7 @@ class ProductRepository extends BaseRepository
                 }
                 else
                 {
-                    throw ValidationException::withMessages(["ids" => __("core::app.response.range-required", ["name" => "ids"])]);
+                    throw ValidationException::withMessages(["ids" => __("core::app.response.range-required", ["name" => "IDs"])]);
                 }
             }
 
