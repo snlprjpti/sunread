@@ -6,6 +6,8 @@ Route::group(["middleware" => ["api"]], function () {
         Route::resource("rates", TaxRateController::class)->except(["create", "edit"]);
 
         Route::group(["prefix" => "groups", "as" => "groups."], function () {
+            Route::get("customers/all", [\Modules\Tax\Http\Controllers\CustomerTaxGroupController::class, "all"])->name("customers.all");
+            Route::get("products/all", [\Modules\Tax\Http\Controllers\ProductTaxGroupController::class, "all"])->name("products.all");
             Route::resource("customers", CustomerTaxGroupController::class)->except(["create", "edit"]);
             Route::resource("products", ProductTaxGroupController::class)->except(["create", "edit"]);
         });

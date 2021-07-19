@@ -49,6 +49,21 @@ class CustomerTaxGroupController extends BaseController
         return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
+    public function all(Request $request): JsonResponse
+    {
+        try
+        {
+            $request->without_pagination = true;
+            $fetched = $this->repository->fetchAll($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
     public function store(Request $request): JsonResponse
     {
         try
