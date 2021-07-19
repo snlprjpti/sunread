@@ -226,7 +226,7 @@ class CategoryController extends BaseController
         try
         {
             $data = $request->validate([
-                "parent_id" => "required|numeric|exists:categories,id",
+                "parent_id" => "nullable|numeric|exists:categories,id",
                 "position" => "required|numeric"
             ]);
 
