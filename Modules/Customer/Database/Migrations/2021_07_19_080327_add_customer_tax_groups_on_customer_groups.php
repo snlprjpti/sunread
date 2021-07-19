@@ -26,6 +26,9 @@ class AddCustomerTaxGroupsOnCustomerGroups extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('customer_groups', function (Blueprint $table) {
+            $table->dropColumn('customer_tax_group_id');
+            $table->dropForeign('customer_tax_group_id');
+        });
     }
 }
