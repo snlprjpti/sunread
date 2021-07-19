@@ -15,7 +15,7 @@ class AddCustomerTaxGroupsOnCustomerGroups extends Migration
     {
         Schema::table('customer_groups', function (Blueprint $table) {
             $table->unsignedBigInteger('customer_tax_group_id')->nullable();
-            $table->foreign('customer_tax_group_id')->references('id')->on('customer_tax_groups')->onDelete('cascade');
+            $table->foreign('customer_tax_group_id')->references('id')->on('customer_tax_groups')->onDelete("set null");
         });
     }
 
