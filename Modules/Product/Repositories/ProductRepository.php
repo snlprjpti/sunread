@@ -607,7 +607,7 @@ class ProductRepository extends BaseRepository
             {
                 if (array_key_exists("from", $request["filter"]["ids"]) && array_key_exists("to", $request["filter"]["ids"]))
                 {
-                    $product->whereBetween("ids", [$request["filter"]["ids"]["from"], $request["filter"]["ids"]["to"]]);
+                    $product->whereBetween("id", [$request["filter"]["ids"]["from"], $request["filter"]["ids"]["to"]]);
                 }
                 else
                 {
