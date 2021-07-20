@@ -127,6 +127,7 @@ class CategoryController extends BaseController
 
             $fetched = [];
             $fetched = [
+                "id" => $id,
                 "parent_id" => $category->parent_id,
                 "website_id" => $category->website_id,
                 "name" => $nameValue?->value
