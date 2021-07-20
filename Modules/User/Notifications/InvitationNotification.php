@@ -12,35 +12,19 @@ class InvitationNotification extends Notification
     use Queueable;
     private $token;
     private $role;
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
+
     public function __construct($token, $role)
     {
         $this->token = $token;
         $this->role = $role;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param mixed $notifiable
-     * @return array
-     */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
-     */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject('Invitation')
@@ -48,13 +32,7 @@ class InvitationNotification extends Notification
             ->action('Accept', route('admin.accept-invitation', $this->token));
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //
