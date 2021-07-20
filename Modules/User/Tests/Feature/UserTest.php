@@ -33,4 +33,15 @@ class UserTest extends BaseTestCase
             "email" => null
         ]);
     }
+
+    public function testAdminCanResendInvitationToUser()
+    {
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("resend-invitation", [$this->default_resource_id]));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
+        ]);
+    }
 }
