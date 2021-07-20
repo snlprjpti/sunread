@@ -6,11 +6,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class AddInviteTokenOnAdmins extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::table('admins', function (Blueprint $table) {
@@ -18,11 +13,6 @@ class AddInviteTokenOnAdmins extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::table('admins', function (Blueprint $table) {
