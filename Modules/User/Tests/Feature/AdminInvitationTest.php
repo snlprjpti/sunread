@@ -37,7 +37,7 @@ class AdminInvitationTest extends BaseTestCase
             "password" => "new_password",
             "password_confirmation" => "new_password",
         ];
-        $response = $this->post(route("{$this->route_prefix}.accept-invitation"), $post_data);
+        $response = $this->post($this->getRoute("accept-invitation", $post_data));
 
         $response->assertOk();
         $response->assertJsonFragment([
