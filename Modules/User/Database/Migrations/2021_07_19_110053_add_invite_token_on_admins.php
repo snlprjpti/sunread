@@ -9,7 +9,7 @@ class AddInviteTokenOnAdmins extends Migration
     public function up(): void
     {
         Schema::table('admins', function (Blueprint $table) {
-            $table->string('invitation_token')->after('remember_token')->nullable();
+            $table->string('invitation_token')->unique()->after('remember_token')->nullable();
         });
     }
 
