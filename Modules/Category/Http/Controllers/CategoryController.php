@@ -121,10 +121,15 @@ class CategoryController extends BaseController
                 "category_id" => $id 
             ];
 
+            $name_data = array_merge($data, ["attribute" => "name"]);
+            $category->createModel();
+            $nameValue = $category->has($name_data) ? $category->getValues($name_data) : $category->getDefaultValues($name_data);
+
             $fetched = [];
             $fetched = [
                 "parent_id" => $category->parent_id,
-                "website_id" => $category->website_id
+                "website_id" => $category->website_id,
+                "name" => $nameValue?->value
             ];
             $fetched["attributes"] = $this->repository->getConfigData($data);
         }
@@ -157,6 +162,7 @@ class CategoryController extends BaseController
                 $this->categoryValueRepository->createOrUpdate($data, $updated);
                 if(isset($data["channels"])) $updated->channels()->sync($data["channels"]);
                 if(isset($data["products"])) $updated->products()->sync($data["products"]);
+                $updated->load("values");
             });
         }
         catch (Exception $exception)
@@ -226,7 +232,7 @@ class CategoryController extends BaseController
         try
         {
             $data = $request->validate([
-                "parent_id" => "required|numeric|exists:categories,id",
+                "parent_id" => "nullable|numeric|exists:categories,id",
                 "position" => "required|numeric"
             ]);
 
