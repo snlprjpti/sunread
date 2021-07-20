@@ -65,20 +65,22 @@ class UserController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "password" => "nullable|confirmed",
+                "password" => "sometimes|confirmed",
                 "status" => "sometimes|boolean",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
 
-            $data["password"] = Hash::make($data["password"]);
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
                 if ( $request->is_invite == true ) {
-                    $token = Str::random(60);
-                    $created->notify(new InvitationNotification($token));
+                    $token = Str::random(20);
                     $created->password = Hash::make(Str::random(20));
                     $created->invitation_token = $token;
                     $created->save();
+                    $created->notify(new InvitationNotification($token));
+                }
+                else {
+                    $data["password"] = Hash::make($request["password"]);
                 }
             });
         }
