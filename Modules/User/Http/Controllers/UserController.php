@@ -67,10 +67,11 @@ class UserController extends BaseController
             $data = $this->repository->validateData($request, [
                 "status" => "sometimes|boolean",
                 "is_invite" => "sometimes|boolean",
-                "password" => "required_if:is_invite,false|confirmed",
+                "password" => "required_unless:is_invite,true|confirmed",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
 
+            dd($data);
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
                 if ( $request->is_invite == true ) {
