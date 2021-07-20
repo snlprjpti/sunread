@@ -8,7 +8,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
-use Modules\User\Exceptions\AdminNotFoundException;
 use Modules\User\Repositories\AdminRepository;
 use Modules\User\Transformers\AdminResource;
 use Exception;
@@ -19,7 +18,7 @@ class UserInvitationController extends BaseController
 
     public function __construct(Admin $admin, AdminRepository $adminRepository)
     {
-        $this->middleware('guest:admin')->except(['logout']);
+        $this->middleware('guest:admin');
 
         $this->model = $admin;
         $this->model_name = "Admin account";
@@ -41,11 +40,12 @@ class UserInvitationController extends BaseController
                 'token' => 'required',
                 'password' => 'required|confirmed|min:6',
             ]);
-            $user = $this->model->whereInvitationToken($request->token)->first();
-            if (!$user) throw new AdminNotFoundException("Admin not found.");
+            $user = $this->model->whereInvitationToken($request->token)->firstOrFail();
 
-            $data["invitation_token"] = null;
-            $data["password"] = Hash::make($data["password"]);
+            $data = [
+                "invitation_token" => null,
+                "password" => Hash::make($data["password"])
+            ];
 
             $updated = $this->repository->update($data, $user->id, function ($updated) {
                 $updated->load("role");
