@@ -71,17 +71,19 @@ class UserController extends BaseController
                 "role_id" => "required|integer|exists:roles,id"
             ]);
 
-            $data["password"] = Hash::make($request["password"]);
-
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
                 if ( $request->is_invite == true ) {
-                    $token = Str::random(20);
+
+                    $token = $this->generateInvitationToken();
                     $created->password = Hash::make(Str::random(20));
                     $created->invitation_token = $token;
                     $created->save();
                     $role = $created->role->name ?? '';
                     $created->notify(new InvitationNotification($token, $role));
+                }
+                else {
+                    $data["password"] = Hash::make($request->password);
                 }
             });
         }
@@ -91,6 +93,21 @@ class UserController extends BaseController
         }
 
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+    }
+
+    public function generateInvitationToken()
+    {
+        $token = Str::random(20);
+
+        if ($this->tokenExists($token)) {
+            return $this->generateInvitationToken();
+        }
+        return $token;
+    }
+
+    public function tokenExists($token)
+    {
+        return $this->model->whereInvitationToken($token)->exists();
     }
 
     public function show(int $id): JsonResponse
