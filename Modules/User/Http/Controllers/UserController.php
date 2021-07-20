@@ -77,7 +77,8 @@ class UserController extends BaseController
                     $created->password = Hash::make(Str::random(20));
                     $created->invitation_token = $token;
                     $created->save();
-                    $created->notify(new InvitationNotification($token));
+                    $role = $created->role->name ?? '';
+                    $created->notify(new InvitationNotification($token, $role));
                 }
                 else {
                     $data["password"] = Hash::make($request["password"]);

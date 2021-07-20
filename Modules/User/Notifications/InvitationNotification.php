@@ -11,14 +11,16 @@ class InvitationNotification extends Notification
 {
     use Queueable;
     private $token;
+    private $role;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($token)
+    public function __construct($token, $role)
     {
         $this->token = $token;
+        $this->role = $role;
     }
 
     /**
@@ -42,7 +44,7 @@ class InvitationNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Invitation')
-            ->line('You are receiving this email because you are invited to '.env('APP_NAME','Sunread').' as Admin.')
+            ->line('You are receiving this email because you are invited to '.config('name','Sunread').' '.$this->role.' role')
             ->action('Accept', route('admin.accept-invitation', $this->token));
     }
 
