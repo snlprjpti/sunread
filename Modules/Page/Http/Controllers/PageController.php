@@ -12,17 +12,18 @@ use Modules\Page\Repositories\PageRepository;
 use Modules\Page\Repositories\PageTranslationRepository;
 use Modules\Page\Transformers\PageResource;
 use Exception;
+use Modules\Page\Repositories\PageScopeRepository;
 
 class PageController extends BaseController
 {
     protected $repository, $translation, $pageTranslationRepository;
 
-    public function __construct(Page $page, PageRepository $pageRepository, PageTranslationRepository $pageTranslationRepository)
+    public function __construct(Page $page, PageRepository $pageRepository, PageScopeRepository $pageScopeRepository)
     {
         $this->model = $page;
         $this->model_name = "Page";
         $this->repository = $pageRepository;
-        $this->pageTranslationRepository = $pageTranslationRepository;
+        $this->pageScopeRepository = $pageScopeRepository;
         parent::__construct($this->model, $this->model_name);
     }
 
@@ -59,8 +60,8 @@ class PageController extends BaseController
             });
             $this->repository->validateSlug($data);
 
-            $created = $this->repository->create($data, function($created) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translations, $created);
+            $created = $this->repository->create($data, function($created) use($data){
+                if(isset($data["page_scopes"])) $this->pageScopeRepository->updateOrCreate($data["page_scopes"], $created);
             });
         }
         catch (Exception $exception)
