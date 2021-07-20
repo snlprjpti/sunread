@@ -35,7 +35,9 @@ Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], f
 
         // User Routes
         Route::put("/users/{user_id}/status", [\Modules\User\Http\Controllers\UserController::class, "updateStatus"])->name("users.status");
+        Route::get("/users/{user_id}/resend-invitation", [\Modules\User\Http\Controllers\UserController::class, "resendInvitation"])->name("resend-invitation");
         Route::resource("users", UserController::class)->except(['create', 'edit']);
+
 
         // Account Routes
         Route::group(["prefix" => "account", "as" => "account."], function() {

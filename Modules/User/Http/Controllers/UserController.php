@@ -95,21 +95,6 @@ class UserController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function generateInvitationToken()
-    {
-        $token = Str::random(20);
-
-        if ($this->tokenExists($token)) {
-            return $this->generateInvitationToken();
-        }
-        return $token;
-    }
-
-    public function tokenExists($token)
-    {
-        return $this->model->whereInvitationToken($token)->exists();
-    }
-
     public function show(int $id): JsonResponse
     {
         try
@@ -184,5 +169,40 @@ class UserController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
+
+    public function generateInvitationToken()
+    {
+        $token = Str::random(20);
+
+        if ($this->tokenExists($token)) {
+            return $this->generateInvitationToken();
+        }
+        return $token;
+    }
+
+    public function tokenExists($token)
+    {
+        return $this->model->whereInvitationToken($token)->exists();
+    }
+
+    public function resendInvitation(int $id)
+    {
+        try
+        {
+            $fetched = $this->repository->fetch($id);
+            $token = $this->generateInvitationToken();
+            $fetched["password"] = Hash::make(Str::random(20));
+            $fetched["invitation_token"] = $token;
+            $fetched->save();
+            $role = $fetched->role->name ?? '';
+            $fetched->notify(new InvitationNotification($token, $role));
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 }
