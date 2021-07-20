@@ -13,47 +13,16 @@ use Modules\Page\Traits\HasPageConfiguration;
 class Page extends Model
 {
     use HasFactory, Sluggable;
-    use HasTranslation, HasPageConfiguration {
-        HasTranslation::getAttribute as getAttributeTranslate;
-        HasPageConfiguration::getAttribute as getAttributeConfig;
+
+    protected $fillable = [ "slug", "title", "position", "status", "meta_title", "meta_description", "meta_keywords" ];
+
+    public function page_attributes(): HasMany
+    {
+        return $this->hasMany(PageAttribute::class);
     }
 
-    public function getAttribute($name)
+    public function page_scopes(): HasMany
     {
-        if( array_key_exists("store_id", getallheaders())) {
-            return $this->getAttributeTranslate($name);
-        }
-        else {
-            return $this->getAttributeConfig($name);
-        }
-    }
-
-    protected $fillable = [ "parent_id", "slug", "title", "description", "position", "status", "meta_title", "meta_description", "meta_keywords" ];
-    protected $with = [ "translations" ];
-
-    public $translatedAttributes = [ "title", "description", "meta_title", "meta_description", "meta_keywords" ];
-    public $translatedModels = [ PageTranslation::class, "page_id" ];
-
-    public $configAttributes = [ "title", "description", "status", "meta_title", "meta_description", "meta_keywords" ];
-    public $configModels = [ PageConfiguration::class ];
-
-    public function translations(): HasMany
-    {
-        return $this->hasMany(PageTranslation::class);
-    }
-
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(static::class, "parent_id");
-    }
-
-    public function scopePublished(object $query): object
-    {
-        return $query->whereStatus(1);
-    }
-
-    public function images(): HasMany
-    {
-        return $this->hasMany(PageImage::class);
+        return $this->hasMany(PageScope::class);
     }
 }
