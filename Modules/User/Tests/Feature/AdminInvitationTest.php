@@ -27,11 +27,7 @@ class AdminInvitationTest extends BaseTestCase
 
     public function createAdmin(array $attributes = []): object
     {
-        $data = [
-            "invitation_token" => \Str::random(20)
-        ];
-
-        return Admin::factory()->create($data);
+        return Admin::factory()->create(["invitation_token" => \Str::random(20) ]);
     }
 
     public function testUserShouldBeAbleToAcceptInvitation()
