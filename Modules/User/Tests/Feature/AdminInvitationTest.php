@@ -12,7 +12,6 @@ class AdminInvitationTest extends BaseTestCase
         $this->model = Admin::class;
 
         parent::setUp();
-        $this->admin = $this->createAdmin(["invitation_token" => \Str::random(20) ]);
 
         $this->model_name = "Admin account";
         $this->route_prefix = "admin";
@@ -33,7 +32,7 @@ class AdminInvitationTest extends BaseTestCase
     public function testUserShouldBeAbleToAcceptInvitation()
     {
         $post_data = [
-            "invitation_token" => $this->admin->invitation_token,
+            "invitation_token" => $this->createAdmin()->invitation_token,
             "password" => "new_password",
             "password_confirmation" => "new_password",
         ];
