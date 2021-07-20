@@ -52,7 +52,7 @@ class AdminInvitationTest extends BaseTestCase
     public function testUserShouldBeAbleToAcceptInvitation()
     {
         $post_data = [
-            "token" => $this->admin->invitation_token,
+            "invitation_token" => $this->admin->invitation_token,
             "password" => "new_password",
             "password_confirmation" => "new_password",
         ];

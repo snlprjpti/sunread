@@ -37,10 +37,10 @@ class UserInvitationController extends BaseController
         try
         {
             $data = $request->validate([
-                'token' => 'required',
+                'invitation_token' => 'required',
                 'password' => 'required|confirmed|min:6',
             ]);
-            $user = $this->model->whereInvitationToken($request->token)->firstOrFail();
+            $user = $this->model->whereInvitationToken($request->invitation_token)->firstOrFail();
 
             $data = [
                 "invitation_token" => null,
