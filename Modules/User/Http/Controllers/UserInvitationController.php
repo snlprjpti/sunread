@@ -32,6 +32,21 @@ class UserInvitationController extends BaseController
         return new AdminResource($data);
     }
 
+    public function getInvitationToken(Request $request)
+    {
+        try
+        {
+            $token = $request->token;
+            if(!$token) throw new Exception('Token Not Found');
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($token, $this->lang('fetch-success'));
+    }
+
     public function acceptInvitation(Request $request): JsonResponse
     {
         try

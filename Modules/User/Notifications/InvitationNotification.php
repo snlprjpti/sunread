@@ -28,8 +28,8 @@ class InvitationNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Invitation')
-            ->line('You are receiving this email because you are invited to '.config('name','Sunread').' for the '.$this->role.' role.')
-            ->line('Your invitation code is '. $this->token);
+            ->line('You are receiving this email because you are invited to '.config('name','Sunread').' for the '.$this->role. ' role.')
+            ->action('Accept Invitation', route('admin.invitation-info', ['token' => $this->token]));
     }
 
     public function toArray($notifiable): array
