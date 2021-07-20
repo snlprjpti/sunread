@@ -23,7 +23,7 @@ class CreateCustomersTable extends Migration
             $table->date('date_of_birth')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->tinyInteger('is_lock')->default(0);
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('profile_image')->nullable();
             $table->string('tax_number')->nullable();
 
