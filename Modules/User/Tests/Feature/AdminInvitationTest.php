@@ -34,21 +34,6 @@ class AdminInvitationTest extends BaseTestCase
         return Admin::factory()->create($data);
     }
 
-    public function getCreateData(): array
-    {
-        return array_merge($this->model::factory()->make()->toArray(), [
-            "password" => "password",
-            "password_confirmation" => "password"
-        ]);
-    }
-
-    public function getInvalidCreateData(): array
-    {
-        return array_merge($this->getCreateData(), [
-            "email" => null
-        ]);
-    }
-
     public function testUserShouldBeAbleToAcceptInvitation()
     {
         $post_data = [
