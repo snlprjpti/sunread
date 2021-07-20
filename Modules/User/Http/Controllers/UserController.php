@@ -16,7 +16,6 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Exceptions\CannotDeleteSelfException;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\User\Exceptions\CannotDeleteSuperAdminException;
-use Illuminate\Notifications\Notification;
 
 class UserController extends BaseController
 {
@@ -71,7 +70,6 @@ class UserController extends BaseController
                 "role_id" => "required|integer|exists:roles,id"
             ]);
 
-            dd($data);
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
                 if ( $request->is_invite == true ) {
