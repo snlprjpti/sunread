@@ -65,8 +65,9 @@ class UserController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "password" => "sometimes|confirmed",
                 "status" => "sometimes|boolean",
+                "is_invite" => "sometimes|boolean",
+                "password" => "required_if:is_invite,false|confirmed",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
 
