@@ -71,6 +71,8 @@ class UserController extends BaseController
                 "role_id" => "required|integer|exists:roles,id"
             ]);
 
+            $data["password"] = Hash::make($request["password"]);
+
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
                 if ( $request->is_invite == true ) {
@@ -80,9 +82,6 @@ class UserController extends BaseController
                     $created->save();
                     $role = $created->role->name ?? '';
                     $created->notify(new InvitationNotification($token, $role));
-                }
-                else {
-                    $data["password"] = Hash::make($request["password"]);
                 }
             });
         }
