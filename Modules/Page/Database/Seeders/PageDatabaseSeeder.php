@@ -11,7 +11,5 @@ class PageDatabaseSeeder extends Seeder
     {
         Model::unguard();
         $this->call(PageTableSeeder::class);
-        $this->call(PageConfigurationTableSeeder::class);
-        $this->call(PageImageTableSeeder::class);
     }
 }
