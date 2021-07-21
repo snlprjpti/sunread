@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Modules\Page\Entities\PageScope;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Modules\Core\Rules\ScopeRule;
 
 class PageScopeRepository extends BaseRepository
@@ -30,29 +31,29 @@ class PageScopeRepository extends BaseRepository
         Event::dispatch("{$this->model_key}.sync.before");
         try
         {
-            $page_scope = [];
+            $page_scopes = [];
             foreach($scopes as $scope)
             {  
                 $data = $this->validateData(new Request($scope), [
                     "scope_id" => [ "required", "numeric", new ScopeRule($scope["scope"]) ]
                 ]);
                 $data["page_id"] = $parent->id;
-                if($page_scope = $this->model->where($data)->first())
+
+                if($exist = $this->model->where($data)->first())
                 {
-                    dd($this->model->update($data, $page_scope->id));
+                    $page_scopes[] = $exist;
                     continue;
                 }
-                $page_scope[] = $this->model->create($data);
+                $page_scopes[] = $this->create($data);
             }
-            // dd($page_scope);
-            // $parent->page_scopes()->whereNotIn('id', array_filter(Arr::pluck($groups, 'id')))->delete();
+            $parent->page_scopes()->whereNotIn('id', array_filter(Arr::pluck($page_scopes, 'id')))->delete();
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        Event::dispatch("{$this->model_key}.sync.after", []);
+        Event::dispatch("{$this->model_key}.sync.after", $page_scopes);
         DB::commit();
     }
 }

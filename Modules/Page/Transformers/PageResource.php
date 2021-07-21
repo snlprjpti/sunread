@@ -10,16 +10,15 @@ class PageResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "parent" => new PageResource($this->whenLoaded("parent")),
             "slug" => $this->slug,
             "title" => $this->title,
             "position" => $this->position,
-            "description" => $this->description,
             "status" => (bool) $this->status,
             "meta_title" => $this->meta_title,
             "meta_description" => $this->meta_description,
             "meta_keywords" => $this->meta_keywords,
-            "translations" => PageTranslationResource::collection($this->whenLoaded("translations")),
+            "scopes" => PageScopeResource::collection($this->whenLoaded("page_scopes")),
+            "attributes" => PageAttributeResource::collection($this->whenLoaded("page_attributes")),
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
