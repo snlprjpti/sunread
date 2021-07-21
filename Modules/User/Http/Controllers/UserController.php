@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Modules\User\Exceptions\AdminAlreadyActiveException;
 use Modules\User\Notifications\InvitationNotification;
 use Modules\User\Transformers\AdminResource;
 use Modules\User\Repositories\AdminRepository;
@@ -29,7 +30,8 @@ class UserController extends BaseController
         $this->model_name = "Admin";
         $exception_statuses = [
             CannotDeleteSelfException::class => 403,
-            CannotDeleteSuperAdminException::class => 403
+            CannotDeleteSuperAdminException::class => 403,
+            AdminAlreadyActiveException::class => 403
         ];
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);
@@ -186,7 +188,7 @@ class UserController extends BaseController
         try
         {
             $fetched = $this->repository->fetch($id);
-            if( is_null($fetched->invitation_token) ) throw new Exception(__("core::app.users.users.already-active"));
+            if( is_null($fetched->invitation_token) ) throw new AdminAlreadyActiveException();
             $token = $this->generateInvitationToken();
             $fetched->password = Hash::make(Str::random(20));
             $fetched->invitation_token = $token;
