@@ -37,7 +37,7 @@ class UserInvitationController extends BaseController
         try
         {
             $token = $request->token;
-            if(!$token) throw new Exception('Token Not Found');
+            if(!$token) throw new Exception(__("core::app.users.token.token-missing"));
         }
         catch (Exception $exception)
         {
