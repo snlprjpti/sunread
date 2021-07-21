@@ -26,7 +26,7 @@ class AdminInvitationTest extends BaseTestCase
 
     public function createAdmin(array $attributes = []): object
     {
-        return Admin::factory()->create(["invitation_token" => \Str::random(20) ]);
+        return $this->model::factory()->create(["invitation_token" => \Str::random(20) ]);
     }
 
     public function testUserShouldBeAbleToAcceptInvitation()
@@ -63,13 +63,25 @@ class AdminInvitationTest extends BaseTestCase
 
     public function testUserShouldBeAbleToGetInvitationToken()
     {
-        $token = \Str::random(20);
+        $token = $this->createAdmin()->invitation_token;
         $response = $this->get($this->getRoute("invitation-info",  [$token]));
 
         $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-success",  ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testShouldReturnErrorIfInvitationTokenInvalid()
+    {
+        $token = "Invalid_Token";
+        $response = $this->get($this->getRoute("invitation-info",  [$token]));
+
+        $response->assertNotFound();
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
         ]);
     }
 }

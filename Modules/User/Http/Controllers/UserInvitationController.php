@@ -35,12 +35,13 @@ class UserInvitationController extends BaseController
         return new AdminResource($data);
     }
 
-    public function getInvitationToken(Request $request)
+    public function getInvitationToken(Request $request): jsonResponse
     {
         try
         {
             $token = $request->token;
             if(!$token) throw new Exception(__("core::app.users.token.token-missing"));
+            if( !$this->model->whereInvitationToken($request->token)->firstOrFail() );
         }
         catch (Exception $exception)
         {
