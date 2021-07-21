@@ -171,19 +171,14 @@ class UserController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 
-    public function generateInvitationToken()
+    public function generateInvitationToken(): string
     {
-        $token = Str::random(20);
-
-        if ($this->tokenExists($token)) {
-            return $this->generateInvitationToken();
+        do {
+            $token = Str::random(20);
         }
-        return $token;
-    }
+        while ($this->model->whereInvitationToken($token)->exists());
 
-    public function tokenExists($token)
-    {
-        return $this->model->whereInvitationToken($token)->exists();
+        return $token;
     }
 
     public function resendInvitation(int $id): JsonResponse
