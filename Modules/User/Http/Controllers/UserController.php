@@ -191,7 +191,7 @@ class UserController extends BaseController
         try
         {
             $fetched = $this->repository->fetch($id);
-            if( is_null($fetched->invitation_token) ) throw new Exception(__("core::app.response.not-found"), 404);
+            if( is_null($fetched->invitation_token) ) throw new Exception(__("core::app.users.users.already-active"));
             $token = $this->generateInvitationToken();
             $fetched->password = Hash::make(Str::random(20));
             $fetched->invitation_token = $token;
