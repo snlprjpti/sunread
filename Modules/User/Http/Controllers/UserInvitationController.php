@@ -60,7 +60,7 @@ class UserInvitationController extends BaseController
             ]);
             $user = $this->model->whereInvitationToken($request->invitation_token)->firstOrFail();
 
-            if (!$user) throw new Exception(__("core::app.response.not-found"));
+            if (!$user) throw new Exception(__("core::app.response.not-found"), 403);
 
             $data = [
                 "invitation_token" => null,
