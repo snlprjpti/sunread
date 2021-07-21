@@ -60,7 +60,7 @@ class UserInvitationController extends BaseController
             ]);
             $user = $this->model->whereInvitationToken($request->invitation_token)->first();
 
-            if (! $user ) throw new AdminNotFoundException(__("core::app.response.not-found"));
+            if (! $user ) throw new AdminNotFoundException(__("core::app.response.not-found", [ "name" => $this->model_name ]));
             $data = [
                 "invitation_token" => null,
                 "password" => Hash::make($data["password"])

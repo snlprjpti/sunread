@@ -57,7 +57,7 @@ class AdminInvitationTest extends BaseTestCase
         $response->assertStatus(403);
         $response->assertJsonFragment([
             "status" => "error",
-            "message" => __("core::app.response.not-found")
+            "message" => __("core::app.response.not-found",  ["name" => $this->model_name])
         ]);
     }
 
