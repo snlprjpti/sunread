@@ -60,4 +60,16 @@ class AdminInvitationTest extends BaseTestCase
             "message" => __("core::app.response.not-found",  ["name" => $this->model_name])
         ]);
     }
+
+    public function testUserShouldBeAbleToGetInvitationToken()
+    {
+        $token = \Str::random(20);
+        $response = $this->get($this->getRoute("invitation-info",  [$token]));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success",  ["name" => $this->model_name])
+        ]);
+    }
 }
