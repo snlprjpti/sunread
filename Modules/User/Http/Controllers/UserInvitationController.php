@@ -48,7 +48,7 @@ class UserInvitationController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($token, $this->lang('fetch-success'));
+        return $this->successResponse( [ "invitation_token"=>$token ], $this->lang('fetch-success'));
     }
 
     public function acceptInvitation(Request $request): JsonResponse

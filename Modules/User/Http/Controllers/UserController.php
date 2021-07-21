@@ -9,7 +9,6 @@ use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Modules\User\Exceptions\AdminAlreadyActiveException;
-use Modules\User\Notifications\InvitationNotification;
 use Modules\User\Transformers\AdminResource;
 use Modules\User\Repositories\AdminRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -75,8 +74,8 @@ class UserController extends BaseController
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
                 if ( $request->is_invite == true ) {
-                    $token = $this->generateInvitationToken();
-                    $created = $this->repository->sendNotification($created,$token);
+                    $invitation_token = $this->generateInvitationToken();
+                    $created = $this->repository->sendNotification($created,$invitation_token);
                 }
                 else {
                     $created->password = Hash::make($request->password);

@@ -129,17 +129,17 @@ class AdminRepository extends BaseRepository
         return $data;
     }
 
-    public function sendNotification(object $data, string $token): object
+    public function sendNotification(object $data, string $invitation_token): object
     {
         DB::beginTransaction();
 
         try
         {
             $data->password = Hash::make(Str::random(20));
-            $data->invitation_token = $token;
+            $data->invitation_token = $invitation_token;
             $data->save();
             $role = $data->role->name ?? '';
-            $data->notify(new InvitationNotification($token, $role));
+            $data->notify(new InvitationNotification($invitation_token, $role));
         }
         catch (Exception $exception)
         {

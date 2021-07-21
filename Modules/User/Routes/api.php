@@ -49,6 +49,6 @@ Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], f
         });
     });
 
-    Route::get("/invitation-info/{token}", [UserInvitationController::class, "getInvitationToken"])->name("invitation-info");
+    Route::get("/invitation-info/{invitation_token}", [UserInvitationController::class, "getInvitationToken"])->name("invitation-info");
     Route::post("/accept-invitation", [UserInvitationController::class, "acceptInvitation"])->name("accept-invitation");
 });

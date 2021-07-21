@@ -10,12 +10,12 @@ use Illuminate\Notifications\Messages\MailMessage;
 class InvitationNotification extends Notification
 {
     use Queueable;
-    private $token;
+    private $invitation_token;
     private $role;
 
-    public function __construct($token, $role)
+    public function __construct($invitation_token, $role)
     {
-        $this->token = $token;
+        $this->invitation_token = $invitation_token;
         $this->role = $role;
     }
 
@@ -29,7 +29,7 @@ class InvitationNotification extends Notification
         return (new MailMessage)
             ->subject('Invitation')
             ->line('You are receiving this email because you are invited to '.config('name','Sunread').' for the '.$this->role. ' role.')
-            ->action('Accept Invitation', route('admin.invitation-info', ['token' => $this->token]));
+            ->action('Accept Invitation', route('admin.invitation-info',$this->invitation_token));
     }
 
     public function toArray($notifiable): array
