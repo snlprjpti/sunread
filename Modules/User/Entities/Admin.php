@@ -9,7 +9,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Modules\User\Notifications\ResetPasswordNotification;
-use phpDocumentor\Reflection\Types\Boolean;
 
 class Admin extends Authenticatable implements JWTSubject
 {
@@ -115,5 +114,4 @@ class Admin extends Authenticatable implements JWTSubject
     {
         return $this->invitation_token ? true : false;
     }
-
 }
