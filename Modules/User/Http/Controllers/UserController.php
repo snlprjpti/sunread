@@ -137,7 +137,7 @@ class UserController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         try
         {
