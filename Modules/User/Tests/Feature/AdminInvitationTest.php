@@ -44,5 +44,21 @@ class AdminInvitationTest extends BaseTestCase
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
         ]);
     }
+    public function testUserShouldNotBeAbleToAcceptInvitationWithInvalidToken()
+    {
+        $invitation_token = \Str::random(20);
+        $post_data = [
+            "invitation_token" => $invitation_token,
+            "password" => "new_password",
+            "password_confirmation" => "new_password",
+        ];
+        $response = $this->post($this->getRoute("accept-invitation", $post_data));
+
+        $response->assertStatus(404);
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found",  ["name" => $this->model_name])
+        ]);
+    }
 
 }
