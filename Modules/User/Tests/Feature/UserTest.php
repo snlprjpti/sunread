@@ -36,7 +36,7 @@ class UserTest extends BaseTestCase
 
     public function testAdminCanResendInvitationToUser()
     {
-        $newAdmin = Admin::factory()->create(["invitation_token" => \Str::random(20) ]);
+        $newAdmin = $this->model::factory()->create(["invitation_token" => \Str::random(20) ]);
         $response = $this->withHeaders($this->headers)->put($this->getRoute("resend-invitation", [$newAdmin->id]));
 
         $response->assertOk();
@@ -48,7 +48,7 @@ class UserTest extends BaseTestCase
 
     public function testAdminShouldNotBeAbleToResendInvitationIfUserNoLongerInvitedStatus()
     {
-        $newAdmin = Admin::factory()->create(["invitation_token" => null]);
+        $newAdmin = $this->model::factory()->create(["invitation_token" => null]);
 
         $response = $this->withHeaders($this->headers)->put($this->getRoute("resend-invitation", [$newAdmin->id]));
 
