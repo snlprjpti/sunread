@@ -1,6 +1,9 @@
 <?php
 
 Route::group(["middleware" => ["api"]], function () {
+    // Resolver
+    Route::get("resolver/{website?}", [Modules\Core\Http\Controllers\ResolverController::class, "resolve"])->name("resolver");
+
     // Visitor channel stores
     Route::get("channels/{id}/stores", [Modules\Core\Http\Controllers\Visitors\ChannelController::class, "stores"])->name("channels.stores.index");
 
