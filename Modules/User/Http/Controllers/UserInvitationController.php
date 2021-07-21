@@ -2,6 +2,7 @@
 
 namespace Modules\User\Http\Controllers;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -22,9 +23,11 @@ class UserInvitationController extends BaseController
 
         $this->model = $admin;
         $this->model_name = "Admin account";
-
-        parent::__construct($this->model, $this->model_name);
         $this->repository = $adminRepository;
+        $exception_statuses = [
+            ModelNotFoundException::class => 403
+        ];
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function resource(object $data): JsonResource
