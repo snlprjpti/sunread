@@ -44,6 +44,7 @@ class AdminInvitationTest extends BaseTestCase
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
         ]);
     }
+
     public function testUserShouldNotBeAbleToAcceptInvitationWithInvalidToken()
     {
         $invitation_token = \Str::random(20);
@@ -60,5 +61,4 @@ class AdminInvitationTest extends BaseTestCase
             "message" => __("core::app.response.not-found",  ["name" => $this->model_name])
         ]);
     }
-
 }
