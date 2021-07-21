@@ -75,13 +75,8 @@ class UserController extends BaseController
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
                 if ( $request->is_invite == true ) {
-
                     $token = $this->generateInvitationToken();
-                    $created->password = Hash::make(Str::random(20));
-                    $created->invitation_token = $token;
-                    $created->save();
-                    $role = $created->role->name ?? '';
-                    $created->notify(new InvitationNotification($token, $role));
+                    $created = $this->repository->sendNotification($created,$token);
                 }
                 else {
                     $created->password = Hash::make($request->password);
@@ -190,11 +185,7 @@ class UserController extends BaseController
             $fetched = $this->repository->fetch($id);
             if( is_null($fetched->invitation_token) ) throw new AdminAlreadyActiveException();
             $token = $this->generateInvitationToken();
-            $fetched->password = Hash::make(Str::random(20));
-            $fetched->invitation_token = $token;
-            $fetched->save();
-            $role = $fetched->role->name ?? '';
-            $fetched->notify(new InvitationNotification($token, $role));
+            $fetched = $this->repository->sendNotification($fetched, $token);
         }
         catch (Exception $exception)
         {

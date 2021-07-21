@@ -3,12 +3,15 @@
 namespace Modules\User\Repositories;
 
 use Exception;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Modules\User\Entities\Admin;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\User\Notifications\InvitationNotification;
 
 class AdminRepository extends BaseRepository
 {
@@ -97,7 +100,7 @@ class AdminRepository extends BaseRepository
 
             $path_array = explode("/", $updated->profile_image);
             unset($path_array[count($path_array) - 1]);
-    
+
             $delete_folder = implode("/", $path_array);
             Storage::disk("public")->deleteDirectory($delete_folder);
 
@@ -122,6 +125,29 @@ class AdminRepository extends BaseRepository
             "current_password" => "required",
             "password" => "required|confirmed"
         ]);
+
+        return $data;
+    }
+
+    public function sendNotification(object $data, string $token): object
+    {
+        DB::beginTransaction();
+
+        try
+        {
+            $data->password = Hash::make(Str::random(20));
+            $data->invitation_token = $token;
+            $data->save();
+            $role = $data->role->name ?? '';
+            $data->notify(new InvitationNotification($token, $role));
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
 
         return $data;
     }
