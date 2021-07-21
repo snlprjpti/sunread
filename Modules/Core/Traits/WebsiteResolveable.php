@@ -16,13 +16,17 @@ trait WebsiteResolveable
         return $root_domain;
     }
 
-    public function resolveWebsite(): ?object
+    public function resolveWebsite(?int $website_id = null): ?object
     {
         $domain = $this->getDomain();
-        $website = ( config("website.environment") == "local" )
-            ? Website::find(config("website.fallback_id"))
-            : Website::whereHostname($domain)->first();
-        return $website;
+        $fallback_id = $website_id ?? config("website.fallback_id");
+
+        $website = Website::whereHostname($domain);
+        if ( !$website->exists() && config("website.environment") == "local" ) {
+            $website = Website::whereId($fallback_id);
+        }
+
+        return $website->with("channels.stores")->firstOrFail();
     }
 
     public function fetchAll(object $request, array $with = [], ?callable $callback = null): object
