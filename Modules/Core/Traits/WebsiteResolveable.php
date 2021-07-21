@@ -7,19 +7,23 @@ use Modules\Core\Entities\Website;
 
 trait WebsiteResolveable
 {
-    public function getDomain(): string
+    public function getDomain(?string $naked_domain = null): string
     {
-        $naked_domain = str_replace(["http://", "https://"], "", Request::root());
+        $naked_domain = str_replace(["http://", "https://"], "", $naked_domain ?? Request::root());
         $naked_domain = explode("/", $naked_domain)[0];
         $root_domain = explode(":", $naked_domain)[0];
 
         return $root_domain;
     }
 
-    public function resolveWebsite(?int $website_id = null): ?object
+    public function resolveWebsite(?string $website_domain = null): ?object
     {
         $domain = $this->getDomain();
-        $fallback_id = $website_id ?? config("website.fallback_id");
+
+        $fallback_id = config("website.fallback_id");
+        if ($website_domain !== null) {
+            $fallback_id = Website::whereHostname($this->getDomain($website_domain))->firstOrFail()?->id;
+        }
 
         $website = Website::whereHostname($domain);
         if ( !$website->exists() && config("website.environment") == "local" ) {
