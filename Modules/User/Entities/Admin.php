@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Modules\User\Notifications\ResetPasswordNotification;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class Admin extends Authenticatable implements JWTSubject
 {
@@ -17,7 +18,7 @@ class Admin extends Authenticatable implements JWTSubject
     public static $SEARCHABLE = [ "first_name", "email" ];
     protected $fillable = [ "first_name", "last_name", "email", "password", "api_token", "role_id", "status", "company", "address", "profile_image", "invitation_token" ];
     protected $hidden = [ "password", "api_token", "remember_token" ];
-    protected $appends = [ "avatar", "profile_image_url", "is_invite" ];
+    protected $appends = [ "avatar", "profile_image_url" ];
 
     public function role(): BelongsTo
     {
@@ -110,8 +111,4 @@ class Admin extends Authenticatable implements JWTSubject
         return ucwords("{$this->first_name} {$this->last_name}");
     }
 
-    public function getIsInviteAttribute(): bool
-    {
-        return $this->invitation_token ? true : false;
-    }
 }
