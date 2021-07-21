@@ -39,9 +39,9 @@ class UserInvitationController extends BaseController
     {
         try
         {
-            $token = $request->token;
-            if(!$token) throw new Exception(__("core::app.users.token.token-missing"));
-            if( !$this->model->whereInvitationToken($request->token)->firstOrFail() );
+            $token = $request->invitation_token;
+            if( !$token ) throw new Exception(__("core::app.users.token.token-missing"));
+            if( !$this->model->whereInvitationToken( $request->invitation_token )->firstOrFail() );
         }
         catch (Exception $exception)
         {
