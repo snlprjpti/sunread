@@ -82,7 +82,8 @@ class UserController extends BaseController
                     $created->notify(new InvitationNotification($token, $role));
                 }
                 else {
-                    $data["password"] = Hash::make($request->password);
+                    $created->password = Hash::make($request->password);
+                    $created->save();
                 }
             });
         }
@@ -185,14 +186,15 @@ class UserController extends BaseController
         return $this->model->whereInvitationToken($token)->exists();
     }
 
-    public function resendInvitation(int $id)
+    public function resendInvitation(int $id): JsonResponse
     {
         try
         {
             $fetched = $this->repository->fetch($id);
+            if( is_null($fetched->invitation_token) ) throw new Exception(__("core::app.response.not-found"), 404);
             $token = $this->generateInvitationToken();
-            $fetched["password"] = Hash::make(Str::random(20));
-            $fetched["invitation_token"] = $token;
+            $fetched->password = Hash::make(Str::random(20));
+            $fetched->invitation_token = $token;
             $fetched->save();
             $role = $fetched->role->name ?? '';
             $fetched->notify(new InvitationNotification($token, $role));

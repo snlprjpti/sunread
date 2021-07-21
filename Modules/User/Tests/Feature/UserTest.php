@@ -36,12 +36,24 @@ class UserTest extends BaseTestCase
 
     public function testAdminCanResendInvitationToUser()
     {
-        $response = $this->withHeaders($this->headers)->put($this->getRoute("resend-invitation", [$this->default_resource_id]));
+        $newAdmin = Admin::factory()->create(["invitation_token" => \Str::random(20) ]);
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("resend-invitation", [$newAdmin->id]));
 
         $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testAdminShouldNotBeAbleToResendInvitationIfUserNoLongerInvitedStatus()
+    {
+        $response = $this->withHeaders($this->headers)->put($this->getRoute("resend-invitation", [$this->fake_resource_id]));
+
+        $response->assertNotFound();
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
         ]);
     }
 }
