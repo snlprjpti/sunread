@@ -4,11 +4,10 @@ namespace Modules\Page\Tests\Feature;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Modules\Core\Entities\Store;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Page\Entities\Page;
 use Illuminate\Support\Str;
-use Modules\Core\Entities\Website;
+use Modules\Page\Entities\PageScope;
 
 class PageTest extends BaseTestCase
 {
@@ -36,18 +35,7 @@ class PageTest extends BaseTestCase
 
         for($i = 0; $i < rand(1,2); $i++)
         {
-            $data["scope"] = Arr::random([ "website", "store" ]);
-
-            switch ($data["scope"]) {
-                case "website":
-                    $data["scope_id"] = Website::factory()->create()->id;
-                    break;
-    
-                case "store":
-                    $data["scope_id"] = Store::factory()->create()->id;
-                    break;
-            }
-            $scopes[] = $data;
+            $scopes[] = PageScope::factory()->make()->toArray();
         }
 
         for($i = 0; $i < rand(1,2); $i++)
@@ -67,6 +55,7 @@ class PageTest extends BaseTestCase
                 "position" => rand(1,2)
             ];
         }
+        
         return array_merge($this->model::factory()->make()->toArray(), [
             "scopes" => $scopes,
             "components" => $singleItem
