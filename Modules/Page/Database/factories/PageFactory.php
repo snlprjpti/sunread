@@ -2,9 +2,6 @@
 namespace Modules\Page\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Arr;
-use Modules\Core\Entities\Store;
-use Modules\Core\Entities\Website;
 
 class PageFactory extends Factory
 {
