@@ -106,7 +106,7 @@ class PageAttributeRepository extends BaseRepository
         ];        
     }
 
-    public function getChildren(array $elements, ?int $key = null, array $values): void
+    private function getChildren(array $elements, ?int $key = null, array $values): void
     {
         if(count($this->children) > 0) $this->parent[] = $this->children;
         $this->children = [];
@@ -134,7 +134,7 @@ class PageAttributeRepository extends BaseRepository
         }
     }
 
-    public function getAttributes(array $elements): void
+    private function getAttributes(array $elements): void
     {
         foreach($elements as $element)
         {
