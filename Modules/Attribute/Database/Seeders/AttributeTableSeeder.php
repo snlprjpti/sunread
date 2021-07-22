@@ -273,7 +273,7 @@ class AttributeTableSeeder extends Seeder
                 "attribute_id" => $attribute_data->id
             ]);
 
-            if(isset($attribute["options"])) 
+            if(isset($attribute["options"]))
             {
                 $count = 0;
                 array_map(function($attribute_option) use($attribute_data, $attribute, $count) {
@@ -283,7 +283,8 @@ class AttributeTableSeeder extends Seeder
                             "attribute_id" => $attribute_data->id,
                             "name" => $attribute_option,
                             "position" => ++$count,
-                            "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0
+                            "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0,
+                            "code" => $attribute_option,
                         ]);
                     });
                 }, $attribute["options"]);
