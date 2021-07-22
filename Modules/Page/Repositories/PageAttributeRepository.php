@@ -29,7 +29,7 @@ class PageAttributeRepository extends BaseRepository
         ];
     }
 
-    public function validateAttribute(array $component)
+    public function validateAttribute(array $component): array
     {
         $this->attributes = [];
 
@@ -91,7 +91,7 @@ class PageAttributeRepository extends BaseRepository
         DB::commit();
     }
 
-    public function show(string $slug, $values = [])
+    public function show(string $slug, array $values = []): array
     {
         $this->children = []; 
         $this->parent = [];
@@ -106,7 +106,7 @@ class PageAttributeRepository extends BaseRepository
         ];        
     }
 
-    public function getChildren($elements, $key = null, $values)
+    public function getChildren(array $elements, ?int $key = null, array $values): void
     {
         if(count($this->children) > 0) $this->parent[] = $this->children;
         $this->children = [];
@@ -134,7 +134,7 @@ class PageAttributeRepository extends BaseRepository
         }
     }
 
-    public function getAttributes($elements)
+    public function getAttributes(array $elements): void
     {
         foreach($elements as $element)
         {
@@ -147,7 +147,7 @@ class PageAttributeRepository extends BaseRepository
         }
     }
 
-    public function getComponents()
+    public function getComponents(): array
     {
         $component = [];
         foreach($this->config_fields as $field)
