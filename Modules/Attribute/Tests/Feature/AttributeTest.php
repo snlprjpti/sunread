@@ -47,11 +47,11 @@ class AttributeTest extends BaseTestCase
                 ]
             ]
         ];
-        return $this->default_resource->is_user_defined 
+        return $this->default_resource->is_user_defined
             ? array_merge($this->model::factory()->make([
                 'type' => $this->default_resource->type,
                 'slug' => $this->default_resource->slug
-            ])->toArray(), $translations) 
+            ])->toArray(), $translations)
             : array_merge($this->default_resource->toArray(), [
                 'name' => Str::random(10)
             ], $translations);
@@ -75,7 +75,7 @@ class AttributeTest extends BaseTestCase
     {
         return array_merge($this->getUpdateData(), [
             "validation" => null
-        ]); 
+        ]);
     }
 
     public function testShouldReturnErrorIfNonUserDefinedAttributeIsDeleted()
@@ -110,7 +110,7 @@ class AttributeTest extends BaseTestCase
     {
         $resource_id = $this->model::factory()->create([
             "is_user_defined" => 1
-        ])->id; 
+        ])->id;
 
         $response = $this->withHeaders($this->headers)->delete($this->getRoute("destroy", [$resource_id]));
 
@@ -140,7 +140,7 @@ class AttributeTest extends BaseTestCase
         $post_data = $this->addAttributeOptionIfNecessary($post_data);
 
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
- 
+
         $response->assertCreated();
         $response->assertJsonFragment([
             "status" => "success",
@@ -180,7 +180,7 @@ class AttributeTest extends BaseTestCase
     {
         $post_data = $this->getCreateData();
         $post_data = $this->addAttributeOptionIfNecessary($post_data);
-        
+
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->fake_resource_id]), $post_data);
 
         $response->assertNotFound();
@@ -198,6 +198,7 @@ class AttributeTest extends BaseTestCase
                 [
                     "name" => "blue",
                     "position" => 2,
+                    "code" => "Blue",
                     "translations" => [
                         [
                             "name" => "nilo",
@@ -205,8 +206,8 @@ class AttributeTest extends BaseTestCase
                         ]
                     ]
                 ]
-            ];   
-        }   
+            ];
+        }
 
         return $post_data;
     }
