@@ -4,6 +4,7 @@ use Modules\User\Http\Controllers\AccountController;
 use Modules\User\Http\Controllers\SessionController;
 use Modules\User\Http\Controllers\ResetPasswordController;
 use Modules\User\Http\Controllers\ForgotPasswordController;
+use Modules\User\Http\Controllers\UserInvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +35,9 @@ Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], f
 
         // User Routes
         Route::put("/users/{user_id}/status", [\Modules\User\Http\Controllers\UserController::class, "updateStatus"])->name("users.status");
+        Route::put("/users/{user_id}/resend-invitation", [\Modules\User\Http\Controllers\UserController::class, "resendInvitation"])->name("users.resend-invitation");
         Route::resource("users", UserController::class)->except(['create', 'edit']);
+
 
         // Account Routes
         Route::group(["prefix" => "account", "as" => "account."], function() {
@@ -45,4 +48,7 @@ Route::group(["middleware" => ["api"], "prefix" => "admin", "as" => "admin."], f
             Route::delete("image", [AccountController::class, "deleteProfileImage"])->name("image.delete");
         });
     });
+
+    Route::get("/invitation-info/{invitation_token}", [UserInvitationController::class, "getInvitationToken"])->name("invitation-info");
+    Route::post("/accept-invitation", [UserInvitationController::class, "acceptInvitation"])->name("accept-invitation");
 });

@@ -9,14 +9,11 @@ class WebsiteFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->name();
-        $code = $this->faker->unique()->slug();
-
          return [
-            'code' => $code,
-            'name' => $name,
+            'code' => $this->faker->name(),
+            'name' => $this->faker->unique()->slug(),
             'description' => $this->faker->paragraph(),
-            'hostname' => $this->faker->unique()->domainName(),
+            'hostname' => "test-" . substr(time(), 0, rand(5, 10)) . "-" . $this->faker->unique()->domainName(),
             "position" => $this->faker->randomDigit()
         ];
     }
