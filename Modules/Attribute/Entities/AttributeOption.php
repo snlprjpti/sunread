@@ -12,7 +12,7 @@ class AttributeOption extends Model
     use HasFactory;
 
     public static $SEARCHABLE = [ "name" ];
-    protected $fillable = [ "attribute_id", "name", "position", "is_default" ];
+    protected $fillable = [ "attribute_id", "name", "position", "is_default", "code" ];
 
     public function attribute(): BelongsTo
     {
