@@ -4,7 +4,6 @@ namespace Modules\User\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -73,11 +72,10 @@ class UserController extends BaseController
 
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
+
                 if ( $request->is_invite == true ) {
-                    $invitation_token = $this->generateInvitationToken();
-                    $created = $this->repository->sendNotification($created,$invitation_token);
-                }
-                else {
+                    $created = $this->repository->storeInvitation($created);
+                } else {
                     $created->password = Hash::make($request->password);
                     $created->save();
                 }
@@ -167,24 +165,14 @@ class UserController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 
-    public function generateInvitationToken(): string
-    {
-        do {
-            $token = Str::random(20);
-        }
-        while ($this->model->whereInvitationToken($token)->exists());
-
-        return $token;
-    }
-
     public function resendInvitation(int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetch($id);
-            if( is_null($fetched->invitation_token) ) throw new AdminAlreadyActiveException();
-            $token = $this->generateInvitationToken();
-            $fetched = $this->repository->sendNotification($fetched, $token);
+            $fetched = $this->repository->fetch($id, ["role"]);
+            if( !$fetched->invitation_token ) throw new AdminAlreadyActiveException();
+
+            $fetched = $this->repository->storeInvitation($fetched);
         }
         catch (Exception $exception)
         {

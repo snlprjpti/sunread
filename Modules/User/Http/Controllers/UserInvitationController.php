@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Hash;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\User\Entities\Admin;
-use Modules\User\Exceptions\AdminNotFoundException;
+use Modules\User\Exceptions\InvalidInvitationTokenException;
 use Modules\User\Repositories\AdminRepository;
 use Modules\User\Transformers\AdminResource;
 use Exception;
@@ -25,7 +25,7 @@ class UserInvitationController extends BaseController
         $this->model_name = "Admin account";
         $this->repository = $adminRepository;
         $exception_statuses = [
-            AdminNotFoundException::class => 403
+            InvalidInvitationTokenException::class => 403
         ];
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
@@ -41,14 +41,14 @@ class UserInvitationController extends BaseController
         {
             $token = $request->invitation_token;
             if( !$token ) throw new Exception(__("core::app.users.token.token-missing"));
-            if( !$this->model->whereInvitationToken( $request->invitation_token )->firstOrFail() );
+            $user = $this->model->whereInvitationToken($request->invitation_token)->firstOrFail();
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse( [ "invitation_token"=>$token ], $this->lang('fetch-success'));
+        return $this->successResponse( ["invitation_token" => $user->invitation_token], $this->lang('fetch-success'));
     }
 
     public function acceptInvitation(Request $request): JsonResponse
@@ -61,7 +61,7 @@ class UserInvitationController extends BaseController
             ]);
             $user = $this->model->whereInvitationToken($request->invitation_token)->first();
 
-            if (! $user ) throw new AdminNotFoundException(__("core::app.response.not-found", [ "name" => $this->model_name ]));
+            if ( !$user ) throw new InvalidInvitationTokenException(__("core::app.users.token.token-missing"));
             $data = [
                 "invitation_token" => null,
                 "password" => Hash::make($data["password"])
