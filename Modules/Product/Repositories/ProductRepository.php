@@ -544,9 +544,9 @@ class ProductRepository extends BaseRepository
             if (isset($request->product_name))
             {
                 $product_attributes = ProductAttribute::whereAttributeId(1)
-                ->whereScope($request->scope ?? "website")
-                ->whereScopeId($request->scope_id ?? $request->website_id)
-                ->get();
+                    ->whereScope($request->scope ?? "website")
+                    ->whereScopeId($request->scope_id ?? $request->website_id)
+                    ->get();
 
                 $product_ids = [];
                 foreach ( $product_attributes as $product_attribute )
@@ -561,9 +561,9 @@ class ProductRepository extends BaseRepository
             if (isset($request->visibility))
             {
                 $product_attributes = ProductAttribute::whereAttributeId(1)
-                ->whereScope($request->scope ?? "website")
-                ->whereScopeId($request->scope_id ?? $request->website_id)
-                ->get();
+                    ->whereScope($request->scope ?? "website")
+                    ->whereScopeId($request->scope_id ?? $request->website_id)
+                    ->get();
 
                 $product_ids = [];
                 foreach ( $product_attributes as $product_attribute )
@@ -578,9 +578,9 @@ class ProductRepository extends BaseRepository
             if (isset($request->price_from) || isset($request->price_to))
             {
                 $product_attributes = ProductAttribute::whereAttributeId(3)
-                ->whereScope($request->scope ?? "website")
-                ->whereScopeId($request->scope_id ?? $request->website_id)
-                ->get();
+                    ->whereScope($request->scope ?? "website")
+                    ->whereScopeId($request->scope_id ?? $request->website_id)
+                    ->get();
 
                 $product_ids = [];
                 foreach ( $product_attributes as $product_attribute )
