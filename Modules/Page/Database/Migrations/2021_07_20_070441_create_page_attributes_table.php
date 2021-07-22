@@ -16,10 +16,11 @@ class CreatePageAttributesTable extends Migration
         Schema::create('page_attributes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('page_id');
-            $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
             $table->string('attribute');
             $table->json('value')->nullable();
             $table->integer('position')->nullable();
+            $table->unique([ 'page_id', 'attribute' ]);
+            $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
             $table->timestamps();
         });
     }
