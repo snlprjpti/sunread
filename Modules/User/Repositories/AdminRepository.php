@@ -128,18 +128,18 @@ class AdminRepository extends BaseRepository
 
         return $data;
     }
-
-    public function sendNotification(object $data, string $invitation_token): object
+    
+    public function storeInvitation(object $user): object
     {
         DB::beginTransaction();
 
         try
         {
-            $data->password = Hash::make(Str::random(20));
-            $data->invitation_token = $invitation_token;
-            $data->save();
-            $role = $data->role->name ?? '';
-            $data->notify(new InvitationNotification($invitation_token, $role));
+            $user->password = Hash::make(Str::random(20));
+            $user->invitation_token = $this->generateInvitationToken();
+            $user->save();
+
+            $user->notify(new InvitationNotification($user->invitation_token, $user?->role?->name));
         }
         catch (Exception $exception)
         {
@@ -149,6 +149,15 @@ class AdminRepository extends BaseRepository
 
         DB::commit();
 
-        return $data;
+        return $user;
+    }
+
+    public function generateInvitationToken(): string
+    {
+        do {
+            $token = Str::random(20);
+        } while ($this->model->whereInvitationToken($token)->exists());
+
+        return $token;
     }
 }
