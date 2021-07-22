@@ -63,7 +63,7 @@ class PageController extends BaseController
 
             $created = $this->repository->create($data, function($created) use($data){
                 if(isset($data["scopes"])) $this->pageScopeRepository->updateOrCreate($data["scopes"], $created);
-                if(isset($data["attributes"])) $this->pageAttributeRepository->updateOrCreate($data["attributes"], $created);
+                if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $created);
             });
         }
         catch (Exception $exception)
@@ -78,14 +78,14 @@ class PageController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id);
+            $fetched = $this->repository->show($id);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -99,7 +99,7 @@ class PageController extends BaseController
 
             $updated = $this->repository->update($data, $id, function($updated) use($data){
                 if(isset($data["scopes"])) $this->pageScopeRepository->updateOrCreate($data["scopes"], $updated);
-                if(isset($data["attributes"])) $this->pageAttributeRepository->updateOrCreate($data["attributes"], $updated);
+                if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $updated);
             });
         }
         catch (Exception $exception)

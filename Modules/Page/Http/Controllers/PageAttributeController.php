@@ -26,18 +26,14 @@ class PageAttributeController extends BaseController
     {
         try
         {
-            foreach($this->config_fields as $field)
-            {
-                unset($field["attributes"]);
-                $component[] = $field;
-            }
+            $fetched = $this->repository->getComponents();
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($component, $this->lang('fetch-list-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
     }
 
     public function show(string $slug): JsonResponse

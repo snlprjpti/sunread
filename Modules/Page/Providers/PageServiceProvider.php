@@ -56,9 +56,6 @@ class PageServiceProvider extends ServiceProvider
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
         $this->mergeConfigFrom(
-            module_path($this->moduleName, 'Config/page.php'), 'page'
-        );
-        $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/attributes.php'), 'attributes'
         );
     }

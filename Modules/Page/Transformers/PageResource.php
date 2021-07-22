@@ -18,7 +18,7 @@ class PageResource extends JsonResource
             "meta_description" => $this->meta_description,
             "meta_keywords" => $this->meta_keywords,
             "scopes" => PageScopeResource::collection($this->whenLoaded("page_scopes")),
-            "attributes" => PageAttributeResource::collection($this->whenLoaded("page_attributes")),
+            "components" => PageAttributeResource::collection($this->whenLoaded("page_attributes")),
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
