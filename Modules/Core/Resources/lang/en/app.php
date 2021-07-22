@@ -97,7 +97,8 @@ return [
             'login-error' => 'Invalid credentials.',
             'login-success' => 'Logged in successfully.',
             'logout-success' => 'Logged out successfully.',
-            'activate-warning' => 'Your account is yet to be activated, please contact administrator.'
+            'activate-warning' => 'Your account is yet to be activated, please contact administrator.',
+            'already-active' => 'Already Active'
         ],
 
         'sessions' => [
