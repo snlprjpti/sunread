@@ -25,6 +25,7 @@ class PageTest extends BaseTestCase
         $this->route_prefix = "admin.pages";
 
         $this->default_resource_id = $this->model::latest('id')->first()->id;
+        $this->hasStatusTest = true;
     }
 
     public function getCreateData(): array
