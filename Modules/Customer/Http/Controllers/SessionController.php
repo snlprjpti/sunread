@@ -2,6 +2,7 @@
 
 namespace Modules\Customer\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,7 @@ class SessionController extends BaseController
                 "token" => $jwtToken,
                 "user" => auth()->guard("customer")->user()
             ];
+            Event::dispatch('customers.session.login.success', auth()->guard("customer")->user());
         }
         catch( Exception $exception )
         {
