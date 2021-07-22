@@ -5,7 +5,7 @@ namespace Modules\User\Tests\Feature;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\User\Entities\Admin;
 
-class AdminInvitationTest extends BaseTestCase
+class UserInvitationTest extends BaseTestCase
 {
     public function setUp(): void
     {
@@ -54,17 +54,17 @@ class AdminInvitationTest extends BaseTestCase
         ];
         $response = $this->post($this->getRoute("accept-invitation", $post_data));
 
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $response->assertJsonFragment([
             "status" => "error",
-            "message" => __("core::app.response.not-found",  ["name" => $this->model_name])
+            "message" => __("core::app.users.token.token-missing")
         ]);
     }
 
     public function testUserShouldBeAbleToGetInvitationToken()
     {
         $token = $this->createAdmin()->invitation_token;
-        $response = $this->get($this->getRoute("invitation-info",  [$token]));
+        $response = $this->get($this->getRoute("invitation-info", [$token]));
 
         $response->assertOk();
         $response->assertJsonFragment([
@@ -76,7 +76,7 @@ class AdminInvitationTest extends BaseTestCase
     public function testShouldReturnErrorIfInvitationTokenInvalid()
     {
         $token = "Invalid_Token";
-        $response = $this->get($this->getRoute("invitation-info",  [$token]));
+        $response = $this->get($this->getRoute("invitation-info", [$token]));
 
         $response->assertNotFound();
         $response->assertJsonFragment([
