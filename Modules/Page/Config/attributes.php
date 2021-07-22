@@ -11,40 +11,40 @@ return [
                 "attributes" => [
                     [
                         "title" => "Top Image",
-                        "slug" => "banner/shape-section/top-image",
+                        "slug" => "top-image",
                         "hasChildren" => 0,
                         "type" => "file",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
-                        "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                        "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
                         "is_required" => 1
                     ],
                     [
                         "title" => "Left Image",
-                        "slug" => "banner/shape-section/left-image",
+                        "slug" => "left-image",
                         "hasChildren" => 0,
                         "type" => "file",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
-                        "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                        "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
                         "is_required" => 1
                     ],
                     [
                         "title" => "Right Image",
-                        "slug" => "banner/shape-section/right-image",
+                        "slug" => "right-image",
                         "hasChildren" => 0,
                         "type" => "file",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
-                        "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                        "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
                         "is_required" => 1
                     ],
@@ -52,7 +52,7 @@ return [
             ],
             [
                 "title" => "Has Overlay",
-                "slug" => "banner/has-overlay",
+                "slug" => "has-overlay",
                 "hasChildren" => 0,
                 "type" => "radio",
                 "provider" => "",
@@ -62,19 +62,19 @@ return [
                     [ "value" => 1, "label" => "Yes" ],
                     [ "value" => 0, "label" => "No" ]
                 ],
-                "rules" => "nullable|in:0,1",
+                "rules" => "in:0,1",
                 "is_required" => 0
             ],
             [
                 "title" => "Background Image",
-                "slug" => "banner/background-image",
+                "slug" => "background-image",
                 "hasChildren" => 0,
                 "type" => "file",
                 "provider" => "",
                 "pluck" => [],
                 "default" => "",
                 "options" => [],
-                "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                "rules" => "mimes:jpeg,jpg,bmp,png",
                 "multiple" => false,
                 "is_required" => 1
             ],
@@ -85,7 +85,7 @@ return [
                 "attributes" => [
                     [
                         "title" => "Title",
-                        "slug" => "banner/banner-content/title",
+                        "slug" => "title",
                         "hasChildren" => 0,
                         "type" => "text",
                         "provider" => "",
@@ -97,7 +97,7 @@ return [
                     ],
                     [
                         "title" => "Content",
-                        "slug" => "banner/banner-content/content",
+                        "slug" => "content",
                         "hasChildren" => 0,
                         "type" => "textarea",
                         "provider" => "",
@@ -122,40 +122,40 @@ return [
                 "attributes" => [
                     [
                         "title" => "Top Image",
-                        "slug" => "content/shape-section/top-image",
+                        "slug" => "top-image",
                         "hasChildren" => 0,
                         "type" => "file",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
-                        "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                        "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
                         "is_required" => 1
                     ],
                     [
-                        "title" => "Left Image",
-                        "slug" => "content/shape-section/left-image",
+                        "title" => "Left Content",
+                        "slug" => "left-content",
                         "hasChildren" => 0,
-                        "type" => "file",
+                        "type" => "text",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
-                        "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                        "rules" => "",
                         "multiple" => false,
                         "is_required" => 1
                     ],
                     [
-                        "title" => "Right Image",
-                        "slug" => "content/shape-section/right-image",
+                        "title" => "Right Content",
+                        "slug" => "right-content",
                         "hasChildren" => 0,
-                        "type" => "file",
+                        "type" => "text",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
-                        "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                        "rules" => "",
                         "multiple" => false,
                         "is_required" => 1
                     ],
@@ -163,7 +163,7 @@ return [
             ],
             [
                 "title" => "Has Overlay",
-                "slug" => "content/has-overlay",
+                "slug" => "has-overlay",
                 "hasChildren" => 0,
                 "type" => "radio",
                 "provider" => "",
@@ -173,19 +173,19 @@ return [
                     [ "value" => 1, "label" => "Yes" ],
                     [ "value" => 0, "label" => "No" ]
                 ],
-                "rules" => "nullable|in:0,1",
+                "rules" => "in:0,1",
                 "is_required" => 0
             ],
             [
-                "title" => "Background Image",
-                "slug" => "content/background-image",
+                "title" => "Background Content",
+                "slug" => "background-content",
                 "hasChildren" => 0,
-                "type" => "file",
+                "type" => "text",
                 "provider" => "",
                 "pluck" => [],
                 "default" => "",
                 "options" => [],
-                "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                "rules" => "",
                 "multiple" => false,
                 "is_required" => 1
             ],
@@ -196,7 +196,7 @@ return [
                 "attributes" => [
                     [
                         "title" => "Title",
-                        "slug" => "content/banner-content/title",
+                        "slug" => "title",
                         "hasChildren" => 0,
                         "type" => "text",
                         "provider" => "",
@@ -208,7 +208,7 @@ return [
                     ],
                     [
                         "title" => "Content",
-                        "slug" => "content/banner-content/content",
+                        "slug" => "content",
                         "hasChildren" => 0,
                         "type" => "textarea",
                         "provider" => "",
