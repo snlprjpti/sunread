@@ -198,7 +198,7 @@ class AttributeTest extends BaseTestCase
                 [
                     "name" => "blue",
                     "position" => 2,
-                    "code" => "Blue",
+                    "code" => "B123",
                     "translations" => [
                         [
                             "name" => "nilo",
