@@ -124,7 +124,24 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "is_required" => 1,
                 "default_value" => "Not Visible Individually",
-                "options" => ["Not Visible Individually", "Catalog", "Search", "Catalog, Search"],
+                "options" => [
+                  [
+                      "name" => "Not Visible Individually",
+                      "code" => null
+                  ],
+                  [
+                      "name" => "Catalog",
+                      "code" => null
+                  ],
+                  [
+                      "name" => "Search",
+                      "code" => null
+                  ],
+                  [
+                      "name" => "Catalog, Search",
+                      "code" => null
+                  ],
+                ],
                 "scope" => "store"
             ],
             [
@@ -233,14 +250,48 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
                 "default_value" => "Red",
-                "options" => ["Red", "Green", "Yellow", "Blue"],
+                "options" => [
+                    [
+                        "name" => "Red",
+                        "code" => "Raato",
+                    ],
+                    [
+                        "name" => "Green",
+                        "code" => "Hariyo",
+                    ],
+                    [
+                        "name" => "Yellow",
+                        "code" => "Pahelo",
+                    ],
+                    [
+                        "name" => "Blue",
+                        "code" => "Nilo"
+                    ]
+                ],
             ],
             [
                 "name" => "Size",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
                 "default_value" => "S",
-                "options" => ["S", "M", "L", "XL"],
+                "options" => [
+                    [
+                        "name" => "S",
+                        "code" => "Small",
+                    ],
+                    [
+                        "name" => "M",
+                        "code" => "Medium",
+                    ],
+                    [
+                        "name" => "L",
+                        "code" => "Large",
+                    ],
+                    [
+                        "name" => "XL",
+                        "code" => "ExtraL"
+                    ],
+                ],
             ],
         ];
 
@@ -281,10 +332,10 @@ class AttributeTableSeeder extends Seeder
                     AttributeOption::withoutEvents( function () use ( $attribute_data, $count, $attribute_option, $attribute ) {
                         AttributeOption::create([
                             "attribute_id" => $attribute_data->id,
-                            "name" => $attribute_option,
+                            "name" => $attribute_option["name"],
                             "position" => ++$count,
                             "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0,
-                            "code" => $attribute_option,
+                            "code" => $attribute_option["code"],
                         ]);
                     });
                 }, $attribute["options"]);
