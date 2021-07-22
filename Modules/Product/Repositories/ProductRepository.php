@@ -199,7 +199,8 @@ class ProductRepository extends BaseRepository
         {
             $validator = Validator::make($request->all(), [
                 "catalog_inventory.quantity" => "required|decimal",
-                "catalog_inventory.use_config_manage_stock" => "required|boolean"
+                "catalog_inventory.use_config_manage_stock" => "required|boolean",
+                "catalog_inventory.manage_stock" => "required|boolean"
             ]);
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
         }
@@ -220,7 +221,6 @@ class ProductRepository extends BaseRepository
                 $data = $this->validataInventoryData($request);
                 $data["product_id"] = $product->id;
                 $data["website_id"] = $product->website_id;
-                $data["manage_stock"] = 1;
                 $data["is_in_stock"] = (bool) $value;
                 $match = [
                     "product_id" => $product->id,

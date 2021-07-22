@@ -54,7 +54,15 @@ class ProductTest extends BaseTestCase
             }
         }
 
-        return array_merge($merge_product, ["attributes" => $attributes]);
+        $catalog_inventory = [
+            "catalog_inventory" => [
+                "quantity" => 20,
+                "use_config_manage_stock" => 1,
+                "manage_stock" => 0
+            ]
+        ];
+
+        return array_merge($merge_product, ["attributes" => $attributes], $catalog_inventory);
     }
 
     public function getUpdateData(): array
