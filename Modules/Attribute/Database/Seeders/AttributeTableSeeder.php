@@ -125,18 +125,18 @@ class AttributeTableSeeder extends Seeder
                 "is_required" => 1,
                 "default_value" => "Not Visible Individually",
                 "options" => [
-                  [
-                      "name" => "Not Visible Individually"
-                  ],
-                  [
-                      "name" => "Catalog"
-                  ],
-                  [
-                      "name" => "Search"
-                  ],
-                  [
-                      "name" => "Catalog, Search"
-                  ],
+                    [
+                        "name" => "Not Visible Individually"
+                    ],
+                    [
+                        "name" => "Catalog"
+                    ],
+                    [
+                        "name" => "Search"
+                    ],
+                    [
+                        "name" => "Catalog, Search"
+                    ],
                 ],
                 "scope" => "store"
             ],
