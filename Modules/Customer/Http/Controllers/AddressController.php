@@ -13,16 +13,19 @@ use Modules\Customer\Transformers\CustomerAddressResource;
 use Modules\Customer\Repositories\CustomerAddressRepository;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Modules\Customer\Repositories\CustomerRepository;
+use Modules\Customer\Transformers\CustomerDefaultAddressResource;
 
 class AddressController extends BaseController
 {
-    protected $repository;
+    protected $repository, $customerRepository;
 
-    public function __construct(CustomerAddressRepository $customerAddressRepository, CustomerAddress $customer_address)
+    public function __construct(CustomerAddressRepository $customerAddressRepository, CustomerAddress $customer_address, CustomerRepository $customerRepository)
     {
         $this->repository = $customerAddressRepository;
         $this->model = $customer_address;
         $this->model_name = "Customer Address";
+        $this->customerRepository = $customerRepository;
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -35,6 +38,11 @@ class AddressController extends BaseController
     public function resource(object $data): JsonResource
     {
         return new CustomerAddressResource($data);
+    }
+
+    public function defaultAddressResource(object $data): JsonResource
+    {
+        return new CustomerDefaultAddressResource($data);
     }
 
     public function index(Request $request, int $customer_id): JsonResponse
@@ -154,13 +162,13 @@ class AddressController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->getDefaultAddresses($customer_id);
+            $fetched = $this->customerRepository->fetch($customer_id, ["addresses"]);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-success'));
+        return $this->successResponse($this->defaultAddressResource($fetched), $this->lang('fetch-success'));
     }
 }
