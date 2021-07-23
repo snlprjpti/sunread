@@ -3,12 +3,15 @@
 namespace Modules\User\Repositories;
 
 use Exception;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Modules\User\Entities\Admin;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\User\Notifications\InvitationNotification;
 
 class AdminRepository extends BaseRepository
 {
@@ -97,7 +100,7 @@ class AdminRepository extends BaseRepository
 
             $path_array = explode("/", $updated->profile_image);
             unset($path_array[count($path_array) - 1]);
-    
+
             $delete_folder = implode("/", $path_array);
             Storage::disk("public")->deleteDirectory($delete_folder);
 
@@ -124,5 +127,37 @@ class AdminRepository extends BaseRepository
         ]);
 
         return $data;
+    }
+    
+    public function storeInvitation(object $user): object
+    {
+        DB::beginTransaction();
+
+        try
+        {
+            $user->password = Hash::make(Str::random(20));
+            $user->invitation_token = $this->generateInvitationToken();
+            $user->save();
+
+            $user->notify(new InvitationNotification($user->invitation_token, $user?->role?->name));
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        DB::commit();
+
+        return $user;
+    }
+
+    public function generateInvitationToken(): string
+    {
+        do {
+            $token = Str::random(20);
+        } while ($this->model->whereInvitationToken($token)->exists());
+
+        return $token;
     }
 }

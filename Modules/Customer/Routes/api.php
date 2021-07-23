@@ -50,6 +50,7 @@ Route::group(["middleware" => ["api"]], function () {
 
         // Customer Address Routes
         Route::group(["prefix" => "customers/{customers}", "as" => "customers."], function() {
+            Route::get("address/default", [\Modules\Customer\Http\Controllers\AddressController::class, "default"])->name("addresses.default");
             Route::put("addresses/{address_id}/default-address", [\Modules\Customer\Http\Controllers\AddressController::class, "updateAddress"])->name("addresses.defaultAddress");
             Route::resource("addresses", AddressController::class)->except(["create", "edit"]);
         });

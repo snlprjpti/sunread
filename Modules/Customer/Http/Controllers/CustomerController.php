@@ -64,7 +64,7 @@ class CustomerController extends BaseController
                 })]
             ]);
 
-            $data["password"] = Hash::make($data["password"]);
+            if(isset($data["password"])) $data["password"] = Hash::make($data["password"]);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
 
             $created = $this->repository->create($data, function($created) {
@@ -105,7 +105,7 @@ class CustomerController extends BaseController
                 })->ignore($id)]
             ]);
 
-            $data["password"] = Hash::make($data["password"]);
+            if(isset($data["password"])) $data["password"] = Hash::make($data["password"]);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
             
             $updated = $this->repository->update($data, $id, function($updated) {

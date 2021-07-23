@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Modules\User\Entities\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Modules\User\Exceptions\AdminAlreadyActiveException;
 use Modules\User\Transformers\AdminResource;
 use Modules\User\Repositories\AdminRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,7 +28,8 @@ class UserController extends BaseController
         $this->model_name = "Admin";
         $exception_statuses = [
             CannotDeleteSelfException::class => 403,
-            CannotDeleteSuperAdminException::class => 403
+            CannotDeleteSuperAdminException::class => 403,
+            AdminAlreadyActiveException::class => 403
         ];
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);
@@ -62,16 +64,20 @@ class UserController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, [
-                "password" => "required|confirmed",
                 "status" => "sometimes|boolean",
+                "is_invite" => "sometimes|boolean",
+                "password" => "required_unless:is_invite,true|confirmed",
                 "role_id" => "required|integer|exists:roles,id"
             ]);
-            $data["password"] = Hash::make($data["password"]);
 
             $created = $this->repository->create($data, function ($created) use ($request) {
                 $created->load("role");
+
                 if ( $request->is_invite == true ) {
-                    // Send an email for invite
+                    $created = $this->repository->storeInvitation($created);
+                } else {
+                    $created->password = Hash::make($request->password);
+                    $created->save();
                 }
             });
         }
@@ -125,7 +131,7 @@ class UserController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         try
         {
@@ -157,5 +163,22 @@ class UserController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
+
+    public function resendInvitation(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->fetch($id, ["role"]);
+            if( !$fetched->invitation_token ) throw new AdminAlreadyActiveException();
+
+            $fetched = $this->repository->storeInvitation($fetched);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 }

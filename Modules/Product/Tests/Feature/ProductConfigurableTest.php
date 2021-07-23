@@ -50,7 +50,7 @@ class ProductConfigurableTest extends BaseTestCase
                 ];
             }
         }
-
+        
         $super_attributes = Attribute::inRandomOrder()->whereisUserDefined(0)->whereType("select")->where("slug", "!=", "tax_class_id")->take(2)->get();
       
         foreach($super_attributes as $super_attribute)
@@ -60,7 +60,16 @@ class ProductConfigurableTest extends BaseTestCase
                 "value" => $super_attribute->attribute_options->take(2)->pluck('id')->toArray()
             ];
         }
-        return array_merge($merge_product, ["attributes" => $attributes], ["super_attributes" => $variant_attributes]);
+
+        $catalog_inventory = [
+            "catalog_inventory" => [
+                "quantity" => 20,
+                "use_config_manage_stock" => 1,
+                "manage_stock" => 0
+            ]
+        ];
+        
+        return array_merge($merge_product, ["attributes" => $attributes], ["super_attributes" => $variant_attributes], $catalog_inventory);
     }
 
     public function getUpdateData(): array

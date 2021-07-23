@@ -16,7 +16,7 @@ class Admin extends Authenticatable implements JWTSubject
     use Notifiable, HasFactory;
 
     public static $SEARCHABLE = [ "first_name", "email" ];
-    protected $fillable = [ "first_name", "last_name", "email", "password", "api_token", "role_id", "status", "company", "address", "profile_image" ];
+    protected $fillable = [ "first_name", "last_name", "email", "password", "api_token", "role_id", "status", "company", "address", "profile_image", "invitation_token" ];
     protected $hidden = [ "password", "api_token", "remember_token" ];
     protected $appends = [ "avatar", "profile_image_url" ];
 
