@@ -18,7 +18,7 @@ class CustomerAddressRepository extends BaseRepository
 
         $this->rules = [
             "first_name" => "required|min:2|max:200",
-            "middle_name" => "sometimes|min:2|max:200",
+            "middle_name" => "sometimes|nullable|min:2|max:200",
             "last_name" => "required|min:2|max:200",
 
             "address1" => "required|min:2|max:500",
