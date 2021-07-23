@@ -85,7 +85,14 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Quantity And Stock Status",
                 "slug" => "quantity_and_stock_status",
                 "type" => "select",
-                "options" => ["In stock", "Out of stock"],
+                "options" => [
+                    [
+                        "name" => "In stock"
+                    ],
+                    [
+                        "name" => "Out of stock"
+                    ]
+                ],
                 "default_value" => "In stock",
                 "scope" => "website"
             ],
@@ -125,7 +132,20 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "is_required" => 1,
                 "default_value" => "Not Visible Individually",
-                "options" => ["Not Visible Individually", "Catalog", "Search", "Catalog, Search"],
+                "options" => [
+                    [
+                        "name" => "Not Visible Individually"
+                    ],
+                    [
+                        "name" => "Catalog"
+                    ],
+                    [
+                        "name" => "Search"
+                    ],
+                    [
+                        "name" => "Catalog, Search"
+                    ],
+                ],
                 "scope" => "store"
             ],
             [
@@ -234,14 +254,44 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
                 "default_value" => "Red",
-                "options" => ["Red", "Green", "Yellow", "Blue"],
+                "options" => [
+                    [
+                        "name" => "Red",
+                        "code" => "198",
+                    ],
+                    [
+                        "name" => "Green",
+                        "code" => "276",
+                    ],
+                    [
+                        "name" => "Yellow",
+                        "code" => "321",
+                    ],
+                    [
+                        "name" => "Blue",
+                        "code" => "423"
+                    ]
+                ],
             ],
             [
                 "name" => "Size",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
                 "default_value" => "S",
-                "options" => ["S", "M", "L", "XL"],
+                "options" => [
+                    [
+                        "name" => "S",
+                    ],
+                    [
+                        "name" => "M",
+                    ],
+                    [
+                        "name" => "L",
+                    ],
+                    [
+                        "name" => "XL",
+                    ],
+                ],
             ],
         ];
 
@@ -274,7 +324,7 @@ class AttributeTableSeeder extends Seeder
                 "attribute_id" => $attribute_data->id
             ]);
 
-            if(isset($attribute["options"])) 
+            if(isset($attribute["options"]))
             {
                 $count = 0;
                 array_map(function($attribute_option) use($attribute_data, $attribute, $count) {
@@ -282,9 +332,10 @@ class AttributeTableSeeder extends Seeder
                     AttributeOption::withoutEvents( function () use ( $attribute_data, $count, $attribute_option, $attribute ) {
                         AttributeOption::create([
                             "attribute_id" => $attribute_data->id,
-                            "name" => $attribute_option,
+                            "name" => $attribute_option["name"],
                             "position" => ++$count,
-                            "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0
+                            "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0,
+                            "code" => $attribute_option["code"] ?? null,
                         ]);
                     });
                 }, $attribute["options"]);
