@@ -10,15 +10,7 @@ class PageTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $page = Page::create([
-            "title" => "Test",
-            "slug" => "test",
-            "meta_title" => "Test",
-            "meta_description" => "Test",
-            "meta_keywords" => "Test",
-            "status" => 1,
-            "position" => 1 
-        ]);
+        $page = Page::factory()->create();
 
         PageScope::create([
             "page_id" => $page->id,
