@@ -105,8 +105,8 @@ class CustomerAddressRepository extends BaseRepository
         {
             $data = $this->customerRepository->fetch($customer_id, ["addresses"]);
             
-            $fetched["default_billing_address"] = new CustomerAddressResource($data->default_billing_address);
-            $fetched["default_shipping_address"] = new CustomerAddressResource($data->default_shipping_address);
+            $fetched["default_billing_address"] = $data->default_billing_address ? new CustomerAddressResource($data->default_billing_address) : null;
+            $fetched["default_shipping_address"] = $data->default_shipping_address ? new CustomerAddressResource($data->default_shipping_address) : null;
         }
         catch (Exception $exception)
         {
