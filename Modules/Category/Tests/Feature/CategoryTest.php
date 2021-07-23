@@ -137,8 +137,9 @@ class CategoryTest extends BaseTestCase
 
     public function testAdminCanUpdateResourceWithPosition()
     {
+        $category = Category::inRandomOrder()->first();
         $post_data = [
-            "parent_id" => Category::inRandomOrder()->first()->id,
+            "parent_id" => ($category->parent_id != $this->default_resource_id) ? $category->id : null,
             "position" => rand(1,10)
         ];
         $response = $this->withHeaders($this->headers)->put($this->getRoute("position", [$this->default_resource_id]), $post_data);
