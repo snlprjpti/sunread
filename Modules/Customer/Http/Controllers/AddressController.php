@@ -149,4 +149,18 @@ class AddressController extends BaseController
         
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
+
+    public function default(int $customer_id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->getDefaultAddresses($customer_id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
+    }
 }
