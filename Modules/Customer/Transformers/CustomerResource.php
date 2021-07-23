@@ -34,7 +34,7 @@ class CustomerResource extends JsonResource
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,
             "status" => (bool) $this->status,
             "is_lock" => (bool) $this->is_lock,
-            "last_login_at" => $this->last_login_at->format('M d, Y H:i A'),
+            "last_login_at" => ($this->last_login_at) ? $this->last_login_at->format('M d, Y H:i A') : "Never Login",
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
