@@ -8,13 +8,17 @@ use Illuminate\Support\Facades\Event;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
+use Modules\Customer\Transformers\CustomerAddressResource;
 
 class CustomerAddressRepository extends BaseRepository
 {
-    public function __construct(CustomerAddress $customer_address)
+    protected $customerRepository;
+
+    public function __construct(CustomerAddress $customer_address, CustomerRepository $customerRepository)
     {
         $this->model = $customer_address;
         $this->model_key = "customers.addresses";
+        $this->customerRepository = $customerRepository;
 
         $this->rules = [
             "first_name" => "required|min:2|max:200",
@@ -93,5 +97,22 @@ class CustomerAddressRepository extends BaseRepository
         DB::commit();
 
         return $updated;
+    }
+
+    public function getDefaultAddresses(int $customer_id): array
+    {
+        try
+        {
+            $data = $this->customerRepository->fetch($customer_id, ["addresses"]);
+            
+            $fetched["default_billing_address"] = new CustomerAddressResource($data->default_billing_address);
+            $fetched["default_shipping_address"] = new CustomerAddressResource($data->default_shipping_address);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
     }
 }
