@@ -26,6 +26,7 @@ class AttributeOptionRepository extends BaseRepository
         $this->rules = [
             "name" => "required",
             "position" => "sometimes|numeric",
+            "code" => "nullable|unique:attribute_options,code",
             "translations" => "nullable|array"
         ];
     }

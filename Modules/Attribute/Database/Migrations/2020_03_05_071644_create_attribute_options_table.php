@@ -16,7 +16,7 @@ class CreateAttributeOptionsTable extends Migration
             $table->string('name')->nullable();
             $table->integer('position')->nullable();
             $table->boolean('is_default')->default(0);
-            $table->string('code')->nullable();
+            $table->string('code')->unique()->nullable();
 
             $table->timestamps();
         });
