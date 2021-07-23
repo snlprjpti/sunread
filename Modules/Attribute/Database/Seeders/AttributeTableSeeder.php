@@ -84,8 +84,9 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Quantity And Stock Status",
                 "slug" => "quantity_and_stock_status",
-                "type" => "boolean",
-                "default_value" => 1,
+                "type" => "select",
+                "options" => ["In stock", "Out of stock"],
+                "default_value" => "In stock",
                 "scope" => "website"
             ],
             [

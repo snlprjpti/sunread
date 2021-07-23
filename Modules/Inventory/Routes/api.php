@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 Route::group(['middleware' => ['api']], function () {
     Route::group(["prefix" => "admin/catalog", "middleware" => ["admin", "language"], "as" => "admin.catalog."], function () {        
         Route::resource("inventories", CatalogInventoryController::class)->except(["create","edit"]);
+        Route::get("inventory-items", [Modules\Inventory\Http\Controllers\CatalogInventoryController::class, "inventory_items"])->name("inventory-items");
     });
     
 });

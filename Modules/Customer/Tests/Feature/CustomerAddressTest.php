@@ -48,4 +48,15 @@ class CustomerAddressTest extends BaseTestCase
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
         ]);
     }
+
+    public function testAdminCanFetchIndividualDefaultAddresses()
+    {
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("default"));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
+        ]);
+    }
 }

@@ -5,8 +5,7 @@ namespace Modules\Core\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Modules\Core\Entities\Website;
-use Illuminate\Support\Facades\Request;
-use Modules\Core\Transformers\WebsiteResource;
+use Modules\Core\Transformers\ResolveResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Repositories\ResolveRepository;
 use Modules\Core\Http\Controllers\BaseController;
@@ -26,7 +25,7 @@ class ResolverController extends BaseController
 
     public function resource(object $data): JsonResource
     {
-        return new WebsiteResource($data);
+        return new ResolveResource($data);
     }
 
     public function resolve(?string $website = null): JsonResponse

@@ -9,22 +9,25 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Request;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Inventory\Entities\CatalogInventory;
+use Modules\Inventory\Entities\CatalogInventoryItem;
 use Modules\Inventory\Exceptions\InventoryCannotBeLessThanZero;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
+use Modules\Inventory\Repositories\CatalogInventoryItemRepository;
 use Modules\Inventory\Transformers\CatalogInventoryResource;
 use Modules\Inventory\Repositories\CatalogInventoryRepository;
-
+use Modules\Inventory\Transformers\CatalogInventoryItemResource;
 
 class CatalogInventoryController extends BaseController
 {
-    protected $repository, $model_key;
+    protected $repository, $model_key, $inventoryItemRepository;
 
-    public function __construct(CatalogInventory $catalogInventory, CatalogInventoryRepository $catalogInventoryRepository)
+    public function __construct(CatalogInventory $catalogInventory, CatalogInventoryRepository $catalogInventoryRepository, CatalogInventoryItemRepository $inventoryItemRepository)
     {
         $this->model = $catalogInventory;
         $this->model_name = "Catalog Inventory";
         $this->model_key = "catalog.inventories";
         $this->repository = $catalogInventoryRepository;
+        $this->inventoryItemRepository = $inventoryItemRepository;
         $exception_statuses = [
             InventoryCannotBeLessThanZero::class => 403
         ];
@@ -40,6 +43,16 @@ class CatalogInventoryController extends BaseController
     public function resource(object $data): JsonResource
     {
         return new CatalogInventoryResource($data);
+    }
+
+    public function inventoryItemCollection(object $data): ResourceCollection
+    {
+        return CatalogInventoryItemResource::collection($data);
+    }
+
+    public function inventoryItemResource(object $data): JsonResource
+    {
+        return new CatalogInventoryItemResource($data);
     }
 
     public function index(Request $request): JsonResponse
@@ -137,5 +150,19 @@ class CatalogInventoryController extends BaseController
         }
 
         return $this->successResponseWithMessage($this->lang("delete-success"));
+    }
+
+    public function inventory_items(Request $request): jsonResponse
+    {
+        try
+        {
+            $fetched = $this->inventoryItemRepository->fetchAll($request);
+        }
+        catch ( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->inventoryItemCollection($fetched), $this->lang("fetch-list-success"));
     }
 }
