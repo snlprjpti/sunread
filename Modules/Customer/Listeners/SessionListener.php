@@ -11,6 +11,8 @@ class SessionListener
     public function customerLogin($customer)
     {
         Audit::log($customer, "login", "Customer Login", "{$customer->full_name} logged in.");
+        $customer->last_login_at = now();
+        $customer->save();
     }
 
     public function customerLogOut($customer)
