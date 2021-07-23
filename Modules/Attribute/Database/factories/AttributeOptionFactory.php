@@ -13,7 +13,8 @@ class AttributeOptionFactory extends Factory
         return [
             "attribute_id" => Attribute::factory()->create()->id,
             "name" => $this->faker->name(),
-            "position" => rand(1,20)
+            "position" => rand(1,20),
+            "code" => $this->faker->unique()->text(8)
         ];
     }
 }
