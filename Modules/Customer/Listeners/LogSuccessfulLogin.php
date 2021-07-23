@@ -2,10 +2,7 @@
 
 namespace Modules\Customer\Listeners;
 
-use Illuminate\Auth\Events\Login;
-use Modules\Customer\Events\LoginLog;
-
-class LogSuccessfulLogins
+class LogSuccessfulLogin
 {
     public function loginSuccess($customer)
     {
