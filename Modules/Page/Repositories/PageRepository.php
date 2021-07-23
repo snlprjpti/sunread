@@ -3,6 +3,7 @@
 namespace Modules\Page\Repositories;
 
 use Attribute;
+use Exception;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
 use Illuminate\Validation\ValidationException;
@@ -41,19 +42,27 @@ class PageRepository extends BaseRepository
 
     public function show(int $id): array
     {
-        $attributes = [];
-        $data = $this->fetch($id, [ "page_scopes", "page_attributes" ]);
-        $components = $data->page_attributes->pluck("attribute")->toArray();
-
-        foreach($components as $component)
+        try
         {
-            $values = $data->page_attributes->where("attribute", $component)->first()->toArray();
-            $attributes[] = $this->pageAttributeRepository->show($component, $values["value"]);
+            $attributes = [];
+            $data = $this->fetch($id, [ "page_scopes", "page_attributes" ]);
+            $components = $data->page_attributes->pluck("attribute")->toArray();
+
+            foreach($components as $component)
+            {
+                $values = $data->page_attributes->where("attribute", $component)->first()->toArray();
+                $attributes[] = $this->pageAttributeRepository->show($component, $values["value"]);
+            }
+
+            $item = $data->toArray();
+            unset($item["page_attributes"]);
+            $item["components"] = $attributes;
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
         }
 
-        $item = $data->toArray();
-        unset($item["page_attributes"]);
-        $item["components"] = $attributes;
         return $item;
     }
 }

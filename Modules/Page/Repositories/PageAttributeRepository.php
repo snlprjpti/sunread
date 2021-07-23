@@ -14,7 +14,7 @@ use Illuminate\Validation\ValidationException;
 class PageAttributeRepository extends BaseRepository
 {
     use Configuration;
-    protected $config_fields, $children = [], $parent = [], $attributes = [];
+    protected $config_fields, $parent = [], $attributes = [];
 
     public function __construct(PageAttribute $pageAttribute)
     {
@@ -31,21 +31,30 @@ class PageAttributeRepository extends BaseRepository
 
     public function validateAttribute(array $component): array
     {
-        $this->attributes = [];
+        try
+        {
+            $this->attributes = [];
 
-        $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
-        if(!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
+            $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
+            if(!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
 
 
-        $elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("attributes")->first();
-        $this->getAttributes($elements);
+            $elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("attributes")->first();
+            $this->getAttributes($elements);
 
-        return collect($this->attributes)->mapWithKeys(function($element) {
-            $rule = ($element["is_required"] == 1) ? "required" : "nullable";
-            return [
-                "attributes.{$element["slug"]}" => "$rule|{$element["rules"]}"
-            ];
-        })->toArray();
+            $rules = collect($this->attributes)->mapWithKeys(function($element) {
+                $rule = ($element["is_required"] == 1) ? "required" : "nullable";
+                return [
+                    "attributes.{$element["slug"]}" => "$rule|{$element["rules"]}"
+                ];
+            })->toArray();
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $rules;
     }
 
     public function updateOrCreate(array $components, object $parent):void
@@ -84,6 +93,7 @@ class PageAttributeRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
 
@@ -92,8 +102,7 @@ class PageAttributeRepository extends BaseRepository
     }
 
     public function show(string $slug, array $values = []): array
-    {
-        $this->children = []; 
+    { 
         $this->parent = [];
 
         $data = collect($this->config_fields)->where("slug", $slug)->first();
