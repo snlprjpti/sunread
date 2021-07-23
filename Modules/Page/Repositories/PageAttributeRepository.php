@@ -106,16 +106,15 @@ class PageAttributeRepository extends BaseRepository
         ];        
     }
 
-    private function getChildren(array $elements, ?int $key = null, array $values): void
+    private function getChildren(array $elements, ?string $key = null, array $values): void
     {
-        if(count($this->children) > 0) $this->parent[] = $this->children;
-        $this->children = [];
-        if(isset($key)) $this->parent[$key]["attributes"] = [];
         foreach($elements as $i => &$element)
         {
+            $append_key = isset($key) ? "$key.$i" : $i;
+
             if($element["hasChildren"] == 0)
             {
-                if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
+                if( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
                 unset($element["pluck"], $element["provider"], $element["rules"]);
 
                 if(count($values) > 0)
@@ -123,14 +122,13 @@ class PageAttributeRepository extends BaseRepository
                     $exist = collect($values)->where("slug", $element["slug"])->first();
                     $element["default"] = $exist ? $exist["value"] : $element["default"];
                 }
-                
-                if(isset($key)) $this->parent[$key]["attributes"][] = $element;
-                else $this->parent[$i] = $element;
-                
+
+                setDotToArray($append_key, $this->parent, $element);           
                 continue;
             }
-            $this->children = $element;
-            $this->getChildren($element["attributes"], $i, $values);
+
+            setDotToArray($append_key, $this->parent,  $element);           
+            $this->getChildren($element["attributes"], "$append_key.attributes", $values);
         }
     }
 
