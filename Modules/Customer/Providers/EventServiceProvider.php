@@ -11,6 +11,5 @@ class EventServiceProvider extends ServiceProvider
     {
         Event::listen('customers.session.login.after', 'Modules\Customer\Listeners\SessionListener@customerLogin');
         Event::listen('customers.session.logout.after', 'Modules\Customer\Listeners\SessionListener@customerLogOut');
-        Event::listen('customers.session.login.success', 'Modules\Customer\Listeners\LogSuccessfulLogin@loginSuccess');
     }
 }
