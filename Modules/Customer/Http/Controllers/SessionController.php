@@ -49,7 +49,6 @@ class SessionController extends BaseController
                 "token" => $jwtToken,
                 "user" => auth()->guard("customer")->user()
             ];
-            Event::dispatch('customers.session.login.success', auth()->guard("customer")->user());
         }
         catch( Exception $exception )
         {
@@ -57,6 +56,7 @@ class SessionController extends BaseController
         }
 
         Event::dispatch('customers.session.login.after', auth()->guard("customer")->user());
+        Event::dispatch('customers.session.login.success', auth()->guard("customer")->user());
         return $this->successResponse($payload, $this->lang("login-success"));
     }
 
