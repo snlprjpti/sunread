@@ -6,7 +6,7 @@ class LogSuccessfulLogin
 {
     public function loginSuccess($customer)
     {
-        $customer->last_login_at = date('Y-m-d H:i:s');
+        $customer->last_login_at = now();
         $customer->save();
     }
 }
