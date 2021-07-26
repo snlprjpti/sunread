@@ -3,14 +3,15 @@
 namespace Modules\Page\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Core\Traits\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PageConfiguration extends Model
+class PageAttribute extends Model
 {
     use HasFactory;
 
-    protected $fillable =  [ "scope", "scope_id", "page_id", "title", "description", "status", "meta_title", "meta_description", "meta_keywords" ];
+    protected $fillable = [ "page_id", "attribute", "value", "position" ];
+    protected $casts = [ "value" => "array" ];
 
     public function page(): BelongsTo
     {

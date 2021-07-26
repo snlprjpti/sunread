@@ -47,5 +47,15 @@ if (! function_exists('array_permutation')) {
             return app()->make(Core::class);
         }
     }
+
+    if (! function_exists('setDotToArray')) {
+        function setDotToArray($dot_syntax, &$main_array, $value, $separator = ".") 
+        {
+            $keys = explode($separator, $dot_syntax);
+            foreach ($keys as $key) $main_array = &$main_array[$key];
+            $main_array = $value;
+        }
+    }
+    
 }
 ?>

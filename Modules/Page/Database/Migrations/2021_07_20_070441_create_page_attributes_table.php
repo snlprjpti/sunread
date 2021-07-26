@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePageAvailabilityTable extends Migration
+class CreatePageAttributesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,15 @@ class CreatePageAvailabilityTable extends Migration
      */
     public function up()
     {
-        Schema::create('page_availability', function (Blueprint $table) {
+        Schema::create('page_attributes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('page_id');
+            $table->string('attribute');
+            $table->json('value')->nullable();
+            $table->integer('position')->nullable();
+            $table->unique([ 'page_id', 'attribute' ]);
             $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
-
-            $table->string('model_type');
-            $table->bigInteger('model_id');
-            $table->boolean('status')->default(1);
+            $table->timestamps();
         });
     }
 
@@ -31,6 +32,6 @@ class CreatePageAvailabilityTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('page_availability');
+        Schema::dropIfExists('page_attributes');
     }
 }

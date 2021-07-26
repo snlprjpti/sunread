@@ -15,10 +15,8 @@ class CreatePagesTable extends Migration
     {
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('parent_id')->nullable();
-            $table->string('slug')->unique();
             $table->string('title');
-            $table->text('description');
+            $table->string('slug');
             $table->integer('position')->nullable();
             $table->boolean('status')->default(1);
             $table->string('meta_title')->nullable();
