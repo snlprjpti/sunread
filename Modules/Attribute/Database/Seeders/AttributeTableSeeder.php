@@ -231,21 +231,21 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Base Image",
                 "slug" => "base_image",
-                "type" => "multiselect",
+                "type" => "multiimages",
                 "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Small Image",
                 "slug" => "small_image",
-                "type" => "multiselect",
+                "type" => "multiimages",
                 "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Thumbnail Image",
                 "slug" => "thumbnail_image",
-                "type" => "multiselect",
+                "type" => "multiimages",
                 "scope" => "website",
                 "is_required" => 0
             ],
@@ -254,6 +254,7 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
                 "default_value" => "Red",
+                "is_user_defined" => 1,
                 "options" => [
                     [
                         "name" => "Red",
@@ -278,6 +279,7 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
                 "default_value" => "S",
+                "is_user_defined" => 1,
                 "options" => [
                     [
                         "name" => "S",

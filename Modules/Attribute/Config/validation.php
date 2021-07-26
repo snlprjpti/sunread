@@ -13,5 +13,6 @@ return [
 	"date" => "date",
 	"image" => "mimes:bmp,jpeg,jpg,png",
 	"file" => "file",
-	"checkbox" => null
+	"checkbox" => null,
+	"multiimages" => "array",
 ];
