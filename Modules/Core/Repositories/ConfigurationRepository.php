@@ -260,4 +260,23 @@ class ConfigurationRepository extends BaseRepository
         return $file_path;
     }
 
+    public function getSinglePathValue($request): string
+    {
+        try
+        {
+            $elements = collect($this->config_fields)->pluck("children")->flatten(1)->pluck("subChildren")->flatten(1)->pluck("elements")->flatten(1);
+            $element = $elements->where("path", $request->path)->first();
+
+            if(!$element) throw ValidationException::withMessages([ "path" => "Invalid Path" ]);
+
+            $fetched = ($this->has((object) $request)) ? $this->getValues($request) : $this->getDefaultValues($request, $element["default"]);
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
 }
