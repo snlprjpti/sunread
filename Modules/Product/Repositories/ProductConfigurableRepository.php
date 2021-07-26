@@ -85,7 +85,7 @@ class ProductConfigurableRepository extends BaseRepository
             
             foreach ($request->get("super_attributes") as $super_attribute) {
                 $attribute = $this->attributeCache()->find($super_attribute['attribute_id']);
-                if ($attribute->is_user_defined == 1 && $attribute->type != "select") continue;
+                if ($attribute->is_user_defined == 0 && $attribute->type != "select") continue;
                 $super_attributes[$attribute->id] = $super_attribute["value"];
             }
 
@@ -93,7 +93,7 @@ class ProductConfigurableRepository extends BaseRepository
                 return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku"));
             })->toArray();
 
-            //generate multiple product(variant) combination on the basis of color, size (super_attributes/system_define attributes) for variants
+            //generate multiple product(variant) combination on the basis of color, size (super_attributes/user defined attributes) for variants
             foreach (array_permutation($super_attributes) as $permutation) {
                 $this->addVariant($product, $permutation, $request, $productAttributes, $scope);
             }

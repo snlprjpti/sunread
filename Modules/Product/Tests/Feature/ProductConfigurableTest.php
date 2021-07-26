@@ -51,7 +51,7 @@ class ProductConfigurableTest extends BaseTestCase
             }
         }
         
-        $super_attributes = Attribute::inRandomOrder()->whereisUserDefined(0)->whereType("select")->where("slug", "!=", "tax_class_id")->take(2)->get();
+        $super_attributes = Attribute::inRandomOrder()->whereisUserDefined(1)->whereType("select")->where("slug", "!=", "tax_class_id")->take(2)->get();
       
         foreach($super_attributes as $super_attribute)
         {
