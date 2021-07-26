@@ -3,6 +3,7 @@
 namespace Modules\Core\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Facades\SiteConfig;
 
 class ResolveResource extends JsonResource
 {
@@ -13,6 +14,7 @@ class ResolveResource extends JsonResource
             "code" => $this->code,
             "name" => $this->name,
             "channels" => ResolveChannelResource::collection($this->whenLoaded("channels")),
+            "config" => SiteConfig::fetch("default_country", "website", $this->id),
         ];
     }
 }
