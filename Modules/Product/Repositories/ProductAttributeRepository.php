@@ -113,7 +113,9 @@ class ProductAttributeRepository extends ProductRepository
                 
                 if ( $validator->fails() ) throw ValidationException::withMessages([$attribute->name => $validator->errors()->toArray()]);
 
-                if(isset($product_attribute["value"]) && in_array($attribute->type, $this->option_fields)) $this->optionValidation($attribute, $product_attribute["value"]);
+                //if(isset($product_attribute["value"]) && in_array($attribute->type, $this->option_fields)) $this->optionValidation($attribute, $product_attribute["value"]);
+                
+                if($attribute->slug == "quantity_and_stock_status") $product_attribute["catalog_inventory"] = $single_attribute_collection->pluck("catalog_inventory")->first();
 
                 $all_product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid()); 
             }
@@ -180,7 +182,7 @@ class ProductAttributeRepository extends ProductRepository
                 {
                     // store mapped attributes on respective function. ( sku, categories.)
                     $function_name = $this->functionMapper[$attribute["attribute_slug"]];
-                    $this->product_repository->$function_name($product, $request, $method, $attribute["value"]);
+                    $this->product_repository->$function_name($product, $request, $method, $attribute);
                     continue;
                 }
                 

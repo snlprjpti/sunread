@@ -48,14 +48,17 @@ class ProductRepository extends BaseRepository
         $this->store_model = $store_model;
     }
 
-    public function validataInventoryData(object $request): array
+    public function validataInventoryData(array $data): array
     { 
         try
         {
-            $validator = Validator::make($request->all(), [
-                "catalog_inventory.quantity" => "required|decimal",
-                "catalog_inventory.use_config_manage_stock" => "required|boolean",
-                "catalog_inventory.manage_stock" => "required|boolean"
+            $config_rules = (isset($data["manage_stock"]) && $data["manage_stock"] == 1) ? 0 : 1;
+            $no_config_rules = (isset($data["use_config_manage_stock"]) && $data["use_config_manage_stock"] == 1) ? 0 : 1;
+
+            $validator = Validator::make($data, [
+                "quantity" => "required|decimal",
+                "use_config_manage_stock" => "required|boolean|in:$config_rules",
+                "manage_stock" => "required|boolean|in:$no_config_rules"
             ]);
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
         }
@@ -64,19 +67,19 @@ class ProductRepository extends BaseRepository
             throw $exception;
         }
 
-        return $validator->validated()["catalog_inventory"];
+        return $validator->validated();
     }
 
-    public function catalogInventory(object $product, object $request, string $method, mixed $value): bool
+    public function catalogInventory(object $product, object $request, string $method, array $value): bool
     {
         try
         {  
-            if ($value)
+            if (isset($value["value"]) && isset($value["catalog_inventory"]))
             {                
-                $data = $this->validataInventoryData($request);
+                $data = $this->validataInventoryData($value["catalog_inventory"]);
                 $data["product_id"] = $product->id;
                 $data["website_id"] = $product->website_id;
-                $data["is_in_stock"] = (bool) $value;
+                $data["is_in_stock"] = (bool) $value["value"];
                 $match = [
                     "product_id" => $product->id,
                     "website_id" => $product->website_id
@@ -86,14 +89,14 @@ class ProductRepository extends BaseRepository
                 $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
       
                 $original_quantity = (float) $catalog_inventory->quantity;
-                $adjustment_type = (($request->catalog_inventory["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
+                $adjustment_type = (($value["catalog_inventory"]["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
                 LogCatalogInventoryItem::dispatchSync([
                     "product_id" => $catalog_inventory->product_id,
                     "website_id" => $catalog_inventory->website_id,
                     "event" => ($method == "store") ? "{$this->model_key}.store" : "{$this->model_key}.{$adjustment_type}",
                     "adjustment_type" => ($method == "store") ? "addition" : $adjustment_type,
                     "adjusted_by" => auth()->guard("admin")->id(),
-                    "quantity" => ($method == "store") ? $request->catalog_inventory["quantity"] : (float) abs($original_quantity - $request->catalog_inventory["quantity"])
+                    "quantity" => ($method == "store") ? $value["catalog_inventory"]["quantity"] : (float) abs($original_quantity - $value["catalog_inventory"]["quantity"])
                 ]);
             }
         }
@@ -105,14 +108,14 @@ class ProductRepository extends BaseRepository
         return true;
     }
 
-    public function sku(object $product, object $request, string $method, mixed $value): bool
+    public function sku(object $product, object $request, string $method, array $value): bool
     {
         try
         {
-            if ($value)
+            if (isset($value["value"]))
             {
                 $id = ($method == "update") ? $product->id : "";
-                $validator = Validator::make(["sku" => $value ], [
+                $validator = Validator::make(["sku" => $value["value"] ], [
                     "sku" => "required|unique:products,sku,".$id
                 ]);
     
@@ -128,11 +131,11 @@ class ProductRepository extends BaseRepository
         return true;
     }
 
-    public function status(object $product, object $request, string $method, mixed $value): bool
+    public function status(object $product, object $request, string $method, array $value): bool
     {
         try
         {
-            if($value) $product->update(["status" => $value]);
+            if (isset($value["value"])) $product->update(["status" => $value["value"]]);
         }
         catch ( Exception $exception )
         {
@@ -141,13 +144,13 @@ class ProductRepository extends BaseRepository
         return true;
     }
 
-    public function categories(object $product, object $request, string $method, mixed $value): bool
+    public function categories(object $product, object $request, string $method, array $value): bool
     {
         try
         {           
-            if ($value)
+            if (isset($value["value"]))
             {
-                $validator = Validator::make(["categories" => $value], [
+                $validator = Validator::make(["categories" => $value["value"]], [
                     "categories" => "required|array",
                     "categories.*" => "required|exists:categories,id"
                 ]);
@@ -164,11 +167,11 @@ class ProductRepository extends BaseRepository
         return true;
     }
 
-    public function base_image(object $product, object $request, string $method, mixed $value): bool
+    public function base_image(object $product, object $request, string $method, array $value): bool
     {
         try
         {
-            $this->storeImages($product, $value, "base_image");
+            if (isset($value["value"])) $this->storeImages($product, $value["value"], "base_image");
         }
         catch ( Exception $exception )
         {
@@ -178,11 +181,11 @@ class ProductRepository extends BaseRepository
         return true; 
     }
 
-    public function small_image(object $product, object $request, string $method, mixed $value): bool
+    public function small_image(object $product, object $request, string $method, array $value): bool
     {
         try
         {
-            $this->storeImages($product, $value, "small_image");
+            if (isset($value["value"])) $this->storeImages($product, $value["value"], "small_image");
         }
         catch ( Exception $exception )
         {
@@ -192,11 +195,11 @@ class ProductRepository extends BaseRepository
         return true; 
     }
 
-    public function thumbnail_image(object $product, object $request, string $method, mixed $value): bool
+    public function thumbnail_image(object $product, object $request, string $method, array $value): bool
     {
         try
         {
-            $this->storeImages($product, $value, "thumbnail_image");
+            if (isset($value["value"])) $this->storeImages($product, $value["value"], "thumbnail_image");
         }
         catch ( Exception $exception )
         {
