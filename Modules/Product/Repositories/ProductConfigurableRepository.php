@@ -16,9 +16,9 @@ use Modules\Attribute\Entities\AttributeOption;
 
 class ProductConfigurableRepository extends BaseRepository
 {
-    protected $attribute, $product_repository, $non_required_attributes;
+    protected $attribute, $product_repository, $non_required_attributes, $product_attribute_repository;
 
-    public function __construct(Product $product, Attribute $attribute, ProductRepository $product_repository)
+    public function __construct(Product $product, Attribute $attribute, ProductRepository $product_repository, ProductAttributeRepository $productAttributeRepository)
     {
         $this->model = $product;
         $this->model_key = "catalog.products";
@@ -31,6 +31,7 @@ class ProductConfigurableRepository extends BaseRepository
         ];
         $this->attribute = $attribute;
         $this->product_repository = $product_repository;
+        $this->product_attribute_repository = $productAttributeRepository;
         $this->non_required_attributes = [ "price", "cost", "quantity_and_stock_status" ];
         $this->asd = $this->attributeCache();
     }
@@ -150,7 +151,7 @@ class ProductConfigurableRepository extends BaseRepository
                     ]
                 ], $productAttributes, $variant_options);
 
-                $this->product_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
+                $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
                 $variant->channels()->sync($request->get("channels"));
             });
         }
