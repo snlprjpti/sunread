@@ -42,7 +42,7 @@ class ProductAttributeRepository extends ProductRepository
         $this->non_option_slug = [ "tax_class_id", "category_ids" ];
     }
 
-    public function attributeSetCache()
+    public function attributeSetCache(): object
     {
         try
         {
@@ -127,14 +127,14 @@ class ProductAttributeRepository extends ProductRepository
         return collect($all_product_attributes)->where("value", "!=", null)->toArray();
     }
 
-    public function optionValidation($attribute, $values): void
+    public function optionValidation(object $attribute, mixed $values): void
     {
         if(in_array($attribute->type, ["checkbox", "multiselect"])) $this->multipleOptionValidation($attribute, $values);
         if(in_array($attribute->type, ["select"])) $this->singleOptionValidation($attribute, $values);
         if(in_array($attribute->type, ["multiimages"])) $this->multipleImageValidation($attribute, $values);
     }
 
-    public function singleOptionValidation($attribute, $values): void
+    public function singleOptionValidation(object $attribute, mixed $values): void
     {
         if(in_array($attribute->slug, $this->non_option_slug))
         {
@@ -146,7 +146,7 @@ class ProductAttributeRepository extends ProductRepository
 
     }
 
-    public function multipleOptionValidation($attribute, $values): void
+    public function multipleOptionValidation(object $attribute, mixed $values): void
     {
         foreach($values as $value)
         {
@@ -154,15 +154,22 @@ class ProductAttributeRepository extends ProductRepository
         }
     }
 
-    public function multipleImageValidation($attribute, $values): void
+    public function multipleImageValidation(object $attribute, mixed $values): void
     {
-        foreach($values as $value)
+        try
         {
-            $images["value"] = $value;
-            $validator = Validator::make($images, [
-                "value" => "mimes:bmp,jpeg,jpg,png"
-            ]);
-            if ( $validator->fails() ) throw ValidationException::withMessages([$attribute->name => $validator->errors()->toArray()]);
+            foreach($values as $value)
+            {
+                $images["value"] = $value;
+                $validator = Validator::make($images, [
+                    "value" => "mimes:bmp,jpeg,jpg,png"
+                ]);
+                if ( $validator->fails() ) throw ValidationException::withMessages([$attribute->name => $validator->errors()->toArray()]);
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
         }
     }
 
