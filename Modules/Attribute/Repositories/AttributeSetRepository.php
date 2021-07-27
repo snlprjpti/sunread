@@ -66,10 +66,15 @@ class AttributeSetRepository extends BaseRepository
                             "scope" => $attribute->scope,
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required,
-                            "value" => ""
+                            "value" => $attribute->default_value
                         ];
 
-                        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributesData["options"] = $this->getAttributeOption($attribute);
+                        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
+                        {
+                            $attributesData["options"] = $this->getAttributeOption($attribute);
+                            $attributeDefault = $attribute->attribute_options()->whereIsDefault(1)->first();
+                            $attributesData["value"] = $attributeDefault?->id;
+                        } 
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->getInventoryChildren();
 
                         return $attributesData;
@@ -111,26 +116,26 @@ class AttributeSetRepository extends BaseRepository
     {
         try
         {
-            if($id) $inventory = CatalogInventory::whereProductId($id)->first();
+            $inventory = $id ? CatalogInventory::whereProductId($id)->first() : null;
             
             $children["catalog_inventory"] = [
                 [
                     "name" => "Quantity",
                     "slug" => "quantity",
                     "type" => "number",
-                    "value" => (isset($inventory)) ? $inventory->quantity : ""
+                    "value" => $inventory?->quantity
                 ],
                 [
                     "name" => "Use Config Manage Stock",
                     "slug" => "use_config_manage_stock",
                     "type" => "boolean",
-                    "value" => (isset($inventory)) ? $inventory->use_config_manage_stock : ""
+                    "value" => $inventory?->use_config_manage_stock
                 ],
                 [
                     "name" => "Manage Stock",
                     "slug" => "manage_stock",
                     "type" => "boolean",
-                    "value" => (isset($inventory)) ? $inventory->manage_stock : ""
+                    "value" => $inventory?->manage_stock
                 ],
             ];
         }
