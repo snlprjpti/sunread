@@ -336,7 +336,7 @@ class AttributeTableSeeder extends Seeder
                             "attribute_id" => $attribute_data->id,
                             "name" => $attribute_option["name"],
                             "position" => ++$count,
-                            "is_default" => ( $attribute["default_value"] == $attribute_option ) ? 1 : 0,
+                            "is_default" => ( $attribute["default_value"] == $attribute_option["name"] ) ? 1 : 0,
                             "code" => $attribute_option["code"] ?? null,
                         ]);
                     });

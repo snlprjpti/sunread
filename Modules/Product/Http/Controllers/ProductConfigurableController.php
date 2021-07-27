@@ -17,19 +17,21 @@ use Illuminate\Validation\ValidationException;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 use Exception;
 use Modules\Core\Rules\ScopeRule;
+use Modules\Product\Repositories\ProductAttributeRepository;
 use Modules\Product\Repositories\ProductRepository;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
 
 class ProductConfigurableController extends BaseController
 {
-    protected $repository, $product_repository;
+    protected $repository, $product_repository, $product_attribute_repository;
 
-    public function __construct(Product $product, ProductConfigurableRepository $productConfigurableRepository, ProductRepository $product_repository)
+    public function __construct(Product $product, ProductConfigurableRepository $productConfigurableRepository, ProductRepository $product_repository, ProductAttributeRepository $productAttributeRepository)
     {
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $productConfigurableRepository;
         $this->product_repository = $product_repository;
+        $this->product_attribute_repository = $productAttributeRepository;
         $exception_statuses = [
             ProductAttributeCannotChangeException::class => 403
         ];
@@ -68,8 +70,8 @@ class ProductConfigurableController extends BaseController
             ];
 
             $created = $this->repository->create($data, function (&$created) use ($request, $scope) {
-                $attributes = $this->product_repository->validateAttributes($created, $request, $scope, "configurable");
-                $this->product_repository->syncAttributes($attributes, $created, $scope, $request, "store", "configurable");
+                $attributes = $this->product_attribute_repository->validateAttributes($created, $request, $scope, "configurable");
+                $this->product_attribute_repository->syncAttributes($attributes, $created, $scope, $request, "store", "configurable");
 
                 $created->channels()->sync($request->get("channels"));
 
@@ -105,8 +107,8 @@ class ProductConfigurableController extends BaseController
             ];
 
             $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope) {
-                $attributes = $this->product_repository->validateAttributes($updated, $request, $scope, "configurable");
-                $this->product_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
+                $attributes = $this->product_attribute_repository->validateAttributes($updated, $request, $scope, "configurable");
+                $this->product_attribute_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
 
                 $updated->channels()->sync($request->get("channels"));
 
