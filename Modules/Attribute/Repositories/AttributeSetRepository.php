@@ -117,7 +117,7 @@ class AttributeSetRepository extends BaseRepository
                 [
                     "name" => "Quantity",
                     "slug" => "quantity",
-                    "type" => "text",
+                    "type" => "number",
                     "value" => (isset($inventory)) ? $inventory->quantity : ""
                 ],
                 [
