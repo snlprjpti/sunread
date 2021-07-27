@@ -113,7 +113,7 @@ class ProductAttributeRepository extends ProductRepository
                 
                 if ( $validator->fails() ) throw ValidationException::withMessages([$attribute->name => $validator->errors()->toArray()]);
 
-                //if(isset($product_attribute["value"]) && in_array($attribute->type, $this->option_fields)) $this->optionValidation($attribute, $product_attribute["value"]);
+                if(isset($product_attribute["value"]) && in_array($attribute->type, $this->option_fields)) $this->optionValidation($attribute, $product_attribute["value"]);
                 
                 if($attribute->slug == "quantity_and_stock_status") $product_attribute["catalog_inventory"] = $single_attribute_collection->pluck("catalog_inventory")->first();
 
@@ -218,7 +218,7 @@ class ProductAttributeRepository extends ProductRepository
             throw $exception;
         }
 
-        if($product_attribute) Event::dispatch("{$this->model_key}.sync.after", $product_attribute);
+        if(isset($product_attribute)) Event::dispatch("{$this->model_key}.sync.after", $product_attribute);
         DB::commit();
 
         return true;

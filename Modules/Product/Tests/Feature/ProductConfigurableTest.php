@@ -6,9 +6,11 @@ use Illuminate\Support\Arr;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Tests\BaseTestCase;
-use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Website;
 use Modules\Product\Entities\Product;
+use Modules\Tax\Entities\CustomerTaxGroup;
+use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 
 class ProductConfigurableTest extends BaseTestCase
 {
@@ -46,7 +48,7 @@ class ProductConfigurableTest extends BaseTestCase
                 if (in_array($attribute->slug, ["category_ids", "base_image", "small_image", "thumbnail_image", "quantity_and_stock_status"])) continue;
                 $attributes[] = [
                     "attribute_id" => $attribute->id,
-                    "value" => $this->value($attribute->type)
+                    "value" => $this->value($attribute)
                 ];
             }
         }
@@ -60,16 +62,8 @@ class ProductConfigurableTest extends BaseTestCase
                 "value" => $super_attribute->attribute_options->take(2)->pluck('id')->toArray()
             ];
         }
-
-        $catalog_inventory = [
-            "catalog_inventory" => [
-                "quantity" => 20,
-                "use_config_manage_stock" => 1,
-                "manage_stock" => 0
-            ]
-        ];
         
-        return array_merge($merge_product, ["attributes" => $attributes], ["super_attributes" => $variant_attributes], $catalog_inventory);
+        return array_merge($merge_product, ["attributes" => $attributes], ["super_attributes" => $variant_attributes]);
     }
 
     public function getUpdateData(): array
@@ -98,9 +92,10 @@ class ProductConfigurableTest extends BaseTestCase
     {
         $this->markTestSkipped("Invalid Update method not available.");
     }
-    public function value(string $type): mixed
+
+    public function value(object $attribute): mixed
     {
-        switch($type)
+        switch($attribute->type)
         {
             case "price" : 
                 $value = 1000.1;
@@ -110,7 +105,7 @@ class ProductConfigurableTest extends BaseTestCase
                 $value = true;
                 break;
 
-            case ($type == "datetime" || $type == "date"):
+            case ($attribute->type == "datetime" || $attribute->type == "date"):
                 $value = now();
                 break;
 
@@ -118,8 +113,32 @@ class ProductConfigurableTest extends BaseTestCase
                 $value = rand(1,1000);
                 break;
 
+            case "select" : 
+                $attribute_option = ($attribute->slug == "tax_class_id") ? CustomerTaxGroup::inRandomOrder()->first() : AttributeOption::create([
+                    "attribute_id" => $attribute->id,
+                    "name" => Str::random(10)
+                ]);
+                $value = $attribute_option->id;
+                break;
+
+            case ($attribute->type == "multiselect" || $attribute->type == "checkbox"):
+                $attribute_option = AttributeOption::create([
+                    "attribute_id" => $attribute->id,
+                    "name" => Str::random(10)
+                ]);
+                $value[] = $attribute_option->id;
+                break;
+
+            case "image":
+                $value = UploadedFile::fake()->image('image.jpeg');
+                break;
+            
+            case "multiimage":
+                $value[] = UploadedFile::fake()->image('image.jpeg');
+                break;
+
             default:
-                $value = \Str::random(10);
+                $value = Str::random(10);
                 break;
         }
         return $value;
