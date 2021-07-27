@@ -109,27 +109,36 @@ class AttributeSetRepository extends BaseRepository
 
     public function getInventoryChildren(?int $id = null): array
     {
-        if($id) $inventory = CatalogInventory::whereProductId($id)->first();
-        $children["catalog_inventory"] = [
-            [
-                "name" => "Quantity",
-                "slug" => "quantity",
-                "type" => "text",
-                "value" => (isset($inventory)) ? $inventory->quantity : ""
-            ],
-            [
-                "name" => "Use Config Manage Stock",
-                "slug" => "use_config_manage_stock",
-                "type" => "boolean",
-                "value" => (isset($inventory)) ? $inventory->use_config_manage_stock : ""
-            ],
-            [
-                "name" => "Manage Stock",
-                "slug" => "manage_stock",
-                "type" => "boolean",
-                "value" => (isset($inventory)) ? $inventory->manage_stock : ""
-            ],
-        ];
+        try
+        {
+            if($id) $inventory = CatalogInventory::whereProductId($id)->first();
+            
+            $children["catalog_inventory"] = [
+                [
+                    "name" => "Quantity",
+                    "slug" => "quantity",
+                    "type" => "text",
+                    "value" => (isset($inventory)) ? $inventory->quantity : ""
+                ],
+                [
+                    "name" => "Use Config Manage Stock",
+                    "slug" => "use_config_manage_stock",
+                    "type" => "boolean",
+                    "value" => (isset($inventory)) ? $inventory->use_config_manage_stock : ""
+                ],
+                [
+                    "name" => "Manage Stock",
+                    "slug" => "manage_stock",
+                    "type" => "boolean",
+                    "value" => (isset($inventory)) ? $inventory->manage_stock : ""
+                ],
+            ];
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
         return $children;
     }
 }
