@@ -2,8 +2,9 @@
 
 namespace Modules\Core\Traits;
 
-use Illuminate\Support\Facades\Request;
+use Exception;
 use Modules\Core\Entities\Website;
+use Illuminate\Support\Facades\Request;
 
 trait WebsiteResolveable
 {
@@ -16,21 +17,31 @@ trait WebsiteResolveable
         return $root_domain;
     }
 
-    public function resolveWebsite(?string $website_domain = null): ?object
+    public function resolveWebsite(?string $website_domain = null, ?callable $callback = null): ?object
     {
-        $domain = $this->getDomain();
+        try
+        {
+            $domain = $this->getDomain();
 
-        $fallback_id = config("website.fallback_id");
-        if ($website_domain !== null) {
-            $fallback_id = Website::whereHostname($this->getDomain($website_domain))->firstOrFail()?->id;
+            $fallback_id = config("website.fallback_id");
+            if ($website_domain !== null) {
+                $fallback_id = Website::whereHostname($this->getDomain($website_domain))->firstOrFail()?->id;
+            }
+
+            $website = Website::whereHostname($domain);
+            if ( !$website->exists() && config("website.environment") == "local" ) {
+                $website = Website::whereId($fallback_id);
+            }
+
+            $resolved = $website->with("channels.stores")->firstOrFail();
+            if ($callback) $resolved = $callback($resolved);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
         }
 
-        $website = Website::whereHostname($domain);
-        if ( !$website->exists() && config("website.environment") == "local" ) {
-            $website = Website::whereId($fallback_id);
-        }
-
-        return $website->with("channels.stores")->firstOrFail();
+        return $resolved;
     }
 
     public function fetchAll(object $request, array $with = [], ?callable $callback = null): object

@@ -2,9 +2,10 @@
 
 namespace Modules\Core\Entities;
 
+use Modules\Core\Traits\HasFactory;
+use Modules\Core\Facades\SiteConfig;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Modules\Core\Traits\HasFactory;
 
 
 class Website extends Model
