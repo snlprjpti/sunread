@@ -9,6 +9,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
+use Modules\Inventory\Entities\CatalogInventory;
 
 class AttributeSetRepository extends BaseRepository
 {
@@ -64,9 +65,13 @@ class AttributeSetRepository extends BaseRepository
                             "type" => $attribute->type,
                             "scope" => $attribute->scope,
                             "position" => $attribute->position,
-                            "is_required" => $attribute->is_required
+                            "is_required" => $attribute->is_required,
+                            "value" => ""
                         ];
+
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributesData["options"] = $this->getAttributeOption($attribute);
+                        if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->getInventoryChildren();
+
                         return $attributesData;
                     })->toArray()
                 ];
@@ -100,5 +105,31 @@ class AttributeSetRepository extends BaseRepository
         {
             throw $exception;
         }
+    }
+
+    public function getInventoryChildren(?int $id = null): array
+    {
+        if($id) $inventory = CatalogInventory::whereProductId($id)->first();
+        $children["catalog_inventory"] = [
+            [
+                "name" => "Quantity",
+                "slug" => "quantity",
+                "type" => "text",
+                "value" => (isset($inventory)) ? $inventory->quantity : ""
+            ],
+            [
+                "name" => "Use Config Manage Stock",
+                "slug" => "use_config_manage_stock",
+                "type" => "boolean",
+                "value" => (isset($inventory)) ? $inventory->use_config_manage_stock : ""
+            ],
+            [
+                "name" => "Manage Stock",
+                "slug" => "manage_stock",
+                "type" => "boolean",
+                "value" => (isset($inventory)) ? $inventory->manage_stock : ""
+            ],
+        ];
+        return $children;
     }
 }
