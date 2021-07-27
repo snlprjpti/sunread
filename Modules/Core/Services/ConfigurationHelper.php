@@ -19,11 +19,50 @@ class ConfigurationHelper
     {
         $this->model = $configuration;
         $this->config_fields = ($data = Cache::get("configurations.all")) ? $data : config("configuration");
+        $this->createModel();
     }
 
     public function fetch(string $absolute_path, string $scope = "global", int $scope_id = 0): mixed
     {
         return $this->getSinglePathValue($absolute_path, $scope, $scope_id);
+    }
+
+    public function getValues(object $request): mixed
+    {
+        $value = $this->model->where([
+            ['scope', $request->scope],
+            ['scope_id', $request->scope_id],
+            ['path', $request->path]
+        ])->first()->value;
+
+        return $value;
+    }
+
+    public function getDefaultValues(object $data, mixed $configValue=null): mixed
+    {
+        if($data->scope != "global")
+        {
+            $input["path"] = $data->path;
+            switch($data->scope)
+            {
+                case "store":
+                    $input["scope"] = "channel";
+                    $input["scope_id"] = $this->store_model->find($data->scope_id)->channel->id;
+                    break;
+                
+                case "channel":
+                    $input["scope"] = "website";
+                    $input["scope_id"] = $this->channel_model->find($data->scope_id)->website->id;
+                    break;
+
+                case "website":
+                    $input["scope"] = "global";
+                    $input["scope_id"] = 0;
+                    break;
+            }
+            return ($item = $this->checkCondition((object) $input)->first()) ? $item->value : (( $input["scope"] == "global") ? $configValue : $this->getDefaultValues((object)$input, $configValue));           
+        }
+        return $configValue;
     }
 
     public function getSinglePathValue(string $path, string $scope = "global", int $scope_id): string
@@ -35,23 +74,22 @@ class ConfigurationHelper
                 ->pluck("subChildren")->flatten(1)
                 ->pluck("elements")->flatten(1);
 
-                $element = $elements->where("path", $path)->first();
+            $element = $elements->where("path", $path)->first();
             if(!$element) return "Invalid path";
 
             $data = (object) [
                 "scope" => $scope,
                 "scope_id" => $scope_id,
-                "path" => $element->path
+                "path" => $path
             ];
 
-            $fetched = ($this->has((object) $data)) ? $this->getValues($data) : $this->getDefaultValues($data, $element["default"]);
-            dd($fetched);
+            $fetched = ($this->has($data)) ? $this->getValues($data) : $this->getDefaultValues($data, $element["default"]);
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return true;
+        return $fetched;
     }
 }
