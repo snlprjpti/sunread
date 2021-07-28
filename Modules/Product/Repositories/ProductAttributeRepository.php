@@ -76,7 +76,7 @@ class ProductAttributeRepository extends ProductRepository
             // get all request attribute id
             $request_attribute_ids = array_map( function ($request_attribute) {
 
-                if(!isset($request_attribute["attribute_id"])) throw ValidationException::withMessages(["attribute_id" => "attribute_id is missing."]);
+                if(!isset($request_attribute["attribute_id"])) throw ValidationException::withMessages(["attribute_id" => "Invalid attribute format."]);
                 return $request_attribute["attribute_id"];
                 
             }, $request->get("attributes"));
