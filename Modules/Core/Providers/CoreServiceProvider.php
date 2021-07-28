@@ -11,11 +11,13 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Core\Entities\ExchangeRate;
 use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Support\Facades\Validator;
+use Modules\Core\Entities\Configuration;
 use Modules\Core\Observers\LocaleObserver;
 use Modules\Core\Observers\ChannelObserver;
 use Modules\Core\Observers\CurrencyObserver;
 use Modules\Core\Services\ActivityLogHelper;
 use Modules\Core\Observers\ExchangeRateObserver;
+use Modules\Core\Services\ConfigurationHelper;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -145,6 +147,10 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->app->singleton('audit', function () {
             return new ActivityLogHelper(new ActivityLog());
+        });
+
+        $this->app->singleton('siteConfig', function () {
+            return new ConfigurationHelper(new Configuration());
         });
     }
 

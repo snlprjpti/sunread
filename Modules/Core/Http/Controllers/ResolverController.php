@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Modules\Core\Entities\Website;
 use Modules\Core\Transformers\ResolveResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\ResolveRepository;
 use Modules\Core\Http\Controllers\BaseController;
 
@@ -32,7 +33,10 @@ class ResolverController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->resolveWebsite($website);
+            $fetched = $this->repository->resolveWebsite($website, function ($fetched) {
+                // $fetched->config = SiteConfig::fetch("default_country", "website", $fetched->id);
+                return $fetched;
+            });
         }
         catch( Exception $exception )
         {
