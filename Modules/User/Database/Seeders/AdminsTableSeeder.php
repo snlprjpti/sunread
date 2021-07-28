@@ -43,6 +43,12 @@ class AdminsTableSeeder extends Seeder
                 "company" => "hdl",
                 "email" => "luitelbj@gmail.com",
                 "password" => "Alice123$"
+            ], [
+                "first_name" => "Dinesh",
+                "last_name" => "Parajapati",
+                "company" => "hdl",
+                "email" => "dinpra@gmail.com",
+                "password" => "123456"
             ]
         ];
 
