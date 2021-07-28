@@ -260,7 +260,7 @@ class ConfigurationRepository extends BaseRepository
         return $file_path;
     }
 
-    public function getSinglePathValue($request): string
+    public function getSinglePathValue($request): mixed
     {
         try
         {
@@ -269,7 +269,8 @@ class ConfigurationRepository extends BaseRepository
 
             if(!$element) throw ValidationException::withMessages([ "path" => "Invalid Path" ]);
 
-            $fetched = ($this->has((object) $request)) ? $this->getValues($request) : $this->getDefaultValues($request, $element["default"]);
+            $values = ($this->has((object) $request)) ? $this->getValues($request) : $this->getDefaultValues($request, $element["default"]);
+            $fetched = ($values && $values != "" && $element["provider"] != "") ? $this->getProviderData($element, $values) : $values;
         }
         catch( Exception $exception )
         {
@@ -277,6 +278,21 @@ class ConfigurationRepository extends BaseRepository
         }
 
         return $fetched;
+    }
+
+    public function getProviderData(array $element, mixed $values): array
+    {
+        try
+        {
+            $model = new $element["provider"];
+            $fetched = is_array($values) ? $model->whereIn("id", $values)->get() : $model->find($values);
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $fetched->toArray();   
     }
 
 }

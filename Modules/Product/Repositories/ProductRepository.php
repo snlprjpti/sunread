@@ -16,6 +16,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
+use Modules\Attribute\Entities\AttributeOption;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Core\Entities\Channel;
@@ -333,6 +334,10 @@ class ProductRepository extends BaseRepository
 
     public function getDefaultValues(object $product, array $data): mixed
     {
+        $attribute = Attribute::findorFail($data["attribute_id"]);
+        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributeOptions = AttributeOption::whereAttributeId($attribute->id)->first();
+        $defaultValue = isset($attributeOptions) ? $attributeOptions->id : $attribute->default_value;
+
         if($data["scope"] != "website")
         {
             $data["attribute_id"] = $data["attribute_id"];
@@ -351,7 +356,7 @@ class ProductRepository extends BaseRepository
             }
             return ($item = $product->product_attributes()->where($data)->first()) ? $item->value->value : $this->getDefaultValues($product, $data);           
         }
-        return ($item = $product->product_attributes()->where($data)->first()) ? $item->value->value : null;
+        return ($item = $product->product_attributes()->where($data)->first()) ? $item->value->value : $defaultValue;
     }
 
     public function getMapperValue($attribute, $product)
