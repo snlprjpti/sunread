@@ -127,9 +127,9 @@ class ConfigurationHelper
     {
         try
         {
-            $fetched = $values;
+            $fetched = $values == "" ? null : $values;
 
-            if ( class_exists($element["provider"]) ) {
+            if ( class_exists($element["provider"]) && !$values ) {
                 $model = new $element["provider"];
                 $fetched = is_array($values)
                     ? $model->whereIn("id", $values)->get()
