@@ -12,6 +12,7 @@ use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Rules\ScopeRule;
+use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 use Modules\Product\Repositories\ProductAttributeRepository;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
@@ -154,8 +155,11 @@ class ProductController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted){
-                $deleted->product_attributes()->delete();
+            $this->repository->delete($id, function ($deleted) {
+                ProductAttribute::preventLazyLoading(false);
+                $deleted->product_attributes()->each(function ($product_attribute) {
+                    $product_attribute->delete();
+                });
             });
         }
         catch( Exception $exception )
