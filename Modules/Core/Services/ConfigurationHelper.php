@@ -34,7 +34,8 @@ class ConfigurationHelper
                 "path" => $path
             ];
 
-            $fetched = ($this->has($data)) ? $this->getValues($data) : $this->getDefaultValues($data, $element["default"]);
+            $values = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data, $element["default"]);
+            $fetched = $this->getProviderData($element, $values);
         }
         catch( Exception $exception )
         {
@@ -66,39 +67,82 @@ class ConfigurationHelper
 
     public function getValues(object $request): mixed
     {
-        $value = $this->model->where([
-            ['scope', $request->scope],
-            ['scope_id', $request->scope_id],
-            ['path', $request->path]
-        ])->first()->value;
-
+        try
+        {
+            $value = $this->model->where([
+                ["scope", $request->scope],
+                ["scope_id", $request->scope_id],
+                ["path", $request->path]
+            ])->first()?->value;
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+    
         return $value;
     }
 
-    public function getDefaultValues(object $data, mixed $configValue=null): mixed
+    public function getDefaultValues(object $data, mixed $configValue = null): mixed
     {
-        if($data->scope != "global")
+        try
         {
-            $input["path"] = $data->path;
-            switch($data->scope)
-            {
-                case "store":
-                    $input["scope"] = "channel";
-                    $input["scope_id"] = $this->store_model->find($data->scope_id)->channel->id;
-                    break;
-                
-                case "channel":
-                    $input["scope"] = "website";
-                    $input["scope_id"] = $this->channel_model->find($data->scope_id)->website->id;
-                    break;
+            if($data->scope != "global") {
+                $input = ["path" => $data->path];
 
-                case "website":
-                    $input["scope"] = "global";
-                    $input["scope_id"] = 0;
-                    break;
+                switch($data->scope)
+                {
+                    case "store":
+                        $input["scope"] = "channel";
+                        $input["scope_id"] = $this->store_model->find($data->scope_id)->channel->id;
+                        break;
+                    
+                    case "channel":
+                        $input["scope"] = "website";
+                        $input["scope_id"] = $this->channel_model->find($data->scope_id)->website->id;
+                        break;
+
+                    case "website":
+                        $input["scope"] = "global";
+                        $input["scope_id"] = 0;
+                        break;
+                }
+
+                if ( $item = $this->checkCondition((object) $input)->first() ) {
+                    $configValue = $item->value;
+                } else {
+                    $configValue = $input["scope"] == "global" ? $configValue : $this->getDefaultValues((object)$input, $configValue);
+                }
             }
-            return ($item = $this->checkCondition((object) $input)->first()) ? $item->value : (( $input["scope"] == "global") ? $configValue : $this->getDefaultValues((object)$input, $configValue));           
         }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
         return $configValue;
+    }
+
+    public function getProviderData(array $element, mixed $values): array
+    {
+        try
+        {
+            $fetched = $values;
+
+            if ( class_exists($element["provider"]) ) {
+                $model = new $element["provider"];
+                $fetched = is_array($values)
+                    ? $model->whereIn("id", $values)->get()
+                    : $model->find($values);
+                if ( !$fetched ) throw ValidationException::withMessages(["path" => "Invalid value for configuration."]);
+                $fetched = $fetched->toArray();
+            }
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $fetched;   
     }
 }
