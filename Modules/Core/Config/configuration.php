@@ -294,6 +294,49 @@ return[
                         ]
                     ],
                 ]
+            ],
+            [
+                "title" => "Website Defaults",
+                "subChildren" => [
+                    [
+                        "title" => "Channel",
+                        "elements" => [
+                            [
+                                "title" => "Default Channel",
+                                "path" => "website_default_channel",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\Channel",
+                                "pluck" => ["code","id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:channels,id",
+                                "showIn" => ["website"],
+                                "multiple" => false,
+                                "scope" => "website",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Store",
+                        "elements" => [
+                            [
+                                "title" => "Default Store",
+                                "path" => "website_default_store",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\Store",
+                                "pluck" => ["code","id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:stores,id",
+                                "showIn" => ["website"],
+                                "multiple" => false,
+                                "scope" => "website",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                ]
             ]
 
         ]
