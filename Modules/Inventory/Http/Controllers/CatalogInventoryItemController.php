@@ -19,7 +19,7 @@ class CatalogInventoryItemController extends BaseController
     public function __construct(CatalogInventoryItem $catalogInventoryItem, CatalogInventoryItemRepository $catalogInventoryItemRepository)
     {
         $this->model = $catalogInventoryItem;
-        $this->model_name = "CatalogInventoryItem";
+        $this->model_name = "Catalog Inventory Item";
         $this->repository = $catalogInventoryItemRepository;   
         
         parent::__construct($this->model, $this->model_name);
