@@ -3,17 +3,20 @@
 namespace Modules\Erp\Traits;
 
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Modules\Erp\Entities\ErpImport;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Jobs\ErpImport as JobsErpImport;
+use Modules\Erp\Jobs\FtpToStorage;
 
 trait HasErpMapper
 {
 	protected $url = "https://bc.sportmanship.se:7148/sportmanshipbctestapi/api/NaviproAB/web/beta/";
+    public $erp_folder = "ERP Product Images";
 
 	private function basicAuth(): object
 	{
@@ -135,14 +138,19 @@ trait HasErpMapper
 	{
 		try
 		{
-			$directories = Storage::disk("ftp")->directories();
-			$files = Storage::disk("ftp")->files("/{$directories[0]}");
+			$ftp_directories = Storage::disk("ftp")->directories();
+			$ftp_files = Storage::disk("ftp")->files("/{$ftp_directories[0]}");
 
-			foreach ( $files as $file )
+            $ftp_files = array_filter($ftp_files, function ($file) {
+                $file_is_image = Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]);
+                $file_does_not_already_exist = !Storage::exists("{$this->erp_folder}/{$file}");
+
+                return $file_is_image && $file_does_not_already_exist;
+            });
+
+			foreach ( $ftp_files as $file )
 			{
-				if ( !\Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]) ) continue;
-				$get_file = Storage::disk("ftp")->get($file);
-				Storage::disk("public")->put("ERP Product Images/{$file}", $get_file);
+				FtpToStorage::dispatch($file);
 			}
 		}
 		catch ( Exception $exception )
@@ -152,6 +160,19 @@ trait HasErpMapper
 
 		return true;
 	}
+
+    public function storeFtpToLocal(string $location): void
+    {
+		try
+		{
+            $get_file = Storage::disk("ftp")->get($location);
+			Storage::put("{$this->erp_folder}/{$location}", $get_file);
+		}
+		catch ( Exception $exception )
+		{
+			throw $exception;
+		}
+    }
 
 	public function storeDescription(string $sku): bool
 	{
