@@ -39,7 +39,7 @@ class CatalogInventoryItemController extends BaseController
     {
         try
         {           
-            $fetched = $this->repository->fetchAll($request, [], function () use ($id){
+            $fetched = $this->repository->fetchAll($request, callback: function () use ($id) {
                 return $this->repository->filterByProduct($id);
             });
         }
