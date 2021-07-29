@@ -123,19 +123,19 @@ class ConfigurationHelper
         return $configValue;
     }
 
-    public function getProviderData(array $element, mixed $values): array
+    public function getProviderData(array $element, mixed $values): mixed
     {
         try
         {
+            $values = $values == "" ? null : $values;
             $fetched = $values;
 
-            if ( class_exists($element["provider"]) && $values !== null && $values !== "" ) {
+            if ( class_exists($element["provider"]) && $values !== null ) {
                 $model = new $element["provider"];
                 $fetched = is_array($values)
                     ? $model->whereIn("id", $values)->get()
                     : $model->find($values);
                 if ( !$fetched ) throw ValidationException::withMessages(["path" => "Invalid value for configuration."]);
-                $fetched = $fetched->toArray();
             }
         }
         catch( Exception $exception )

@@ -12,7 +12,9 @@ class ResolveResource extends JsonResource
             "id" => $this->id,
             "code" => $this->code,
             "name" => $this->name,
-            "channels" => ResolveChannelResource::collection($this->whenLoaded("channels"))
+            "channels" => ResolveChannelResource::collection($this->whenLoaded("channels")),
+            "default_channel" => $this->when($this->default_channel, new ResolveChannelResource($this->default_channel)),
+            "default_store" => $this->when($this->default_store, new ResolveStoreResource($this->default_store))
         ];
     }
 }

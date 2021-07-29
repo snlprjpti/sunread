@@ -34,7 +34,9 @@ class ResolverController extends BaseController
         try
         {
             $fetched = $this->repository->resolveWebsite($website, function ($fetched) {
-                // $fetched->config = SiteConfig::fetch("default_country", "website", $fetched->id);
+                $fetched->default_channel = SiteConfig::fetch("website_default_channel", "website", $fetched->id);
+                $fetched->default_store = SiteConfig::fetch("website_default_store", "website", $fetched->id);
+
                 return $fetched;
             });
         }
