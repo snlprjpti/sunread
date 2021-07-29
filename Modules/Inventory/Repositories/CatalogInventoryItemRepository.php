@@ -23,12 +23,12 @@ class CatalogInventoryItemRepository extends BaseRepository
             $inventories = CatalogInventory::whereProductId($id)->get();
 
             $inventory_item_ids = $inventories->map( function ($inventory) {
-                return $inventory->catalog_inventory_items->map( function ( $item ) {
+                return $inventory->catalog_inventory_items->map( function ($item) {
                     return $item->id;
                 });
             })->flatten(1)->toArray();
             $query = $this->model::query();
-            $query = $query->whereIn("id",$inventory_item_ids);
+            $query = $query->whereIn("id", $inventory_item_ids);
         }
         catch ( Exception $exception )
         {
