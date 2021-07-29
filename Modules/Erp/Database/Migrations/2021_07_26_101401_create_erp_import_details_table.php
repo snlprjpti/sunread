@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateErpImportProductsTable extends Migration
+class CreateErpImportDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateErpImportProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('erp_import_products', function (Blueprint $table) {
+        Schema::create('erp_import_details', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("erp_import_id"); 
             $table->foreign('erp_import_id')->references('id')->on('erp_imports')->onDelete('cascade');
@@ -30,6 +30,6 @@ class CreateErpImportProductsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('erp_import_products');
+        Schema::dropIfExists('erp_import_details');
     }
 }

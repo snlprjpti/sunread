@@ -15,8 +15,8 @@ class CreateErpImportsTable extends Migration
     {
         Schema::create('erp_imports', function (Blueprint $table) {
             $table->id();
-            $table->string("type");
-            $table->boolean("status");
+            $table->string("type")->unique();
+            $table->boolean("status")->default(0)->nullable();
             $table->timestamps();
         });
     }
