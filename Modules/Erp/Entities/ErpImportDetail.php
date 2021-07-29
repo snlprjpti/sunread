@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ErpImportProduct extends Model
+class ErpImportDetail extends Model
 {
     use HasFactory;
 
@@ -16,5 +16,4 @@ class ErpImportProduct extends Model
     {
         return $this->belongsTo(ErpImport::class);
     }
-    
 }
