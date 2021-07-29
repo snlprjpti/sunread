@@ -21,14 +21,15 @@ class ErpRepositiory extends BaseRepository
 	public function list(object $request)
 	{
 		// ProductImages::dispatch();
-		dd($this->storeDescription());
+		// dd($this->storeDescription());
 		// dd($this->storeImage());
 		// dd(storage_path('app\public'));
 		// ->get("/1511111_965_a.jpg")
 		// $storage = Storage::disk("ftp")->path("/1511111_965_a.jpg");
 
 
-		// ListProducts::dispatchSync();
+		ListProducts::dispatchSync();
+		dd("done");
 		// ErpAttributeGroups::dispatchSync();
 		// dd($this->allData());
 	}

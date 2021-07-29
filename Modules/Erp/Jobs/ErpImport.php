@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Collection;
 use Modules\Erp\Entities\ErpImport as EntitiesErpImport;
 use Modules\Erp\Entities\ErpImportDetail;
+use Modules\Erp\Jobs\ErpProductDescription;
 
 class ErpImport implements ShouldQueue
 {
@@ -42,12 +43,14 @@ class ErpImport implements ShouldQueue
                 else{
                     $sku = $item["itemNo"];
                 }
-                
+
                 ErpImportDetail::updateOrInsert([
 					"erp_import_id" => $erp_import_id,
 					"sku" => $sku,
 					"value" => json_encode($item)
 				]);
+
+                if ( $this->type == "listProducts" ) ErpProductDescription::dispatchSync($sku);
 			});
         }
         catch ( Exception $exception )

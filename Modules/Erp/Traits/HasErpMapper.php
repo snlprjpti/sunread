@@ -7,6 +7,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Modules\Erp\Entities\ErpImport;
+use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Jobs\ErpImport as JobsErpImport;
 
 trait HasErpMapper
@@ -151,16 +153,29 @@ trait HasErpMapper
 		return true;
 	}
 
-	public function storeDescription(): bool
+	public function storeDescription(string $sku): bool
 	{
 		try
 		{
-			$api = $this->basicAuth();
-			dd("asdwqe");
+			$erp_import_id = ErpImport::whereType("productDescriptions")->first()->id;
+
+			$url = "{$this->url}webExtendedTexts(tableName='Item',No='{$sku}',Language_Code='ENU',textNo=1)/Data";
+			$response = $this->basicAuth()->get($url);
+			if ( $response->status() == 200 )
+			{
+				$value = json_encode(["description" => $response->body()]);
+
+				ErpImportDetail::updateOrInsert([
+					"erp_import_id" => $erp_import_id,
+					"sku" => $sku,
+					"value" => json_encode($value)
+				]);
+
+			}
 		}
 		catch ( Exception $exception )
 		{
-
+			throw $exception;
 		}
 
 		return true;
