@@ -85,7 +85,8 @@ class ProductTest extends BaseTestCase
             case "select" : 
                 $attribute_option = ($attribute->slug == "tax_class_id") ? CustomerTaxGroup::inRandomOrder()->first() : AttributeOption::create([
                     "attribute_id" => $attribute->id,
-                    "name" => Str::random(10)
+                    "name" => Str::random(10),
+                    "code" => ($attribute->slug == "status") ? rand(0,1) : Str::random(10)
                 ]);
                 $value = $attribute_option->id;
                 break;
