@@ -128,13 +128,33 @@ class AttributeSetRepository extends BaseRepository
                 [
                     "name" => "Use Config Manage Stock",
                     "slug" => "use_config_manage_stock",
-                    "type" => "boolean",
+                    "type" => "select",
+                    "options" => [
+                        [
+                            "value" => 1,
+                            "label" => "Yes"
+                        ],
+                        [
+                            "value" => 0,
+                            "label" => "No"
+                        ]
+                    ],
                     "value" => $inventory?->use_config_manage_stock
                 ],
                 [
                     "name" => "Manage Stock",
                     "slug" => "manage_stock",
-                    "type" => "boolean",
+                    "type" => "select",
+                    "options" => [
+                        [
+                            "value" => 1,
+                            "label" => "Yes"
+                        ],
+                        [
+                            "value" => 0,
+                            "label" => "No"
+                        ]
+                    ],
                     "value" => $inventory?->manage_stock
                 ],
             ];
