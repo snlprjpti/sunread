@@ -99,8 +99,18 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Has Weight",
                 "slug" => "has_weight",
-                "type" => "boolean",
-                "default_value" => 1,
+                "type" => "select",
+                "options" => [
+                    [
+                        "name" => "Yes",
+                        "code" => 1
+                    ],
+                    [
+                        "name" => "No",
+                        "code" => 0
+                    ]
+                ],
+                "default_value" => "Yes",
                 "scope" => "website"
             ],
             // [
@@ -223,10 +233,20 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Product Status",
                 "slug" => "status",
-                "type" => "boolean",
+                "type" => "select",
+                "options" => [
+                    [
+                        "name" => "Yes",
+                        "code" => 1
+                    ],
+                    [
+                        "name" => "No",
+                        "code" => 0
+                    ]
+                ],
+                "default_value" => "Yes",
                 "scope" => "website",
-                "is_required" => 1,
-                "default_value" => 1
+                "is_required" => 1
             ],
             [
                 "name" => "Base Image",

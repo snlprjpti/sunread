@@ -136,7 +136,11 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            if (isset($value["value"])) $product->update(["status" => $value["value"]]);
+            if (isset($value["value"]))
+            {
+                $attributeOption = AttributeOption::find($value["value"]);
+                if($attributeOption) $product->update(["status" => $attributeOption?->code]);
+            } 
         }
         catch ( Exception $exception )
         {
@@ -362,7 +366,11 @@ class ProductRepository extends BaseRepository
     public function getMapperValue($attribute, $product)
     {
         if($attribute->slug == "sku") return $product->sku;
-        if($attribute->slug == "status") return $product->status;
+        if($attribute->slug == "status")
+        {
+            $statusOption = AttributeOption::whereAttributeId($attribute->id)->whereCode($product->status)->first();
+            return $statusOption?->id;
+        } 
         if($attribute->slug == "category_ids") return $product->categories()->pluck('category_id')->toArray();
         if($attribute->slug == "base_image") return $product->images()->where('main_image', 1)->pluck('path')->map(function ($base_image) {
             return Storage::url($base_image);
