@@ -242,6 +242,24 @@ class AttributeTableSeeder extends Seeder
                 "default_value" => "S",
                 "options" => ["S", "M", "L", "XL"],
             ],
+            [
+                "name" => "Features",
+                "type" => "texteditor",
+                "scope" => "store",
+                "is_searchable" => 1,
+            ],
+            [
+                "name" => "Size and Care",
+                "type" => "texteditor",
+                "scope" => "store",
+                "is_searchable" => 1,
+            ],
+            [
+                "name" => "EAN Code",
+                "type" => "text",
+                "is_unique" => 1,
+                "scope" => "store"
+            ]
         ];
 
         array_map(function($attribute){
