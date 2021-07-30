@@ -322,7 +322,7 @@ class ProductRepository extends BaseRepository
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
                         {
                             $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
-                            $attributesData["value"] = (int) $attributesData["value"];
+                            if($attributesData["value"] && !is_array($attributesData["value"])) $attributesData["value"] = (int) $attributesData["value"];
                         } 
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->attribute_set_repository->getInventoryChildren($product->id);
                         
@@ -360,9 +360,9 @@ class ProductRepository extends BaseRepository
                     $data["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
                     break;
             }
-            return ($item = $product->product_attributes()->where($data)->first()) ? $item->value->value : $this->getDefaultValues($product, $data);           
+            return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $this->getDefaultValues($product, $data);           
         }
-        return ($item = $product->product_attributes()->where($data)->first()) ? $item->value->value : $defaultValue;
+        return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $defaultValue;
     }
 
     public function getMapperValue($attribute, $product)
