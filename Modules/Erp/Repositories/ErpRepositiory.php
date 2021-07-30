@@ -4,33 +4,37 @@ namespace Modules\Erp\Repositories;
 
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Erp\Jobs\EanCodes;
 use Modules\Erp\Jobs\ErpAttributeGroups;
+use Modules\Erp\Jobs\ErpProductDescription;
 use Modules\Erp\Jobs\ListProducts;
 use Modules\Erp\Jobs\ProductImages;
+use Modules\Erp\Jobs\ProductVariants;
+use Modules\Erp\Jobs\SalePrices;
+use Modules\Erp\Jobs\WebAssortments;
+use Modules\Erp\Jobs\WebInventories;
 use Modules\Erp\Traits\HasErpMapper;
+use Modules\Erp\Traits\HasErpValueMapper;
 
 class ErpRepositiory extends BaseRepository
 {
-	use HasErpMapper;
+	use HasErpMapper, HasErpValueMapper;
 
-	public function __construct()
-	{
-
-	}
 
 	public function list(object $request)
 	{
+
+		dd($this->importAll());
+
 		ProductImages::dispatch();
-		// dd($this->storeDescription());
-		// dd($this->storeImage());
-		// dd(storage_path('app\public'));
-		// ->get("/1511111_965_a.jpg")
-		// $storage = Storage::disk("ftp")->path("/1511111_965_a.jpg");
-
-
-		// ListProducts::dispatchSync();
+		EanCodes::dispatch();
+		ErpAttributeGroups::dispatch();
+		// ErpProductDescription::dispatch();
+		ListProducts::dispatch();
+		ProductVariants::dispatch();
+		SalePrices::dispatch();
+		WebAssortments::dispatch();
+		WebInventories::dispatch();
 		dd("done");
-		// ErpAttributeGroups::dispatchSync();
-		// dd($this->allData());
 	}
 }
