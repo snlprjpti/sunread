@@ -17,9 +17,9 @@ class ErpImport implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $type;
+    protected string $type;
 
-    public function __construct( string $type)
+    public function __construct( string $type )
     {
         $this->type = $type;
     }
@@ -47,7 +47,9 @@ class ErpImport implements ShouldQueue
                 ErpImportDetail::updateOrInsert([
 					"erp_import_id" => $erp_import_id,
 					"sku" => $sku,
-					"value" => json_encode($item)
+					"value" => json_encode($item),
+                    "created_at" => now(),
+                    "updated_at" => now()
 				]);
 
                 if ( $this->type == "listProducts" ) ErpProductDescription::dispatchSync($sku);

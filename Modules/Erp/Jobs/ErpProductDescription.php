@@ -13,9 +13,9 @@ class ErpProductDescription implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpMapper;
 
-    protected $sku;
+    protected string $sku;
 
-    public function __construct(string $sku)
+    public function __construct( string $sku )
     {
         $this->sku = $sku;
     }
