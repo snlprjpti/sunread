@@ -149,6 +149,13 @@ trait HasErpMapper
                 $file_is_image = Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]);
                 $file_does_not_already_exist = !Storage::exists("{$this->erp_folder}/{$file}");
 
+                if ( !$file_does_not_already_exist ) {
+                    $remote_hash = md5(Storage::disk("ftp")->size($file));
+                    $local_hash = md5(Storage::size("{$this->erp_folder}/{$file}"));
+
+                    $file_does_not_already_exist = $remote_hash !== $local_hash;
+                }
+
                 return $file_is_image && $file_does_not_already_exist;
             });
 
