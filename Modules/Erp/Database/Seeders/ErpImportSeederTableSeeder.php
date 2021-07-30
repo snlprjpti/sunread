@@ -18,7 +18,8 @@ class ErpImportSeederTableSeeder extends Seeder
             "eanCodes",
             "webInventories",
             "productDescriptions",
-            "productVariants"
+            "productVariants",
+            "productImages"
         ];
 
         foreach ( $data as $type )
