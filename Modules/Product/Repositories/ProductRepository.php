@@ -91,7 +91,7 @@ class ProductRepository extends BaseRepository
       
                 $original_quantity = (float) $catalog_inventory->quantity;
                 $adjustment_type = (($value["catalog_inventory"]["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
-                LogCatalogInventoryItem::dispatch([
+                LogCatalogInventoryItem::dispatchSync([
                     "product_id" => $catalog_inventory->product_id,
                     "website_id" => $catalog_inventory->website_id,
                     "event" => ($method == "store") ? "{$this->model_key}.store" : "{$this->model_key}.{$adjustment_type}",
