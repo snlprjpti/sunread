@@ -322,7 +322,7 @@ class ProductRepository extends BaseRepository
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
                         {
                             $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
-                            if($attributesData["value"] && !is_array($attributesData["value"])) $attributesData["value"] = (int) $attributesData["value"];
+                            if($attributesData["value"] && !is_array($attributesData["value"])) $attributesData["value"] = json_decode($attributesData["value"]);
                         } 
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->attribute_set_repository->getInventoryChildren($product->id);
                         

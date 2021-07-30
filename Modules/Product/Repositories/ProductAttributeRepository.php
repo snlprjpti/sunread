@@ -211,6 +211,8 @@ class ProductAttributeRepository extends ProductRepository
                     continue;
                 }
 
+                if(is_array($attribute["value"])) $attribute["value"] = json_encode($attribute["value"], JSON_NUMERIC_CHECK);
+
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
 
                 if ( $product_attribute->value_id != null ) {
