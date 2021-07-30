@@ -91,7 +91,7 @@ class ProductRepository extends BaseRepository
       
                 $original_quantity = (float) $catalog_inventory->quantity;
                 $adjustment_type = (($value["catalog_inventory"]["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
-                LogCatalogInventoryItem::dispatchSync([
+                LogCatalogInventoryItem::dispatch([
                     "product_id" => $catalog_inventory->product_id,
                     "website_id" => $catalog_inventory->website_id,
                     "event" => ($method == "store") ? "{$this->model_key}.store" : "{$this->model_key}.{$adjustment_type}",
@@ -317,14 +317,16 @@ class ProductRepository extends BaseRepository
                             "is_required" => $attribute->is_required
                         ];
                         if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
-                        $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value->value : $this->getDefaultValues($product, $match));
+                        $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
                         
-                        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
+                        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
+                        {
+                            $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
+                            $attributesData["value"] = (int) $attributesData["value"];
+                        } 
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->attribute_set_repository->getInventoryChildren($product->id);
                         
                         return $attributesData;
-                    })->reject(function ($item) use($scope){
-                        return $this->scopeFilter($scope["scope"], $item['scope']); 
                     })->toArray()
                 ];
             })->toArray();
