@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Jobs\ErpImport as JobsErpImport;
 use Modules\Erp\Jobs\FtpToStorage;
+use Modules\Erp\Jobs\ImportErpData;
 
 trait HasErpMapper
 {
@@ -23,85 +24,88 @@ trait HasErpMapper
         return Http::withBasicAuth(env("ERP_API_USERNAME"), env("ERP_API_PASSWORD"));
     }
 
-    public function erpImport( string $type, string $url ): Collection
+    public function erpImport( string $type, string $url, ?string $skip_token = null ): Collection
     {
         try
         {
-            // Get ERP API
-            $response = $this->basicAuth()->get($url);
-            
-            // values refers to response values
-            $values = [];
-            $values = $response->json()["value"];
-
-            // last refers to response last values
-            $last = [];
-            $last[] = end($values);
-            
-            while ( true )
-            {
-                // Generate skip token
-                $last_value = end($last);
-                $skip = $this->skipToken($last_value, $type);
-
-                // Get current page values
-                $paginated = $this->basicAuth()->get($url, $skip);
-                
-                // End iteration if current value is empty 
-                if (empty($paginated->json()["value"]) || !array_key_exists("@odata.nextLink", $paginated->json())) break;
-    
-                // Merge last value for generating skip token for next page.
-                $last[] = end($paginated->json()["value"]);
-
-                // Merge all values 
-                $values = array_merge($values, $paginated->json()["value"]);
-            }
-
-            Cache::forget($type);
-            Cache::rememberForever($type, function () use ($values, $type) {
-                // get all values fron erp api
-                return $this->generateCollection($values, $type);
+            $response_json = $this->getResponse($type, $url, $skip_token, function ($response_json_array, $new_skip_token) use ($type) {
+                ImportErpData::dispatch($type, $response_json_array);
+                get_class()::dispatch($new_skip_token);
             });
 
-            JobsErpImport::dispatch($type);
+            // return $this->generateCollection($response_json, $type);
+
+            // Cache::forget($type);
+            // Cache::rememberForever($type, function () use ($response_json, $type) {
+            //     // get all values fron erp api
+            //     return $this->generateCollection($response_json, $type);
+            // });
+
+            // JobsErpImport::dispatch($type);
         }
         catch ( Exception $exception )
         {
             throw $exception;
         }
 
-        return $this->generateCollection($values, $type);
+        return $this->generateCollection($response_json, $type);
+    }
+
+    public function getResponse(string $type, string $url, ?string $skip_token = null, callable $callback = null): array
+    {
+        try
+        {
+            $response = $this->basicAuth()->get($url, $skip_token);
+
+            $response_json_array = $response->json()["value"];
+            $skip_token = $this->skipToken(end($response_json_array), $type);
+
+            if (!empty($response_json_array) && array_key_exists("@odata.nextLink", $response->json())) {
+                if ( $callback ) $callback($response_json_array, $skip_token);
+            } else {
+                // ErpImport::whereType($type)->update(["status" => 1]);
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $response_json_array;
     }
 
     private function skipToken( array $data, string $type ): string
     {
+        $data = (object) $data;
+        $prepend = "\$skiptoken";
+
         switch ($type) {
             case 'webAssortments':
-                $token = '$skiptoken='."'{$data['itemNo']}',".'SR'.",'{$data['colorCode']}'";
+                $token = "{$prepend}='{$data->itemNo}',".'SR'.",'{$data->colorCode}'";
                 break;
             
             case 'listProducts':
-                $token = '$skiptoken='."'{$data['no']}',"."'{$data['webAssortmentWeb_Setup']}',"."'{$data['webAssortmentColor_Code']}'".",'{$data['languageCode']}'".",'{$data['auxiliaryIndex1']}'".",'{$data['auxiliaryIndex2']}'".",'{$data['auxiliaryIndex3']}'".",'{$data['auxiliaryIndex4']}'";
+                $token = "{$prepend}='{$data->no}',"."'{$data->webAssortmentWeb_Setup}',"."'{$data->webAssortmentColor_Code}'".",'{$data->languageCode}'".",'{$data->auxiliaryIndex1}'".",'{$data->auxiliaryIndex2}'".",'{$data->auxiliaryIndex3}'".",'{$data->auxiliaryIndex4}'";
                 break;
             
             case 'attributeGroups':
-                $token = '$skiptoken='."'{$data['itemNo']}',"."'{$data['sortKey']}',"."'{$data['groupCode']}',"."'{$data['attributeID']}',"."'{$data['name']}',"."'{$data['auxiliaryIndex1']}'";
+                $token = "{$prepend}='{$data->itemNo}',"."'{$data->sortKey}',"."'{$data->groupCode}',"."'{$data->attributeID}',"."'{$data->name}',"."'{$data->auxiliaryIndex1}'";
                 break;
             
             case 'productVariants':
-                $token = '$skiptoken='."'{$data['pfVerticalComponentCode']}',"."'{$data['itemNo']}'";
+                $token = "{$prepend}='{$data->pfVerticalComponentCode}','{$data->itemNo}'";
                 break;
 
             case 'salePrices':
-                $token = '$skiptoken'."'{$data['itemNo']}',"."'{$data['salesCode']}',"."'{$data['currencyCode']}',"."'{$data['startingDate']}',"."'{$data['salesType']}',"."'{$data['minimumQuantity']}',"."'{$data['unitofMeasureCode']}',"."'{$data['variantCode']}'";
+                $token = '$skiptoken'."'{$data->itemNo}',"."'{$data->salesCode}',"."'{$data->currencyCode}',"."'{$data->startingDate}',"."'{$data->salesType}',"."'{$data->minimumQuantity}',"."'{$data->unitofMeasureCode}',"."'{$data->variantCode}'";
                 break;
 
             case 'eanCodes':
-                $token = '$skiptoken'."'{$data['itemNo']}',"."'{$data['variantCode']}',"."'{$data['unitofMeasure']}',"."'{$data['crossReferenceType']}',"."'{$data['crossReferenceTypeNo']}',"."'{$data['crossReferenceNo']}'";
+                $token = '$skiptoken'."'{$data->itemNo}',"."'{$data->variantCode}',"."'{$data->unitofMeasure}',"."'{$data->crossReferenceType}',"."'{$data->crossReferenceTypeNo}',"."'{$data->crossReferenceNo}'";
                 break;
 
             case 'webInventories':
-                $token = '$skiptoken'."'{$data['Item_No']}',"."'{$data['Code']}'";
+                $token = '$skiptoken'."'{$data->Item_No}',"."'{$data->Code}'";
         }
 
         return $token;

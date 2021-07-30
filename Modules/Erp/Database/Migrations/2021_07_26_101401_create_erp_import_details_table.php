@@ -19,6 +19,7 @@ class CreateErpImportDetailsTable extends Migration
             $table->foreign('erp_import_id')->references('id')->on('erp_imports')->onDelete('cascade');
             $table->string("sku");
             $table->json("value");
+            $table->string("hash")->nullable();
             $table->timestamps();
         });
     }
