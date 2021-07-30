@@ -22,6 +22,6 @@ class EanCodes implements ShouldQueue
 
     public function handle(): void
     {
-        $this->erpImport("productVariants", $this->url."webItemVariants", $this->skip_token);
+        $this->erpImport("eanCodes", $this->url."webItemCrossReferences", $this->skip_token);
     }
 }
