@@ -10,7 +10,7 @@ class ErpImportDetail extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ "erp_import_id", "sku", "value" ];
+    protected $fillable = [ "erp_import_id", "sku", "value", "hash" ];
 
     protected $casts = [
         'value' => 'array'
