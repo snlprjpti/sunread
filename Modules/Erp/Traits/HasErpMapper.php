@@ -189,7 +189,9 @@ trait HasErpMapper
                 ErpImportDetail::updateOrInsert([
                     "erp_import_id" => $erp_import_id,
                     "sku" => $sku,
-                    "value" => json_encode($value)
+                    "value" => json_encode($value),
+                    "created_at" => now(),
+                    "updated_at" => now()
                 ]);
 
             }
