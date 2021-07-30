@@ -12,6 +12,10 @@ class ErpImportDetail extends Model
 
     protected $fillable = [ "erp_import_id", "sku", "value" ];
 
+    protected $casts = [
+        'value' => 'array'
+    ];
+
     public function erp_import(): BelongsTo
     {
         return $this->belongsTo(ErpImport::class);
