@@ -66,8 +66,8 @@ class ProductAttributeRepository extends ProductRepository
         try
         {
 
-            //$attribute_set = AttributeSet::where("id", $product->attribute_set_id)->first();
-            $attribute_set = $this->attributeSetCache()->where("id", $product->attribute_set_id)->first();
+            $attribute_set = AttributeSet::where("id", $product->attribute_set_id)->first();
+            //$attribute_set = $this->attributeSetCache()->where("id", $product->attribute_set_id)->first();
 
             // get all the attributes of following attribute set
             $attributes = $attribute_set->attribute_groups->map(function($attributeGroup){
@@ -210,6 +210,8 @@ class ProductAttributeRepository extends ProductRepository
                     if($product_attribute) $product_attribute->delete();
                     continue;
                 }
+
+                if(is_array($attribute["value"])) $attribute["value"] = json_encode($attribute["value"], JSON_NUMERIC_CHECK);
 
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
 
