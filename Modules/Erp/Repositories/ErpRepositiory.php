@@ -23,8 +23,11 @@ class ErpRepositiory extends BaseRepository
 
 	public function list(object $request)
 	{
+        EanCodes::dispatch();
+        dd("done");
 
-		dd($this->importAll());
+
+        dd($this->importAll());
 
 		ProductImages::dispatch();
 		EanCodes::dispatch();
