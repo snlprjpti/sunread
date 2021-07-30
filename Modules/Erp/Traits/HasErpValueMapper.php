@@ -4,6 +4,8 @@ namespace Modules\Erp\Traits;
 
 use Exception;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeGroup;
+use Modules\Attribute\Entities\AttributeSet;
 use Modules\Attribute\Entities\AttributeTranslation;
 use Modules\Erp\Entities\ErpImport;
 
@@ -24,6 +26,7 @@ trait HasErpValueMapper
 	{
 		$erp = ErpImport::query();
 		$erp_details = $erp->whereType("listProducts")->first()->erp_import_details;
+		dd($erp_details);
 		//1111703, OR161610
 		// dd($erp_details->last());
 		// dd($erp_details->where("sku","OR161610")->map( function ($data) {
@@ -31,18 +34,31 @@ trait HasErpValueMapper
 		// }));
 		// dd("asd");
 		$attributes = $this->getAttributes();
-		dd($attributes);
-		$type = ($erp_details->where("sku", "OR161610")->count() > 1) ? "configurable" : "simple";
 
-		// product updateOrCreate data
-		$data = [
-			"attribute_set_id" => 1,
-			"website_id" => 1,
-			"sku" => $erp_details->sku,
-			"type" => $type,
-			"created_at" => now(),
-			"updated_at" => now()
-		];
+
+		foreach ( $erp_details as $detail )
+		{
+			$type = ($erp_details->where("sku", "OR161610")->count() > 1) ? "configurable" : "simple";
+
+			// product updateOrCreate data
+			$data = [
+				"attribute_set_id" => 1,
+				"website_id" => 1,
+				"sku" => $erp_details->sku,
+				"type" => $type,
+				"created_at" => now(),
+				"updated_at" => now()
+			];
+
+			
+
+			$erp->whereType("eanCodes")->first()->erp_import_details->where("value->code");
+
+
+		}
+		dd($attributes);
+
+		
 
 		dd(json_decode($erp_details->value, true));
 
@@ -114,6 +130,30 @@ trait HasErpValueMapper
 					"slug" => \Str::slug($attribute["name"]),
 				];
 			}
+
+			$attribute_set_data = [
+				"name" => "Import",
+				"is_user_defined" => 0,
+				"created_at" => now(),
+				"updated_at" => now()
+			];
+
+			$attribute_set = AttributeSet::withoutEvents( function () use ($attribute_set_data) {
+				return AttributeSet::updateOrCreate($attribute_set_data);
+			});
+
+			$attribute_group_data = [
+                "name" => "Extra",
+                "position" => 5,
+                "attribute_set_id" => $attribute_set->id,
+                "created_at" => now(),
+                "updated_at" => now()
+            ];
+
+			$attribute_group = AttributeGroup::create($attribute_group_data);
+
+			//add default attributes
+            $attribute_group->attributes()->sync(collect($attribute_arr)->pluck("id")->toArray());
 		}
 		catch ( Exception $exception )
 		{
