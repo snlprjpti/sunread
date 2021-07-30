@@ -47,6 +47,8 @@ class ImportErpData implements ShouldQueue
                     $item_hash = md5($erp_import_id.$sku.json_encode($item));
                     $hashes[] = $item_hash;
 
+                    if ( $this->type == "listProducts" ) ErpProductDescription::dispatchSync($sku);
+
                     return [
                         "erp_import_id" => $erp_import_id,
                         "sku" => $sku,
@@ -63,7 +65,6 @@ class ImportErpData implements ShouldQueue
                 });
 
                 ErpImportDetail::insert($import_data);
-                // if ( $this->type == "listProducts" ) ErpProductDescription::dispatchSync($import_data);
             }
         }
         catch ( Exception $exception )

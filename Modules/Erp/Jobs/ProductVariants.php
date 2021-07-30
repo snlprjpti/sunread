@@ -12,14 +12,16 @@ use Modules\Erp\Traits\HasErpMapper;
 class ProductVariants implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpMapper;
+   
+    public $skip_token;
 
-    public function __construct()
+    public function __construct(?string $skip_token = null)
     {
-        //
+        $this->skip_token = $skip_token;
     }
 
     public function handle(): void
     {
-        $this->erpImport("productVariants", $this->url."webItemVariants");
+        $this->erpImport("productVariants", $this->url."webItemVariants", $this->skip_token);
     }
 }

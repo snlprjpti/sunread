@@ -23,21 +23,20 @@ class ErpRepositiory extends BaseRepository
 
 	public function list(object $request)
 	{
-        ProductImages::dispatch();
-        dd("done");
+        // dd("done");
 
 
         dd($this->importAll());
 
-		ProductImages::dispatch();
-		EanCodes::dispatch();
-		ErpAttributeGroups::dispatch();
+		// ProductImages::dispatch();
+		// EanCodes::dispatch();
+		// ErpAttributeGroups::dispatch();
 		// ErpProductDescription::dispatch();
-		ListProducts::dispatch();
-		ProductVariants::dispatch();
-		SalePrices::dispatch();
-		WebAssortments::dispatch();
-		WebInventories::dispatch();
+		// ListProducts::dispatch();
+		// ProductVariants::dispatch();
+		// SalePrices::dispatch();
+		// WebAssortments::dispatch();
+		// WebInventories::dispatch();
 		dd("done");
 	}
 }

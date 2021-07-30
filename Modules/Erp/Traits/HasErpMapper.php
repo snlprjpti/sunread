@@ -190,12 +190,13 @@ trait HasErpMapper
     {
         try
         {
-            $erp_import_id = 7;
+            $erp_import_id = 9;
             $file_arr = explode("_", explode(".", explode("/", $location)[1])[0]);
             $file_info = [
                 "sku" => $file_arr[0],
                 "color_code" => $file_arr[1],
-                "image_type" => $file_arr[2]
+                "image_type" => $file_arr[2],
+                "url" => "{$this->erp_folder}/{$location}"
             ];
             $hash = md5($erp_import_id.$file_info["sku"].json_encode($file_info));
 
@@ -222,14 +223,12 @@ trait HasErpMapper
             $response = $this->basicAuth()->get($url);
             if ( $response->status() == 200 )
             {
-                $value = json_encode(["description" => $response->body()]);
+                $value = json_encode(["description" => $response->body(), "lang" => "ENU"]);
 
                 ErpImportDetail::updateOrInsert([
                     "erp_import_id" => $erp_import_id,
                     "sku" => $sku,
-                    "value" => json_encode($value),
-                    "created_at" => now(),
-                    "updated_at" => now()
+                    "value" => json_encode($value)
                 ]);
 
             }

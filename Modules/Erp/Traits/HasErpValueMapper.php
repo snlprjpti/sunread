@@ -53,20 +53,21 @@ trait HasErpValueMapper
 
 			$product = Product::updateOrCreate($match, $product_data);
 
-			$desc = $erp->where("type", "productDescriptions")->first()->erp_import_details()->where("sku", $detail->sku)->get();
 			$price_detail = $erp->where("type", "salePrices")->first()->erp_import_details()->where("sku", $detail->sku)->get();
 
 			$inventory = $erp->where("type", "webInventories")->first()->erp_import_details()->where("sku", $detail->sku)->get(); 
 
 			$variants = $erp->where("type", "productVariants")->first()->erp_import_details()->where("sku", $detail->sku)->get(); 
 
-			$attr_groups = $erp->where("type", "attributeGroups")->first()->erp_import_details()->where("sku", $detail->sku)->get(); 
 			
+			
+			// $variants = $erp->where("type", "eanCodes")->first()->erp_import_details()->where("sku", $detail->sku)->get(); 
+
 
 			$count ++;
 		
 			// $this->createInventory($product, $inventory);
-			if ($count > 50) $this->createAttributeValue($attr_groups, $product, $detail);
+			if ($count > 2) $this->createAttributeValue($erp, $product, $detail);
 
 
 		}
@@ -74,14 +75,50 @@ trait HasErpValueMapper
 		dd("asd");
 	}
 
-	private function createAttributeValue(mixed $attr_groups, object $product, object $erp_product_iteration)
+	private function createAttributeValue(mixed $erp, object $product, object $erp_product_iteration)
 	{
 		try
 		{
+			$attr_groups = $erp->where("type", "attributeGroups")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get(); 
+			$ean_code = $erp->where("type", "eanCodes")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
+			
+			
+			$description = $erp->where("type", "productDescriptions")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
+			$description = json_decode($this->getValue($description)->first(), true)["description"];
+
+			dd($erp_product_iteration->value);
 			$attribute_data = [
 				[
 					"attribute_id" => 1,
 					"value" => $erp_product_iteration->value["description"]
+				],
+				[
+					"attribute_id" => 16,
+					"value" => $description, 
+				],
+				[
+					"attribute_id" => 17,
+					"value" => \Str::limit($description, 100), 
+				],
+				[
+					"attribute_id" => 18,
+					"value" => null, 
+				],
+				[
+					"attribute_id" => 19,
+					"value" => $description, 
+				],
+				[
+					"attribute_id" => 20,
+					"value" => $erp_product_iteration->value["description"], 
+				],
+				[
+					"attribute_id" => 21,
+					"value" => $description, 
+				],
+				[
+					"attribute_id" => 22,
+					"value" => 1, 
 				],
 				[
 					"attribute_id" => 28,
@@ -94,9 +131,9 @@ trait HasErpValueMapper
 				[
 					"attribute_id" => 29,
 					"value" => $this->getAttributeValue( $attr_groups, "Size and care" ), 
-				]
+				],
 			];
-			// dd($attribute_data);
+			dd($this->getValue($ean_code));
 		}
 		catch ( Exception $exception )
 		{
@@ -110,6 +147,7 @@ trait HasErpValueMapper
 		try
 		{
 			$attach_value = "<ul><li>";
+
 			$this->getValue($attr_groups, function ($value) use (&$attach_value, $attribute_name) {
 				if ( $value["attributetype"] == $attribute_name ) $attach_value .= \Str::start("<li>", \Str::finish($value["description"], "</li>"));
 			});
