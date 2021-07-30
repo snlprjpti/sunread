@@ -178,6 +178,33 @@ trait HasErpMapper
         {
             $get_file = Storage::disk("ftp")->get($location);
             Storage::put("{$this->erp_folder}/{$location}", $get_file);
+            $this->storeFileToDb($location);
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+    }
+
+    public function storeFileToDb(string $location): void
+    {
+        try
+        {
+            $erp_import_id = 7;
+            $file_arr = explode("_", explode(".", explode("/", $location)[1])[0]);
+            $file_info = [
+                "sku" => $file_arr[0],
+                "color_code" => $file_arr[1],
+                "image_type" => $file_arr[2]
+            ];
+            $hash = md5($erp_import_id.$file_info["sku"].json_encode($file_info));
+
+            ErpImportDetail::create([
+                "erp_import_id" => $erp_import_id,
+                "sku" => $file_info["sku"],
+                "value" => json_encode($file_info),
+                "hash" => $hash
+            ]);
         }
         catch ( Exception $exception )
         {
