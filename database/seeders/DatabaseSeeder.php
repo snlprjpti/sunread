@@ -22,5 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Modules\Country\Database\Seeders\CountryDatabaseSeeder::class);
         $this->call(\Modules\Tax\Database\Seeders\TaxDatabaseSeeder::class);
         $this->call(\Modules\Inventory\Database\Seeders\InventoryDatabaseSeeder::class);
+        $this->call(\Modules\Erp\Database\Seeders\ErpDatabaseSeeder::class);
     }
 }

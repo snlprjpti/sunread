@@ -12,5 +12,6 @@
     "Page": true,
     "Tax": true,
     "Country": true,
-    "Inventory": true
+    "Inventory": true,
+    "Erp": true
 }
