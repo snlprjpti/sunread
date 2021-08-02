@@ -63,16 +63,10 @@ trait HasErpValueMapper
 					];
 		
 					$product = Product::updateOrCreate($match, $product_data);
-					
-					// $this->mapstoreImages($product, $detail);
 					ErpMigrateProductImageJob::dispatch($product, $detail);
 
 					if (($erp_details->where("sku", $detail->sku)->count() > 1)) $this->createVariants($product, $detail);
-					
-					// $this->createAttributeValue($product, $detail, false);
 					ErpMigrateProductAttributeJob::dispatch($product, $detail, false);
-
-					// $this->createInventory($product, $detail);
 					ErpMigrateProductInventoryJob::dispatch($product, $detail);
 				}
 			}
@@ -89,11 +83,7 @@ trait HasErpValueMapper
 	{
 		try
 		{
-            // dd("done");
-			// $ean_code = $erp->where("type", "eanCodes")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
 			$ean_code = $this->getDetailCollection("eanCodes", $erp_product_iteration->sku);
-			// $variants = $erp->where("type", "productVariants")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
-
 			$variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
 
 			if ( $ean_code_value )
@@ -105,13 +95,10 @@ trait HasErpValueMapper
 				$ean_code_value = $this->getValue($ean_code)->first()["crossReferenceNo"] ?? "";
 			}
 
-
-			// $description = $erp->where("type", "productDescriptions")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
 			$description_value = $this->getDetailCollection("productDescriptions", $erp_product_iteration->sku);
 			$description = ($description_value->count() > 1) ? json_decode($this->getValue($description_value)->first(), true)["description"] ?? "" : "";
 			
 			// get price for specific product need more clearification
-			// $price = $erp->where("type", "salePrices")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
 			$price = $this->getDetailCollection("salePrices", $erp_product_iteration->sku);
 			$price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->first() ?? ["unitPrice" => 0.0] : ["unitPrice" => 0.0];
 
@@ -213,7 +200,6 @@ trait HasErpValueMapper
 	{
 		try
 		{
-			// $attr_groups = $erp->where("type", "attributeGroups")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get(); 
 			$attribute_groups = $this->getDetailCollection("attributeGroups", $erp_product_iteration->sku);
 			$attach_value = "";
 			if ( $attribute_groups->count() > 1 )
@@ -250,7 +236,6 @@ trait HasErpValueMapper
 
 	private function mapstoreImages( object $product, object $erp_product_iteration, array $variant = [] )
 	{
-		// $image = $erp->where("type", "productImages")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
 		$product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
 		$images = $this->getValue($product_images, function ($value) {
 			return json_decode($value, true);
@@ -295,12 +280,10 @@ trait HasErpValueMapper
 	{
 		try
 		{
-			// $variants = $erp->where("type", "productVariants")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get(); 
 			$variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
 
 			if ( $variants->count() > 1 )
-			{
-				// $ean_codes = $erp->where("type", "eanCodes")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();			
+			{		
 				$ean_codes = $this->getDetailCollection("eanCodes", $erp_product_iteration->sku);
 				foreach ( $this->getValue($variants) as $variant )
 				{
@@ -320,13 +303,10 @@ trait HasErpValueMapper
 					$variant_product = Product::updateOrCreate($match, $product_data);
 					
 					$ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
-					
+		
 					ErpMigrateProductImageJob::dispatch($variant_product, $erp_product_iteration, $variant);
 					ErpMigrateProductAttributeJob::dispatch($variant_product, $erp_product_iteration, $ean_code);
 					ErpMigrateProductInventoryJob::dispatch($variant_product, $erp_product_iteration);
-					// $this->mapstoreImages($variant_product, $erp_product_iteration, $variant );
-					// $this->createAttributeValue($variant_product, $erp_product_iteration, $ean_code);
-					// $this->createInventory($variant_product, $erp_product_iteration);
 				}
 			}
 		}
@@ -342,7 +322,6 @@ trait HasErpValueMapper
 	{
 		try
 		{
-			// $inventory = $erp->where("type", "webInventories")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
 			$inventory = $this->getDetailCollection("webInventories", $erp_product_iteration->sku);
 
 			if ( $inventory->count() > 1 )
@@ -375,9 +354,7 @@ trait HasErpValueMapper
 
 	private function getDetailCollection(string $slug, string $sku): Collection
 	{
-		$erp = ErpImport::all();
-
-		return $erp->where("type", $slug)->first()->erp_import_details()->where("sku", $sku)->get();
+		return ErpImport::where("type", $slug)->first()->erp_import_details()->where("sku", $sku)->get();
 	}
 
 }
