@@ -13,18 +13,15 @@ class WebAssortments implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpMapper;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public $skip_token;
+
+    public function __construct(?string $skip_token = null)
     {
-        //
+        $this->skip_token = $skip_token;
     }
 
     public function handle(): void
     {
-        $this->erpImport("webAssortments", $this->url."webAssortments");
+        $this->erpImport("webAssortments", $this->url."webAssortments", $this->skip_token);
     }
 }

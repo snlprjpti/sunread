@@ -8,6 +8,7 @@ use Modules\Erp\Jobs\EanCodes;
 use Modules\Erp\Jobs\ErpAttributeGroups;
 use Modules\Erp\Jobs\ErpProductDescription;
 use Modules\Erp\Jobs\ListProducts;
+use Modules\Erp\Jobs\MigrateProductJob;
 use Modules\Erp\Jobs\ProductImages;
 use Modules\Erp\Jobs\ProductVariants;
 use Modules\Erp\Jobs\SalePrices;
@@ -23,20 +24,22 @@ class ErpRepositiory extends BaseRepository
 
 	public function list(object $request)
 	{
-        // dd("done");
+        // dd("done");  
 
-
-        dd($this->importAll());
-
-		// ProductImages::dispatch();
-		// EanCodes::dispatch();
-		// ErpAttributeGroups::dispatch();
-		// ErpProductDescription::dispatch();
-		// ListProducts::dispatch();
-		// ProductVariants::dispatch();
-		// SalePrices::dispatch();
 		// WebAssortments::dispatch();
-		// WebInventories::dispatch();
+		// dd("asd");
+        // dd($this->importAll());
+		MigrateProductJob::dispatch();
+		dd("done");
+		ProductImages::dispatch();
+		EanCodes::dispatch();
+		ErpAttributeGroups::dispatch();
+		// ErpProductDescription::dispatch();
+		ListProducts::dispatch();
+		ProductVariants::dispatch();
+		SalePrices::dispatch();
+		
+		WebInventories::dispatch();
 		dd("done");
 	}
 }

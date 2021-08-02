@@ -21,13 +21,13 @@ class ProductResource extends JsonResource
 
         return [
             "id" => $this->id,
-            "name" => $name->value_data,
+            "name" => $name->value_data ?? $this->sku,
             "type" => $this->type,
             "sku" => $this->sku,           
             "stock" => $stock ? $stock->quantity : null,
             "status" => (bool) $this->status,
             "categories" => CategoryResource::collection($this->whenLoaded("categories")),
-            "visibility" => $visibility->value_data,
+            "visibility" => $visibility->value_data ?? 0,
             "images" => $images ? Storage::url($images->path) : null,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
