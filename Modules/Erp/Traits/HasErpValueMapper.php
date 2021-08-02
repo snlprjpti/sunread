@@ -3,16 +3,17 @@
 namespace Modules\Erp\Traits;
 
 use Exception;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Modules\Attribute\Entities\Attribute;
 use Modules\Erp\Entities\ErpImport;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
-use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Product\Entities\Product;
-use Modules\Product\Entities\ProductAttribute;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\ProductImage;
+use Modules\Product\Entities\ProductAttribute;
+use Modules\Inventory\Entities\CatalogInventory;
+use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
+use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
+use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
 
 trait HasErpValueMapper
 {
@@ -39,7 +40,7 @@ trait HasErpValueMapper
 		try
 		{
 			$erp_details = ErpImport::where("type", "listProducts")->first()->erp_import_details;
-			
+
 			$chunked = $erp_details->chunk(100); 
 			foreach ( $chunked as $chunk )
 			{
@@ -68,7 +69,7 @@ trait HasErpValueMapper
 
 					if (($erp_details->where("sku", $detail->sku)->count() > 1)) $this->createVariants($product, $detail);
 					
-					// $this->createAttributeValue($erp, $product, $detail, false);
+					// $this->createAttributeValue($product, $detail, false);
 					ErpMigrateProductAttributeJob::dispatch($product, $detail, false);
 
 					// $this->createInventory($product, $detail);
@@ -88,6 +89,7 @@ trait HasErpValueMapper
 	{
 		try
 		{
+            // dd("done");
 			// $ean_code = $erp->where("type", "eanCodes")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
 			$ean_code = $this->getDetailCollection("eanCodes", $erp_product_iteration->sku);
 			// $variants = $erp->where("type", "productVariants")->first()->erp_import_details()->where("sku", $erp_product_iteration->sku)->get();
@@ -113,6 +115,14 @@ trait HasErpValueMapper
 			$price = $this->getDetailCollection("salePrices", $erp_product_iteration->sku);
 			$price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->first() ?? ["unitPrice" => 0.0] : ["unitPrice" => 0.0];
 
+            // Condition for invalid date/times
+            $max_time = strtotime("2030-12-28");
+            $start_time = abs(strtotime($price_value["startingDate"]));
+            $end_time = abs(strtotime($price_value["endingDate"]));
+
+            $start_time = $start_time < $max_time ? $start_time : $max_time - 1;
+            $end_time = $end_time < $max_time ? $end_time : $max_time;
+
 			$attribute_data = [
 				[
 					"attribute_id" => 1,
@@ -122,14 +132,14 @@ trait HasErpValueMapper
 					"attribute_id" => 3,
 					"value" => $price_value["unitPrice"], 
 				],
-				// [
-				// 	"attribute_id" => 6,
-				// 	"value" => Carbon::parse($price_value["startingDate"]), 
-				// ],
-				// [
-				// 	"attribute_id" => 7,
-				// 	"value" => Carbon::parse($price_value["endingDate"]), 
-				// ],
+				[
+					"attribute_id" => 6,
+					"value" => Carbon::parse(date("Y-m-d", $start_time)), 
+				],
+				[
+					"attribute_id" => 7,
+					"value" => Carbon::parse(date("Y-m-d", $end_time)), 
+				],
 				[
 					"attribute_id" => 16,
 					"value" => $description, 
@@ -172,15 +182,20 @@ trait HasErpValueMapper
 			{
 				$attribute = Attribute::find($attributeData["attribute_id"]);
 				$attribute_type = config("attribute_types")[$attribute->type ?? "string"];
-				$value = $attribute_type::updateOrCreate(["value" => $attributeData["value"]]);
-				ProductAttribute::updateOrCreate([
+				$value = $attribute_type::create(["value" => $attributeData["value"]]);
+
+                $product_attribute_data = [
 					"attribute_id" => $attribute->id,
 					"product_id"=> $product->id,
 					"value_type" => $attribute_type,
 					"value_id" => $value->id,
 					"scope" => "website",
 					"scope_id" => 1
-				]);
+				];
+                $match = $product_attribute_data;
+                unset($match["value_id"]);
+
+				ProductAttribute::updateOrCreate($match, $product_attribute_data);
 			}
 
 		}

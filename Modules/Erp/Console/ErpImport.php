@@ -27,13 +27,15 @@ class ErpImport extends Command
 
     public function handle(): void
     {
-        ProductImages::dispatch();
-        EanCodes::dispatch();
-        ErpAttributeGroups::dispatch();
         ListProducts::dispatch();
-        ProductVariants::dispatch();
+        ErpAttributeGroups::dispatch();
+        EanCodes::dispatch();
         SalePrices::dispatch();
         WebInventories::dispatch();
+        ProductVariants::dispatch();
+        ProductImages::dispatch();
+
+        echo "All jobs dispatched.\r\n";
     }
 
     protected function getArguments(): array
