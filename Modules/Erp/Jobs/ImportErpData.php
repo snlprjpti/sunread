@@ -47,7 +47,7 @@ class ImportErpData implements ShouldQueue
                     $item_hash = md5($erp_import_id.$sku.json_encode($item));
                     $hashes[] = $item_hash;
 
-                    if ( $this->type == "listProducts" ) ErpProductDescription::dispatchSync($sku);
+                    if ( $this->type == "listProducts" ) ErpProductDescription::dispatch($sku);
 
                     return [
                         "erp_import_id" => $erp_import_id,
