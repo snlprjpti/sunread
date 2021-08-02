@@ -2,30 +2,31 @@
 
 namespace Modules\Product\Repositories;
 
-use Carbon\Carbon;
 use Exception;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use Modules\Core\Entities\Store;
+use Modules\Core\Rules\ScopeRule;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Entities\Channel;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Modules\Product\Entities\Product;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Product\Entities\ProductImage;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
+use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
-use Modules\Attribute\Repositories\AttributeRepository;
-use Modules\Attribute\Repositories\AttributeSetRepository;
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
-use Modules\Core\Rules\ScopeRule;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
-use Modules\Product\Entities\ProductAttribute;
-use Modules\Product\Entities\ProductImage;
+use Modules\Attribute\Repositories\AttributeRepository;
+use Modules\Attribute\Repositories\AttributeSetRepository;
 
 class ProductRepository extends BaseRepository
 {
@@ -232,8 +233,8 @@ class ProductRepository extends BaseRepository
                 foreach ( $images as $index => $image )
                 {
                     $position += $index;
-                    $key = \Str::random(6);
-                    $file_name = $image->getClientOriginalName();
+                    $key = Str::random(6);
+                    $file_name = Str::slug($image->getClientOriginalName());
                     $data["path"] = $image->storeAs("images/products/{$key}", $file_name);
                     foreach ( $image_dimensions as $dimension )
                     {
