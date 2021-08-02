@@ -8,6 +8,7 @@ use Modules\Erp\Jobs\EanCodes;
 use Modules\Erp\Jobs\ErpAttributeGroups;
 use Modules\Erp\Jobs\ErpProductDescription;
 use Modules\Erp\Jobs\ListProducts;
+use Modules\Erp\Jobs\Mapper\ErpMigrateProductJob;
 use Modules\Erp\Jobs\MigrateProductJob;
 use Modules\Erp\Jobs\ProductImages;
 use Modules\Erp\Jobs\ProductVariants;
@@ -29,7 +30,7 @@ class ErpRepositiory extends BaseRepository
 		// WebAssortments::dispatch();
 		// dd("asd");
         // dd($this->importAll());
-		MigrateProductJob::dispatch();
+		ErpMigrateProductJob::dispatch();
 		dd("done");
 		ProductImages::dispatch();
 		EanCodes::dispatch();

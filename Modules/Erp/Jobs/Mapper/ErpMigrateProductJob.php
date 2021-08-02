@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Erp\Jobs;
+namespace Modules\Erp\Jobs\Mapper;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Erp\Traits\HasErpValueMapper;
 
-class MigrateProductJob implements ShouldQueue
+class ErpMigrateProductJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpValueMapper;
 

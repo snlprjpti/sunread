@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Erp\Jobs;
+namespace Modules\Erp\Jobs\Mapper;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -9,17 +9,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Erp\Traits\HasErpValueMapper;
 
-class MigrateProductAttributeJob implements ShouldQueue
+class ErpGenerateVariantProductJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpValueMapper;
 
-    public function __construct()
+    protected $product, $erp_product_iteration;
+
+    public function __construct(object $product, object $erp_product_iteration)
     {
-        //
+        $this->product = $product;
+        $this->erp_product_iteration = $erp_product_iteration;
     }
 
     public function handle(): void
     {
-        //
+        $this->createVariants($this->product, $this->erp_product_iteration);
     }
 }
