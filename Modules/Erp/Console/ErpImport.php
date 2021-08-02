@@ -34,8 +34,7 @@ class ErpImport extends Command
         WebInventories::dispatch();
         ProductVariants::dispatch();
         ProductImages::dispatch();
-
-        echo "All jobs dispatched.\r\n";
+        $this->info("All jobs dispatched.");
     }
 
     protected function getArguments(): array
