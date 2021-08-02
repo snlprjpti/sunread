@@ -234,7 +234,7 @@ class ProductRepository extends BaseRepository
                 {
                     $position += $index;
                     $key = Str::random(6);
-                    $file_name = Str::slug($image->getClientOriginalName());
+                    $file_name = $this->generateFileName($image);
                     $data["path"] = $image->storeAs("images/products/{$key}", $file_name);
                     foreach ( $image_dimensions as $dimension )
                     {

@@ -33,7 +33,7 @@ class ProductImageRepository extends BaseRepository
         {
             // Store File
             $key = Str::random(6);
-            $file_name = Str::slug($file->getClientOriginalName());
+            $file_name = $this->generateFileName($file);
             $data['path'] = $file->storeAs("images/products/{$key}", $file_name);
 
 
