@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Http\Controllers;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Modules\Core\Traits\FileManager;
@@ -106,9 +107,9 @@ class BaseController extends Controller
         {
             // Store File
             $file = $request->file($file_name);
-            $key = \Str::random(6);
+            $key = Str::random(6);
             $folder = $folder ?? "default";
-            $file_path = $file->storeAs("images/{$folder}/{$key}", (string) $file->getClientOriginalName());
+            $file_path = $file->storeAs("images/{$folder}/{$key}", $this->generateFileName($file));
 
             // Delete old file if requested
             if ( $delete_url !== null ) Storage::delete($delete_url);
@@ -161,5 +162,24 @@ class BaseController extends Controller
     public function handleException(object $exception): JsonResponse
     {
         return $this->errorResponse($this->getExceptionMessage($exception), $this->getExceptionStatus($exception));
+    }
+    
+    public function generateFileName(object $file): string
+    {
+        try
+        {
+            $original_filename = $file->getClientOriginalName();
+            $name = pathinfo($original_filename, PATHINFO_FILENAME);
+            $extension = pathinfo($original_filename, PATHINFO_EXTENSION);
+
+            $filename_slug = Str::slug($name);
+            $filename = "{$filename_slug}.{$extension}";
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return (string) $filename;
     }
 }

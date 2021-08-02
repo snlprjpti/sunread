@@ -8,12 +8,10 @@ use Illuminate\Support\Arr;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
-use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeSet;
-use Modules\Attribute\Entities\AttributeGroup;
-use Modules\Category\Entities\Category;
+use Modules\Attribute\Entities\AttributeOption;
 use Modules\Product\Entities\ProductImage;
 use Modules\Core\Entities\Website;
+use Modules\Tax\Entities\CustomerTaxGroup;
 
 class ProductTest extends BaseTestCase
 {
@@ -49,7 +47,7 @@ class ProductTest extends BaseTestCase
                 if (in_array($attribute->slug, ["category_ids", "base_image", "small_image", "thumbnail_image", "quantity_and_stock_status"])) continue;
                 $attributes[] = [
                     "attribute_id" => $attribute->id,
-                    "value" => $this->value($attribute->type)
+                    "value" => $this->value($attribute)
                 ];
             }
         }
@@ -64,9 +62,9 @@ class ProductTest extends BaseTestCase
         return array_merge($updateData, $this->getScope($websiteId)); 
     }
 
-    public function value(string $type): mixed
+    public function value(object $attribute): mixed
     {
-        switch($type)
+        switch($attribute->type)
         {
             case "price" : 
                 $value = 1000.1;
@@ -76,12 +74,37 @@ class ProductTest extends BaseTestCase
                 $value = true;
                 break;
 
-            case ($type == "datetime" || $type == "date"):
+            case ($attribute->type == "datetime" || $attribute->type == "date"):
                 $value = now();
                 break;
 
             case "number":
                 $value = rand(1,1000);
+                break;
+
+            case "select" : 
+                $attribute_option = ($attribute->slug == "tax_class_id") ? CustomerTaxGroup::inRandomOrder()->first() : AttributeOption::create([
+                    "attribute_id" => $attribute->id,
+                    "name" => Str::random(10),
+                    "code" => ($attribute->slug == "status") ? rand(0,1) : Str::random(10)
+                ]);
+                $value = $attribute_option->id;
+                break;
+
+            case ($attribute->type == "multiselect" || $attribute->type == "checkbox"):
+                $attribute_option = AttributeOption::create([
+                    "attribute_id" => $attribute->id,
+                    "name" => Str::random(10)
+                ]);
+                $value[] = $attribute_option->id;
+                break;
+
+            case "image":
+                $value = UploadedFile::fake()->image('image.jpeg');
+                break;
+            
+            case "multiimage":
+                $value[] = UploadedFile::fake()->image('image.jpeg');
                 break;
 
             default:

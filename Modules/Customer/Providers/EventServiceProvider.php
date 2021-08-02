@@ -7,7 +7,6 @@ use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
-
     public function boot()
     {
         Event::listen('customers.session.login.after', 'Modules\Customer\Listeners\SessionListener@customerLogin');

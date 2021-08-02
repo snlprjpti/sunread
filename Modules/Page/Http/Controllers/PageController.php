@@ -9,20 +9,22 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
 use Modules\Page\Repositories\PageRepository;
-use Modules\Page\Repositories\PageTranslationRepository;
 use Modules\Page\Transformers\PageResource;
 use Exception;
+use Modules\Page\Repositories\PageAttributeRepository;
+use Modules\Page\Repositories\PageScopeRepository;
 
 class PageController extends BaseController
 {
-    protected $repository, $translation, $pageTranslationRepository;
+    protected $repository, $pageScopeRepository, $pageAttributeRepository;
 
-    public function __construct(Page $page, PageRepository $pageRepository, PageTranslationRepository $pageTranslationRepository)
+    public function __construct(Page $page, PageRepository $pageRepository, PageScopeRepository $pageScopeRepository, PageAttributeRepository $pageAttributeRepository)
     {
         $this->model = $page;
         $this->model_name = "Page";
         $this->repository = $pageRepository;
-        $this->pageTranslationRepository = $pageTranslationRepository;
+        $this->pageScopeRepository = $pageScopeRepository;
+        $this->pageAttributeRepository = $pageAttributeRepository;
         parent::__construct($this->model, $this->model_name);
     }
 
@@ -40,7 +42,7 @@ class PageController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, [ "page_scopes", "page_attributes" ]);
         }
         catch (Exception $exception)
         {
@@ -57,10 +59,11 @@ class PageController extends BaseController
             $data = $this->repository->validateData($request, callback:function ($request) {
                 return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
             });
-            $this->repository->validateTranslation($request);
+            $this->repository->validateSlug($data);
 
-            $created = $this->repository->create($data, function($created) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translations, $created);
+            $created = $this->repository->create($data, function($created) use($data){
+                if(isset($data["scopes"])) $this->pageScopeRepository->updateOrCreate($data["scopes"], $created);
+                if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $created);
             });
         }
         catch (Exception $exception)
@@ -75,30 +78,29 @@ class PageController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id);
+            $fetched = $this->repository->show($id);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
     {
         try
         {
-            $merge = ["slug" => "nullable|unique:pages,slug,{$id}"];
-            $data = $this->repository->validateData($request, $merge, function ($request) {
+            $data = $this->repository->validateData($request, callback:function ($request) {
                 return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
             });
-            $this->repository->validateTranslation($request);
+            $this->repository->validateSlug($data, $id);
 
-            $updated = $this->repository->update($data, $id, function($updated) use($request){
-                $this->pageTranslationRepository->updateOrCreate($request->translations, $updated);
+            $updated = $this->repository->update($data, $id, function($updated) use($data){
+                if(isset($data["scopes"])) $this->pageScopeRepository->updateOrCreate($data["scopes"], $updated);
+                if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $updated);
             });
-            $updated->translations = $updated->translations()->get();
         }
         catch (Exception $exception)
         {
@@ -112,11 +114,7 @@ class PageController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted){
-                $deleted->translations()->each(function($translation){
-                    $translation->delete();
-                });
-            });
+            $this->repository->delete($id);
         }
         catch (Exception $exception)
         {

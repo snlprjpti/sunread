@@ -69,7 +69,9 @@ class ConfigurationController extends BaseController
             if(!$request->scope) $request->scope = "global";
             if(!$request->scope_id) $request->scope_id = 0;
 
-            $fetched = ($this->has((object) $request)) ? $this->repository->getValues($request) : $this->repository->getDefaultValues($request);
+            $fetched = [
+                "value" => $this->repository->getSinglePathValue($request)
+            ];
         }
         catch( Exception $exception )
         {

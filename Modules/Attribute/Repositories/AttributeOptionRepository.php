@@ -26,6 +26,7 @@ class AttributeOptionRepository extends BaseRepository
         $this->rules = [
             "name" => "required",
             "position" => "sometimes|numeric",
+            "code" => "nullable",
             "translations" => "nullable|array"
         ];
     }
@@ -45,7 +46,7 @@ class AttributeOptionRepository extends BaseRepository
                 $this->validateData(new Request($row), isset($row["id"]) ? [
                     "id" => "exists:attribute_options,id"
                 ] : []);
-                
+
                 $row['attribute_id'] = $parent->id;
                 $created = !isset($row["id"]) ? $this->create($row) : $this->update($row, $row["id"]);
 
@@ -76,7 +77,8 @@ class AttributeOptionRepository extends BaseRepository
                 "id" => $attribute_option->id,
                 "name" => $attribute_option->name,
                 "position" => $attribute_option->position,
-                "is_default" => $attribute_option->is_default
+                "is_default" => $attribute_option->is_default,
+                "code" => $attribute_option->code
             ];
             $selected_stores = array_unique($this->translation_model->whereAttributeOptionId($attribute_option->id)->pluck('store_id')->toArray());
             $selected_channels = array_unique(Store::whereIn('id', $selected_stores)->pluck('channel_id')->toArray());
@@ -88,11 +90,11 @@ class AttributeOptionRepository extends BaseRepository
                     "id" =>  $channel->id,
                     "name" => $channel->name
                 ];
-            
+
                 foreach($channel->stores as $store)
                 {
                     if(!isset($store)) continue;
-    
+
                     $item["stores"][] = [
                        "id" => $store->id,
                        "name" => $store->name,

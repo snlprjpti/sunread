@@ -3,12 +3,13 @@
 namespace Modules\Customer\Repositories;
 
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Storage;
-use Modules\Core\Repositories\BaseRepository;
-use Modules\Customer\Entities\Customer;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Modules\Customer\Entities\Customer;
+use Modules\Core\Repositories\BaseRepository;
 
 class CustomerRepository extends BaseRepository
 {
@@ -52,8 +53,8 @@ class CustomerRepository extends BaseRepository
 
             // Store File
             $file = $request->file("image");
-            $key = \Str::random(6);
-            $file_name = $file->getClientOriginalName();
+            $key = Str::random(6);
+            $file_name = $this->generateFileName($file);
             $file_path = $file->storeAs("images/customers/{$key}", $file_name, ["disk" => "public"]);
             $updated->fill(["profile_image" => $file_path]);
             $updated->save();

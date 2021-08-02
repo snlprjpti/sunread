@@ -8,12 +8,13 @@ class PageFactory extends Factory
     protected $model = \Modules\Page\Entities\Page::class;
 
     public function definition(): array
-    {
+    {      
         return [
-            "parent_id" => null,
-            "slug" => $this->faker->unique()->slug(),
             "title" => $this->faker->name(),
-            "description" => $this->faker->paragraph(),
+            "slug" => $this->faker->unique()->slug(),
+            "meta_title" => $this->faker->name(),
+            "meta_keywords" => $this->faker->name(),
+            "meta_description" => $this->faker->paragraph(),
             "position" => $this->faker->randomDigit(),
             "status" => 1
         ];

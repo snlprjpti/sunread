@@ -305,7 +305,7 @@ class BaseRepository
             // Store File
             $key = Str::random(6);
             $folder = $folder ?? "default";
-            $file_path = $request->storeAs("images/{$folder}/{$key}", (string) $request->getClientOriginalName());
+            $file_path = $request->storeAs("images/{$folder}/{$key}", $this->generateFileName($request));
 
             // Delete old file if requested
             if ( $delete_url !== null ) Storage::delete($delete_url);
@@ -316,5 +316,24 @@ class BaseRepository
         }
 
         return $file_path;
+    }
+
+    public function generateFileName(object $file): string
+    {
+        try
+        {
+            $original_filename = $file->getClientOriginalName();
+            $name = pathinfo($original_filename, PATHINFO_FILENAME);
+            $extension = pathinfo($original_filename, PATHINFO_EXTENSION);
+
+            $filename_slug = Str::slug($name);
+            $filename = "{$filename_slug}.{$extension}";
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return (string) $filename;
     }
 }

@@ -22,7 +22,7 @@ class ProductTableSeeder extends Seeder
             ],
             [
                 "attribute_id" => 11,
-                "value" => 1
+                "value" => 3
             ]
         ];
         

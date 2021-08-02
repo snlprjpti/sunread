@@ -13,7 +13,8 @@ $types = [
 	"date" => "timestamp",
 	"image" => "text",
 	"file" => "text",
-	"checkbox" => "text"
+	"checkbox" => "text",
+	"multiimages" => "text"
 ];
 
 return array_map(function($data) {

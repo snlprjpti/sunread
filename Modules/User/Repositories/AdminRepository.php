@@ -49,8 +49,8 @@ class AdminRepository extends BaseRepository
 
             // Store File
             $file = $request->file("image");
-            $key = \Str::random(6);
-            $file_name = $file->getClientOriginalName();
+            $key = Str::random(6);
+            $file_name = $this->generateFileName($file);
             $file_path = $file->storeAs("images/users/{$key}", $file_name, ["disk" => "public"]);
 
             $updated->fill(["profile_image" => $file_path]);

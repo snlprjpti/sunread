@@ -12,19 +12,23 @@ use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Rules\ScopeRule;
+use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
+use Modules\Product\Repositories\ProductAttributeRepository;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
 use Modules\Product\Transformers\List\ProductResource as ListProductResource;
 
 class ProductController extends BaseController
 {
-    protected $repository;
+    protected $repository, $product_attribute_repository;
 
-    public function __construct(Product $product, ProductRepository $productRepository)
+    public function __construct(Product $product, ProductRepository $productRepository, ProductAttributeRepository $productAttributeRepository)
     {
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $productRepository;
+        $this->product_attribute_repository = $productAttributeRepository;
+
         $exception_statuses = [
             ProductAttributeCannotChangeException::class => 403
         ];
@@ -84,8 +88,8 @@ class ProductController extends BaseController
             ];
 
             $created = $this->repository->create($data, function(&$created) use($request, $scope) {
-                $attributes = $this->repository->validateAttributes($created, $request, $scope);
-                $this->repository->syncAttributes($attributes, $created, $scope, $request);
+                $attributes = $this->product_attribute_repository->validateAttributes($created, $request, $scope);
+                $this->product_attribute_repository->syncAttributes($attributes, $created, $scope, $request);
 
                 $created->channels()->sync($request->get("channels"));
             });
@@ -133,8 +137,8 @@ class ProductController extends BaseController
             ];
 
             $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
-                $attributes = $this->repository->validateAttributes($updated, $request, $scope);
-                $this->repository->syncAttributes($attributes, $updated, $scope, $request, "update");
+                $attributes = $this->product_attribute_repository->validateAttributes($updated, $request, $scope);
+                $this->product_attribute_repository->syncAttributes($attributes, $updated, $scope, $request, "update");
 
                 $updated->channels()->sync($request->get("channels"));
             });
@@ -151,8 +155,9 @@ class ProductController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function($deleted){
-                $deleted->product_attributes()->each(function($product_attribute){
+            $this->repository->delete($id, function ($deleted) {
+                ProductAttribute::preventLazyLoading(false);
+                $deleted->product_attributes()->each(function ($product_attribute) {
                     $product_attribute->delete();
                 });
             });

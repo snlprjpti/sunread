@@ -247,7 +247,7 @@ class ConfigurationRepository extends BaseRepository
             $file = $request;
             $key = Str::random(6);
             $folder = $folder ?? "default";
-            $file_path = $file->storeAs("images/{$folder}/{$key}", (string) $file->getClientOriginalName());
+            $file_path = $file->storeAs("images/{$folder}/{$key}", $this->generateFileName($file));
 
             // Delete old file if requested
             if ( $delete_url !== null ) Storage::delete($delete_url);
@@ -258,6 +258,41 @@ class ConfigurationRepository extends BaseRepository
         }
 
         return $file_path;
+    }
+
+    public function getSinglePathValue($request): mixed
+    {
+        try
+        {
+            $elements = collect($this->config_fields)->pluck("children")->flatten(1)->pluck("subChildren")->flatten(1)->pluck("elements")->flatten(1);
+            $element = $elements->where("path", $request->path)->first();
+
+            if(!$element) throw ValidationException::withMessages([ "path" => "Invalid Path" ]);
+
+            $values = ($this->has((object) $request)) ? $this->getValues($request) : $this->getDefaultValues($request, $element["default"]);
+            $fetched = ($values && $values != "" && $element["provider"] != "") ? $this->getProviderData($element, $values) : $values;
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function getProviderData(array $element, mixed $values): array
+    {
+        try
+        {
+            $model = new $element["provider"];
+            $fetched = is_array($values) ? $model->whereIn("id", $values)->get() : $model->find($values);
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $fetched->toArray();   
     }
 
 }

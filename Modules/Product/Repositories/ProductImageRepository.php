@@ -2,12 +2,13 @@
 
 namespace Modules\Product\Repositories;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Modules\Core\Repositories\BaseRepository;
-use Modules\Product\Entities\ProductImage;
-use Intervention\Image\Facades\Image;
 use Exception;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Modules\Product\Entities\ProductImage;
+use Modules\Core\Repositories\BaseRepository;
 
 class ProductImageRepository extends BaseRepository
 {
@@ -31,8 +32,8 @@ class ProductImageRepository extends BaseRepository
         try
         {
             // Store File
-            $key = \Str::random(6);
-            $file_name = $file->getClientOriginalName();
+            $key = Str::random(6);
+            $file_name = $this->generateFileName($file);
             $data['path'] = $file->storeAs("images/products/{$key}", $file_name);
 
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
 use Modules\Category\Traits\HasScope;
@@ -118,9 +119,16 @@ class CategoryRepository extends BaseRepository
         {
             $category = $this->model->findOrFail($id);
             $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : null;
+            
+            if($parent_id) 
+            {
+                $parent = $this->model->findOrFail($parent_id);
+                if(($id == $parent_id) || ($parent->parent_id == $id)) throw ValidationException::withMessages([ "parent_id" => "Node must not be a descendant." ]);
+            }
+
             if($parent_id != $category->parent_id) $category->update(["parent_id" => $parent_id]);
 
-            $all_category = $parent_id ? $this->model->findOrFail($parent_id)->children : $this->model->whereParentId(null)->get();
+            $all_category = $parent_id ? $parent->children : $this->model->whereParentId(null)->get();
             if($data["position"] > count($all_category)) $data["position"] = count($all_category);
             
             $allnodes = $all_category->sortBy('_lft')->values();

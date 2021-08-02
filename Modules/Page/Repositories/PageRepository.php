@@ -2,56 +2,67 @@
 
 namespace Modules\Page\Repositories;
 
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
+use Attribute;
+use Exception;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
-use Modules\Page\Entities\PageConfiguration;
-use Modules\Page\Exceptions\PageTranslationDoesNotExist;
-use Exception;
+use Illuminate\Validation\ValidationException;
 
 class PageRepository extends BaseRepository
 {
-    private $pageConfiguration, $store, $channel;
+    protected $pageAttributeRepository;
 
-    public function __construct(Page $page, PageConfiguration $pageConfiguration, Store $store, Channel $channel)
+    public function __construct(Page $page, PageAttributeRepository $pageAttributeRepository)
     {
         $this->model = $page;
         $this->model_key = "page";
         $this->rules = [
-            "parent_id" => "sometimes|numeric|exists:pages,id",
-            "slug" => "nullable|unique:pages,slug",
             "title" => "required",
-            "description" => "required",
             "position" => "sometimes|numeric",
             "status" => "sometimes|boolean",
             "meta_title" => "sometimes|nullable",
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
-            "translations" => "nullable|array"
+            "scopes" => "required|array",
+            "components" => "required|array"
         ];
-        $this->pageConfiguration = $pageConfiguration;
-        $this->store = $store;
-        $this->channel = $channel;
+        $this->pageAttributeRepository = $pageAttributeRepository;
     }
 
-
-    public function validateTranslationData(?array $translations): bool
+    public function validateSlug(array $data, ?int $id=null): void
     {
-        if (empty($translations)) return false;
-
-        foreach ($translations as $translation) {
-            if (!array_key_exists("store_id", $translation) || !array_key_exists("title", $translation)) return false;
-        }
-
-        return true;
+        $model = ($id) ? $this->model->where('id', '!=', $id) : $this->model;
+        array_map(function($scope) use ($data, $model) {
+            $exist_slug = $model->whereSlug($data["slug"])->whereHas("page_scopes", function ($query) use ($scope) {
+                $query->whereScope($scope["scope"])->whereScopeId($scope["scope_id"]);
+            })->first();
+            if($exist_slug) throw ValidationException::withMessages(["slug" => "Slug has already taken."]);
+        }, $data["scopes"]);
     }
 
-    public function validateTranslation(object $request): void
+    public function show(int $id): array
     {
-        $translations = $request->translations;
-        if (!$this->validateTranslationData($translations)) {
-            throw new PageTranslationDoesNotExist(__("core::app.response.missing-data", ["title" => "Page"]));
+        try
+        {
+            $attributes = [];
+            $data = $this->fetch($id, [ "page_scopes", "page_attributes" ]);
+            $components = $data->page_attributes->pluck("attribute")->toArray();
+
+            foreach($components as $component)
+            {
+                $values = $data->page_attributes->where("attribute", $component)->first()->toArray();
+                $attributes[] = $this->pageAttributeRepository->show($component, $values["value"]);
+            }
+
+            $item = $data->toArray();
+            unset($item["page_attributes"]);
+            $item["components"] = $attributes;
         }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $item;
     }
 }
