@@ -7,6 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Modules\Erp\Entities\ErpImport;
 use Modules\Erp\Traits\HasErpMapper;
 
 class ProductImages implements ShouldQueue
@@ -21,5 +22,6 @@ class ProductImages implements ShouldQueue
     public function handle(): void
     {
         $this->storeImage();
+        ErpImport::whereType("productImages")->update(["status" => 1]);
     }
 }

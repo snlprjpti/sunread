@@ -7,6 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Modules\Erp\Entities\ErpImport;
 use Modules\Erp\Traits\HasErpMapper;
 
 class WebInventories implements ShouldQueue
@@ -23,5 +24,6 @@ class WebInventories implements ShouldQueue
     public function handle(): void
     {
         $this->erpImport("webInventories", $this->url."webInventorys", $this->skip_token);
+        ErpImport::whereType("webInventories")->update(["status" => 1]);
     }
 }

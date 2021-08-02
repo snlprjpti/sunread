@@ -24,6 +24,7 @@ class ListProducts implements ShouldQueue
     public function handle(): void
     {
         $this->erpImport("listProducts", $this->url."webItems", $this->skip_token);
-        ErpImport::whereSlug("listProducts")->update(["status" => 1]);
+        ErpImport::whereType("listProducts")->update(["status" => 1]);
+        ErpImport::whereType("productDescriptions")->update(["status" => 1]);
     }
 }
