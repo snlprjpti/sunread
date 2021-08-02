@@ -39,7 +39,7 @@ trait HasErpValueMapper
 		try
 		{
 			$erp_details = ErpImport::where("type", "listProducts")->first()->erp_import_details;
-			$erp = ErpImport::all();
+			
 			$chunked = $erp_details->chunk(100); 
 			foreach ( $chunked as $chunk )
 			{

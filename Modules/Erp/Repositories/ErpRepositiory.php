@@ -29,7 +29,7 @@ class ErpRepositiory extends BaseRepository
 
 		// WebAssortments::dispatch();
 		// dd("asd");
-        // dd($this->importAll());
+        dd($this->importAll());
 		ErpMigrateProductJob::dispatch();
 		dd("done");
 		ProductImages::dispatch();
