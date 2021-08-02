@@ -3,8 +3,9 @@
 namespace Modules\Erp\Console;
 
 use Illuminate\Console\Command;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductJob;
+use Modules\Erp\Entities\ErpImport;
 use Symfony\Component\Console\Input\InputOption;
+use Modules\Erp\Jobs\Mapper\ErpMigrateProductJob;
 use Symfony\Component\Console\Input\InputArgument;
 
 class ErpMigrate extends Command
@@ -19,9 +20,16 @@ class ErpMigrate extends Command
         parent::__construct();
     }
 
-    public function handle(): mixed
+    public function handle(): bool
     {
+        if ( ErpImport::whereStatus(0)->count() > 0 ) {
+            $this->error("ERP Import is not complete.");
+            return false;
+        }
+
         ErpMigrateProductJob::dispatch();
+        $this->info("ERP migration job started.");
+        return true;
     }
 
     protected function getArguments(): array
