@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Event;
 use Modules\Page\Entities\PageScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\ValidationException;
+use Modules\Core\Entities\Website;
 use Modules\Core\Rules\ScopeRule;
 
 class PageScopeRepository extends BaseRepository
@@ -17,27 +19,31 @@ class PageScopeRepository extends BaseRepository
     {
         $this->model = $pageScope;
         $this->model_key = "page.scope";
-        $this->rules = [
-            "scope" => "required|in:website,store",
-            "scope_id" => "required|numeric"
-        ];
+        $this->rules = [];
     }
 
-    public function updateOrCreate(array $scopes, object $parent):void
+    public function updateOrCreate(array $stores, object $parent):void
     {
-        if ( !is_array($scopes) || count($scopes) == 0 ) return;
+        if ( !is_array($stores) || count($stores) == 0 ) return;
 
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.sync.before");
         try
         {
             $page_scopes = [];
-            foreach($scopes as $scope)
+            foreach($stores as $store)
             {  
-                $data = $this->validateData(new Request($scope), [
-                    "scope_id" => [ "required", "numeric", new ScopeRule($scope["scope"]) ]
-                ]);
-                $data["page_id"] = $parent->id;
+                // $website_stores = Website::find($parent->website_id)->channels->mapWithKeys(function ($channel) {
+                //     return $channel->stores->pluck('id');
+                // })->toArray();
+
+                // if(in_array($store, $website_stores) && $store != 0) throw ValidationException::withMessages(["stores" => "Invalid Store"]);
+
+                $data = [
+                    "page_id" => $parent->id,
+                    "scope" => "scope",
+                    "scope_id" => $store
+                ];
 
                 if($exist = $this->model->where($data)->first())
                 {

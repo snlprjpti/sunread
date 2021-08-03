@@ -23,7 +23,7 @@ class PageRepository extends BaseRepository
             "meta_title" => "sometimes|nullable",
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
-            "scopes" => "required|array",
+            "stores" => "required|array",
             "components" => "required|array"
         ];
         $this->pageAttributeRepository = $pageAttributeRepository;
@@ -34,10 +34,10 @@ class PageRepository extends BaseRepository
         $model = ($id) ? $this->model->where('id', '!=', $id) : $this->model;
         array_map(function($scope) use ($data, $model) {
             $exist_slug = $model->whereSlug($data["slug"])->whereHas("page_scopes", function ($query) use ($scope) {
-                $query->whereScope($scope["scope"])->whereScopeId($scope["scope_id"]);
+                $query->whereScope("store")->whereScopeId($scope);
             })->first();
             if($exist_slug) throw ValidationException::withMessages(["slug" => "Slug has already taken."]);
-        }, $data["scopes"]);
+        }, $data["stores"]);
     }
 
     public function show(int $id): array
