@@ -292,13 +292,13 @@ trait HasErpValueMapper
 						"parent_id" => $product->id,
 						"attribute_set_id" => 1,
 						"website_id" => 1,
-						"sku" => "{$product->sku}-variants-{$variant['code']}",
+						"sku" => "{$product->sku}-variant-{$variant['code']}",
 						"type" => "simple",
 					];
 
 					$match = [
 						"website_id" => 1,
-						"sku" => "{$product->sku}-variants-{$variant['code']}",
+						"sku" => "{$product->sku}-variant-{$variant['code']}",
 					];
 
 					$variant_product = Product::updateOrCreate($match, $product_data);
