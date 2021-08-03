@@ -78,35 +78,35 @@ trait HasErpMapper
     private function skipToken( array $data, string $type ): string
     {
         $data = (object) $data;
-        $prepend = "\$skiptoken";
+        $prepend = "\$skiptoken=";
 
         switch ($type) {
             case 'webAssortments':
-                $token = "{$prepend}='{$data->itemNo}',".'SR'.",'{$data->colorCode}'";
+                $token = "{$prepend}'{$data->itemNo}','SR','{$data->colorCode}'";
                 break;
             
             case 'listProducts':
-                $token = "{$prepend}='{$data->no}',"."'{$data->webAssortmentWeb_Setup}',"."'{$data->webAssortmentColor_Code}'".",'{$data->languageCode}'".",'{$data->auxiliaryIndex1}'".",'{$data->auxiliaryIndex2}'".",'{$data->auxiliaryIndex3}'".",'{$data->auxiliaryIndex4}'";
+                $token = "{$prepend}'{$data->no}','{$data->webAssortmentWeb_Setup}','{$data->webAssortmentColor_Code}','{$data->languageCode}','{$data->auxiliaryIndex1}','{$data->auxiliaryIndex2}','{$data->auxiliaryIndex3}','{$data->auxiliaryIndex4}'";
                 break;
             
             case 'attributeGroups':
-                $token = "{$prepend}='{$data->itemNo}',"."'{$data->sortKey}',"."'{$data->groupCode}',"."'{$data->attributeID}',"."'{$data->name}',"."'{$data->auxiliaryIndex1}'";
+                $token = "{$prepend}'{$data->itemNo}','{$data->sortKey}','{$data->groupCode}','{$data->attributeID}','{$data->name}','{$data->auxiliaryIndex1}'";
                 break;
             
             case 'productVariants':
-                $token = "{$prepend}='{$data->pfVerticalComponentCode}','{$data->itemNo}'";
+                $token = "{$prepend}'{$data->pfVerticalComponentCode}','{$data->itemNo}'";
                 break;
 
             case 'salePrices':
-                $token = '$skiptoken'."'{$data->itemNo}',"."'{$data->salesCode}',"."'{$data->currencyCode}',"."'{$data->startingDate}',"."'{$data->salesType}',"."'{$data->minimumQuantity}',"."'{$data->unitofMeasureCode}',"."'{$data->variantCode}'";
+                $token = "{$prepend}'{$data->itemNo}','{$data->salesCode}','{$data->currencyCode}','{$data->startingDate}','{$data->salesType}','{$data->minimumQuantity}','{$data->unitofMeasureCode}','{$data->variantCode}'";
                 break;
 
             case 'eanCodes':
-                $token = '$skiptoken'."'{$data->itemNo}',"."'{$data->variantCode}',"."'{$data->unitofMeasure}',"."'{$data->crossReferenceType}',"."'{$data->crossReferenceTypeNo}',"."'{$data->crossReferenceNo}'";
+                $token = "{$prepend}'{$data->itemNo}','{$data->variantCode}','{$data->unitofMeasure}','{$data->crossReferenceType}','{$data->crossReferenceTypeNo}','{$data->crossReferenceNo}'";
                 break;
 
             case 'webInventories':
-                $token = '$skiptoken'."'{$data->Item_No}',"."'{$data->Code}'";
+                $token = "{$prepend}'{$data->Item_No}','{$data->Code}'";
         }
 
         return $token;
