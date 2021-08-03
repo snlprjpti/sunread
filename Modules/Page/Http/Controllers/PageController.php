@@ -62,7 +62,7 @@ class PageController extends BaseController
             $this->repository->validateSlug($data);
 
             $created = $this->repository->create($data, function($created) use($data){
-                if(isset($data["scopes"])) $this->pageScopeRepository->updateOrCreate($data["scopes"], $created);
+                if(isset($data["stores"])) $this->pageScopeRepository->updateOrCreate($data["stores"], $created);
                 if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $created);
             });
         }
@@ -98,7 +98,7 @@ class PageController extends BaseController
             $this->repository->validateSlug($data, $id);
 
             $updated = $this->repository->update($data, $id, function($updated) use($data){
-                if(isset($data["scopes"])) $this->pageScopeRepository->updateOrCreate($data["scopes"], $updated);
+                if(isset($data["stores"])) $this->pageScopeRepository->updateOrCreate($data["stores"], $updated);
                 if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $updated);
             });
         }
