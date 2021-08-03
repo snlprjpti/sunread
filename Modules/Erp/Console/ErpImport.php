@@ -11,8 +11,6 @@ use Modules\Erp\Jobs\ProductImages;
 use Modules\Erp\Jobs\ProductVariants;
 use Modules\Erp\Jobs\SalePrices;
 use Modules\Erp\Jobs\WebInventories;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class ErpImport extends Command
 {
@@ -27,27 +25,17 @@ class ErpImport extends Command
 
     public function handle(): void
     {
+        // Import from API
         ListProducts::dispatch();
         ErpAttributeGroups::dispatch();
         EanCodes::dispatch();
         SalePrices::dispatch();
         WebInventories::dispatch();
         ProductVariants::dispatch();
+
+        // Import from FTP
         ProductImages::dispatch();
+
         $this->info("All jobs dispatched.");
-    }
-
-    protected function getArguments(): array
-    {
-        return [
-            ['erp:import', InputArgument::REQUIRED, 'An example argument.'],
-        ];
-    }
-
-    protected function getOptions(): array
-    {
-        return [
-            ['erp:import', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
-        ];
     }
 }

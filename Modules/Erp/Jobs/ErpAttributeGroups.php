@@ -24,7 +24,5 @@ class ErpAttributeGroups implements ShouldQueue
     public function handle(): void
     {
         $this->erpImport("attributeGroups", $this->url."webItemAttributeGroups", $this->skip_token);
-        ErpImport::whereType("attributeGroups")->update(["status" => 1]);
-
     }
 }
