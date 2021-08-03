@@ -63,7 +63,8 @@ trait HasErpMapper
             if (!empty($response_json_array) && array_key_exists("@odata.nextLink", $response->json())) {
                 if ( $callback ) $callback($response_json_array, $skip_token);
             } else {
-                // ErpImport::whereType($type)->update(["status" => 1]);
+                ErpImport::whereType($type)->update(["status" => 1]);
+                if ( $type == "listProducts" ) ErpImport::whereType("productDescriptions")->update(["status" => 1]);
             }
         }
         catch ( Exception $exception )
@@ -230,7 +231,6 @@ trait HasErpMapper
                     "sku" => $sku,
                     "value" => json_encode($value)
                 ]);
-
             }
         }
         catch ( Exception $exception )
