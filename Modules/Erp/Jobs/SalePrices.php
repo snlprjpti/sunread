@@ -24,6 +24,5 @@ class SalePrices implements ShouldQueue
     public function handle(): void
     {
         $this->erpImport("salePrices", $this->url."webSalesPrices", $this->skip_token);
-        // ErpImport::whereType("salePrices")->update(["status" => 1]);
     }
 }

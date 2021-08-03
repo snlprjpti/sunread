@@ -24,7 +24,5 @@ class WebAssortments implements ShouldQueue
     public function handle(): void
     {
         $this->erpImport("webAssortments", $this->url."webAssortments", $this->skip_token);
-        ErpImport::whereType("webAssortments")->update(["status" => 1]);
-
     }
 }

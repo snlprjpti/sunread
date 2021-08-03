@@ -24,6 +24,5 @@ class ProductVariants implements ShouldQueue
     public function handle(): void
     {
         $this->erpImport("productVariants", $this->url."webItemVariants", $this->skip_token);
-        // ErpImport::whereType("productVariants")->update(["status" => 1]);
     }
 }
