@@ -19,7 +19,6 @@ class CreatePageAttributesTable extends Migration
             $table->string('attribute');
             $table->json('value')->nullable();
             $table->integer('position')->nullable();
-            $table->unique([ 'page_id', 'attribute' ]);
             $table->foreign('page_id')->references('id')->on('pages')->onDelete('cascade');
             $table->timestamps();
         });
