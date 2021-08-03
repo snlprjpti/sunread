@@ -46,7 +46,7 @@ trait HasErpValueMapper
 			{
 				foreach ( $chunk as $detail )
 				{
-					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR") continue;
+					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" && $detail->status == 1) continue;
 		
 					$type = ($erp_details->where("sku", $detail->sku)->count() > 1) ? "configurable" : "simple";
 					
@@ -68,6 +68,7 @@ trait HasErpValueMapper
 					if (($erp_details->where("sku", $detail->sku)->count() > 1)) $this->createVariants($product, $detail);
 					ErpMigrateProductAttributeJob::dispatch($product, $detail, false);
 					ErpMigrateProductInventoryJob::dispatch($product, $detail);
+					$detail->update(["status" => 1]);
 				}
 			}
 		}
@@ -205,7 +206,7 @@ trait HasErpValueMapper
 			if ( $attribute_groups->count() > 1 )
 			{
 				$this->getValue($attribute_groups, function ($value) use (&$attach_value, $attribute_name) {
-					if ( $value["attributetype"] == $attribute_name ) $attach_value .= \Str::finish($value["description"], ". ");
+					if ( $value["attributetype"] == $attribute_name ) $attach_value .= \Str::finish($value["description"], ".\r\n ");
 				});
 			}
 		}
@@ -355,6 +356,11 @@ trait HasErpValueMapper
 	private function getDetailCollection(string $slug, string $sku): Collection
 	{
 		return ErpImport::where("type", $slug)->first()->erp_import_details()->where("sku", $sku)->get();
+	}
+
+	private function updateErpDetailStatus(): bool
+	{
+		# code...
 	}
 
 }

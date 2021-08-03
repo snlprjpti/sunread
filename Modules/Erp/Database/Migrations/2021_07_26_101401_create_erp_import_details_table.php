@@ -20,6 +20,7 @@ class CreateErpImportDetailsTable extends Migration
             $table->string("sku");
             $table->json("value");
             $table->string("hash")->nullable();
+            $table->boolean("status")->default(0)->nullable();
             $table->timestamps();
         });
     }

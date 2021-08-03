@@ -17,7 +17,7 @@ use Modules\Erp\Jobs\ImportErpData;
 trait HasErpMapper
 {
     protected $url = "https://bc.sportmanship.se:7148/sportmanshipbctestapi/api/NaviproAB/web/beta/";
-    public $erp_folder = "ERP Product Images";
+    public $erp_folder = "ERP-Product-Images";
 
     private function basicAuth(): object
     {
@@ -219,17 +219,19 @@ trait HasErpMapper
         try
         {
             $erp_import_id = ErpImport::whereType("productDescriptions")->first()->id;
-
             $url = "{$this->url}webExtendedTexts(tableName='Item',No='{$sku}',Language_Code='ENU',textNo=1)/Data";
             $response = $this->basicAuth()->get($url);
             if ( $response->status() == 200 )
             {
                 $value = json_encode(["description" => $response->body(), "lang" => "ENU"]);
-
-                ErpImportDetail::updateOrInsert([
+                $hash = md5($erp_import_id.$sku.json_encode($value));
+                $existing_details = ErpImportDetail::where("hash", $hash)->first();
+                if ( !$existing_details ) return true;
+                ErpImportDetail::insert([
                     "erp_import_id" => $erp_import_id,
                     "sku" => $sku,
-                    "value" => json_encode($value)
+                    "value" => json_encode($value),
+                    "hash" => $hash
                 ]);
             }
         }
