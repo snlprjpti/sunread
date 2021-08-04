@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Modules\Erp\Entities\ErpImport;
 use Modules\Product\Entities\Product;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeOption;
 use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Inventory\Entities\CatalogInventory;
@@ -65,8 +66,10 @@ trait HasErpValueMapper
 					$product = Product::updateOrCreate($match, $product_data);
 					ErpMigrateProductImageJob::dispatch($product, $detail);
 
-					if (($erp_details->where("sku", $detail->sku)->count() > 1)) $this->createVariants($product, $detail);
-					ErpMigrateProductAttributeJob::dispatch($product, $detail, false);
+					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
+					if ($check_variants) $this->createVariants($product, $detail);
+					
+					ErpMigrateProductAttributeJob::dispatch($product, $detail, false, $check_variants ? 5 : 8);
 					ErpMigrateProductInventoryJob::dispatch($product, $detail);
 					$detail->update(["status" => 1]);
 				}
@@ -80,10 +83,11 @@ trait HasErpValueMapper
 		return true;
 	}
 
-	private function createAttributeValue(object $product, object $erp_product_iteration, bool $ean_code_value = true): bool
+	private function createAttributeValue(object $product, object $erp_product_iteration, bool $ean_code_value = true, int $visibility = 8, mixed $variant = null): bool
 	{
 		try
 		{
+			$this->getAttributeOptionValue($erp_product_iteration, "color");
 			$ean_code = $this->getDetailCollection("eanCodes", $erp_product_iteration->sku);
 			$variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
 
@@ -129,6 +133,10 @@ trait HasErpValueMapper
 					"value" => Carbon::parse(date("Y-m-d", $end_time)), 
 				],
 				[
+					"attribute_id" => 11,
+					"value" => $visibility, 
+				],
+				[
 					"attribute_id" => 16,
 					"value" => $description, 
 				],
@@ -151,6 +159,14 @@ trait HasErpValueMapper
 				[
 					"attribute_id" => 22,
 					"value" => 1, 
+				],
+				[
+					"attribute_id" => 26,
+					"value" => $this->getAttributeOptionValue($erp_product_iteration, "color"), 
+				],
+				[
+					"attribute_id" => 27,
+					"value" => ($this->getDetailCollection("productVariants", $erp_product_iteration->sku)->count() > 1) ? $this->getAttributeOptionValue($variant, "size") : "", 
 				],
 				[
 					"attribute_id" => 28,
@@ -194,6 +210,43 @@ trait HasErpValueMapper
 
 		return true;
 
+	}
+
+	private function getAttributeOptionValue(object $erp_product_iteration, string $attribute_slug): bool
+	{
+		try
+		{
+			switch ($attribute_slug) {
+				case 'color':
+					$data = [
+						"attribute_id" => Attribute::whereSlug("color")->first()->id,
+						"name" => $erp_product_iteration->value["webAssortmentColor_Description"],
+						"code" => $erp_product_iteration->value["webAssortmentColor_Code"]
+					];
+					$match = $data;
+					unset($match["name"]);
+					$attribute_option = AttributeOption::updateOrCreate($match, $data);
+					break;
+				
+				case 'size':
+					$data = [
+						"attribute_id" => Attribute::whereSlug("size")->first()->id,
+						"name" => $erp_product_iteration->value["pfHorizontalComponentCode"],
+						"code" => $erp_product_iteration->value["pfVerticalComponentCode"]
+					];
+					$match = $data;
+					unset($match["code"]);
+					$attribute_option = AttributeOption::updateOrCreate($match, $data);
+					break;
+			}
+			
+		}
+		catch ( Exception $exception )
+		{
+			throw $exception;
+		}
+
+		return $attribute_option->id;
 	}
 
 	//This fn is for concat features and size and care values 
@@ -306,7 +359,7 @@ trait HasErpValueMapper
 					$ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
 		
 					ErpMigrateProductImageJob::dispatch($variant_product, $erp_product_iteration, $variant);
-					ErpMigrateProductAttributeJob::dispatch($variant_product, $erp_product_iteration, $ean_code);
+					ErpMigrateProductAttributeJob::dispatch($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
 					ErpMigrateProductInventoryJob::dispatch($variant_product, $erp_product_iteration);
 				}
 			}
@@ -356,11 +409,6 @@ trait HasErpValueMapper
 	private function getDetailCollection(string $slug, string $sku): Collection
 	{
 		return ErpImport::where("type", $slug)->first()->erp_import_details()->where("sku", $sku)->get();
-	}
-
-	private function updateErpDetailStatus(): bool
-	{
-		# code...
 	}
 
 }

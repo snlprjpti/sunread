@@ -8,11 +8,13 @@ use Illuminate\Support\Collection;
 use Modules\Erp\Entities\ErpImport;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Jobs\ErpImport as JobsErpImport;
 use Modules\Erp\Jobs\FtpToStorage;
 use Modules\Erp\Jobs\ImportErpData;
+use Modules\Product\Entities\ProductImage;
 
 trait HasErpMapper
 {
@@ -83,30 +85,31 @@ trait HasErpMapper
         switch ($type) {
             case 'webAssortments':
                 $token = "{$prepend}'{$data->itemNo}','SR','{$data->colorCode}'";
-                break;
+            break;
             
             case 'listProducts':
                 $token = "{$prepend}'{$data->no}','{$data->webAssortmentWeb_Setup}','{$data->webAssortmentColor_Code}','{$data->languageCode}','{$data->auxiliaryIndex1}','{$data->auxiliaryIndex2}','{$data->auxiliaryIndex3}','{$data->auxiliaryIndex4}'";
-                break;
+            break;
             
             case 'attributeGroups':
                 $token = "{$prepend}'{$data->itemNo}','{$data->sortKey}','{$data->groupCode}','{$data->attributeID}','{$data->name}','{$data->auxiliaryIndex1}'";
-                break;
+            break;
             
             case 'productVariants':
                 $token = "{$prepend}'{$data->pfVerticalComponentCode}','{$data->itemNo}'";
-                break;
+            break;
 
             case 'salePrices':
                 $token = "{$prepend}'{$data->itemNo}','{$data->salesCode}','{$data->currencyCode}','{$data->startingDate}','{$data->salesType}','{$data->minimumQuantity}','{$data->unitofMeasureCode}','{$data->variantCode}'";
-                break;
+            break;
 
             case 'eanCodes':
                 $token = "{$prepend}'{$data->itemNo}','{$data->variantCode}','{$data->unitofMeasure}','{$data->crossReferenceType}','{$data->crossReferenceTypeNo}','{$data->crossReferenceNo}'";
-                break;
+            break;
 
             case 'webInventories':
                 $token = "{$prepend}'{$data->Item_No}','{$data->Code}'";
+            break;
         }
 
         return $token;
@@ -204,7 +207,7 @@ trait HasErpMapper
             ErpImportDetail::create([
                 "erp_import_id" => $erp_import_id,
                 "sku" => $file_info["sku"],
-                "value" => json_encode($file_info),
+                "value" => $file_info,
                 "hash" => $hash
             ]);
         }
@@ -241,5 +244,46 @@ trait HasErpMapper
         }
 
         return true;
+    }
+
+    public function storeFromLocalImage(): void
+    {
+        try
+        {
+            // Filter Images only
+            $files = array_filter(Storage::files("/{$this->erp_folder}/COLECT.IO"), fn ($file) => Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]));
+
+            $hases = [];
+            $files = array_map(function ($file) use (&$hases) {
+                $erp_import_id = 9;
+                $file_arr = explode("_", explode(".", array_reverse(explode("/", $file))[0])[0]);
+                $file_info = [
+                    "sku" => $file_arr[0],
+                    "color_code" => $file_arr[1],
+                    "image_type" => $file_arr[2],
+                    "url" => "{$this->erp_folder}/COLECT.IO/{$file}"
+                ];
+                $hash = md5($erp_import_id.$file_info["sku"].json_encode($file_info));
+                $hases[] = $hash;
+                
+                return [
+                    "erp_import_id" => $erp_import_id,
+                    "sku" => $file_info["sku"],
+                    "value" => $file_info,
+                    "hash" => $hash,
+                    "created_at" => now(),
+                    "updated_at" => now()
+                ];
+            }, $files);
+            
+            $existing_hashes = ErpImportDetail::whereIn("hash", $hases)->get()->pluck("hash")->toArray();
+            $files = array_filter($files, fn ($file) => !in_array($file["hash"], $existing_hashes));
+
+            ErpImportDetail::insert($files);
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
     }
 }

@@ -21,7 +21,14 @@ class ProductImages implements ShouldQueue
 
     public function handle(): void
     {
-        $this->storeImage();
+        if (env("ERP_IMAGE_MIGRATE"))
+        {
+            $this->storeImage();
+        }
+        else
+        {
+            $this->storeFromLocalImage();
+        }
         ErpImport::whereType("productImages")->update(["status" => 1]);
     }
 }
