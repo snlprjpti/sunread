@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Page\Entities\Page;
 use Illuminate\Support\Str;
+use Modules\Core\Entities\Store;
 use Modules\Page\Entities\PageScope;
 
 class PageTest extends BaseTestCase
@@ -30,25 +31,20 @@ class PageTest extends BaseTestCase
     public function getCreateData(): array
     {
         $this->config_fields = config("attributes");
-        $scopes = [];
         $components = [];
 
         for($i = 0; $i < rand(1,2); $i++)
         {
-            $scopes[] = PageScope::factory()->make()->toArray();
-        }
-
-        for($i = 0; $i < rand(1,2); $i++)
-        {
-            $components[] = Arr::random([ "banner", "content" ]);
+            $components[] = Arr::random([ "banner" ]);
         }
 
         $singleItem = [];
         foreach($components as $component)
         {
             $this->attributes = [];
-            $elements = collect($this->config_fields)->where("slug", $component)->pluck("attributes")->first();
+            $elements = collect($this->config_fields)->where("slug", $component)->pluck("groups")->first();
             $this->getAttributes($elements);
+            unset($this->attributes["background-video"]);
             $singleItem[] = [
                 "component" => $component,
                 "attributes" => $this->attributes,
@@ -57,33 +53,45 @@ class PageTest extends BaseTestCase
         }
         
         return array_merge($this->model::factory()->make()->toArray(), [
-            "scopes" => $scopes,
+            "stores" => Store::get()->take(3)->pluck("id")->toArray(),
             "components" => $singleItem
         ]);
     }
 
-    private function getAttributes(array $elements): void
+    private function getAttributes(array $elements, ?string $key = null): void
     {
-        foreach($elements as $element)
+        foreach($elements as $i => &$element)
         {
-            if($element["hasChildren"] == 0)
+            if(!isset($element["type"]))
             {
-                $this->attributes[$element["slug"]] = $this->value($element["type"]);
+                $this->getAttributes($element["attributes"]);
                 continue;
             }
-            $this->getAttributes($element["attributes"]);
+            $append_key = isset($key) ? "$key.{$element["slug"]}" : $element["slug"];
+
+            if($element["hasChildren"] == 0)
+            {
+                setDotToArray($append_key, $this->attributes, $this->value($element));           
+                continue;
+            }  
+            if($element["type"] == "repeater")
+            {
+                $this->getAttributes($element["attributes"], "$append_key.0");
+                continue;     
+            } 
+            $this->getAttributes($element["attributes"], $append_key);
         }
     }
 
-    private function value(string $type): mixed
+    private function value(array $element): mixed
     {
-        switch($type)
+        switch($element["type"])
         {
             case "radio" : 
                 $value = true;
                 break;
 
-            case ($type == "datetime" || $type == "date"):
+            case ($element["type"] == "datetime" || $element["type"] == "date"):
                 $value = now();
                 break;
 
@@ -93,6 +101,10 @@ class PageTest extends BaseTestCase
 
             case "file":
                 $value = UploadedFile::fake()->image('image.jpeg');
+                break;
+
+            case "select":
+                $value = (count($element["options"]) > 0) ? $element["options"][0]["value"] : Str::random(10);
                 break;
 
             default:
