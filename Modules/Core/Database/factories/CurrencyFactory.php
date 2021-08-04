@@ -18,6 +18,7 @@ class CurrencyFactory extends Factory
 
         return [
             "code" => $currency,
+            "erp_code" => $currency,
             "name" => $currency,
             "symbol" => $currency
         ];
