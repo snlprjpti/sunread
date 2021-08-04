@@ -101,7 +101,7 @@ class PageController extends BaseController
 
             $updated = $this->repository->update($data, $id, function($updated) use($data){
                 if(isset($data["stores"])) $this->pageScopeRepository->updateOrCreate($data["stores"], $updated);
-                if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $updated);
+                if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $updated, "update");
             });
         }
         catch (Exception $exception)
