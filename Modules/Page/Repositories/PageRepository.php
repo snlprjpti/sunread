@@ -24,7 +24,7 @@ class PageRepository extends BaseRepository
             "meta_title" => "sometimes|nullable",
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
-            "website_id" => "nullable|exists:websites,id",
+            "website_id" => "required|exists:websites,id",
             "stores" => "required|array",
             "components" => "required|array"
         ];
