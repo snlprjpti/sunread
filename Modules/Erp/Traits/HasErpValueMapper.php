@@ -411,5 +411,4 @@ trait HasErpValueMapper
 	{
 		return ErpImport::where("type", $slug)->first()->erp_import_details()->where("sku", $sku)->get();
 	}
-
 }
