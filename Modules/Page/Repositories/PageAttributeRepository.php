@@ -15,7 +15,8 @@ use Illuminate\Validation\ValidationException;
 class PageAttributeRepository extends BaseRepository
 {
     use Configuration;
-    protected $config_fields, $parent = [], $config_rules = [], $collect_elements = [], $config_types = [];
+    public $config_fields = [];
+    protected $parent = [], $config_rules = [], $collect_elements = [], $config_types = [];
 
     public function __construct(PageAttribute $pageAttribute)
     {
@@ -131,12 +132,12 @@ class PageAttributeRepository extends BaseRepository
         return $default;
     }
 
-    public function show(string $slug, array $values = []): array
+    public function show(string $slug): array
     { 
         $this->parent = [];
 
         $data = collect($this->config_fields)->where("slug", $slug)->first();
-        $this->getChildren($data["groups"], values:$values);
+        $this->getChildren($data["groups"]);
 
         return [
             "title" => $data["title"],
@@ -145,34 +146,25 @@ class PageAttributeRepository extends BaseRepository
         ];        
     }
 
-    private function getChildren(array $elements, ?string $key = null, array $values): void
+    private function getChildren(array $elements, ?string $key = null): void
     {
         foreach($elements as $i => &$element)
         {
             $append_key = isset($key) ? "$key.$i" : $i;
 
+            if(isset($element["type"])) unset($element["rules"]);
+
             if($element["hasChildren"] == 0)
             {
                 if( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
-                unset($element["pluck"], $element["provider"], $element["rules"]);
-
-                if(count($values) > 0)
-                {
-                    $exist = collect($values)->where("slug", $element["slug"])->first();
-                    $element["default"] = $exist ? $exist["value"] : $element["default"];
-                }
+                unset($element["pluck"], $element["provider"]);
 
                 setDotToArray($append_key, $this->parent, $element);           
                 continue;
             }
 
-            if(isset($element["type"]))
-            {
-                unset($element["pluck"], $element["provider"], $element["rules"]);
-            }
-
             setDotToArray($append_key, $this->parent,  $element);           
-            $this->getChildren($element["attributes"], "$append_key.attributes", $values);
+            $this->getChildren($element["attributes"], "$append_key.attributes");
         }
     }
 
@@ -191,7 +183,7 @@ class PageAttributeRepository extends BaseRepository
             if($state == 0) continue;
 
             $rule = ($element["is_required"] == 1) ? "required" : "nullable";
-            if(count($element["options"]) > 0)
+            if(isset($element["options"]) && count($element["options"]) > 0)
             {
                 $options = Arr::pluck($element["options"], "value");
                 $option_str = implode(",", $options);
