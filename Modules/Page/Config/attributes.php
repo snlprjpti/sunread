@@ -53,7 +53,7 @@ return [
                         "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
                         "is_required" => 1
-                    ],
+                    ]
                 ]
             ],
             [
@@ -73,7 +73,7 @@ return [
                         "description" => "Enter top padding in <em>px</em>",
                         "conditions" => [],
                         "rules" => "numeric",
-                        "is_required" => 1                 
+                        "is_required" => 1
                     ],
                     [
                         "title" => "Padding Bottom",
@@ -87,7 +87,7 @@ return [
                         "description" => "Enter bottom padding in <em>px</em>",
                         "conditions" => [],
                         "rules" => "numeric",
-                        "is_required" => 1                 
+                        "is_required" => 1
                     ],
                     [
                         "title" => "Class",
@@ -101,8 +101,8 @@ return [
                         "description" => "",
                         "conditions" => [],
                         "rules" => "",
-                        "is_required" => 1                 
-                    ],
+                        "is_required" => 1
+                    ]
                 ]
             ],
             [
