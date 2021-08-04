@@ -253,14 +253,14 @@ return [
                                 "title" => "Button Label",
                                 "slug" => "button-label",
                                 "hasChildren" => 0,
-                                "type" => "text",
+                                "type" => "file",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
                                 "conditions" => [],
                                 "description" => "",
-                                "rules" => "",
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
                                 "is_required" => 1
                             ],
                             [
@@ -307,15 +307,15 @@ return [
                                 "title" => "Content",
                                 "slug" => "content",
                                 "hasChildren" => 0,
-                                "type" => "text",
+                                "type" => "file",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
                                 "conditions" => [],
                                 "description" => "",
-                                "rules" => "",
-                                "is_required" => 1
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "is_required" => 0
                             ]
                         ]
                     ],
