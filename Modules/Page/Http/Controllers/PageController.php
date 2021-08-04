@@ -42,7 +42,7 @@ class PageController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, [ "page_scopes", "page_attributes" ]);
+            $fetched = $this->repository->fetchAll($request, [ "page_scopes", "page_attributes", "website" ]);
         }
         catch (Exception $exception)
         {

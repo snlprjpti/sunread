@@ -23,6 +23,7 @@ class PageRepository extends BaseRepository
             "meta_title" => "sometimes|nullable",
             "meta_description" => "sometimes|nullable",
             "meta_keywords" => "sometimes|nullable",
+            "website_id" => "nullable|exists:websites,id",
             "stores" => "required|array",
             "components" => "required|array"
         ];
@@ -45,7 +46,7 @@ class PageRepository extends BaseRepository
         try
         {
             $attributes = [];
-            $data = $this->fetch($id, [ "page_scopes", "page_attributes" ]);
+            $data = $this->fetch($id, [ "page_scopes", "page_attributes", "website" ]);
             $components = $data->page_attributes->pluck("attribute")->toArray();
 
             foreach($components as $component)
