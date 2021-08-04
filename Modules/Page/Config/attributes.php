@@ -19,7 +19,7 @@ return [
                         "default" => "",
                         "options" => [],
                         "description" => "",
-						"conditions" => [],
+                        "conditions" => [],
                         "rules" => "",
                         "multiple" => false,
                         "is_required" => 1
@@ -34,7 +34,7 @@ return [
                         "default" => "",
                         "options" => [],
                         "description" => "",
-						"conditions" => [],
+                        "conditions" => [],
                         "rules" => "",
                         "multiple" => false,
                         "is_required" => 1
@@ -49,7 +49,7 @@ return [
                         "default" => "",
                         "options" => [],
                         "description" => "",
-						"conditions" => [],
+                        "conditions" => [],
                         "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
                         "is_required" => 1
@@ -57,8 +57,8 @@ return [
                 ]
             ],
             [
-				"title" => "Style",
-				"slug" => "style",
+                "title" => "Style",
+                "slug" => "style",
                 "hasChildren" => 1,
 				"attributes" => [
 					[
@@ -66,7 +66,7 @@ return [
 						"slug" => "padding-top",
                         "hasChildren" => 0,
 						"type" => "number",
-						"provider" => "",
+                        "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
@@ -94,7 +94,7 @@ return [
 						"slug" => "css-class",
                         "hasChildren" => 0,
 						"type" => "text",
-						"provider" => "",
+                        "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
@@ -106,12 +106,12 @@ return [
 				]
 			],
             [
-				"title" => "Content",
+                "title" => "Content",
 				"slug"	=> "content",
                 "hasChildren" => 1,
 				"attributes" => [
 					[
-						"title" => "Backgroud Type",
+                        "title" => "Backgroud Type",
 						"slug" => "backgroud-type",
                         "hasChildren" => 0,
 						"type" => "select",
@@ -123,13 +123,13 @@ return [
                             [ "value" => "video", "label" => "Video" ]
                         ],
                         "description" => "",
-						"conditions" => [],
+                        "conditions" => [],
                         "rules" => "",
                         "multiple" => false,
 						"is_required" => true
 					],
 					[
-						"title" => "Backgroud Image",
+                        "title" => "Backgroud Image",
 						"slug" => "backgroud-image",
                         "hasChildren" => 0,
 						"type" => "file",
@@ -139,10 +139,10 @@ return [
 						"options" => [],
                         "description" => "",
                         "conditions" => [
-							"operator"	=> "AND",
-							"condition"	=> [
+                            "operator"	=> "AND",
+                            "condition"	=> [
 								[
-									"backgroud-type" => "image",
+                                    "backgroud-type" => "image",
 								]
 							]
 						],
@@ -151,7 +151,7 @@ return [
 						"is_required" => true
 					],
 					[
-						"title" => "Video Type",
+                        "title" => "Video Type",
 						"slug" => "video-type",
                         "hasChildren" => 0,
 						"type" => "select",
@@ -164,7 +164,7 @@ return [
                             [ "value" => "hosted", "label" => "Self Hosted" ]
                         ],
                         "description" => "",
-						"conditions" => [
+                        "conditions" => [
 							"operator"	=> "AND",
 							"condition"	=> [
 								[
@@ -177,7 +177,7 @@ return [
 						"is_required" => true
 					],
 					[
-						"title" => "Video Link",
+                        "title" => "Video Link",
 						"slug" => "video-link",
                         "hasChildren" => 0,
 						"type" => "text",
@@ -203,7 +203,7 @@ return [
 						"is_required" => true
 					],
 					[
-						"title" => "Background Video",
+                        "title" => "Background Video",
 						"slug" => "background-video",
                         "hasChildren" => 0,
 						"type" => "file",
@@ -212,7 +212,7 @@ return [
 						"default" => "",
 						"options" => [],
 						"description" => "",
-						"conditions" => [
+                        "conditions" => [
                             "operator"	=> "AND",
                             "condition"	=> [
                                 [
@@ -226,14 +226,14 @@ return [
 						"is_required" => false
 					],
 					[
-						"title" => "Buttons",
+                        "title" => "Buttons",
 						"slug" => "buttons",
                         "hasChildren" => 1,
 						"type" => "repeater",
                         "provider" => "",
                         "pluck" => [],
 						"default" => "",
-						"options" => [],
+                        "options" => [],
 						"conditions" => [],
 						"description" => "",
                         "rules" => "array",
