@@ -126,9 +126,9 @@ return [
                         "conditions" => [],
                         "rules" => "",
                         "multiple" => false,
-                        "is_required" => 1                 
-					],
-					[
+                        "is_required" => 1
+                    ],
+                    [
                         "title" => "Backgroud Image",
                         "slug" => "backgroud-image",
                         "hasChildren" => 0,
@@ -174,7 +174,7 @@ return [
                         ],
                         "rules" => "",
                         "multiple" => false,
-                        "is_required" => 1                 
+                        "is_required" => 1
                     ],
                     [
                         "title" => "Video Link",
@@ -200,7 +200,7 @@ return [
                             ]
                         ],
                         "rules" => "",
-                        "is_required" => 1                 
+                        "is_required" => 1
                     ],
                     [
                         "title" => "Background Video",
@@ -237,7 +237,7 @@ return [
                         "conditions" => [],
                         "description" => "",
                         "rules" => "array",
-                        "is_required" => 1                 ,
+                        "is_required" => 1,
                         "attributes" => [
                             [
                                 "title" => "Button Link",
@@ -295,7 +295,7 @@ return [
                         "conditions" => [],
                         "description" => "",
                         "rules" => "array",
-                        "is_required" => 1                 ,
+                        "is_required" => 1,
                         "attributes" => [
                             [
                                 "title" => "Title",
@@ -309,7 +309,7 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => 1                 
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Content",
