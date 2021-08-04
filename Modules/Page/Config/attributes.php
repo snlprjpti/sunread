@@ -61,7 +61,7 @@ return [
                 "slug" => "style",
                 "hasChildren" => 1,
                 "attributes" => [
-					[
+                    [
                         "title" => "Padding Top",
                         "slug" => "padding-top",
                         "hasChildren" => 0,
@@ -87,37 +87,37 @@ return [
                         "description" => "Enter bottom padding in <em>px</em>",
                         "conditions" => [],
                         "rules" => "numeric",
-						"is_required" => true
-					],
-					[
+                        "is_required" => true
+                    ],
+                    [
                         "title" => "Class",
-						"slug" => "css-class",
+                        "slug" => "css-class",
                         "hasChildren" => 0,
-						"type" => "text",
+                        "type" => "text",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
                         "description" => "",
-						"conditions" => [],
-						"rules" => "",
-						"is_required" => true
-					],
-				]
-			],
+                        "conditions" => [],
+                        "rules" => "",
+                        "is_required" => true
+                    ],
+                ]
+            ],
             [
                 "title" => "Content",
-				"slug"	=> "content",
+                "slug"	=> "content",
                 "hasChildren" => 1,
-				"attributes" => [
-					[
+                "attributes" => [
+                    [
                         "title" => "Backgroud Type",
-						"slug" => "backgroud-type",
+                        "slug" => "backgroud-type",
                         "hasChildren" => 0,
-						"type" => "select",
+                        "type" => "select",
                         "provider" => "",
                         "pluck" => [],
-						"default" => "image",
+                        "default" => "image",
                         "options" => [ 
                             [ "value" => "image", "label" => "Image" ],
                             [ "value" => "video", "label" => "Video" ]
@@ -126,38 +126,38 @@ return [
                         "conditions" => [],
                         "rules" => "",
                         "multiple" => false,
-						"is_required" => true
-					],
-					[
+                        "is_required" => true
+                    ],
+                    [
                         "title" => "Backgroud Image",
-						"slug" => "backgroud-image",
+                        "slug" => "backgroud-image",
                         "hasChildren" => 0,
-						"type" => "file",
+                        "type" => "file",
                         "provider" => "",
                         "pluck" => [],
-						"default" => "",
-						"options" => [],
+                        "default" => "",
+                        "options" => [],
                         "description" => "",
                         "conditions" => [
                             "operator"	=> "AND",
                             "condition"	=> [
-								[
-                                    "backgroud-type" => "image",
-								]
-							]
-						],
+                                [
+                                    "backgroud-type" => "image"
+                                ]
+                            ]
+                        ],
                         "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
-						"is_required" => true
-					],
-					[
+                        "is_required" => true
+                    ],
+                    [
                         "title" => "Video Type",
-						"slug" => "video-type",
+                        "slug" => "video-type",
                         "hasChildren" => 0,
-						"type" => "select",
+                        "type" => "select",
                         "provider" => "",
                         "pluck" => [],
-						"default" => "",
+                        "default" => "",
                         "options" => [ 
                             [ "value" => "youtube", "label" => "Youtube" ],
                             [ "value" => "vimeo", "label" => "Vimeo" ],
@@ -165,124 +165,124 @@ return [
                         ],
                         "description" => "",
                         "conditions" => [
-							"operator"	=> "AND",
-							"condition"	=> [
-								[
-									"backgroud-type" => "video",
-								]
-							]
-						],
+                            "operator"	=> "AND",
+                            "condition"	=> [
+                                [
+                                    "backgroud-type" => "video"
+                                ]
+                            ]
+                        ],
                         "rules" => "",
                         "multiple" => false,
-						"is_required" => true
-					],
-					[
+                        "is_required" => true
+                    ],
+                    [
                         "title" => "Video Link",
-						"slug" => "video-link",
+                        "slug" => "video-link",
                         "hasChildren" => 0,
-						"type" => "text",
+                        "type" => "text",
                         "provider" => "",
                         "pluck" => [],
-						"default" => "",
+                        "default" => "",
                         "options" => [],
-						"description" => "",
+                        "description" => "",
                         "conditions" => [
-							"operator" => "AND",
-							"condition"	=> [
-								[
-									"backgroud-type" => "video",
-									"video-type" => "youtube",
-								],
-								[
-									"backgroud-type" => "video",
-									"video-type" => "vimeo",
-								]
-							]
-						],	
+                            "operator" => "AND",
+                            "condition"	=> [
+                                [
+                                    "backgroud-type" => "video",
+                                    "video-type" => "youtube"
+                                ],
+                                [
+                                    "backgroud-type" => "video",
+                                    "video-type" => "vimeo"
+                                ]
+                            ]
+                        ],
                         "rules" => "",
-						"is_required" => true
-					],
-					[
+                        "is_required" => true
+                    ],
+                    [
                         "title" => "Background Video",
-						"slug" => "background-video",
+                        "slug" => "background-video",
                         "hasChildren" => 0,
-						"type" => "file",
+                        "type" => "file",
                         "provider" => "",
                         "pluck" => [],
-						"default" => "",
-						"options" => [],
-						"description" => "",
+                        "default" => "",
+                        "options" => [],
+                        "description" => "",
                         "conditions" => [
                             "operator"	=> "AND",
                             "condition"	=> [
                                 [
                                     "backgroud-type" => "video",
-                                    "video-type" => "hosted",
-								],
-							]
-						],
+                                    "video-type" => "hosted"
+                                ]
+                            ]
+                        ],
                         "rules" => "mimes:mp4,x-flv,x-mpegURL,MP2T,3gpp,quicktime,x-msvideo,x-ms-wmv",
                         "multiple" => false,
-						"is_required" => false
-					],
-					[
+                        "is_required" => false
+                    ],
+                    [
                         "title" => "Buttons",
-						"slug" => "buttons",
+                        "slug" => "buttons",
                         "hasChildren" => 1,
-						"type" => "repeater",
+                        "type" => "repeater",
                         "provider" => "",
                         "pluck" => [],
-						"default" => "",
+                        "default" => "",
                         "options" => [],
-						"conditions" => [],
-						"description" => "",
+                        "conditions" => [],
+                        "description" => "",
                         "rules" => "array",
                         "is_required" => true,
-						"attributes" => [
-							[
-								"title" => "Button Link",
-								"slug" => "button-link",
-                                "hasChildren" => 0,
-								"type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-								"default" => "",
-								"options" => [],
-								"conditions" => [],
-								"description" => "",
-                                "rules" => "",
-								"is_required" => true
-							],
+                        "attributes" => [
                             [
-								"title" => "Button Label",
-								"slug" => "button-label",
+                                "title" => "Button Link",
+                                "slug" => "button-link",
                                 "hasChildren" => 0,
-								"type" => "text",
+                                "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
-								"default" => "",
-								"options" => [],
-								"conditions" => [],
-								"description" => "",
+                                "default" => "",
+                                "options" => [],
+                                "conditions" => [],
+                                "description" => "",
                                 "rules" => "",
-								"is_required" => true
-							],
+                                "is_required" => true
+                            ],
                             [
-								"title" => "Button Color",
-								"slug" => "button-color",
+                                "title" => "Button Label",
+                                "slug" => "button-label",
                                 "hasChildren" => 0,
-								"type" => "text",
+                                "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
-								"default" => "",
-								"options" => [],
-								"conditions" => [],
-								"description" => "",
+                                "default" => "",
+                                "options" => [],
+                                "conditions" => [],
+                                "description" => "",
                                 "rules" => "",
-								"is_required" => true
-							]
-						],
-					],
+                                "is_required" => true
+                            ],
+                            [
+                                "title" => "Button Color",
+                                "slug" => "button-color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "conditions" => [],
+                                "description" => "",
+                                "rules" => "",
+                                "is_required" => true
+                            ]
+                        ],
+                    ],
                     [
                         "title" => "Banner Editor",
                         "slug" => "banner-editor",
@@ -290,10 +290,10 @@ return [
                         "type" => "normal",
                         "provider" => "",
                         "pluck" => [],
-						"default" => "",
-						"options" => [],
-						"conditions" => [],
-						"description" => "",
+                        "default" => "",
+                        "options" => [],
+                        "conditions" => [],
+                        "description" => "",
                         "rules" => "array",
                         "is_required" => true,
                         "attributes" => [
@@ -307,7 +307,7 @@ return [
                                 "default" => "",
                                 "options" => [],
                                 "conditions" => [],
-								"description" => "",
+                                "description" => "",
                                 "rules" => "",
                                 "is_required" => 1
                             ],
@@ -321,13 +321,13 @@ return [
                                 "default" => "",
                                 "options" => [],
                                 "conditions" => [],
-								"description" => "",
+                                "description" => "",
                                 "rules" => "",
                                 "is_required" => 1
                             ]
                         ]
                     ],
-				]
+                ]
             ],
             [
                 "title" => "Has Overlay",
@@ -342,7 +342,7 @@ return [
                     [ "value" => 0, "label" => "No" ]
                 ],
                 "description" => "",
-				"conditions" => [],
+                "conditions" => [],
                 "rules" => "boolean",
                 "is_required" => 0
             ]
