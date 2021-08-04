@@ -65,8 +65,11 @@ class PageAttributeRepository extends BaseRepository
             {
                 $all_attributes = [];
 
+                $data = $this->validateData(new Request($component));
+
                 $rules = $this->validateAttribute($component);
-                $data = $this->validateData(new Request($component), $rules);
+                $attribute_request = new Request($component["attributes"]);
+                $data["attributes"] = $attribute_request->validate($rules);
 
                 foreach($data["attributes"] as $slug => $value)
                 {
@@ -163,6 +166,11 @@ class PageAttributeRepository extends BaseRepository
                 continue;
             }
 
+            if(isset($element["type"]))
+            {
+                unset($element["pluck"], $element["provider"], $element["rules"]);
+            }
+
             setDotToArray($append_key, $this->parent,  $element);           
             $this->getChildren($element["attributes"], "$append_key.attributes", $values);
         }
@@ -172,11 +180,15 @@ class PageAttributeRepository extends BaseRepository
     {
         foreach($elements as &$element)
         {
+            $state = 1;
             if(!isset($element["type"])) 
             {
                 $this->getRules($component, $element["attributes"]);
                 continue;
             }
+
+            if(count($element["conditions"]) > 0) $state = $this->checkConditions($element, $component);
+            if($state == 0) continue;
 
             $rule = ($element["is_required"] == 1) ? "required" : "nullable";
             if(count($element["options"]) > 0)
@@ -185,8 +197,7 @@ class PageAttributeRepository extends BaseRepository
                 $option_str = implode(",", $options);
                 $rule = "$rule|in:$option_str";
             }
-
-            $append_key = isset($key) ? "$key.{$element["slug"]}" : "attributes.{$element["slug"]}";
+            $append_key = isset($key) ? "$key.{$element["slug"]}" : "{$element["slug"]}";
             $this->config_rules[$append_key] = "$rule|{$element["rules"]}"; 
             $this->config_types[$element["slug"]] = $element["type"];
 
@@ -204,6 +215,25 @@ class PageAttributeRepository extends BaseRepository
        
             $this->getRules($component, $element["attributes"], $append_key);
         }
+    }
+
+    public function checkConditions(array $element, array $component): int
+    {
+        $state = 0;
+        foreach($element["conditions"]["condition"] as $conditions)
+        {
+            if($state == 1) break;
+            foreach($conditions as $k => $condition)
+            {
+                if($component["attributes"][$k] == $condition) $state = 1;
+                else
+                {
+                    $state = 0;
+                    break;
+                }
+            }
+        } 
+        return $state;     
     }
 
     public function getComponents(): array
