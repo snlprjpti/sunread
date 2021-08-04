@@ -15,6 +15,7 @@ class CurrencyTableSeeder extends Seeder
             [
                 'id' => 1,
                 'code' => 'USD',
+                'erp_code' => 'ENU',
                 'name' => 'US Dollar',
                 'symbol' => '$',
                 'created_at' => now(),
@@ -22,6 +23,7 @@ class CurrencyTableSeeder extends Seeder
             ], [
                 'id' => 2,
                 'code' => 'EUR',
+                'erp_code' => 'EUR',
                 'name' => 'Euro',
                 'symbol' => '€',
                 'created_at' => now(),
