@@ -2,7 +2,6 @@
 
 namespace Modules\Erp\Console;
 
-use Exception;
 use Illuminate\Console\Command;
 use Modules\Erp\Jobs\EanCodes;
 use Modules\Erp\Jobs\ErpAttributeGroups;

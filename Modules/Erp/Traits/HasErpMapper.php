@@ -7,10 +7,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Modules\Erp\Entities\ErpImport;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Modules\Erp\Entities\ErpImportDetail;
-use Modules\Erp\Jobs\ErpImport as JobsErpImport;
 use Modules\Erp\Jobs\FtpToStorage;
 use Modules\Erp\Jobs\ImportErpData;
 
@@ -219,8 +217,10 @@ trait HasErpMapper
         try
         {
             $erp_import_id = ErpImport::whereType("productDescriptions")->first()->id;
+
             $url = "{$this->url}webExtendedTexts(tableName='Item',No='{$sku}',Language_Code='ENU',textNo=1)/Data";
             $response = $this->basicAuth()->get($url);
+
             if ( $response->status() == 200 )
             {
                 $value = json_encode(["description" => $response->body(), "lang" => "ENU"]);

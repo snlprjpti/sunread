@@ -272,8 +272,6 @@ trait HasErpValueMapper
 				ProductImage::updateOrCreate($data);
 			}
 		}
-		
-
 	}
 	
 	// This fn create variants based on parent product
@@ -360,7 +358,6 @@ trait HasErpValueMapper
 
 	private function updateErpDetailStatus(): bool
 	{
-		# code...
+		return false;
 	}
-
 }
