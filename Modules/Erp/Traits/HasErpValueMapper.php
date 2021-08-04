@@ -68,8 +68,11 @@ trait HasErpValueMapper
 
 					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
 					if ($check_variants) $this->createVariants($product, $detail);
+
+					//visibility attribute value
+					$visibility = ($check_variants) ? 5 : 8;
 					
-					ErpMigrateProductAttributeJob::dispatch($product, $detail, false, $check_variants ? 5 : 8);
+					ErpMigrateProductAttributeJob::dispatch($product, $detail, false, $visibility);
 					ErpMigrateProductInventoryJob::dispatch($product, $detail);
 					$detail->update(["status" => 1]);
 				}
