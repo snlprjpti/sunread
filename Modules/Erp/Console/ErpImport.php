@@ -2,7 +2,6 @@
 
 namespace Modules\Erp\Console;
 
-use Exception;
 use Illuminate\Console\Command;
 use Modules\Erp\Jobs\EanCodes;
 use Modules\Erp\Jobs\ErpAttributeGroups;
@@ -23,7 +22,7 @@ class ErpImport extends Command
         parent::__construct();
     }
 
-    public function handle(): void
+    public function handle(): bool
     {
         // Import from API
         ListProducts::dispatch();
@@ -37,5 +36,6 @@ class ErpImport extends Command
         ProductImages::dispatch();
 
         $this->info("All jobs dispatched.");
+        return true;
     }
 }

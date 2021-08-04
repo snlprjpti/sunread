@@ -7,11 +7,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Erp\Traits\HasErpMapper;
+use Modules\Erp\Traits\HasStorageMapper;
 
 class FtpToStorage implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpMapper;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasStorageMapper;
 
     public string $location;
 
@@ -22,6 +22,6 @@ class FtpToStorage implements ShouldQueue
 
     public function handle()
     {
-        $this->storeFtpToLocal($this->location);
+        $this->transferFtpToLocal($this->location);
     }
 }

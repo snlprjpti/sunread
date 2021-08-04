@@ -3,21 +3,16 @@
 namespace Modules\Erp\Traits;
 
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Modules\Erp\Entities\ErpImport;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Modules\Erp\Entities\ErpImportDetail;
-use Modules\Erp\Jobs\ErpImport as JobsErpImport;
-use Modules\Erp\Jobs\FtpToStorage;
 use Modules\Erp\Jobs\ImportErpData;
 
 trait HasErpMapper
 {
     protected $url = "https://bc.sportmanship.se:7148/sportmanshipbctestapi/api/NaviproAB/web/beta/";
-    public $erp_folder = "ERP Product Images";
+    public $erp_folder = "ERP-Product-Images";
 
     private function basicAuth(): object
     {
@@ -83,30 +78,31 @@ trait HasErpMapper
         switch ($type) {
             case 'webAssortments':
                 $token = "{$prepend}'{$data->itemNo}','SR','{$data->colorCode}'";
-                break;
+            break;
             
             case 'listProducts':
                 $token = "{$prepend}'{$data->no}','{$data->webAssortmentWeb_Setup}','{$data->webAssortmentColor_Code}','{$data->languageCode}','{$data->auxiliaryIndex1}','{$data->auxiliaryIndex2}','{$data->auxiliaryIndex3}','{$data->auxiliaryIndex4}'";
-                break;
+            break;
             
             case 'attributeGroups':
                 $token = "{$prepend}'{$data->itemNo}','{$data->sortKey}','{$data->groupCode}','{$data->attributeID}','{$data->name}','{$data->auxiliaryIndex1}'";
-                break;
+            break;
             
             case 'productVariants':
                 $token = "{$prepend}'{$data->pfVerticalComponentCode}','{$data->itemNo}'";
-                break;
+            break;
 
             case 'salePrices':
                 $token = "{$prepend}'{$data->itemNo}','{$data->salesCode}','{$data->currencyCode}','{$data->startingDate}','{$data->salesType}','{$data->minimumQuantity}','{$data->unitofMeasureCode}','{$data->variantCode}'";
-                break;
+            break;
 
             case 'eanCodes':
                 $token = "{$prepend}'{$data->itemNo}','{$data->variantCode}','{$data->unitofMeasure}','{$data->crossReferenceType}','{$data->crossReferenceTypeNo}','{$data->crossReferenceNo}'";
-                break;
+            break;
 
             case 'webInventories':
                 $token = "{$prepend}'{$data->Item_No}','{$data->Code}'";
+            break;
         }
 
         return $token;
@@ -139,81 +135,6 @@ trait HasErpMapper
         return $collection;
     }
 
-    public function storeImage(): bool
-    {
-        try
-        {
-            $ftp_directories = Storage::disk("ftp")->directories();
-            $ftp_files = Storage::disk("ftp")->files("/{$ftp_directories[0]}");
-
-            $ftp_files = array_filter($ftp_files, function ($file) {
-                $file_is_image = Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]);
-                $file_does_not_already_exist = !Storage::exists("{$this->erp_folder}/{$file}");
-
-                if ( !$file_does_not_already_exist ) {
-                    $remote_hash = md5(Storage::disk("ftp")->size($file));
-                    $local_hash = md5(Storage::size("{$this->erp_folder}/{$file}"));
-
-                    $file_does_not_already_exist = $remote_hash !== $local_hash;
-                }
-
-                return $file_is_image && $file_does_not_already_exist;
-            });
-
-            foreach ( $ftp_files as $file )
-            {
-                FtpToStorage::dispatch($file);
-            }
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return true;
-    }
-
-    public function storeFtpToLocal(string $location): void
-    {
-        try
-        {
-            $get_file = Storage::disk("ftp")->get($location);
-            Storage::put("{$this->erp_folder}/{$location}", $get_file);
-            $this->storeFileToDb($location);
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-    }
-
-    public function storeFileToDb(string $location): void
-    {
-        try
-        {
-            $erp_import_id = 9;
-            $file_arr = explode("_", explode(".", explode("/", $location)[1])[0]);
-            $file_info = [
-                "sku" => $file_arr[0],
-                "color_code" => $file_arr[1],
-                "image_type" => $file_arr[2],
-                "url" => "{$this->erp_folder}/{$location}"
-            ];
-            $hash = md5($erp_import_id.$file_info["sku"].json_encode($file_info));
-
-            ErpImportDetail::create([
-                "erp_import_id" => $erp_import_id,
-                "sku" => $file_info["sku"],
-                "value" => json_encode($file_info),
-                "hash" => $hash
-            ]);
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-    }
-
     public function storeDescription(string $sku): bool
     {
         try
@@ -222,14 +143,18 @@ trait HasErpMapper
 
             $url = "{$this->url}webExtendedTexts(tableName='Item',No='{$sku}',Language_Code='ENU',textNo=1)/Data";
             $response = $this->basicAuth()->get($url);
+
             if ( $response->status() == 200 )
             {
                 $value = json_encode(["description" => $response->body(), "lang" => "ENU"]);
-
-                ErpImportDetail::updateOrInsert([
+                $hash = md5($erp_import_id.$sku.json_encode($value));
+                $existing_details = ErpImportDetail::where("hash", $hash)->first();
+                if ( !$existing_details ) return true;
+                ErpImportDetail::insert([
                     "erp_import_id" => $erp_import_id,
                     "sku" => $sku,
-                    "value" => json_encode($value)
+                    "value" => json_encode($value),
+                    "hash" => $hash
                 ]);
             }
         }
