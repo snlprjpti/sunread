@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Event;
 use Modules\Core\Traits\Configuration;
 use Modules\Page\Entities\PageAttribute;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 
 class PageAttributeRepository extends BaseRepository
 {
     use Configuration;
-    protected $config_fields, $parent = [], $attributes = [];
+    protected $config_fields, $parent = [], $config_rules = [], $collect_elements = [], $config_types = [];
 
     public function __construct(PageAttribute $pageAttribute)
     {
@@ -33,28 +34,22 @@ class PageAttributeRepository extends BaseRepository
     {
         try
         {
-            $this->attributes = [];
+            $this->config_rules = [];
+            $this->config_types = [];
 
             $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
             if(!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
 
 
-            $elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("attributes")->first();
-            $this->getAttributes($elements);
-
-            $rules = collect($this->attributes)->mapWithKeys(function($element) {
-                $rule = ($element["is_required"] == 1) ? "required" : "nullable";
-                return [
-                    "attributes.{$element["slug"]}" => "$rule|{$element["rules"]}"
-                ];
-            })->toArray();
+            $this->collect_elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("groups")->first();
+            $this->getRules($component, $this->collect_elements);
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $rules;
+        return $this->config_rules;
     }
 
     public function updateOrCreate(array $components, object $parent):void
@@ -69,26 +64,26 @@ class PageAttributeRepository extends BaseRepository
             foreach($components as $component)
             {
                 $all_attributes = [];
+
                 $rules = $this->validateAttribute($component);
                 $data = $this->validateData(new Request($component), $rules);
 
                 foreach($data["attributes"] as $slug => $value)
                 {
-                    $attributeData = collect($this->attributes)->where("slug", $slug)->first();
-                    $item["slug"] = $slug;
-                    $item["value"] = ($attributeData["type"] == "file" && $value) ? $this->storeScopeImage($value, "page") : $value;
-                    $all_attributes[] = $item;
+                    $type = $this->config_types[$slug];
+                    if(is_array($value) && $type == "repeater") $all_attributes[$slug] = $this->getRepeatorType($value);
+                    if(is_array($value) && $type == "normal") $all_attributes[$slug] = $this->getNormalType($value);
+                    $default = ($type == "file" && $value) ? $this->storeScopeImage($value, "page") : $value;
+                    $all_attributes[$slug] = $default;
                 }
 
                 $input = [
-                    "value" => $all_attributes,
-                    "position" => $data["position"]
-                ];
-                $match = [
                     "page_id" => $parent->id,
-                    "attribute" => $data["component"]
+                    "attribute" => $data["component"],
+                    "position" => isset($data["position"]) ? $data["position"] : null,
+                    "value" => $all_attributes
                 ];
-                $page_attributes[] = $this->model->updateOrCreate($match, $input);
+                $page_attributes[] = isset($component["id"]) ? $this->update($input, $component["id"]) : $this->create($input);
             }
         }
         catch (Exception $exception)
@@ -101,17 +96,49 @@ class PageAttributeRepository extends BaseRepository
         DB::commit();
     }
 
+    private function getRepeatorType(array $repeators): array
+    {
+        $element = [];
+        foreach($repeators as $repeator)
+        {
+            $data = [];
+            foreach($repeator as $slug => $value)
+            {
+                $data[$slug] = $this->getValue($slug, $value);
+            }  
+            $element[] = $data;
+        }
+        return $element;
+    }
+
+    private function getNormalType(array $normals): array
+    {
+        $element = [];       
+        foreach($normals as $slug => $value)
+        {
+            $element[$slug] = $this->getValue($slug, $value);
+        }  
+        return $element;
+    }
+
+    private function getValue(string $slug, mixed $value)
+    {
+        $type = $this->config_types[$slug];
+        $default = ($type == "file" && $value) ? $this->storeScopeImage($value, "page") : $value;  
+        return $default;
+    }
+
     public function show(string $slug, array $values = []): array
     { 
         $this->parent = [];
 
         $data = collect($this->config_fields)->where("slug", $slug)->first();
-        $this->getChildren($data["attributes"], values:$values);
+        $this->getChildren($data["groups"], values:$values);
 
         return [
             "title" => $data["title"],
             "slug" => $data["slug"],
-            "attributes" => $this->parent
+            "groups" => $this->parent
         ];        
     }
 
@@ -141,16 +168,41 @@ class PageAttributeRepository extends BaseRepository
         }
     }
 
-    private function getAttributes(array $elements): void
+    private function getRules(array $component, array $elements, ?string $key = null): void
     {
-        foreach($elements as $element)
+        foreach($elements as &$element)
         {
-            if($element["hasChildren"] == 0)
+            if(!isset($element["type"])) 
             {
-                $this->attributes[] = $element;
+                $this->getRules($component, $element["attributes"]);
                 continue;
             }
-            $this->getAttributes($element["attributes"]);
+
+            $rule = ($element["is_required"] == 1) ? "required" : "nullable";
+            if(count($element["options"]) > 0)
+            {
+                $options = Arr::pluck($element["options"], "value");
+                $option_str = implode(",", $options);
+                $rule = "$rule|in:$option_str";
+            }
+
+            $append_key = isset($key) ? "$key.{$element["slug"]}" : "attributes.{$element["slug"]}";
+            $this->config_rules[$append_key] = "$rule|{$element["rules"]}"; 
+            $this->config_types[$element["slug"]] = $element["type"];
+
+            if($element["hasChildren"] == 0) continue;
+
+            if($element["type"] == "repeater")
+            {
+                $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
+                for( $i=0; $i < $count; $i++ )
+                {
+                    $this->getRules($component, $element["attributes"], "$append_key.$i");
+                } 
+                continue;     
+            } 
+       
+            $this->getRules($component, $element["attributes"], $append_key);
         }
     }
 
