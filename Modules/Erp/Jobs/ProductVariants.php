@@ -7,7 +7,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Erp\Entities\ErpImport;
 use Modules\Erp\Traits\HasErpMapper;
 
 class ProductVariants implements ShouldQueue
@@ -23,6 +22,6 @@ class ProductVariants implements ShouldQueue
 
     public function handle(): void
     {
-        $this->erpImport("productVariants", $this->url."webItemVariants", $this->skip_token);
+        $this->erpImport("productVariants", "{$this->url}webItemVariants", $this->skip_token);
     }
 }

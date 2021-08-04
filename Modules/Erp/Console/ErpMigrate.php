@@ -26,6 +26,7 @@ class ErpMigrate extends Command
         }
 
         ErpMigrateProductJob::dispatch();
+
         $this->info("ERP migration job started.");
         return true;
     }

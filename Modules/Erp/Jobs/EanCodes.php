@@ -7,7 +7,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Erp\Entities\ErpImport;
 use Modules\Erp\Traits\HasErpMapper;
 
 class EanCodes implements ShouldQueue
@@ -23,6 +22,6 @@ class EanCodes implements ShouldQueue
 
     public function handle(): void
     {
-        $this->erpImport("eanCodes", $this->url."webItemCrossReferences", $this->skip_token);
+        $this->erpImport("eanCodes", "{$this->url}webItemCrossReferences", $this->skip_token);
     }
 }

@@ -2,6 +2,7 @@
 namespace Modules\Page\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Core\Entities\Website;
 
 class PageFactory extends Factory
 {
@@ -16,6 +17,7 @@ class PageFactory extends Factory
             "meta_keywords" => $this->faker->name(),
             "meta_description" => $this->faker->paragraph(),
             "position" => $this->faker->randomDigit(),
+            "website_id" => Website::factory()->create()->id,
             "status" => 1
         ];
     }

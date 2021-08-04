@@ -13,5 +13,6 @@
     "Tax": true,
     "Country": true,
     "Inventory": true,
-    "Erp": true
+    "Erp": true,
+    "Cart": true
 }

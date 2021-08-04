@@ -7,7 +7,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Erp\Entities\ErpImport;
 use Modules\Erp\Traits\HasErpMapper;
 
 class ErpAttributeGroups implements ShouldQueue
@@ -23,6 +22,6 @@ class ErpAttributeGroups implements ShouldQueue
 
     public function handle(): void
     {
-        $this->erpImport("attributeGroups", $this->url."webItemAttributeGroups", $this->skip_token);
+        $this->erpImport("attributeGroups", "{$this->url}webItemAttributeGroups", $this->skip_token);
     }
 }
