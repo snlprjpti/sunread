@@ -132,10 +132,10 @@ return [
                         "title" => "Backgroud Image",
                         "slug" => "backgroud-image",
                         "hasChildren" => 0,
-						"type" => "file",
+                        "type" => "file",
                         "provider" => "",
                         "pluck" => [],
-						"default" => "",
+                        "default" => "",
                         "options" => [],
                         "description" => "",
                         "conditions" => [
@@ -148,9 +148,9 @@ return [
                         ],
                         "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
-                        "is_required" => 1                 
-					],
-					[
+                        "is_required" => 1
+                    ],
+                    [
                         "title" => "Video Type",
                         "slug" => "video-type",
                         "hasChildren" => 0,
@@ -185,7 +185,7 @@ return [
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
-						"description" => "",
+                        "description" => "",
                         "conditions" => [
                             "operator" => "AND",
                             "condition"	=> [
@@ -251,10 +251,10 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => 1                 
-							],
+                                "is_required" => 1
+                            ],
                             [
-								"title" => "Button Label",
+                                "title" => "Button Label",
                                 "slug" => "button-label",
                                 "hasChildren" => 0,
                                 "type" => "text",
@@ -265,10 +265,10 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => 1                 
-							],
+                                "is_required" => 1
+                            ],
                             [
-								"title" => "Button Color",
+                                "title" => "Button Color",
                                 "slug" => "button-color",
                                 "hasChildren" => 0,
                                 "type" => "text",
@@ -279,7 +279,7 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => 1                 
+                                "is_required" => 1
                             ]
                         ]
                     ],
@@ -323,11 +323,11 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => 1                 
+                                "is_required" => 1
                             ]
                         ]
                     ],
-				]
+                ]
             ],
             [
                 "title" => "Has Overlay",
