@@ -73,7 +73,7 @@ return [
                         "description" => "Enter top padding in <em>px</em>",
                         "conditions" => [],
                         "rules" => "numeric",
-                        "is_required" => true
+                        "is_required" => 1                 
                     ],
                     [
                         "title" => "Padding Bottom",
@@ -87,7 +87,7 @@ return [
                         "description" => "Enter bottom padding in <em>px</em>",
                         "conditions" => [],
                         "rules" => "numeric",
-                        "is_required" => true
+                        "is_required" => 1                 
                     ],
                     [
                         "title" => "Class",
@@ -101,7 +101,7 @@ return [
                         "description" => "",
                         "conditions" => [],
                         "rules" => "",
-                        "is_required" => true
+                        "is_required" => 1                 
                     ],
                 ]
             ],
@@ -126,16 +126,16 @@ return [
                         "conditions" => [],
                         "rules" => "",
                         "multiple" => false,
-                        "is_required" => true
-                    ],
-                    [
+                        "is_required" => 1                 
+					],
+					[
                         "title" => "Backgroud Image",
                         "slug" => "backgroud-image",
                         "hasChildren" => 0,
-                        "type" => "file",
+						"type" => "file",
                         "provider" => "",
                         "pluck" => [],
-                        "default" => "",
+						"default" => "",
                         "options" => [],
                         "description" => "",
                         "conditions" => [
@@ -148,9 +148,9 @@ return [
                         ],
                         "rules" => "mimes:jpeg,jpg,bmp,png",
                         "multiple" => false,
-                        "is_required" => true
-                    ],
-                    [
+                        "is_required" => 1                 
+					],
+					[
                         "title" => "Video Type",
                         "slug" => "video-type",
                         "hasChildren" => 0,
@@ -174,7 +174,7 @@ return [
                         ],
                         "rules" => "",
                         "multiple" => false,
-                        "is_required" => true
+                        "is_required" => 1                 
                     ],
                     [
                         "title" => "Video Link",
@@ -185,7 +185,7 @@ return [
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
-                        "description" => "",
+						"description" => "",
                         "conditions" => [
                             "operator" => "AND",
                             "condition"	=> [
@@ -200,7 +200,7 @@ return [
                             ]
                         ],
                         "rules" => "",
-                        "is_required" => true
+                        "is_required" => 1                 
                     ],
                     [
                         "title" => "Background Video",
@@ -223,7 +223,7 @@ return [
                         ],
                         "rules" => "mimes:mp4,x-flv,x-mpegURL,MP2T,3gpp,quicktime,x-msvideo,x-ms-wmv",
                         "multiple" => false,
-                        "is_required" => false
+                        "is_required" => 0              
                     ],
                     [
                         "title" => "Buttons",
@@ -237,7 +237,7 @@ return [
                         "conditions" => [],
                         "description" => "",
                         "rules" => "array",
-                        "is_required" => true,
+                        "is_required" => 1                 ,
                         "attributes" => [
                             [
                                 "title" => "Button Link",
@@ -251,10 +251,10 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => true
-                            ],
+                                "is_required" => 1                 
+							],
                             [
-                                "title" => "Button Label",
+								"title" => "Button Label",
                                 "slug" => "button-label",
                                 "hasChildren" => 0,
                                 "type" => "text",
@@ -265,10 +265,10 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => true
-                            ],
+                                "is_required" => 1                 
+							],
                             [
-                                "title" => "Button Color",
+								"title" => "Button Color",
                                 "slug" => "button-color",
                                 "hasChildren" => 0,
                                 "type" => "text",
@@ -279,9 +279,9 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => true
+                                "is_required" => 1                 
                             ]
-                        ],
+                        ]
                     ],
                     [
                         "title" => "Banner Editor",
@@ -295,7 +295,7 @@ return [
                         "conditions" => [],
                         "description" => "",
                         "rules" => "array",
-                        "is_required" => true,
+                        "is_required" => 1                 ,
                         "attributes" => [
                             [
                                 "title" => "Title",
@@ -309,13 +309,13 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => 1
+                                "is_required" => 1                 
                             ],
                             [
                                 "title" => "Content",
                                 "slug" => "content",
                                 "hasChildren" => 0,
-                                "type" => "textarea",
+                                "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
@@ -323,11 +323,11 @@ return [
                                 "conditions" => [],
                                 "description" => "",
                                 "rules" => "",
-                                "is_required" => 1
+                                "is_required" => 1                 
                             ]
                         ]
                     ],
-                ]
+				]
             ],
             [
                 "title" => "Has Overlay",
