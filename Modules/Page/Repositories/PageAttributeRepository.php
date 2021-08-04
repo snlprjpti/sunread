@@ -89,6 +89,7 @@ class PageAttributeRepository extends BaseRepository
                 ];
                 $page_attributes[] = isset($component["id"]) ? $this->update($input, $component["id"]) : $this->create($input);
             }
+            $parent->page_attributes()->whereNotIn('id', array_filter(Arr::pluck($page_attributes, 'id')))->delete();
         }
         catch (Exception $exception)
         {
