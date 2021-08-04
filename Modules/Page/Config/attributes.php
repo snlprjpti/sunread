@@ -62,7 +62,7 @@ return [
                 "hasChildren" => 1,
 				"attributes" => [
 					[
-						"title" => "Padding Top",
+                        "title" => "Padding Top",
 						"slug" => "padding-top",
                         "hasChildren" => 0,
 						"type" => "number",
@@ -76,7 +76,7 @@ return [
 						"is_required" => true
 					],
 					[
-						"title" => "Padding Bottom",
+                        "title" => "Padding Bottom",
 						"slug" => "padding-bottom",
                         "hasChildren" => 0,
 						"type" => "number",
@@ -90,7 +90,7 @@ return [
 						"is_required" => true
 					],
 					[
-						"title" => "Class",
+                        "title" => "Class",
 						"slug" => "css-class",
                         "hasChildren" => 0,
 						"type" => "text",
@@ -137,7 +137,7 @@ return [
                         "pluck" => [],
 						"default" => "",
 						"options" => [],
-						"description" => "",
+                        "description" => "",
                         "conditions" => [
 							"operator"	=> "AND",
 							"condition"	=> [
@@ -163,7 +163,7 @@ return [
                             [ "value" => "vimeo", "label" => "Vimeo" ],
                             [ "value" => "hosted", "label" => "Self Hosted" ]
                         ],
-						"description" => "",
+                        "description" => "",
 						"conditions" => [
 							"operator"	=> "AND",
 							"condition"	=> [
@@ -186,7 +186,7 @@ return [
 						"default" => "",
                         "options" => [],
 						"description" => "",
-						"conditions" => [
+                        "conditions" => [
 							"operator" => "AND",
 							"condition"	=> [
 								[
@@ -213,11 +213,11 @@ return [
 						"options" => [],
 						"description" => "",
 						"conditions" => [
-							"operator"	=> "AND",
-							"condition"	=> [
-								[
-									"backgroud-type" => "video",
-									"video-type" => "hosted",
+                            "operator"	=> "AND",
+                            "condition"	=> [
+                                [
+                                    "backgroud-type" => "video",
+                                    "video-type" => "hosted",
 								],
 							]
 						],
