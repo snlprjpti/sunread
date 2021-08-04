@@ -60,33 +60,33 @@ return [
                 "title" => "Style",
                 "slug" => "style",
                 "hasChildren" => 1,
-				"attributes" => [
+                "attributes" => [
 					[
                         "title" => "Padding Top",
-						"slug" => "padding-top",
+                        "slug" => "padding-top",
                         "hasChildren" => 0,
-						"type" => "number",
+                        "type" => "number",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
                         "description" => "Enter top padding in <em>px</em>",
-						"conditions" => [],
-						"rules" => "numeric",
-						"is_required" => true
-					],
-					[
+                        "conditions" => [],
+                        "rules" => "numeric",
+                        "is_required" => true
+                    ],
+                    [
                         "title" => "Padding Bottom",
-						"slug" => "padding-bottom",
+                        "slug" => "padding-bottom",
                         "hasChildren" => 0,
-						"type" => "number",
+                        "type" => "number",
                         "provider" => "",
                         "pluck" => [],
                         "default" => "",
                         "options" => [],
                         "description" => "Enter bottom padding in <em>px</em>",
-						"conditions" => [],
-						"rules" => "numeric",
+                        "conditions" => [],
+                        "rules" => "numeric",
 						"is_required" => true
 					],
 					[
