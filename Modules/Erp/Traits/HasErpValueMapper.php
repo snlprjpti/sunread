@@ -4,13 +4,14 @@ namespace Modules\Erp\Traits;
 
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Modules\Erp\Entities\ErpImport;
 use Modules\Product\Entities\Product;
 use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeOption;
 use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
+use Modules\Attribute\Entities\AttributeOption;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
@@ -36,7 +37,7 @@ trait HasErpValueMapper
 		"Ean Code"
 	];
 
-	public function importAll(): bool
+	public function importAll(): void
 	{
 		try
 		{
@@ -47,24 +48,20 @@ trait HasErpValueMapper
 			{
 				foreach ( $chunk as $detail )
 				{
-					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" && $detail->status == 1) continue;
-		
+					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" && $detail->status == 1 ) continue;
 					$type = ($erp_details->where("sku", $detail->sku)->count() > 1) ? "configurable" : "simple";
-					
-					$product_data = [
+
+                    $match = [
+                        "website_id" => 1,
+						"sku" => $detail->sku
+                    ];
+                    $product_data = array_merge($match, [
 						"attribute_set_id" => 1,
-						"website_id" => 1,
-						"sku" => $detail->sku,
 						"type" => $type,
-					];
-		
-					$match = [
-						"website_id" => 1,
-						"sku" => $detail->sku,
-					];
+					]);
 		
 					$product = Product::updateOrCreate($match, $product_data);
-					ErpMigrateProductImageJob::dispatch($product, $detail);
+                    ErpMigrateProductImageJob::dispatch($product, $detail);
 
 					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
 					if ($check_variants) $this->createVariants($product, $detail);
@@ -82,11 +79,9 @@ trait HasErpValueMapper
 		{
 			throw $exception;
 		}
-
-		return true;
 	}
 
-	private function createAttributeValue(object $product, object $erp_product_iteration, bool $ean_code_value = true, int $visibility = 8, mixed $variant = null): bool
+	private function createAttributeValue(object $product, object $erp_product_iteration, bool $ean_code_value = true, int $visibility = 8, mixed $variant = null): void
 	{
 		try
 		{
@@ -94,12 +89,10 @@ trait HasErpValueMapper
 			$ean_code = $this->getDetailCollection("eanCodes", $erp_product_iteration->sku);
 			$variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
 
-			if ( $ean_code_value )
-			{
+			if ( $ean_code_value ) {
 				$pluck_code = $this->getValue($variants)->first()["code"];
 				$ean_code_value = $this->getValue($ean_code)->where("variantCode", $pluck_code)->first()["crossReferenceNo"] ?? "";
-			}
-			else{
+			} else {
 				$ean_code_value = $this->getValue($ean_code)->first()["crossReferenceNo"] ?? "";
 			}
 
@@ -145,7 +138,7 @@ trait HasErpValueMapper
 				],
 				[
 					"attribute_id" => 17,
-					"value" => \Str::limit($description, 100), 
+					"value" => Str::limit($description, 100), 
 				],
 				[
 					"attribute_id" => 19,
@@ -204,15 +197,11 @@ trait HasErpValueMapper
 
 				ProductAttribute::updateOrCreate($match, $product_attribute_data);
 			}
-
 		}
 		catch ( Exception $exception )
 		{
 			throw $exception;
 		}
-
-		return true;
-
 	}
 
 	private function getAttributeOptionValue(object $erp_product_iteration, string $attribute_slug): bool
@@ -262,7 +251,7 @@ trait HasErpValueMapper
 			if ( $attribute_groups->count() > 1 )
 			{
 				$this->getValue($attribute_groups, function ($value) use (&$attach_value, $attribute_name) {
-					if ( $value["attributetype"] == $attribute_name ) $attach_value .= \Str::finish($value["description"], ".\r\n ");
+					if ( $value["attributetype"] == $attribute_name ) $attach_value .= Str::finish($value["description"], ".\r\n ");
 				});
 			}
 		}
@@ -291,7 +280,7 @@ trait HasErpValueMapper
 		return $data;
 	}
 
-	private function mapstoreImages( object $product, object $erp_product_iteration, array $variant = [] )
+	private function mapstoreImages( object $product, object $erp_product_iteration, array $variant = [] ): void
 	{
 		$product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
 		$images = $this->getValue($product_images, function ($value) {
@@ -331,7 +320,7 @@ trait HasErpValueMapper
 	}
 	
 	// This fn create variants based on parent product
-	private function createVariants( object $product, object $erp_product_iteration )
+	private function createVariants( object $product, object $erp_product_iteration ): void
 	{
 		try
 		{
@@ -369,11 +358,9 @@ trait HasErpValueMapper
 		{
 			throw $exception;
 		}
-
-		return true;
 	}
 
-	private function createInventory(object $product, object $erp_product_iteration): bool
+	private function createInventory(object $product, object $erp_product_iteration): void
 	{
 		try
 		{
@@ -403,8 +390,6 @@ trait HasErpValueMapper
 		{
 			throw $exception;
 		}
-
-		return true;
 	}
 
 	private function getDetailCollection(string $slug, string $sku): Collection
