@@ -250,8 +250,8 @@ return [
                                 "is_required" => 1
                             ],
                             [
-                                "title" => "Button Label",
-                                "slug" => "button-label",
+                                "title" => "Button Image",
+                                "slug" => "button-image",
                                 "hasChildren" => 0,
                                 "type" => "file",
                                 "provider" => "",
@@ -304,8 +304,8 @@ return [
                                 "is_required" => 1
                             ],
                             [
-                                "title" => "Content",
-                                "slug" => "content",
+                                "title" => "Content Image",
+                                "slug" => "content-image",
                                 "hasChildren" => 0,
                                 "type" => "file",
                                 "provider" => "",
