@@ -4,6 +4,8 @@ namespace Modules\Category\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Modules\Category\Entities\Category;
+use Modules\Category\Entities\CategoryValue;
 
 class CategoryValueTableSeeder extends Seeder
 {
@@ -14,7 +16,9 @@ class CategoryValueTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('category_values')->insert([
+        $category = Category::inRandomOrder()->first();
+        dd($category);
+        $category_values = [
             [
                 "category_id" => 1,
                 "scope" => "website",
@@ -96,6 +100,10 @@ class CategoryValueTableSeeder extends Seeder
                 "created_at" => now(),
                 "updated_at" => now()
             ],
-        ]);
+        ];
+        foreach($category_values as $category_value)
+        {
+            CategoryValue::create($category_value);
+        }
     }
 }
