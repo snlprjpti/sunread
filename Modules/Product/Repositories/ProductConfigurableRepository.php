@@ -140,13 +140,13 @@ class ProductConfigurableRepository extends BaseRepository
                     [
                         // Attrubute name
                         "attribute_slug" => "name",
-                        "value" => $product->sku."-variant-".implode("-", $permutation_modify),
+                        "value" => $product->sku."-".implode("-", $permutation_modify),
                         "value_type" => "Modules\Product\Entities\ProductAttributeString"
                     ],
                     [
                         //Attribute slug
                         "attribute_slug" => "sku",
-                        "value" => Str::slug($product->sku)."-variant-".implode("-", $permutation_modify),
+                        "value" => Str::slug($product->sku)."-".implode("-", $permutation_modify),
                         "value_type" => "Modules\Product\Entities\ProductAttributeString"
                     ]
                 ], $productAttributes, $variant_options);
