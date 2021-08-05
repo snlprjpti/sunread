@@ -53,7 +53,7 @@ class PageTest extends BaseTestCase
         }
         
         return array_merge($this->model::factory()->make()->toArray(), [
-            "stores" => Store::get()->take(3)->pluck("id")->toArray(),
+            "stores" => [0],
             "components" => $singleItem
         ]);
     }
