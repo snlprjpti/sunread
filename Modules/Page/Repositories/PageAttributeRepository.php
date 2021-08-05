@@ -39,7 +39,7 @@ class PageAttributeRepository extends BaseRepository
             $this->config_types = [];
 
             $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
-            if(!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
+            if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
 
 
             $this->collect_elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("groups")->first();
@@ -78,8 +78,8 @@ class PageAttributeRepository extends BaseRepository
                 {
                     $type = $this->config_types[$slug];
                     
-                    if(is_array($value) && $type == "repeater") $all_attributes[$slug] = $this->getRepeatorType($value, $slug);
-                    elseif(is_array($value) && $type == "normal") $all_attributes[$slug] = $this->getNormalType($value, $slug);
+                    if (is_array($value) && $type == "repeater") $all_attributes[$slug] = $this->getRepeatorType($value, $slug);
+                    elseif (is_array($value) && $type == "normal") $all_attributes[$slug] = $this->getNormalType($value, $slug);
                     else $all_attributes[$slug] = $this->getValue($type, $value, $slug);
                 }
 
@@ -105,44 +105,77 @@ class PageAttributeRepository extends BaseRepository
 
     private function getRepeatorType(array $repeators, string $parent_slug): array
     {
-        $element = [];
-        foreach($repeators as $i => $repeator)
+        try
         {
-            $data = [];
-            foreach($repeator as $slug => $value)
+            $element = [];
+            foreach($repeators as $i => $repeator)
             {
-                $append_key = "$parent_slug.$i.$slug";
-                $type = $this->config_types[$slug];
-                $data[$slug] = $this->getValue($type, $value, $append_key);
-            }  
-            $element[] = $data;
+                $data = [];
+                foreach($repeator as $slug => $value)
+                {
+                    $append_key = "$parent_slug.$i.$slug";
+                    $type = $this->config_types[$slug];
+                    $data[$slug] = $this->getValue($type, $value, $append_key);
+                }  
+                $element[] = $data;
+            }
         }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
         return $element;
     }
 
     private function getNormalType(array $normals, string $parent_slug): array
     {
-        $element = [];       
-        foreach($normals as $slug => $value)
+        try
         {
-            $type = $this->config_types[$slug];
-            $element[$slug] = $this->getValue($type, $value, "$parent_slug.$slug");
-        }  
+            $element = [];       
+            foreach($normals as $slug => $value)
+            {
+                $type = $this->config_types[$slug];
+                $element[$slug] = $this->getValue($type, $value, "$parent_slug.$slug");
+            } 
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
         return $element;
     }
 
     private function getValue(string $type, mixed $value, string $slug): mixed
     {
-        if($global_value = getDotToArray($slug, $this->parent)) return $global_value;
-        return ($type == "file" && $value && is_file($value)) ? $this->storeScopeImage($value, "page") : $value;  
+        try
+        {
+            if ($global_value = getDotToArray($slug, $this->parent)) return $global_value;
+            $default = ($type == "file" && $value && is_file($value)) ? $this->storeScopeImage($value, "page") : $value; 
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        } 
+
+        return $default;
     }
 
     public function show(string $slug): array
     { 
-        $this->parent = [];
+        try
+        {
+            $this->parent = [];
 
-        $data = collect($this->config_fields)->where("slug", $slug)->first();
-        $this->getChildren($data["groups"]);
+            $data = collect($this->config_fields)->where("slug", $slug)->first();
+            $this->getChildren($data["groups"]);
+
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
         return [
             "title" => $data["title"],
@@ -159,11 +192,10 @@ class PageAttributeRepository extends BaseRepository
             {
                 $append_key = isset($key) ? "$key.$i" : $i;
 
-                if(isset($element["type"])) unset($element["rules"]);
+                if (isset($element["type"])) unset($element["rules"]);
 
-                if($element["hasChildren"] == 0)
-                {
-                    if( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
+                if ($element["hasChildren"] == 0) {
+                    if ( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
                     unset($element["pluck"], $element["provider"]);
 
                     setDotToArray($append_key, $this->parent, $element);           
@@ -187,18 +219,17 @@ class PageAttributeRepository extends BaseRepository
             foreach($elements as &$element)
             {
                 $state = 1;
-                if(!isset($element["type"])) 
+                if (!isset($element["type"])) 
                 {
                     $this->getRules($component, $element["attributes"], method:$method);
                     continue;
                 }
 
-                if(count($element["conditions"]) > 0) $state = $this->checkConditions($element, $component);
-                if($state == 0) continue;
+                if (count($element["conditions"]) > 0) $state = $this->checkConditions($element, $component);
+                if ($state == 0) continue;
 
                 $rule = ($element["is_required"] == 1) ? "required" : "nullable";
-                if(isset($element["options"]) && count($element["options"]) > 0)
-                {
+                if (isset($element["options"]) && count($element["options"]) > 0) {
                     $options = Arr::pluck($element["options"], "value");
                     $option_str = implode(",", $options);
                     $rule = "$rule|in:$option_str";
@@ -209,12 +240,11 @@ class PageAttributeRepository extends BaseRepository
                 $this->config_rules[$append_key] = "$rule|{$element["rules"]}"; 
                 $this->config_types[$element["slug"]] = $element["type"];
 
-                if($method == "update" && isset($component["id"]) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
+                if ($method == "update" && isset($component["id"]) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
 
-                if($element["hasChildren"] == 0) continue;
+                if ($element["hasChildren"] == 0) continue;
 
-                if($element["type"] == "repeater")
-                {
+                if ($element["type"] == "repeater") {
                     $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
                     for( $i=0; $i < $count; $i++ )
                     {
@@ -239,11 +269,9 @@ class PageAttributeRepository extends BaseRepository
             $exist_component = $this->model->findOrFail($component["id"]);
             $exist_values = $exist_component->value;
             $request_element_value = getDotToArray("attributes.$append_key", $component);
-            if($request_element_value && !is_file($request_element_value)) 
-            {
+            if ($request_element_value && !is_file($request_element_value)) {
                 $db_value = getDotToArray($append_key, $exist_values);
-                if($db_value)
-                {
+                if ($db_value) {
                     $this->config_rules[$append_key] = "";
                     setDotToArray($append_key, $this->parent, $db_value);  
                 }
@@ -257,31 +285,46 @@ class PageAttributeRepository extends BaseRepository
 
     public function checkConditions(array $element, array $component): int
     {
-        $state = 0;
-        foreach($element["conditions"]["condition"] as $conditions)
+        try
         {
-            if($state == 1) break;
-            foreach($conditions as $k => $condition)
+            $state = 0;
+            foreach($element["conditions"]["condition"] as $conditions)
             {
-                if(isset($component["attributes"][$k]) && $component["attributes"][$k] == $condition) $state = 1;
-                else
+                if ($state == 1) break;
+                foreach($conditions as $k => $condition)
                 {
-                    $state = 0;
-                    break;
+                    if (isset($component["attributes"][$k]) && $component["attributes"][$k] == $condition) $state = 1;
+                    else {
+                        $state = 0;
+                        break;
+                    }
                 }
             }
-        } 
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }  
+
         return $state;     
     }
 
     public function getComponents(): array
     {
-        $component = [];
-        foreach($this->config_fields as $field)
+        try
         {
-            unset($field["attributes"]);
-            $component[] = $field;
+            $component = [];
+            foreach($this->config_fields as $field)
+            {
+                unset($field["groups"]);
+                $component[] = $field;
+            }
         }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }  
+
         return $component;
     }
 }
