@@ -353,8 +353,8 @@ return [
         "usp_banner_3_second_image" => "usp_banner_3.elements.1",,
         "usp_banner_3_third_image" => "usp_banner_3.elements.2",,
         "usp_banner_3_placement" => "usp_banner_3.elements.3",,       
-        "meta_title" => "search_engine_optimization.elements.1",
-        "meta_keywords" => "search_engine_optimization.elements.2",
-        "meta_description" => "search_engine_optimization.elements.3"
+        "meta_title" => "search_engine_optimization.elements.0",
+        "meta_keywords" => "search_engine_optimization.elements.1",
+        "meta_description" => "search_engine_optimization.elements.2"
     ]
 ];
