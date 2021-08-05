@@ -13,6 +13,8 @@ use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Erp\Entities\ErpImportDetail;
+use Modules\Erp\Jobs\Mapper\ErpDetailStatusUpdate;
+use Modules\Erp\Jobs\Mapper\ErpGenerateVariantProductJob;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
@@ -49,7 +51,9 @@ trait HasErpValueMapper
 			{
 				foreach ( $chunk as $detail )
 				{
-					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" && $detail->status == 1 ) continue;
+					if ( $detail->status == 1 ) continue;
+
+					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" ) continue;
 
 					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
 					$type = ($check_variants) ? "configurable" : "simple";
@@ -66,15 +70,14 @@ trait HasErpValueMapper
 					$product = Product::updateOrCreate($match, $product_data);
                     ErpMigrateProductImageJob::dispatch($product, $detail);
 
-					if ($check_variants) $this->createVariants($product, $detail);
+					if ($check_variants) ErpGenerateVariantProductJob::dispatch($product, $detail);
 
 					//visibility attribute value
 					$visibility = ($check_variants) ? 5 : 8;
 					
 					ErpMigrateProductAttributeJob::dispatch($product, $detail, false, $visibility);
 					ErpMigrateProductInventoryJob::dispatch($product, $detail);
-
-					ErpImportDetail::whereId($detail->id)->update(["status" => 1]);
+					ErpDetailStatusUpdate::dispatch($detail->id);
 				}
 			}
 		}
