@@ -10,6 +10,8 @@ use Modules\Erp\Jobs\FtpToStorage;
 
 trait HasStorageMapper
 {
+    public $erp_folder = "ERP-Product-Images";
+
     public function storeFromFtpImage(): void
     {
         try

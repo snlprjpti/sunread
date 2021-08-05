@@ -12,7 +12,6 @@ use Modules\Erp\Jobs\ImportErpData;
 trait HasErpMapper
 {
     protected $url = "https://bc.sportmanship.se:7148/sportmanshipbctestapi/api/NaviproAB/web/beta/";
-    public $erp_folder = "ERP-Product-Images";
 
     private function basicAuth(): object
     {
