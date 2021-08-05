@@ -12,6 +12,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
+use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
@@ -49,7 +50,7 @@ trait HasErpValueMapper
 				foreach ( $chunk as $detail )
 				{
 					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" && $detail->status == 1 ) continue;
-					
+
 					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
 					$type = ($check_variants) ? "configurable" : "simple";
 
@@ -72,7 +73,8 @@ trait HasErpValueMapper
 					
 					ErpMigrateProductAttributeJob::dispatch($product, $detail, false, $visibility);
 					ErpMigrateProductInventoryJob::dispatch($product, $detail);
-					$detail->update(["status" => 1]);
+
+					ErpImportDetail::whereId($detail->id)->update(["status" => 1]);
 				}
 			}
 		}
