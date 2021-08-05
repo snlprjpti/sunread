@@ -285,7 +285,7 @@ class ProductRepository extends BaseRepository
         return false;
     }
 
-    public function getParentScope(array $scope)
+    public function getParentScope(array $scope): array
     {
         try
         {
@@ -306,7 +306,7 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-        
+
         return $data;
     }
 
