@@ -27,6 +27,7 @@ use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
+use Modules\Product\Rules\WebsiteWiseScopeRule;
 
 class ProductRepository extends BaseRepository
 {
@@ -283,6 +284,44 @@ class ProductRepository extends BaseRepository
         if($scope == "channel" && in_array($element_scope, ["website"])) return true;
         if($scope == "store" && in_array($element_scope, ["website", "channel"])) return true;
         return false;
+    }
+
+    public function product_attribute_data(int $id, object $request): array
+    {
+        try
+        {
+            $product = $this->model::findOrFail($id);
+
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+            ]);
+    
+            $scope = [
+                "scope" => $request->scope ?? "website",
+                "scope_id" => $request->scope_id ??  $product->website_id,
+            ];
+    
+            $fetched = [];
+            $fetched = [
+                "parent_id" => $product->id,
+                "website_id" => $product->website_id
+            ];
+            $fetched["attributes"] = $this->getData($id, $scope);
+            $fetched["configurable_attributes"] = $product->attribute_configurable_products->map(function ($configurable_attribute) {
+                return [
+                    "product_id" => $configurable_attribute->product_id,
+                    "attribute_id" => $configurable_attribute->attribute_id,
+                    "attribute_option_id" => $configurable_attribute->attribute_option_id
+                ];
+            })->toArray();
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+        
+        return $fetched;
     }
 
     public function getData(int $id, array $scope): array

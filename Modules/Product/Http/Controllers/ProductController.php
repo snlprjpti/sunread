@@ -208,23 +208,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $product = $this->model::findOrFail($id);
-            $request->validate([
-                "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
-            ]);
-
-            $scope = [
-                "scope" => $request->scope ?? "website",
-                "scope_id" => $request->scope_id ??  $product->website_id,
-            ];
-
-            $fetched = [];
-            $fetched = [
-                "parent_id" => $product->id,
-                "website_id" => $product->website_id
-            ];
-            $fetched["attributes"] = $this->repository->getData($id, $scope);
+            $fetched = $this->repository->product_attribute_data($id, $request);
         }
         catch( Exception $exception )
         {
