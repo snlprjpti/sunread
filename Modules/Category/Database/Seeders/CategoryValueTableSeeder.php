@@ -3,8 +3,6 @@
 namespace Modules\Category\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
 
 class CategoryValueTableSeeder extends Seeder
@@ -16,8 +14,6 @@ class CategoryValueTableSeeder extends Seeder
      */
     public function run()
     {
-        $category = Category::inRandomOrder()->first();
-        dd($category);
         $category_values = [
             [
                 "category_id" => 1,
