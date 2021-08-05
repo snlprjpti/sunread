@@ -330,8 +330,8 @@ return [
     "absolute_path" => [
         "name" => "general.elements.0",
         "slug" => "general.elements.1",
-        "status" => "general.elements.1",
-        "include_in_menu" => "general.elements.2",
+        "status" => "general.elements.2",
+        "include_in_menu" => "general.elements.3",
         "image" => "content.elements.0",
         "description" => "content.elements.1",
         "background_type" => "hero_banner.elements.0",
