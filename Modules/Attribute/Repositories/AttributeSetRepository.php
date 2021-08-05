@@ -67,7 +67,7 @@ class AttributeSetRepository extends BaseRepository
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required,
                             "value" => $attribute->default_value,
-                            "is_user_defined" => $attribute->is_user_defined
+                            "is_user_defined" => (bool) $attribute->is_user_defined
                         ];
 
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
