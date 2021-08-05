@@ -58,17 +58,17 @@ trait HasErpValueMapper
 					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
 					$type = ($check_variants) ? "configurable" : "simple";
 
-                    $match = [
-                        "website_id" => 1,
+					$match = [
+						"website_id" => 1,
 						"sku" => $detail->sku
-                    ];
-                    $product_data = array_merge($match, [
+					];
+					$product_data = array_merge($match, [
 						"attribute_set_id" => 1,
 						"type" => $type,
 					]);
 		
 					$product = Product::updateOrCreate($match, $product_data);
-                    ErpMigrateProductImageJob::dispatch($product, $detail);
+					ErpMigrateProductImageJob::dispatch($product, $detail);
 
 					if ($check_variants) ErpGenerateVariantProductJob::dispatch($product, $detail);
 
@@ -109,13 +109,13 @@ trait HasErpValueMapper
 			$price = $this->getDetailCollection("salePrices", $erp_product_iteration->sku);
 			$price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->first() ?? ["unitPrice" => 0.0] : ["unitPrice" => 0.0];
 
-            // Condition for invalid date/times
-            $max_time = strtotime("2030-12-28");
-            $start_time = abs(strtotime($price_value["startingDate"]));
-            $end_time = abs(strtotime($price_value["endingDate"]));
+			// Condition for invalid date/times
+			$max_time = strtotime("2030-12-28");
+			$start_time = abs(strtotime($price_value["startingDate"]));
+			$end_time = abs(strtotime($price_value["endingDate"]));
 
-            $start_time = $start_time < $max_time ? $start_time : $max_time - 1;
-            $end_time = $end_time < $max_time ? $end_time : $max_time;
+			$start_time = $start_time < $max_time ? $start_time : $max_time - 1;
+			$end_time = $end_time < $max_time ? $end_time : $max_time;
 
 			$attribute_data = [
 				[
@@ -190,7 +190,7 @@ trait HasErpValueMapper
 				$attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 				$value = $attribute_type::create(["value" => $attributeData["value"]]);
 
-                $product_attribute_data = [
+				$product_attribute_data = [
 					"attribute_id" => $attribute->id,
 					"product_id"=> $product->id,
 					"value_type" => $attribute_type,
@@ -198,8 +198,8 @@ trait HasErpValueMapper
 					"scope" => "website",
 					"scope_id" => 1
 				];
-                $match = $product_attribute_data;
-                unset($match["value_id"]);
+				$match = $product_attribute_data;
+				unset($match["value_id"]);
 
 				ProductAttribute::updateOrCreate($match, $product_attribute_data);
 			}
