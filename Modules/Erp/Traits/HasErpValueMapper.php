@@ -48,8 +48,10 @@ trait HasErpValueMapper
 			{
 				foreach ( $chunk as $detail )
 				{
+					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
+
 					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" && $detail->status == 1 ) continue;
-					$type = ($erp_details->where("sku", $detail->sku)->count() > 1) ? "configurable" : "simple";
+					$type = ($check_variants) ? "configurable" : "simple";
 
                     $match = [
                         "website_id" => 1,
@@ -63,7 +65,6 @@ trait HasErpValueMapper
 					$product = Product::updateOrCreate($match, $product_data);
                     ErpMigrateProductImageJob::dispatch($product, $detail);
 
-					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
 					if ($check_variants) $this->createVariants($product, $detail);
 
 					//visibility attribute value
@@ -335,13 +336,13 @@ trait HasErpValueMapper
 						"parent_id" => $product->id,
 						"attribute_set_id" => 1,
 						"website_id" => 1,
-						"sku" => "{$product->sku}-variant-{$variant['code']}",
+						"sku" => "{$product->sku}-{$variant['code']}",
 						"type" => "simple",
 					];
 
 					$match = [
 						"website_id" => 1,
-						"sku" => "{$product->sku}-variant-{$variant['code']}",
+						"sku" => "{$product->sku}-{$variant['code']}",
 					];
 
 					$variant_product = Product::updateOrCreate($match, $product_data);
