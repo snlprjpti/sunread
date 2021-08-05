@@ -323,6 +323,31 @@ class ProductRepository extends BaseRepository
         
         return $fetched;
     }
+    
+    public function getParentScope(array $scope): array
+    {
+        try
+        {
+            switch($scope["scope"])
+            {
+                case "store":
+                    $data["scope"] = "channel";
+                    $data["scope_id"] = $this->store_model->find($scope["scope_id"])->channel->id;
+                    break;
+                    
+                case "channel":
+                    $data["scope"] = "website";
+                    $data["scope_id"] = $this->channel_model->find($scope["scope_id"])->website->id;
+                    break;
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
 
     public function getData(int $id, array $scope): array
     {
@@ -386,20 +411,10 @@ class ProductRepository extends BaseRepository
 
         if($data["scope"] != "website")
         {
-            $data["attribute_id"] = $data["attribute_id"];
+            $parent_scope = $this->getParentScope($data);
+            $data["scope"] = $parent_scope["scope"];
+            $data["scope_id"] = $parent_scope["scope_id"];
             $data["product_id"] = $product->id;
-            switch($data["scope"])
-            {
-                case "store":
-                    $data["scope"] = "channel";
-                    $data["scope_id"] = $this->store_model->find($data["scope_id"])->channel->id;
-                    break;
-                
-                case "channel":
-                    $data["scope"] = "website";
-                    $data["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
-                    break;
-            }
             return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $this->getDefaultValues($product, $data);           
         }
         return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $defaultValue;

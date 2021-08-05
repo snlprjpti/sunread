@@ -93,7 +93,7 @@ class ProductAttributeRepository extends ProductRepository
                 $product_attribute = [];
 
                 //Scope Filter
-                if($this->product_repository->scopeFilter($scope["scope"], $attribute->scope)) continue; 
+                //if($this->product_repository->scopeFilter($scope["scope"], $attribute->scope)) continue; 
 
                 //Super attribute filter in case of configurable products
                 if(isset($super_attributes) && (in_array($attribute->id, $super_attributes))) continue;
@@ -196,12 +196,15 @@ class ProductAttributeRepository extends ProductRepository
                     $this->product_repository->$function_name($product, $request, $method, $attribute);
                     continue;
                 }
-                
+
+                $db_attribute = Attribute::whereSlug($attribute['attribute_slug'])->first();
+                if($this->product_repository->scopeFilter($scope["scope"], $db_attribute->scope)) $scope = $this->product_repository->getParentScope($scope); 
+           
                 $match = [
                     "product_id" => $product->id,
                     "scope" => $scope["scope"],
                     "scope_id" => $scope["scope_id"],
-                    "attribute_id" => Attribute::whereSlug($attribute['attribute_slug'])->first()->id
+                    "attribute_id" => $db_attribute->id
                 ];
 
                 if(isset($attribute["use_default_value"]) && $attribute["use_default_value"] == 1)
