@@ -12,6 +12,7 @@ class CategoryValue extends Model
 
     public $timestamps = true;
     protected $fillable = [ "scope", "scope_id", "category_id", "attribute", "value" ];
+    protected $casts = [ "value" => "array" ];
 
     //protected $appends = ['url'];
 
