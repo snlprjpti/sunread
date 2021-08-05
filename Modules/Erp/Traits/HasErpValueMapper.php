@@ -48,9 +48,9 @@ trait HasErpValueMapper
 			{
 				foreach ( $chunk as $detail )
 				{
-					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
-
 					if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" && $detail->status == 1 ) continue;
+					
+					$check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
 					$type = ($check_variants) ? "configurable" : "simple";
 
                     $match = [
