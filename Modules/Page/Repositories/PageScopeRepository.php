@@ -10,6 +10,7 @@ use Modules\Page\Entities\PageScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Core\Rules\ScopeRule;
 
@@ -31,13 +32,15 @@ class PageScopeRepository extends BaseRepository
         try
         {
             $page_scopes = [];
-            foreach($stores as $store)
+            foreach($stores as $k => $store)
             {  
-                // $website_stores = Website::find($parent->website_id)->channels->mapWithKeys(function ($channel) {
-                //     return $channel->stores->pluck('id');
-                // })->toArray();
-
-                // if(in_array($store, $website_stores) && $store != 0) throw ValidationException::withMessages(["stores" => "Invalid Store"]);
+                if ($parent->website_id) {
+                    $website_stores = Website::find($parent->website_id)->channels->mapWithKeys(function ($channel) {
+                        return $channel->stores->pluck('id');
+                    })->toArray();
+    
+                    if (!in_array($store, $website_stores) && $store != 0) throw ValidationException::withMessages(["stores.$k" => "Store does not belong to this website"]);
+                }
 
                 $data = [
                     "page_id" => $parent->id,
@@ -45,8 +48,7 @@ class PageScopeRepository extends BaseRepository
                     "scope_id" => $store
                 ];
 
-                if($exist = $this->model->where($data)->first())
-                {
+                if ($exist = $this->model->where($data)->first()) {
                     $page_scopes[] = $exist;
                     continue;
                 }

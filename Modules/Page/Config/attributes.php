@@ -230,10 +230,6 @@ return [
                         "slug" => "buttons",
                         "hasChildren" => 1,
                         "type" => "repeater",
-                        "provider" => "",
-                        "pluck" => [],
-                        "default" => "",
-                        "options" => [],
                         "conditions" => [],
                         "description" => "",
                         "rules" => "array",
@@ -254,17 +250,17 @@ return [
                                 "is_required" => 1
                             ],
                             [
-                                "title" => "Button Label",
-                                "slug" => "button-label",
+                                "title" => "Button Image",
+                                "slug" => "button-image",
                                 "hasChildren" => 0,
-                                "type" => "text",
+                                "type" => "file",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
                                 "conditions" => [],
                                 "description" => "",
-                                "rules" => "",
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
                                 "is_required" => 1
                             ],
                             [
@@ -288,10 +284,6 @@ return [
                         "slug" => "banner-editor",
                         "hasChildren" => 1,
                         "type" => "normal",
-                        "provider" => "",
-                        "pluck" => [],
-                        "default" => "",
-                        "options" => [],
                         "conditions" => [],
                         "description" => "",
                         "rules" => "array",
@@ -312,18 +304,18 @@ return [
                                 "is_required" => 1
                             ],
                             [
-                                "title" => "Content",
-                                "slug" => "content",
+                                "title" => "Content Image",
+                                "slug" => "content-image",
                                 "hasChildren" => 0,
-                                "type" => "text",
+                                "type" => "file",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
                                 "conditions" => [],
                                 "description" => "",
-                                "rules" => "",
-                                "is_required" => 1
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "is_required" => 0
                             ]
                         ]
                     ],

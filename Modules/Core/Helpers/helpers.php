@@ -56,6 +56,15 @@ if (! function_exists('array_permutation')) {
             $main_array = $value;
         }
     }
+
+    if (! function_exists('getDotToArray')) {
+        function getDotToArray($dot_syntax, &$main_array, $separator = ".") 
+        {
+            $keys = explode($separator, $dot_syntax);
+            foreach ($keys as $key) $main_array = &$main_array[$key];
+            return $main_array;
+        }
+    }
     
 }
 ?>

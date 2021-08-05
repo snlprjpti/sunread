@@ -42,7 +42,9 @@ class PageController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, [ "page_scopes", "page_attributes", "website" ]);
+            $fetched = $this->repository->fetchAll($request, [ "page_scopes", "page_attributes", "website" ], function () use ($request) {
+                return ($request->website_id) ? $this->model->whereWebsiteId($request->website_id) : $this->model;
+            });
         }
         catch (Exception $exception)
         {
@@ -99,7 +101,7 @@ class PageController extends BaseController
 
             $updated = $this->repository->update($data, $id, function($updated) use($data){
                 if(isset($data["stores"])) $this->pageScopeRepository->updateOrCreate($data["stores"], $updated);
-                if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $updated);
+                if(isset($data["components"])) $this->pageAttributeRepository->updateOrCreate($data["components"], $updated, "update");
             });
         }
         catch (Exception $exception)
