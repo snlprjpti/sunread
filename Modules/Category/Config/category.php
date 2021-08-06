@@ -28,21 +28,27 @@ return [
                 [
                     "title" => "Status",
                     "slug" => "status",
-                    "type" => "boolean",
+                    "type" => "select",
                     "value" => "",
                     "scope" => "store",
-                    "options" => [],
-                    "rules" => "nullable|boolean",
+                    "options" => [ 
+                        [ "value" => "1", "label" => "Yes" ],
+                        [ "value" => "0", "label" => "No" ]
+                    ],
+                    "rules" => "nullable|in:0,1",
                     "is_required" => 0
                 ],
                 [
                     "title" => "Include In Menu",
                     "slug" => "include_in_menu",
-                    "type" => "boolean",
+                    "type" => "select",
                     "value" => "",
                     "scope" => "website",
-                    "options" => [],
-                    "rules" => "nullable|boolean",
+                    "options" => [ 
+                        [ "value" => "1", "label" => "Yes" ],
+                        [ "value" => "0", "label" => "No" ]
+                    ],
+                    "rules" => "nullable|in:0,1",
                     "is_required" => 0
                     
                 ]
