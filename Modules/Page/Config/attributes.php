@@ -236,46 +236,48 @@ return [
                         "is_required" => 1,
                         "attributes" => [
                             [
-                                "title" => "Button Link",
-                                "slug" => "button-link",
-                                "hasChildren" => 0,
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "conditions" => [],
-                                "description" => "",
-                                "rules" => "",
-                                "is_required" => 1
-                            ],
-                            [
-                                "title" => "Button Image",
-                                "slug" => "button-image",
-                                "hasChildren" => 0,
-                                "type" => "file",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "conditions" => [],
-                                "description" => "",
-                                "rules" => "mimes:jpeg,jpg,bmp,png",
-                                "is_required" => 1
-                            ],
-                            [
-                                "title" => "Button Color",
-                                "slug" => "button-color",
-                                "hasChildren" => 0,
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "conditions" => [],
-                                "description" => "",
-                                "rules" => "",
-                                "is_required" => 1
+                                [
+                                    "title" => "Button Link",
+                                    "slug" => "button-link",
+                                    "hasChildren" => 0,
+                                    "type" => "text",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "",
+                                    "options" => [],
+                                    "conditions" => [],
+                                    "description" => "",
+                                    "rules" => "",
+                                    "is_required" => 1
+                                ],
+                                [
+                                    "title" => "Button Image",
+                                    "slug" => "button-image",
+                                    "hasChildren" => 0,
+                                    "type" => "file",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "",
+                                    "options" => [],
+                                    "conditions" => [],
+                                    "description" => "",
+                                    "rules" => "mimes:jpeg,jpg,bmp,png",
+                                    "is_required" => 1
+                                ],
+                                [
+                                    "title" => "Button Color",
+                                    "slug" => "button-color",
+                                    "hasChildren" => 0,
+                                    "type" => "text",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "",
+                                    "options" => [],
+                                    "conditions" => [],
+                                    "description" => "",
+                                    "rules" => "",
+                                    "is_required" => 1
+                                ]
                             ]
                         ]
                     ],
