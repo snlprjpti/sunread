@@ -62,7 +62,7 @@ class CategoryValueRepository
         return $all_rules;
     }
 
-    public function handleFileIssue($id, $request, $item, $value_rule): ?string
+    public function handleFileIssue(int $id, object $request, array $item, ?string $value_rule): ?string
     {
         try
         {
