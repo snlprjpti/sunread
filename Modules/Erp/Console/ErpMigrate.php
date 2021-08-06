@@ -20,7 +20,7 @@ class ErpMigrate extends Command
 
     public function handle(): bool
     {
-        if ( ErpImport::whereStatus(0)->count() < 1 ) {
+        if ( ErpImport::whereStatus(0)->count() > 0 ) {
             $this->error("ERP Import is not complete.");
             return false;
         }
