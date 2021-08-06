@@ -20,8 +20,11 @@ class CategoryMigrate extends Command
 
     public function handle(): void
     {
-        CategoryValue::query()->delete();
+        CategoryValue::query()->truncate();
+        $this->info("Category values truncated");
         Artisan::call("migrate");
+        $this->info("Category values migrated");
         Artisan::call("db:seed", ["--class" => "Modules\Category\Database\Seeders\CategoryValueTableSeeder"]);
+        $this->info("Seeding completed");
     }
 }

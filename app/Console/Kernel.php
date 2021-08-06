@@ -32,7 +32,6 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command("erp:import");
         $schedule->command("erp:migrate");
-        $schedule->command("category:migrate");
     }
 
     /**

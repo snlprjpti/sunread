@@ -14,92 +14,80 @@ class CategoryValueTableSeeder extends Seeder
      */
     public function run()
     {
-        $category_values = [
+        $data = [
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "name",
-                "value" => "Root",
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => "Root"
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "slug",
-                "value" => "root",
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => "root"
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "status",
-                "value" => 1,
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => 1
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "include_in_menu",
-                "value" => 1,
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => 1
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "description",
-                "value" => "Good",
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => "Good"
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "image",
-                "value" => null,
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => null
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "meta_title",
-                "value" => "Root",
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => "Root"
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "meta_description",
-                "value" => "Root",
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => "Root"
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "meta_keywords",
-                "value" => "Root",
-                "created_at" => now(),
-                "updated_at" => now()
+                "value" => "Root"
             ],
         ];
-        foreach($category_values as $category_value)
-        {
-            CategoryValue::create($category_value);
-        }
+
+        $data = array_map(function($item) {
+            return array_merge($item, [
+                "value" => json_encode($item["value"]),
+                "created_at" => now(),
+                "updated_at" => now()
+            ]);
+        }, $data);
+
+        CategoryValue::insert($data);
     }
 }
