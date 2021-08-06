@@ -210,7 +210,7 @@ trait HasErpValueMapper
         }
     }
 
-    private function getAttributeOptionValue(object $erp_product_iteration, string $attribute_slug): bool
+    private function getAttributeOptionValue(mixed $erp_product_iteration, string $attribute_slug): bool
     {
         try
         {
@@ -229,8 +229,8 @@ trait HasErpValueMapper
                 case 'size':
                     $data = [
                         "attribute_id" => Attribute::whereSlug("size")->first()->id,
-                        "name" => $erp_product_iteration->value["pfHorizontalComponentCode"],
-                        "code" => $erp_product_iteration->value["pfVerticalComponentCode"]
+                        "name" => $erp_product_iteration["pfHorizontalComponentCode"],
+                        "code" => $erp_product_iteration["pfVerticalComponentCode"]
                     ];
                     $match = $data;
                     unset($match["code"]);
@@ -290,7 +290,7 @@ trait HasErpValueMapper
     {
         $product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
         $images = $this->getValue($product_images, function ($value) {
-            return json_decode($value, true);
+            return json_decode($value, true) ?? $value;
         });
 
         if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"]);
