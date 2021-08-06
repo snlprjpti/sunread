@@ -60,7 +60,7 @@ class PageTest extends BaseTestCase
 
     private function getAttributes(array $elements, ?string $key = null): void
     {
-        foreach($elements as $i => &$element)
+        foreach($elements as &$element)
         {
             if(!isset($element["type"]))
             {
@@ -76,7 +76,7 @@ class PageTest extends BaseTestCase
             }  
             if($element["type"] == "repeater")
             {
-                $this->getAttributes($element["attributes"], "$append_key.0");
+                $this->getAttributes($element["attributes"][0], "$append_key.0");
                 continue;     
             } 
             $this->getAttributes($element["attributes"], $append_key);

@@ -121,7 +121,7 @@ class PageRepository extends BaseRepository
                         for($j=0; $j<$count; $j++)
                         { 
                             if ($j==0) setDotToArray($append_key, $this->parent, $fake_element);           
-                            $this->getChildren($element["attributes"], "$append_key.attributes.$j", $values, "$append_slug_key.$j");
+                            $this->getChildren($element["attributes"][0], "$append_key.attributes.$j", $values, "$append_slug_key.$j");
                         }
                         continue; 
                     } 

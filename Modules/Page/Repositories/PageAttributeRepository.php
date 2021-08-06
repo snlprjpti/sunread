@@ -192,7 +192,14 @@ class PageAttributeRepository extends BaseRepository
             {
                 $append_key = isset($key) ? "$key.$i" : $i;
 
-                if (isset($element["type"])) unset($element["rules"]);
+                if (isset($element["type"])) {
+                    unset($element["rules"]);
+                    if ($element["type"] == "repeater") {
+                        setDotToArray($append_key, $this->parent,  $element);           
+                        $this->getChildren($element["attributes"][0], "$append_key.attributes.0");
+                        continue;
+                    }
+                } 
 
                 if ($element["hasChildren"] == 0) {
                     if ( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
@@ -248,7 +255,7 @@ class PageAttributeRepository extends BaseRepository
                     $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
                     for( $i=0; $i < $count; $i++ )
                     {
-                        $this->getRules($component, $element["attributes"], "$append_key.$i", $method);
+                        $this->getRules($component, $element["attributes"][0], "$append_key.$i", $method);
                     } 
                     continue;     
                 } 
