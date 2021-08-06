@@ -7,7 +7,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Erp\Entities\ErpImport;
 use Modules\Erp\Traits\HasErpMapper;
 
 class WebAssortments implements ShouldQueue
@@ -15,6 +14,9 @@ class WebAssortments implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpMapper;
 
     public $skip_token;
+
+    public $tries = 5;
+    public $timeout = 1200;
 
     public function __construct(?string $skip_token = null)
     {
