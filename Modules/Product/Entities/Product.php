@@ -101,4 +101,9 @@ class Product extends Model
     {
         return $this->belongsTo(Website::class);
     }
+
+    public function attribute_configurable_products(): HasMany
+    {
+        return $this->hasMany(AttributeConfigurableProduct::class);
+    }
 }

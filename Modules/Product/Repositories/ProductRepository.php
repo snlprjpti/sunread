@@ -27,6 +27,7 @@ use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
+use Modules\Product\Rules\WebsiteWiseScopeRule;
 
 class ProductRepository extends BaseRepository
 {
@@ -285,6 +286,69 @@ class ProductRepository extends BaseRepository
         return false;
     }
 
+    public function product_attribute_data(int $id, object $request): array
+    {
+        try
+        {
+            $product = $this->model::findOrFail($id);
+
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+            ]);
+    
+            $scope = [
+                "scope" => $request->scope ?? "website",
+                "scope_id" => $request->scope_id ??  $product->website_id,
+            ];
+    
+            $fetched = [];
+            $fetched = [
+                "parent_id" => $product->id,
+                "website_id" => $product->website_id
+            ];
+            $fetched["attributes"] = $this->getData($id, $scope);
+            $fetched["configurable_attributes"] = $product->attribute_configurable_products->map(function ($configurable_attribute) {
+                return [
+                    "product_id" => $configurable_attribute->product_id,
+                    "attribute_id" => $configurable_attribute->attribute_id,
+                    "attribute_option_id" => $configurable_attribute->attribute_option_id
+                ];
+            })->toArray();
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+        
+        return $fetched;
+    }
+    
+    public function getParentScope(array $scope): array
+    {
+        try
+        {
+            switch($scope["scope"])
+            {
+                case "store":
+                    $data["scope"] = "channel";
+                    $data["scope_id"] = $this->store_model->find($scope["scope_id"])->channel->id;
+                    break;
+                    
+                case "channel":
+                    $data["scope"] = "website";
+                    $data["scope_id"] = $this->channel_model->find($scope["scope_id"])->website->id;
+                    break;
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
     public function getData(int $id, array $scope): array
     {
         try
@@ -315,7 +379,8 @@ class ProductRepository extends BaseRepository
                             "type" => $attribute->type,
                             "scope" => $attribute->scope,
                             "position" => $attribute->position,
-                            "is_required" => $attribute->is_required
+                            "is_required" => $attribute->is_required,
+                            "is_user_defined" => (bool) $attribute->is_user_defined
                         ];
                         if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
@@ -347,20 +412,10 @@ class ProductRepository extends BaseRepository
 
         if($data["scope"] != "website")
         {
-            $data["attribute_id"] = $data["attribute_id"];
+            $parent_scope = $this->getParentScope($data);
+            $data["scope"] = $parent_scope["scope"];
+            $data["scope_id"] = $parent_scope["scope_id"];
             $data["product_id"] = $product->id;
-            switch($data["scope"])
-            {
-                case "store":
-                    $data["scope"] = "channel";
-                    $data["scope_id"] = $this->store_model->find($data["scope_id"])->channel->id;
-                    break;
-                
-                case "channel":
-                    $data["scope"] = "website";
-                    $data["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
-                    break;
-            }
             return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $this->getDefaultValues($product, $data);           
         }
         return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $defaultValue;

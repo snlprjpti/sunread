@@ -13,6 +13,7 @@ use Modules\Attribute\Entities\Attribute;
 use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Attribute\Entities\AttributeOption;
+use Modules\Product\Entities\AttributeConfigurableProduct;
 
 class ProductConfigurableRepository extends BaseRepository
 {
@@ -124,8 +125,8 @@ class ProductConfigurableRepository extends BaseRepository
             ];
             $product_attributes = [];
 
-
-            $variant_options = collect($permutation)->map(function ($option, $key) {
+            $variant_options = collect($permutation)->map(function ($option, $key) use ($product) {
+                AttributeConfigurableProduct::updateOrCreate(["product_id" => $product->id, "attribute_id" => $key, "attribute_option_id" => $option]);
                 return [
                     "attribute_slug" => $this->attributeCache()->find($key)->slug,
                     "value" => $option,

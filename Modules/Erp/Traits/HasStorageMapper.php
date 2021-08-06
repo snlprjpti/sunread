@@ -109,14 +109,14 @@ trait HasStorageMapper
                 "sku" => $file_arr[0],
                 "color_code" => $file_arr[1],
                 "image_type" => $file_arr[2],
-                "url" => "{$this->erp_folder}/COLECT.IO/{$file}"
+                "url" => $file
             ];
             $hash = md5($erp_import_id.$file_info["sku"].json_encode($file_info));
             
             $file_data = [
                 "erp_import_id" => $erp_import_id,
                 "sku" => $file_info["sku"],
-                "value" => $file_info,
+                "value" => json_encode($file_info),
                 "hash" => $hash,
                 "created_at" => now(),
                 "updated_at" => now()
