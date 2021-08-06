@@ -29,28 +29,37 @@ class CategoryValueRepository
 
     public function getValidationRules(object $request, ?int $id = null, ?string $method = null): array
     {
-        $scope = $request->scope ?? "website";
-        return collect(config("category.attributes"))->pluck("elements")->flatten(1)->map(function($data) {
-            return $data;
-        })->reject(function ($data) use ($scope, $id, $method, $request) {
-            return $this->scopeFilter($scope, $data["scope"]);
-        })->mapWithKeys(function ($item) use ($scope, $id, $method, $request) {
+        try
+        {
+            $scope = $request->scope ?? "website";
+            $all_rules = collect(config("category.attributes"))->pluck("elements")->flatten(1)->map(function($data) {
+                return $data;
+            })->reject(function ($data) use ($scope) {
+                return $this->scopeFilter($scope, $data["scope"]);
+            })->mapWithKeys(function ($item) use ($scope, $id, $method, $request) {
 
-            $prefix = "items.{$item["slug"]}";
-            $value_path = "{$prefix}.value";
-            $default_path = "{$prefix}.use_default_value";
+                $prefix = "items.{$item["slug"]}";
+                $value_path = "{$prefix}.value";
+                $default_path = "{$prefix}.use_default_value";
 
-            $value_rule = ($item["is_required"] == 1) ? (($scope != "website") ? "required_without:{$default_path}" : "required") : "nullable";
-            $value_rule = "$value_rule|{$item["rules"]}";
-            if($scope != "website") $default_rule = ($item["is_required"] == 1) ? "required_without:{$value_path}|{$item["rules"]}" : "boolean";
+                $value_rule = ($item["is_required"] == 1) ? (($scope != "website") ? "required_without:{$default_path}" : "required") : "nullable";
+                $value_rule = "$value_rule|{$item["rules"]}";
+                if($scope != "website") $default_rule = ($item["is_required"] == 1) ? "required_without:{$value_path}|{$item["rules"]}" : "boolean";
 
-            if ($method == "update" && $id && $item["type"] == "file") $value_rule = $this->handleFileIssue($id, $request, $item, $value_rule);
+                if ($method == "update" && $id && $item["type"] == "file") $value_rule = $this->handleFileIssue($id, $request, $item, $value_rule);
 
-            $rules = [
-                $value_path => $value_rule
-            ];
-            return isset($default_rule) ? array_merge($rules, [ $default_path => $default_rule ]) : $rules;
-        })->toArray();
+                $rules = [
+                    $value_path => $value_rule
+                ];
+                return isset($default_rule) ? array_merge($rules, [ $default_path => $default_rule ]) : $rules;
+            })->toArray();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $all_rules;
     }
 
     public function handleFileIssue($id, $request, $item, $value_rule): ?string
