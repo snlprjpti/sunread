@@ -229,11 +229,11 @@ class PageAttributeRepository extends BaseRepository
                 if ($state == 0) continue;
 
                 $rule = ($element["is_required"] == 1) ? "required" : "nullable";
-                if (isset($element["options"]) && count($element["options"]) > 0) {
-                    $options = Arr::pluck($element["options"], "value");
-                    $option_str = implode(",", $options);
-                    $rule = "$rule|in:$option_str";
-                }
+                // if (isset($element["options"]) && count($element["options"]) > 0) {
+                //     $options = Arr::pluck($element["options"], "value");
+                //     $option_str = implode(",", $options);
+                //     $rule = "$rule|in:$option_str";
+                // }
 
                 $append_key = isset($key) ? "$key.{$element["slug"]}" : "{$element["slug"]}";
 

@@ -124,7 +124,7 @@ return [
                         ],
                         "description" => "",
                         "conditions" => [],
-                        "rules" => "",
+                        "rules" => "in:image,video",
                         "multiple" => false,
                         "is_required" => 1
                     ],
@@ -172,7 +172,7 @@ return [
                                 ]
                             ]
                         ],
-                        "rules" => "",
+                        "rules" => "in:youtube,vimeo,hosted",
                         "multiple" => false,
                         "is_required" => 1
                     ],
