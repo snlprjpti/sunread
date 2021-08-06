@@ -9,6 +9,7 @@ use Modules\Erp\Jobs\ListProducts;
 use Modules\Erp\Jobs\ProductImages;
 use Modules\Erp\Jobs\ProductVariants;
 use Modules\Erp\Jobs\SalePrices;
+use Modules\Erp\Jobs\WebAssortments;
 use Modules\Erp\Jobs\WebInventories;
 
 class ErpImport extends Command
@@ -30,6 +31,7 @@ class ErpImport extends Command
         EanCodes::dispatch();
         SalePrices::dispatch();
         WebInventories::dispatch();
+        WebAssortments::dispatch();
         ProductVariants::dispatch();
 
         // Import from FTP
