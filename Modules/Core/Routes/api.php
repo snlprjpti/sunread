@@ -39,5 +39,10 @@ Route::group(["middleware" => ["api"]], function () {
         // Configurations Routes
         Route::get("configurations/value", [\Modules\Core\Http\Controllers\ConfigurationController::class, "getElementValue"])->name("configurations.value");
         Route::resource("configurations", ConfigurationController::class)->except(["create", "edit"]);
+
+        //Failed Jobs Routes
+        Route::get("failed/jobs", [\Modules\Core\Http\Controllers\FailedJobController::class, "index"])->name("failed-jobs.index");
+        Route::get("failed/jobs/{id}", [\Modules\Core\Http\Controllers\FailedJobController::class, "show"])->name("failed-jobs.show");
+
     });
 });
