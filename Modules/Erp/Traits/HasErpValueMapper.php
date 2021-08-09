@@ -109,8 +109,8 @@ trait HasErpValueMapper
             $price = $this->getDetailCollection("salePrices", $erp_product_iteration->sku);
             $default_price_data = [
                 "unitPrice" => 0.0,
-                "startingDate" => strtotime("2030-12-28"),
-                "endingDate" => strtotime("2030-12-28")
+                "startingDate" => "2030-12-28",
+                "endingDate" => "2030-12-28"
             ];
 
             $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->first() ?? $default_price_data : $default_price_data;
