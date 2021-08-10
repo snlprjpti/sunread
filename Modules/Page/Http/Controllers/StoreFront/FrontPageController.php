@@ -8,7 +8,7 @@ use Exception;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
 use Modules\Page\Repositories\PageRepository;
-use Modules\Page\Transformers\PageResource;
+use Modules\Page\Transformers\StoreFront\PageResource;
 
 class FrontPageController extends BaseController
 {
