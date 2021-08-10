@@ -79,10 +79,7 @@ class ProductConfigurableRepository extends BaseRepository
     public function createVariants(object $product, object $request, array $scope, array $request_attributes, ?string $method = null)
     {
        try
-       {
-            //get previous variants and delete all collection variants
-            //if ($product->variants->count() > 0) $product->variants()->delete();
-            
+       {    
             //create product-superattribute
             $super_attributes = [];
             
@@ -171,46 +168,60 @@ class ProductConfigurableRepository extends BaseRepository
 
     private function checkVariant(object $product): ?object
     {
-        foreach($product->variants as $child_variant)
+        try 
         {
-                $exist_variant = $child_variant->attribute_configurable_products()
-                 ->whereIn("attribute_id", collect($this->configurable_attributes)->pluck("attribute_id")->toArray())
-                 ->whereIn("attribute_option_id",collect($this->configurable_attributes)->pluck("attribute_option_id")->toArray())
-                ->get();
+            foreach($product->variants as $child_variant)
+            {
+                    $exist_variant = $child_variant->attribute_configurable_products()
+                    ->whereIn("attribute_id", collect($this->configurable_attributes)->pluck("attribute_id")->toArray())
+                    ->whereIn("attribute_option_id",collect($this->configurable_attributes)->pluck("attribute_option_id")->toArray())
+                    ->get();
 
-                if($exist_variant && count($exist_variant) == count($this->configurable_attributes)) 
-                {
-                    $data = $child_variant;
-                    break;
-                }
+                    if($exist_variant && count($exist_variant) == count($this->configurable_attributes)) 
+                    {
+                        $data = $child_variant;
+                        break;
+                    }
+            }
         }
-
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+        
         return $data ?? null;
     }
 
-    private function syncConfigurableAttributes(object $product, array $permutation_modify, object $request, array &$product_attributes, array $productAttributes, array $scope, array $variant_options, object $variant)
+    private function syncConfigurableAttributes(object $product, array $permutation_modify, object $request, array &$product_attributes, array $productAttributes, array $scope, array $variant_options, object $variant): void
     {
-        $product_attributes = array_merge([
-            [
-                // Attrubute name
-                "attribute_slug" => "name",
-                "value" => $product->sku."-".implode("-", $permutation_modify),
-                "value_type" => "Modules\Product\Entities\ProductAttributeString"
-            ],
-            [
-                //Attribute slug
-                "attribute_slug" => "sku",
-                "value" => Str::slug($product->sku)."-".implode("-", $permutation_modify),
-                "value_type" => "Modules\Product\Entities\ProductAttributeString"
-            ]
-        ], $productAttributes, $variant_options);
+        try 
+        {
+            $product_attributes = array_merge([
+                [
+                    // Attrubute name
+                    "attribute_slug" => "name",
+                    "value" => $product->sku."-".implode("-", $permutation_modify),
+                    "value_type" => "Modules\Product\Entities\ProductAttributeString"
+                ],
+                [
+                    //Attribute slug
+                    "attribute_slug" => "sku",
+                    "value" => Str::slug($product->sku)."-".implode("-", $permutation_modify),
+                    "value_type" => "Modules\Product\Entities\ProductAttributeString"
+                ]
+            ], $productAttributes, $variant_options);
 
-        $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
+            $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
 
-        array_map(function($child_attribute) use($variant) {
-            AttributeConfigurableProduct::updateOrCreate(array_merge($child_attribute, [ "product_id" => $variant->id ]));
-        }, $this->configurable_attributes);
+            array_map(function($child_attribute) use($variant) {
+                AttributeConfigurableProduct::updateOrCreate(array_merge($child_attribute, [ "product_id" => $variant->id ]));
+            }, $this->configurable_attributes);
 
-        $variant->channels()->sync($request->get("channels"));
+            $variant->channels()->sync($request->get("channels"));
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
     }
 }
