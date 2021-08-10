@@ -35,7 +35,7 @@ class FrontPageController extends BaseController
         try
         {
             $page = $this->repository->findPage($slug);
-            if(isset($page)) $fetch = $this->repository->fetch($page->page_id, ["page_attributes"]);
+            $fetch = $this->repository->fetch($page->page_id, ["page_attributes"]);
         }
         catch( Exception $exception )
         {
