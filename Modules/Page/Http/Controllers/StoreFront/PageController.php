@@ -11,7 +11,7 @@ use Modules\Page\Entities\Page;
 use Modules\Page\Repositories\PageRepository;
 use Modules\Page\Transformers\StoreFront\PageResource;
 
-class FrontPageController extends BaseController
+class PageController extends BaseController
 {
     protected $repository;
 
