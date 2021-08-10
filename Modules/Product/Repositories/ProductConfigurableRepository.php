@@ -18,7 +18,7 @@ use Modules\Product\Entities\AttributeConfigurableProduct;
 
 class ProductConfigurableRepository extends BaseRepository
 {
-    protected $attribute, $product_repository, $non_required_attributes, $product_attribute_repository, $configurable_attributes = [];
+    protected $attribute, $product_repository, $non_required_attributes, $product_attribute_repository, $configurable_attributes;
 
     public function __construct(Product $product, Attribute $attribute, ProductRepository $product_repository, ProductAttributeRepository $productAttributeRepository)
     {
@@ -82,6 +82,7 @@ class ProductConfigurableRepository extends BaseRepository
        {    
             //create product-superattribute
             $super_attributes = [];
+            $this->configurable_attributes = [];
             
             foreach ($request->get("super_attributes") as $super_attribute) {
                 $attribute = $this->attributeCache()->find($super_attribute['attribute_id']);
@@ -188,7 +189,7 @@ class ProductConfigurableRepository extends BaseRepository
         {
             throw $exception;
         }
-        
+
         return $data ?? null;
     }
 
@@ -200,13 +201,13 @@ class ProductConfigurableRepository extends BaseRepository
                 [
                     // Attrubute name
                     "attribute_slug" => "name",
-                    "value" => $product->sku."-".implode("-", $permutation_modify),
+                    "value" => $product->sku."_".implode("_", $permutation_modify),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ],
                 [
                     //Attribute slug
                     "attribute_slug" => "sku",
-                    "value" => Str::slug($product->sku)."-".implode("-", $permutation_modify),
+                    "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ]
             ], $productAttributes, $variant_options);
