@@ -1,15 +1,12 @@
 <?php
 
-namespace Modules\Page\Http\Controllers;
+namespace Modules\Page\Http\Controllers\StoreFront;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Routing\Controller;
 use Exception;
-use Modules\Core\Entities\Store;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
-use Modules\Page\Entities\PageScope;
 use Modules\Page\Repositories\PageRepository;
 use Modules\Page\Transformers\PageResource;
 
