@@ -7,12 +7,9 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Modules\Page\Entities\PageScope;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
-use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
-use Modules\Core\Rules\ScopeRule;
 
 class PageScopeRepository extends BaseRepository
 {
@@ -44,7 +41,7 @@ class PageScopeRepository extends BaseRepository
 
                 $data = [
                     "page_id" => $parent->id,
-                    "scope" => "scope",
+                    "scope" => "store",
                     "scope_id" => $store
                 ];
 
