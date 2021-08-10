@@ -5,15 +5,17 @@ namespace Modules\Page\Repositories;
 use Attribute;
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
 use Illuminate\Validation\ValidationException;
+use Modules\Page\Entities\PageScope;
 
 class PageRepository extends BaseRepository
 {
     protected $pageAttributeRepository, $parent = [];
 
-    public function __construct(Page $page, PageAttributeRepository $pageAttributeRepository)
+    public function __construct(Page $page, PageAttributeRepository $pageAttributeRepository, Store $store, PageScope $pageScope)
     {
         $this->model = $page;
         $this->model_key = "page";
@@ -29,6 +31,8 @@ class PageRepository extends BaseRepository
             "components" => "required|array"
         ];
         $this->pageAttributeRepository = $pageAttributeRepository;
+        $this->store = $store;
+        $this->pageScope = $pageScope;
     }
 
     public function validateSlug(array $data, ?int $id=null): void
@@ -68,7 +72,7 @@ class PageRepository extends BaseRepository
     }
 
     public function getParent(object $component): array
-    { 
+    {
         try
         {
             $this->parent = [];
@@ -86,7 +90,7 @@ class PageRepository extends BaseRepository
             "title" => $data["title"],
             "slug" => $data["slug"],
             "groups" => $this->parent
-        ];        
+        ];
     }
 
     private function getChildren(array $elements, ?string $key = null, array $values, ?string $slug_key = null): void
@@ -107,7 +111,7 @@ class PageRepository extends BaseRepository
                         if($default) $element["default"] = ($element["type"] == "file") ? Storage::url($default) : $default;
                     }
 
-                    setDotToArray($append_key, $this->parent, $element);        
+                    setDotToArray($append_key, $this->parent, $element);
                     continue;
                 }
 
@@ -119,20 +123,20 @@ class PageRepository extends BaseRepository
                         $fake_element = $element;
                         $fake_element["attributes"] = [];
                         for($j=0; $j<$count; $j++)
-                        { 
-                            if ($j==0) setDotToArray($append_key, $this->parent, $fake_element);           
+                        {
+                            if ($j==0) setDotToArray($append_key, $this->parent, $fake_element);
                             $this->getChildren($element["attributes"][0], "$append_key.attributes.$j", $values, "$append_slug_key.$j");
                         }
-                        continue; 
-                    } 
-                    if ($element["type"] == "normal") {   
+                        continue;
+                    }
+                    if ($element["type"] == "normal") {
                         setDotToArray($append_key, $this->parent,  $element);
                         $this->getChildren($element["attributes"], "$append_key.attributes", $values, $append_slug_key);
                         continue;
-                    }  
+                    }
                 }
 
-                setDotToArray($append_key, $this->parent,  $element);           
+                setDotToArray($append_key, $this->parent,  $element);
                 $this->getChildren($element["attributes"], "$append_key.attributes", $values);
             }
         }
@@ -140,5 +144,22 @@ class PageRepository extends BaseRepository
         {
             throw $exception;
         }
+    }
+
+    public function findPage(string $slug): object
+    {
+        try
+        {
+            $store_code = array_key_exists("store_code", getallheaders()) ? getallheaders()["store_code"] : null;
+            $store_id = $this->store::whereCode($store_code)->pluck("id")->first();
+            $page_id  = $this->model::whereSlug($slug)->pluck("id")->first();
+            $pageScope = $this->pageScope::wherePageId($page_id)->whereScopeId($store_id)->orWhere("scope_id",0)->firstOrFail();
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $pageScope;
     }
 }
