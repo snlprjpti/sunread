@@ -112,7 +112,7 @@ class ProductConfigurableController extends BaseController
 
                 $updated->channels()->sync($request->get("channels"));
 
-                $this->repository->createVariants($updated, $request, $scope, $attributes);
+                $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
 
                 $updated->load("variants");
             });

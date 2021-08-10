@@ -27,6 +27,7 @@ use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
+use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
 
 class ProductRepository extends BaseRepository
@@ -308,13 +309,21 @@ class ProductRepository extends BaseRepository
                 "website_id" => $product->website_id
             ];
             $fetched["attributes"] = $this->getData($id, $scope);
-            $fetched["configurable_attributes"] = $product->attribute_configurable_products->map(function ($configurable_attribute) {
-                return [
-                    "product_id" => $configurable_attribute->product_id,
-                    "attribute_id" => $configurable_attribute->attribute_id,
-                    "attribute_option_id" => $configurable_attribute->attribute_option_id
-                ];
-            })->toArray();
+
+            if ($product->type == "configurable") {
+                $configurable_childs = $this->model->with("attribute_configurable_products")->whereParentId($id)->get();
+
+                foreach($configurable_childs as $configurable_child)
+                {
+                    $fetched["configurable_attributes"][] = $configurable_child->attribute_configurable_products->map(function ($configurable_attribute) {      
+                        return [
+                            "product_id" => $configurable_attribute->product_id,
+                            "attribute_id" => $configurable_attribute->attribute_id,
+                            "attribute_option_id" => $configurable_attribute->attribute_option_id
+                        ];
+                    })->toArray();
+                }
+            }
         }
         catch ( Exception $exception )
         {
