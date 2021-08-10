@@ -146,11 +146,11 @@ class PageRepository extends BaseRepository
         }
     }
 
-    public function findPage(string $slug): object
+    public function findPage(object $request, string $slug): object
     {
         try
         {
-            $store_code = array_key_exists("store_code", getallheaders()) ? getallheaders()["store_code"] : null;
+            $store_code = ($request->hasHeader("store_code")) ? $request->header("store_code") : null;
             $store_id = $this->store::whereCode($store_code)->pluck("id")->first();
             $page_id  = $this->model::whereSlug($slug)->pluck("id")->first();
             $pageScope = $this->pageScope::wherePageId($page_id)->whereScopeId($store_id)->orWhere("scope_id",0)->firstOrFail();
