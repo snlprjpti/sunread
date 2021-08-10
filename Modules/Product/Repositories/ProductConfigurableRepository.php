@@ -17,7 +17,7 @@ use Modules\Product\Entities\AttributeConfigurableProduct;
 
 class ProductConfigurableRepository extends BaseRepository
 {
-    protected $attribute, $product_repository, $non_required_attributes, $product_attribute_repository;
+    protected $attribute, $product_repository, $non_required_attributes, $product_attribute_repository, $configurable_attributes = [];
 
     public function __construct(Product $product, Attribute $attribute, ProductRepository $product_repository, ProductAttributeRepository $productAttributeRepository)
     {
@@ -124,9 +124,13 @@ class ProductConfigurableRepository extends BaseRepository
                 "attribute_set_id" => $product->attribute_set_id
             ];
             $product_attributes = [];
+            $this->configurable_attributes = [];
 
-            $variant_options = collect($permutation)->map(function ($option, $key) use ($product) {
-                AttributeConfigurableProduct::updateOrCreate(["product_id" => $product->id, "attribute_id" => $key, "attribute_option_id" => $option]);
+            $variant_options = collect($permutation)->map(function ($option, $key) {
+                $this->configurable_attributes[] = [
+                    "attribute_id" => $key,
+                    "attribute_option_id" => $option
+                ];
                 return [
                     "attribute_slug" => $this->attributeCache()->find($key)->slug,
                     "value" => $option,
@@ -153,6 +157,11 @@ class ProductConfigurableRepository extends BaseRepository
                 ], $productAttributes, $variant_options);
 
                 $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
+
+                array_map(function($child_attribute) use($variant) {
+                    AttributeConfigurableProduct::updateOrCreate(array_merge($child_attribute, [ "product_id" => $variant->id ]));
+                }, $this->configurable_attributes);
+
                 $variant->channels()->sync($request->get("channels"));
             });
         }
