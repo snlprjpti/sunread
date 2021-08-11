@@ -60,7 +60,7 @@ return[
                                 "title" => "State Country",
                                 "path" => "state_country",
                                 "type" => "select",
-                                "provider" => "Modules\Country\Entities\Region",
+                                "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name", "id"],
                                 "default" => "",
                                 "options" => [],
