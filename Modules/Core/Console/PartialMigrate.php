@@ -6,11 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeGroup;
-use Modules\Core\Jobs\PartialMigrateJob;
-use Modules\Product\Entities\AttributeConfigurableProduct;
-use Modules\Product\Entities\Product;
 
 class PartialMigrate extends Command
 { 
