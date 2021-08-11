@@ -40,19 +40,19 @@ class ProductConfigurableTest extends BaseTestCase
         $merge_product = $product->toArray(); 
 
         $attributes = [];
-
+  
         foreach ( $product->attribute_set->attribute_groups as $attribute_group )
         {
             foreach ($attribute_group->attributes as $attribute)
             {
-                if (in_array($attribute->slug, ["category_ids", "base_image", "small_image", "thumbnail_image", "quantity_and_stock_status"])) continue;
+                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status"])) continue;
                 $attributes[] = [
                     "attribute_id" => $attribute->id,
                     "value" => $this->value($attribute)
                 ];
             }
         }
-        
+
         $super_attributes = Attribute::inRandomOrder()->whereisUserDefined(1)->whereType("select")->where("slug", "!=", "tax_class_id")->take(2)->get();
       
         foreach($super_attributes as $super_attribute)

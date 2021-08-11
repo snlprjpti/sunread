@@ -251,21 +251,21 @@ class AttributeTableSeeder extends Seeder
             [
                 "name" => "Base Image",
                 "slug" => "base_image",
-                "type" => "multiimages",
+                "type" => "image",
                 "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Small Image",
                 "slug" => "small_image",
-                "type" => "multiimages",
+                "type" => "image",
                 "scope" => "website",
                 "is_required" => 0
             ],
             [
                 "name" => "Thumbnail Image",
                 "slug" => "thumbnail_image",
-                "type" => "multiimages",
+                "type" => "image",
                 "scope" => "website",
                 "is_required" => 0
             ],
@@ -332,7 +332,21 @@ class AttributeTableSeeder extends Seeder
                 "type" => "text",
                 "is_unique" => 1,
                 "scope" => "store"
-            ]
+            ],
+            [
+                "name" => "Section Background Image",
+                "slug" => "section_background_image",
+                "type" => "image",
+                "scope" => "website",
+                "is_required" => 0
+            ],
+            [
+                "name" => "Gallery",
+                "slug" => "gallery",
+                "type" => "multiimages",
+                "scope" => "website",
+                "is_required" => 0
+            ],
         ];
 
         array_map(function($attribute){
