@@ -11,7 +11,7 @@ class PageTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route, $store_code;
+    public $model, $model_name, $route_prefix, $default_resource_slug, $append_to_route, $store_code;
 
     public function setUp(): void
     {
