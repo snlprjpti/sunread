@@ -26,8 +26,7 @@ class ProductTableSeeder extends Seeder
             ]
         ];
         
-        $product = Product::withoutSyncingToSearch(function () {
-            return Product::withoutEvents( function () {
+        $product = Product::withoutEvents( function () {
                 return Product::create([
                     "attribute_set_id" => 1,
                     "sku" => "dell-laptop",
@@ -37,7 +36,6 @@ class ProductTableSeeder extends Seeder
                     "updated_at" => now()
                 ]);
             });
-        });
 
         foreach($attributes as $attributeData)
         {
