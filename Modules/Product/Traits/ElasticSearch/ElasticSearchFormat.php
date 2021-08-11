@@ -47,8 +47,8 @@ trait ElasticSearchFormat
             return [
                 "id" => $category->id,
                 "parent_id" => $category->parent_id,
-                "slug" => $category->value(array_merge( $defaul_data, ["attribute" => "slug"] )),
-                "name" => $category->value(array_merge( $defaul_data, ["attribute" => "name"] )),
+                "slug" => $category->value($defaul_data, "slug"),
+                "name" => $category->value($defaul_data, "name"),
                 "position" => $category->position
             ];
         })->toArray();

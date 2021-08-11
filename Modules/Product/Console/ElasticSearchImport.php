@@ -3,66 +3,35 @@
 namespace Modules\Product\Console;
 
 use Illuminate\Console\Command;
+use Modules\Core\Entities\Website;
+use Modules\Product\Entities\Product;
+use Modules\Product\Jobs\ElasticSearchIndexingJob;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 class ElasticSearchImport extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'elasticsearch:import';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Import all the data to the elasticsearch';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
-        //
-    }
+        $products = Product::get();
+        foreach($products as $product)
+        {
+            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+                return $channel->stores;
+            });
 
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['example', InputArgument::REQUIRED, 'An example argument.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
-        ];
+            foreach($stores as $store) ElasticSearchIndexingJob::dispatch($product, $store);
+        }
+        
+        $this->info("All data imported successfully");
     }
 }

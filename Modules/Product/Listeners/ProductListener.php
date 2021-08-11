@@ -13,9 +13,6 @@ class ProductListener
             return $channel->stores;
         });
 
-        foreach($stores as $store)
-        {
-            ElasticSearchIndexingJob::dispatch($product, $store);
-        }
+        foreach($stores as $store) ElasticSearchIndexingJob::dispatch($product, $store);
     }
 }

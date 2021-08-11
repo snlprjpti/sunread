@@ -13,9 +13,6 @@ class StoreListener
     {
         $website = $store?->channel?->website;
         $products = Product::whereWebsiteId($website->id)->get();
-        foreach($products as $product)
-        {
-            ElasticSearchIndexingJob::dispatch($product, $store);
-        }
+        foreach($products as $product) ElasticSearchIndexingJob::dispatch($product, $store);
     }
 }
