@@ -11,5 +11,5 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
     });
 
-    Route::get('page/{slug}', [\Modules\Page\Http\Controllers\StoreFront\FrontPageController::class, "show"])->name("page.show");
+    Route::get('pages/{slug}', [\Modules\Page\Http\Controllers\StoreFront\PageController::class, "show"])->name("pages.show");
 });
