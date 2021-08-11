@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\Page\Tests\Feature;
+namespace Modules\Page\Tests\Feature\StoreFront;
 
 use Modules\Core\Entities\Store;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Page\Entities\Page;
 
-class FrontPageTest extends BaseTestCase
+class PageTest extends BaseTestCase
 {
     private $store_code;
 
