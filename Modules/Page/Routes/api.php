@@ -11,5 +11,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
     });
 
-    Route::get('pages/{page_slug}', [\Modules\Page\Http\Controllers\StoreFront\PageController::class, "show"])->name("pages.show");
+    Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+        Route::get('pages/{page_slug}', [\Modules\Page\Http\Controllers\StoreFront\PageController::class, "show"])->name("pages.show");
+    });
 });

@@ -150,7 +150,7 @@ class PageRepository extends BaseRepository
     {
         try
         {
-            $store_code = ($request->hasHeader("store_code")) ? $request->header("store_code") : null;
+            $store_code = ($request->hasHeader("store")) ? $request->header("store") : null;
             $store = $this->store_model->whereCode($store_code)->firstOrFail();
             $page = $this->model->with("page_attributes")->whereSlug($slug)->firstOrFail();
             $page_scope = $page->page_scopes()->whereScope("store");

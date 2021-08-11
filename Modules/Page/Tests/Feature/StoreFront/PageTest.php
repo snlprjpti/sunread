@@ -2,13 +2,16 @@
 
 namespace Modules\Page\Tests\Feature\StoreFront;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Core\Entities\Store;
-use Modules\Core\Tests\BaseTestCase;
 use Modules\Page\Entities\Page;
+use Tests\TestCase;
 
-class PageTest extends BaseTestCase
+class PageTest extends TestCase
 {
-    private $store_code;
+    use DatabaseTransactions;
+
+    public $model, $model_name, $route_prefix, $default_resource_slug, $append_to_route, $store_code;
 
     public function setUp(): void
     {
@@ -17,23 +20,16 @@ class PageTest extends BaseTestCase
         parent::setUp();
 
         $this->model_name = "Page";
-        $this->route_prefix = "pages";
+        $this->route_prefix = "public.pages";
 
         $this->default_resource_slug = $this->model::latest('id')->first()->slug;
         $this->store_code = Store::oldest("id")->first()->code;
-        $this->hasIndexTest = false;
-        $this->hasShowTest = false;
-        $this->hasStoreTest = false;
-        $this->hasUpdateTest = false;
-        $this->hasDestroyTest = false;
-        $this->hasBulkDestroyTest = false;
-        $this->hasStatusTest = false;
     }
 
     public function testUserShouldBeAbleToGetPage()
     {
-        $this->headers["store_code"] = "{$this->store_code}";
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_slug]));
+        $this->headers["store"] = "{$this->store_code}";
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", [$this->default_resource_slug]));
 
         $response->assertOk();
         $response->assertJsonFragment([
@@ -44,8 +40,8 @@ class PageTest extends BaseTestCase
 
     public function testUserShouldNotBeAbleToGetPageWithInvalidStoreCode()
     {
-        $this->headers["store_code"] = "Invalid_Code";
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_slug]));
+        $this->headers["store"] = "Invalid_Code";
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", [$this->default_resource_slug]));
 
         $response->assertNotFound();
         $response->assertJsonFragment([
