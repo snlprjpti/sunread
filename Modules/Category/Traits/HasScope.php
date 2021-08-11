@@ -68,8 +68,10 @@ trait HasScope
         })->first();
     }
 
-    public function intialValuesChecking(array $data)
+    public function value(array $data)
     {
-        return $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
+        $this->createModel();
+        $default = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
+        return $default?->value;
     }
 }
