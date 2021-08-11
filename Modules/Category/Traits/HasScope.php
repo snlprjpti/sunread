@@ -68,7 +68,7 @@ trait HasScope
         })->first();
     }
 
-    public function value(array $data)
+    public function value(array $data): mixed
     {
         $this->createModel();
         $default = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);

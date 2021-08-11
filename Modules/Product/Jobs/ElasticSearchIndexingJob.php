@@ -15,29 +15,23 @@ class ElasticSearchIndexingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $product, $client;
+    public $product, $store;
 
-    public function __construct(Model $product)
+    public function __construct(Model $product, Model $store)
     {
-        // $this->client = ClientBuilder::create()->setHosts(config("elastic.client.hosts"))->build();
         $this->product = $product;
+        $this->store = $store;
     }
 
     public function handle(): void
     {
-        $stores = Website::find($this->product->website_id)->channels->mapWithKeys(function ($channel) {
-            return $channel->stores;
-        });
-
-        foreach($stores as $store)
-        {
-            $data = $this->product->documentDataStructure($store);
-            $params = [
-                "index" => "sail_racing_store_{$store->id}",
-                "id" => $this->product->id,
-                "body" => $data
-            ];
-            $this->client->index($params);
-        }
+        $client = ClientBuilder::create()->setHosts(config("elastic.client.hosts"))->build();
+        $data = $this->product->documentDataStructure($this->store);
+        $params = [
+            "index" => "sail_racing_store_{$this->store->id}",
+            "id" => $this->product->id,
+            "body" => $data
+        ];
+        $client->index($params);
     }
 }
