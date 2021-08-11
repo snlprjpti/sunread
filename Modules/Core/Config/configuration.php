@@ -64,7 +64,7 @@ return[
                                 "pluck" => ["name", "id"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:regions,id",
+                                "rules" => "exists:countries,id",
                                 "showIn" => ["channel", "website", "default", "store"],
                                 "multiple" => false,
                                 "scope" => "store",
