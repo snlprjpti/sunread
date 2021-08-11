@@ -17,8 +17,8 @@ class CategoryResource extends JsonResource
 
         return [
             "id" => $this->id,
-            "slug" => $this->value(array_merge( $data, ["attribute" => "slug"] )),
-            "name" => $this->value(array_merge( $data, ["attribute" => "name"] )),
+            "slug" => $this->value($data, "slug"),
+            "name" => $this->value($data, "name"),
             "children" => CategoryResource::collection($this->whenLoaded("children")->sortBy('_lft'))
         ];
     }
