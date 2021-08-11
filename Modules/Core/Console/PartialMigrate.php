@@ -23,6 +23,11 @@ class PartialMigrate extends Command
         Schema::disableForeignKeyConstraints();
         DB::table('products')->truncate();
         DB::table('attribute_configurable_products')->truncate();
+        DB::table('attribute_configurable_products')->truncate();
+        DB::table('categroy_product')->truncate();
+        DB::table('channel_product')->truncate();
+        DB::table('catalog_inventories')->truncate();
+        DB::table('catalog_inventory_items')->truncate();     
         DB::table('product_attributes')->truncate();
         DB::table('product_attribute_boolean')->truncate();
         DB::table('product_attribute_decimal')->truncate();
