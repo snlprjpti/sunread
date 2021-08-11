@@ -44,7 +44,7 @@ class ProductTest extends BaseTestCase
         {
             foreach ($attribute_group->attributes as $attribute)
             {
-                if (in_array($attribute->slug, ["category_ids", "base_image", "small_image", "thumbnail_image", "quantity_and_stock_status"])) continue;
+                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status"])) continue;
                 $attributes[] = [
                     "attribute_id" => $attribute->id,
                     "value" => $this->value($attribute)
