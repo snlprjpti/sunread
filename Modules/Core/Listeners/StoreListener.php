@@ -2,10 +2,8 @@
 
 namespace Modules\Core\Listeners;
 
-use Elasticsearch\ClientBuilder;
-use Modules\Core\Entities\Website;
 use Modules\Product\Entities\Product;
-use Modules\Product\Jobs\ElasticSearchIndexingJob;
+use Modules\Product\Jobs\SingleIndexing;
 
 class StoreListener
 {
@@ -13,6 +11,6 @@ class StoreListener
     {
         $website = $store?->channel?->website;
         $products = Product::whereWebsiteId($website->id)->get();
-        foreach($products as $product) ElasticSearchIndexingJob::dispatch($product, $store);
+        foreach($products as $product) SingleIndexing::dispatch($product, $store);
     }
 }

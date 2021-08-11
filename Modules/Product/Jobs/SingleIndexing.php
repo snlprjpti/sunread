@@ -9,9 +9,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Core\Entities\Website;
 
-class ElasticSearchIndexingJob implements ShouldQueue
+class SingleIndexing implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -26,11 +25,10 @@ class ElasticSearchIndexingJob implements ShouldQueue
     public function handle(): void
     {
         $client = ClientBuilder::create()->setHosts(config("elastic.client.hosts"))->build();
-        $data = $this->product->documentDataStructure($this->store);
         $params = [
             "index" => "sail_racing_store_{$this->store->id}",
             "id" => $this->product->id,
-            "body" => $data
+            "body" => $this->product->documentDataStructure($this->store)
         ];
         $client->index($params);
     }

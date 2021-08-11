@@ -4,10 +4,10 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Modules\Category\Console\CategoryMigrate;
 use Modules\Core\Console\PartialMigrate;
 use Modules\Erp\Console\ErpImport;
 use Modules\Erp\Console\ErpMigrate;
+use Modules\Product\Console\ElasticSearchImport;
 
 class Kernel extends ConsoleKernel
 {
@@ -19,8 +19,9 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         ErpImport::class,
         ErpMigrate::class,
-        CategoryMigrate::class,
+        // CategoryMigrate::class,
         PartialMigrate::class,
+        ElasticSearchImport::class
     ];
 
     /**

@@ -3,7 +3,7 @@
 namespace Modules\Product\Listeners;
 
 use Modules\Core\Entities\Website;
-use Modules\Product\Jobs\ElasticSearchIndexingJob;
+use Modules\Product\Jobs\SingleIndexing;
 
 class ProductListener
 {
@@ -13,6 +13,6 @@ class ProductListener
             return $channel->stores;
         });
 
-        foreach($stores as $store) ElasticSearchIndexingJob::dispatch($product, $store);
+        foreach($stores as $store) SingleIndexing::dispatch($product, $store);
     }
 }
