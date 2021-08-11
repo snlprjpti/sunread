@@ -17,7 +17,7 @@ class FrontPageTest extends BaseTestCase
         parent::setUp();
 
         $this->model_name = "Page";
-        $this->route_prefix = "page";
+        $this->route_prefix = "pages";
 
         $this->default_resource_slug = $this->model::latest('id')->first()->slug;
         $this->store_code = Store::oldest("id")->first()->code;
