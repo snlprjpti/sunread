@@ -107,7 +107,7 @@ trait HasErpValueMapper
             
             // get price for specific product need more clearification
             $price = $this->getDetailCollection("salePrices", $erp_product_iteration->sku);
-            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->first() ?? ["unitPrice" => 0.0] : ["unitPrice" => 0.0];
+            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->where("salesCode", "WEB")->first() ?? ["unitPrice" => 0.0] : ["unitPrice" => 0.0];
 
             // Condition for invalid date/times
             $max_time = strtotime("2030-12-28");
@@ -315,8 +315,16 @@ trait HasErpValueMapper
                         $data["small_image"] = 1;
                     break;
         
-                    default :
+                    case "c" :
                         $data["thumbnail"] = 1;
+                    break;
+
+                    case "d" :
+                        $data["section_background"] = 1;
+                    break;
+
+                    default :
+                        $data["gallery"] = 1;
                     break;
                 }
                 
