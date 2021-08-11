@@ -67,4 +67,9 @@ trait HasScope
             $query->whereAttribute("slug")->whereValue($slug);
         })->first();
     }
+
+    public function intialValuesChecking(array $data)
+    {
+        return $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
+    }
 }

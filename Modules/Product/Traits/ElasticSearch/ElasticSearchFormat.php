@@ -2,83 +2,58 @@
 
 namespace Modules\Product\Traits\ElasticSearch;
 
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
-
 trait ElasticSearchFormat
 {
-    use AttributeFormat;
-
-    protected $attribute_array = [
-        'global' => [],
-        'channel' => [],
-        'store' => []
-    ];
-
-    protected $option_attribute_array = [
-        'global' => [],
-        'channel' => [],
-        'store' => []
-    ];
-
-    protected $categoryData, $attributeData, $globalAttributes, $channelAttributes, $storeAttributes, $mainChannels, $mainStores;
-
-
-    public function documentDataStructure(): array
+    public function documentDataStructure(object $store): array
     {
-        $this->getChannels();
-        $this->getStores();
 
-        $array = $this->toArray();
-        
-        $array['categories'] = $this->getScopeWiseCategory();
-        
-        $array['channels'] = $this->channels->map(function($channel){
-            return [
-                'id' => $channel->id
-            ];
-        });
-
-        $array['product_attributes'] = $this->getScopeWiseAttribute();
-
+        $array = $this->toArray();     
+        $array['categories'] = $this->getCategoryData($store);
+        dd($array);
+        $array['product_attributes'] = $this->getProductAttributes();
+       // $array['product_images'] = $this->images->toArray();
+        $array['catalog_inventories'] = $this->catalog_inventories->toArray();
+        dd($array);
         return $array;
     }
 
-    public function getChannels(): void
-    {
-        $this->mainChannels = Channel::pluck('id')->toArray();
-    }
-
-    public function getStores(): void
-    {
-        $this->mainStores = Store::pluck('id')->toArray();
-    }
-
-    public function getChannelID(int $store_id): int
-    {
-        foreach($this->channels as $channel) if(in_array($store_id, $channel->stores->pluck('id')->toArray())) return $channel->id;
-        return 0;
-    }
-
-    public function getScopeWiseCategory(): array
+    public function getProductAttributes(): array
     {
         $data = [];
-        
-        foreach($this->categories as $category)
+        $product_attributes = $this->product_attributes()->with("attribute")->get();
+        foreach($product_attributes as $product_attribute)
         {
-            $data['global'][] = $this->getCategoryData($category->toArray());
-            foreach($this->mainStores as $store_id) $data['store'][$store_id][] = $this->getCategoryData($category->firstTranslation($store_id));
+            $data[$product_attribute->attribute->slug] = $product_attribute->value?->value;
         }
 
         return $data;
     }
 
-    public function getCategoryData(array $category): array
+    public function getCategoryData(object $store)
     {
-        return [
-            'id' => $category["id"],
-            'slug' => $category["slug"],
-            'name' =>$category["name"]
-        ];
+        return $this->categories->map(function ($category) use ($store) {
+
+            $category->createModel();
+
+            $defaul_data = [
+                "category_id" => $category->id,
+                "scope" => "store",
+                "scope_id" => $store->id 
+            ];
+
+            $slug_data = array_merge( $defaul_data, ["attribute" => "slug"] );
+            $name_data = array_merge( $defaul_data, ["attribute" => "name"] );
+
+            $slug = $category->has($slug_data) ? $category->getValues($slug_data) : $category->getDefaultValues($slug_data);
+            $name = $category->has($name_data) ? $category->getValues($name_data) : $category->getDefaultValues($name_data);
+
+            return [
+                "id" => $category->id,
+                "parent_id" => $category->parent_id,
+                "slug" => $slug?->value,
+                "name" => $name?->value,
+                "position" => $category->position
+            ];
+        })->toArray();
     }
 }
