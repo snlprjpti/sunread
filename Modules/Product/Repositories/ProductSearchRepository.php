@@ -4,7 +4,10 @@ namespace Modules\Product\Repositories;
 
 use Exception;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Core\Entities\Website;
 use Modules\Product\Entities\Product;
+use Modules\Product\Jobs\BulkIndexing;
+use Modules\Product\Jobs\SingleIndexing;
 
 class ProductSearchRepository extends ElasticSearchRepository
 {
@@ -170,7 +173,11 @@ class ProductSearchRepository extends ElasticSearchRepository
         {
             $indexed = $this->model->findOrFail($id);
 			if ($callback) $callback($indexed);
-            $indexed->searchable();
+            $stores = Website::find($indexed->website_id)->channels->mapWithKeys(function ($channel) {
+                return $channel->stores;
+            });
+    
+            foreach($stores as $store) SingleIndexing::dispatch($indexed, $store);
         }
         catch (Exception $exception)
         {
@@ -191,9 +198,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $indexed = $this->model->whereIn('id', $request->ids)->get();
 			if ($callback) $callback($indexed);
-            $indexed->map(function($item){
-                $item->searchable();
-            });
+            BulkIndexing::dispatchSync($indexed);
         }
         catch (Exception $exception)
         {

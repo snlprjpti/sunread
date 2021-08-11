@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Product\Traits\ElasticSearch;
+namespace Modules\Product\Traits;
 
 use Exception;
 use Modules\Attribute\Entities\Attribute;

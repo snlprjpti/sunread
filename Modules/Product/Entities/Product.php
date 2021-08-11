@@ -15,7 +15,7 @@ use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Product\Traits\ElasticSearch\ElasticSearchFormat;
-use Modules\Product\Traits\ElasticSearch\HasAttributeScope;
+use Modules\Product\Traits\HasAttributeScope;
 
 class Product extends Model
 {

@@ -25,7 +25,7 @@ class ElasticSearchImport extends Command
     public function handle(): void
     {
         $products = Product::get();
-        BulkIndexing::dispatchSync($products);
+        BulkIndexing::dispatch($products);
         $this->info("All data imported successfully");
     }
 }

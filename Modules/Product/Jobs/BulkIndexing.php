@@ -9,10 +9,11 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Core\Entities\Website;
+use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
 class BulkIndexing implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 
     public $products;
 
@@ -23,27 +24,6 @@ class BulkIndexing implements ShouldQueue
 
     public function handle(): void
     {
-        $client = ClientBuilder::create()->setHosts(config("elastic.client.hosts"))->build();
-
-        foreach($this->products as $product)
-        {
-            $product->load("categories", "product_attributes", "catalog_inventories");
-            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
-                return $channel->stores;
-            });
-
-            foreach($stores as $store)
-            {
-                $params["body"][] = [
-                    "index" => [
-                        "_index" => "sail_racing_store_{$store->id}",
-                        "_id" => $product->id
-                    ]
-                ];
-            
-                $params["body"][] = $product->documentDataStructure($store);
-            }
-        }
-        $client->bulk($params);
+       $this->bulkIndexing($this->products);
     }
 }
