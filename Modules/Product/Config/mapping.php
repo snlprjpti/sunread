@@ -4,6 +4,18 @@ return [
         "id" =>  [
             "type" => "long"
         ],
+        "name" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "price" =>  [
+            "type" => "float"
+        ],
         "sku" =>  [
             "type" => "text",
             "fields" =>  [
@@ -28,46 +40,66 @@ return [
         "status" =>  [
             "type" => "long"
         ],
-        "created_at" =>  [
-            "type" => "date"
+        "is_in_stock"=> [
+            "type"=> "long"
         ],
-        "updated_at" =>  [
-            "type" => "date"
+        "manage_stock"=> [
+            "type"=> "long"
         ],
-        "catalog_inventories"=> [
-            "properties"=> [
-                "created_at"=> [
-                    "type"=> "date"
-                ],
-                "id"=> [
-                    "type"=> "long"
-                ],
-                "is_in_stock"=> [
-                    "type"=> "long"
-                ],
-                "manage_stock"=> [
-                    "type"=> "long"
-                ],
-                "product_id"=> [
-                    "type"=> "long"
-                ],
-                "quantity"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "updated_at"=> [
-                    "type"=> "date"
-                ],
-                "use_config_manage_stock"=> [
-                    "type"=> "long"
-                ],
-                "website_id"=> [
-                    "type"=> "long"
+        "quantity"=> [
+            "type"=> "text",
+            "fields"=> [
+                "keyword"=> [
+                    "type"=> "keyword",
+                    "ignore_above"=> 256
+                ]
+            ]
+        ],
+        "use_config_manage_stock"=> [
+            "type"=> "long"
+        ],
+        "base_image" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "small_image" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "thumbnail" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "section_background" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "gallery" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
                 ]
             ]
         ],
@@ -319,61 +351,6 @@ return [
                 ],
                 "scope_id"=> [
                     "type"=> "long"
-                ]
-            ]
-        ],
-        "product_images"=> [
-            "properties"=> [
-                "created_at"=> [
-                    "type"=> "date"
-                ],
-                "id"=> [
-                    "type"=> "long"
-                ],
-                "main_image"=> [
-                    "type"=> "long"
-                ],
-                "path"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "position"=> [
-                    "type"=> "long"
-                ],
-                "product_id"=> [
-                    "type"=> "long"
-                ],
-                "small_image"=> [
-                    "type"=> "long"
-                ],
-                "small_image_url"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "thumbnail"=> [
-                    "type"=> "long"
-                ],
-                "thumbnail_url"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "updated_at"=> [
-                    "type"=> "date"
                 ]
             ]
         ]
