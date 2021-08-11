@@ -2,9 +2,7 @@
 
 namespace Modules\Attribute\Database\Seeders;
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Modules\Attribute\Entities\AttributeGroup;
 
 class AttributeGroupTableSeeder extends Seeder
@@ -16,7 +14,7 @@ class AttributeGroupTableSeeder extends Seeder
              [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 22, 30],
              [28, 29, 16, 17],
              [18, 19, 20, 21],
-             [23, 24, 25]
+             [32]
         ];
         foreach($groups as $count => $data)
         {
