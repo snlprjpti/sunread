@@ -20,22 +20,16 @@ class PageTest extends TestCase
         parent::setUp();
 
         $this->model_name = "Page";
-        $this->route_prefix = "pages";
+        $this->route_prefix = "public.pages";
 
         $this->default_resource_slug = $this->model::latest('id')->first()->slug;
         $this->store_code = Store::oldest("id")->first()->code;
     }
 
-    public function getRoute(string $method, ?array $parameters = null): string
-    {
-        $parameters = $this->append_to_route ? array_merge([$this->append_to_route], $parameters ?? []) : $parameters;
-        return route("{$this->route_prefix}.{$method}", $parameters);
-    }
-
     public function testUserShouldBeAbleToGetPage()
     {
         $this->headers["store"] = "{$this->store_code}";
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_slug]));
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", [$this->default_resource_slug]));
 
         $response->assertOk();
         $response->assertJsonFragment([
@@ -47,7 +41,7 @@ class PageTest extends TestCase
     public function testUserShouldNotBeAbleToGetPageWithInvalidStoreCode()
     {
         $this->headers["store"] = "Invalid_Code";
-        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_slug]));
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", [$this->default_resource_slug]));
 
         $response->assertNotFound();
         $response->assertJsonFragment([
