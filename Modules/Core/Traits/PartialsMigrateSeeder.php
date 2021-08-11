@@ -18,11 +18,11 @@ trait PartialsMigrateSeeder
 
             // updated image attributes types
             $base_image = $attribute_model->where("slug", "base_image")->first();
-            $base_image->update(["type" => "multiimages"]);
+            $base_image->update(["type" => "image"]);
             $small_image = $attribute_model->where("slug", "small_image")->first();
-            $small_image->update(["type" => "multiimages"]);
+            $small_image->update(["type" => "image"]);
             $thumbnail_image = $attribute_model->where("slug", "thumbnail_image")->first();
-            $thumbnail_image->update(["type" => "multiimages"]);
+            $thumbnail_image->update(["type" => "image"]);
 
             // Added attributes
             $attributes = [
