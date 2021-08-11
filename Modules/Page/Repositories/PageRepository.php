@@ -5,15 +5,17 @@ namespace Modules\Page\Repositories;
 use Attribute;
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
 use Illuminate\Validation\ValidationException;
+use Modules\Page\Entities\PageScope;
 
 class PageRepository extends BaseRepository
 {
-    protected $pageAttributeRepository, $parent = [];
+    protected $pageAttributeRepository, $parent = [], $store_model, $pageScope;
 
-    public function __construct(Page $page, PageAttributeRepository $pageAttributeRepository)
+    public function __construct(Page $page, PageAttributeRepository $pageAttributeRepository, Store $store, PageScope $pageScope)
     {
         $this->model = $page;
         $this->model_key = "page";
@@ -29,6 +31,8 @@ class PageRepository extends BaseRepository
             "components" => "required|array"
         ];
         $this->pageAttributeRepository = $pageAttributeRepository;
+        $this->store_model = $store;
+        $this->pageScope = $pageScope;
     }
 
     public function validateSlug(array $data, ?int $id=null): void
@@ -68,7 +72,7 @@ class PageRepository extends BaseRepository
     }
 
     public function getParent(object $component): array
-    { 
+    {
         try
         {
             $this->parent = [];
@@ -86,7 +90,7 @@ class PageRepository extends BaseRepository
             "title" => $data["title"],
             "slug" => $data["slug"],
             "groups" => $this->parent
-        ];        
+        ];
     }
 
     private function getChildren(array $elements, ?string $key = null, array $values, ?string $slug_key = null): void
@@ -107,7 +111,7 @@ class PageRepository extends BaseRepository
                         if($default) $element["default"] = ($element["type"] == "file") ? Storage::url($default) : $default;
                     }
 
-                    setDotToArray($append_key, $this->parent, $element);        
+                    setDotToArray($append_key, $this->parent, $element);
                     continue;
                 }
 
@@ -119,20 +123,20 @@ class PageRepository extends BaseRepository
                         $fake_element = $element;
                         $fake_element["attributes"] = [];
                         for($j=0; $j<$count; $j++)
-                        { 
-                            if ($j==0) setDotToArray($append_key, $this->parent, $fake_element);           
+                        {
+                            if ($j==0) setDotToArray($append_key, $this->parent, $fake_element);
                             $this->getChildren($element["attributes"][0], "$append_key.attributes.$j", $values, "$append_slug_key.$j");
                         }
-                        continue; 
-                    } 
-                    if ($element["type"] == "normal") {   
+                        continue;
+                    }
+                    if ($element["type"] == "normal") {
                         setDotToArray($append_key, $this->parent,  $element);
                         $this->getChildren($element["attributes"], "$append_key.attributes", $values, $append_slug_key);
                         continue;
-                    }  
+                    }
                 }
 
-                setDotToArray($append_key, $this->parent,  $element);           
+                setDotToArray($append_key, $this->parent,  $element);
                 $this->getChildren($element["attributes"], "$append_key.attributes", $values);
             }
         }
@@ -140,5 +144,24 @@ class PageRepository extends BaseRepository
         {
             throw $exception;
         }
+    }
+
+    public function findPage(object $request, string $slug): object
+    {
+        try
+        {
+            $store_code = ($request->hasHeader("store")) ? $request->header("store") : null;
+            $store = $this->store_model->whereCode($store_code)->firstOrFail();
+            $page = $this->model->with("page_attributes")->whereSlug($slug)->firstOrFail();
+            $page_scope = $page->page_scopes()->whereScope("store");
+            $all_scope = (clone $page_scope)->whereScopeId(0)->first();
+            if(!$all_scope) $page = $page_scope->whereScopeId($store->id)->firstOrFail();
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $page;
     }
 }

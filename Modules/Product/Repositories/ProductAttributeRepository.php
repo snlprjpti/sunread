@@ -28,15 +28,13 @@ class ProductAttributeRepository extends ProductRepository
 
         $this->option_fields = [ "select", "multiselect", "checkbox", "multiimages" ];
 
-        $this->attributeMapperSlug = [ "quantity_and_stock_status", "sku", "status", "category_ids", "base_image", "small_image", "thumbnail_image" ];
+        $this->attributeMapperSlug = [ "quantity_and_stock_status", "sku", "status", "category_ids", "gallery" ];
         $this->functionMapper = [
             "sku" => "sku",
             "status" => "status",
             "quantity_and_stock_status" => "catalogInventory",
             "category_ids" => "categories",
-            "base_image" => "base_image", 
-            "small_image" => "small_image",
-            "thumbnail_image" => "thumbnail_image"
+            "gallery" => "gallery"
         ];
         $this->non_required_attributes = [ "price", "cost", "special_price", "special_from_date", "special_to_date", "quantity_and_stock_status" ];
         $this->non_option_slug = [ "tax_class_id", "category_ids" ];
@@ -135,7 +133,7 @@ class ProductAttributeRepository extends ProductRepository
     {
         if(in_array($attribute->type, ["checkbox", "multiselect"])) $this->multipleOptionValidation($attribute, $values);
         if(in_array($attribute->type, ["select"])) $this->singleOptionValidation($attribute, $values);
-        if(in_array($attribute->type, ["multiimages"])) $this->multipleImageValidation($attribute, $values);
+        // if(in_array($attribute->type, ["multiimages"])) $this->multipleImageValidation($attribute, $values);
     }
 
     public function singleOptionValidation(object $attribute, mixed $values): void

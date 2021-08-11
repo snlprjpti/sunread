@@ -19,6 +19,18 @@ return [
                 "width" => 1800,
                 "height" => 1800
             ]
+        ],
+        "product_section_background_image" => [
+            [
+                "width" => 1800,
+                "height" => 1800
+            ]
+        ],
+        "product_gallery_image" => [
+            [
+                "width" => 1800,
+                "height" => 1800
+            ]
         ]
     ]
 ];

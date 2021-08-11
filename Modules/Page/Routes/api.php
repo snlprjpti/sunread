@@ -10,4 +10,8 @@ Route::group(['middleware' => ['api']], function () {
         Route::put("pages/{page_id}/status", [\Modules\Page\Http\Controllers\PageController::class, "updateStatus"])->name("pages.status");
         Route::resource('pages', PageController::class)->except(['create', 'edit']);
     });
+
+    Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+        Route::get('pages/{page_slug}', [\Modules\Page\Http\Controllers\StoreFront\PageController::class, "show"])->name("pages.show");
+    });
 });

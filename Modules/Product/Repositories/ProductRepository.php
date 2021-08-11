@@ -175,11 +175,15 @@ class ProductRepository extends BaseRepository
         return true;
     }
 
-    public function base_image(object $product, object $request, string $method, array $value): bool
+    public function gallery(object $product, object $request, string $method, array $value): bool
     {
         try
         {
-            if (isset($value["value"])) $this->storeImages($product, $value["value"], "base_image");
+            if (isset($value["value"]["base_image"])) $this->storeImages($product, $value["value"]["base_image"], "base_image");
+            if (isset($value["value"]["small_image"])) $this->storeImages($product, $value["value"]["small_image"], "small_image");
+            if (isset($value["value"]["thumbnail_image"])) $this->storeImages($product, $value["value"]["thumbnail_image"], "thumbnail_image");
+            if (isset($value["value"]["section_background_image"])) $this->storeImages($product, $value["value"]["section_background_image"], "section_background_image");
+            if (isset($value["value"]["gallery"])) $this->storeImages($product, $value["value"]["gallery"], "gallery_image");
         }
         catch ( Exception $exception )
         {
@@ -189,52 +193,27 @@ class ProductRepository extends BaseRepository
         return true; 
     }
 
-    public function small_image(object $product, object $request, string $method, array $value): bool
+    public function storeImages(object $product, mixed $images, string $image_type): bool
     {
         try
         {
-            if (isset($value["value"])) $this->storeImages($product, $value["value"], "small_image");
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
+            $images = is_array($images) ? $images : [$images];
 
-        return true; 
-    }
-
-    public function thumbnail_image(object $product, object $request, string $method, array $value): bool
-    {
-        try
-        {
-            if (isset($value["value"])) $this->storeImages($product, $value["value"], "thumbnail_image");
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return true; 
-    }
-
-    public function storeImages(object $product, ?array $images, string $image_type): bool
-    {
-        try
-        {
-            if ( isset($images) && is_array($images) )
+            if ( isset($images) )
             {
                 $data = [];
                 $image_dimensions = config("product_image.image_dimensions.product_{$image_type}");
-                $position = 1;
+                $position = 0;
 
                 $validator = Validator::make(["image" =>  $images], [
                     "image.*" => "required|mimes:bmp,jpeg,jpg,png"
                 ]);
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
     
-                foreach ( $images as $index => $image )
+                foreach ( $images as $image )
                 {
-                    $position += $index;
+                    
+                    $position += 1;
                     $key = Str::random(6);
                     $file_name = $this->generateFileName($image);
                     $data["path"] = $image->storeAs("images/products/{$key}", $file_name);
@@ -265,6 +244,14 @@ class ProductRepository extends BaseRepository
     
                         case "thumbnail_image" :
                             $data["thumbnail"] = 1;
+                        break;
+
+                        case "section_background_image" :
+                            $data["section_background"] = 1;
+                        break;
+
+                        case "gallery_image" :
+                            $data["gallery"] = 1;
                         break;
                     }
 
