@@ -4,11 +4,18 @@ namespace Modules\Product\Listeners;
 
 use Elasticsearch\ClientBuilder;
 use Modules\Core\Entities\Website;
+use Modules\Product\Traits\ElasticSearch\ElasticSearchFormat;
 
 class ProductListener
 {
+    use ElasticSearchFormat;
+    
     public function indexing($product)
     {
+        $client = ClientBuilder::create()->setHosts(config("elastic.client.hosts"))->build();
+
+        dd($client);
+
         $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
             return $channel->stores->pluck("id");
         })->toArray();
@@ -20,12 +27,6 @@ class ProductListener
         }
         $data["categories"] = $product->categories()->pluck("id")->toArray();
         $data["catalog_inventories"] = $product->catalog_inventories;
-        
-        $hosts = [
-            "localhost:9200" 
-        ];
-        
-        $client = ClientBuilder::create()->setHosts($hosts)->build();
 
         foreach($stores as $store)
         {
