@@ -67,4 +67,12 @@ trait HasScope
             $query->whereAttribute("slug")->whereValue($slug);
         })->first();
     }
+
+    public function value(array $data): mixed
+    {
+        $this->createModel();
+        $default = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
+        return $default?->value;
+    }
+
 }
