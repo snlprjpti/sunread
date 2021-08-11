@@ -13,7 +13,7 @@ use Modules\Page\Entities\PageScope;
 
 class PageRepository extends BaseRepository
 {
-    protected $pageAttributeRepository, $parent = [];
+    protected $pageAttributeRepository, $parent = [], $store_model, $pageScope;
 
     public function __construct(Page $page, PageAttributeRepository $pageAttributeRepository, Store $store, PageScope $pageScope)
     {
@@ -31,7 +31,7 @@ class PageRepository extends BaseRepository
             "components" => "required|array"
         ];
         $this->pageAttributeRepository = $pageAttributeRepository;
-        $this->store = $store;
+        $this->store_model = $store;
         $this->pageScope = $pageScope;
     }
 
@@ -151,15 +151,17 @@ class PageRepository extends BaseRepository
         try
         {
             $store_code = array_key_exists("store_code", getallheaders()) ? getallheaders()["store_code"] : null;
-            $store_id = $this->store::whereCode($store_code)->pluck("id")->first();
-            $page_id  = $this->model::whereSlug($slug)->pluck("id")->first();
-            $pageScope = $this->pageScope::wherePageId($page_id)->whereScopeId($store_id)->orWhere("scope_id",0)->firstOrFail();
+            $store = $this->store_model->whereCode($store_code)->firstOrFail();
+            $page = $this->model->with("page_attributes")->whereSlug($slug)->firstOrFail();
+            $page_scope = $page->page_scopes()->whereScope("store");
+            $all_scope = (clone $page_scope)->whereScopeId(0)->first();
+            if(!$all_scope) $exist_page = $page_scope->whereScopeId($store->id)->firstOrFail();
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $pageScope;
+        return $page;
     }
 }
