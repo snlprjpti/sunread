@@ -32,14 +32,13 @@ class PageController extends BaseController
     {
         try
         {
-            $page = $this->repository->findPage( $request, $slug );
-            $fetch = $this->repository->fetch($page->page_id, ["page_attributes"]);
+            $fetched = $this->repository->findPage( $request, $slug );
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetch), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 }
