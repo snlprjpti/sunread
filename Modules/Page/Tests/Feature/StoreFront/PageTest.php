@@ -2,13 +2,16 @@
 
 namespace Modules\Page\Tests\Feature\StoreFront;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Core\Entities\Store;
-use Modules\Core\Tests\BaseTestCase;
 use Modules\Page\Entities\Page;
+use Tests\TestCase;
 
-class PageTest extends BaseTestCase
+class PageTest extends TestCase
 {
-    private $store_code;
+    use DatabaseTransactions;
+
+    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route, $store_code;
 
     public function setUp(): void
     {
@@ -21,18 +24,17 @@ class PageTest extends BaseTestCase
 
         $this->default_resource_slug = $this->model::latest('id')->first()->slug;
         $this->store_code = Store::oldest("id")->first()->code;
-        $this->hasIndexTest = false;
-        $this->hasShowTest = false;
-        $this->hasStoreTest = false;
-        $this->hasUpdateTest = false;
-        $this->hasDestroyTest = false;
-        $this->hasBulkDestroyTest = false;
-        $this->hasStatusTest = false;
+    }
+
+    public function getRoute(string $method, ?array $parameters = null): string
+    {
+        $parameters = $this->append_to_route ? array_merge([$this->append_to_route], $parameters ?? []) : $parameters;
+        return route("{$this->route_prefix}.{$method}", $parameters);
     }
 
     public function testUserShouldBeAbleToGetPage()
     {
-        $this->headers["store_code"] = "{$this->store_code}";
+        $this->headers["store"] = "{$this->store_code}";
         $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_slug]));
 
         $response->assertOk();
@@ -44,7 +46,7 @@ class PageTest extends BaseTestCase
 
     public function testUserShouldNotBeAbleToGetPageWithInvalidStoreCode()
     {
-        $this->headers["store_code"] = "Invalid_Code";
+        $this->headers["store"] = "Invalid_Code";
         $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_slug]));
 
         $response->assertNotFound();
