@@ -36,7 +36,7 @@ class ProductAttributeRepository extends ProductRepository
             "category_ids" => "categories",
             "gallery" => "gallery"
         ];
-        $this->non_required_attributes = [ "price", "cost", "quantity_and_stock_status" ];
+        $this->non_required_attributes = [ "price", "cost", "special_price", "special_from_date", "special_to_date", "quantity_and_stock_status" ];
         $this->non_option_slug = [ "tax_class_id", "category_ids" ];
     }
 
@@ -59,7 +59,7 @@ class ProductAttributeRepository extends ProductRepository
         return Cache::get("attributes_attribute_set");
     }
 
-    public function validateAttributes(object $product, object $request, array $scope, ?string $product_type = null): array
+    public function validateAttributes(object $product, object $request, array $scope, ?string $method = null, ?string $product_type = null): array
     {
         try
         {
@@ -90,8 +90,8 @@ class ProductAttributeRepository extends ProductRepository
             {
                 $product_attribute = [];
 
-                //Scope Filter
-                //if($this->product_repository->scopeFilter($scope["scope"], $attribute->scope)) continue; 
+                //removed some attributes in case of configurable products
+                if($method == "update" && $product_type && in_array($attribute->slug, $this->non_required_attributes)) continue;
 
                 //Super attribute filter in case of configurable products
                 if(isset($super_attributes) && (in_array($attribute->id, $super_attributes))) continue;

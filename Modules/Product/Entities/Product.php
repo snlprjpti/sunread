@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\Attribute\Entities\AttributeGroup;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Brand\Entities\Brand;
@@ -15,30 +14,17 @@ use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Inventory\Entities\CatalogInventory;
-use Modules\Product\IndexConfigurator\ProductIndexConfigurator;
-use Modules\Product\Traits\ElasticSearch\ElasticSearchFormat;
-use ScoutElastic\Searchable;
 
 class Product extends Model
 {
-    use HasFactory, Searchable;
-    // use ElasticSearchFormat;
+    use HasFactory;
 
     protected $fillable = [ "parent_id", "website_id", "brand_id", "attribute_set_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];
 
-    protected $indexConfigurator = ProductIndexConfigurator::class;
-
-    protected $searchRules = [
-        //
-    ];
-    
-    protected $mapping;
-
     public function __construct(?array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->mapping = config('mapping');
     }
 
     public function parent(): BelongsTo
@@ -79,12 +65,6 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy("main_image", "desc")->orderBy("position");
-    }
-    
-    public function toSearchableArray()
-    {
-        return $this->toArray();
-        // return $this->documentDataStructure();
     }
 
     public function variants(): HasMany

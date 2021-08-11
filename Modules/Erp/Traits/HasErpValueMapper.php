@@ -290,7 +290,7 @@ trait HasErpValueMapper
     {
         $product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
         $images = $this->getValue($product_images, function ($value) {
-            return json_decode($value, true) ?? $value;
+            return is_array($value) ? $value : json_decode($value, true) ?? $value;
         });
 
         if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"]);
