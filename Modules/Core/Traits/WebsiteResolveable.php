@@ -46,7 +46,6 @@ trait WebsiteResolveable
         return $resolved;
     }
 
-
     public function resolveWebsiteUpdate(object $request, ?callable $callback = null): ?object
     {
         try
@@ -54,23 +53,15 @@ trait WebsiteResolveable
             $domain = $this->getDomain();
 
             $fallback_id = config("website.fallback_id");
-            if ($request->hasHeader('host')) {
-                $fallback_id = Website::whereHostname($request->header("host"))->firstOrFail()?->id;
+            if ($request->hasHeader('hc-host')) {
+                $fallback_id = Website::whereHostname($request->header("hc-host"))->firstOrFail()?->id;
             }
             $website = Website::whereHostname($domain)->first();
-            if ( !$website->exists() && config("website.environment") == "local" ) {
+            if ( !$website && config("website.environment") == "local" ) {
                 $website = Website::whereId($fallback_id)->firstOrFail();
             }
 
-            if($request->hasHeader("channel")){
-                $channel_code = $request->header("channel");
-                $channel = Store::whereCode($channel_code)->firstOrFail();
-            }
-            else {
-                $channel = ($channel = $this->checkCondition()->first()) ? Channel::whereId($channel->value)->firstOrFail() : null;
-            }
-
-            if ($callback) $website = $callback(array_combine($website->toArray(), $channel->toArray()));
+            if ($callback) $website = $callback($website);
         }
         catch (Exception $exception)
         {
@@ -79,7 +70,6 @@ trait WebsiteResolveable
 
         return $website;
     }
-
 
     public function checkCondition(): object
     {

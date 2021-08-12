@@ -6,11 +6,11 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Core\Entities\Website;
-use Modules\Core\Transformers\ResolveResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\ResolveRepository;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Core\Transformers\StoreFront\ResolveResource;
 
 class ResolverController extends BaseController
 {
@@ -30,7 +30,7 @@ class ResolverController extends BaseController
         return new ResolveResource($data);
     }
 
-    public function resolves(?string $website = null): JsonResponse
+    public function resolveOld(?string $website = null): JsonResponse
     {
         try
         {
