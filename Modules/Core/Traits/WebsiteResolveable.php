@@ -3,6 +3,8 @@
 namespace Modules\Core\Traits;
 
 use Exception;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Illuminate\Support\Facades\Request;
 
@@ -42,6 +44,48 @@ trait WebsiteResolveable
         }
 
         return $resolved;
+    }
+
+
+    public function resolveWebsiteUpdate(object $request, ?callable $callback = null): ?object
+    {
+        try
+        {
+            $domain = $this->getDomain();
+
+            $fallback_id = config("website.fallback_id");
+            if ($request->hasHeader('host')) {
+                $fallback_id = Website::whereHostname($request->header("host"))->firstOrFail()?->id;
+            }
+            $website = Website::whereHostname($domain)->first();
+            if ( !$website->exists() && config("website.environment") == "local" ) {
+                $website = Website::whereId($fallback_id)->firstOrFail();
+            }
+
+            if($request->hasHeader("channel")){
+                $channel_code = $request->header("channel");
+                $channel = Store::whereCode($channel_code)->firstOrFail();
+            }
+            else {
+                $channel = ($channel = $this->checkCondition()->first()) ? Channel::whereId($channel->value)->firstOrFail() : null;
+            }
+
+            if ($callback) $website = $callback(array_combine($website->toArray(), $channel->toArray()));
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $website;
+    }
+
+
+    public function checkCondition(): object
+    {
+        return \Modules\Core\Entities\Configuration::where([
+            ['path', "website_default_channel"]
+        ]);
     }
 
     public function fetchAll(object $request, array $with = [], ?callable $callback = null): object
