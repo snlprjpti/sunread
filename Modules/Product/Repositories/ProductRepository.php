@@ -380,7 +380,7 @@ class ProductRepository extends BaseRepository
                         ];
                         if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
-                        
+
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
                         {
                             $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
@@ -444,7 +444,7 @@ class ProductRepository extends BaseRepository
         ];
     }
 
-    private function getFullPath(object $product,string $image_name): ?string
+    private function getFullPath(object $product, string $image_name): ?string
     {
         $image = $product->images()->where($image_name, 1)->first();
         return $image ? Storage::url($image->path) : $image;
