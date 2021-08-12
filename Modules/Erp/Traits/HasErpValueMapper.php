@@ -223,7 +223,7 @@ trait HasErpValueMapper
         try
         {
             $price_data = $this->getValue($prices)->filter(function ($price_value) {
-                return $price_value["currencyCode"] !== "USD";
+                return $price_value["salesCode"] == "WEB" && $price_value["currencyCode"] !== "USD";
             })->map(function ($price_value) {
 
                 // Condition for invalid date/times
