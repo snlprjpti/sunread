@@ -426,22 +426,28 @@ class ProductRepository extends BaseRepository
             return $statusOption?->id;
         } 
         if($attribute->slug == "category_ids") return $product->categories()->pluck('category_id')->toArray();
-        if($attribute->slug == "gallery")
-        {
-            $main_image = $product->images()->where('main_image', 1)->first();
-            $small_image = $product->images()->where('small_image', 1)->first();
-            $thumbnail_image = $product->images()->where('thumbnail', 1)->first();
-            return [
-                "main_image" =>  ($main_image) ? Storage::url($main_image->path) : null,
-                "small_image" =>  ($small_image) ? Storage::url($small_image->path) : null,
-                "thumbnail_image" =>  ($thumbnail_image) ? Storage::url($thumbnail_image->path) : null,
-                "gallery" => $product->images()->where('gallery', 1)->pluck('path')->map(function ($gallery) {
-                    return Storage::url($gallery);
-                })->toArray()
-            ];
-        }
+        if($attribute->slug == "gallery") return $this->getImages($product);
 
         if($attribute->slug == "quantity_and_stock_status") return ($data = $product->catalog_inventories()->first()) ? $data->is_in_stock : null;
+    }
+
+    private function getImages(object $product): array
+    {
+        return [
+            "base_image" => $this->getFullPath($product, "main_image"),
+            "thumbnail_image" => $this->getFullPath($product, "thumbnail"),
+            "section_background_image" => $this->getFullPath($product, "section_background"),
+            "small_image" => $this->getFullPath($product, "small_image"),
+            "gallery" => $product->images()->whereGallery(1)->pluck('path')->map(function ($gallery) {
+                return Storage::url($gallery);
+            })->toArray()
+        ];
+    }
+
+    private function getFullPath(object $product,string $image_name): ?string
+    {
+        $image = $product->images()->where($image_name, 1)->first();
+        return $image ? Storage::url($image->path) : $image;
     }
 
     public function getFilterProducts(object $request): mixed
