@@ -426,15 +426,21 @@ class ProductRepository extends BaseRepository
             return $statusOption?->id;
         } 
         if($attribute->slug == "category_ids") return $product->categories()->pluck('category_id')->toArray();
-        if($attribute->slug == "base_image") return $product->images()->where('main_image', 1)->pluck('path')->map(function ($base_image) {
-            return Storage::url($base_image);
-        })->toArray();
-        if($attribute->slug == "small_image") return $product->images()->where('small_image', 1)->pluck('path')->map(function ($small_image) {
-            return Storage::url($small_image);
-        })->toArray();
-        if($attribute->slug == "thumbnail_image") return $product->images()->where('thumbnail', 1)->pluck('path')->map(function ($thumbnail) {
-            return Storage::url($thumbnail);
-        })->toArray();
+        if($attribute->slug == "gallery")
+        {
+            $main_image = $product->images()->where('main_image', 1)->first();
+            $small_image = $product->images()->where('small_image', 1)->first();
+            $thumbnail_image = $product->images()->where('thumbnail', 1)->first();
+            return [
+                "main_image" =>  ($main_image) ? Storage::url($main_image->path) : null,
+                "small_image" =>  ($small_image) ? Storage::url($small_image->path) : null,
+                "thumbnail_image" =>  ($thumbnail_image) ? Storage::url($thumbnail_image->path) : null,
+                "gallery" => $product->images()->where('gallery', 1)->pluck('path')->map(function ($gallery) {
+                    return Storage::url($gallery);
+                })->toArray()
+            ];
+        }
+
         if($attribute->slug == "quantity_and_stock_status") return ($data = $product->catalog_inventories()->first()) ? $data->is_in_stock : null;
     }
 
