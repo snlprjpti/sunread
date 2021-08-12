@@ -152,4 +152,15 @@ trait HasIndexing
             throw $exception;
         }
     }
+
+    public function searchIndex(array $data): ?array
+    {
+        $params["index"]  = "sail_racing_store_1";
+        $exists = $this->checkIndexIfExist($params);
+
+        $params = array_merge($params, [ "body" => $data ]);         
+        $response = $exists ? $this->client->search($params) : null;  
+        return $response; 
+
+    }
 }
