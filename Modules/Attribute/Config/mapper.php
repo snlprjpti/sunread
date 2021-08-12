@@ -15,6 +15,11 @@ return [
         "options" => 0,
         "pluck" => []
     ],
+    "gallery" => [
+        "module" => "Modules\Product\Entities\ProductImage",
+        "options" => 0,
+        "pluck" => []
+    ],
     "sku" => [
         "module" => "Modules\Product\Entities\Product",
         "options" => 0,
