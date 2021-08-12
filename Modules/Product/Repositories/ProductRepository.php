@@ -380,7 +380,7 @@ class ProductRepository extends BaseRepository
                         ];
                         if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
-                        
+
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
                         {
                             $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
@@ -426,16 +426,28 @@ class ProductRepository extends BaseRepository
             return $statusOption?->id;
         } 
         if($attribute->slug == "category_ids") return $product->categories()->pluck('category_id')->toArray();
-        if($attribute->slug == "base_image") return $product->images()->where('main_image', 1)->pluck('path')->map(function ($base_image) {
-            return Storage::url($base_image);
-        })->toArray();
-        if($attribute->slug == "small_image") return $product->images()->where('small_image', 1)->pluck('path')->map(function ($small_image) {
-            return Storage::url($small_image);
-        })->toArray();
-        if($attribute->slug == "thumbnail_image") return $product->images()->where('thumbnail', 1)->pluck('path')->map(function ($thumbnail) {
-            return Storage::url($thumbnail);
-        })->toArray();
+        if($attribute->slug == "gallery") return $this->getImages($product);
+
         if($attribute->slug == "quantity_and_stock_status") return ($data = $product->catalog_inventories()->first()) ? $data->is_in_stock : null;
+    }
+
+    private function getImages(object $product): array
+    {
+        return [
+            "base_image" => $this->getFullPath($product, "main_image"),
+            "thumbnail_image" => $this->getFullPath($product, "thumbnail"),
+            "section_background_image" => $this->getFullPath($product, "section_background"),
+            "small_image" => $this->getFullPath($product, "small_image"),
+            "gallery" => $product->images()->whereGallery(1)->pluck('path')->map(function ($gallery) {
+                return Storage::url($gallery);
+            })->toArray()
+        ];
+    }
+
+    private function getFullPath(object $product, string $image_name): ?string
+    {
+        $image = $product->images()->where($image_name, 1)->first();
+        return $image ? Storage::url($image->path) : $image;
     }
 
     public function getFilterProducts(object $request): mixed
