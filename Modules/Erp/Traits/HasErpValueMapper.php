@@ -12,6 +12,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
+use Modules\Core\Entities\Channel;
 use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Jobs\Mapper\ErpDetailStatusUpdate;
 use Modules\Erp\Jobs\Mapper\ErpGenerateVariantProductJob;
@@ -107,7 +108,13 @@ trait HasErpValueMapper
             
             // get price for specific product need more clearification
             $price = $this->getDetailCollection("salePrices", $erp_product_iteration->sku);
-            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->where("salesCode", "WEB")->first() ?? ["unitPrice" => 0.0] : ["unitPrice" => 0.0];
+            $default_price_data = [
+                "unitPrice" => 0.0,
+                "startingDate" => "",
+                "endingDate" => ""
+            ];
+            $this->storeScopeWiseValue($price, $product);
+            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
 
             // Condition for invalid date/times
             $max_time = strtotime("2030-12-28");
@@ -203,11 +210,101 @@ trait HasErpValueMapper
 
                 ProductAttribute::updateOrCreate($match, $product_attribute_data);
             }
+        
         }
         catch ( Exception $exception )
         {
             throw $exception;
         }
+    }
+
+    private function storeScopeWiseValue(mixed $prices, object $product): bool
+    {
+        try
+        {
+            $price_data = $this->getValue($prices)->filter(function ($price_value) {
+                return $price_value["currencyCode"] !== "USD";
+            })->map(function ($price_value) {
+
+                // Condition for invalid date/times
+                $max_time = strtotime("2030-12-28");
+                $start_time = abs(strtotime($price_value["startingDate"]));
+                $end_time = abs(strtotime($price_value["endingDate"]));
+
+                $start_time = $start_time < $max_time ? $start_time : $max_time - 1;
+                $end_time = $end_time < $max_time ? $end_time : $max_time;
+
+                return [ 
+                    [
+                        "attribute_id" => 3,
+                        "value" => $price_value["unitPrice"],
+                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"] 
+                    ],
+                    [
+                        "attribute_id" => 6,
+                        "value" => Carbon::parse(date("Y-m-d", $start_time)),
+                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
+                    ],
+                    [
+                        "attribute_id" => 7,
+                        "value" => Carbon::parse(date("Y-m-d", $end_time)),
+                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
+                    ] 
+                ];
+            });
+
+            foreach ( $price_data as $price )
+            {
+                foreach ($price as $attributeData)
+                {
+                    $channel_id  = $this->getChannelId($attributeData["channel_code"])->id ?? 1;
+                    $attribute = Attribute::find($attributeData["attribute_id"]);
+                    $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
+                    $value = $attribute_type::create(["value" => $attributeData["value"]]);
+
+                    $product_attribute_data = [
+                        "attribute_id" => $attribute->id,
+                        "product_id"=> $product->id,
+                        "value_type" => $attribute_type,
+                        "value_id" => $value->id,
+                        "scope" => "channel",
+                        "scope_id" => $channel_id
+                    ];
+                    $match = $product_attribute_data;
+                    unset($match["value_id"]);
+                    ProductAttribute::updateOrCreate($match, $product_attribute_data);  
+                }              
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return true;
+    }
+
+    private function getChannelId(string $code): ?object
+    {
+        try
+        {
+            $data = [
+                "name" => $code,
+                "code" => $code,
+                "hostname" => "{$code}.xyz.co",
+                "description" => "{$code} channel",
+                "website_id" => 1
+            ];
+            $match = $data;
+            unset($match["description"], $match["name"]);
+            $channel = Channel::updateOrCreate($match, $data);
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $channel;
     }
 
     private function getAttributeOptionValue(mixed $erp_product_iteration, string $attribute_slug): bool
@@ -218,8 +315,8 @@ trait HasErpValueMapper
                 case 'color':
                     $data = [
                         "attribute_id" => Attribute::whereSlug("color")->first()->id,
-                        "name" => $erp_product_iteration->value["webAssortmentColor_Description"],
-                        "code" => $erp_product_iteration->value["webAssortmentColor_Code"]
+                        "name" => $erp_product_iteration->value["webAssortmentColor_Description"] ?? "",
+                        "code" => $erp_product_iteration->value["webAssortmentColor_Code"] ?? ""
                     ];
                     $match = $data;
                     unset($match["name"]);
@@ -229,8 +326,8 @@ trait HasErpValueMapper
                 case 'size':
                     $data = [
                         "attribute_id" => Attribute::whereSlug("size")->first()->id,
-                        "name" => $erp_product_iteration["pfHorizontalComponentCode"],
-                        "code" => $erp_product_iteration["pfVerticalComponentCode"]
+                        "name" => $erp_product_iteration["pfHorizontalComponentCode"] ?? "",
+                        "code" => $erp_product_iteration["pfVerticalComponentCode"] ?? ""
                     ];
                     $match = $data;
                     unset($match["code"]);
@@ -257,7 +354,7 @@ trait HasErpValueMapper
             if ( $attribute_groups->count() > 1 )
             {
                 $this->getValue($attribute_groups, function ($value) use (&$attach_value, $attribute_name) {
-                    if ( $value["attributetype"] == $attribute_name ) $attach_value .= Str::finish($value["description"], ".\r\n ");
+                    if ( $value["attributetype"] == $attribute_name ) $attach_value .= Str::finish($value["description"], ".\\r\\n ");
                 });
             }
         }
