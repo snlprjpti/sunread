@@ -264,72 +264,26 @@ return [
         ],
         "categories"=> [
             "properties"=> [
-                "_lft"=> [
-                    "type"=> "long"
-                ],
-                "_rgt"=> [
-                    "type"=> "long"
-                ],
-                "created_at"=> [
-                    "type"=> "date"
-                ],
                 "id"=> [
                     "type"=> "long"
                 ],
-                "position"=> [
-                    "type"=> "long"
-                ],
-                "updated_at"=> [
-                    "type"=> "date"
-                ],
-                "values"=> [
-                    "properties"=> [
-                        "attribute"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "category_id"=> [
-                            "type"=> "long"
-                        ],
-                        "created_at"=> [
-                            "type"=> "date"
-                        ],
-                        "id"=> [
-                            "type"=> "long"
-                        ],
-                        "scope"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "scope_id"=> [
-                            "type"=> "long"
-                        ],
-                        "updated_at"=> [
-                            "type"=> "date"
-                        ],
-                        "value"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
+                "name" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
                         ]
                     ]
                 ],
-                "website_id"=> [
-                    "type"=> "long"
+                "slug" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ]

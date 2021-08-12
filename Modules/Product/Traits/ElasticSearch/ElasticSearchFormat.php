@@ -74,10 +74,8 @@ trait ElasticSearchFormat
 
             return [
                 "id" => $category->id,
-                "parent_id" => $category->parent_id,
                 "slug" => $category->value($defaul_data, "slug"),
-                "name" => $category->value($defaul_data, "name"),
-                "position" => $category->position
+                "name" => $category->value($defaul_data, "name")
             ];
         })->toArray();
     }
