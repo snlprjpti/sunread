@@ -4,60 +4,40 @@ namespace Modules\Product\Traits\ElasticSearch;
 
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeOption;
+use Modules\Tax\Entities\ProductTaxGroup;
 
 trait ElasticSearchFormat
 {
+    protected $non_required_attributes = [ "cost" ],
+    $options_fields = [ "select", "multiselect", "checkbox" ];
+
     public function documentDataStructure(object $store): array
     {
-        $array = $this->getBasicAttribute($store); 
+        $array = $this->getProductAttributes($store);
         $array = array_merge($array, $this->getInventoryData()); 
 
         $array['categories'] = $this->getCategoryData($store);
-        $array['product_attributes'] = $this->getProductAttributes($store);
         
         $array = array_merge($array, $this->getImages());
 
         return $array;
     }
 
-    public function getBasicAttribute(object $store): array
-    {
-        $slugs = [ "name", "price" ];
-        $data = [];
-
-        $data = collect($this)->filter(function ($product, $key) {
-            if(in_array($key, ["id", "sku", "status", "website_id", "parent_id", "type", "attribute_set_id"])) return $product;
-        })->toArray();
-
-        foreach($slugs as $slug)
-        {
-            $attribute = Attribute::whereSlug($slug)->first();
-            $match = [
-                "scope" => "store",
-                "scope_id" => $store->id,
-                "attribute_id" => $attribute->id
-            ];
-            $data[$slug] = $this->value($match);
-        }
-        return $data;
-    }
-
-    public function getInventoryData(): ?array
-    {
-        return $this->catalog_inventories()->select("quantity", "is_in_stock", "manage_stock", "use_config_manage_stock")->first()->toArray();
-    }
-
     public function getProductAttributes(object $store): array
     {
         $data = [];
+
+        $data = collect($this)->filter(function ($product, $key) {
+            if(in_array($key, [ "id", "sku", "status", "website_id", "parent_id", "type" ])) return $product;
+        })->toArray();
+        
         $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
         
         foreach($attributeIds as $attributeId)
         {
             $attribute = Attribute::find($attributeId);
-            $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
-            $model_type = new $attribute_type();
-            $type = $model_type::$type;
+            if(in_array($attribute->slug, $this->non_required_attributes)) continue;
 
             $match = [
                 "scope" => "store",
@@ -65,13 +45,21 @@ trait ElasticSearchFormat
                 "attribute_id" => $attributeId
             ];
 
-            $data[] = [
-                "attribute" => $attribute->toArray(),
-                "value" => $this->value($match),
-                "{$type}_value" => $this->value($match),
-            ];
+            $data[$attribute->slug] = $this->value($match);
+            if(in_array($attribute->type, $this->options_fields))
+            {
+                $attribute_option_class = $attribute->getConfigOption() ? new ProductTaxGroup() : new AttributeOption();
+                $attribute_option = $attribute_option_class->find($data[$attribute->slug]);
+                if($attribute_option) $data["{$attribute->slug}_value"] = $attribute_option->name;
+            }
         }
+
         return $data;
+    }
+
+    public function getInventoryData(): ?array
+    {
+        return $this->catalog_inventories()->select("quantity", "is_in_stock")->first()->toArray();
     }
 
     public function getCategoryData(object $store): array

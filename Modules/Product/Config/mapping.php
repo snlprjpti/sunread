@@ -13,9 +13,6 @@ return [
                 ]
             ]
         ],
-        "price" =>  [
-            "type" => "float"
-        ],
         "sku" =>  [
             "type" => "text",
             "fields" =>  [
@@ -24,6 +21,9 @@ return [
                     "ignore_above" => 256
                 ]
             ]
+        ],
+        "price" =>  [
+            "type" => "float"
         ],
         "type" =>  [
             "type" => "text",
@@ -34,17 +34,8 @@ return [
                 ]
             ]
         ],
-        "attribute_set_id" =>  [
-            "type" => "long"
-        ],
         "status" =>  [
             "type" => "long"
-        ],
-        "is_in_stock"=> [
-            "type"=> "long"
-        ],
-        "manage_stock"=> [
-            "type"=> "long"
         ],
         "quantity"=> [
             "type"=> "text",
@@ -55,10 +46,178 @@ return [
                 ]
             ]
         ],
-        "use_config_manage_stock"=> [
+        "website_id" =>  [
+            "type" => "long"
+        ],
+        "parent_id" =>  [
+            "type" => "long"
+        ],
+        "visibility" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "visibility_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "is_in_stock"=> [
             "type"=> "long"
         ],
         "base_image" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "has_weight" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "has_weight_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "new_from_date" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "new_to_date" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "description" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "short_description" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "meta_keywords" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "meta_title" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "meta_description" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],        
+        "special_price" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "special_from_date" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "special_to_date" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "tax_class_id" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "tax_class_id_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "url_key" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "weight" =>  [
             "type" => "text",
             "fields" =>  [
                 "keyword" =>  [
@@ -76,7 +235,7 @@ return [
                 ]
             ]
         ],
-        "thumbnail" =>  [
+        "thumbnail_image" =>  [
             "type" => "text",
             "fields" =>  [
                 "keyword" =>  [
@@ -170,186 +329,6 @@ return [
                     ]
                 ],
                 "website_id"=> [
-                    "type"=> "long"
-                ]
-            ]
-        ],
-        "product_attributes"=> [
-            "type"=> "nested",
-            "properties"=> [
-                "attribute"=> [
-                    "properties"=> [
-                        "attribute_group_id"=> [
-                            "type"=> "long"
-                        ],
-                        "attribute_options"=> [
-                            "properties"=> [
-                                "attribute_id"=> [
-                                    "type"=> "long"
-                                ],
-                                "code"=> [
-                                    "type"=> "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=> "keyword",
-                                            "ignore_above"=> 256
-                                        ]
-                                    ]
-                                ],
-                                "created_at"=> [
-                                    "type"=> "date"
-                                ],
-                                "id"=> [
-                                    "type"=> "long"
-                                ],
-                                "is_default"=> [
-                                    "type"=> "long"
-                                ],
-                                "name"=> [
-                                    "type"=> "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=> "keyword",
-                                            "ignore_above"=> 256
-                                        ]
-                                    ]
-                                ],
-                                "position"=> [
-                                    "type"=> "long"
-                                ],
-                                "updated_at"=> [
-                                    "type"=> "date"
-                                ]
-                            ]
-                        ],
-                        "comparable_on_storefront"=> [
-                            "type"=> "long"
-                        ],
-                        "created_at"=> [
-                            "type"=> "date"
-                        ],
-                        "id"=> [
-                            "type"=> "long"
-                        ],
-                        "is_required"=> [
-                            "type"=> "long"
-                        ],
-                        "is_searchable"=> [
-                            "type"=> "long"
-                        ],
-                        "is_unique"=> [
-                            "type"=> "long"
-                        ],
-                        "is_user_defined"=> [
-                            "type"=> "long"
-                        ],
-                        "is_visible_on_storefront"=> [
-                            "type"=> "long"
-                        ],
-                        "name"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "position"=> [
-                            "type"=> "long"
-                        ],
-                        "scope"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "search_weight"=> [
-                            "type"=> "long"
-                        ],
-                        "slug"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "type"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "type_validation"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "updated_at"=> [
-                            "type"=> "date"
-                        ],
-                        "use_in_layered_navigation"=> [
-                            "type"=> "long"
-                        ],
-                        "validation"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                "value"=> [
-                    "type"=> "integer",
-                    "ignore_malformed"=> true
-                ],
-                "string_value" =>  [
-                    "type" => "text",
-                    "fields" =>  [
-                        "keyword" =>  [
-                            "type" => "keyword",
-                            "ignore_above" => 256
-                        ]
-                    ]
-                ],
-                "boolean_value" =>  [
-                    "type" => "long"
-                ],
-                "date_value" =>  [
-                    "type" => "date",
-                    "format"=> "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
-                ],
-                "integer_value" =>  [
-                    "type" => "date"
-                ],
-                "decimal_value" =>  [
-                    "type" => "double"
-                ],
-                "scope"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "scope_id"=> [
                     "type"=> "long"
                 ]
             ]
