@@ -5,7 +5,8 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\Attribute\\Providers\\AttributeServiceProvider"
+        "Modules\\Attribute\\Providers\\AttributeServiceProvider",
+        "Modules\\Attribute\\Providers\\EventServiceProvider"
     ],
     "aliases": {},
     "files": [],
