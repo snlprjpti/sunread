@@ -48,13 +48,26 @@ trait ElasticSearchFormat
             $data[$attribute->slug] = $this->value($match);
             if(in_array($attribute->type, $this->options_fields))
             {
-                $attribute_option_class = $attribute->getConfigOption() ? new ProductTaxGroup() : new AttributeOption();
-                $attribute_option = $attribute_option_class->find($data[$attribute->slug]);
-                if($attribute_option) $data["{$attribute->slug}_value"] = $attribute_option->name;
+                $value = $data[$attribute->slug];
+                if (is_array($value)) {
+                    foreach($value as $key => $val)
+                    {
+                        $data["{$attribute->slug}_{$key}_value"] = $this->getAttributeOption($attribute, $val);
+                    }
+                }
+                else $data["{$attribute->slug}_value"] = $this->getAttributeOption($attribute, $value);
             }
         }
 
         return $data;
+    }
+
+    public function getAttributeOption(object $attribute, mixed $value): ?string
+    {
+        $attribute_option_class = $attribute->getConfigOption() ? new ProductTaxGroup() : new AttributeOption();
+        $attribute_option = $attribute_option_class->find($value);
+        if($attribute_option) return $attribute_option->name;
+        return null;
     }
 
     public function getInventoryData(): ?array

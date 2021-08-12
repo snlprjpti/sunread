@@ -78,6 +78,29 @@ trait HasIndexing
         }
     }
 
+    public function partialIndexing(object $product, object $store, array $slug_values): void
+    {
+        try
+        {
+            $params["index"]  = $this->setIndexName($store->id);
+            $exists = $this->checkIndexIfExist($params);
+
+            if ($exists) {
+                $params = array_merge($params, [ 
+                    "id" => $product->id,
+                    "body" => [
+                        "doc" => $slug_values
+                    ]
+                ]);
+                $this->client->update($params);
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
     public function removeIndex(object $product, object $store): void
     {
         try
@@ -85,8 +108,7 @@ trait HasIndexing
             $params["index"]  = $this->setIndexName($store->id);
             $exists = $this->checkIndexIfExist($params);
 
-            if($exists)
-            {
+            if ($exists) {
                 $params = array_merge($params, [ "id" => $product["id"] ]);
                 $this->client->delete($params);
             }
