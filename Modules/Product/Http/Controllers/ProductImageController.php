@@ -73,6 +73,20 @@ class ProductImageController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
+    public function bulkDelete(Request $request)
+    {
+        try
+        {
+            $this->repository->bulkDelete($request);
+        }
+        catch ( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'));
+    }
+
     public function changeMainImage(int $id): JsonResponse
     {
         try
