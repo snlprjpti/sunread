@@ -8,6 +8,7 @@ use Modules\Core\Entities\Configuration;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Illuminate\Support\Facades\Request;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Page\Entities\Page;
 
 trait WebsiteResolveable
@@ -64,8 +65,8 @@ trait WebsiteResolveable
                 $collection["website"] = Website::whereId($fallback_id)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             }
 
-            $collection["channel"] = $this->getChannel($request);
-            $collection["store"] = $this->getStore($request);
+            $collection["channel"] = $this->getChannel($request, $collection["website"]);
+            $collection["store"] = $this->getStore($request, $collection["website"]);
             $collection["pages"] = $this->getPages($collection["website"]);
 
             if ($callback) $collection = $callback($collection);
@@ -78,7 +79,7 @@ trait WebsiteResolveable
         return $collection;
     }
 
-    public function getChannel(object $request): object
+    public function getChannel(object $request, object $website): object|null
     {
         try
         {
@@ -87,7 +88,7 @@ trait WebsiteResolveable
                 $channel = Channel::whereCode($channel_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             }
             else {
-                $channel = ($channel = $this->checkConditionChannel()->first()) ? Channel::whereId($channel->value)->select(["id","name","code"])->setEagerLoads([])->firstOrFail() : null;
+                $channel = ($channel = $this->checkConditionChannel($website)) ? $channel->select(["id","name","code"])->setEagerLoads([])->firstOrFail() : null;
             }
         }
         catch( Exception $exception )
@@ -98,7 +99,7 @@ trait WebsiteResolveable
         return $channel;
     }
 
-    public function getStore(object $request): object
+    public function getStore(object $request, object $website): object|null
     {
         try
         {
@@ -107,7 +108,7 @@ trait WebsiteResolveable
                 $store = Store::whereCode($store_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             }
             else {
-                $store = ($store = $this->checkConditionStore()->first()) ? Store::whereId($store->value)->select(["id","name","code"])->setEagerLoads([])->firstOrFail() : null;
+                $store = ($store = $this->checkConditionStore($website)) ? $store->select(["id","name","code"])->setEagerLoads([])->firstOrFail() : null;
             }
         }
         catch( Exception $exception )
@@ -118,7 +119,7 @@ trait WebsiteResolveable
         return $store;
     }
 
-    public function getPages(object $website): object
+    public function getPages(object $website): object|null
     {
         try
         {
@@ -132,18 +133,14 @@ trait WebsiteResolveable
         return $pages;
     }
 
-    public function checkConditionChannel(): object
+    public function checkConditionChannel(object $website): object|null
     {
-        return Configuration::where([
-            ['path', "website_default_channel"]
-        ]);
+        return SiteConfig::fetch("website_default_channel", "website", $website->id);
     }
 
-    public function checkConditionStore(): object
+    public function checkConditionStore(object $website): object|null
     {
-        return Configuration::where([
-            ['path', "website_default_store"]
-        ]);
+        return SiteConfig::fetch("website_default_store", "website", $website->id);
     }
 
     public function fetchAll(object $request, array $with = [], ?callable $callback = null): object
