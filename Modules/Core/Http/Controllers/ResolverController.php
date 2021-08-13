@@ -4,7 +4,6 @@ namespace Modules\Core\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Modules\Core\Entities\Website;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Facades\SiteConfig;
@@ -30,7 +29,7 @@ class ResolverController extends BaseController
         return new ResolveResource($data);
     }
 
-    public function resolveOld(?string $website = null): JsonResponse
+    public function resolve(?string $website = null): JsonResponse
     {
         try
         {
@@ -47,19 +46,5 @@ class ResolverController extends BaseController
         }
 
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
-    }
-
-    public function resolve(Request $request): JsonResponse
-    {
-        try
-        {
-            $fetched = $this->repository->resolveWebsiteUpdate($request);
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }
