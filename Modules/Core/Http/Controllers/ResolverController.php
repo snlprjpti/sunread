@@ -5,6 +5,7 @@ namespace Modules\Core\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Facades\SiteConfig;
@@ -60,6 +61,6 @@ class ResolverController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }

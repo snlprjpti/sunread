@@ -4,6 +4,7 @@ namespace Modules\Core\Traits;
 
 use Exception;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Configuration;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Illuminate\Support\Facades\Request;
@@ -46,7 +47,7 @@ trait WebsiteResolveable
         return $resolved;
     }
 
-    public function resolveWebsiteUpdate(object $request, ?callable $callback = null): ?object
+    public function resolveWebsiteUpdate(object $request, ?callable $callback = null): ?array
     {
         try
         {
@@ -56,25 +57,76 @@ trait WebsiteResolveable
             if ($request->hasHeader('hc-host')) {
                 $fallback_id = Website::whereHostname($request->header("hc-host"))->firstOrFail()?->id;
             }
-            $website = Website::whereHostname($domain)->first();
-            if ( !$website && config("website.environment") == "local" ) {
-                $website = Website::whereId($fallback_id)->firstOrFail();
+
+            $collection["website"] = Website::whereHostname($domain)->select(["id","name","code"])->setEagerLoads([])->first();
+            if ( !$collection["website"] && config("website.environment") == "local" ) {
+                $collection["website"] = Website::whereId($fallback_id)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             }
 
-            if ($callback) $website = $callback($website);
+            $collection["channel"] = $this->getChannel($request);
+            $collection["store"] = $this->getStore($request);
+
+            if ($callback) $collection = $callback($collection);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return $website;
+        return $collection;
     }
 
-    public function checkCondition(): object
+    public function getChannel($request): object
     {
-        return \Modules\Core\Entities\Configuration::where([
+        try
+        {
+            if($request->hasHeader("hc-channel")){
+                $channel_code = $request->header("hc-channel");
+                $channel = Channel::whereCode($channel_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            }
+            else {
+                $channel = ($channel = $this->checkConditionChannel()->first()) ? Channel::whereId($channel->value)->select(["id","name","code"])->setEagerLoads([])->firstOrFail() : null;
+            }
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $channel;
+    }
+
+    public function getStore($request): object
+    {
+        try
+        {
+            if($request->hasHeader("hc-store")){
+                $store_code = $request->header("hc-store");
+                $store = Store::whereCode($store_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            }
+            else {
+                $store = ($store = $this->checkConditionStore()->first()) ? Store::whereId($store->value)->select(["id","name","code"])->setEagerLoads([])->firstOrFail() : null;
+            }
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $store;
+    }
+
+    public function checkConditionChannel(): object
+    {
+        return Configuration::where([
             ['path', "website_default_channel"]
+        ]);
+    }
+
+    public function checkConditionStore(): object
+    {
+        return Configuration::where([
+            ['path', "website_default_store"]
         ]);
     }
 
