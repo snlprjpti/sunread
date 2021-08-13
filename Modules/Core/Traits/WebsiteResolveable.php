@@ -49,7 +49,7 @@ trait WebsiteResolveable
         return $resolved;
     }
 
-    public function resolveWebsiteUpdate(object $request, ?callable $callback = null): ?array
+    public function resolveWebsiteUpdate(object $request, ?callable $callback = null): ?object
     {
         try
         {
@@ -60,23 +60,23 @@ trait WebsiteResolveable
                 $fallback_id = Website::whereHostname($request->header("hc-host"))->firstOrFail()?->id;
             }
 
-            $collection["website"] = Website::whereHostname($domain)->select(["id","name","code"])->setEagerLoads([])->first();
-            if ( !$collection["website"] && config("website.environment") == "local" ) {
-                $collection["website"] = Website::whereId($fallback_id)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            $website = Website::whereHostname($domain)->select(["id","name","code"])->setEagerLoads([])->first();
+            if ( !$website && config("website.environment") == "local" ) {
+                $website = Website::whereId($fallback_id)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             }
 
-            $collection["channel"] = $this->getChannel($request, $collection["website"]);
-            $collection["store"] = $this->getStore($request, $collection["website"]);
-            $collection["pages"] = $this->getPages($collection["website"]);
+            $website->channel = $this->getChannel($request, $website);
+            $website->store = $this->getStore($request, $website);
+            $website->pages = $this->getPages($website);
 
-            if ($callback) $collection = $callback($collection);
+            if ($callback) $website = $callback($website);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return $collection;
+        return $website;
     }
 
     public function getChannel(object $request, object $website): object|null
@@ -88,7 +88,7 @@ trait WebsiteResolveable
                 $channel = Channel::whereCode($channel_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             }
             else {
-                $channel = ($channel = $this->checkConditionChannel($website)) ? $channel->select(["id","name","code"])->setEagerLoads([])->firstOrFail() : null;
+                $channel = ($channel = $this->checkConditionChannel($website)) ? $channel->firstOrFail() : null;
             }
         }
         catch( Exception $exception )
@@ -108,7 +108,7 @@ trait WebsiteResolveable
                 $store = Store::whereCode($store_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             }
             else {
-                $store = ($store = $this->checkConditionStore($website)) ? $store->select(["id","name","code"])->setEagerLoads([])->firstOrFail() : null;
+                $store = ($store = $this->checkConditionStore($website)) ? $store->firstOrFail() : null;
             }
         }
         catch( Exception $exception )
@@ -123,7 +123,7 @@ trait WebsiteResolveable
     {
         try
         {
-           $pages = Page::whereWebsiteId($website->id)->select(["id","slug as code","title"])->get()->keyBy("title");
+           $pages = Page::whereWebsiteId($website->id)->get();
         }
         catch( Exception $exception )
         {
