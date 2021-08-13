@@ -20,7 +20,6 @@ class Attribute extends Model
     protected $appends = [ 'type_validation' ];
     protected $with = [ "attribute_options" ];
     
-    //protected $touches = [ 'product_attributes' ];
     public $translatedAttributes = ["name"];
     public $translatedModels = [ AttributeTranslation::class, "attribute_id" ];
 

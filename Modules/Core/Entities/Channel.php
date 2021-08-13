@@ -18,8 +18,6 @@ class Channel extends Model
     protected $fillable = [ "code", "hostname", "name", "description", "default_store_id", "website_id", "status" ];
     protected $with = [ "stores" ];
 
-    protected $touches = ['products'];
-
     public function default_store(): BelongsTo
     {
         return $this->belongsTo(Store::class, "default_store_id");

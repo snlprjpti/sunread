@@ -9,6 +9,5 @@ class ProductAttributeTimestampObserver
 {
     public function updated(ProductAttributeTimestamp $product_attribute_timestamp)
     {
-        $product_attribute_timestamp->product_attribute->product->searchable();
     }
 }
