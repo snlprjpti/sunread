@@ -8,6 +8,7 @@ use Modules\Core\Entities\Configuration;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Illuminate\Support\Facades\Request;
+use Modules\Page\Entities\Page;
 
 trait WebsiteResolveable
 {
@@ -65,6 +66,7 @@ trait WebsiteResolveable
 
             $collection["channel"] = $this->getChannel($request);
             $collection["store"] = $this->getStore($request);
+            $collection["pages"] = $this->getPages($collection["website"]);
 
             if ($callback) $collection = $callback($collection);
         }
@@ -76,7 +78,7 @@ trait WebsiteResolveable
         return $collection;
     }
 
-    public function getChannel($request): object
+    public function getChannel(object $request): object
     {
         try
         {
@@ -96,7 +98,7 @@ trait WebsiteResolveable
         return $channel;
     }
 
-    public function getStore($request): object
+    public function getStore(object $request): object
     {
         try
         {
@@ -114,6 +116,20 @@ trait WebsiteResolveable
         }
 
         return $store;
+    }
+
+    public function getPages(object $website): object
+    {
+        try
+        {
+           $pages = Page::whereWebsiteId($website->id)->select(["id","slug as code","title"])->get()->keyBy("title");
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $pages;
     }
 
     public function checkConditionChannel(): object
