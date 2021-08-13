@@ -60,11 +60,11 @@ trait WebsiteResolveable
                 $fallback_id = Website::whereHostname($request->header("hc-host"))->firstOrFail()?->id;
             }
 
-            $website = Website::whereHostname($domain)->select(["id","name","code"])->setEagerLoads([])->first();
-            if ( !$website && config("website.environment") == "local" ) {
-                $website = Website::whereId($fallback_id)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            $website = Website::whereHostname($domain);
+            if ( !$website->exists() && config("website.environment") == "local" ) {
+                $website = Website::whereId($fallback_id);
             }
-
+            $website = $website->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             $website->channel = $this->getChannel($request, $website);
             $website->store = $this->getStore($request, $website);
             $website->pages = $this->getPages($website);

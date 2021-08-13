@@ -16,7 +16,7 @@ class ResolverTest extends BaseTestCase
 
         $this->model_name = "Website";
         $this->route_prefix = "resolver";
-        
+
         $this->createFactories = false;
         $this->hasFilters = false;
         $this->hasIndexTest = false;
@@ -50,15 +50,16 @@ class ResolverTest extends BaseTestCase
 
     public function testCustomWebsiteShouldNotBeResolvedIfInvalid(): void
     {
-        $response = $this->get($this->getRoute("resolve", ["random-non-existent.domain"]));
+        $this->headers["hc-host"] = "random-non-existent.domain";
 
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
         $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
         ]);
     }
-    
+
     public function testWebsiteShouldNotBeResolvedIfInProduction(): void
     {
         Config::set("website.environment", "production");
