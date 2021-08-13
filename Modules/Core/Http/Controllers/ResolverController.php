@@ -5,13 +5,12 @@ namespace Modules\Core\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\ResolveRepository;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Core\Transformers\StoreFront\ResolveResource;
+use Modules\Core\Transformers\ResolveResource;
 
 class ResolverController extends BaseController
 {
