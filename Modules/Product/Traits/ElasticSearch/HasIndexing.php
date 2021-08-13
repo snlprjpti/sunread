@@ -11,7 +11,7 @@ trait HasIndexing
 {
     protected $client;
 
-    public function setIndexName(int $id)
+    public function setIndexName(int $id): string
     {
         $prefix = config("elastic.prefix");
         return $prefix.$id;
@@ -30,6 +30,22 @@ trait HasIndexing
             $this->connectElasticSearch();
 
             $exists = $this->client->indices()->exists($params);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $exists;
+    }
+
+    public function checkDocumentIfExist(array $params): bool
+    {
+        try
+        {
+            $this->connectElasticSearch();
+
+            $exists = $this->client->exists($params);
         }
         catch(Exception $exception)
         {
@@ -83,12 +99,14 @@ trait HasIndexing
     {
         try
         {
-            $params["index"]  = $this->setIndexName($store->id);
-            $exists = $this->checkIndexIfExist($params);
+            $params = [
+                "index" => $this->setIndexName($store->id),
+                "id" => $product->id
+            ];
+            $exists = $this->checkDocumentIfExist($params);
 
             if ($exists) {
                 $params = array_merge($params, [ 
-                    "id" => $product->id,
                     "body" => [
                         "doc" => $slug_values
                     ]
@@ -102,17 +120,50 @@ trait HasIndexing
         }
     }
 
+    public function partialRemoving(object $product, object $store, array $slug_values, array $field_values): void
+    {
+        try
+        {
+            if(count($slug_values) > 0) $this->partialIndexing($product, $store, $slug_values);
+
+            $params = [
+                "index" => $this->setIndexName($store->id),
+                "id" => $product->id
+            ];
+            $exists = $this->checkDocumentIfExist($params);
+
+            if ($exists) {
+
+                if (count($field_values) > 0) {
+                    $fields = implode(";", $field_values);
+
+                    $params = array_merge($params, [ 
+                        'body'  => [
+                            'script' => $fields 
+                        ]
+                    ]);
+                    
+                    $this->client->update($params);
+                }
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
     public function removeIndex(object $product, object $store): void
     {
         try
         {
-            $params["index"]  = $this->setIndexName($store->id);
-            $exists = $this->checkIndexIfExist($params);
+            $params = [
+                "index" => $this->setIndexName($store->id),
+                "id" => $product["id"]
+            ];
+            $exists = $this->checkDocumentIfExist($params);
 
-            if ($exists) {
-                $params = array_merge($params, [ "id" => $product["id"] ]);
-                $this->client->delete($params);
-            }
+            if ($exists) $this->client->delete($params);
         }
         catch(Exception $exception)
         {
@@ -167,9 +218,33 @@ trait HasIndexing
 
     public function getStoreId(): ?object
     {
-        $store_code = array_key_exists("store", getallheaders()) ? getallheaders()["store"] : "";
-        $store = Store::whereCode($store_code)->first();
+        try
+        {
+            $store_code = array_key_exists("store", getallheaders()) ? getallheaders()["store"] : "";
+            $store = Store::whereCode($store_code)->first();
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
         return $store;
 	}
+
+    public function getStores(object $product): ?object
+    {
+        try
+        {
+            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+                return $channel->stores;
+            });
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $stores;
+    } 
 
 }
