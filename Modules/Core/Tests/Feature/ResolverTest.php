@@ -51,8 +51,8 @@ class ResolverTest extends BaseTestCase
     public function testCustomWebsiteShouldNotBeResolvedIfInvalid(): void
     {
         $this->headers["hc-host"] = "random-non-existent.domain";
-
         $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
+
         $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
