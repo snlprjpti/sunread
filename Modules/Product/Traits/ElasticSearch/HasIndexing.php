@@ -4,6 +4,7 @@ namespace Modules\Product\Traits\ElasticSearch;
 
 use Elasticsearch\ClientBuilder;
 use Exception;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 
 trait HasIndexing
@@ -155,12 +156,20 @@ trait HasIndexing
 
     public function searchIndex(array $data): ?array
     {
-        $params["index"]  = "sail_racing_store_1";
+        $store = $this->getStoreId();
+        $params["index"]  = $this->setIndexName($store->id);
         $exists = $this->checkIndexIfExist($params);
 
         $params = array_merge($params, [ "body" => $data ]);         
         $response = $exists ? $this->client->search($params) : null;  
         return $response; 
-
     }
+
+    public function getStoreId(): ?object
+    {
+        $store_code = array_key_exists("store", getallheaders()) ? getallheaders()["store"] : "";
+        $store = Store::whereCode($store_code)->first();
+        return $store;
+	}
+
 }

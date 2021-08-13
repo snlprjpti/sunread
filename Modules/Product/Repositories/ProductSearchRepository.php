@@ -15,7 +15,7 @@ class ProductSearchRepository extends ElasticSearchRepository
     use HasIndexing;
 
     protected $model; 
-    protected $mainFilterKeys, $attributeFilterKeys, $categoryFilterKeys, $searchKeys;
+    protected $mainFilterKeys, $attributeFilterKeys, $categoryFilterKeys, $searchKeys, $staticFilterKeys;
     protected  $allFilter = [], $allSearch = [];
 
     public function __construct(Product $product)
@@ -27,6 +27,8 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->searchKeys = Attribute::where('is_searchable', 1)->pluck('slug')->toArray();
 
         $this->categoryFilterKeys = [ "category_id", "category_slug" ];
+
+        $this->staticFilterKeys = ["colouruy", "visibility"];
     }
 
     public function search(object $request): array
@@ -151,6 +153,41 @@ class ProductSearchRepository extends ElasticSearchRepository
         }
 
         return $indexed;
+    }
+
+    public function getFilter(array $products): array
+    {
+        $filter = [];
+        foreach($this->staticFilterKeys as $key) {           
+            $options = [];
+            foreach($products as $product) {
+                $array_options = [];
+                if(!isset($product[$key])) continue;
+
+                if(is_array($product[$key])) {
+                    $array_options[] = collect($product[$key])->map(function($value, $i) use($key, $product) {
+                        $option_key = "{$key}_{$i}_value";
+                        if(isset($product[$option_key])) return $this->getOption($value, $product[$option_key]);
+                    })->toArray();
+                    
+                    $options = array_merge($options, collect($array_options)->flatten(1)->toArray());
+                }
+                else  {
+                    $option_key = "{$key}_value";
+                    if(isset($product[$option_key])) $options[] = $this->getOption($product[$key], $product[$option_key]);
+                }
+            }   
+            $filter[$key] = array_unique($options, SORT_REGULAR);
+        }
+        return $filter;
+    }
+
+    public function getOption($value, $label)
+    {
+        return [
+            "value" => $value,
+            "label" => $label
+        ];
     }
 
 }
