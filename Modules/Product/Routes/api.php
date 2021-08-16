@@ -25,8 +25,10 @@ Route::group(["middleware" => ["api"]], function() {
             Route::put('image/{id}/change-main-image', [\Modules\Product\Http\Controllers\ProductImageController::class,"changeMainImage"])->name("image.change_main_image");
             Route::resource('image', ProductImageController::class)->only(['store', 'destroy']);
             Route::delete('images/bulk', [\Modules\Product\Http\Controllers\ProductImageController::class, "bulkDelete"])->name("image.bulk-delete");
-
+            Route::put('image/type/{id}', [\Modules\Product\Http\Controllers\ProductImageController::class, "updateType"])->name("image.update-type");
         });
+
+
 
         // Product Images Routes
         Route::get('products/{category_id}/category', [\Modules\Product\Http\Controllers\ProductController::class,"categoryWiseProducts"])->name("products.categoryWiseProducts");
