@@ -49,9 +49,8 @@ class MapProductImageTypeValueJob implements ShouldQueue
             $other_name = explode("/", $product_image->path);            
             $types = (end($name) === end($other_name)) ? $this->getImageType($product_image) : [];
             $image->update($types);
-            (end($name) === end($other_name)) ? $ids[] = $product_image->id : "";
+            return (end($name) === end($other_name)) ? $ids[] = $product_image->id : "";
         })->toArray();
-        ProductImage::whereIn("id", $ids)->delete();
     }
 
     private function getImageType(object $type): ?array
