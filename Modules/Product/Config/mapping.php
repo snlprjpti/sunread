@@ -4,6 +4,15 @@ return [
         "id" =>  [
             "type" => "long"
         ],
+        "name" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
         "sku" =>  [
             "type" => "text",
             "fields" =>  [
@@ -12,6 +21,9 @@ return [
                     "ignore_above" => 256
                 ]
             ]
+        ],
+        "price" =>  [
+            "type" => "float"
         ],
         "type" =>  [
             "type" => "text",
@@ -22,262 +34,259 @@ return [
                 ]
             ]
         ],
-        "attribute_group_id" =>  [
-            "type" => "long"
-        ],
-        "channels" => [
-            "properties"=> [
-                "id"=> [
-                    "type"=> "long"
-                ],
-            ]
-        ],
-        "categories" => [
-            "properties"=> [
-                "id"=> [
-                    "type"=> "long"
-                ],
-                "name"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-                "slug"=> [
-                    "type"=> "text",
-                    "fields"=> [
-                        "keyword"=> [
-                            "type"=> "keyword",
-                            "ignore_above"=> 256
-                        ]
-                    ]
-                ],
-            ]
-        ],
-        "product_attributes" =>  [
-            "dynamic" => true, 
-            "type" => "nested",
-            "properties" =>  [
-                "global" =>  [
-                    "type" => "nested",
-                    "dynamic" =>  true,
-                    "properties"=> [
-                        "attribute"=> [
-                            "properties"=> [
-                                "attribute_group_id"=> [
-                                    "type"=> "long"
-                                ],
-                                "id"=> [
-                                    "type"=> "long"
-                                ],
-                                "name"=> [
-                                    "type"=> "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=> "keyword",
-                                            "ignore_above"=> 256
-                                        ]
-                                    ]
-                                ],
-                                "position"=> [
-                                    "type"=> "long"
-                                ],
-                                "slug"=> [
-                                    "type"=> "text",
-                                    "fields"=> [
-                                        "keyword"=> [
-                                            "type"=> "keyword",
-                                            "ignore_above"=> 256
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ],
-                        "value"=> [
-                            "type"=> "integer",
-                            "ignore_malformed"=> true
-                        ],
-                        "string_value" =>  [
-                            "type" => "text",
-                            "fields" =>  [
-                                "keyword" =>  [
-                                    "type" => "keyword",
-                                    "ignore_above" => 256
-                                ]
-                            ]
-                        ],
-                        "boolean_value" =>  [
-                            "type" => "long"
-                        ],
-                        "date_value" =>  [
-                            "type" => "date",
-                            "format"=> "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
-                        ],
-                        "integer_value" =>  [
-                            "type" => "date"
-                        ],
-                        "decimal_value" =>  [
-                            "type" => "double"
-                        ],
-
-                    ]
-                ],
-                "channel" =>  [
-                    "type" => "nested",
-                    "dynamic" =>  true,
-                ],
-                "store" =>  [
-                    "type" => "nested",
-                    "dynamic" =>  true,
-                ],
-            ]
-        ],
         "status" =>  [
             "type" => "long"
         ],
-        "created_at" =>  [
-            "type" => "date"
-        ],
-        "updated_at" =>  [
-            "type" => "date"
-        ]
-    ],
-    "dynamic_templates"=> [
-        [
-          "channel_nested"=> [
-            "path_match"=> "product_attributes.channel.*",
-            "mapping"=> [
-              "properties"=> [
-                "attribute"=> [
-                    "properties"=> [
-                        "attribute_group_id"=> [
-                            "type"=> "long"
-                        ],
-                        "id"=> [
-                            "type"=> "long"
-                        ],
-                        "name"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ],
-                        "position"=> [
-                            "type"=> "long"
-                        ],
-                        "slug"=> [
-                            "type"=> "text",
-                            "fields"=> [
-                                "keyword"=> [
-                                    "type"=> "keyword",
-                                    "ignore_above"=> 256
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                "value"=> [
-                    "type"=> "integer",
-                    "ignore_malformed"=> true
-                ],
-                "string_value" =>  [
-                    "type" => "text",
-                    "fields" =>  [
-                        "keyword" =>  [
-                            "type" => "keyword",
-                            "ignore_above" => 256
-                        ]
-                    ]
-                ],
-                "boolean_value" =>  [
-                    "type" => "long"
-                ],
-                "date_value" =>  [
-                    "type" => "date",
-                    "format"=> "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
-                ],
-                "integer_value" =>  [
-                    "type" => "date"
-                ],
-                "decimal_value" =>  [
-                    "type" => "double"
-                ],
-              ]
-            ]
-          ]
-        ],
-        [
-            "store_nested"=> [
-              "path_match"=> "product_attributes.store.*",
-              "mapping"=> [
-                "properties"=> [
-                    "attribute"=> [
-                        "properties"=> [
-                            "attribute_group_id"=> [
-                                "type"=> "long"
-                            ],
-                            "id"=> [
-                                "type"=> "long"
-                            ],
-                            "name"=> [
-                                "type"=> "text",
-                                "fields"=> [
-                                    "keyword"=> [
-                                        "type"=> "keyword",
-                                        "ignore_above"=> 256
-                                    ]
-                                ]
-                            ],
-                            "position"=> [
-                                "type"=> "long"
-                            ],
-                            "slug"=> [
-                                "type"=> "text",
-                                "fields"=> [
-                                    "keyword"=> [
-                                        "type"=> "keyword",
-                                        "ignore_above"=> 256
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                  "value"=> [
-                      "type"=> "integer",
-                      "ignore_malformed"=> true
-                  ],
-                  "string_value" =>  [
-                    "type" => "text",
-                    "fields" =>  [
-                        "keyword" =>  [
-                            "type" => "keyword",
-                            "ignore_above" => 256
-                        ]
-                    ]
-                ],
-                "boolean_value" =>  [
-                    "type" => "long"
-                ],
-                "date_value" =>  [
-                    "type" => "date",
-                    "format"=> "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
-                ],
-                "integer_value" =>  [
-                    "type" => "date"
-                ],
-                "decimal_value" =>  [
-                    "type" => "double"
-                ],
+        "quantity"=> [
+            "type"=> "text",
+            "fields"=> [
+                "keyword"=> [
+                    "type"=> "keyword",
+                    "ignore_above"=> 256
                 ]
-              ]
             ]
-          ],
+        ],
+        "website_id" =>  [
+            "type" => "long"
+        ],
+        "parent_id" =>  [
+            "type" => "long"
+        ],
+        "visibility" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "visibility_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "is_in_stock"=> [
+            "type"=> "long"
+        ],
+        "base_image" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "has_weight" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "has_weight_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "new_from_date" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "new_to_date" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "description" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "short_description" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "meta_keywords" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "meta_title" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "meta_description" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],        
+        "special_price" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "special_from_date" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "special_to_date" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "tax_class_id" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "tax_class_id_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "url_key" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "weight" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "small_image" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "thumbnail_image" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "section_background" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "gallery" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ]
+        ],
+        "categories"=> [
+            "properties"=> [
+                "id"=> [
+                    "type"=> "long"
+                ],
+                "name" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "slug" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ]
+            ]
+        ]
     ],
 
 ];

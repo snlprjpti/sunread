@@ -27,8 +27,6 @@ class Category extends Model
 
     // protected $appends = ['url'];
 
-    protected $touches = ['products'];
-
     public function __construct(?array $attributes = [])
     {
         parent::__construct($attributes);

@@ -5,9 +5,11 @@ namespace Modules\Attribute\Providers;
 use Illuminate\Support\ServiceProvider;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeGroup;
+use Modules\Attribute\Entities\AttributeOption;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Attribute\Observers\AttributeObserver;
 use Modules\Attribute\Observers\AttributeGroupObserver;
+use Modules\Attribute\Observers\AttributeOptionObserver;
 use Modules\Attribute\Observers\AttributeSetObserver;
 
 class AttributeServiceProvider extends ServiceProvider
@@ -135,5 +137,6 @@ class AttributeServiceProvider extends ServiceProvider
         AttributeGroup::observe(AttributeGroupObserver::class);
         AttributeSet::observe(AttributeSetObserver::class);
         Attribute::observe(AttributeObserver::class);
+        AttributeOption::observe(AttributeOptionObserver::class);
     }
 }

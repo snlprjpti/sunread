@@ -9,6 +9,5 @@ class ProductAttributeIntegerObserver
 {
     public function updated(ProductAttributeInteger $product_attribute_integer)
     {
-        $product_attribute_integer->product_attribute->product->searchable();
     }
 }

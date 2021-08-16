@@ -75,5 +75,4 @@ trait HasScope
         $default = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
         return $default?->value;
     }
-
 }
