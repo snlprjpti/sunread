@@ -109,4 +109,46 @@ class ProductImageRepository extends BaseRepository
         DB::commit();
         return true;
     }
+
+    public function updateImage(object $request, int $id): bool
+    {
+        try
+        {
+            $data = $request->validate([
+                "type" => "required|in:main_image,thumbnail,section_background,small_image,gallery",
+                "delete" => "sometimes|boolean"
+            ]);
+            
+            if ($data["delete"]) $this->delete($id);
+    
+            switch ( $data["type"] )
+            {
+                case "main_image" :
+                    $data["main_image"] = 1;
+                break;
+    
+                case "small_image" :
+                    $data["small_image"] = 1;
+                break;
+    
+                case "thumbnail" :
+                    $data["thumbnail"] = 1;
+                break;
+    
+                case "section_background" :
+                    $data["section_background"] = 1;
+                break;
+    
+                case "gallery" :
+                    $data["gallery"] = 1;
+                break;
+            }
+            $this->update($data, $id);
+        }
+        catch (Exception $exception) 
+        {
+            throw $exception;
+        }
+        return true;
+    }
 }
