@@ -29,10 +29,10 @@ trait HasAttributeScope
         {
             $parent_scope = $this->getParentScope($data);
             $data["scope"] = $parent_scope["scope"];
-            $data["scope_id"] = $parent_scope["scope_id"];
-            return ($item = $this->product_attributes()->where($data)->first()) ? $item->value?->value : $this->getDefaultValues($data);           
+            $data["scope_id"] = $parent_scope["scope_id"];       
         }
-        return ($item = $this->product_attributes()->where($data)->first()) ? $item->value?->value : $defaultValue;
+        $item = $this->product_attributes()->where($data)->first();
+        return $item ? $item->value?->value : (($data["scope"] != "website") ? $this->getDefaultValues($data) : $defaultValue);    
     }
 
     public function getParentScope(array $scope): array

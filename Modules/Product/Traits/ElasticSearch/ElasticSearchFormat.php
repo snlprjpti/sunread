@@ -2,6 +2,7 @@
 
 namespace Modules\Product\Traits\ElasticSearch;
 
+use Exception;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
@@ -14,49 +15,65 @@ trait ElasticSearchFormat
 
     public function documentDataStructure(object $store): array
     {
-        $array = $this->getProductAttributes($store);
-        if ($inventory = $this->getInventoryData()) $array = array_merge($array, $inventory); 
+        try
+        {
+            $array = $this->getProductAttributes($store);
 
-        $array['categories'] = $this->getCategoryData($store);
+            $inventory = $this->getInventoryData();
+            if ($inventory) $array = array_merge($array, $inventory); 
+    
+            $array['categories'] = $this->getCategoryData($store);
+            $images = $this->getImages();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
         
-        $array = array_merge($array, $this->getImages());
-
-        return $array;
+        return array_merge($array, $images);
     }
 
     public function getProductAttributes(object $store): array
     {
-        $data = [];
-
-        $data = collect($this)->filter(function ($product, $key) {
-            if(in_array($key, [ "id", "sku", "status", "website_id", "parent_id", "type" ])) return $product;
-        })->toArray();
-        
-        $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
-        
-        foreach($attributeIds as $attributeId)
+        try
         {
-            $attribute = Attribute::find($attributeId);
-            if(in_array($attribute->slug, $this->non_required_attributes)) continue;
+            $data = [];
 
-            $match = [
-                "scope" => "store",
-                "scope_id" => $store->id,
-                "attribute_id" => $attributeId
-            ];
-
-            $data[$attribute->slug] = $this->value($match);
-            if(in_array($attribute->type, $this->options_fields))
+            $selected_attr = [ "id", "sku", "status", "website_id", "parent_id", "type" ];
+            $data = collect($this)->filter(function ($product, $key) use($selected_attr) {
+                if(in_array($key, $selected_attr)) return $product;
+            })->toArray();
+            
+            $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
+            
+            foreach($attributeIds as $attributeId)
             {
-                $value = $data[$attribute->slug];
-                if (is_array($value)) {
-                    foreach($value as $key => $val)
-                    {
-                        $data["{$attribute->slug}_{$key}_value"] = $this->getAttributeOption($attribute, $val);
+                $attribute = Attribute::find($attributeId);
+                if(in_array($attribute->slug, $this->non_required_attributes)) continue;
+    
+                $match = [
+                    "scope" => "store",
+                    "scope_id" => $store->id,
+                    "attribute_id" => $attributeId
+                ];
+    
+                $data[$attribute->slug] = $this->value($match);
+                if(in_array($attribute->type, $this->options_fields))
+                {
+                    $value = $data[$attribute->slug];
+                    if (is_array($value)) {
+                        foreach($value as $key => $val)
+                        {
+                            $data["{$attribute->slug}_{$key}_value"] = $this->getAttributeOption($attribute, $val);
+                        }
                     }
+                    else $data["{$attribute->slug}_value"] = $this->getAttributeOption($attribute, $value);
                 }
-                else $data["{$attribute->slug}_value"] = $this->getAttributeOption($attribute, $value);
             }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
         }
 
         return $data;
@@ -64,51 +81,93 @@ trait ElasticSearchFormat
 
     public function getAttributeOption(object $attribute, mixed $value): ?string
     {
-        $attribute_option_class = $attribute->getConfigOption() ? new ProductTaxGroup() : new AttributeOption();
-        $attribute_option = $attribute_option_class->find($value);
-        if($attribute_option) return $attribute_option->name;
-        return null;
+        try
+        {
+            $attribute_option_class = $attribute->getConfigOption() ? new ProductTaxGroup() : new AttributeOption();
+            $attribute_option = $attribute_option_class->find($value);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $attribute_option?->name;
     }
 
     public function getInventoryData(): ?array
     {
-        return $this->catalog_inventories()->select("quantity", "is_in_stock")->first()?->toArray();
+        try
+        {
+            $inventory = $this->catalog_inventories()->select("quantity", "is_in_stock")->first()?->toArray();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $inventory;
     }
 
     public function getCategoryData(object $store): array
     {
-        return $this->categories->map(function ($category) use ($store) {
+        try
+        {
+            $categories = $this->categories->map(function ($category) use ($store) {
 
-            $defaul_data = [
-                "category_id" => $category->id,
-                "scope" => "store",
-                "scope_id" => $store->id 
-            ];
-
-            return [
-                "id" => $category->id,
-                "slug" => $category->value($defaul_data, "slug"),
-                "name" => $category->value($defaul_data, "name")
-            ];
-        })->toArray();
+                $defaul_data = [
+                    "category_id" => $category->id,
+                    "scope" => "store",
+                    "scope_id" => $store->id 
+                ];
+    
+                return [
+                    "id" => $category->id,
+                    "slug" => $category->value($defaul_data, "slug"),
+                    "name" => $category->value($defaul_data, "name")
+                ];
+            })->toArray();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $categories;
     }
 
     public function getImages(): array
     {
-        return [
-            'base_image' => $this->getFullPath("main_image"),
-            'thumbnail_image' => $this->getFullPath("thumbnail"),
-            'small_image' => $this->getFullPath("small_image"),
-            'section_background' => $this->getFullPath("section_background"),
-            'gallery' => $this->images()->whereGallery(1)->pluck('path')->map(function ($gallery) {
-                return Storage::url($gallery);
-            })->toArray()
-        ];
+        try
+        {
+            $images = [
+                'main_image' => $this->getFullPath("main_image"),
+                'thumbnail' => $this->getFullPath("thumbnail"),
+                'small_image' => $this->getFullPath("small_image"),
+                'section_background' => $this->getFullPath("section_background"),
+                'gallery' => $this->images()->whereGallery(1)->pluck('path')->map(function ($gallery) {
+                    return Storage::url($gallery);
+                })->toArray()
+            ];
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        return $images;
     }
 
     Public function getFullPath($image_name): ?string
     {
-        $image = $this->images()->where($image_name, 1)->first();
-        return $image ? Storage::url($image->path) : $image;
+        try
+        {
+            $image = $this->images()->where($image_name, 1)->first();
+            $path = $image ? Storage::url($image->path) : $image;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+         
+        return $path;
     }
 }

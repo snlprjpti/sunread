@@ -3,6 +3,7 @@
 namespace Modules\Product\Jobs;
 
 use Elasticsearch\ClientBuilder;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -27,19 +28,27 @@ class SingleIndexing implements ShouldQueue
 
     public function handle(): void
     {
-        if ($this->model == "product") {
-            foreach($this->stores as $store)
-            {
-                if(!$this->method) $this->singleIndexing($this->products, $store);
-                else $this->removeIndex($this->products, $store);
+        try
+        {
+            if ($this->model == "product") {
+                foreach($this->stores as $store)
+                {
+                    if(!$this->method) $this->singleIndexing($this->products, $store);
+                    else $this->removeIndex($this->products, $store);
+                }
+            }
+    
+            if ($this->model == "store") {
+                foreach ($this->products as $product)
+                {
+                    $product->load("categories", "product_attributes", "catalog_inventories", "images");
+                    if(!$this->method) $this->singleIndexing($product, $this->stores);  
+                } 
             }
         }
-
-        if($this->model == "store") 
-        foreach ($this->products as $product)
+        catch (Exception $exception)
         {
-            $product->load("categories", "product_attributes", "catalog_inventories", "images");
-            if(!$this->method) $this->singleIndexing($product, $this->stores);  
-        } 
+            throw $exception;
+        }
     }
 }

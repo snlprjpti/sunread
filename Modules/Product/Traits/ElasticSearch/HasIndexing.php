@@ -14,7 +14,7 @@ trait HasIndexing
     public function setIndexName(int $id): string
     {
         $prefix = config("elastic.prefix");
-        return $prefix.$id;
+        return "{$prefix}{$id}";
     }
 
     public function connectElasticSearch(): void
@@ -207,12 +207,20 @@ trait HasIndexing
 
     public function searchIndex(array $data): ?array
     {
-        $store = $this->getStoreId();
-        $params["index"]  = $this->setIndexName($store->id);
-        $exists = $this->checkIndexIfExist($params);
-
-        $params = array_merge($params, [ "body" => $data ]);         
-        $response = $exists ? $this->client->search($params) : null;  
+        try
+        {
+            $store = $this->getStoreId();
+            $params["index"]  = $this->setIndexName($store->id);
+            $exists = $this->checkIndexIfExist($params);
+    
+            $params = array_merge($params, [ "body" => $data ]);         
+            $response = $exists ? $this->client->search($params) : null; 
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+ 
         return $response; 
     }
 

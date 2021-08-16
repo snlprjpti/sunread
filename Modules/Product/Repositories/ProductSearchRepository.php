@@ -182,7 +182,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $filter;
     }
 
-    public function getOption($value, $label)
+    public function getOption(mixed $value, string $label): array
     {
         return [
             "value" => $value,

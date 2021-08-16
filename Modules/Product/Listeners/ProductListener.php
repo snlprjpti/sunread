@@ -16,7 +16,7 @@ class ProductListener
         SingleIndexing::dispatch($product, $stores, "product");
     }
 
-    public function removing($product)
+    public function remove($product)
     {
         $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
             return $channel->stores;

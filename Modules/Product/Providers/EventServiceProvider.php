@@ -11,6 +11,6 @@ class EventServiceProvider extends ServiceProvider
     {
         Event::listen('catalog.products.create.after', 'Modules\Product\Listeners\ProductListener@indexing');
         Event::listen('catalog.products.update.after', 'Modules\Product\Listeners\ProductListener@indexing');
-        Event::listen('catalog.products.delete.after', 'Modules\Product\Listeners\ProductListener@removing');
+        Event::listen('catalog.products.delete.after', 'Modules\Product\Listeners\ProductListener@remove');
     }
 }
