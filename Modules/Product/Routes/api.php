@@ -24,7 +24,6 @@ Route::group(["middleware" => ["api"]], function() {
         Route::group(['prefix' => 'product', 'as' => 'products.'], function() {
             Route::put('image/{id}/change-main-image', [\Modules\Product\Http\Controllers\ProductImageController::class,"changeMainImage"])->name("image.change_main_image");
             Route::resource('image', ProductImageController::class)->only(['store', 'destroy']);
-            Route::put('images/update/{id}', [\Modules\Product\Http\Controllers\ProductImageController::class, "updateImage"])->name("images.update-image");
         });
 
 

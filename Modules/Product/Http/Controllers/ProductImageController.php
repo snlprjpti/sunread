@@ -100,18 +100,4 @@ class ProductImageController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('status-change-success'));
     }
-
-    public function updateImage(Request $request, int $id): JsonResponse
-    {
-        try 
-        {
-            $this->repository->updateImage($request, $id);
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponseWithMessage($this->lang('update-success'));
-    }
 }
