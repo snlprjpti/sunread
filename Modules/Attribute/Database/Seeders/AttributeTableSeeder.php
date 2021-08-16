@@ -334,26 +334,6 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "store"
             ],
             [
-                "name" => "Collection",
-                "type" => "collection",
-                "use_in_layered_navigation" => 1,
-                "default_value" => "Collection1",
-                "options" => [
-                    [
-                        "name" => "Collection1",
-                    ],
-                    [
-                        "name" => "Collection2",
-                    ],
-                    [
-                        "name" => "Collection3",
-                    ],
-                    [
-                        "name" => "Collection4",
-                    ],
-                ],
-            ],
-            [
                 "name" => "Section Background Image",
                 "slug" => "section_background_image",
                 "type" => "image",
