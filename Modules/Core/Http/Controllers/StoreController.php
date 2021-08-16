@@ -4,6 +4,7 @@ namespace Modules\Core\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Modules\Core\Entities\Store;
 use Illuminate\Http\JsonResponse;
 use Modules\Core\Entities\Channel;
@@ -99,8 +100,10 @@ class StoreController extends BaseController
             $data = $this->repository->validateData($request,[
                 "code" => "required|unique:stores,code,{$id}"
             ]);
-            
-            $updated = $this->repository->update($data, $id);
+
+            $updated = $this->repository->update($data, $id, function ($updated) {
+                Event::dispatch('core.store.cache.update', $updated);
+            });
         }
         catch(Exception $exception)
         {
@@ -116,6 +119,7 @@ class StoreController extends BaseController
         {
             $this->repository->delete($id, function ($deleted){
                 if($deleted->image) Storage::delete($deleted->image);
+                Event::dispatch('core.store.cache.delete', $deleted);
             });
         }
         catch (Exception $exception)
@@ -125,7 +129,7 @@ class StoreController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
-    
+
     public function updateStatus(Request $request, int $id): JsonResponse
     {
         try

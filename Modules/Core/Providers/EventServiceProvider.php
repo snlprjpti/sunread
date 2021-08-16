@@ -12,8 +12,14 @@ class EventServiceProvider extends ServiceProvider
         Event::listen('core.stores.create.after', 'Modules\Core\Listeners\StoreListener@indexing');
         Event::listen('core.stores.update.after', 'Modules\Core\Listeners\StoreListener@indexing');
 
-        Event::listen('core.channel.resolver.update', 'Modules\Core\Listeners\ResolverListener@channelResolver');
-        Event::listen('core.channel.resolver.delete', 'Modules\Core\Listeners\ResolverListener@removeChannelResolver');
+        Event::listen('core.website.cache.update', 'Modules\Core\Listeners\ResolverListener@updateWebsite');
+        Event::listen('core.website.cache.delete', 'Modules\Core\Listeners\ResolverListener@deleteWebsite');
+
+        Event::listen('core.channel.cache.update', 'Modules\Core\Listeners\ResolverListener@updateChannel');
+        Event::listen('core.channel.cache.delete', 'Modules\Core\Listeners\ResolverListener@deleteChannel');
+
+        Event::listen('core.store.cache.update', 'Modules\Core\Listeners\ResolverListener@updatestore');
+        Event::listen('core.store.cache.delete', 'Modules\Core\Listeners\ResolverListener@deleteStore');
 
     }
 }

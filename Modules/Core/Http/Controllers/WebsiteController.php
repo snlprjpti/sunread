@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Event;
 use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\WebsiteRepository;
 use Modules\Core\Rules\FQDN;
@@ -101,7 +102,9 @@ class WebsiteController extends BaseController
                 "code" => "required|unique:websites,code,{$id}",
                 "hostname" => [ "required", "unique:websites,hostname,{$id}", "unique:channels,hostname", new FQDN()],
             ]);
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $id, function ($updated) {
+                Event::dispatch('core.website.cache.update', $updated);
+            });
         }
         catch( Exception $exception )
         {
@@ -115,7 +118,9 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function ($deleted){
+                Event::dispatch('core.website.cache.delete', $deleted);
+            });
         }
         catch( Exception $exception )
         {
