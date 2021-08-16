@@ -180,13 +180,13 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            if (isset($value["value"]["base_image"])) $this->storeImages($product, $value["value"]["base_image"], "base_image", $method);
-            if (isset($value["value"]["small_image"])) $this->storeImages($product, $value["value"]["small_image"], "small_image", $method);
-            if (isset($value["value"]["thumbnail_image"])) $this->storeImages($product, $value["value"]["thumbnail_image"], "thumbnail_image", $method);
-            if (isset($value["value"]["section_background_image"])) $this->storeImages($product, $value["value"]["section_background_image"], "section_background_image", $method);
-            MapProductImageTypeValueJob::dispatchSync($product->id);
-            
-            if (isset($value["value"]["gallery"])) $this->storeImages($product, $value["value"]["gallery"], "gallery_image", $method);
+            $images = $value["value"]; 
+            if ($method == "update") $images = $value["value"]["new"];
+            if (isset($images["base_image"])) $this->storeImages($product, $images["base_image"], "base_image", $method);
+            if (isset($images["small_image"])) $this->storeImages($product, $images["small_image"], "small_image", $method);
+            if (isset($images["thumbnail_image"])) $this->storeImages($product, $images["thumbnail_image"], "thumbnail_image", $method);
+            if (isset($images["section_background_image"])) $this->storeImages($product, $images["section_background_image"], "section_background_image", $method);
+            if (isset($images["gallery"])) $this->storeImages($product, $images["gallery"], "gallery_image", $method);
         }
         catch ( Exception $exception )
         {
@@ -436,20 +436,22 @@ class ProductRepository extends BaseRepository
     private function getImages(object $product): array
     {
         return [
-            "main_image" => $this->getFullPath($product, "main_image"),
-            "thumbnail" => $this->getFullPath($product, "thumbnail"),
-            "section_background" => $this->getFullPath($product, "section_background"),
-            "small_image" => $this->getFullPath($product, "small_image"),
-            "gallery" => $product->images()->whereGallery(1)->pluck('path', 'id')->map(function ($gallery, $id) {
-                return [ "id" => $id, "url" => Storage::url($gallery) ];
-            })->toArray()
+            "existing" => [
+                "main_image" => $this->getFullPath($product, "main_image"),
+                "thumbnail" => $this->getFullPath($product, "thumbnail"),
+                "section_background" => $this->getFullPath($product, "section_background"),
+                "small_image" => $this->getFullPath($product, "small_image"),
+                "gallery" => $product->images()->whereGallery(1)->pluck('path', 'id')->map(function ($gallery, $id) {
+                    return [ "id" => $id, "type" => "gallery", "delete" => 0, "url" => Storage::url($gallery) ];
+                })->toArray()
+            ]
         ];
     }
 
     private function getFullPath(object $product, string $image_name): ?array
     {
-        $image = $product->images()->where($image_name, 1)->latest("updated_at")->first();
-        return $image ? [ "id" => $image->id, "url" => Storage::url($image->path) ] : $image;
+        $image = $product->images()->where($image_name, 1)->latest()->first();
+        return $image ? [ "id" => $image->id, "type" => $image_name, "delete" => 0, "url" => Storage::url($image->path) ] : $image;
     }
 
     public function getFilterProducts(object $request): mixed
