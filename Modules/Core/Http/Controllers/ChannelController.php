@@ -5,6 +5,7 @@ namespace Modules\Core\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Event;
 use Modules\Core\Entities\Channel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -100,6 +101,7 @@ class ChannelController extends BaseController
             if(isset($data['default_store_id'])) $this->repository->defaultStoreValidation($data, $id);
 
             $updated = $this->repository->update($data, $id);
+            Event::dispatch('core.channel.resolver', $updated);
         }
         catch( Exception $exception )
         {
