@@ -2,7 +2,7 @@
 
 Route::group(["middleware" => ["api"]], function () {
 
-    Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+    Route::group(['as' => 'public.'], function () {
         // Resolver
         Route::get("resolver/{website?}", [Modules\Core\Http\Controllers\StoreFront\ResolverController::class, "resolve"])->name("resolver.resolve");
     });
