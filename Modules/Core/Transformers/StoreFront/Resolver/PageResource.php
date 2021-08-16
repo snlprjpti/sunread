@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Core\Transformers\StoreFront;
+namespace Modules\Core\Transformers\StoreFront\Resolver;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PageResolverResource extends JsonResource
+class PageResource extends JsonResource
 {
     public function toArray($request): array
     {

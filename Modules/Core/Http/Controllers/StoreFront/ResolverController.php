@@ -9,7 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Entities\Website;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Core\Repositories\ResolveRepository;
-use Modules\Core\Transformers\StoreFront\ResolveResource;
+use Modules\Core\Transformers\StoreFront\Resolver\ResolveResource;
 
 class ResolverController extends BaseController
 {
