@@ -11,6 +11,6 @@ class StoreListener
     {
         $website = $store?->channel?->website;
         $products = Product::whereWebsiteId($website->id)->get();
-        foreach($products as $product) SingleIndexing::dispatch($product, $store);
+        SingleIndexing::dispatch($products, $store, "store");
     }
 }

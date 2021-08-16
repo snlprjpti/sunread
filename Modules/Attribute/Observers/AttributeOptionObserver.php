@@ -24,6 +24,6 @@ class AttributeOptionObserver
     {
         $attribute = $attribute_option?->attribute;
         $product_attributes = $attribute->product_attributes()->with("product")->get();
-        PartialModifyAttributeOption::dispatchSync($product_attributes, $attribute, collect($attribute_option), "delete");
+        PartialModifyAttributeOption::dispatch($product_attributes, $attribute, collect($attribute_option), "delete");
     }
 }

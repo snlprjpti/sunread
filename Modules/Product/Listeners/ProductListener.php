@@ -13,7 +13,7 @@ class ProductListener
             return $channel->stores;
         });
 
-        foreach($stores as $store) SingleIndexing::dispatchSync($product, $store);
+        SingleIndexing::dispatch($product, $stores, "product");
     }
 
     public function removing($product)
@@ -22,6 +22,6 @@ class ProductListener
             return $channel->stores;
         });
         
-        foreach($stores as $store) SingleIndexing::dispatchSync(collect($product), $store, "delete");
+        SingleIndexing::dispatch(collect($product), $stores, "product", "delete");
     }
 }

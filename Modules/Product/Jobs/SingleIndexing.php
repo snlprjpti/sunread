@@ -15,18 +15,31 @@ class SingleIndexing implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 
-    public $product, $store, $method;
+    public $products, $stores, $model, $method;
 
-    public function __construct(object $product, Model $store, ?string $method = null)
+    public function __construct(object $products, object $stores, string $model, ?string $method = null)
     {
-        $this->product = $product;
-        $this->store = $store;
+        $this->products = $products;
+        $this->stores = $stores;
+        $this->model = $model;
         $this->method = $method;
     }
 
     public function handle(): void
     {
-        if(!$this->method) $this->singleIndexing($this->product, $this->store);
-        else $this->removeIndex($this->product, $this->store);
+        if ($this->model == "product") {
+            foreach($this->stores as $store)
+            {
+                if(!$this->method) $this->singleIndexing($this->products, $store);
+                else $this->removeIndex($this->products, $store);
+            }
+        }
+
+        if($this->model == "store") 
+        foreach ($this->products as $product)
+        {
+            $product->load("categories", "product_attributes", "catalog_inventories", "images");
+            if(!$this->method) $this->singleIndexing($product, $this->stores);  
+        } 
     }
 }

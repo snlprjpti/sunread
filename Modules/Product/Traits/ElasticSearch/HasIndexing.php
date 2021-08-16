@@ -85,7 +85,7 @@ trait HasIndexing
 
             $params = array_merge($params, [
                 "id" => $product->id,
-                "body" => $product->documentDataStructure($this->store)
+                "body" => $product->documentDataStructure($store)
             ]);
             $this->client->index($params);
         }
