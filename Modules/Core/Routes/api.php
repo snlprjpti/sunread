@@ -1,8 +1,11 @@
 <?php
 
 Route::group(["middleware" => ["api"]], function () {
-    // Resolver
-    Route::get("resolver/{website?}", [Modules\Core\Http\Controllers\StoreFront\ResolverController::class, "resolve"])->name("resolver.resolve");
+
+    Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+        // Resolver
+        Route::get("resolver/{website?}", [Modules\Core\Http\Controllers\StoreFront\ResolverController::class, "resolve"])->name("resolver.resolve");
+    });
 
     // Visitor channel stores
     Route::get("channels/{id}/stores", [Modules\Core\Http\Controllers\Visitors\ChannelController::class, "stores"])->name("channels.stores.index");
