@@ -100,4 +100,26 @@ class ProductImageController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('status-change-success'));
     }
+
+    public function updateType(Request $request, int $id): JsonResponse
+    {
+        try 
+        {
+            $data = $request->validate([
+                "main_image" => "sometimes|boolean",
+                "thumbnail" => "sometimes|boolean",
+                "section_background" => "sometimes|boolean",
+                "small_image" => "sometimes|boolean",
+                "gallery" => "sometimes|boolean"
+            ]);
+
+            $this->repository->update($data, $id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('type-status-updated'));
+    }
 }
