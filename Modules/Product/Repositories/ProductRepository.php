@@ -436,9 +436,9 @@ class ProductRepository extends BaseRepository
     private function getImages(object $product): array
     {
         return [
-            "base_image" => $this->getFullPath($product, "main_image"),
-            "thumbnail_image" => $this->getFullPath($product, "thumbnail"),
-            "section_background_image" => $this->getFullPath($product, "section_background"),
+            "main_image" => $this->getFullPath($product, "main_image"),
+            "thumbnail" => $this->getFullPath($product, "thumbnail"),
+            "section_background" => $this->getFullPath($product, "section_background"),
             "small_image" => $this->getFullPath($product, "small_image"),
             "gallery" => $product->images()->whereGallery(1)->pluck('path', 'id')->map(function ($gallery, $id) {
                 return [ "id" => $id, "url" => Storage::url($gallery) ];
@@ -448,7 +448,7 @@ class ProductRepository extends BaseRepository
 
     private function getFullPath(object $product, string $image_name): ?array
     {
-        $image = $product->images()->where($image_name, 1)->first();
+        $image = $product->images()->where($image_name, 1)->latest("updated_at")->first();
         return $image ? [ "id" => $image->id, "url" => Storage::url($image->path) ] : $image;
     }
 
