@@ -28,6 +28,7 @@ use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Product\Entities\AttributeConfigurableProduct;
+use Modules\Product\Jobs\MapProductImageTypeValueJob;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
 
 class ProductRepository extends BaseRepository
@@ -179,11 +180,13 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            if (isset($value["value"]["base_image"])) $this->storeImages($product, $value["value"]["base_image"], "base_image");
-            if (isset($value["value"]["small_image"])) $this->storeImages($product, $value["value"]["small_image"], "small_image");
-            if (isset($value["value"]["thumbnail_image"])) $this->storeImages($product, $value["value"]["thumbnail_image"], "thumbnail_image");
-            if (isset($value["value"]["section_background_image"])) $this->storeImages($product, $value["value"]["section_background_image"], "section_background_image");
-            if (isset($value["value"]["gallery"])) $this->storeImages($product, $value["value"]["gallery"], "gallery_image");
+            if (isset($value["value"]["base_image"])) $this->storeImages($product, $value["value"]["base_image"], "base_image", $method);
+            if (isset($value["value"]["small_image"])) $this->storeImages($product, $value["value"]["small_image"], "small_image", $method);
+            if (isset($value["value"]["thumbnail_image"])) $this->storeImages($product, $value["value"]["thumbnail_image"], "thumbnail_image", $method);
+            if (isset($value["value"]["section_background_image"])) $this->storeImages($product, $value["value"]["section_background_image"], "section_background_image", $method);
+            MapProductImageTypeValueJob::dispatchSync($product->id);
+            
+            if (isset($value["value"]["gallery"])) $this->storeImages($product, $value["value"]["gallery"], "gallery_image", $method);
         }
         catch ( Exception $exception )
         {
@@ -209,10 +212,9 @@ class ProductRepository extends BaseRepository
                     "image.*" => "required|mimes:bmp,jpeg,jpg,png"
                 ]);
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
-    
+                
                 foreach ( $images as $image )
                 {
-                    
                     $position += 1;
                     $key = Str::random(6);
                     $file_name = $this->generateFileName($image);
