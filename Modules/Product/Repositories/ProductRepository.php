@@ -438,16 +438,16 @@ class ProductRepository extends BaseRepository
             "thumbnail_image" => $this->getFullPath($product, "thumbnail"),
             "section_background_image" => $this->getFullPath($product, "section_background"),
             "small_image" => $this->getFullPath($product, "small_image"),
-            "gallery" => $product->images()->whereGallery(1)->pluck('path')->map(function ($gallery) {
-                return Storage::url($gallery);
+            "gallery" => $product->images()->whereGallery(1)->pluck('path', 'id')->map(function ($gallery, $id) {
+                return [ "id" => $id, "url" => Storage::url($gallery) ];
             })->toArray()
         ];
     }
 
-    private function getFullPath(object $product, string $image_name): ?string
+    private function getFullPath(object $product, string $image_name): ?array
     {
         $image = $product->images()->where($image_name, 1)->first();
-        return $image ? Storage::url($image->path) : $image;
+        return $image ? [ "id" => $image->id, "url" => Storage::url($image->path) ] : $image;
     }
 
     public function getFilterProducts(object $request): mixed
