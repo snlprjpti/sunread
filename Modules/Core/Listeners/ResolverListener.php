@@ -8,9 +8,12 @@ class ResolverListener
 {
     public function channelResolver($channel)
     {
-        Cache::rememberForever('channel_'.$channel->code, function() use($channel){
-            return $channel->first();
-        });
+        Cache::put("channel_{$channel->code}", $channel);
+    }
+
+    public function removeChannelResolver($channel)
+    {
+        Cache::forget("channel_{$channel->code}");
     }
 
 }
