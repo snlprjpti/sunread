@@ -20,6 +20,7 @@ return [
         'status-change-success' => 'The :name has changed successfully.',
         'status-change-failed' => 'Cannot change the status.',
         'status-updated' => ':name status updated successfully.',
+        'type-status-updated' => ':name type updated successfully.',
         'reindex-success' => ':name reindexed successfully.',
         "delete-failed" => ":name could not be deleted.",
         'bulk-reindex-success' => 'All :name reindexed successfully.',
