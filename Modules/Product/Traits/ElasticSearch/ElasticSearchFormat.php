@@ -15,7 +15,7 @@ trait ElasticSearchFormat
     public function documentDataStructure(object $store): array
     {
         $array = $this->getProductAttributes($store);
-        $array = array_merge($array, $this->getInventoryData()); 
+        if ($inventory = $this->getInventoryData()) $array = array_merge($array, $inventory); 
 
         $array['categories'] = $this->getCategoryData($store);
         
@@ -72,7 +72,7 @@ trait ElasticSearchFormat
 
     public function getInventoryData(): ?array
     {
-        return $this->catalog_inventories()->select("quantity", "is_in_stock")->first()->toArray();
+        return $this->catalog_inventories()->select("quantity", "is_in_stock")->first()?->toArray();
     }
 
     public function getCategoryData(object $store): array
