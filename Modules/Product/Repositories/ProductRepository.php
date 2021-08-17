@@ -518,17 +518,19 @@ class ProductRepository extends BaseRepository
 
     private function getImages(object $product): array
     {
-        return [
+        $images = [
             "existing" => [
                 $this->getFullPath($product, "base_image"),
                 $this->getFullPath($product, "thumbnail_image"),
                 $this->getFullPath($product, "section_background_image"),
                 $this->getFullPath($product, "small_image"),
-                $product->images()->whereGallery(1)->pluck('path', 'id')->map(function ($gallery, $id) {
-                    return [ "id" => $id, "type" => "gallery_image", "delete" => 0, "url" => Storage::url($gallery) ];
-                })->toArray()
             ]
         ];
+        foreach ( $product->images()->whereGallery(1)->pluck('path', 'id') as $id => $path )
+        {
+            $images["existing"][] = [ "id" => $id, "type" => "gallery_image", "delete" => 0, "url" => Storage::url($path) ]; 
+        }
+        return $images;
     }
 
     private function getFullPath(object $product, string $image_name): ?array
