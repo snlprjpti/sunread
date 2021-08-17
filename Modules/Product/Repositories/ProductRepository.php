@@ -33,9 +33,9 @@ use Modules\Product\Rules\WebsiteWiseScopeRule;
 
 class ProductRepository extends BaseRepository
 {
-    protected $attribute, $attribute_set_repository, $channel_model, $store_model;
+    protected $attribute, $attribute_set_repository, $channel_model, $store_model, $image_repository;
     
-    public function __construct(Product $product, AttributeSetRepository $attribute_set_repository, AttributeRepository $attribute_repository, Channel $channel_model, Store $store_model)
+    public function __construct(Product $product, AttributeSetRepository $attribute_set_repository, AttributeRepository $attribute_repository, ProductImageRepository $image_repository,Channel $channel_model, Store $store_model)
     {
         $this->model = $product;
         $this->model_key = "catalog.products";
@@ -51,6 +51,7 @@ class ProductRepository extends BaseRepository
         $this->attribute_repository = $attribute_repository;
         $this->channel_model = $channel_model;
         $this->store_model = $store_model;
+        $this->image_repository = $image_repository;
     }
 
     public function validataInventoryData(array $data): array
@@ -181,7 +182,11 @@ class ProductRepository extends BaseRepository
         try
         {
             $images = $value["value"]; 
-            if ($method == "update") $images = $value["value"]["new"];
+            if ($method == "update")
+            {
+                $this->updateImageType($images);
+                $images = $value["value"]["new"];
+            }
             if (isset($images["base_image"])) $this->storeImages($product, $images["base_image"], "base_image", $method);
             if (isset($images["small_image"])) $this->storeImages($product, $images["small_image"], "small_image", $method);
             if (isset($images["thumbnail_image"])) $this->storeImages($product, $images["thumbnail_image"], "thumbnail_image", $method);
@@ -194,6 +199,84 @@ class ProductRepository extends BaseRepository
         }
 
         return true; 
+    }
+
+    private function updateImageType(mixed $data): bool
+    {
+        try
+        {
+            if (!isset($data["existing"])) throw ValidationException::withMessages(["existing" => "Existing values is required"]); 
+            $validator = Validator::make($data["existing"], [
+                "*.type" => "required|in:base_image,thumbnail_image,section_background_image,small_image,gallery_image",
+                "*.delete" => "required|boolean",
+                "*.id" => "exists:product_images,id"
+            ]);
+
+            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+            $this->updateImage($validator->validate(), "base_image");
+            $this->updateImage($validator->validate(), "small_image");
+            $this->updateImage($validator->validate(), "thumbnail_image");
+            $this->updateImage($validator->validate(), "section_background_image");
+            $this->updateImage($validator->validate(), "gallery_image");
+        }
+        catch (Exception $exception) 
+        {
+            throw $exception;
+        }
+        return true;
+    }
+
+    private function updateImage(array $data, string $type): bool
+    {
+        try
+        {
+            $data = collect($data)->where("type", $type)->first();
+            if ($data)
+            {
+                if ($data["delete"])
+                {
+                    $this->image_repository->delete($data["id"], function ($deleted) {
+                        if ($deleted->path)
+                        {
+                            Storage::delete($deleted->path);
+                            $this->image_repository->deleteThumbnail($deleted->path);
+                        }
+                    });
+                }
+
+                switch ( $data["type"] )
+                {
+                    case "base_image" :
+                        $data["main_image"] = 1;
+                    break;
+        
+                    case "small_image" :
+                        $data["small_image"] = 1;
+                    break;
+        
+                    case "thumbnail_image" :
+                        $data["thumbnail"] = 1;
+                    break;
+        
+                    case "section_background_image" :
+                        $data["section_background"] = 1;
+                    break;
+        
+                    case "gallery_image" :
+                        $data["gallery"] = 1;
+                    break;
+                }
+                $id = $data["id"];
+                unset($data["id"], $data["type"], $data["delete"]);
+                $this->image_repository->update($data, $id);
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
     }
 
     public function storeImages(object $product, mixed $images, string $image_type): bool
@@ -437,12 +520,12 @@ class ProductRepository extends BaseRepository
     {
         return [
             "existing" => [
-                "main_image" => $this->getFullPath($product, "main_image"),
-                "thumbnail" => $this->getFullPath($product, "thumbnail"),
-                "section_background" => $this->getFullPath($product, "section_background"),
-                "small_image" => $this->getFullPath($product, "small_image"),
-                "gallery" => $product->images()->whereGallery(1)->pluck('path', 'id')->map(function ($gallery, $id) {
-                    return [ "id" => $id, "type" => "gallery", "delete" => 0, "url" => Storage::url($gallery) ];
+                $this->getFullPath($product, "base_image"),
+                $this->getFullPath($product, "thumbnail_image"),
+                $this->getFullPath($product, "section_background_image"),
+                $this->getFullPath($product, "small_image"),
+                $product->images()->whereGallery(1)->pluck('path', 'id')->map(function ($gallery, $id) {
+                    return [ "id" => $id, "type" => "gallery_image", "delete" => 0, "url" => Storage::url($gallery) ];
                 })->toArray()
             ]
         ];
@@ -450,8 +533,36 @@ class ProductRepository extends BaseRepository
 
     private function getFullPath(object $product, string $image_name): ?array
     {
-        $image = $product->images()->where($image_name, 1)->latest()->first();
+        $image = $product->images()->where($this->getImageTypeMapper($image_name), 1)->latest("updated_at")->first();
         return $image ? [ "id" => $image->id, "type" => $image_name, "delete" => 0, "url" => Storage::url($image->path) ] : $image;
+    }
+
+    private function getImageTypeMapper(string $type): string
+    {
+        switch ( $type )
+        {
+            case "base_image" :
+                $image_type = "main_image";
+            break;
+
+            case "small_image" :
+                $image_type = "small_image";
+            break;
+
+            case "thumbnail_image" :
+                $image_type = "thumbnail";
+            break;
+
+            case "section_background_image" :
+                $image_type = "section_background";
+            break;
+
+            default:
+                $image_type = "gallery";
+            break;
+        }
+
+        return $image_type;
     }
 
     public function getFilterProducts(object $request): mixed
