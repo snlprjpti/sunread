@@ -181,10 +181,12 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-
-            if ($method == "update") $this->updateImageType($value["value"]);
             $images = $value["value"]; 
-            if ($method == "update") $images = $value["value"]["new"];
+            if ($method == "update")
+            {
+                $this->updateImageType($images);
+                $images = $value["value"]["new"];
+            }
             if (isset($images["base_image"])) $this->storeImages($product, $images["base_image"], "base_image", $method);
             if (isset($images["small_image"])) $this->storeImages($product, $images["small_image"], "small_image", $method);
             if (isset($images["thumbnail_image"])) $this->storeImages($product, $images["thumbnail_image"], "thumbnail_image", $method);
