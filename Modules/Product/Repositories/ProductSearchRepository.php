@@ -52,7 +52,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         foreach($this->searchKeys as $key) array_push($this->allSearch, $this->match($key, $request->search));
     }
 
-    public function filter(object $request): array
+    public function filter(object $request, ?int $category_id = null): array
     {
         try
         {
@@ -60,9 +60,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $this->getAttributeFilter($request);
 
-            $this->getCategoryFilter($request);
-            
-            //if(isset($request->max_price) && isset($request->min_price) ) array_push($this->nestedFilter, $this->range("product_attributes.$this->scope.price.value", $request->min_price, $request->max_price));
+            if($category_id) $this->getCategoryFilter($category_id);
 
             $query = $this->whereQuery($this->allFilter);
         }
@@ -86,9 +84,9 @@ class ProductSearchRepository extends ElasticSearchRepository
         }
     }
 
-    public function getCategoryFilter($request): void
+    public function getCategoryFilter(int $category_id): void
     {
-        foreach($this->categoryFilterKeys as $key) if(isset($request->$key)) array_push($this->allFilter, $this->term("categories.".substr($key,9), $request->$key));
+        array_push($this->allFilter, $this->term("categories.id", $category_id));
     }
 
     public function getProduct($request): ?array
@@ -101,6 +99,20 @@ class ProductSearchRepository extends ElasticSearchRepository
             array_push($data, $this->filter($request));
         }
 
+        return $this->finalQuery($data);
+    }
+
+    public function getFilterProduct(object $request, int $category_id): ?array
+    {
+        $data =[];
+
+        if(count($request->all()) > 0 || $category_id) array_push($data, $this->filter($request, $category_id));
+
+        return $this->finalQuery($data);
+    }
+
+    public function finalQuery(array $data): ?array
+    {
         $fetched = [
             "size"=> 500,
             "query"=> (count($data) > 0) ? $this->whereQuery($data) : [

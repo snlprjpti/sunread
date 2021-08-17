@@ -1,6 +1,5 @@
 <?php
 
-
 Route::group(["middleware" => ["api"]], function() {
     // ADMIN PRODUCT ROUTES
     Route::group(["prefix" => "admin/catalog", "as" => "admin.catalog.", "middleware" => ["admin", "language"]], function() {
@@ -32,4 +31,9 @@ Route::group(["middleware" => ["api"]], function() {
         // Product Images Routes
         Route::get('products/{category_id}/category', [\Modules\Product\Http\Controllers\ProductController::class,"categoryWiseProducts"])->name("products.categoryWiseProducts");
     });
+});
+
+Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+    Route::get('catalog/category/{category_id}/products', [\Modules\Product\Http\Controllers\StoreFront\ProductFilterController::class, "index"])->name("products.index");
+    Route::get('catalog/category/{category_id}/navigation/layered', [\Modules\Product\Http\Controllers\StoreFront\ProductFilterController::class, "filter"])->name("products.filter");
 });
