@@ -4,7 +4,6 @@ namespace Modules\Core\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Event;
 use Modules\Core\Entities\Store;
 use Illuminate\Http\JsonResponse;
 use Modules\Core\Entities\Channel;
