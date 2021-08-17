@@ -53,13 +53,7 @@ return [
             "type" => "long"
         ],
         "visibility" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
-                ]
-            ]
+            "type" => "long"
         ],
         "visibility_value" =>  [
             "type" => "text",
@@ -83,13 +77,7 @@ return [
             ]
         ],
         "has_weight" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
-                ]
-            ]
+            "type" => "long"
         ],
         "has_weight_value" =>  [
             "type" => "text",
@@ -191,13 +179,7 @@ return [
             ]
         ],
         "tax_class_id" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
-                ]
-            ]
+            "type" => "long"
         ],
         "tax_class_id_value" =>  [
             "type" => "text",
@@ -261,6 +243,32 @@ return [
                     "ignore_above" => 256
                 ]
             ]
+        ],
+        "color" =>  [
+            "type" => "long"
+        ],
+        "color_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ],
+            "fielddata"=> true
+        ],
+        "size" =>  [
+            "type" => "long"
+        ],
+        "size_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ],
+            "fielddata"=> true
         ],
         "categories"=> [
             "properties"=> [

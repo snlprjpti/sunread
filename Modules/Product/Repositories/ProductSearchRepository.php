@@ -14,9 +14,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 {
     use HasIndexing;
 
-    protected $model; 
-    protected $mainFilterKeys, $attributeFilterKeys, $categoryFilterKeys, $searchKeys, $staticFilterKeys;
-    protected  $allFilter = [], $allSearch = [];
+    protected $model, $mainFilterKeys, $attributeFilterKeys, $searchKeys, $staticFilterKeys, $sortByKeys;
 
     public function __construct(Product $product)
     {
@@ -26,17 +24,21 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->attributeFilterKeys = Attribute::where('use_in_layered_navigation', 1)->pluck('slug')->toArray();
         $this->searchKeys = Attribute::where('is_searchable', 1)->pluck('slug')->toArray();
 
-        $this->categoryFilterKeys = [ "category_id", "category_slug" ];
+        $this->sortByKeys = [ "sort_by_id", "sort_by_name", "sort_by_price" ];
 
-        $this->staticFilterKeys = ["colouruy", "visibility"];
+        $this->staticFilterKeys = ["color", "size", "collection"];
     }
 
     public function search(object $request): array
     {
         try
         {
-            if(isset($request->search)) $this->getMainSearch($request);   
-            $query = $this->orwhereQuery($this->allSearch);
+            $search = [];
+            if(isset($request->q)) {
+                $search[] = $this->queryString($this->searchKeys, $request->q);
+                foreach($this->searchKeys as $key) $search[] = $this->match($key, $request->q);
+            }
+            $query = $this->orwhereQuery($search);
         }
         catch (Exception $exception)
         {
@@ -46,84 +48,139 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $query;
     }
 
-    public function getMainSearch($request): void
-    {
-        array_push($this->allSearch, $this->queryString($this->searchKeys, $request->search));
-        foreach($this->searchKeys as $key) array_push($this->allSearch, $this->match($key, $request->search));
-    }
-
-    public function filter(object $request, ?int $category_id = null): array
+    public function filterAndSort(?object $request = null, ?int $category_id = null): array
     {
         try
         {
-            $this->getMainFilter($request);
-
-            $this->getAttributeFilter($request);
-
-            if($category_id) $this->getCategoryFilter($category_id);
-
-            $query = $this->whereQuery($this->allFilter);
+            $filter = [];
+            $sort = [];
+    
+            if($category_id) $filter[]= $this->term("categories.id", $category_id);
+    
+            if ($request && count($request->all()) > 0) {
+                foreach($request->all() as $key => $value) 
+                {
+                    if (str_starts_with($key, 'sort_by_')) $sort = $this->sort(substr($key,8), $value ?? "asc");
+                    if(in_array($key, $this->attributeFilterKeys) && $value) $filter[] = $this->term($key, $value);
+                }
+            }
+    
+            $query = $this->whereQuery($filter);       
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
-    
-        return $query;
-    }
 
-    public function getMainFilter($request): void
-    {
-        foreach($this->mainFilterKeys as $key) if(isset($request->$key)) array_push($this->allFilter, $this->term($key, $request->$key));
-    }
-
-    public function getAttributeFilter($request): void
-    {
-        foreach($this->attributeFilterKeys as $key) {
-            if(isset($request->$key)) array_push($this->allFilter, $this->term($key, $request->$key));
-        }
-    }
-
-    public function getCategoryFilter(int $category_id): void
-    {
-        array_push($this->allFilter, $this->term("categories.id", $category_id));
-    }
-
-    public function getProduct($request): ?array
-    {
-        $data =[];
-
-        if(count($request->all()) > 0)
-        {
-            array_push($data, $this->search($request));
-            array_push($data, $this->filter($request));
-        }
-
-        return $this->finalQuery($data);
-    }
-
-    public function getFilterProduct(object $request, int $category_id): ?array
-    {
-        $data =[];
-
-        if(count($request->all()) > 0 || $category_id) array_push($data, $this->filter($request, $category_id));
-
-        return $this->finalQuery($data);
-    }
-
-    public function finalQuery(array $data): ?array
-    {
-        $fetched = [
-            "size"=> 500,
-            "query"=> (count($data) > 0) ? $this->whereQuery($data) : [
-                "match_all"=> (object)[]
-            ],
-            "sort" => [
-                ["id" => ["order" => "asc", "mode" => "avg"]]
-            ],
+        return [
+            "query" => $query,
+            "sort" => $sort
         ];
+    }
 
-        return $this->searchIndex($fetched);
+    public function getFilterProducts(object $request, int $category_id): ?array
+    {
+        $filter = $this->filterAndSort($request, $category_id);
+        return $this->finalQuery($filter["query"], $request->page ?? 1, $request->limit ?? 10, $filter["sort"]);
+    }
+
+    public function getProduct(object $request): ?array
+    {
+        try
+        {
+            $data = [];
+            $data[] = $this->search($request);
+    
+            $filter = $this->filterAndSort($request);
+            $data[] = $filter["query"];
+    
+            $query = $this->whereQuery($data);
+            $final_query = $this->finalQuery($query, $request->page ?? 1, $request->limit ?? 10, $filter["sort"]);      
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $final_query;
+    }
+
+    public function aggregation(): ?array
+    {
+        try
+        {
+            $aggregate = [];
+            foreach($this->staticFilterKeys as $field) 
+            {
+                $aggregate[$field] = $this->aggregate($field);
+                $aggregate["{$field}_value"] = $this->aggregate("{$field}_value");
+            }         
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        return $aggregate;   
+    }
+
+    public function getFilterOptions(int $category_id): ?array
+    {
+        try
+        {
+            $filter = [];
+            $data = $this->filterAndSort(category_id:$category_id);
+            $aggregate = $this->aggregation();
+    
+            $query = [
+                "size"=> 0,
+                "query"=> (count($data["query"]) > 0) ? $data["query"] : [
+                    "match_all"=> (object)[]
+                ],
+                "aggs"=> $aggregate
+            ];
+    
+            $fetched = $this->searchIndex($query);
+    
+            foreach($this->staticFilterKeys as $field) 
+            {
+                $filter[$field] = collect($fetched["aggregations"][$field]["buckets"])->map(function($bucket, $key) use($fetched, $field) {
+                    return [
+                        "label" => $fetched["aggregations"]["{$field}_value"]["buckets"][$key]["key"],
+                        "value" =>  $bucket["key"]  
+                    ];
+                });
+            } 
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $filter;
+    }
+
+    public function finalQuery(array $query, ?int $page = 1, ?int $limit = 10, ?array $sort = []): ?array
+    {
+        try
+        {
+            $fetched = [
+                "from"=> ($page-1) * $limit,
+                "size"=> $limit,
+                "query"=> (count($query) > 0) ? $query : [
+                    "match_all"=> (object)[]
+                ],
+                "sort" => (count($sort) > 0) ? $sort : [
+                    ["id" => ["order" => "asc", "mode" => "avg"]]
+                ],
+            ];
+            $data =  $this->searchIndex($fetched);     
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 
     public function reIndex(int $id, ?callable $callback = null): object
@@ -166,40 +223,4 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         return $indexed;
     }
-
-    public function getFilter(array $products): array
-    {
-        $filter = [];
-        foreach($this->staticFilterKeys as $key) {           
-            $options = [];
-            foreach($products as $product) {
-                $array_options = [];
-                if(!isset($product[$key])) continue;
-
-                if(is_array($product[$key])) {
-                    $array_options[] = collect($product[$key])->map(function($value, $i) use($key, $product) {
-                        $option_key = "{$key}_{$i}_value";
-                        if(isset($product[$option_key])) return $this->getOption($value, $product[$option_key]);
-                    })->toArray();
-                    
-                    $options = array_merge($options, collect($array_options)->flatten(1)->toArray());
-                }
-                else  {
-                    $option_key = "{$key}_value";
-                    if(isset($product[$option_key])) $options[] = $this->getOption($product[$key], $product[$option_key]);
-                }
-            }   
-            $filter[$key] = array_unique($options, SORT_REGULAR);
-        }
-        return $filter;
-    }
-
-    public function getOption(mixed $value, string $label): array
-    {
-        return [
-            "value" => $value,
-            "label" => $label
-        ];
-    }
-
 }

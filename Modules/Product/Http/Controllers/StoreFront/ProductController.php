@@ -10,31 +10,34 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Transformers\StoreFront\PageResource;
 use Modules\Product\Entities\Product;
+use Modules\Product\Repositories\ProductRepository;
 use Modules\Product\Repositories\ProductSearchRepository;
 
-class ProductFilterController extends BaseController
+class ProductController extends BaseController
 {
-    protected $repository;
+    protected $repository, $search_repository;
 
-    public function __construct(Product $product, ProductSearchRepository $repository)
+    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository)
     {
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $repository;
+        $this->search_repository = $search_repository;
 
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function index($category_id, Request $request): JsonResponse
+    public function index(Request $request, int $category_id): JsonResponse
     {
         try
         {
-            Cache::forget('product_filter_list');
-
-            $fetched = Cache::rememberForever("product_filter_list", function() use($request, $category_id){
-                $data = $this->repository->getFilterProduct($request, $category_id);
-                return collect($data["hits"]["hits"])->pluck("_source")->toArray();
-            });
+            $request->validate([
+                "page" => "numeric|min:1",
+                "limit" => "numeric|min:5"
+            ]);
+            
+            $data = $this->search_repository->getFilterProducts($request, $category_id);
+            $fetched = collect($data["hits"]["hits"])->pluck("_source")->toArray();
         }
         catch( Exception $exception )
         {
@@ -44,13 +47,11 @@ class ProductFilterController extends BaseController
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
-    public function filter(Request $request): JsonResponse
+    public function filter(int $category_id): JsonResponse
     {
         try
         {
-            $products = Cache::forget('product_filter_list');
-            dd($products);
-            // $fetched = $this->repository->getFilter($products);
+            $fetched = $this->search_repository->getFilterOptions($category_id);
         }
         catch( Exception $exception )
         {

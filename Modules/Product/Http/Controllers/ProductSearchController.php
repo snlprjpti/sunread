@@ -27,8 +27,7 @@ class ProductSearchController extends BaseController
         try
         {
             $data = $this->repository->getProduct($request);
-            $fetched["data"] = collect($data["hits"]["hits"])->pluck("_source")->toArray();
-            $fetched["filter"] = $this->repository->getFilter($fetched["data"]);
+            $fetched = collect($data["hits"]["hits"])->pluck("_source")->toArray();
         } 
         catch( Exception $exception )
         {

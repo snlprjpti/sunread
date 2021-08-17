@@ -6,23 +6,6 @@ class ElasticSearchRepository
 {
     protected $scope, $path, $storeORGlobal;
 
-    public function getScope($request): string
-    {
-        return isset($request->store_id) ? "store.$request->store_id" : 
-        (isset($request->channel_id) ? "channel.$request->channel_id" : "global"); 
-    }
-
-    public function getPath($request): string
-    {
-        return isset($request->store_id) ? "store" : 
-        (isset($request->channel_id) ? "channel" : "global"); 
-    }
-
-    public function getStore($request): string
-    {
-        return isset($request->store_id) ? "store.$request->store_id" : "global"; 
-    }
-
     public function orwhereQuery(array $filter): array
     {
         return [
@@ -51,7 +34,7 @@ class ElasticSearchRepository
         ];
     }
 
-    public function match(string $field, string $data): array
+    public function match(string $field, ?string $data): array
     {
         return [
             "match" => [
@@ -60,7 +43,7 @@ class ElasticSearchRepository
         ];
     }
 
-    public function term(string $field, string $data): array
+    public function term(string $field, ?string $data): array
     {
         return [
             "term" => [
@@ -77,6 +60,22 @@ class ElasticSearchRepository
                 "gte"=> $value1,
                 "lte"=> $value2
                 ]
+            ]
+        ];
+    }
+
+    public function sort(string $field, ?string $order): array
+    {
+        return [
+            [$field => ["order" => $order, "mode" => "avg"]]
+        ];
+    }
+
+    public function aggregate(string $field): array
+    {
+        return [ 
+            "terms" => [
+                "field" => $field
             ]
         ];
     }
