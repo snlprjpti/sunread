@@ -56,9 +56,8 @@ trait WebsiteResolveable
             $host = $request->header('hc-host');
             $website = Cache::rememberForever("website_{$host}", function() use($host){
                 $fallback_id = config("website.fallback_id");
-                return ($host) ?  Website::whereHostname($host)->firstOrFail() : Website::whereId($fallback_id);
+                return ($host) ?  Website::whereHostname($host)->firstOrFail() : Website::findOrFail($fallback_id);
             });
-
             $website->channel = $this->getChannel($request, $website);
             $website->store = $this->getStore($request, $website);
             $website->pages = $this->getPages($website);
@@ -73,13 +72,13 @@ trait WebsiteResolveable
         return $website;
     }
 
-    public function getChannel(object $request, object $website): object
+    public function getChannel(object $request, object $website): object|null
     {
         try
         {
             $channel_code = $request->header("hc-channel");
             $channel = Cache::rememberForever("channel_{$channel_code}", function() use($channel_code, $website) {
-                return ($channel_code) ? Channel::whereCode($channel_code)->firstOrFail() : $this->checkConditionChannel($website);
+                return ($channel_code) ? Channel::whereCode($channel_code)->firstOrFail() : ($this->checkConditionChannel($website)) ?? null;
             });
         }
         catch( Exception $exception )
@@ -90,13 +89,13 @@ trait WebsiteResolveable
         return $channel;
     }
 
-    public function getStore(object $request, object $website): object
+    public function getStore(object $request, object $website): object|null
     {
         try
         {
             $store_code = $request->header("hc-store");
             $store = Cache::rememberForever("store_{$store_code}", function() use($store_code, $website) {
-                return ($store_code) ? Store::whereCode($store_code)->firstOrFail() : $this->checkConditionStore($website);
+                return ($store_code) ? Store::whereCode($store_code)->firstOrFail() : $this->checkConditionStore($website) ?? null;
             });
         }
         catch( Exception $exception )
@@ -121,12 +120,12 @@ trait WebsiteResolveable
         return $pages;
     }
 
-    public function checkConditionChannel(object $website): object
+    public function checkConditionChannel(object $website): object|null
     {
         return SiteConfig::fetch("website_default_channel", "website", $website->id);
     }
 
-    public function checkConditionStore(object $website): object
+    public function checkConditionStore(object $website): object|null
     {
         return SiteConfig::fetch("website_default_store", "website", $website->id);
     }
