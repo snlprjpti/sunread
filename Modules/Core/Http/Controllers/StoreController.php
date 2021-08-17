@@ -101,9 +101,7 @@ class StoreController extends BaseController
                 "code" => "required|unique:stores,code,{$id}"
             ]);
 
-            $updated = $this->repository->update($data, $id, function ($updated) {
-                Event::dispatch('core.store.cache.update', $updated);
-            });
+            $updated = $this->repository->update($data, $id);
         }
         catch(Exception $exception)
         {
@@ -119,7 +117,6 @@ class StoreController extends BaseController
         {
             $this->repository->delete($id, function ($deleted){
                 if($deleted->image) Storage::delete($deleted->image);
-                Event::dispatch('core.store.cache.delete', $deleted);
             });
         }
         catch (Exception $exception)

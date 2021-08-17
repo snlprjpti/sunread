@@ -100,9 +100,7 @@ class ChannelController extends BaseController
 
             if(isset($data['default_store_id'])) $this->repository->defaultStoreValidation($data, $id);
 
-            $updated = $this->repository->update($data, $id, function ($updated) {
-                Event::dispatch('core.channel.cache.update', $updated);
-            });
+            $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )
         {
@@ -116,9 +114,7 @@ class ChannelController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function ($deleted){
-                Event::dispatch('core.channel.cache.delete', $deleted);
-            });
+            $this->repository->delete($id);
         }
         catch( Exception $exception )
         {

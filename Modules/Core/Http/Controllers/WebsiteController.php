@@ -102,9 +102,7 @@ class WebsiteController extends BaseController
                 "code" => "required|unique:websites,code,{$id}",
                 "hostname" => [ "required", "unique:websites,hostname,{$id}", "unique:channels,hostname", new FQDN()],
             ]);
-            $updated = $this->repository->update($data, $id, function ($updated) {
-                Event::dispatch('core.website.cache.update', $updated);
-            });
+            $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )
         {
@@ -118,9 +116,7 @@ class WebsiteController extends BaseController
     {
         try
         {
-            $this->repository->delete($id, function ($deleted){
-                Event::dispatch('core.website.cache.delete', $deleted);
-            });
+            $this->repository->delete($id);
         }
         catch( Exception $exception )
         {
