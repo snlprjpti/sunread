@@ -2,6 +2,7 @@
 
 namespace Modules\Product\Listeners;
 
+use Illuminate\Support\Facades\Bus;
 use Modules\Core\Entities\Website;
 use Modules\Product\Jobs\SingleIndexing;
 
@@ -13,7 +14,8 @@ class ProductListener
             return $channel->stores;
         });
 
-        SingleIndexing::dispatch($product, $stores, "product");
+        $batch = Bus::batch([])->dispatch();
+        foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
     }
 
     public function remove($product)
@@ -22,6 +24,7 @@ class ProductListener
             return $channel->stores;
         });
         
-        SingleIndexing::dispatch(collect($product), $stores, "product", "delete");
+        $batch = Bus::batch([])->dispatch();
+        foreach($stores as $store) $batch->add(new SingleIndexing(collect($product), $store, "delete"));
     }
 }
