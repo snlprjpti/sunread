@@ -30,16 +30,16 @@ class ConfigurationTest extends BaseTestCase
 
     public function getNonMandodtaryCreateData(): array
     {
-        return array_merge($this->getCreateData(), [
-            "scope" => "global",
-            "scope_id" => 0,
-            "items" => [
-                "store_phone_number" => [
-                    "value" => null,
-                    "absolute_path" => "general.children.0.subChildren.2.elements.1"
-                ],
-            ]
-        ]);
+        $created_data = $this->getCreateData();
+        $created_data["items"] = array_merge($created_data["items"], [
+                    "store_phone_number" => [
+                        "value" => null,
+                        "absolute_path" => "general.children.0.subChildren.2.elements.1"
+                    ],
+                ]);
+        return $created_data;
+
+    
     }
 
     public function getInvalidCreateData(): array
