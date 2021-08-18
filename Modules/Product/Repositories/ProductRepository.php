@@ -544,13 +544,11 @@ class ProductRepository extends BaseRepository
         try
         {
             $images = [ "existing" => [] ];
-            foreach (["base_image", "thumbnail_image", "section_background_image", "small_image",] as $type)
-            {
+            foreach (["base_image", "thumbnail_image", "section_background_image", "small_image" ] as $type) {
                 if ( is_null($this->getFullPath($product, $type)) ) continue;
                 $images["existing"][] = $this->getFullPath($product, $type);
             }
-            foreach ( $product->images()->whereGallery(1)->get() as $gallery )
-            {
+            foreach ( $product->images()->whereGallery(1)->get() as $gallery ) {
                 $images["existing"][] = [ "id" => $gallery->id, "type" => $this->getImageTypes($gallery), "delete" => 0, "url" => Storage::url($gallery->path) ]; 
             }    
         }
@@ -568,28 +566,23 @@ class ProductRepository extends BaseRepository
         return $image ? [ "id" => $image->id, "type" => $this->getImageTypes($image), "delete" => 0, "url" => Storage::url($image->path) ] : $image;
     }
     
-    public function getImageTypes(mixed $image):array
+    public function getImageTypes(mixed $image): array
     {
         try
         {
-            if ($image->main_image)
-            {
+            if ($image->main_image) {
                 $types[] = "main_image";
             }
-            if ($image->small_image)
-            {
+            if ($image->small_image) {
                 $types[] = "small_image";
             }
-            if ($image->thumbnail)
-            {
+            if ($image->thumbnail) {
                 $types[] = "thumbnail";
             }
-            if ($image->section_background)
-            {
+            if ($image->section_background) {
                 $types[] = "section_background";
             }
-            if ($image->gallery)
-            {
+            if ($image->gallery) {
                 $types[] = "gallery";
             }    
         }
