@@ -223,7 +223,14 @@ class ProductRepository extends BaseRepository
                     });
                     continue;
                 }
-                $update_data = $this->getImageType($item["type"]);
+
+                $update_data = [];
+                $image_data = $this->image_repository->fetch($item["id"]);
+                $this->storeUpdateImage($item, $image_data, $image_data->path);
+                $update_data["path"] = $image_data->path;
+                $update_data = array_merge($update_data, $this->getImageType($item["type"]));
+                
+                dd($update_data);
                 $this->image_repository->update($update_data, $item["id"]);
             }
         }
@@ -232,6 +239,23 @@ class ProductRepository extends BaseRepository
             throw $exception;
         }
         return true;
+    }
+
+    private function storeUpdateImage(array $data, object $image, string $path)
+    {
+        try
+        {
+            dd($image);
+            dd($data["type"]);
+            $directory = Storage::get($path);
+
+            dd($directory);
+        }
+        catch (Exception $exception) 
+        {
+            throw $exception;
+        }
+        return $directory;
     }
 
     private function validateUpdateImage(array $data, object $product)
