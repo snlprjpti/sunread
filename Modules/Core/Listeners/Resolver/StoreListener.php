@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Cache;
 
 class StoreListener
 {
-    public function updatestore($store)
+    public function createCache($store)
     {
         Cache::put("store_{$store->code}", $store);
     }
 
-    public function deleteStore($store)
+    public function deleteCache($store)
     {
         Cache::forget("store_{$store->code}");
     }

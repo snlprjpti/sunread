@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Cache;
 
 class WebsiteListener
 {
-    public function updateWebsite($website)
+    public function createCache($website)
     {
         Cache::put("website_{$website->hostname}", $website);
     }
 
-    public function deleteWebsite($website)
+    public function deleteCache($website)
     {
         Cache::forget("website_{$website->hostname}");
     }

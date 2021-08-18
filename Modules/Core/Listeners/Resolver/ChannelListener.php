@@ -6,12 +6,12 @@ use Illuminate\Support\Facades\Cache;
 
 class ChannelListener
 {
-    public function updateChannel($channel)
+    public function createCache($channel)
     {
         Cache::put("channel_{$channel->code}", $channel);
     }
 
-    public function deleteChannel($channel)
+    public function deleteCache($channel)
     {
         Cache::forget("channel_{$channel->code}");
     }
