@@ -35,16 +35,16 @@ class ConfigurationFactory extends Factory
 
         foreach($paths as $i => $path)
         {
-            return [
-                'scope' => $scope,
-                'scope_id' => $scope_id,
-                'items' => [
-                    $path => [
-                        'use_default_value' => 1,
-                        'absolute_path' => "general.children.0.subChildren.{$absolute_paths[$i]}"
-                    ] 
-                ]
+            $items[$path] = [
+                    'use_default_value' => 1,
+                    'absolute_path' => "general.children.0.subChildren.{$absolute_paths[$i]}"
             ];
         }
+        return [
+            "absolute_path" => "general.children.0.subChildren",
+            'scope' => $scope,
+            'scope_id' => $scope_id,
+            'items' => $items
+        ];
     }
 }
