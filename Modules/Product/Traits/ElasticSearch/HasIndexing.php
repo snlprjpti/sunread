@@ -228,7 +228,7 @@ trait HasIndexing
     {
         try
         {
-            $store_code = array_key_exists("store", getallheaders()) ? getallheaders()["store"] : "";
+            $store_code = array_key_exists("store", getallheaders()) ? getallheaders()["store"] : "english-store";
             $store = Store::whereCode($store_code)->first();
         }
         catch(Exception $exception)
