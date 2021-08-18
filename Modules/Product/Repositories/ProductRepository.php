@@ -571,19 +571,19 @@ class ProductRepository extends BaseRepository
         try
         {
             if ($image->main_image) {
-                $types[] = "main_image";
+                $types[] = "base_image";
             }
             if ($image->small_image) {
                 $types[] = "small_image";
             }
             if ($image->thumbnail) {
-                $types[] = "thumbnail";
+                $types[] = "thumbnail_image";
             }
             if ($image->section_background) {
-                $types[] = "section_background";
+                $types[] = "section_background_image";
             }
             if ($image->gallery) {
-                $types[] = "gallery";
+                $types[] = "gallery_image";
             }    
         }
         catch ( Exception $exception )
