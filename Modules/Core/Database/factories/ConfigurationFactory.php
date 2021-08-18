@@ -7,6 +7,7 @@ use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Country\Entities\Country;
 
 class ConfigurationFactory extends Factory
 {
@@ -39,7 +40,7 @@ class ConfigurationFactory extends Factory
             'scope_id' => $scope_id,
             'items' => [
                 $paths[$i] => [
-                    'value' => $this->faker->name(),
+                    'value' => Country::inRandomOrder()->first()->id,
                     'absolute_path' => $absolute_paths[$i]
                 ] 
             ]
