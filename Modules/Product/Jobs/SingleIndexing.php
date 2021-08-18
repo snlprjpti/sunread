@@ -4,6 +4,7 @@ namespace Modules\Product\Jobs;
 
 use Elasticsearch\ClientBuilder;
 use Exception;
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,15 +15,14 @@ use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
 class SingleIndexing implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 
-    public $products, $stores, $model, $method;
+    public $product, $store, $method;
 
-    public function __construct(object $products, object $stores, string $model, ?string $method = null)
+    public function __construct(object $product, object $store, ?string $method = null)
     {
-        $this->products = $products;
-        $this->stores = $stores;
-        $this->model = $model;
+        $this->product = $product;
+        $this->store = $store;
         $this->method = $method;
     }
 
@@ -30,21 +30,8 @@ class SingleIndexing implements ShouldQueue
     {
         try
         {
-            if ($this->model == "product") {
-                foreach($this->stores as $store)
-                {
-                    if(!$this->method) $this->singleIndexing($this->products, $store);
-                    else $this->removeIndex($this->products, $store);
-                }
-            }
-    
-            if ($this->model == "store") {
-                foreach ($this->products as $product)
-                {
-                    $product->load("categories", "product_attributes", "catalog_inventories", "images");
-                    if(!$this->method) $this->singleIndexing($product, $this->stores);  
-                } 
-            }
+            if(!$this->method) $this->singleIndexing($this->product, $this->store);
+            else $this->removeIndex($this->product, $this->store);
         }
         catch (Exception $exception)
         {

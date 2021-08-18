@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Listeners;
 
+use Illuminate\Support\Facades\Bus;
 use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\SingleIndexing;
 
@@ -11,6 +12,8 @@ class StoreListener
     {
         $website = $store?->channel?->website;
         $products = Product::whereWebsiteId($website->id)->get();
-        SingleIndexing::dispatch($products, $store, "store");
+
+        $batch = Bus::batch([])->dispatch();
+        foreach($products as $product) $batch->add(new SingleIndexing($product, $store));
     }
 }
