@@ -242,7 +242,7 @@ class ProductRepository extends BaseRepository
                 "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery_image",
                 "*.delete" => "required|boolean",
                 "*.id" => "required|exists:product_images,id",
-                "*.id" => "in:{$product->images()->pluck("id")}",
+                "*.id" => Rule::in($product->images()->pluck("id")->toArray()),
             ]);
 
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
