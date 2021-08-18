@@ -307,7 +307,7 @@ trait HasErpValueMapper
         return $channel;
     }
 
-    private function getAttributeOptionValue(mixed $erp_product_iteration, string $attribute_slug): bool
+    private function getAttributeOptionValue(mixed $erp_product_iteration, string $attribute_slug): ?int
     {
         try
         {
