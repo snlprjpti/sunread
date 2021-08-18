@@ -1,15 +1,15 @@
 <?php
 
-namespace Modules\Core\Http\Controllers;
+namespace Modules\Core\Http\Controllers\StoreFront;
 
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Modules\Core\Entities\Website;
+use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Core\Facades\SiteConfig;
-use Modules\Core\Repositories\ResolveRepository;
+use Modules\Core\Entities\Website;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Core\Transformers\ResolveResource;
+use Modules\Core\Repositories\ResolveRepository;
+use Modules\Core\Transformers\StoreFront\Resolver\ResolveResource;
 
 class ResolverController extends BaseController
 {
@@ -29,16 +29,11 @@ class ResolverController extends BaseController
         return new ResolveResource($data);
     }
 
-    public function resolve(?string $website = null): JsonResponse
+    public function resolve(Request $request): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->resolveWebsite($website, function ($fetched) {
-                $fetched->default_channel = SiteConfig::fetch("website_default_channel", "website", $fetched->id);
-                $fetched->default_store = SiteConfig::fetch("website_default_store", "website", $fetched->id);
-
-                return $fetched;
-            });
+            $fetched = $this->repository->resolveWebsiteUpdate($request);
         }
         catch( Exception $exception )
         {

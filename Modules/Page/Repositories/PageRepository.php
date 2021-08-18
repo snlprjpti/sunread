@@ -53,6 +53,7 @@ class PageRepository extends BaseRepository
             $attributes = [];
             $data = $this->fetch($id, [ "page_scopes", "page_attributes", "website" ]);
             $components = $data->page_attributes()->get();
+            $stores = $data->page_scopes()->pluck("scope_id")->toArray();
 
             foreach($components as $component)
             {
@@ -60,7 +61,8 @@ class PageRepository extends BaseRepository
             }
 
             $item = $data->toArray();
-            unset($item["page_attributes"]);
+            unset($item["page_attributes"], $item["page_scopes"]);
+            $item["stores"] = $stores;
             $item["components"] = $attributes;
         }
         catch( Exception $exception )

@@ -19,8 +19,6 @@ class ProductAttribute extends Model
 
     protected $appends = ["value_data", "url"];
 
-    protected $touches = ["product"];
-
     public function __construct(?array $attributes = [])
     {
         parent::__construct($attributes);

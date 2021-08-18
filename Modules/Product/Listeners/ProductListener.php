@@ -2,39 +2,29 @@
 
 namespace Modules\Product\Listeners;
 
-use Elasticsearch\ClientBuilder;
+use Illuminate\Support\Facades\Bus;
 use Modules\Core\Entities\Website;
+use Modules\Product\Jobs\SingleIndexing;
 
 class ProductListener
 {
     public function indexing($product)
     {
-        // $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
-        //     return $channel->stores->pluck("id");
-        // })->toArray();
+        $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            return $channel->stores;
+        });
 
-        // $data = $product->toArray();
-        // foreach($product->product_attributes()->with("attribute")->get() as $product_attribute)
-        // {
-        //     $data[$product_attribute->attribute->slug] = $product_attribute->value?->value;
-        // }
-        // $data["categories"] = $product->categories()->pluck("id")->toArray();
-        // $data["catalog_inventories"] = $product->catalog_inventories;
-        
-        // $hosts = [
-        //     "localhost:9200" 
-        // ];
-        
-        // $client = ClientBuilder::create()->setHosts($hosts)->build();
+        $batch = Bus::batch([])->dispatch();
+        foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
+    }
 
-        // foreach($stores as $store)
-        // {
-        //     $params = [
-        //         "index" => "sail_racing_store_$store",
-        //         "id" => $product->id,
-        //         "body" => $data
-        //     ];
-        //     $client->index($params);
-        // }
+    public function remove($product)
+    {
+        $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            return $channel->stores;
+        });
+        
+        $batch = Bus::batch([])->dispatch();
+        foreach($stores as $store) $batch->add(new SingleIndexing(collect($product), $store, "delete"));
     }
 }
