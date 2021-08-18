@@ -18,18 +18,12 @@ class CategoryObserver
 
     public function updated(Category $category)
     {
-        $category->products->map(function ($product) {
-            $product->searchable();
-        });
         Audit::log($category, __FUNCTION__);
         //UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
     }
 
     public function deleted(Category $category)
     {
-        $category->products->map(function ($product) {
-            $product->searchable();
-        });
         Audit::log($category, __FUNCTION__);
         //UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
     }
