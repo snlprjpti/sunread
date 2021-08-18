@@ -3,6 +3,8 @@
 namespace Modules\Core\Tests\Feature;
 
 use Illuminate\Support\Facades\Config;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Core\Tests\BaseTestCase;
 
@@ -15,8 +17,8 @@ class ResolverTest extends BaseTestCase
         parent::setUp();
 
         $this->model_name = "Website";
-        $this->route_prefix = "resolver";
-        
+        $this->route_prefix = "public.resolver";
+
         $this->createFactories = false;
         $this->hasFilters = false;
         $this->hasIndexTest = false;
@@ -50,7 +52,8 @@ class ResolverTest extends BaseTestCase
 
     public function testCustomWebsiteShouldNotBeResolvedIfInvalid(): void
     {
-        $response = $this->get($this->getRoute("resolve", ["random-non-existent.domain"]));
+        $this->headers["hc-host"] = "random-non-existent.domain";
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
 
         $response->assertNotFound();
         $response->assertJsonFragment([
@@ -58,11 +61,59 @@ class ResolverTest extends BaseTestCase
             "message" => __("core::app.response.not-found", ["name" => $this->model_name])
         ]);
     }
-    
+
     public function testWebsiteShouldNotBeResolvedIfInProduction(): void
     {
         Config::set("website.environment", "production");
         $response = $this->get($this->getRoute("resolve"));
+
+        $response->assertNotFound();
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testChannelCanBeResolved(): void
+    {
+        $this->headers["hc-channel"] = Channel::inRandomOrder()->first()->code;
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testChannelShouldNotBeResolvedIfInvalid(): void
+    {
+        $this->headers["hc-channel"] = "random-non-existent-channel-code";
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
+
+        $response->assertNotFound();
+        $response->assertJsonFragment([
+            "status" => "error",
+            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testStoreCanBeResolved(): void
+    {
+        $this->headers["hc-store"] = Store::inRandomOrder()->first()->code;
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
+        ]);
+    }
+
+    public function testStoreShouldNotBeResolvedIfInvalid(): void
+    {
+        $this->headers["hc-store"] = "random-non-existent-store-code";
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
 
         $response->assertNotFound();
         $response->assertJsonFragment([
