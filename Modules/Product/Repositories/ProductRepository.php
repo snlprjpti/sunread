@@ -221,6 +221,7 @@ class ProductRepository extends BaseRepository
                             $this->image_repository->deleteThumbnail($deleted->path);
                         }
                     });
+                    continue;
                 }
                 $update_data = $this->getImageType($item["type"]);
                 $this->image_repository->update($update_data, $item["id"]);
@@ -540,25 +541,57 @@ class ProductRepository extends BaseRepository
 
     private function getImages(object $product): array
     {
-        $images = [
-            "existing" => [
-                $this->getFullPath($product, "base_image"),
-                $this->getFullPath($product, "thumbnail_image"),
-                $this->getFullPath($product, "section_background_image"),
-                $this->getFullPath($product, "small_image"),
-            ]
-        ];
-        foreach ( $product->images()->whereGallery(1)->pluck('path', 'id') as $id => $path )
+        try
         {
-            $images["existing"][] = [ "id" => $id, "type" => "gallery_image", "delete" => 0, "url" => Storage::url($path) ]; 
+            $images = [ "existing" => [] ];
+            foreach (["base_image", "thumbnail_image", "section_background_image", "small_image" ] as $type) {
+                if ( is_null($this->getFullPath($product, $type)) ) continue;
+                $images["existing"][] = $this->getFullPath($product, $type);
+            }
+            foreach ( $product->images()->whereGallery(1)->get() as $gallery ) {
+                $images["existing"][] = [ "id" => $gallery->id, "type" => $this->getImageTypes($gallery), "delete" => 0, "url" => Storage::url($gallery->path) ]; 
+            }    
         }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
         return $images;
     }
 
     private function getFullPath(object $product, string $image_name): ?array
     {
         $image = $product->images()->where($this->getImageTypeMapper($image_name), 1)->latest("updated_at")->first();
-        return $image ? [ "id" => $image->id, "type" => $image_name, "delete" => 0, "url" => Storage::url($image->path) ] : $image;
+        return $image ? [ "id" => $image->id, "type" => $this->getImageTypes($image), "delete" => 0, "url" => Storage::url($image->path) ] : $image;
+    }
+    
+    public function getImageTypes(mixed $image): array
+    {
+        try
+        {
+            if ($image->main_image) {
+                $types[] = "main_image";
+            }
+            if ($image->small_image) {
+                $types[] = "small_image";
+            }
+            if ($image->thumbnail) {
+                $types[] = "thumbnail";
+            }
+            if ($image->section_background) {
+                $types[] = "section_background";
+            }
+            if ($image->gallery) {
+                $types[] = "gallery";
+            }    
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $types;
     }
 
     private function getImageTypeMapper(string $type): string
