@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 
 namespace Modules\Core\Tests\Feature;
 
@@ -147,4 +147,4 @@ class ConfigurationTest extends BaseTestCase
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
-}
+} -->

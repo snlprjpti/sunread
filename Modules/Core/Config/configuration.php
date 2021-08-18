@@ -21,7 +21,7 @@ return[
                                 "showIn" => ["channel", "website", "default", "store"],
                                 "multiple" => false,
                                 "scope" => "global",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Allow Countries",
@@ -35,7 +35,7 @@ return[
                                 "value_rules" => "exists:countries,id",
                                 "showIn" => ["channel", "website", "default", "store"],
                                 "scope" => "website",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Zip/Postal Code is Optional for",
@@ -49,7 +49,7 @@ return[
                                 "showIn" => ["channel", "website", "default", "store"],
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 0
+                                "is_required" => 1
                             ]
                         ]
                     ],
@@ -68,7 +68,7 @@ return[
                                 "showIn" => ["channel", "website", "default", "store"],
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                         ]
                     ],
@@ -87,7 +87,7 @@ return[
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => false,
                                 "scope" => "global",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Store Phone Number",
@@ -128,7 +128,7 @@ return[
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => true,
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Region/State",
@@ -141,7 +141,7 @@ return[
                                 "rules" => "",
                                 "showIn" => ["channel","website","default","store"],
                                 "scope" => "global",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Zip/Postal Code",
@@ -167,7 +167,7 @@ return[
                                 "rules" => "",
                                 "showIn" => ["channel","website","default","store"],
                                 "scope" => "global",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Street Address",
@@ -206,7 +206,7 @@ return[
                                 "rules" => "mimes:jpeg,jpg,bmp,png",
                                 "showIn" => ["channel","website","default","store"],
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                         ]
                     ]
@@ -275,7 +275,7 @@ return[
                                 "showIn" => ["channel","website","default","store"],
                                 "multiple" => false,
                                 "scope" => "global",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Default Display Currency",
