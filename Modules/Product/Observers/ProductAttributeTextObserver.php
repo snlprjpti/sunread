@@ -9,6 +9,5 @@ class ProductAttributeTextObserver
 {
     public function updated(ProductAttributeText $product_attribute_text)
     {
-        $product_attribute_text->product_attribute->product->searchable();
     }
 }

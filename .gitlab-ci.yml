@@ -15,8 +15,8 @@ variables:
   DB_PASSWORD: mysql_password
   DB_DATABASE: mysql_db
   DB_USERNAME: mysql_user
-  SCOUT_DRIVER: elastic
-  SCOUT_ELASTIC_HOST: 94.237.111.68:9200
+  ELASTIC_HOST: 94.237.111.68:9200
+  ELASTIC_PREFIX: sail_racing_store_
   QUEUE_CONNECTION: database
   APP_ENV: ci
 cache:
