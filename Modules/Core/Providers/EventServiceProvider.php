@@ -18,7 +18,8 @@ class EventServiceProvider extends ServiceProvider
         Event::listen([ 'core.channel.create.after', 'core.channel.update.after' ], 'Modules\Core\Listeners\Resolver\ChannelListener@createCache');
         Event::listen('core.channel.delete.after', 'Modules\Core\Listeners\Resolver\ChannelListener@deleteCache');
 
-        Event::listen([ 'core.store.create.after', 'core.store.update.after' ], 'Modules\Core\Listeners\Resolver\StoreListener@createCache');
-        Event::listen('core.store.delete.after', 'Modules\Core\Listeners\Resolver\StoreListener@deleteCache');
+        Event::listen('core.stores.create.after', 'Modules\Core\Listeners\Resolver\StoreListener@createCache');
+        Event::listen('core.stores.update.after', 'Modules\Core\Listeners\Resolver\StoreListener@updateCache');
+        Event::listen('core.stores.delete.after', 'Modules\Core\Listeners\Resolver\StoreListener@deleteCache');
     }
 }
