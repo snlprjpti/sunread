@@ -541,15 +541,22 @@ class ProductRepository extends BaseRepository
 
     private function getImages(object $product): array
     {
-        $images = [ "existing" => [] ];
-        foreach (["base_image", "thumbnail_image", "section_background_image", "small_image",] as $type)
+        try
         {
-            if ( is_null($this->getFullPath($product, $type)) ) continue;
-            $images["existing"][] = $this->getFullPath($product, $type);
+            $images = [ "existing" => [] ];
+            foreach (["base_image", "thumbnail_image", "section_background_image", "small_image",] as $type)
+            {
+                if ( is_null($this->getFullPath($product, $type)) ) continue;
+                $images["existing"][] = $this->getFullPath($product, $type);
+            }
+            foreach ( $product->images()->whereGallery(1)->get() as $gallery )
+            {
+                $images["existing"][] = [ "id" => $gallery->id, "type" => $this->getImageTypes($gallery), "delete" => 0, "url" => Storage::url($gallery->path) ]; 
+            }    
         }
-        foreach ( $product->images()->whereGallery(1)->get() as $gallery )
+        catch( Exception $exception )
         {
-            $images["existing"][] = [ "id" => $gallery->id, "type" => $this->getImageTypes($gallery), "delete" => 0, "url" => Storage::url($gallery->path) ]; 
+            throw $exception;
         }
 
         return $images;
