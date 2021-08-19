@@ -27,10 +27,8 @@ class ProductSearchController extends BaseController
         try
         {
             $data = $this->repository->getProduct($request);
-            $fetched["attribute_key"] = $this->repository->getScope($request);
-            $fetched["category_key"] = $this->repository->getStore($request);
-            $fetched["data"] = collect($data["hits"]["hits"])->pluck("_source");
-        }
+            $fetched = collect($data["hits"]["hits"])->pluck("_source")->toArray();
+        } 
         catch( Exception $exception )
         {
             return $this->handleException($exception);

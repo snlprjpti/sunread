@@ -30,16 +30,14 @@ class ConfigurationTest extends BaseTestCase
 
     public function getNonMandodtaryCreateData(): array
     {
-        return array_merge($this->getCreateData(), [
-            "scope" => "global",
-            "scope_id" => 0,
-            "items" => [
-                "optional_zip_countries" => [
-                    "value" => null,
-                    "absolute_path" => "general.children.0.subChildren.0.elements.2"
-                ],
+        $created_data = $this->getCreateData();
+        $created_data["items"] = array_merge($created_data["items"], [
+            "store_phone_number" => [
+                "value" => null,
+                "absolute_path" => "general.children.0.subChildren.2.elements.1"
             ]
         ]);
+        return $created_data;  
     }
 
     public function getInvalidCreateData(): array
@@ -55,22 +53,6 @@ class ConfigurationTest extends BaseTestCase
             ]
         ]);
     }
-
-    public function getUpdateData(): array
-    {
-        return array_merge($this->model::factory()->make()->toArray(), [
-            "scope" => $this->default_resource->scope,
-            "scope_id" => $this->default_resource->scope_id,
-            "items" => [
-                $this->default_resource->path => [
-                    "value" => 15,
-                    "absolute_path" => "general.children.0.subChildren.0.elements.0"
-                ]
-            ]
-        ]);
-    }
-
-
 
     /**
      * Fetch tests

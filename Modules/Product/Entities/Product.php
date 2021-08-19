@@ -14,10 +14,12 @@ use Modules\Category\Entities\Category;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Inventory\Entities\CatalogInventory;
+use Modules\Product\Traits\ElasticSearch\ElasticSearchFormat;
+use Modules\Product\Traits\HasAttributeScope;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, ElasticSearchFormat, HasAttributeScope;
 
     protected $fillable = [ "parent_id", "website_id", "brand_id", "attribute_set_id", "sku", "type", "status" ];
     public static $SEARCHABLE = [ "sku", "type" ];

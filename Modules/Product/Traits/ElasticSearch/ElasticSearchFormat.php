@@ -2,83 +2,172 @@
 
 namespace Modules\Product\Traits\ElasticSearch;
 
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
+use Exception;
+use Illuminate\Support\Facades\Storage;
+use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeOption;
+use Modules\Tax\Entities\ProductTaxGroup;
 
 trait ElasticSearchFormat
 {
-    use AttributeFormat;
+    protected $non_required_attributes = [ "cost" ],
+    $options_fields = [ "select", "multiselect", "checkbox" ];
 
-    protected $attribute_array = [
-        'global' => [],
-        'channel' => [],
-        'store' => []
-    ];
-
-    protected $option_attribute_array = [
-        'global' => [],
-        'channel' => [],
-        'store' => []
-    ];
-
-    protected $categoryData, $attributeData, $globalAttributes, $channelAttributes, $storeAttributes, $mainChannels, $mainStores;
-
-
-    public function documentDataStructure(): array
+    public function documentDataStructure(object $store): array
     {
-        $this->getChannels();
-        $this->getStores();
-
-        $array = $this->toArray();
-        
-        $array['categories'] = $this->getScopeWiseCategory();
-        
-        $array['channels'] = $this->channels->map(function($channel){
-            return [
-                'id' => $channel->id
-            ];
-        });
-
-        $array['product_attributes'] = $this->getScopeWiseAttribute();
-
-        return $array;
-    }
-
-    public function getChannels(): void
-    {
-        $this->mainChannels = Channel::pluck('id')->toArray();
-    }
-
-    public function getStores(): void
-    {
-        $this->mainStores = Store::pluck('id')->toArray();
-    }
-
-    public function getChannelID(int $store_id): int
-    {
-        foreach($this->channels as $channel) if(in_array($store_id, $channel->stores->pluck('id')->toArray())) return $channel->id;
-        return 0;
-    }
-
-    public function getScopeWiseCategory(): array
-    {
-        $data = [];
-        
-        foreach($this->categories as $category)
+        try
         {
-            $data['global'][] = $this->getCategoryData($category->toArray());
-            foreach($this->mainStores as $store_id) $data['store'][$store_id][] = $this->getCategoryData($category->firstTranslation($store_id));
+            $array = $this->getProductAttributes($store);
+
+            $inventory = $this->getInventoryData();
+            if ($inventory) $array = array_merge($array, $inventory); 
+    
+            $array['categories'] = $this->getCategoryData($store);
+            $images = $this->getImages();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return array_merge($array, $images);
+    }
+
+    public function getProductAttributes(object $store): array
+    {
+        try
+        {
+            $data = [];
+
+            $selected_attr = [ "id", "sku", "status", "website_id", "parent_id", "type" ];
+            $data = collect($this)->filter(function ($product, $key) use($selected_attr) {
+                if(in_array($key, $selected_attr)) return $product;
+            })->toArray();
+            
+            $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
+            
+            foreach($attributeIds as $attributeId)
+            {
+                $attribute = Attribute::find($attributeId);
+                if(in_array($attribute->slug, $this->non_required_attributes)) continue;
+    
+                $match = [
+                    "scope" => "store",
+                    "scope_id" => $store->id,
+                    "attribute_id" => $attributeId
+                ];
+    
+                $data[$attribute->slug] = $this->value($match);
+                if(in_array($attribute->type, $this->options_fields))
+                {
+                    $value = $data[$attribute->slug];
+                    if (is_array($value)) {
+                        foreach($value as $key => $val)
+                        {
+                            $data["{$attribute->slug}_{$key}_value"] = $this->getAttributeOption($attribute, $val);
+                        }
+                    }
+                    else $data["{$attribute->slug}_value"] = $this->getAttributeOption($attribute, $value);
+                }
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
         }
 
         return $data;
     }
 
-    public function getCategoryData(array $category): array
+    public function getAttributeOption(object $attribute, mixed $value): ?string
     {
-        return [
-            'id' => $category["id"],
-            'slug' => $category["slug"],
-            'name' =>$category["name"]
-        ];
+        try
+        {
+            $attribute_option_class = $attribute->getConfigOption() ? new ProductTaxGroup() : new AttributeOption();
+            $attribute_option = $attribute_option_class->find($value);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $attribute_option?->name;
+    }
+
+    public function getInventoryData(): ?array
+    {
+        try
+        {
+            $inventory = $this->catalog_inventories()->select("quantity", "is_in_stock")->first()?->toArray();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $inventory;
+    }
+
+    public function getCategoryData(object $store): array
+    {
+        try
+        {
+            $categories = $this->categories->map(function ($category) use ($store) {
+
+                $defaul_data = [
+                    "category_id" => $category->id,
+                    "scope" => "store",
+                    "scope_id" => $store->id 
+                ];
+    
+                return [
+                    "id" => $category->id,
+                    "slug" => $category->value($defaul_data, "slug"),
+                    "name" => $category->value($defaul_data, "name")
+                ];
+            })->toArray();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $categories;
+    }
+
+    public function getImages(): array
+    {
+        try
+        {
+            $images = [
+                'main_image' => $this->getFullPath("main_image"),
+                'thumbnail' => $this->getFullPath("thumbnail"),
+                'small_image' => $this->getFullPath("small_image"),
+                'section_background' => $this->getFullPath("section_background"),
+                'gallery' => $this->images()->whereGallery(1)->pluck('path')->map(function ($gallery) {
+                    return Storage::url($gallery);
+                })->toArray()
+            ];
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        return $images;
+    }
+
+    Public function getFullPath($image_name): ?string
+    {
+        try
+        {
+            $image = $this->images()->where($image_name, 1)->first();
+            $path = $image ? Storage::url($image->path) : $image;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+         
+        return $path;
     }
 }

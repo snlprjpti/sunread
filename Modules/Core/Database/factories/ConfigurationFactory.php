@@ -14,11 +14,10 @@ class ConfigurationFactory extends Factory
 
     public function definition(): array
     {
-        $paths = [ "default_country", "allow_countries", "optional_zip_countries" ];
-        $absolute_paths = [ "general.children.0.subChildren.0.elements.0", "general.children.0.subChildren.0.elements.1", "general.children.0.subChildren.0.elements.2" ];
-        $i = rand(0,2);
-        $scope_id = 0;
-        $scope = Arr::random([ "global", "website", "channel", "store" ]);
+        $paths = [ "allow_countries", "optional_zip_countries", "state_country", "store_phone_number", "store_hours_operation", "store_country", "store_zip_code", "store_street_address", "store_address_line2", "store_image" ];
+        $absolute_paths = [ "0.elements.1", "0.elements.2", "1.elements.0", "2.elements.1", "2.elements.2",  "2.elements.3", "2.elements.5", "2.elements.7", "2.elements.8", "2.elements.9"];
+
+        $scope = Arr::random([ "website", "channel", "store" ]);
 
         switch ($scope) {
             case "website":
@@ -34,15 +33,18 @@ class ConfigurationFactory extends Factory
                 break;
         }
 
+        foreach($paths as $i => $path)
+        {
+            $items[$path] = [
+                'use_default_value' => 1,
+                'absolute_path' => "general.children.0.subChildren.{$absolute_paths[$i]}"
+            ];
+        }
         return [
+            "absolute_path" => "general.children.0.subChildren",
             'scope' => $scope,
             'scope_id' => $scope_id,
-            'items' => [
-                $paths[$i] => [
-                    'value' => $this->faker->name(),
-                    'absolute_path' => $absolute_paths[$i]
-                ] 
-            ]
+            'items' => $items
         ];
     }
 }
