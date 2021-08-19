@@ -183,8 +183,7 @@ class ProductRepository extends BaseRepository
         try
         {
             $images = $value["value"]; 
-            if ($method == "update")
-            {
+            if ($method == "update") {
                 $this->updateImageType($images, $product);
                 if (isset($value["value"]["new"])) $images = $value["value"]["new"];
             }
@@ -206,25 +205,53 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            if (!isset($data["existing"])) throw ValidationException::withMessages(["existing" => "Existing values is required"]);
-           
-            $validate_data = $this->validateUpdateImage($data["existing"], $product);
+            if (isset($data["existing"])) {
+                $validate_data = $this->validateUpdateImage($data["existing"], $product);
 
-            foreach ( $validate_data as $item )
-            { 
-                if ($item["delete"])
-                {
-                    $this->image_repository->delete($item["id"], function ($deleted) {
-                        if ($deleted->path)
-                        {
-                            Storage::delete($deleted->path);
-                            $this->image_repository->deleteThumbnail($deleted->path);
-                        }
-                    });
-                    continue;
+                foreach ( $validate_data as $item )
+                { 
+                    if ($item["delete"]) {
+                        $this->image_repository->delete($item["id"], function ($deleted) {
+                            if ($deleted->path) {
+                                Storage::delete($deleted->path);
+                                $this->image_repository->deleteThumbnail($deleted->path);
+                            }
+                        });
+                        continue;
+                    }
+                    $this->storeUpdateImage($item, $product->id);
                 }
-                $update_data = $this->getImageType($item["type"]);
-                $this->image_repository->update($update_data, $item["id"]);
+            }
+        }
+        catch (Exception $exception) 
+        {
+            throw $exception;
+        }
+        return true;
+    }
+
+    private function storeUpdateImage(array $data, int $product_id): bool
+    {
+        try
+        {
+            $image = $this->image_repository->fetch($data["id"]);
+            $get_types = $this->getImageTypes($image);
+
+            $create_new_type_image = [];
+            foreach ( $data["type"] as $type )
+            {
+                if ( in_array($type, $get_types) ) continue;
+                // take image and make a copy image
+                $get_image = Storage::get($image->path);
+                $array_path = explode("/", $image->path);
+                $array_path[2] = $array_path[2]."/{$type}";
+                $path = implode("/", $array_path);
+                Storage::put($path, $get_image);
+                
+                $create_new_type_image["path"] = $path;
+                $create_new_type_image["product_id"] = $product_id;
+                $create_new_type_image = array_merge($create_new_type_image, $this->getImageType([$type]));
+                ProductImage::updateOrCreate($create_new_type_image);
             }
         }
         catch (Exception $exception) 
