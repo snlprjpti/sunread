@@ -183,8 +183,7 @@ class ProductRepository extends BaseRepository
         try
         {
             $images = $value["value"]; 
-            if ($method == "update")
-            {
+            if ($method == "update") {
                 $this->updateImageType($images, $product);
                 if (isset($value["value"]["new"])) $images = $value["value"]["new"];
             }
@@ -206,17 +205,14 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            if (isset($data["existing"]))
-            {
+            if (isset($data["existing"])) {
                 $validate_data = $this->validateUpdateImage($data["existing"], $product);
 
                 foreach ( $validate_data as $item )
                 { 
-                    if ($item["delete"])
-                    {
+                    if ($item["delete"]) {
                         $this->image_repository->delete($item["id"], function ($deleted) {
-                            if ($deleted->path)
-                            {
+                            if ($deleted->path) {
                                 Storage::delete($deleted->path);
                                 $this->image_repository->deleteThumbnail($deleted->path);
                             }
