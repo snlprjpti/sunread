@@ -12,31 +12,34 @@ class ChannelListener
     public function createCache($channel)
     {
         $hostname = $channel->website->hostname;
+        $website = $channel->website;
         unset($channel->website);
 
-        $website = Cache::rememberForever("website_{$hostname}", function () use($hostname) {
+        $websiteCache = Cache::rememberForever("website_{$hostname}", function () use($hostname) {
             return Website::whereHostname($hostname)->setEagerLoads([])->first()->toArray();
         });
 
-        $website["channel"][] = $channel->toArray();
-        Cache::put("website_{$hostname}", $website);
+        $websiteCache["channels"][] = $channel->toArray();
+        Cache::put("website_{$hostname}", $websiteCache);
 
-        $channel = Cache::rememberForever("channel_{$channel->code}", function () use($channel) {
-            $channel["website"] = Website::find($channel->website_id)->setEagerLoads([])->first()->toArray();
-            $channel["stores"] = [];
+        Cache::rememberForever("channel_{$channel->code}", function () use($channel, $website) {
+            $channel["website"] = $website->setEagerLoads([])->first()->toArray();
             return $channel->toArray();
         });
     }
 
     public function updateCache($channel)
     {
+        $cacheChannel = Cache::rememberForever("channel_{$channel->code}", function () use($channel) {
+            return $this->createCache($channel);
+        });
+
         $hostname = $channel->website->hostname;
         unset($channel->website);
 
-        foreach($channel["stores"] as $store) {
+        foreach($cacheChannel["stores"] as $store) {
             unset($channel->stores);
             $cacheStore = Cache::get("store_{$store->code}");
-            unset($cacheStore["channel"]);
             $cacheStore["channel"] = $channel->toArray();
             Cache::put("store_{$store->code}", $cacheStore);
         }
@@ -47,7 +50,9 @@ class ChannelListener
         $website_key = array_search($channel->id, array_column($website["channels"], 'id'));
         $website["channels"][$website_key] = $channel->toArray();
         Cache::put("website_{$hostname}", $website);
-        Cache::put("channel_{$channel->code}", $channel->toArray());
+
+        $cacheChannel = array_merge($cacheChannel, $channel->toArray());
+        Cache::put("channel_{$channel->code}", $cacheChannel);
     }
 
     public function deleteCache($channel)

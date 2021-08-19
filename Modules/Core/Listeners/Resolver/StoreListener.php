@@ -36,13 +36,15 @@ class StoreListener
 
     public function updateCache($store)
     {
+        $storeCache = Cache::rememberForever("store_{$store->code}", function () use($store) {
+            return $this->createCache($store);
+        });
         $channel_code = $store->channel->code;
         $hostname = $store->channel->website->hostname;
         unset($store->channel);
 
         $store["channel"] = Channel::whereCode($channel_code)->setEagerLoads([])->first()->toArray();
         $store["website"] = Website::whereHostname($hostname)->setEagerLoads([])->first()->toArray();
-        Cache::put("store_{$store->code}", $store->toArray());
 
         $channel = Cache::get("channel_{$channel_code}");
         $website = Cache::get("website_{$hostname}");
@@ -55,6 +57,9 @@ class StoreListener
         $website["stores"][$website_key] = $store->toArray();
         Cache::put("channel_{$channel_code}", $channel);
         Cache::put("website_{$hostname}", $website);
+
+        $storeCache = array_merge($storeCache, $store->toArray());
+        Cache::put("store_{$store->code}", $storeCache);
     }
 
     public function deleteCache($store)

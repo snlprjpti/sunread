@@ -26,7 +26,6 @@ class WebsiteListener
 
         foreach($cacheWebsite["channels"] as $channel) {
             $cacheChannel = Cache::get("channel_{$channel["code"]}");
-
             $cacheChannel["website"] = $website->toArray();
             Cache::put("channel_{$channel["code"]}", $cacheChannel);
         }
@@ -37,9 +36,8 @@ class WebsiteListener
             Cache::put("store_{$store["code"]}", $cacheStore);
         }
 
-        $website["stores"] = $cacheWebsite["stores"];
-        $website["channels"] = $cacheWebsite["channels"];
-        Cache::put("website_{$website->hostname}", $website->toArray());
+        $cacheWebsite = array_merge($cacheWebsite, $website->toArray());
+        Cache::put("website_{$website->hostname}",  $cacheWebsite);
     }
 
     public function deleteCache($website)
