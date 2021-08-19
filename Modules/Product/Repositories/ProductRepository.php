@@ -315,7 +315,7 @@ class ProductRepository extends BaseRepository
                 "gallery" => 0,
             ];
 
-            if (in_array("base_image", $types))
+            if (in_array("main_image", $types))
             {
                 unset($all_types["main_image"]);
                 $all_types["main_image"] = 1;
@@ -325,17 +325,17 @@ class ProductRepository extends BaseRepository
                 unset($all_types["small_image"]);
                 $all_types["small_image"] = 1;
             }
-            if (in_array("thumbnail_image", $types))
+            if (in_array("thumbnail", $types))
             {
                 unset($all_types["thumbnail"]);
                 $all_types["thumbnail"] = 1;
             }
-            if (in_array("section_background_image", $types))
+            if (in_array("section_background", $types))
             {
                 unset($all_types["section_background"]);
                 $all_types["section_background"] = 1;
             }
-            if (in_array("gallery_image", $types))
+            if (in_array("gallery", $types))
             {
                 unset($all_types["gallery"]);
                 $all_types["gallery"] = 1;
@@ -582,7 +582,7 @@ class ProductRepository extends BaseRepository
         try
         {
             $images = [ "existing" => [] ];
-            foreach (["base_image", "thumbnail_image", "section_background_image", "small_image" ] as $type) {
+            foreach (["main_image", "thumbnail", "section_background", "small_image" ] as $type) {
                 if ( is_null($this->getFullPath($product, $type)) ) continue;
                 $images["existing"][] = $this->getFullPath($product, $type);
             }
@@ -600,7 +600,7 @@ class ProductRepository extends BaseRepository
 
     private function getFullPath(object $product, string $image_name): ?array
     {
-        $image = $product->images()->where($this->getImageTypeMapper($image_name), 1)->latest("updated_at")->first();
+        $image = $product->images()->where($image_name, 1)->latest("updated_at")->first();
         return $image ? [ "id" => $image->id, "type" => $this->getImageTypes($image), "delete" => 0, "url" => Storage::url($image->path) ] : $image;
     }
     
@@ -609,19 +609,19 @@ class ProductRepository extends BaseRepository
         try
         {
             if ($image->main_image) {
-                $types[] = "base_image";
+                $types[] = "main_image";
             }
             if ($image->small_image) {
                 $types[] = "small_image";
             }
             if ($image->thumbnail) {
-                $types[] = "thumbnail_image";
+                $types[] = "thumbnail";
             }
             if ($image->section_background) {
-                $types[] = "section_background_image";
+                $types[] = "section_background";
             }
             if ($image->gallery) {
-                $types[] = "gallery_image";
+                $types[] = "gallery";
             }    
         }
         catch ( Exception $exception )
@@ -630,34 +630,6 @@ class ProductRepository extends BaseRepository
         }
 
         return $types;
-    }
-
-    private function getImageTypeMapper(string $type): string
-    {
-        switch ( $type )
-        {
-            case "base_image" :
-                $image_type = "main_image";
-            break;
-
-            case "small_image" :
-                $image_type = "small_image";
-            break;
-
-            case "thumbnail_image" :
-                $image_type = "thumbnail";
-            break;
-
-            case "section_background_image" :
-                $image_type = "section_background";
-            break;
-
-            default:
-                $image_type = "gallery";
-            break;
-        }
-
-        return $image_type;
     }
 
     public function getFilterProducts(object $request): mixed
