@@ -53,6 +53,7 @@ trait WebsiteResolveable
     {
         try
         {
+            dd(Cache::get("channel_das"));
             $host = $request->header('hc-host');
             $website = Cache::rememberForever("website_{$host}", function() use($host){
                 $fallback_id = config("website.fallback_id");
