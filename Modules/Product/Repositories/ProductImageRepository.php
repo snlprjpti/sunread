@@ -17,7 +17,7 @@ class ProductImageRepository extends BaseRepository
         $this->model = $productImage;
         $this->model_key = "catalog.product.images";
         $this->small_image_dimensions = config('product_image.image_dimensions.product_small_image');
-        $this->thumbnail_image_dimensions = config('product_image.image_dimensions.product_thumbnail_image');
+        $this->thumbnail_image_dimensions = config('product_image.image_dimensions.product_thumbnail');
         $this->rules = [
             "product_id" => "required|exists:products,id",
             "image.*" => "required|mimes:bmp,jpeg,jpg,png",
