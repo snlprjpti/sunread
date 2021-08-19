@@ -32,14 +32,12 @@ class ConfigurationTest extends BaseTestCase
     {
         $created_data = $this->getCreateData();
         $created_data["items"] = array_merge($created_data["items"], [
-                    "store_phone_number" => [
-                        "value" => null,
-                        "absolute_path" => "general.children.0.subChildren.2.elements.1"
-                    ],
-                ]);
-        return $created_data;
-
-    
+            "store_phone_number" => [
+                "value" => null,
+                "absolute_path" => "general.children.0.subChildren.2.elements.1"
+            ]
+        ]);
+        return $created_data;  
     }
 
     public function getInvalidCreateData(): array
