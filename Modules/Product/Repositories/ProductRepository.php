@@ -182,16 +182,32 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $images = $value["value"]; 
-            if ($method == "update") {
-                $this->updateImageType($images, $product);
-                if (isset($value["value"]["new"])) $images = $value["value"]["new"];
+            $request_images = $value["value"];
+            
+            if ($method == "update" && isset($request_images["existing"])) {
+                $this->updateImageType($request_images, $product);
             }
-            if (isset($images["base_image"])) $this->storeImages($product, $images["base_image"], "base_image", $method);
-            if (isset($images["small_image"])) $this->storeImages($product, $images["small_image"], "small_image", $method);
-            if (isset($images["thumbnail_image"])) $this->storeImages($product, $images["thumbnail_image"], "thumbnail_image", $method);
-            if (isset($images["section_background_image"])) $this->storeImages($product, $images["section_background_image"], "section_background_image", $method);
-            if (isset($images["gallery"])) $this->storeImages($product, $images["gallery"], "gallery_image", $method);
+
+            unset($request_images["existing"]);
+
+            if ( !empty($request_images) ) {
+                $validator = Validator::make($request_images, [
+                    "*.type" => "required|array",
+                    "*.type.*" => "in:main_image,thumbnail,section_background,small_image,gallery",
+                    "*.file" => "required|mimes:bmp,jpeg,jpg,png",
+                ],[
+                    "*.type.*.in" => "Product Image type must be in main_image,thumbnail,section_background,small_image,gallery",
+                ]);
+                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
+    
+                foreach ( $request_images as $image_values )
+                {
+                    foreach ( array_unique($image_values["type"]) as $type )
+                    {
+                        $this->storeImages($product, $image_values["file"], $type, $method);
+                    }
+                }
+            }
         }
         catch ( Exception $exception )
         {
@@ -267,10 +283,14 @@ class ProductRepository extends BaseRepository
         {
             $validator = Validator::make($data, [
                 "*.type" => "required|array",
-                "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery_image",
+                "*.type.*" => "in:main_image,thumbnail,section_background,small_image,gallery",
                 "*.delete" => "required|boolean",
                 "*.id" => "required|exists:product_images,id",
                 "*.id" => Rule::in($product->images()->pluck("id")->toArray()),
+            ], [
+                "*.id.required" => "Product Image id is required",
+                "*.id.in" => "Product Image id does not belongs to current product.",
+                "*.type.*.in" => "Product Image type must be in main_image,thumbnail,section_background,small_image,gallery"
             ]);
 
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
@@ -329,69 +349,60 @@ class ProductRepository extends BaseRepository
        return $all_types;
     }
 
-    public function storeImages(object $product, mixed $images, string $image_type): bool
+    public function storeImages(object $product, mixed $image, string $image_type): bool
     {
         try
         {
-            $images = is_array($images) ? $images : [$images];
-
-            if ( isset($images) )
+            if ( isset($image) )
             {
                 $data = [];
                 $image_dimensions = config("product_image.image_dimensions.product_{$image_type}");
                 $position = 0;
 
-                $validator = Validator::make(["image" =>  $images], [
-                    "image.*" => "required|mimes:bmp,jpeg,jpg,png"
-                ]);
-                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
-                
-                foreach ( $images as $image )
+                $position += 1;
+                $key = Str::random(6);
+                $file_name = $this->generateFileName($image);
+                $data["path"] = $image->storeAs("images/products/{$key}", $file_name);
+                foreach ( $image_dimensions as $dimension )
                 {
-                    $position += 1;
-                    $key = Str::random(6);
-                    $file_name = $this->generateFileName($image);
-                    $data["path"] = $image->storeAs("images/products/{$key}", $file_name);
-                    foreach ( $image_dimensions as $dimension )
-                    {
-                        $width = $dimension["width"];
-                        $height = $dimension["height"];
-                        $path = "images/products/{$key}/{$image_type}";
-                        if(!Storage::has($path)) Storage::makeDirectory($path, 0777, true, true);
-    
-                        $image = Image::make($image)
-                            ->fit($width, $height, function($constraint) {
-                                $constraint->upsize();
-                            })->encode('jpg', 80);
-                    }
-                    $data["position"] = $position;
-                    $data["product_id"] = $product->id;
-                    
-                    switch ( $image_type )
-                    {
-                        case "base_image" :
-                            $data["main_image"] = 1;
-                        break;
-    
-                        case "small_image" :
-                            $data["small_image"] = 1;
-                        break;
-    
-                        case "thumbnail_image" :
-                            $data["thumbnail"] = 1;
-                        break;
+                    $width = $dimension["width"];
+                    $height = $dimension["height"];
+                    $path = "images/products/{$key}/{$image_type}";
+                    if(!Storage::has($path)) Storage::makeDirectory($path, 0777, true, true);
 
-                        case "section_background_image" :
-                            $data["section_background"] = 1;
-                        break;
-
-                        case "gallery_image" :
-                            $data["gallery"] = 1;
-                        break;
-                    }
-
-                    ProductImage::create($data);
+                    $image = Image::make($image)
+                        ->fit($width, $height, function($constraint) {
+                            $constraint->upsize();
+                        })->encode('jpg', 80);
                 }
+                $data["position"] = $position;
+                $data["product_id"] = $product->id;
+                
+                switch ( $image_type )
+                {
+                    case "main_image" :
+                        $data["main_image"] = 1;
+                    break;
+
+                    case "small_image" :
+                        $data["small_image"] = 1;
+                    break;
+
+                    case "thumbnail" :
+                        $data["thumbnail"] = 1;
+                    break;
+
+                    case "section_background" :
+                        $data["section_background"] = 1;
+                    break;
+
+                    case "gallery" :
+                        $data["gallery"] = 1;
+                    break;
+                }
+
+                ProductImage::create($data);
+
             }
         }
         catch ( Exception $exception )
