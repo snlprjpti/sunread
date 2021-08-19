@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
@@ -72,7 +73,7 @@ class CategoryValueRepository
                 $request_slug = $request->items[$item["slug"]];
                 if (isset($request_slug["value"]) && !is_file($request_slug["value"])  && !isset($request_slug["use_default_value"])) {
                 $exist_file = $exist_category->values()->whereAttribute($item["slug"])->whereScope($request->scope ?? "website")->whereScopeId($request->scope_id ?? $exist_category->website_id)->first();
-                    if ($exist_file?->value) {
+                    if ($exist_file?->value && (Storage::url($exist_file?->value) == $request_slug["value"])) {
                         $this->global_file[] = $item["slug"];
                         return "";
                     }
