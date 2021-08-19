@@ -18,7 +18,7 @@ use Modules\Core\Traits\Configuration as TraitsConfiguration;
 class ConfigurationRepository extends BaseRepository
 {
     protected $config_fields;
-    protected $channel_model, $store_model;
+    protected $channel_model, $store_model, $global_file_slug;
     use TraitsConfiguration;
 
     public function __construct(Configuration $configuration, Website $website_model, Channel $channel_model, Store $store_model)
@@ -69,6 +69,7 @@ class ConfigurationRepository extends BaseRepository
                             $existData = $this->has((object) $checkKey);
                             if($checkKey["scope"] != "global") $element["use_default_value"] = $existData ? 0 : 1;
                             $element["default"] = $existData ? $this->getValues((object) $checkKey) : $this->getDefaultValues((object)$checkKey, $element["default"]);
+                            if($element["type"] == "file" && $element["default"]) $element["default"] = Storage::url($element["default"]); 
 
                             if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
@@ -139,7 +140,8 @@ class ConfigurationRepository extends BaseRepository
         $scope = $request->scope ?? "global";
         return collect(config('configuration.'.$request->absolute_path))->pluck('elements')->flatten(1)->map(function($data) {
             return $data;
-        })->reject(function ($data) use($scope) {
+        })->reject(function ($data) use($scope, $request) {
+            if($data["type"] == "file") return $this->handleFileIssue($request, $data, $scope);
             return $this->scopeFilter($scope, $data["scope"]);
         })->mapWithKeys(function($item) use($scope) {
             $prefix = "items.{$item['path']}";
@@ -173,12 +175,42 @@ class ConfigurationRepository extends BaseRepository
         })->toArray();
     }
 
+    public function handleFileIssue(object $request, array $data, string $scope): bool
+    {
+        try
+        {
+            $this->global_file_slug = [];
+            if (isset($request->items[$data["path"]])) {
+                $request_slug = $request->items[$data["path"]];
+                if (isset($request_slug["value"]) && !is_file($request_slug["value"])  && !isset($request_slug["use_default_value"])) {
+                    $checkKey = [
+                        "scope" => $scope,
+                        "scope_id" => $request->scope_id ?? 0,
+                        "path" => $data["path"]
+                    ];
+                    $exist_file = $this->checkCondition((object) $checkKey)->first();
+                    if ($exist_file?->value && (Storage::url($exist_file?->value) == $request_slug["value"])) {
+                        $this->global_file_slug[] = $data["path"];
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
     public function add(object $request): object
     {
         $item['scope'] = $request->scope;
         $item['scope_id'] = $request->scope_id;
         foreach($request->items as $key => $val)
         {
+            if(in_array($key, $this->global_file_slug)) continue;
+
             if(isset($val["use_default_value"]) && $val["use_default_value"] != 1) throw ValidationException::withMessages([ "use_default_value" => __("core::app.response.use_default_value") ]);
 
             if(!isset($val["use_default_value"]) && !array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
