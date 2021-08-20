@@ -5,20 +5,25 @@ namespace Modules\Core\Services;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
+use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Website;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
 
 class ConfigurationHelper
 {
     use TraitsConfiguration;
 
-    protected object $model;
+    protected object $model, $channel_model, $store_model;
     protected array $config_fields;
 
     public function __construct(Configuration $configuration)
     {
         $this->model = $configuration;
         $this->config_fields = ($data = Cache::get("configurations.all")) ? $data : config("configuration");
+        $this->channel_model = new Channel();
+        $this->store_model = new Store();
         $this->createModel();
     }
 

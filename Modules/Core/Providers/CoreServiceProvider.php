@@ -12,12 +12,14 @@ use Modules\Core\Entities\ExchangeRate;
 use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Support\Facades\Validator;
 use Modules\Core\Entities\Configuration;
+use Modules\Core\Entities\Website;
 use Modules\Core\Observers\LocaleObserver;
 use Modules\Core\Observers\ChannelObserver;
 use Modules\Core\Observers\CurrencyObserver;
 use Modules\Core\Services\ActivityLogHelper;
 use Modules\Core\Observers\ExchangeRateObserver;
 use Modules\Core\Services\ConfigurationHelper;
+use Modules\Core\Services\ResolverHelper;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -151,6 +153,10 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->app->singleton('siteConfig', function () {
             return new ConfigurationHelper(new Configuration());
+        });
+
+        $this->app->singleton('resolver', function () {
+            return new ResolverHelper(new Website());
         });
     }
 

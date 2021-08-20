@@ -1,10 +1,11 @@
 <?php
 
-namespace Modules\Core\Transformers\StoreFront\Resolver;
+namespace Modules\Core\Transformers\StoreFront;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Facades\SiteConfig;
 
-class StoreResource extends JsonResource
+class ChannelResource extends JsonResource
 {
     public function toArray($request): array
     {
@@ -12,6 +13,7 @@ class StoreResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "code" => $this->code,
+            "icon" => SiteConfig::fetch("channel_icon", "channel", $this->id)
         ];
     }
 }
