@@ -347,6 +347,26 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "website",
                 "is_required" => 0
             ],
+            [
+                "name" => "Collection",
+                "type" => "select",
+                "use_in_layered_navigation" => 1,
+                "default_value" => "Collection1",
+                "options" => [
+                    [
+                        "name" => "Collection1",
+                    ],
+                    [
+                        "name" => "Collection2",
+                    ],
+                    [
+                        "name" => "Collection3",
+                    ],
+                    [
+                        "name" => "Collection4",
+                    ],
+                ]
+            ]
         ];
 
         array_map(function($attribute){
