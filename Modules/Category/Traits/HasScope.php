@@ -71,7 +71,7 @@ trait HasScope
     public function value(array $data, string $attribute): mixed
     {
         $this->createModel();
-        $data = array_merge($data, [ "attribute" => $attribute]);
+        $data = array_merge($data, [ "attribute" => $attribute], ["category_id" => $this->id]);
         $default = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
         return $default?->value;
     }

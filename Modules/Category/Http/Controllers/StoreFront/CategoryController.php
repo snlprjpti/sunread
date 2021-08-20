@@ -4,22 +4,14 @@ namespace Modules\Category\Http\Controllers\StoreFront;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Category\Entities\Category;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Category\Transformers\CategoryResource;
 use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
-use Modules\Category\Transformers\List\CategoryResource as ListCategoryResource;
-use Modules\Category\Repositories\CategoryValueRepository;
 use Modules\Category\Repositories\StoreFront\CategoryRepository;
-use Modules\Category\Rules\CategoryScopeRule;
-use Modules\Category\Rules\SlugUniqueRule;
-use Modules\Core\Entities\Website;
-use Modules\Core\Rules\ScopeRule;
-use Modules\Product\Entities\Product;
+use Modules\Category\Transformers\StoreFront\CategoryResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Facades\Resolver;
+use Modules\Core\Facades\SiteConfig;
 
 class CategoryController extends BaseController
 {
@@ -39,27 +31,19 @@ class CategoryController extends BaseController
         return CategoryResource::collection($data);
     }
 
-    public function listCollection(object $data): ResourceCollection
-    {
-        return ListCategoryResource::collection($data);
-    }
-
-    public function resource(object $data): JsonResource
-    {
-        return new CategoryResource($data);
-    }
-
     public function index(Request $request): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->getData($request);
+            $website = Resolver::fetch($request);
+            $fetched["categories"] = $this->collection($this->repository->getCategories($website));
+            $fetched["logo"] = $this->repository->getLogo($website);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse([], $this->lang("fetch-list-success"));
+        return $this->successResponse($fetched, $this->lang("fetch-list-success"));
     }
 }
