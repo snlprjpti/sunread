@@ -173,7 +173,7 @@ class BaseRepository
     public function update(array $data, int $id, ?callable $callback = null): object
     {
         DB::beginTransaction();
-        Event::dispatch("{$this->model_key}.update.before");
+        Event::dispatch("{$this->model_key}.update.before", $id);
 
         try
         {
