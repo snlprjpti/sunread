@@ -23,6 +23,10 @@ class CategoryController extends BaseController
         $this->model = $category;
         $this->model_name = "Category";
 
+        $this->middleware('validate.website.host', ['only' => ['index']]);
+        $this->middleware('validate.channel.code', ['only' => ['index']]);
+        $this->middleware('validate.store.code', ['only' => ['index']]);
+
         parent::__construct($this->model, $this->model_name);
     }
 
@@ -35,7 +39,6 @@ class CategoryController extends BaseController
     {
         try
         {
-            Resolver::requiredValidation($request, ["hc-host", "hc-channel", "hc-store"]);
             $website = Resolver::fetch($request);
             $fetched["categories"] = $this->collection($this->repository->getCategories($website));
             $fetched["logo"] = $this->repository->getLogo($website);

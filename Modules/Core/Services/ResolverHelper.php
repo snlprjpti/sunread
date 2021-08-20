@@ -113,14 +113,4 @@ class ResolverHelper {
     {
         return SiteConfig::fetch($slug, "website", $website->id);
     }
-
-    public function requiredValidation(object $request, array $headers): void
-    {
-        foreach($headers as $header)
-        {
-            if($header == "hc-host" && !$request->hasHeader('hc-host')) throw ValidationException::withMessages(["hc-host" => "hc-host is required"]);
-            if($header == "hc-channel" && !$request->hasHeader('hc-channel')) throw ValidationException::withMessages(["hc-host" => "hc-host is required"]);
-            if($header == "hc-store" && !$request->hasHeader('hc-store')) throw ValidationException::withMessages(["hc-host" => "hc-host is required"]);
-        }   
-    }
 }
