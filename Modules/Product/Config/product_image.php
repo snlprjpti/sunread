@@ -8,25 +8,25 @@ return [
                 "height" => 200
             ]
         ],
-        "product_thumbnail_image" => [
+        "product_thumbnail" => [
             [
                 "width" => 64,
                 "height" => 64
             ]
         ],
-        "product_base_image" => [
+        "product_main_image" => [
             [
                 "width" => 1800,
                 "height" => 1800
             ]
         ],
-        "product_section_background_image" => [
+        "product_section_background" => [
             [
                 "width" => 1800,
                 "height" => 1800
             ]
         ],
-        "product_gallery_image" => [
+        "product_gallery" => [
             [
                 "width" => 1800,
                 "height" => 1800
