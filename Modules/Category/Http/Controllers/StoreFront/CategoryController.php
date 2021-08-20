@@ -35,6 +35,7 @@ class CategoryController extends BaseController
     {
         try
         {
+            Resolver::requiredValidation($request, ["hc-host", "hc-channel", "hc-store"]);
             $website = Resolver::fetch($request);
             $fetched["categories"] = $this->collection($this->repository->getCategories($website));
             $fetched["logo"] = $this->repository->getLogo($website);

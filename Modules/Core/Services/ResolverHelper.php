@@ -4,6 +4,7 @@ namespace Modules\Core\Services;
 
 use Exception;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
@@ -111,5 +112,15 @@ class ResolverHelper {
     public function checkCondition(string $slug, object $website): ?object
     {
         return SiteConfig::fetch($slug, "website", $website->id);
+    }
+
+    public function requiredValidation(object $request, array $headers): void
+    {
+        foreach($headers as $header)
+        {
+            if($header == "hc-host" && !$request->hasHeader('hc-host')) throw ValidationException::withMessages(["hc-host" => "hc-host is required"]);
+            if($header == "hc-channel" && !$request->hasHeader('hc-channel')) throw ValidationException::withMessages(["hc-host" => "hc-host is required"]);
+            if($header == "hc-store" && !$request->hasHeader('hc-store')) throw ValidationException::withMessages(["hc-host" => "hc-host is required"]);
+        }   
     }
 }
