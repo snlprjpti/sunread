@@ -70,7 +70,6 @@ class ChannelController extends BaseController
         {
             return $this->handleException($exception);
         }
-
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
