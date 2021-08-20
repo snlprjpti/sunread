@@ -315,28 +315,23 @@ class ProductRepository extends BaseRepository
                 "gallery" => 0,
             ];
 
-            if (in_array("main_image", $types))
-            {
+            if (in_array("main_image", $types)) {
                 unset($all_types["main_image"]);
                 $all_types["main_image"] = 1;
             }
-            if (in_array("small_image", $types))
-            {
+            if (in_array("small_image", $types)) {
                 unset($all_types["small_image"]);
                 $all_types["small_image"] = 1;
             }
-            if (in_array("thumbnail", $types))
-            {
+            if (in_array("thumbnail", $types)) {
                 unset($all_types["thumbnail"]);
                 $all_types["thumbnail"] = 1;
             }
-            if (in_array("section_background", $types))
-            {
+            if (in_array("section_background", $types)) {
                 unset($all_types["section_background"]);
                 $all_types["section_background"] = 1;
             }
-            if (in_array("gallery", $types))
-            {
+            if (in_array("gallery", $types)) {
                 unset($all_types["gallery"]);
                 $all_types["gallery"] = 1;
             }    
@@ -353,8 +348,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            if ( isset($image) )
-            {
+            if ( isset($image) ) {
                 $data = [];
                 $image_dimensions = config("product_image.image_dimensions.product_{$image_type}");
                 $position = 0;
