@@ -45,7 +45,7 @@ class ResolverHelper {
             if ( !$website->exists() && config("website.environment") == "local" ) {
                 $website = Website::whereId($fallback_id);
             }
-            $website = $website->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            $website = $website->select(["id","name","code", "hostname"])->setEagerLoads([])->firstOrFail();
             $websiteData = $website->toArray();
             $websiteData["channel"] = $this->getChannel($request, $website);
             $websiteData["store"] = $this->getStore($request, $website, $websiteData["channel"]);
