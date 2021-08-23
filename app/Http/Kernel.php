@@ -4,6 +4,9 @@ namespace App\Http;
 
 use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\Language;
+use App\Http\Middleware\ValidateChannelCode;
+use App\Http\Middleware\ValidateStoreCode;
+use App\Http\Middleware\ValidateWebsiteHost;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -68,7 +71,10 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'jwt.verify' => JwtMiddleware::class,
         'jwt.refresh' => 'Tymon\JWTAuth\Middleware\RefreshToken',
-        'language' => Language::class
+        'language' => Language::class,
+        'validate.website.host' => ValidateWebsiteHost::class,
+        'validate.channel.code' => ValidateChannelCode::class,
+        'validate.store.code' => ValidateStoreCode::class
     ];
 
     /**

@@ -19,3 +19,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('categories', CategoryController::class)->except(['create', 'edit']);
     });
 });
+
+Route::group(['prefix'=>'public/catalog', 'as' => 'public.'], function () {
+    Route::get('categories', [\Modules\Category\Http\Controllers\StoreFront\CategoryController::class, "index"])->name("categories.index");
+});

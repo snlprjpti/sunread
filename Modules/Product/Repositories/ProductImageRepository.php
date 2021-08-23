@@ -17,7 +17,7 @@ class ProductImageRepository extends BaseRepository
         $this->model = $productImage;
         $this->model_key = "catalog.product.images";
         $this->small_image_dimensions = config('product_image.image_dimensions.product_small_image');
-        $this->thumbnail_image_dimensions = config('product_image.image_dimensions.product_thumbnail');
+        $this->thumbnail_image_dimensions = config('product_image.image_dimensions.product_thumbnail_image');
         $this->rules = [
             "product_id" => "required|exists:products,id",
             "image.*" => "required|mimes:bmp,jpeg,jpg,png",
@@ -38,7 +38,7 @@ class ProductImageRepository extends BaseRepository
 
 
             // Store small_image and thumbnail variations
-            foreach (["small_image_dimensions" => "small_image", "thumbnail_image_dimensions" => "thumbnail"] as $type => $folder) {
+            foreach (["small_image_dimensions" => "small_image", "thumbnail_image_dimensions" => "thumbnail_image"] as $type => $folder) {
                 foreach ($this->{$type} as $dimension) {
                     $width = $dimension["width"];
                     $height = $dimension["height"];
