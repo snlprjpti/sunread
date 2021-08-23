@@ -48,7 +48,7 @@ class ResolverHelper {
             $website = $website->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             $websiteData = $website->toArray();
             $websiteData["channel"] = $this->getChannel($request, $website);
-            $websiteData["store"] = $this->getStore($request, $website);
+            $websiteData["store"] = $this->getStore($request, $website, $websiteData["channel"]);
             $websiteData["pages"] = $this->getPages($website);
 
             if ($callback) $website = $callback($websiteData);
@@ -67,7 +67,7 @@ class ResolverHelper {
         {
             $channel_code = $request->header("hc-channel");
 
-            if($channel_code) $channel = Channel::whereCode($channel_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            if($channel_code) $channel = Channel::whereCode($channel_code)->whereWebsiteId($website->id)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             else $channel = ($channel = $this->checkCondition("website_default_channel", $website)) ? $channel->firstOrFail() : null;
         }
         catch( Exception $exception )
@@ -78,13 +78,13 @@ class ResolverHelper {
         return $channel ? $channel->toArray() : $channel;
     }
 
-    public function getStore(object $request, object $website): ?array
+    public function getStore(object $request, object $website, ?array $channel): ?array
     {
         try
         {
             $store_code = $request->header("hc-store");
 
-            if($store_code) $store = Store::whereCode($store_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            if($store_code && $channel) $store = Store::whereCode($store_code)->whereChannelId($channel["id"])->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             else $store = ($store = $this->checkCondition("website_default_store", $website)) ? $store->firstOrFail() : null;
         }
         catch( Exception $exception )

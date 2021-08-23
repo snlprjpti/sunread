@@ -3,17 +3,16 @@
 namespace Modules\Category\Transformers\StoreFront;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Core\Facades\Resolver;
-use Modules\Core\Traits\WebsiteResolveable;
+use Modules\Core\Entities\Store;
 
 class CategoryResource extends JsonResource
 {
     public function toArray($request): array
     { 
-        $website = Resolver::fetch($request); 
+        $store = Store::whereCode($request->header("hc-store"))->first(); 
         $data = [
             "scope" => "store",
-            "scope_id" => $website["store"]["id"]
+            "scope_id" => $store->id
         ];
 
         return [

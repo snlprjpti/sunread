@@ -10,6 +10,9 @@ use Exception;
 use Modules\Category\Repositories\StoreFront\CategoryRepository;
 use Modules\Category\Transformers\StoreFront\CategoryResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Website;
 use Modules\Core\Facades\Resolver;
 use Modules\Core\Facades\SiteConfig;
 
@@ -39,9 +42,7 @@ class CategoryController extends BaseController
     {
         try
         {
-            $website = Resolver::fetch($request);
-            $fetched["categories"] = $this->collection($this->repository->getCategories($website));
-            $fetched["logo"] = $this->repository->getLogo($website);
+            $fetched = $this->repository->getMenu($request);
         }
         catch (Exception $exception)
         {

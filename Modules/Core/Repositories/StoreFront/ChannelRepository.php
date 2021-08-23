@@ -4,7 +4,7 @@ namespace Modules\Core\Repositories\StoreFront;
 
 use Exception;
 use Modules\Core\Entities\Channel;
-use Modules\Core\Facades\Resolver;
+use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
 
 class ChannelRepository extends BaseRepository
@@ -20,8 +20,8 @@ class ChannelRepository extends BaseRepository
     {
         try
         {
-            $website = Resolver::fetch($request);
-            $channels = $this->model->whereWebsiteId($website["id"])->get();
+            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
+            $channels = $this->model->whereWebsiteId($website->id)->get();
         }
         catch (Exception $exception)
         {
