@@ -194,15 +194,16 @@ class ProductRepository extends BaseRepository
             if ( !empty($request_images) ) {
                 $validator = Validator::make($request_images, [
                     "*.type" => "required|array",
-                    "*.type.*" => "in:main_image,thumbnail,section_background,small_image,gallery",
+                    "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery",
                     "*.file" => "required|mimes:bmp,jpeg,jpg,png",
                 ],[
-                    "*.type.*.in" => "Product Image type must be in main_image,thumbnail,section_background,small_image,gallery",
+                    "*.type.*.in" => "Product Image type must be in base_image,thumbnail_image,section_background_image,small_image,gallery",
                 ]);
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
-    
+               
                 foreach ( $request_images as $image_values )
                 {
+                   
                     $this->storeImages($product, $image_values["file"], array_unique($image_values["type"]));
                 }
             }
@@ -250,14 +251,14 @@ class ProductRepository extends BaseRepository
         {
             $validator = Validator::make($data, [
                 "*.type" => "required|array",
-                "*.type.*" => "in:main_image,thumbnail,section_background,small_image,gallery",
+                "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery",
                 "*.delete" => "required|boolean",
                 "*.id" => "required|exists:product_images,id",
                 "*.id" => Rule::in($product->images()->pluck("id")->toArray()),
             ], [
                 "*.id.required" => "Product Image id is required",
                 "*.id.in" => "Product Image id does not belongs to current product.",
-                "*.type.*.in" => "Product Image type must be in main_image,thumbnail,section_background,small_image,gallery"
+                "*.type.*.in" => "Product Image type must be in base_image,thumbnail_image,section_background_image,small_image,gallery"
             ]);
 
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
@@ -490,34 +491,6 @@ class ProductRepository extends BaseRepository
         }
 
         return $images;
-    }
-    
-    public function getImageTypes(mixed $image): array
-    {
-        try
-        {
-            if ($image->main_image) {
-                $types[] = "main_image";
-            }
-            if ($image->small_image) {
-                $types[] = "small_image";
-            }
-            if ($image->thumbnail) {
-                $types[] = "thumbnail";
-            }
-            if ($image->section_background) {
-                $types[] = "section_background";
-            }
-            if ($image->gallery) {
-                $types[] = "gallery";
-            }    
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return $types;
     }
 
     public function getFilterProducts(object $request): mixed

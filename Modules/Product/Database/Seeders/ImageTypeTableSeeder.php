@@ -13,8 +13,8 @@ class ImageTypeTableSeeder extends Seeder
     {
         DB::table("image_types")->insert([
             [
-                "name" => "Main Image",
-                "slug" => "main_image",
+                "name" => "Base Image",
+                "slug" => "base_image",
                 "created_at" => now(),
                 "updated_at" => now()
             ],
@@ -25,8 +25,8 @@ class ImageTypeTableSeeder extends Seeder
                 "updated_at" => now()
             ],
             [
-                "name" => "thumbnail",
-                "slug" => "thumbnail",
+                "name" => "thumbnail_image",
+                "slug" => "thumbnail_image",
                 "created_at" => now(),
                 "updated_at" => now()
             ],
