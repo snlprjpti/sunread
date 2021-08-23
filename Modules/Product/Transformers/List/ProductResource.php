@@ -19,7 +19,8 @@ class ProductResource extends JsonResource
         $name = (clone $product_attributes)->whereAttributeId($attributeIdforName)->first();
         $visibility = $product_attributes->whereAttributeId($attributeIdforVisibility)->first();
         
-        $images = $this->images()->where('main_image', 1)->first();
+        $images = $this->images()->get()->filter(fn ($img) => $img->types()->where("slug", "base_image")->first() )->first();
+        
         $stock = $this->catalog_inventories()->first();
 
         return [
