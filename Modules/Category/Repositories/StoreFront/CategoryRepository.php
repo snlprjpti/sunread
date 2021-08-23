@@ -32,7 +32,7 @@ class CategoryRepository extends BaseRepository
             $store = Store::whereChannelId($channel->id)->whereCode($request->header("hc-store"))->firstOrFail();
 
             $categories = $this->model->withDepth()->having('depth', '=', 1)->whereWebsiteId($website->id)->whereHas("values", function($query) use($store) {
-                $query->whereScope("store")->whereScopeId($store->id)->whereAttribute("include_in_menu")->whereValue(json_encode(1));
+                $query->whereScope("store")->whereScopeId($store->id)->whereAttribute("include_in_menu")->whereValue("1");
             })->get(); 
             $fetched["categories"] = CategoryResource::collection($categories);
 
