@@ -84,7 +84,7 @@ class ResolverHelper {
         {
             $store_code = $request->header("hc-store");
 
-            if($store_code && $channel) $store = Store::whereCode($store_code)->whereChannelId($channel["id"])->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            if($store_code) $store = Store::whereChannelId(isset($channel["id"]) ? $channel["id"] : null)->whereCode($store_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
             else $store = ($store = $this->checkCondition("website_default_store", $website)) ? $store->firstOrFail() : null;
         }
         catch( Exception $exception )
