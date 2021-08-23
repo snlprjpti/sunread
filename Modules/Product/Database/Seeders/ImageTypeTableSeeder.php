@@ -37,7 +37,7 @@ class ImageTypeTableSeeder extends Seeder
                 "updated_at" => now()
             ],
             [
-                "name" => "gallery",
+                "name" => "Gallery",
                 "slug" => "gallery",
                 "created_at" => now(),
                 "updated_at" => now()
