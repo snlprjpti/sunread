@@ -21,6 +21,8 @@ class ChannelController extends BaseController
         $this->model_name = "Channel";
         $this->repository = $channelRepository;
 
+        $this->middleware('validate.website.host', ['only' => ['index']]);
+
         parent::__construct($this->model, $this->model_name);
     }
 

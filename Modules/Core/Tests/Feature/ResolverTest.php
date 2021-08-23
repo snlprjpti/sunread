@@ -100,7 +100,11 @@ class ResolverTest extends BaseTestCase
 
     public function testStoreCanBeResolved(): void
     {
-        $this->headers["hc-store"] = Store::inRandomOrder()->first()->code;
+        $website = Website::first();
+        $this->headers["hc-host"] = $website->hostname;    
+        $channel = Channel::inRandomOrder()->whereWebsiteId($website->id)->first();
+        $this->headers["hc-channel"] = $channel->code;
+        $this->headers["hc-store"] = Store::inRandomOrder()->whereChannelId($channel->id)->first()->code;
         $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
 
         $response->assertOk();
