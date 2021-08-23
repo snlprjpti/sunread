@@ -3,6 +3,7 @@
 namespace Modules\Product\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Traits\HasFactory;
 
@@ -13,6 +14,11 @@ class ProductImage extends Model
     protected $fillable = ["product_id", "position", "path", "main_image", "small_image", "thumbnail", "section_background", "gallery"];
     protected $appends = [ "small_image_url", "thumbnail_url" ];
 
+
+    public function types(): BelongsToMany
+    {
+        return $this->belongsToMany(ImageType::class);
+    }
 
     public function getSmallImageUrlAttribute(): ?string
     {
