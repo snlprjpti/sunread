@@ -209,7 +209,7 @@ class ConfigurationRepository extends BaseRepository
         $item['scope_id'] = $request->scope_id;
         foreach($request->items as $key => $val)
         {
-            if(in_array($key, $this->global_file_slug)) continue;
+            if(is_array($this->global_file_slug) && in_array($key, $this->global_file_slug)) continue;
 
             if(isset($val["use_default_value"]) && $val["use_default_value"] != 1) throw ValidationException::withMessages([ "use_default_value" => __("core::app.response.use_default_value") ]);
 
