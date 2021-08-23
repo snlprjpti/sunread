@@ -68,7 +68,10 @@ class ResolverHelper {
             $channel_code = $request->header("hc-channel");
 
             if($channel_code) $channel = Channel::whereCode($channel_code)->whereWebsiteId($website->id)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
-            else $channel = ($channel = $this->checkCondition("website_default_channel", $website)) ? $channel->firstOrFail() : null;
+            else {
+                $default_channel = $this->checkCondition("website_default_channel", $website);
+                $channel = ($default_channel) ? $default_channel->firstOrFail() : null;
+            }
         }
         catch( Exception $exception )
         {
@@ -85,7 +88,10 @@ class ResolverHelper {
             $store_code = $request->header("hc-store");
 
             if($store_code) $store = Store::whereChannelId(isset($channel["id"]) ? $channel["id"] : null)->whereCode($store_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
-            else $store = ($store = $this->checkCondition("website_default_store", $website)) ? $store->firstOrFail() : null;
+            else {
+                $default_store = $this->checkCondition("website_default_store", $website);
+                $store = ($default_store) ? $default_store->firstOrFail() : null;
+            }
         }
         catch( Exception $exception )
         {
