@@ -37,13 +37,14 @@ class ResolverHelper {
 
             $fallback_id = config("website.fallback_id");
             if ($request->hasHeader('hc-host')) $website = CoreCache::getWebsiteCache($request->header('hc-host'));
-            else $website = Website::whereId($fallback_id)->setEagerLoads([])->firstOrFail(); 
+            else $website = Website::whereId($fallback_id)->setEagerLoads([])->firstOrFail();
             $websiteData = $website?->only(["id","name","code", "hostname"]);
 
             $channel = $this->getChannel($request, $website);
             $websiteData["channel"] = $channel?->only(["id","name","code", "hostname"]);
 
             $websiteData["store"] = $this->getStore($request, $website, $channel);
+
             $websiteData["pages"] = $this->getPages($website);
 
             if ($callback) $website = $callback($websiteData);
