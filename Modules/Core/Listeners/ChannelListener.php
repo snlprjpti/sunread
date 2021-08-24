@@ -17,12 +17,12 @@ class ChannelListener
 
     public function update($channel)
     {
+        Cache::forget("sf_channel_{$channel->code}");
         CoreCache::createChannelCache($channel);
     }
 
     public function delete($channel)
     {
-        $website = $channel->website;
-        Cache::forget("sf_website_{$website->hostname}_channel_{$channel->code}");
+        Cache::forget("sf_channel_{$channel->code}");
     }
 }

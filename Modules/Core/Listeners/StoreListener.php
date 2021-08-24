@@ -18,11 +18,12 @@ class StoreListener
 
     public function update($store)
     {
+        Cache::forget("sf_store_{$store->code}");
         CoreCache::createStoreCache($store);
     }
 
     public function delete($store)
     {
-        Cache::forget("sf_website_{$website?->hostname}_channel_{$channel?->code}_store_{$store_code}");
+        Cache::forget("sf_store_{$store->code}");
     }
 }
