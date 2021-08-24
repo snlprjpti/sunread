@@ -20,6 +20,6 @@ Route::group(['middleware' => ['api']], function () {
     });
 });
 
-Route::group(['prefix'=>'public/catalog', 'as' => 'public.'], function () {
-    Route::get('categories', [\Modules\Category\Http\Controllers\StoreFront\CategoryController::class, "index"])->name("categories.index");
+Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+    Route::get('navigation/main', [\Modules\Category\Http\Controllers\StoreFront\CategoryController::class, "index"])->name("navigation.main");
 });
