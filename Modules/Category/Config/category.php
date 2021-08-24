@@ -43,7 +43,7 @@ return [
                     "slug" => "include_in_menu",
                     "type" => "select",
                     "value" => "",
-                    "scope" => "website",
+                    "scope" => "store",
                     "options" => [ 
                         [ "value" => "1", "label" => "Yes" ],
                         [ "value" => "0", "label" => "No" ]
