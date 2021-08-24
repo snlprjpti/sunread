@@ -4,6 +4,7 @@ namespace Modules\Core\Services;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
@@ -41,6 +42,7 @@ class ConfigurationHelper
 
             $values = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data, $element["default"]);
             $fetched = $this->getProviderData($element, $values);
+            if($element["type"] == "file") $fetched = Storage::url($fetched);
         }
         catch( Exception $exception )
         {

@@ -36,7 +36,7 @@ class CategoryRepository extends BaseRepository
             })->get(); 
             $fetched["categories"] = CategoryResource::collection($categories);
 
-            $fetched["logo"] = SiteConfig::fetch("logo", "website", $channel->id); 
+            $fetched["logo"] = SiteConfig::fetch("logo", "channel", $channel->id); 
         }
         catch (Exception $exception)
         {
