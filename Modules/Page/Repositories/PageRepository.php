@@ -2,7 +2,6 @@
 
 namespace Modules\Page\Repositories;
 
-use Attribute;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Entities\Store;

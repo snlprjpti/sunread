@@ -3,13 +3,10 @@
 namespace Modules\Page\Repositories\StoreFront;
 
 use Exception;
-use Illuminate\Support\Facades\Storage;
 use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
-use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Website;
-use Modules\Page\Entities\PageScope;
 
 class PageRepository extends BaseRepository
 {
