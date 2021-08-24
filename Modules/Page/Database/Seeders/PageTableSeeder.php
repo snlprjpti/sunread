@@ -15,7 +15,7 @@ class PageTableSeeder extends Seeder
         PageScope::create([
             "page_id" => $page->id,
             "scope" => "store",
-            "scope_id" => 1
+            "scope_id" => 0
         ]);
     }
 }
