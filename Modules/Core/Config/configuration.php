@@ -195,6 +195,18 @@ return[
                                 "scope" => "store",
                                 "is_required" => 0
                             ],
+                            [
+                                "title" => "Pagination Limit",
+                                "path" => "pagination_limit",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "numeric",
+                                "scope" => "website",
+                                "is_required" => 1
+                            ]
                         ]
                     ]
                 ]
