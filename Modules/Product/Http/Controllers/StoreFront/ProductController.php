@@ -24,6 +24,9 @@ class ProductController extends BaseController
         $this->repository = $repository;
         $this->search_repository = $search_repository;
 
+        $this->middleware('validate.website.host', ['only' => ['index']]);
+        $this->middleware('validate.store.code', ['only' => ['index']]);
+
         parent::__construct($this->model, $this->model_name);
     }
 
@@ -32,8 +35,7 @@ class ProductController extends BaseController
         try
         {
             $request->validate([
-                "page" => "numeric|min:1",
-                "limit" => "numeric|min:5"
+                "page" => "numeric|min:1"
             ]);
             
             $data = $this->search_repository->getFilterProducts($request, $category_id);
