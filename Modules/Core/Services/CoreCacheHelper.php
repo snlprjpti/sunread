@@ -22,57 +22,53 @@ class CoreCacheHelper
     {
         unset($website->channels, $website->stores);
         Cache::rememberForever("sf_website_{$website->hostname}", function () use($website) {
-            return $website->toArray();
+            return $website;
         });
-        Cache::rememberForever("sf_website_{$website->id}", function () use($website) {
-            return $website->toArray();
-        });
-    }
-
-    public function deleteWebsiteCache($website)
-    {
-
     }
 
     public function createChannelCache($channel)
     {
-        $website = $channel->website;
-        unset($channel->website, $channel->stores, $website->channels, $website->stores);
+        unset($channel->website, $channel->stores);
 
-        Cache::rememberForever("sf_website_{$website->id}_channel_{$channel->id}", function () use($channel) {
-            return $channel->toArray();
+        Cache::rememberForever("sf_channel_{$channel->code}", function () use($channel) {
+            return $channel;
         });
-        Cache::rememberForever("sf_website_{$website->id}_channel_{$channel->code}", function () use($channel) {
-            return $channel->toArray();
-        });
-    }
-
-    public function deleteChannelCache($channel)
-    {
-
     }
 
     public function createStoreCache($store)
     {
-        $channel = $store->channel;
-        $website = $channel->website;
+        $website = $store->channel->website;
 
-        unset($store->channel, $store->website, $channel->stores, $channel->website, $website->channels, $website->stores);
+        unset($store->channel, $store->website);
 
-        Cache::rememberForever("sf_website_{$website->id}_channel_{$channel->id}_store_{$store->id}", function () use($store, $channel, $website) {
-            $store["website_id"] = $website->id;
-            return $store->toArray();
-        });
-
-        Cache::rememberForever("sf_website_{$website->id}_channel_{$channel->id}_store_{$store->code}", function () use($store, $channel, $website) {
+        Cache::rememberForever("sf_store_{$store->id}", function () use($store, $website) {
             $store["website_id"] = $website->id;
             return $store->toArray();
         });
     }
 
-
-    public function deleteStoreCache($store)
+    public function getWebsiteCache(string $website_hostname): ?object
     {
+        return Cache::rememberForever("sf_website_{$website_hostname}", function () use($website_hostname) {
+            return $this->website->whereHostname($website_hostname)->setEagerLoads([])->firstOrFail();
+        });
+    }
 
+    public function getChannelCache(?object $website, string $channel_code): ?object
+    {
+        if(!$website) return null;
+        return Cache::rememberForever("sf_channel_{$channel_code}", function () use($channel_code, $website) {
+            return $this->channel->whereWebsiteId($website?->id)->whereCode($channel_code)->setEagerLoads([])->firstOrFail();
+        });
+    }
+
+    public function getStoreCache(?object $website, ?object $channel, string $store_code): ?object
+    {
+        if(!$website) return null;
+        return Cache::rememberForever("sf_store_{$store_code}", function () use($store_code, $channel, $website) {
+            $store = $this->store->whereChannelId($channel?->id)->whereCode($store_code)->setEagerLoads([])->firstOrFail();
+            $store["website_id"] = $website?->id;
+            return $store;
+        });
     }
 }

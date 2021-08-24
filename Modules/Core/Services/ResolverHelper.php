@@ -5,9 +5,9 @@ namespace Modules\Core\Services;
 use Exception;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\ValidationException;
-use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Page\Entities\Page;
 
@@ -34,21 +34,16 @@ class ResolverHelper {
         try
         {
             $websiteData = [];
-            $domain = $this->getDomain();
 
             $fallback_id = config("website.fallback_id");
-            if ($request->hasHeader('hc-host')) {
-                $fallback_id = Website::whereHostname($request->header("hc-host"))->firstOrFail()?->id;
-            }
+            if ($request->hasHeader('hc-host')) $website = CoreCache::getWebsiteCache($request->header('hc-host'));
+            else $website = Website::whereId($fallback_id)->setEagerLoads([])->firstOrFail(); 
+            $websiteData = $website?->only(["id","name","code", "hostname"]);
 
-            $website = Website::whereHostname($domain);
-            if ( !$website->exists() && config("website.environment") == "local" ) {
-                $website = Website::whereId($fallback_id);
-            }
-            $website = $website->select(["id","name","code", "hostname"])->setEagerLoads([])->firstOrFail();
-            $websiteData = $website->toArray();
-            $websiteData["channel"] = $this->getChannel($request, $website);
-            $websiteData["store"] = $this->getStore($request, $website, $websiteData["channel"]);
+            $channel = $this->getChannel($request, $website);
+            $websiteData["channel"] = $channel?->only(["id","name","code", "hostname"]);
+
+            $websiteData["store"] = $this->getStore($request, $website, $channel);
             $websiteData["pages"] = $this->getPages($website);
 
             if ($callback) $website = $callback($websiteData);
@@ -61,16 +56,16 @@ class ResolverHelper {
         return $websiteData;
     }
 
-    public function getChannel(object $request, object $website): ?array
+    public function getChannel(object $request, object $website): ?object
     {
         try
         {
             $channel_code = $request->header("hc-channel");
 
-            if($channel_code) $channel = Channel::whereCode($channel_code)->whereWebsiteId($website->id)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            if($channel_code) $channel = CoreCache::getChannelCache($website, $channel_code);
             else {
-                $default_channel = $this->checkCondition("website_default_channel", $website);
-                $channel = ($default_channel) ? $default_channel->firstOrFail() : null;
+                $channel = $this->checkCondition("website_default_channel", $website)?->firstOrFail();
+                if(!$channel) throw ValidationException::withMessages(["Configure the default channel for a website"]);
             }
         }
         catch( Exception $exception )
@@ -78,19 +73,19 @@ class ResolverHelper {
             throw $exception;
         }
 
-        return $channel ? $channel->toArray() : $channel;
+        return $channel;
     }
 
-    public function getStore(object $request, object $website, ?array $channel): ?array
+    public function getStore(object $request, object $website, ?object $channel): ?object
     {
         try
         {
             $store_code = $request->header("hc-store");
 
-            if($store_code) $store = Store::whereChannelId(isset($channel["id"]) ? $channel["id"] : null)->whereCode($store_code)->select(["id","name","code"])->setEagerLoads([])->firstOrFail();
+            if($store_code) $store = CoreCache::getStoreCache($website, $channel, $store_code);
             else {
-                $default_store = $this->checkCondition("website_default_store", $website);
-                $store = ($default_store) ? $default_store->firstOrFail() : null;
+                $store = $this->checkCondition("website_default_store", $website)?->firstOrFail();
+                if(!$store) throw ValidationException::withMessages(["Configure the default store for a website"]);
             }
         }
         catch( Exception $exception )
@@ -98,7 +93,7 @@ class ResolverHelper {
             throw $exception;
         }
 
-        return $store ? $store->toArray() : $store;
+        return $store;
     }
 
     public function getPages(object $website): ?array

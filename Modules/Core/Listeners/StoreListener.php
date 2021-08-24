@@ -18,23 +18,11 @@ class StoreListener
 
     public function update($store)
     {
-        CoreCache::updateStoreCache($store);
+        CoreCache::createStoreCache($store);
     }
 
     public function delete($store)
     {
-        Cache::forget("store_{$store->code}");
-        $channel_code = $store->channel->code;
-        $hostname = $store->channel->website->hostname;
-        unset($store->channel);
-
-        $channel = Cache::get("channel_{$channel_code}");
-        $website = Cache::get("website_{$hostname}");
-        $channel_key = array_search($store->id, array_column($channel["stores"], 'id'));
-        $website_key = array_search($store->id, array_column($channel["stores"], 'id'));
-        unset($channel["stores"][$channel_key]);
-        unset($website["stores"][$website_key]);
-        Cache::put("channel_{$channel_code}", $channel);
-        Cache::put("website_{$hostname}", $website);
+        Cache::forget("sf_website_{$website?->hostname}_channel_{$channel?->code}_store_{$store_code}");
     }
 }

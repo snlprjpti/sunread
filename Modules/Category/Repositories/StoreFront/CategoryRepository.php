@@ -5,10 +5,7 @@ namespace Modules\Category\Repositories\StoreFront;
 use Exception;
 use Modules\Category\Entities\Category;
 use Modules\Category\Transformers\StoreFront\CategoryResource;
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
-use Modules\Core\Entities\Website;
-use Modules\Core\Facades\Resolver;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 
@@ -27,9 +24,10 @@ class CategoryRepository extends BaseRepository
         {
             $fetched = [];
 
-            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
-            $channel = Channel::whereWebsiteId($website->id)->whereCode($request->header("hc-channel"))->firstOrFail();
-            $store = Store::whereChannelId($channel->id)->whereCode($request->header("hc-store"))->firstOrFail();
+            $website = CoreCache::getWebsiteCache($request->header('hc-host'));
+            $channel = CoreCache::getChannelCache($website, $request->header('hc-channel'));
+            $store = CoreCache::getStoreCache($website, $channel, $request->header('hc-store'));
+            $request->store = $store;
 
             $categories = $this->model->withDepth()->having('depth', '=', 1)->whereWebsiteId($website->id)->whereHas("values", function($query) use($store) {
                 $query->whereScope("store")->whereScopeId($store->id)->whereAttribute("include_in_menu")->whereValue("1");

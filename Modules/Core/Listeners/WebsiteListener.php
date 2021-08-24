@@ -16,23 +16,11 @@ class WebsiteListener
 
     public function update($website)
     {
-        CoreCache::updateWebsiteCache($website);
+        CoreCache::createWebsiteCache($website);
     }
 
     public function delete($website)
     {
-        Cache::forget("website_{$website->hostname}");
-
-        foreach($website["channels"] as $channel) {
-            $cacheStore = Cache::get("channel_{$channel->code}");
-            unset($cacheStore["channels"]);
-            Cache::put("channel_{$channel->code}", $cacheStore);
-        }
-
-        foreach($website["stores"] as $store) {
-            $cacheStore = Cache::get("store_{$store->code}");
-            unset($cacheStore["stores"]);
-            Cache::put("store_{$store->code}", $cacheStore);
-        }
+        Cache::forget("sf_website_{$website->hostname}");
     }
 }
