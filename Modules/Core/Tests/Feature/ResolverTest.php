@@ -62,18 +62,6 @@ class ResolverTest extends BaseTestCase
         ]);
     }
 
-    public function testWebsiteShouldNotBeResolvedIfInProduction(): void
-    {
-        Config::set("website.environment", "production");
-        $response = $this->get($this->getRoute("resolve"));
-
-        $response->assertNotFound();
-        $response->assertJsonFragment([
-            "status" => "error",
-            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
-        ]);
-    }
-
     public function testChannelCanBeResolved(): void
     {
         $this->headers["hc-channel"] = Channel::inRandomOrder()->first()->code;
