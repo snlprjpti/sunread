@@ -4,15 +4,12 @@ namespace Modules\Page\Tests\Feature\StoreFront;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Core\Entities\Store;
+use Modules\Core\Tests\StoreFrontBaseTestCase;
 use Modules\Page\Entities\Page;
 use Tests\TestCase;
 
-class PageTest extends TestCase
+class PageTest extends StoreFrontBaseTestCase
 {
-    use DatabaseTransactions;
-
-    public $model, $model_name, $route_prefix, $default_resource_slug, $append_to_route, $store_code;
-
     public function setUp(): void
     {
         $this->model = Page::class;
@@ -22,31 +19,32 @@ class PageTest extends TestCase
         $this->model_name = "Page";
         $this->route_prefix = "public.pages";
 
-        $this->default_resource_slug = $this->model::latest('id')->first()->slug;
-        $this->store_code = Store::oldest("id")->first()->code;
+        $this->createFactories = false;
+        $this->hasFilters = false;
+        $this->hasIndexTest = false;
+        
+        $this->hasChannel = false;
+        $this->createHeader();
     }
 
-    public function testUserShouldBeAbleToGetPage()
+    public function createScopeData()
+    { 
+        $this->default_resource->update(["website_id" => $this->website->id]);
+        $this->default_resource->page_scopes()->create([
+            "scope" => "store",
+            "scope_id" => $this->store->id 
+        ]); 
+    }
+
+    public function testAdminCanFetchIndividualResource()
     {
-        $this->headers["store"] = "{$this->store_code}";
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", [$this->default_resource_slug]));
+        $this->createScopeData();
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_slug]));
 
         $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
-            "message" => __("core::app.response.fetch-success",  ["name" => $this->model_name])
-        ]);
-    }
-
-    public function testUserShouldNotBeAbleToGetPageWithInvalidStoreCode()
-    {
-        $this->headers["store"] = "Invalid_Code";
-        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", [$this->default_resource_slug]));
-
-        $response->assertNotFound();
-        $response->assertJsonFragment([
-            "status" => "error",
-            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
         ]);
     }
 }

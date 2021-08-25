@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Exception;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
-use Modules\Page\Repositories\PageRepository;
+use Modules\Page\Repositories\StoreFront\PageRepository;
 use Modules\Page\Transformers\StoreFront\PageResource;
 
 class PageController extends BaseController
@@ -20,6 +20,10 @@ class PageController extends BaseController
         $this->repository = $repository;
         $this->model = $page;
         $this->model_name = "Page";
+
+        $this->middleware('validate.website.host')->only(['show']);
+        $this->middleware('validate.store.code')->only(['show']);
+
         parent::__construct($this->model, $this->model_name);
     }
 
