@@ -205,11 +205,10 @@ trait HasIndexing
         }
     }
 
-    public function searchIndex(array $data): ?array
+    public function searchIndex(array $data, object $store): ?array
     {
         try
         {
-            $store = $this->getStoreId();
             $params["index"]  = $this->setIndexName($store->id);
             $exists = $this->checkIndexIfExist($params);
     

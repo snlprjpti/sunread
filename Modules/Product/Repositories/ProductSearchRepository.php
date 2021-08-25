@@ -3,8 +3,11 @@
 namespace Modules\Product\Repositories;
 
 use Exception;
+use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
 use Modules\Product\Jobs\SingleIndexing;
@@ -78,10 +81,19 @@ class ProductSearchRepository extends ElasticSearchRepository
         ];
     }
 
-    public function getFilterProducts(object $request, int $category_id): ?array
+    public function getStore(object $request): object
+    {
+        $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
+        $store = Store::whereCode($request->header("hc-store"))->firstOrFail();
+        
+        if($store->channel->website->id != $website->id) throw ValidationException::withMessages(["hc-store" => "Store does not belong to this website"]);
+        return $store;
+    }
+
+    public function getFilterProducts(object $request, int $category_id, object $store): ?array
     {
         $filter = $this->filterAndSort($request, $category_id);
-        return $this->finalQuery($filter["query"], $request->page ?? 1, $request->limit ?? 10, $filter["sort"]);
+        return $this->finalQuery($filter["query"], $request, $filter["sort"], $store);
     }
 
     public function getProduct(object $request): ?array
@@ -95,7 +107,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             $data[] = $filter["query"];
     
             $query = $this->whereQuery($data);
-            $final_query = $this->finalQuery($query, $request->page ?? 1, $request->limit ?? 10, $filter["sort"]);      
+            $final_query = $this->finalQuery($query, $request, $filter["sort"]);      
         }
         catch (Exception $exception)
         {
@@ -125,44 +137,47 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function getFilterOptions(int $category_id): ?array
     {
-        try
-        {
+        // try
+        // {
             $filter = [];
-            $data = $this->filterAndSort(category_id:$category_id);
-            $aggregate = $this->aggregation();
+        //     $data = $this->filterAndSort(category_id:$category_id);
+        //     $aggregate = $this->aggregation();
     
-            $query = [
-                "size"=> 0,
-                "query"=> (count($data["query"]) > 0) ? $data["query"] : [
-                    "match_all"=> (object)[]
-                ],
-                "aggs"=> $aggregate
-            ];
+        //     $query = [
+        //         "size"=> 0,
+        //         "query"=> (count($data["query"]) > 0) ? $data["query"] : [
+        //             "match_all"=> (object)[]
+        //         ],
+        //         "aggs"=> $aggregate
+        //     ];
     
-            $fetched = $this->searchIndex($query);
+        //     $fetched = $this->searchIndex($query);
     
-            foreach($this->staticFilterKeys as $field) 
-            {
-                $filter[$field] = collect($fetched["aggregations"][$field]["buckets"])->map(function($bucket, $key) use($fetched, $field) {
-                    return [
-                        "label" => $fetched["aggregations"]["{$field}_value"]["buckets"][$key]["key"],
-                        "value" =>  $bucket["key"]  
-                    ];
-                });
-            } 
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
+        //     foreach($this->staticFilterKeys as $field) 
+        //     {
+        //         $filter[$field] = collect($fetched["aggregations"][$field]["buckets"])->map(function($bucket, $key) use($fetched, $field) {
+        //             return [
+        //                 "label" => $fetched["aggregations"]["{$field}_value"]["buckets"][$key]["key"],
+        //                 "value" =>  $bucket["key"]  
+        //             ];
+        //         });
+        //     } 
+        // }
+        // catch (Exception $exception)
+        // {
+        //     throw $exception;
+        // }
 
         return $filter;
     }
 
-    public function finalQuery(array $query, ?int $page = 1, ?int $limit = 10, ?array $sort = []): ?array
+    public function finalQuery(array $query, object $request, ?array $sort = [], object $store): ?array
     {
         try
         {
+            $page = $request->page ?? 1;
+            $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
+
             $fetched = [
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
@@ -173,7 +188,8 @@ class ProductSearchRepository extends ElasticSearchRepository
                     ["id" => ["order" => "asc", "mode" => "avg"]]
                 ],
             ];
-            $data =  $this->searchIndex($fetched);     
+
+            $data =  $this->searchIndex($fetched, $store);     
         }
         catch (Exception $exception)
         {
@@ -214,7 +230,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $indexed = $this->model->whereIn('id', $request->ids)->get();
 			if ($callback) $callback($indexed);
-            BulkIndexing::dispatch($indexed);
+            // BulkIndexing::dispatch($indexed);
         }
         catch (Exception $exception)
         {
