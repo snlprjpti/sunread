@@ -204,7 +204,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "numeric",
-                                "scope" => "website",
+                                "scope" => "global",
                                 "is_required" => 1
                             ]
                         ]
