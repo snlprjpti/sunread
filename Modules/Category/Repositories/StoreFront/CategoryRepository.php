@@ -31,10 +31,19 @@ class CategoryRepository extends BaseRepository
             $channel = Channel::whereWebsiteId($website->id)->whereCode($request->header("hc-channel"))->firstOrFail();
             $store = Store::whereChannelId($channel->id)->whereCode($request->header("hc-store"))->firstOrFail();
 
-            $categories = $this->model->withDepth()->having('depth', '=', 0)->whereWebsiteId($website->id)->whereHas("values", function($query) use($store) {
-                $query->whereScope("store")->whereScopeId($store->id)->whereAttribute("include_in_menu")->whereValue("1");
-            })->get(); 
-            $fetched["categories"] = CategoryResource::collection($categories);
+            $categories = $this->model->withDepth()->having('depth', '=', 0)->whereWebsiteId($website->id)->get();
+            $scope = [
+                "scope" => "store",
+                "scope_id" => $store->id
+            ]; 
+            $request->sf_store = $store;
+
+            foreach($categories as $category)
+            {
+                $include_value = $category->value($scope, "include_in_menu");
+                if(!isset($include_value) || $include_value == "0") continue;
+                $fetched["categories"][] = new CategoryResource($category);
+            }
 
             $fetched["logo"] = SiteConfig::fetch("logo", "channel", $channel->id); 
         }
