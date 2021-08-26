@@ -14,6 +14,7 @@ class PageRepository extends BaseRepository
     {
         $this->model = $page;
         $this->model_key = "page";
+        $this->without_pagination = true;
     }
 
     public function findPage(object $request, string $slug): object
