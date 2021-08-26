@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
-use Modules\Customer\Repositories\CustomerRepository;
+use Modules\Customer\Repositories\StoreFront\CustomerRepository;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,9 +34,7 @@ class RegistrationController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
-            $data["password"] = Hash::make($request->password);
+            $data = $this->repository->registration($request);
             $created = $this->repository->create($data);
 
         }

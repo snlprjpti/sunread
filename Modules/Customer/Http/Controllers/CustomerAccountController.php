@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Repositories\CustomerAddressRepository;
-use Modules\Customer\Repositories\CustomerRepository;
+use Modules\Customer\Repositories\StoreFront\CustomerRepository;
 use Modules\Customer\Transformers\CustomerAccountResource;
 
 class CustomerAccountController extends BaseController
@@ -56,26 +56,9 @@ class CustomerAccountController extends BaseController
     {
         try
         {
-            $updated = auth()->guard("customer")->user();
-            $merge = ["email" => "required|email|unique:customers,email,{$updated->id}"];
-
-            if ( $request->has("current_password") ) {
-                $current_password_validation = $request->has("password") ? "required" : "sometimes";
-                $merge["current_password"] = "{$current_password_validation}|min:6|max:200";
-            }
-
-            $data = $this->repository->validateData($request, $merge);
-
-            if ( $request->has("current_password") ) {
-                if (!Hash::check($request->current_password, auth()->guard('customer')->user()->password)) {
-                    throw new Exception("Password is incorrect.");
-                }
-
-                $data["password"] = Hash::make($request->password);
-            }
-
-            unset($data["current_password"]);
-            $updated = $this->repository->update($data, $updated->id);
+            $customer = auth()->guard("customer")->user();
+            $data = $this->repository->updateAccount($request, $customer);      
+            $updated = $this->repository->update($data, $customer->id);
         }
         catch (Exception $exception)
         {
