@@ -34,18 +34,7 @@ class RegistrationController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, [
-                "password" => "required|min:6|confirmed",
-                "website_id" => "required|exists:websites,id",
-                "store_id" => "required|exists:stores,id",
-            ], function() {
-                return [
-                    "status" => 1,
-                    "is_lock" => 0,
-                ];
-            });
-            if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
-            $data["password"] = Hash::make($request->password);
+            $data = $this->repository->registration($request);
             $created = $this->repository->create($data);
 
         }

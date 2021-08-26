@@ -56,26 +56,9 @@ class CustomerAccountController extends BaseController
     {
         try
         {
-            $updated = auth()->guard("customer")->user();
-
-            $merge = array_merge($this->repository->getPasswordRules($request), [
-                ["email" => "required|email|unique:customers,email,{$updated->id}"]
-            ]);
-
-            $data = $this->repository->validateData($request, $merge, function () use($updated) {
-                return [
-                    "website_id" => $updated->website_id,
-                    "store_id" => $updated->store_id,
-                    "status" => 1,
-                    "is_lock" => 1,
-                    "customer_group_id" => 1,
-                ];
-            });
-
-            if ( isset($request->current_password) ||  isset($request->password) ) $data["password"] = $this->repository->getPassword($request);
-            unset($data["current_password"]);
-            
-            $updated = $this->repository->update($data, $updated->id);
+            $customer = auth()->guard("customer")->user();
+            $data = $this->repository->updateAccount($request, $customer);      
+            $updated = $this->repository->update($data, $customer->id);
         }
         catch (Exception $exception)
         {

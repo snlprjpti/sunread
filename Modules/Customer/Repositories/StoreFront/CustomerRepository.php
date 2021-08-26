@@ -34,6 +34,59 @@ class CustomerRepository extends BaseRepository
         ];
     }
 
+    public function registration(object $request): array
+    {
+        try
+        {
+            $data = $this->validateData($request, [
+                "password" => "required|min:6|confirmed",
+                "website_id" => "required|exists:websites,id",
+                "store_id" => "required|exists:stores,id",
+            ], function() {
+                return [
+                    "status" => 1,
+                    "is_lock" => 0,
+                ];
+            });
+            if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
+            $data["password"] = Hash::make($request->password);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data; 
+    }
+    public function updateAccount(object $request, object $customer): array
+    {
+        try
+        {
+            $merge = array_merge($this->getPasswordRules($request), [
+                ["email" => "required|email|unique:customers,email,{$customer->id}"]
+            ]);
+
+            $data = $this->validateData($request, $merge, function () use($customer) {
+                return [
+                    "website_id" => $customer->website_id,
+                    "store_id" => $customer->store_id,
+                    "status" => 1,
+                    "is_lock" => 1,
+                    "customer_group_id" => 1,
+                ];
+            });
+
+            if ( isset($request->current_password) ||  isset($request->password) ) $data["password"] = $this->getPassword($request);
+            unset($data["current_password"]);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
     public function getPasswordRules(object $request) : array
     {
         $merge_rule = [];
