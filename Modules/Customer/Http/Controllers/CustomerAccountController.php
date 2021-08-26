@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Repositories\CustomerAddressRepository;
-use Modules\Customer\Repositories\CustomerRepository;
+use Modules\Customer\Repositories\StoreFront\CustomerRepository;
 use Modules\Customer\Transformers\CustomerAccountResource;
 
 class CustomerAccountController extends BaseController
@@ -57,24 +57,24 @@ class CustomerAccountController extends BaseController
         try
         {
             $updated = auth()->guard("customer")->user();
-            $merge = ["email" => "required|email|unique:customers,email,{$updated->id}"];
 
-            if ( $request->has("current_password") ) {
-                $current_password_validation = $request->has("password") ? "required" : "sometimes";
-                $merge["current_password"] = "{$current_password_validation}|min:6|max:200";
-            }
+            $merge = array_merge($this->repository->getPasswordRules($request), [
+                ["email" => "required|email|unique:customers,email,{$updated->id}"]
+            ]);
 
-            $data = $this->repository->validateData($request, $merge);
+            $data = $this->repository->validateData($request, $merge, function () use($updated) {
+                return [
+                    "website_id" => $updated->website_id,
+                    "store_id" => $updated->store_id,
+                    "status" => 1,
+                    "is_lock" => 1,
+                    "customer_group_id" => 1,
+                ];
+            });
 
-            if ( $request->has("current_password") ) {
-                if (!Hash::check($request->current_password, auth()->guard('customer')->user()->password)) {
-                    throw new Exception("Password is incorrect.");
-                }
-
-                $data["password"] = Hash::make($request->password);
-            }
-
+            if ( isset($request->current_password) ||  isset($request->password) ) $data["password"] = $this->repository->getPassword($request);
             unset($data["current_password"]);
+            
             $updated = $this->repository->update($data, $updated->id);
         }
         catch (Exception $exception)
