@@ -10,6 +10,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
 use Modules\Customer\Repositories\CustomerRepository;
 use Exception;
+use Illuminate\Support\Facades\Hash;
 
 class RegistrationController extends BaseController
 {
@@ -35,6 +36,7 @@ class RegistrationController extends BaseController
         {
             $data = $this->repository->validateData($request);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
+            $data["password"] = Hash::make($request->password);
             $created = $this->repository->create($data);
 
         }
