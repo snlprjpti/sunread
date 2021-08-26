@@ -13,5 +13,6 @@ Route::group(['middleware' => ['api']], function () {
 });
 
 Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+    Route::get('pages', [\Modules\Page\Http\Controllers\StoreFront\PageController::class, "index"])->name("pages.index");
     Route::get('pages/{page_slug}', [\Modules\Page\Http\Controllers\StoreFront\PageController::class, "show"])->name("pages.show");
 });

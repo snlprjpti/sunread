@@ -13,6 +13,7 @@ class PageRepository extends BaseRepository
     public function __construct(Page $page)
     {
         $this->model = $page;
+        $this->model_key = "page";
     }
 
     public function findPage(object $request, string $slug): object
