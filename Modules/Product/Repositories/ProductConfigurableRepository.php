@@ -99,7 +99,9 @@ class ProductConfigurableRepository extends BaseRepository
                 $product_variant_data[] = $this->addVariant($product, $permutation, $request, $productAttributes, $scope, $method);
             }
             
-            $product->variants()->whereNotIn('id', array_filter(Arr::pluck($product_variant_data, 'id')))->delete();
+            $product->variants()->whereNotIn('id', array_filter(Arr::pluck($product_variant_data, 'id')))->get()->map(function($single_product) {
+                $this->product_repository->delete($single_product->id);
+            });
        }
        catch ( Exception $exception )
        {

@@ -10,12 +10,14 @@ class ProductListener
 {
     public function indexing($product)
     {
-        $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
-            return $channel->stores;
-        });
-
-        $batch = Bus::batch([])->dispatch();
-        foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
+        if (!$product->parent_id && $product->type == "simple") {
+            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+                return $channel->stores;
+            });
+    
+            // $batch = Bus::batch([])->dispatch();
+            foreach($stores as $store) SingleIndexing::dispatchSync($product, $store);
+        }
     }
 
     public function remove($product)

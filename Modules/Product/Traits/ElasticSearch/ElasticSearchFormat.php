@@ -57,6 +57,7 @@ trait ElasticSearchFormat
                     "attribute_id" => $attributeId
                 ];
     
+                dd($this->value($match));
                 $data[$attribute->slug] = $this->value($match);
                 if(in_array($attribute->type, $this->options_fields))
                 {
