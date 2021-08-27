@@ -11,7 +11,6 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Transformers\ProductResource;
 use Modules\Product\Repositories\ProductRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\Core\Entities\Store;
 use Modules\Core\Rules\ScopeRule;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
@@ -108,7 +107,6 @@ class ProductController extends BaseController
         try
         {
             $fetched = $this->repository->fetch($id, ["categories", "parent", "brand", "website", "product_attributes", "catalog_inventories", "variants"]);
-            dd($fetched->documentDataStructure(Store::find(1)));
         }
         catch( Exception $exception )
         {
