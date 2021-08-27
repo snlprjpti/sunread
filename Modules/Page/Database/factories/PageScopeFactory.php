@@ -12,19 +12,8 @@ class PageScopeFactory extends Factory
 
     public function definition(): array
     {
-        $data["scope"] = Arr::random([ "website", "store" ]);
-
-        switch ($data["scope"])
-        {
-            case "website":
-                $data["scope_id"] = Website::factory()->create()->id;
-                break;
-    
-            case "store":
-                $data["scope_id"] = Store::factory()->create()->id;
-                break;
-        }
-        
+        $data["scope"] = "store";
+        $data["scope_id"] = 0;  
         return $data;
     }
 }

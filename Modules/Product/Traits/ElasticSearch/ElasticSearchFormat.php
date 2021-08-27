@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
+use Modules\Product\Entities\ImageType;
 use Modules\Tax\Entities\ProductTaxGroup;
 
 trait ElasticSearchFormat
@@ -140,15 +141,15 @@ trait ElasticSearchFormat
     {
         try
         {
-            $images = [
-                'main_image' => $this->getFullPath("main_image"),
-                'thumbnail' => $this->getFullPath("thumbnail"),
-                'small_image' => $this->getFullPath("small_image"),
-                'section_background' => $this->getFullPath("section_background"),
-                'gallery' => $this->images()->whereGallery(1)->pluck('path')->map(function ($gallery) {
-                    return Storage::url($gallery);
-                })->toArray()
-            ];
+            $image_types = ImageType::where("slug", "!=", "gallery")->get();
+            foreach($image_types as $image_type) $images[$image_type->slug] = $this->getFullPath("base_image");
+
+            $images['gallery'] = $this->images()->wherehas("types", function($query) {
+                $query->whereSlug("gallery");
+            })->pluck('path')->map(function ($gallery) {
+                return Storage::url($gallery);
+            })->toArray();
+            
         }
         catch (Exception $exception)
         {
@@ -161,7 +162,9 @@ trait ElasticSearchFormat
     {
         try
         {
-            $image = $this->images()->where($image_name, 1)->first();
+            $image = $this->images()->wherehas("types", function($query) use($image_name) {
+                $query->whereSlug($image_name);
+            })->first();
             $path = $image ? Storage::url($image->path) : $image;
         }
         catch (Exception $exception)
