@@ -12,17 +12,19 @@ use Modules\Page\Transformers\StoreFront\PageResource;
 use Modules\Product\Entities\Product;
 use Modules\Product\Repositories\ProductRepository;
 use Modules\Product\Repositories\ProductSearchRepository;
+use Modules\Product\Repositories\StoreFront\ProductRepository as StoreFrontProductRepository;
 
 class ProductController extends BaseController
 {
-    protected $repository, $search_repository;
+    protected $repository, $search_repository, $store_fornt_repository;
 
-    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository)
+    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository, StoreFrontProductRepository $store_fornt_repository)
     {
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $repository;
         $this->search_repository = $search_repository;
+        $this->store_fornt_repository = $store_fornt_repository;
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -59,5 +61,19 @@ class ProductController extends BaseController
         }
 
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
+    }
+
+    public function show(Request $request, string $sku)
+    {
+        try
+        {
+            $data = $this->store_fornt_repository->productDetail($request, $sku);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($data,  $this->lang('fetch-success'));
     }
 }
