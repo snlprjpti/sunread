@@ -15,8 +15,8 @@ class ProductListener
                 return $channel->stores;
             });
     
-            // $batch = Bus::batch([])->dispatch();
-            foreach($stores as $store) SingleIndexing::dispatchSync($product, $store);
+            $batch = Bus::batch([])->dispatch();
+            foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
         }
     }
 
