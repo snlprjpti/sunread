@@ -101,7 +101,7 @@ class ProductSearchRepository extends ElasticSearchRepository
     public function getFilterProducts(object $request, int $category_id, object $store): ?array
     {
         $filter = $this->filterAndSort($request, $category_id);
-        return $this->finalQuery($filter["query"], $request, $filter["sort"], $store);
+        return $this->finalQuery($filter["query"], $request, $store, $filter["sort"]);
     }
 
     public function getProduct(object $request): ?array
@@ -197,7 +197,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $filter;
     }
 
-    public function finalQuery(array $query, object $request, ?array $sort = [], object $store): ?array
+    public function finalQuery(array $query, object $request, object $store, ?array $sort = []): ?array
     {
         try
         {
