@@ -3,6 +3,8 @@
 namespace Modules\Core\Listeners;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
+use Modules\Core\Entities\Website;
 use Modules\Core\Facades\CoreCache;
 
 class WebsiteListener
@@ -12,14 +14,18 @@ class WebsiteListener
         CoreCache::createWebsiteCache($website);
     }
 
+    public function beforeUpdate($website)
+    {
+        CoreCache::updateBeforeWebsiteCache($website);
+    }
+
     public function update($website)
     {
-        Cache::forget("sf_website_{$website->hostname}");
-        CoreCache::createWebsiteCache($website);
+        CoreCache::updateWebsiteCache($website);
     }
 
     public function delete($website)
     {
-        Cache::forget("sf_website_{$website->hostname}");
+        CoreCache::deleteWebsiteCache($website);
     }
 }

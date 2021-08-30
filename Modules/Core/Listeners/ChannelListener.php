@@ -2,10 +2,8 @@
 
 namespace Modules\Core\Listeners;
 
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
-use Modules\Core\Entities\Website;
 use Modules\Core\Facades\CoreCache;
 
 class ChannelListener
@@ -15,14 +13,18 @@ class ChannelListener
         CoreCache::createChannelCache($channel);
     }
 
+    public function beforeUpdate($channel)
+    {
+        CoreCache::updateBeforeChannelCache($channel);
+    }
+
     public function update($channel)
     {
-        Cache::forget("sf_channel_{$channel->code}");
-        CoreCache::createChannelCache($channel);
+        CoreCache::updateChannelCache($channel);
     }
 
     public function delete($channel)
     {
-        Cache::forget("sf_channel_{$channel->code}");
+        CoreCache::deleteChannelCache($channel);
     }
 }

@@ -2,11 +2,9 @@
 
 namespace Modules\Core\Listeners;
 
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Website;
+use Illuminate\Support\Facades\Redis;
+use Modules\Core\Entities\Store;
 use Modules\Core\Facades\CoreCache;
 
 class StoreListener
@@ -16,14 +14,18 @@ class StoreListener
         CoreCache::createStoreCache($store);
     }
 
+    public function beforeUpdate($store)
+    {
+        CoreCache::updateBeforeStoreCache($store);
+    }
+
     public function update($store)
     {
-        Cache::forget("sf_store_{$store->code}");
         CoreCache::createStoreCache($store);
     }
 
     public function delete($store)
     {
-        Cache::forget("sf_store_{$store->code}");
+        CoreCache::deleteStoreCache($store);
     }
 }
