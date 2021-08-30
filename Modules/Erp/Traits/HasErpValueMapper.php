@@ -136,7 +136,7 @@ trait HasErpValueMapper
                     "value" => $price_value["unitPrice"], 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("special_from_data")->first()->id,
+                    "attribute_id" => $attribute->whereSlug("special_from_date")->first()->id,
                     "value" => Carbon::parse(date("Y-m-d", $start_time)), 
                 ],
                 [
@@ -243,7 +243,7 @@ trait HasErpValueMapper
                         "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"] 
                     ],
                     [
-                        "attribute_id" => $attribute->whereSlug("special_from_data")->first()->id,
+                        "attribute_id" => $attribute->whereSlug("special_from_date")->first()->id,
                         "value" => Carbon::parse(date("Y-m-d", $start_time)),
                         "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
                     ],
