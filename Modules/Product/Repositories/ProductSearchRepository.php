@@ -205,6 +205,9 @@ class ProductSearchRepository extends ElasticSearchRepository
             $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
             $fetched = [
+                "_source"=>[
+                    "exclude"=> "configurable_*",
+                ],
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
                 "query"=> (count($filter["query"]) > 0) ? $filter["query"] : [

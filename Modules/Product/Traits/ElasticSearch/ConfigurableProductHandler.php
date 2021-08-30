@@ -61,9 +61,16 @@ trait ConfigurableProductHandler
 
             $attribute_data = Attribute::find($variant_attribute);
             if($attribute_data) {
+
+                $attribute_option = AttributeOption::find($key);
                 $items[$variant->id][$store->id]["configurable_{$attribute_data->slug}"][] = $key;
-                // $attribute_key = array_keys($items[$variant->id][$store->id]["configurable_{$attribute_data->slug}"], $key)[0];
-                $items[$variant->id][$store->id]["configurable_{$attribute_data->slug}_value"][] = AttributeOption::find($key)?->name;
+                $items[$variant->id][$store->id]["configurable_{$attribute_data->slug}_value"][] = $attribute_option?->name;
+
+                $items[$variant->id][$store->id]["configurable"][$attribute_data->slug][] = [
+                    "label" => $attribute_option?->name,
+                    "value" => $key
+                ];
+
                 if($main) unset($items[$variant->id][$store->id][$attribute_data->slug], $items[$variant->id][$store->id]["{$attribute_data->slug}_value"]);   
             }
         } 
