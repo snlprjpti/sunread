@@ -226,7 +226,7 @@ trait HasIndexing
                     $params["body"][] = $store_product;
                 }
             }
-            $this->client->bulk($params);
+            if(count($products) > 0) $this->client->bulk($params);
         }
         catch(Exception $exception)
         {
