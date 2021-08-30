@@ -26,8 +26,8 @@ class ProductController extends BaseController
         $this->search_repository = $search_repository;
         $this->category_repository = $category_repository;
 
-        $this->middleware('validate.website.host')->only(['index']);
-        $this->middleware('validate.store.code')->only(['index']);
+        $this->middleware('validate.website.host')->only(['index', 'filter']);
+        $this->middleware('validate.store.code')->only(['index', 'filter']);
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -54,11 +54,12 @@ class ProductController extends BaseController
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
-    public function filter(int $category_id): JsonResponse
+    public function filter(Request $request, int $category_id): JsonResponse
     {
         try
         {
-            $fetched = $this->search_repository->getFilterOptions($category_id);
+            $store = $this->search_repository->getStore($request);
+            $fetched = $this->search_repository->getFilterOptions($category_id, $store);
         }
         catch( Exception $exception )
         {
