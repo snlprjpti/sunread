@@ -205,11 +205,39 @@ trait HasIndexing
         }
     }
 
-    public function searchIndex(array $data): ?array
+    public function configurableIndexing(array $products): void
     {
         try
         {
-            $store = $this->getStoreId();
+            foreach($products as $store_products)
+            {
+                foreach($store_products as $store => $store_product)
+                {
+                    $createParams["index"] = $this->setIndexName($store);
+                    $this->createIndexIfNotExist($createParams);
+    
+                    $params["body"][] = [
+                        "index" => [
+                            "_index" => $createParams["index"],
+                            "_id" => $store_product["id"]
+                        ]
+                    ];
+                
+                    $params["body"][] = $store_product;
+                }
+            }
+            if(count($products) > 0) $this->client->bulk($params);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
+    public function searchIndex(array $data, object $store): ?array
+    {
+        try
+        {
             $params["index"]  = $this->setIndexName($store->id);
             $exists = $this->checkIndexIfExist($params);
     

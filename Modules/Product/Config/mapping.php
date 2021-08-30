@@ -270,6 +270,19 @@ return [
             ],
             "fielddata"=> true
         ],
+        "configurable_size" =>  [
+            "type" => "long"
+        ],
+        "configurable_size_value" =>  [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ],
+            "fielddata"=> true
+        ],
         "categories"=> [
             "properties"=> [
                 "id"=> [

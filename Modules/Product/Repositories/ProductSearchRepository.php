@@ -3,8 +3,13 @@
 namespace Modules\Product\Repositories;
 
 use Exception;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeOption;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
 use Modules\Product\Jobs\SingleIndexing;
@@ -26,7 +31,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         $this->sortByKeys = [ "sort_by_id", "sort_by_name", "sort_by_price" ];
 
-        $this->staticFilterKeys = ["color", "size", "collection"];
+        $this->staticFilterKeys = ["color", "size", "collection", "configurable_size"];
     }
 
     public function search(object $request): array
@@ -61,7 +66,13 @@ class ProductSearchRepository extends ElasticSearchRepository
                 foreach($request->all() as $key => $value) 
                 {
                     if (str_starts_with($key, 'sort_by_')) $sort = $this->sort(substr($key,8), $value ?? "asc");
-                    if(in_array($key, $this->attributeFilterKeys) && $value) $filter[] = $this->term($key, $value);
+                    if(in_array($key, $this->attributeFilterKeys) && $value) {
+                        if($key == "size") {
+                            $size = [$this->term("configurable_size", $value), $this->term($key, $value)];
+                            $filter[] = $this->OrwhereQuery($size); 
+                        }
+                        else $filter[] = $this->term($key, $value);
+                    } 
                 }
             }
     
@@ -78,10 +89,19 @@ class ProductSearchRepository extends ElasticSearchRepository
         ];
     }
 
-    public function getFilterProducts(object $request, int $category_id): ?array
+    public function getStore(object $request): object
+    {
+        $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
+        $store = Store::whereCode($request->header("hc-store"))->firstOrFail();
+        
+        if($store->channel->website->id != $website->id) throw ValidationException::withMessages(["hc-store" => "Store does not belong to this website"]);
+        return $store;
+    }
+
+    public function getFilterProducts(object $request, int $category_id, object $store): ?array
     {
         $filter = $this->filterAndSort($request, $category_id);
-        return $this->finalQuery($filter["query"], $request->page ?? 1, $request->limit ?? 10, $filter["sort"]);
+        return $this->finalQuery($filter["query"], $request, $filter["sort"], $store);
     }
 
     public function getProduct(object $request): ?array
@@ -95,7 +115,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             $data[] = $filter["query"];
     
             $query = $this->whereQuery($data);
-            $final_query = $this->finalQuery($query, $request->page ?? 1, $request->limit ?? 10, $filter["sort"]);      
+            $final_query = $this->finalQuery($query, $request, $filter["sort"]);      
         }
         catch (Exception $exception)
         {
@@ -113,17 +133,18 @@ class ProductSearchRepository extends ElasticSearchRepository
             foreach($this->staticFilterKeys as $field) 
             {
                 $aggregate[$field] = $this->aggregate($field);
-                $aggregate["{$field}_value"] = $this->aggregate("{$field}_value");
+                // $aggregate["{$field}_value"] = $this->aggregate("{$field}_value");
             }         
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
+
         return $aggregate;   
     }
 
-    public function getFilterOptions(int $category_id): ?array
+    public function getFilterOptions(int $category_id, object $store): ?array
     {
         try
         {
@@ -139,17 +160,34 @@ class ProductSearchRepository extends ElasticSearchRepository
                 "aggs"=> $aggregate
             ];
     
-            $fetched = $this->searchIndex($query);
-    
-            foreach($this->staticFilterKeys as $field) 
+            $fetched = $this->searchIndex($query, $store);
+
+            $fetched["aggregations"]["size"]["buckets"] = array_merge($fetched["aggregations"]["size"]["buckets"], $fetched["aggregations"]["configurable_size"]["buckets"]);
+            
+            foreach(["color", "size", "collection"] as $field) 
             {
-                $filter[$field] = collect($fetched["aggregations"][$field]["buckets"])->map(function($bucket, $key) use($fetched, $field) {
-                    return [
-                        "label" => $fetched["aggregations"]["{$field}_value"]["buckets"][$key]["key"],
-                        "value" =>  $bucket["key"]  
-                    ];
-                });
+                $state = [];
+                $filter[$field] = collect($fetched["aggregations"][$field]["buckets"])->map(function($bucket) use(&$state) {
+                    if(!in_array($bucket["key"], $state)) {
+                        $state[] = $bucket["key"];
+                        return [
+                            "label" => AttributeOption::find($bucket["key"])?->name,
+                            "value" =>  $bucket["key"]  
+                        ];
+                    }
+                })->filter()->values();
             } 
+
+            $filter["sort_by"] = [
+                [
+                    "label" => "sort_by_name",
+                    "value" =>  "asc"
+                ],
+                [
+                    "label" => "sort_by_price",
+                    "value" =>  "asc"
+                ]
+            ];
         }
         catch (Exception $exception)
         {
@@ -159,10 +197,13 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $filter;
     }
 
-    public function finalQuery(array $query, ?int $page = 1, ?int $limit = 10, ?array $sort = []): ?array
+    public function finalQuery(array $query, object $request, ?array $sort = [], object $store): ?array
     {
         try
         {
+            $page = $request->page ?? 1;
+            $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
+
             $fetched = [
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
@@ -173,7 +214,8 @@ class ProductSearchRepository extends ElasticSearchRepository
                     ["id" => ["order" => "asc", "mode" => "avg"]]
                 ],
             ];
-            $data =  $this->searchIndex($fetched);     
+
+            $data =  $this->searchIndex($fetched, $store);     
         }
         catch (Exception $exception)
         {
@@ -214,7 +256,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $indexed = $this->model->whereIn('id', $request->ids)->get();
 			if ($callback) $callback($indexed);
-            BulkIndexing::dispatch($indexed);
+            // BulkIndexing::dispatch($indexed);
         }
         catch (Exception $exception)
         {
