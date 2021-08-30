@@ -151,9 +151,10 @@ class CategoryController extends BaseController
                 "scope" => "required|in:website,channel,store",
                 "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
             ]), function () use ($id, $request) {
+                $catgeory = $this->model->findOrFail($id);
                 return [
-                    "parent_id" => $request->parent_id ?? null,
-                    "website_id" => $this->model->findOrFail($id)->website_id
+                    "parent_id" => $catgeory->parent_id,
+                    "website_id" => $catgeory->website_id
                 ];
             });
             

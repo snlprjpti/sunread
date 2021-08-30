@@ -10,13 +10,13 @@ class CustomerAccountResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "name" => $this->name,
+            "full_name" => $this->name,
             "first_name" => $this->first_name,
+            "middle_name" => $this->middle_name,
             "last_name" => $this->last_name,
+            "email" => $this->email,
             "gender" => $this->gender,
             "date_of_birth" => $this->date_of_birth,
-            "email" => $this->email,
-            "status" => (bool) $this->status,
             "addresses" => CustomerAddressResource::collection($this->whenLoaded("addresses")),
             "profile_image" => $this->profile_image_url,
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,

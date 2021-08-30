@@ -6,6 +6,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Exception;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Entities\Website;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
 use Modules\Page\Repositories\StoreFront\PageRepository;
@@ -21,15 +23,37 @@ class PageController extends BaseController
         $this->model = $page;
         $this->model_name = "Page";
 
-        $this->middleware('validate.website.host')->only(['show']);
+        $this->middleware('validate.website.host')->only(['show', 'index']);
         $this->middleware('validate.store.code')->only(['show']);
 
         parent::__construct($this->model, $this->model_name);
     }
 
+    public function collection(object $data): ResourceCollection
+    {
+        return PageResource::collection($data);
+    }
+
     public function resource(object $data): JsonResource
     {
         return new PageResource($data);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
+            $fetched = $this->repository->fetchAll($request, callback:function () use ($website) {
+                return $this->model->whereWebsiteId($website->id);
+            });
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
     public function show(Request $request, string $slug): JsonResponse

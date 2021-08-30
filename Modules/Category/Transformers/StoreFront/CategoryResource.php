@@ -8,11 +8,10 @@ use Modules\Core\Entities\Store;
 class CategoryResource extends JsonResource
 {
     public function toArray($request): array
-    { 
-        $store = Store::whereCode($request->header("hc-store"))->first(); 
+    {  
         $data = [
             "scope" => "store",
-            "scope_id" => $store->id
+            "scope_id" => $request->sf_store->id
         ];
 
         return [
