@@ -16,7 +16,7 @@ trait HasAttributeScope
     {
         $existAttributeData = $this->product_attributes()->where($data)->first();
         $default = $existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($data);
-        return json_decode($default);
+        return is_json($default) ? json_decode($default) : $default;
     }
 
     public function getDefaultValues(array $data): mixed

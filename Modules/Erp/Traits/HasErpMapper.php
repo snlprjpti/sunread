@@ -11,7 +11,7 @@ use Modules\Erp\Jobs\ImportErpData;
 
 trait HasErpMapper
 {
-    protected $url = "https://bc.sportmanship.se:7148/sportmanshipbctestapi/api/NaviproAB/web/beta/";
+    protected $url = "https://bc.sportmanship.se:7148/sportmanshipbcprodapi/api/NaviproAB/web/beta/";
 
     private function basicAuth(): object
     {
@@ -26,16 +26,6 @@ trait HasErpMapper
                 ImportErpData::dispatch($type, $response_json_array);
                 get_class()::dispatch($new_skip_token);
             });
-
-            // return $this->generateCollection($response_json, $type);
-
-            // Cache::forget($type);
-            // Cache::rememberForever($type, function () use ($response_json, $type) {
-            //     // get all values fron erp api
-            //     return $this->generateCollection($response_json, $type);
-            // });
-
-            // JobsErpImport::dispatch($type);
         }
         catch ( Exception $exception )
         {

@@ -3,21 +3,27 @@
 namespace Modules\Core\Tests;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Website;
 use Tests\TestCase;
 
-class VisitorBaseTestCase extends TestCase
+class StoreFrontBaseTestCase extends TestCase
 {
     use DatabaseTransactions;
 
-    public $model, $model_name, $route_prefix, $filter, $default_resource_id, $fake_resource_id, $factory_count, $append_to_route; 
+    public $model, $model_name, $route_prefix, $filter, $default_resource, $default_resource_slug, $fake_resource, $factory_count, $append_to_route, $website, $channel, $store; 
+    protected array $headers;
+    public $createFactories, $hasFilters, $hasIndexTest, $hasShowTest, $hasWebsiteHost, $hasChannel, $hasStore;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->factory_count = 2;
-        $this->default_resource_id = $this->model::latest('id')->first()->id;
-        $this->fake_resource_id = 0;
+        $this->default_resource = $this->model::latest('id')->first();
+        $this->default_resource_slug = $this->default_resource->slug;
+        $this->fake_resource = 0;
         $this->filter = [
             "sort_by" => "id",
             "sort_order" => "asc"
@@ -26,13 +32,51 @@ class VisitorBaseTestCase extends TestCase
         $this->createFactories = true;
         $this->hasFilters = true;
         $this->hasIndexTest = true;
-        $this->hasShowTest = true;  
+        $this->hasShowTest = true;
+
+        $this->hasWebsiteHost = true;
+        $this->hasChannel = true;
+        $this->hasStore = true;  
+
+    }
+
+    public function createHeader(): void
+    {
+        $this->website = Website::factory()->create();
+
+        if ($this->hasWebsiteHost) $this->headers["hc-host"] = $this->website->hostname;
+        if ($this->hasChannel) {
+            $this->channel = $this->createChannel();
+            $this->headers["hc-channel"] = $this->channel->code;
+        } 
+        if ($this->hasStore) {
+            $this->channel = $this->channel ?? $this->createChannel();
+            $this->store = $this->createStore();
+            $this->headers["hc-store"] = $this->store->code;
+        }
+    }
+
+    public function createChannel(): object
+    {
+        $channelData = array_merge(Channel::factory()->make()->toArray(), [
+            "website_id" => $this->website->id
+        ]);
+        return Channel::create($channelData); 
+    }
+
+    public function createStore(): object
+    {
+        $storeData = array_merge(Store::factory()->make()->toArray(), [
+            "channel_id" => $this->channel->id
+        ]);
+        return Store::create($storeData);
     }
 
     /*
      * Factory methods 
     */
     public function getCreateData(): array { return $this->model::factory()->make()->toArray(); }
+    public function getDefaultResourceSlug(): object { return $this->default_resource_slug; }
 
     public function getRoute(string $method, ?array $parameters = null): string
     {
@@ -53,7 +97,7 @@ class VisitorBaseTestCase extends TestCase
         if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
 
-        $response = $this->get($this->getRoute("index"));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index"));
 
         $response->assertOk();
         $response->assertJsonFragment([
@@ -67,7 +111,7 @@ class VisitorBaseTestCase extends TestCase
         if ( !$this->hasIndexTest ) $this->markTestSkipped("Index method not available.");
         if ( !$this->hasFilters ) $this->markTestSkipped("Filters not available.");
 
-        $response = $this->get($this->getRoute("index", $this->filter));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
 
         $response->assertOk();
         $response->assertJsonFragment([
@@ -80,7 +124,7 @@ class VisitorBaseTestCase extends TestCase
     {
         if ( !$this->hasShowTest ) $this->markTestSkipped("Show method not available.");
 
-        $response = $this->get($this->getRoute("show", [$this->default_resource_id]));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->default_resource_slug]));
 
         $response->assertOk();
         $response->assertJsonFragment([
@@ -93,7 +137,7 @@ class VisitorBaseTestCase extends TestCase
     {
         if ( !$this->hasShowTest ) $this->markTestSkipped("Show method not available.");
 
-        $response = $this->get($this->getRoute("show", [$this->fake_resource_id]));
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("show", [$this->fake_resource]));
 
         $response->assertNotFound();
         $response->assertJsonFragment([

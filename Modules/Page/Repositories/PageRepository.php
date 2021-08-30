@@ -2,7 +2,6 @@
 
 namespace Modules\Page\Repositories;
 
-use Attribute;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Entities\Store;
@@ -146,24 +145,5 @@ class PageRepository extends BaseRepository
         {
             throw $exception;
         }
-    }
-
-    public function findPage(object $request, string $slug): object
-    {
-        try
-        {
-            $store_code = ($request->hasHeader("store")) ? $request->header("store") : null;
-            $store = $this->store_model->whereCode($store_code)->firstOrFail();
-            $page = $this->model->with("page_attributes")->whereSlug($slug)->firstOrFail();
-            $page_scope = $page->page_scopes()->whereScope("store");
-            $all_scope = (clone $page_scope)->whereScopeId(0)->first();
-            if(!$all_scope) $page = $page_scope->whereScopeId($store->id)->firstOrFail();
-        }
-        catch( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return $page;
     }
 }
