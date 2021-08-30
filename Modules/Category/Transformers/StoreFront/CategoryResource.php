@@ -8,7 +8,7 @@ use Modules\Core\Entities\Store;
 class CategoryResource extends JsonResource
 {
     public function toArray($request): array
-    {
+    {  
         $data = [
             "scope" => "store",
             "scope_id" => $request->sf_store->id
