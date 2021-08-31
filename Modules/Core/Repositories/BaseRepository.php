@@ -38,7 +38,7 @@ class BaseRepository
                 "q" => "sometimes|string|min:1",
                 "without_pagination" => "sometimes|boolean"
             ];
-    
+
             $messages = [
                 "limit.numeric" => "Limit must be a number.",
                 "page.numeric" => "Page must be a number.",
@@ -54,7 +54,7 @@ class BaseRepository
         {
             throw $exception;
         }
-        
+
         return $data;
     }
 
@@ -198,7 +198,7 @@ class BaseRepository
     public function delete(int $id, ?callable $callback = null): object
     {
         DB::beginTransaction();
-        Event::dispatch("{$this->model_key}.delete.before");
+        Event::dispatch("{$this->model_key}.delete.before", $id);
 
         try
         {

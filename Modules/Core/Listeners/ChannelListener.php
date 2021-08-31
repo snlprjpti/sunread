@@ -13,9 +13,9 @@ class ChannelListener
         CoreCache::createChannelCache($channel);
     }
 
-    public function beforeUpdate($channel)
+    public function beforeUpdate($channel_id)
     {
-        CoreCache::updateBeforeChannelCache($channel);
+        CoreCache::updateBeforeChannelCache($channel_id);
     }
 
     public function update($channel)
@@ -23,6 +23,10 @@ class ChannelListener
         CoreCache::updateChannelCache($channel);
     }
 
+    public function beforeDelete($channel_id)
+    {
+        CoreCache::deleteBeforeChannelCache($channel_id);
+    }
     public function delete($channel)
     {
         CoreCache::deleteChannelCache($channel);
