@@ -7,6 +7,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
+use Modules\Tax\Entities\ProductTaxGroup;
 
 trait HasAttributeScope
 {
@@ -22,8 +23,10 @@ trait HasAttributeScope
             $default = $existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($data);
             $fetched = is_json($default) ? json_decode($default) : $default;
     
-            if(in_array( $this->attribute_val->type, $this->non_filterable_fields))  
-            $fetched = is_array($fetched) ? AttributeOption::whereIn("id", $fetched)->get() : AttributeOption::find($fetched);
+            if(in_array( $this->attribute_val->type, $this->non_filterable_fields)) {
+                $attribute_option_class = $this->attribute_val->getConfigOption() ? new ProductTaxGroup() : new AttributeOption();
+                $fetched = is_array($fetched) ? $attribute_option_class->whereIn("id", $fetched)->get() : $attribute_option_class->find($fetched);
+            }
         }
         catch (Exception $exception)
         {
