@@ -9,7 +9,7 @@ use Modules\Core\Entities\Website;
 
 class CoreCacheHelper
 {
-    protected $website, $channel, $store, $old_website_hostname, $old_website_id, $old_channel_code;
+    protected $website, $channel, $store, $old_website_hostname, $old_channel_code;
 
     public function __construct(Website $website, Channel $channel, Store $store)
     {
@@ -48,6 +48,11 @@ class CoreCacheHelper
         Redis::del("sf_website_{$website->hostname}");
         if( count(Redis::keys("sf_c_website_{$website->hostname}_*")) > 0 ) Redis::del(Redis::keys("sf_c_website_{$website->hostname}_*"));
         if( count(Redis::keys("sf_s_website_{$website->hostname}_*")) > 0) Redis::del(Redis::keys("sf_s_website_{$website->hostname}_*"));
+        $channels = $this->channel->whereWebsiteId($website->id)->get();
+        foreach ($channels as $channel)
+        {
+            Redis::del("sf_channel_{$channel->code}");
+        }
     }
 
     public function createChannelCache($channel)
@@ -62,8 +67,8 @@ class CoreCacheHelper
     public function updateBeforeChannelCache($channel)
     {
         $channel = Channel::findOrFail($channel);
-        $this->old_website_id = $channel->website_id;
-        $this->old_channel_code = $channel->channel_code;
+        $this->old_channel_code = $channel->code;
+
         Redis::del("sf_c_website_{$channel->website->hostname}_channel_{$channel->code}");
         Redis::del("sf_channel_{$channel->code}");
     }
@@ -71,10 +76,6 @@ class CoreCacheHelper
     public function updateChannelCache($channel)
     {
         $website_hostname = $channel->website->hostname;
-        if( $this->old_website_id != $channel->website_id ) {
-            $website = $this->website->findOrFail($this->old_website_id);
-            if( count(Redis::keys("sf_s_website_{$website->hostname}_channel_{$channel->code}_store_*")) > 0 ) Redis::del(Redis::keys("sf_s_website_{$website->hostname}_channel_{$channel->code}_store_*"));
-        }
 
         if( $this->old_channel_code != $channel->code ) {
             if( count(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$this->old_channel_code}_store_*")) > 0 ) Redis::del(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$this->old_channel_code}_store_*"));
@@ -89,6 +90,11 @@ class CoreCacheHelper
         Redis::del("sf_c_website_{$channel->website->hostname}_channel_{$channel->code}");
         if( count(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$channel->code}_*")) > 0 ) Redis::del(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$channel->code}_*"));
         Redis::del("sf_channel_{$channel->code}");
+        $stores = $this->store->whereChannelId($channel->id)->get();
+        foreach ($stores as $store)
+        {
+            Redis::del("sf_store_{$store->code}");
+        }
     }
 
     public function createStoreCache($store)
