@@ -87,6 +87,7 @@ class ProductConfigurableRepository extends BaseRepository
             foreach ($request->get("super_attributes") as $super_attribute) {
                 $attribute = $this->attributeCache()->find($super_attribute['attribute_id']);
                 if ($attribute->is_user_defined == 0 && $attribute->type != "select") continue;
+                foreach($super_attribute["value"] as $super_val) $this->product_attribute_repository->singleOptionValidation($attribute, $super_val);
                 $super_attributes[$attribute->id] = $super_attribute["value"];
             }
 
