@@ -36,7 +36,7 @@ class ResolverHelper {
             $websiteData = [];
 
             $fallback_id = config("website.fallback_id");
-            if ($request->hasHeader('hc-host')) $website = CoreCache::getWebsiteCache($request->header('hc-host'));
+            if ($request->hasHeader('hc-host')) $website = CoreCache::getWebsite($request->header('hc-host'));
             else $website = Website::whereId($fallback_id)->setEagerLoads([])->firstOrFail();
             $websiteData = $website?->only(["id","name","code", "hostname"]);
 
@@ -63,7 +63,7 @@ class ResolverHelper {
         {
             $channel_code = $request->header("hc-channel");
 
-            if($channel_code) $channel = CoreCache::getChannelCache($website, $channel_code);
+            if($channel_code) $channel = CoreCache::getChannel($website, $channel_code);
             else {
                 $channel = $this->checkCondition("website_default_channel", $website)?->firstOrFail();
                 if(!$channel) throw ValidationException::withMessages(["Configure the default channel for a website"]);
@@ -83,7 +83,7 @@ class ResolverHelper {
         {
             $store_code = $request->header("hc-store");
 
-            if($store_code) $store = CoreCache::getStoreCache($website, $channel, $store_code);
+            if($store_code) $store = CoreCache::getStore($website, $channel, $store_code);
             else {
                 $store = $this->checkCondition("website_default_store", $website)?->firstOrFail();
                 if(!$store) throw ValidationException::withMessages(["Configure the default store for a website"]);
