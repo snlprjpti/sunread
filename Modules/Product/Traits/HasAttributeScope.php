@@ -10,13 +10,19 @@ use Modules\Core\Entities\Store;
 
 trait HasAttributeScope
 {
-    protected $non_filterable_fields = [ "select", "multiselect", "checkbox" ];
+    protected $non_filterable_fields = [ "select", "multiselect", "checkbox" ], $attribute_val;
 
     public function value(array $data): mixed
     {
+        $this->attribute_val = Attribute::findorFail($data["attribute_id"]);
+
         $existAttributeData = $this->product_attributes()->where($data)->first();
         $default = $existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($data);
-        return is_json($default) ? json_decode($default) : $default;
+        $fetched = is_json($default) ? json_decode($default) : $default;
+
+        if(in_array( $this->attribute_val->type, $this->non_filterable_fields))  
+        $fetched = is_array($fetched) ? AttributeOption::whereIn("id", $fetched)->get() : AttributeOption::find($fetched);
+        return $fetched; 
     }
 
     public function getDefaultValues(array $data): mixed
