@@ -99,7 +99,7 @@ class StoreController extends BaseController
             $data = $this->repository->validateData($request,[
                 "code" => "required|unique:stores,code,{$id}"
             ]);
-
+            
             $updated = $this->repository->update($data, $id);
         }
         catch(Exception $exception)
@@ -125,7 +125,7 @@ class StoreController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
-
+    
     public function updateStatus(Request $request, int $id): JsonResponse
     {
         try
