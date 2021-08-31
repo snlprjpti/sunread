@@ -101,7 +101,7 @@ class ProductSearchRepository extends ElasticSearchRepository
     public function getFilterProducts(object $request, int $category_id, object $store): ?array
     {
         $filter = $this->filterAndSort($request, $category_id);
-        return $this->finalQuery($filter["query"], $request, $store, $filter["sort"]);
+        return $this->finalQuery($filter, $request, $store);
     }
 
     public function getProduct(object $request): ?array
@@ -115,7 +115,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             $data[] = $filter["query"];
     
             $query = $this->whereQuery($data);
-            $final_query = $this->finalQuery($query, $request, $filter["sort"]);      
+            $final_query = [];      
         }
         catch (Exception $exception)
         {
@@ -197,7 +197,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $filter;
     }
 
-    public function finalQuery(array $query, object $request, object $store, ?array $sort = []): ?array
+    public function finalQuery(array $filter, object $request, object $store): ?array
     {
         try
         {
@@ -207,10 +207,10 @@ class ProductSearchRepository extends ElasticSearchRepository
             $fetched = [
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
-                "query"=> (count($query) > 0) ? $query : [
+                "query"=> (count($filter["query"]) > 0) ? $filter["query"] : [
                     "match_all"=> (object)[]
                 ],
-                "sort" => (count($sort) > 0) ? $sort : [
+                "sort" => (count($filter["sort"]) > 0) ? $filter["sort"] : [
                     ["id" => ["order" => "asc", "mode" => "avg"]]
                 ],
             ];
