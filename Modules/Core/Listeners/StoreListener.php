@@ -10,10 +10,10 @@ class StoreListener
 {
     public function indexing($store)
     {
-        // $website = $store?->channel?->website;
-        // $products = Product::whereWebsiteId($website->id)->get();
+        $website = $store?->channel?->website;
+        $products = Product::whereWebsiteId($website->id)->get();
 
-        // $batch = Bus::batch([])->dispatch();
-        // foreach($products as $product) $batch->add(new SingleIndexing($product, $store));
+        $batch = Bus::batch([])->dispatch();
+        foreach($products as $product) $batch->add(new SingleIndexing($product, $store));
     }
 }
