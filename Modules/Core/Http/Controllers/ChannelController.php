@@ -11,7 +11,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Repositories\ChannelRepository;
 use Modules\Core\Transformers\ChannelResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Rules\FQDN;
 
@@ -42,7 +41,6 @@ class ChannelController extends BaseController
     {
         try
         {
-            dd(Cache::get("channel_fugit-quia-amet"));
             $fetched = $this->repository->fetchAll($request, [ "website", "stores" ],  function () use ($request) {
                 $request->validate([
                     "website_id" => "sometimes|exists:websites,id"
@@ -91,8 +89,8 @@ class ChannelController extends BaseController
 
     public function update(Request $request, int $id): JsonResponse
     {
-        // try
-        // {
+        try
+        {
             $data = $this->repository->validateData($request, [
                 "code" => "required|unique:channels,code,{$id}",
                 "hostname" => [ "nullable", "unique:websites,hostname", "unique:channels,hostname,{$id}", new FQDN()]
@@ -101,11 +99,11 @@ class ChannelController extends BaseController
             if(isset($data['default_store_id'])) $this->repository->defaultStoreValidation($data, $id);
 
             $updated = $this->repository->update($data, $id);
-        // }
-        // catch( Exception $exception )
-        // {
-        //     return $this->handleException($exception);
-        // }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
 
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
