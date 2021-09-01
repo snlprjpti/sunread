@@ -19,6 +19,8 @@ variables:
   ELASTIC_PREFIX: sail_racing_store_
   QUEUE_CONNECTION: database
   APP_ENV: ci
+  REDIS_PASSWORD: Hdl@Hz876!
+
 cache:
   key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
 
