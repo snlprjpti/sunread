@@ -2,6 +2,7 @@
 
 namespace Modules\Category\Traits;
 
+use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\CategoryValue;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
@@ -71,8 +72,10 @@ trait HasScope
     public function value(array $data, string $attribute): mixed
     {
         $this->createModel();
+        $elements = collect(config("category.attributes"))->pluck("elements")->flatten(1);
+        $attribute_data = $elements->where("slug", $attribute)->first();
         $data = array_merge($data, [ "attribute" => $attribute], ["category_id" => $this->id]);
         $default = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
-        return $default?->value;
+        return ($attribute_data["type"] == "file" && $default?->value) ? Storage::url($default?->value) : $default?->value;
     }
 }

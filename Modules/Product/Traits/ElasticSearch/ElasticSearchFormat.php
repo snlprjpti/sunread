@@ -57,7 +57,7 @@ trait ElasticSearchFormat
                     "scope_id" => $store->id,
                     "attribute_id" => $attributeId
                 ];
-    
+
                 $data[$attribute->slug] = $this->value($match);
                 if(in_array($attribute->type, $this->options_fields))
                 {

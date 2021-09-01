@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Bus;
 use Modules\Core\Entities\Website;
 use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
+use Modules\Product\Jobs\ConfigurableIndexing;
 use Modules\Product\Jobs\ElasticSearchIndexingJob;
 use Modules\Product\Jobs\SingleIndexing;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,7 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class ElasticSearchImport extends Command
 {
-    protected $signature = 'elasticsearch:import';
+    protected $signature = 'reindexer:reindex';
 
     protected $description = 'Import all the data to the elasticsearch';
 
@@ -26,7 +27,7 @@ class ElasticSearchImport extends Command
 
     public function handle(): void
     {
-        $products = Product::get();
+        $products = Product::whereType("simple")->whereParentId(null)->get();
 
         $batch = Bus::batch([])->dispatch();
         foreach($products as $product)
@@ -36,6 +37,12 @@ class ElasticSearchImport extends Command
             });
             
             foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
+        }
+
+        $variants = Product::whereType("configurable")->get();
+        foreach($variants as $variant)
+        {
+            $batch->add(new ConfigurableIndexing($variant));
         }
         $this->info("All data imported successfully");
     }
