@@ -148,7 +148,7 @@ class ProductSearchRepository extends ElasticSearchRepository
     {
         try
         {
-            $filter = [];
+            $filters = [];
             $data = $this->filterAndSort(category_id:$category_id);
             $aggregate = $this->aggregation();
     
@@ -167,7 +167,8 @@ class ProductSearchRepository extends ElasticSearchRepository
             foreach(["color", "size", "collection"] as $field) 
             {
                 $state = [];
-                $filter[$field] = collect($fetched["aggregations"][$field]["buckets"])->map(function($bucket) use(&$state) {
+                $filter["label"] = $field;
+                $filter["values"] = collect($fetched["aggregations"][$field]["buckets"])->map(function($bucket) use(&$state) {
                     if(!in_array($bucket["key"], $state)) {
                         $state[] = $bucket["key"];
                         return [
@@ -176,17 +177,23 @@ class ProductSearchRepository extends ElasticSearchRepository
                         ];
                     }
                 })->filter()->values();
+                $filters[] = $filter;
+
             } 
 
-            $filter["sort_by"] = [
-                [
-                    "label" => "sort_by_name",
-                    "value" =>  "asc"
-                ],
-                [
-                    "label" => "sort_by_price",
-                    "value" =>  "asc"
+            $filters[] = [
+                "label" => "Sort By",
+                "values" => [
+                    [
+                        "name" => "Name",
+                        "value" =>  "asc"
+                    ],
+                    [
+                        "name" => "Price",
+                        "value" =>  "asc"
+                    ]
                 ]
+                
             ];
         }
         catch (Exception $exception)
@@ -194,7 +201,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             throw $exception;
         }
 
-        return $filter;
+        return $filters;
     }
 
     public function finalQuery(array $filter, object $request, object $store): ?array
