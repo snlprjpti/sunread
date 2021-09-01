@@ -27,7 +27,7 @@ class AttributeSetController extends BaseController
     public function __construct(AttributeSetRepository $attributeSetRepository, AttributeSet $attribute_set, AttributeGroupRepository $attributeGroupRepository, AttributeGroup $attribute_group)
     {
         $this->repository = $attributeSetRepository;
-        $this->model = $attribute_set;
+        $this->model = $attribute_set;store
         $this->group_model = $attribute_group;
         $this->model_name = "Attribute Set";
         $exception_statuses = [
