@@ -130,7 +130,7 @@ trait HasErpValueMapper
             $attribute_data = [
                 [
                     "attribute_id" => $this->getAttributeId("name"),
-                    "value" => $erp_product_iteration->value["description"]
+                    "value" => $erp_product_iteration->value["description"] ?? $erp_product_iteration->sku
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("price"),
