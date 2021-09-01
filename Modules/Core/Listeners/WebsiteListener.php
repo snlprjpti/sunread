@@ -7,13 +7,14 @@ use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Core\Facades\CoreCache;
+use Modules\Core\Jobs\CoreCacheJob;
 
 class WebsiteListener
 {
-//    public function create($website)
-//    {
-//        CoreCache::createWebsiteCache($website);
-//    }
+    public function create($website)
+    {
+        CoreCacheJob::dispatch("createWebsiteCache", $website);
+    }
 //
 //    public function beforeUpdate($website_id)
 //    {

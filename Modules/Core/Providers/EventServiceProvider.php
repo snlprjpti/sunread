@@ -12,7 +12,7 @@ class EventServiceProvider extends ServiceProvider
         // Event::listen('core.stores.create.after', 'Modules\Core\Listeners\StoreListener@indexing');
         // Event::listen('core.stores.update.after', 'Modules\Core\Listeners\StoreListener@indexing');
 //
-//        Event::listen('core.website.create.after', 'Modules\Core\Listeners\WebsiteListener@create');
+        Event::listen('core.website.create.after', 'Modules\Core\Listeners\WebsiteListener@create');
 //        Event::listen('core.website.update.before', 'Modules\Core\Listeners\WebsiteListener@beforeUpdate');
 //        Event::listen('core.website.update.after', 'Modules\Core\Listeners\WebsiteListener@update');
 //        Event::listen('core.website.delete.before', 'Modules\Core\Listeners\WebsiteListener@beforeDelete');
