@@ -2,33 +2,35 @@
 
 namespace Modules\Core\Listeners;
 
-use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Channel;
-use Modules\Core\Facades\CoreCache;
+use Modules\Core\Jobs\CoreCacheJob;
 
 class ChannelListener
 {
-//    public function create($channel)
-//    {
-//        CoreCache::createChannelCache($channel);
-//    }
-//
-//    public function beforeUpdate($channel_id)
-//    {
-//        CoreCache::updateBeforeChannelCache($channel_id);
-//    }
-//
-//    public function update($channel)
-//    {
-//        CoreCache::updateChannelCache($channel);
-//    }
-//
-//    public function beforeDelete($channel_id)
-//    {
-//        CoreCache::deleteBeforeChannelCache($channel_id);
-//    }
-//    public function delete($channel)
-//    {
-//        CoreCache::deleteChannelCache($channel);
-//    }
+    public function create($channel)
+    {
+        CoreCacheJob::dispatch( "createChannelCache", $channel );
+    }
+
+    public function beforeUpdate($channel_id)
+    {
+        $channel = Channel::findOrFail($channel_id);
+        CoreCacheJob::dispatch( "updateBeforeChannelCache", collect($channel) );
+    }
+
+    public function update($channel)
+    {
+        CoreCacheJob::dispatch( "updateChannelCache", $channel );
+    }
+
+    public function beforeDelete($channel_id)
+    {
+        $channel = Channel::findOrFail($channel_id);
+        CoreCacheJob::dispatch( "deleteBeforeChannelCache", collect($channel) );
+    }
+
+    public function delete($channel)
+    {
+        CoreCacheJob::dispatch( "deleteChannelCache", collect($channel) );
+    }
 }

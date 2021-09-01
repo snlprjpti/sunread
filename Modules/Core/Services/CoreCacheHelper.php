@@ -21,118 +21,171 @@ class CoreCacheHelper
 
     public function createWebsiteCache(object $website)
     {
-        unset($website->channels, $website->stores);
+        try {
+            unset($website->channels, $website->stores);
 
-        Redis::set("sf_website_{$website->hostname}", $website);
+            Redis::set("sf_website_{$website->hostname}", $website);
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
     public function updateBeforeWebsiteCache(object $website)
     {
-        $this->old_website_hostname = $website->hostname;
-        Redis::del("sf_website_{$website->hostname}");
+        try {
+            $this->old_website_hostname = $website["hostname"];
+            Redis::del("sf_website_{$website["hostname"]}");
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
     public function updateWebsiteCache(object $website)
     {
-        unset($website->channels, $website->stores);
-        if( $this->old_website_hostname != $website->hostname ) {
-            if( count(Redis::keys("sf_c_website_{$this->old_website_hostname}_*")) > 0 ) Redis::del(Redis::keys("sf_c_website_{$this->old_website_hostname}_*"));
-            if( count(Redis::keys("sf_s_website_{$this->old_website_hostname}_*")) > 0) Redis::del(Redis::keys("sf_s_website_{$this->old_website_hostname}_*"));
-        }
+        try {
+            unset($website->channels, $website->stores);
+            if( $this->old_website_hostname != $website->hostname ) {
+                if( count(Redis::keys("sf_c_website_{$this->old_website_hostname}_*")) > 0 ) Redis::del(Redis::keys("sf_c_website_{$this->old_website_hostname}_*"));
+                if( count(Redis::keys("sf_s_website_{$this->old_website_hostname}_*")) > 0) Redis::del(Redis::keys("sf_s_website_{$this->old_website_hostname}_*"));
+            }
 
-        Redis::set("sf_website_{$website->hostname}", $website);
+            Redis::set("sf_website_{$website->hostname}", $website);
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
     public function deleteBeforeWebsiteCache(object $website)
     {
-        $channels = $this->channel->whereWebsiteId($website->id)->get();
-        foreach ($channels as $channel)
-        {
-            Redis::del("sf_channel_{$channel->code}");
+        try {
+            $channels = $this->channel->whereWebsiteId($website["id"])->get();
+            if($channels) {
+                foreach ($channels as $channel) {
+                    Redis::del("sf_channel_{$channel->code}");
+
+                    $stores = $this->store->whereStoreId($channel->id)->get();
+                    if ($stores) foreach ($stores as $store) Redis::del("sf_store_{$store->code}");
+                }
+            }
         }
-        $stores = $this->website->find($website->id)->channels->mapWithKeys(function ($channel) {
-            return $channel->stores;
-        });
-        foreach ($stores as $store)
-        {
-            Redis::del("sf_store_{$store->code}");
+        catch( Exception $exception ) {
+            return $exception->getMessage();
         }
     }
 
     public function deleteWebsiteCache(object $website)
     {
-        Redis::del("sf_website_{$website->hostname}");
-        if( count(Redis::keys("sf_c_website_{$website->hostname}_*")) > 0 ) Redis::del(Redis::keys("sf_c_website_{$website->hostname}_*"));
-        if( count(Redis::keys("sf_s_website_{$website->hostname}_*")) > 0) Redis::del(Redis::keys("sf_s_website_{$website->hostname}_*"));
+        try {
+            Redis::del("sf_website_{$website["hostname"]}");
+            if( count(Redis::keys("sf_c_website_{$website["hostname"]}_*")) > 0 ) Redis::del(Redis::keys("sf_c_website_{$website["hostname"]}_*"));
+            if( count(Redis::keys("sf_s_website_{$website["hostname"]}_*")) > 0) Redis::del(Redis::keys("sf_s_website_{$website["hostname"]}_*"));
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
     public function createChannelCache(object $channel)
     {
-        $website_hostname = $channel->website->hostname;
+        try {
+            $website_hostname = $channel->website->hostname;
 
-        unset($channel->website, $channel->stores);
-        Redis::set("sf_c_website_{$website_hostname}_channel_{$channel->code}", $channel);
-        Redis::set("sf_channel_{$channel->code}", $channel);
+            unset($channel->website, $channel->stores);
+            Redis::set("sf_c_website_{$website_hostname}_channel_{$channel->code}", $channel);
+            Redis::set("sf_channel_{$channel->code}", $channel);
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
-    public function updateBeforeChannelCache(int $channel)
+    public function updateBeforeChannelCache(object $channel)
     {
-        $channel = Channel::findOrFail($channel);
-        $this->old_channel_code = $channel->code;
+        try {
+            $website = $this->website->findOrFail($channel["website_id"]);
+            $this->old_channel_code = $channel["code"];
 
-        Redis::del("sf_c_website_{$channel->website->hostname}_channel_{$channel->code}");
-        Redis::del("sf_channel_{$channel->code}");
+            Redis::del("sf_c_website_{$website->hostname}_channel_{$channel["code"]}");
+            Redis::del("sf_channel_{$channel["code"]}");
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
     public function updateChannelCache(object $channel)
     {
-        $website_hostname = $channel->website->hostname;
+        try {
+            $website_hostname = $channel->website->hostname;
 
-        if( $this->old_channel_code != $channel->code ) {
-            if( count(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$this->old_channel_code}_store_*")) > 0 ) Redis::del(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$this->old_channel_code}_store_*"));
+            if( $this->old_channel_code != $channel->code ) {
+                if( count(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$this->old_channel_code}_store_*")) > 0 ) Redis::del(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$this->old_channel_code}_store_*"));
+            }
+            unset($channel->website, $channel->stores);
+            Redis::set("sf_c_website_{$website_hostname}_channel_{$channel->code}", $channel);
+            Redis::set("sf_channel_{$channel->code}", $channel);
         }
-        unset($channel->website, $channel->stores);
-        Redis::set("sf_c_website_{$website_hostname}_channel_{$channel->code}", $channel);
-        Redis::set("sf_channel_{$channel->code}", $channel);
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
-    public function deleteBeforeChannelCache(int $channel_id)
+    public function deleteBeforeChannelCache(object $channel)
     {
-        $stores = $this->store->whereChannelId($channel_id)->get();
-        foreach ($stores as $store)
-        {
-            Redis::del("sf_store_{$store->code}");
+        try {
+            $stores = $this->store->whereChannelId($channel["id"])->get();
+            foreach ($stores as $store)
+            {
+                Redis::del("sf_store_{$store->code}");
+            }
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
         }
     }
 
     public function deleteChannelCache(object $channel)
     {
-        Redis::del("sf_c_website_{$channel->website->hostname}_channel_{$channel->code}");
-        if( count(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$channel->code}_*")) > 0 ) Redis::del(Redis::keys("sf_s_website_{$channel->website->hostname}_channel_{$channel->code}_*"));
-        Redis::del("sf_channel_{$channel->code}");
+        try {
+            $website = $this->website->findOrFail($channel["website_id"]);
+
+            Redis::del("sf_c_website_{$website->hostname}_channel_{$channel["code"]}");
+            if( count(Redis::keys("sf_s_website_{$website->hostname}_channel_{$channel["code"]}_*")) > 0 ) Redis::del(Redis::keys("sf_s_website_{$website->hostname}_channel_{$channel["code"]}_*"));
+            Redis::del("sf_channel_{$channel["code"]}");
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
     public function createStoreCache(object $store)
     {
-        $channel = $store->channel;
-        $store["website_id"] = $channel->website->id;
+        try {
+            $channel = $store->channel;
+            $store["website_id"] = $channel->website->id;
 
-        unset($store->channel, $store->website);
-        Redis::set("sf_s_website_{$channel->website->hostname}_channel_{$channel->code}_store_{$store->code}", $store);
-        Redis::set("sf_store_{$store->code}", $store);
-    }
-
-    public function updateBeforeStoreCache(int $store)
-    {
-        $store = Store::findOrFail($store);
-        Redis::del("sf_s_website_{$store->channel->website->hostname}_channel_{$store->channel->code}_store_{$store->code}");
-        Redis::del("sf_store_{$store->code}");
+            unset($store->channel, $store->website);
+            Redis::set("sf_s_website_{$channel->website->hostname}_channel_{$channel->code}_store_{$store->code}", $store);
+            Redis::set("sf_store_{$store->code}", $store);
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
     public function deleteStoreCache(object $store)
     {
-        Redis::del("sf_s_website_{$store->channel->website->hostname}_channel_{$store->channel->code}_store_{$store->code}");
-        Redis::del("sf_store_{$store->code}");
+        try {
+            $channel = $this->channel->findOrFail($store["channel_id"]);
+            Redis::del("sf_s_website_{$channel->website->hostname}_channel_{$channel->code}_store_{$store["code"]}");
+            Redis::del("sf_store_{$store["code"]}");
+        }
+        catch( Exception $exception ) {
+            return $exception->getMessage();
+        }
     }
 
     public function getWebsite(string $website_hostname): ?object

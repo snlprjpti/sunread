@@ -15,7 +15,6 @@ class WebsiteListener
     public function beforeUpdate($website_id)
     {
         $website = Website::findOrFail($website_id);
-//        dd(collect($website));
         CoreCacheJob::dispatch( "updateBeforeWebsiteCache", collect($website) );
     }
 
@@ -27,11 +26,11 @@ class WebsiteListener
     public function beforeDelete($website_id)
     {
         $website = Website::findOrFail($website_id);
-        CoreCacheJob::dispatch( "deleteBeforeWebsiteCache", $website );
+        CoreCacheJob::dispatch( "deleteBeforeWebsiteCache", collect($website) );
     }
 
     public function delete($website)
     {
-        CoreCacheJob::dispatch( "deleteWebsiteCache", $website );
+        CoreCacheJob::dispatch( "deleteWebsiteCache", collect($website) );
     }
 }

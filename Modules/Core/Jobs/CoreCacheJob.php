@@ -21,10 +21,8 @@ class CoreCacheJob implements ShouldQueue
         $this->data = $data;
     }
 
-
     public function handle(): void
     {
-        dd($this->data);
         $function = $this->method;
         CoreCache::$function($this->data);
     }

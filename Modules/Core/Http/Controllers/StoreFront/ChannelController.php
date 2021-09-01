@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Redis;
 use Modules\Core\Repositories\StoreFront\ChannelRepository;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Http\Controllers\BaseController;
@@ -35,6 +36,8 @@ class ChannelController extends BaseController
     {
         try
         {
+//            Redis::del(Redis::keys("*"));
+            dd(Redis::keys("*"));
             $fetched = $this->repository->getChannelList($request);
         }
         catch( Exception $exception )
