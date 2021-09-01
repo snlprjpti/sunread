@@ -16,6 +16,7 @@ use Modules\Core\Entities\Channel;
 use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Jobs\Mapper\ErpDetailStatusUpdate;
 use Modules\Erp\Jobs\Mapper\ErpGenerateVariantProductJob;
+use Modules\Erp\Jobs\Mapper\ErpMigrateAttributeConfigurableProduct;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
@@ -128,67 +129,67 @@ trait HasErpValueMapper
 
             $attribute_data = [
                 [
-                    "attribute_id" => $attribute->whereSlug("name")->first()->id,
-                    "value" => $erp_product_iteration->value["description"]
+                    "attribute_id" => $this->getAttributeId("name"),
+                    "value" => $erp_product_iteration->value["description"] ?? $erp_product_iteration->sku
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("price")->first()->id,
+                    "attribute_id" => $this->getAttributeId("price"),
                     "value" => $price_value["unitPrice"], 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("special_from_date")->first()->id,
+                    "attribute_id" => $this->getAttributeId("special_from_date"),
                     "value" => Carbon::parse(date("Y-m-d", $start_time)), 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("special_to_date")->first()->id,
+                    "attribute_id" => $this->getAttributeId("special_to_date"),
                     "value" => Carbon::parse(date("Y-m-d", $end_time)), 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("visibility")->first()->id,
+                    "attribute_id" => $this->getAttributeId("visibility"),
                     "value" => $visibility, 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("description")->first()->id,
+                    "attribute_id" => $this->getAttributeId("description"),
                     "value" => $description, 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("short_description")->first()->id,
+                    "attribute_id" => $this->getAttributeId("short_description"),
                     "value" => Str::limit($description, 100), 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("meta_keywords")->first()->id,
+                    "attribute_id" => $this->getAttributeId("meta_keywords"),
                     "value" => $description, 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("meta_title")->first()->id,
+                    "attribute_id" => $this->getAttributeId("meta_title"),
                     "value" => $erp_product_iteration->value["description"], 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("meta_description")->first()->id,
+                    "attribute_id" => $this->getAttributeId("meta_description"),
                     "value" => $description, 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("status")->first()->id,
+                    "attribute_id" => $this->getAttributeId("status"),
                     "value" => 1, 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("color")->first()->id,
+                    "attribute_id" => $this->getAttributeId("color"),
                     "value" => $this->getAttributeOptionValue($erp_product_iteration, "color"), 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("size")->first()->id,
+                    "attribute_id" => $this->getAttributeId("size"),
                     "value" => ($this->getDetailCollection("productVariants", $erp_product_iteration->sku)->count() > 1) ? $this->getAttributeOptionValue($variant, "size") : "", 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("features")->first()->id,
+                    "attribute_id" => $this->getAttributeId("features"),
                     "value" => $this->getAttributeValue($product, $erp_product_iteration ,"Features" ), 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("size-and-care")->first()->id,
+                    "attribute_id" => $this->getAttributeId("size-and-care"),
                     "value" => $this->getAttributeValue($product, $erp_product_iteration ,"Size and care" ), 
                 ],
                 [
-                    "attribute_id" => $attribute->whereSlug("ean-code")->first()->id,
+                    "attribute_id" => $this->getAttributeId("ean-code"),
                     "value" => $ean_code_value, 
                 ],
             ];
@@ -220,6 +221,20 @@ trait HasErpValueMapper
         }
     }
 
+    public function getAttributeId(string $slug): ?int
+    {
+        try
+        {
+            $attribute_id = Attribute::whereSlug($slug)->first()?->id;
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $attribute_id;
+    }
+
     private function storeScopeWiseValue(mixed $prices, object $product): bool
     {
         try
@@ -238,17 +253,17 @@ trait HasErpValueMapper
                 $attribute = new Attribute();
                 return [ 
                     [
-                        "attribute_id" => $attribute->whereSlug("price")->first()->id,
+                        "attribute_id" => $this->getAttributeId("price"),
                         "value" => $price_value["unitPrice"],
                         "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"] 
                     ],
                     [
-                        "attribute_id" => $attribute->whereSlug("special_from_date")->first()->id,
+                        "attribute_id" => $this->getAttributeId("special_from_date"),
                         "value" => Carbon::parse(date("Y-m-d", $start_time)),
                         "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
                     ],
                     [
-                        "attribute_id" => $attribute->whereSlug("special_to_date")->first()->id,
+                        "attribute_id" => $this->getAttributeId("special_to_date"),
                         "value" => Carbon::parse(date("Y-m-d", $end_time)),
                         "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
                     ] 
@@ -461,15 +476,7 @@ trait HasErpValueMapper
 
                     if ( !empty($variant['pfVerticalComponentCode']) )
                     {
-                        $configurable_product_attributes = [];
-                        $attribute_option = AttributeOption::whereCode($variant['pfVerticalComponentCode'])->first();
-                        if ($attribute_option)
-                        {
-                            $configurable_product_attributes["product_id"] = $variant_product->id;
-                            $configurable_product_attributes["attribute_id"] = $attribute_option->attribute_id;
-                            $configurable_product_attributes["attribute_option_id"] = $attribute_option->id;
-                            AttributeConfigurableProduct::updateOrCreate($configurable_product_attributes);
-                        }
+                        ErpMigrateAttributeConfigurableProduct::dispatch($variant_product, $variant);
                     }
 
                     $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
