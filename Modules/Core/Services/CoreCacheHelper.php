@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Exception;
 
 class CoreCacheHelper
 {
@@ -25,9 +26,8 @@ class CoreCacheHelper
         Redis::set("sf_website_{$website->hostname}", $website);
     }
 
-    public function updateBeforeWebsiteCache(int $website_id)
+    public function updateBeforeWebsiteCache(object $website)
     {
-        $website = Website::findOrFail($website_id);
         $this->old_website_hostname = $website->hostname;
         Redis::del("sf_website_{$website->hostname}");
     }
@@ -43,14 +43,14 @@ class CoreCacheHelper
         Redis::set("sf_website_{$website->hostname}", $website);
     }
 
-    public function deleteBeforeWebsiteCache(int $website_id)
+    public function deleteBeforeWebsiteCache(object $website)
     {
-        $channels = $this->channel->whereWebsiteId($website_id)->get();
+        $channels = $this->channel->whereWebsiteId($website->id)->get();
         foreach ($channels as $channel)
         {
             Redis::del("sf_channel_{$channel->code}");
         }
-        $stores = $this->website->find($website_id)->channels->mapWithKeys(function ($channel) {
+        $stores = $this->website->find($website->id)->channels->mapWithKeys(function ($channel) {
             return $channel->stores;
         });
         foreach ($stores as $store)
