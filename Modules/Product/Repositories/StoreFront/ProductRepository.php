@@ -84,11 +84,51 @@ class ProductRepository extends BaseRepository
                                            
                    ], 
                 ];
-                // dump($product->variants->pluck("id"));
                 $variant_ids = $product->variants->pluck("id")->toArray();
-                $attribute_configurable_products = AttributeConfigurableProduct::whereIn("product_id", $variant_ids)->with(["attribute", "attribute_option"])->get();
+                $attribute_configurable_products = AttributeConfigurableProduct::whereIn("product_id", $variant_ids)
+                ->with([ "product", "attribute", "attribute_option", "attribute_option.attribute"])->get();
                 
-                // dd($attribute_configurable_products->groupBy("attribute_id"));
+                $configurable_products = [];
+                foreach( $attribute_configurable_products->groupBy("attribute_id") as $index => $group_products )
+                {
+                    $initial_attribute_id = $group_products->first()?->attribute_id;
+                    $configurable_products[] = [
+                        "attribute_id" => $group_products->first()?->attribute_id,
+                        "name" => $group_products->first()?->attribute->name,
+                        "slug" => $group_products->first()?->attribute->slug,
+                        "values" => $group_products->unique("attribute_option_id")->map(function ($group_product_value) use ($attribute_configurable_products, $initial_attribute_id) {
+                            $initial_attribute_option_id = $group_product_value->attribute_option_id; 
+                            return [
+                                "option_id" => $group_product_value->attribute_option_id,
+                                "name" => $group_product_value->attribute_option->name,
+                                "code" => $group_product_value->attribute_option->code,
+                                "bundle_product_options" => $attribute_configurable_products
+                                ->where("attribute_id", "<>", $initial_attribute_id)
+                                ->unique("attribute_id")
+                                ->map( function ($bundle_product_option) use ($attribute_configurable_products, $initial_attribute_option_id, $initial_attribute_id) {
+                                    return [
+                                        "attribute_id" => $bundle_product_option->attribute_id,
+                                        "name" => $bundle_product_option->attribute->name,
+                                        "slug" => $bundle_product_option->attribute->slug,
+                                        "link_products" => $attribute_configurable_products
+                                        ->where("attribute_id", $initial_attribute_id)
+                                        ->where("attribute_option_id", $initial_attribute_option_id)
+                                        ->map( function ($link_product) {
+                                            return [
+                                                "sku" => $link_product->product->sku 
+                                            ];
+                                        })->toArray()
+                                    ];
+                                })->toArray(),
+                            ];
+                        })->toArray(),
+                    ];
+                }
+
+                dd($configurable_products);
+
+
+
 
 
                $configurable_products = $attribute_configurable_products->groupBy("attribute_id")->map(function ($group_attribute) {
@@ -103,11 +143,11 @@ class ProductRepository extends BaseRepository
                                 "option_id" => $configurable_attribute->attribute_option_id,
                                 "name" => $configurable_attribute->attribute_option->name,
                                 "code" => $configurable_attribute->attribute_option->code,
-
+                                "bundel_product_options" => ""
                             ];
-                        }),
+                        })->toArray(),
                     ];
-                });
+                })->toArray();
                 dd($configurable_products);
                 dd("asd");
                 dd($attribute_configurable_products->groupBy("attribute_id"));
