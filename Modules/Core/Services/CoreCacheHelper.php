@@ -189,7 +189,7 @@ class CoreCacheHelper
             $keys = Redis::keys("sf_c_website_{$website->hostname}_*");
         }
 
-        return Redis::mget($keys);
+        return $keys ? Redis::mget($keys) : null;
     }
 
     public function getWebsiteAllStore(object $website): ?array
@@ -210,7 +210,7 @@ class CoreCacheHelper
             $keys = Redis::keys("sf_s_website_{$website->hostname}_*");
         }
 
-        return Redis::mget($keys);
+        return $keys ? Redis::mget($keys) : null;
     }
 
     public function getChannelAllStore(object $website, object $channel): ?array
@@ -229,7 +229,7 @@ class CoreCacheHelper
             $keys = Redis::keys("sf_s_website_{$website->hostname}_channel_{$channel->code}_*");
         }
 
-        return Redis::mget($keys);
+        return $keys ? Redis::mget($keys) : null;
     }
 
     public function getChannelWithoutWebsite(string $channel_code): ?object

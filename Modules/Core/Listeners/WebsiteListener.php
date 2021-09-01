@@ -10,28 +10,28 @@ use Modules\Core\Facades\CoreCache;
 
 class WebsiteListener
 {
-    public function create($website)
-    {
-        CoreCache::createWebsiteCache($website);
-    }
-
-    public function beforeUpdate($website_id)
-    {
-        CoreCache::updateBeforeWebsiteCache($website_id);
-    }
-
-    public function update($website)
-    {
-        CoreCache::updateWebsiteCache($website);
-    }
-
-    public function beforeDelete($website)
-    {
-        CoreCache::deleteBeforeWebsiteCache($website);
-    }
-
-    public function delete($website)
-    {
-        CoreCache::deleteWebsiteCache($website);
-    }
+//    public function create($website)
+//    {
+//        CoreCache::createWebsiteCache($website);
+//    }
+//
+//    public function beforeUpdate($website_id)
+//    {
+//        CoreCache::updateBeforeWebsiteCache($website_id);
+//    }
+//
+//    public function update($website)
+//    {
+//        CoreCache::updateWebsiteCache($website);
+//    }
+//
+//    public function beforeDelete($website)
+//    {
+//        CoreCache::deleteBeforeWebsiteCache($website);
+//    }
+//
+//    public function delete($website)
+//    {
+//        CoreCache::deleteWebsiteCache($website);
+//    }
 }

@@ -9,23 +9,23 @@ use Modules\Core\Facades\CoreCache;
 
 class StoreListener
 {
-    public function create($store)
-    {
-        CoreCache::createStoreCache($store);
-    }
-
-    public function beforeUpdate($store)
-    {
-        CoreCache::updateBeforeStoreCache($store);
-    }
-
-    public function update($store)
-    {
-        CoreCache::createStoreCache($store);
-    }
-
-    public function delete($store)
-    {
-        CoreCache::deleteStoreCache($store);
-    }
+//    public function create($store)
+//    {
+//        CoreCache::createStoreCache($store);
+//    }
+//
+//    public function beforeUpdate($store)
+//    {
+//        CoreCache::updateBeforeStoreCache($store);
+//    }
+//
+//    public function update($store)
+//    {
+//        CoreCache::createStoreCache($store);
+//    }
+//
+//    public function delete($store)
+//    {
+//        CoreCache::deleteStoreCache($store);
+//    }
 }
