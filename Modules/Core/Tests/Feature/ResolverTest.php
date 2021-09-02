@@ -82,14 +82,14 @@ class ResolverTest extends BaseTestCase
         $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
-            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+            "message" => __("core::app.response.not-found", ["name" => "Channel"])
         ]);
     }
 
     public function testStoreCanBeResolved(): void
     {
         $website = Website::first();
-        $this->headers["hc-host"] = $website->hostname;    
+        $this->headers["hc-host"] = $website->hostname;
         $channel = Channel::inRandomOrder()->whereWebsiteId($website->id)->first();
         $this->headers["hc-channel"] = $channel->code;
         $this->headers["hc-store"] = Store::inRandomOrder()->whereChannelId($channel->id)->first()->code;
@@ -110,7 +110,7 @@ class ResolverTest extends BaseTestCase
         $response->assertNotFound();
         $response->assertJsonFragment([
             "status" => "error",
-            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+            "message" => __("core::app.response.not-found", ["name" => "Store"])
         ]);
     }
 }

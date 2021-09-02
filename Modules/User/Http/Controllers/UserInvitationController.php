@@ -22,7 +22,7 @@ class UserInvitationController extends BaseController
         $this->middleware('guest:admin');
 
         $this->model = $admin;
-        $this->model_name = "Admin account";
+        $this->model_name = "Admin";
         $this->repository = $adminRepository;
         $exception_statuses = [
             InvalidInvitationTokenException::class => 403
