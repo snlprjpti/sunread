@@ -144,7 +144,10 @@ class BaseController extends Controller
             break;
 
             case ModelNotFoundException::class:
-                $exception_message = $this->lang('not-found');
+                $class = $exception->getModel();
+                $path = explode('\\', $class);
+                $model  = array_pop($path);
+                $exception_message = $this->lang('not-found', [ 'name' => $model ]);
             break;
 
             case QueryException::class:
@@ -163,7 +166,7 @@ class BaseController extends Controller
     {
         return $this->errorResponse($this->getExceptionMessage($exception), $this->getExceptionStatus($exception));
     }
-    
+
     public function generateFileName(object $file): string
     {
         try
