@@ -71,16 +71,16 @@ trait HasErpValueMapper
                     ]);
         
                     $product = Product::updateOrCreate($match, $product_data);
-                    ErpMigrateProductImageJob::dispatch($product, $detail);
+                    ErpMigrateProductImageJob::dispatchSync($product, $detail);
 
-                    if ($check_variants) ErpGenerateVariantProductJob::dispatch($product, $detail);
+                    if ($check_variants) ErpGenerateVariantProductJob::dispatchSync($product, $detail);
 
                     //visibility attribute value
                     $visibility = ($check_variants) ? 5 : 8;
                     
-                    ErpMigrateProductAttributeJob::dispatch($product, $detail, false, $visibility);
-                    ErpMigrateProductInventoryJob::dispatch($product, $detail);
-                    ErpDetailStatusUpdate::dispatch($detail->id);
+                    ErpMigrateProductAttributeJob::dispatchSync($product, $detail, false, $visibility);
+                    ErpMigrateProductInventoryJob::dispatchSync($product, $detail);
+                    ErpDetailStatusUpdate::dispatchSync($detail->id);
                 }
             }
         }
@@ -419,30 +419,32 @@ trait HasErpValueMapper
                 $data["position"] = $position;
                 $data["product_id"] = $product->id;
                 
+                $type_ids = [];
                 switch ( $image["image_type"] )
                 {
                     case "a" :
-                        $data["main_image"] = 1;
+                        $type_ids[] = 1;
                     break;
         
                     case "b" :
-                        $data["small_image"] = 1;
+                        $type_ids[] = 2;
                     break;
         
                     case "c" :
-                        $data["thumbnail"] = 1;
+                        $type_ids[] = 3;
                     break;
 
                     case "d" :
-                        $data["section_background"] = 1;
+                        $type_ids[] = 4;
                     break;
 
                     default :
-                        $data["gallery"] = 1;
+                        $type_ids[] = 1;
                     break;
                 }
                 
-                ProductImage::updateOrCreate($data);
+               $product_image = ProductImage::updateOrCreate($data);
+               $product_image->types()->sync($type_ids);
             }
         }
     }
@@ -476,14 +478,23 @@ trait HasErpValueMapper
 
                     if ( !empty($variant['pfVerticalComponentCode']) )
                     {
-                        ErpMigrateAttributeConfigurableProduct::dispatch($variant_product, $variant);
+                        $configurable_product_attributes = [];
+                        $attribute_option = AttributeOption::whereCode($variant['pfVerticalComponentCode'])->first();
+                        if ($attribute_option)
+                        {
+                            $configurable_product_attributes["product_id"] = $variant_product->id;
+                            $configurable_product_attributes["attribute_id"] = $attribute_option->attribute_id;
+                            $configurable_product_attributes["attribute_option_id"] = $attribute_option->id;
+                            AttributeConfigurableProduct::updateOrCreate($configurable_product_attributes);
+                        }
+                        // ErpMigrateAttributeConfigurableProduct::dispatchSync($variant_product, $variant);
                     }
 
                     $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
         
-                    ErpMigrateProductImageJob::dispatch($variant_product, $erp_product_iteration, $variant);
-                    ErpMigrateProductAttributeJob::dispatch($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
-                    ErpMigrateProductInventoryJob::dispatch($variant_product, $erp_product_iteration);
+                    ErpMigrateProductImageJob::dispatchSync($variant_product, $erp_product_iteration, $variant);
+                    ErpMigrateProductAttributeJob::dispatchSync($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
+                    ErpMigrateProductInventoryJob::dispatchSync($variant_product, $erp_product_iteration);
                 }
             }
         }
