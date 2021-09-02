@@ -13,7 +13,7 @@ class ErpMigrateProductJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpValueMapper;
 
-    public $tries = 5;
+    public $tries = 10;
     public $timeout = 1200;
 
     public function __construct()
