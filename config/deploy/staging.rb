@@ -39,7 +39,7 @@ task :reload_supervisor do
     puts "==================restart supervisor======================"
     on roles(:all) do
         execute :sudo, :supervisorctl, "restart php_serve"
-        execute :sudo, :supervisorctl, "restart php_queue"
+        execute :sudo, :supervisorctl, "start php_queue:*"
         execute :sudo, :supervisorctl, "restart php_schedule"
         execute :sudo, :supervisorctl, "reread"
         execute :sudo, :supervisorctl, "update"
