@@ -12,6 +12,9 @@ use Modules\Erp\Traits\HasErpValueMapper;
 class ErpMigrateProductImageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasErpValueMapper;
+    
+    public $tries = 10;
+    public $timeout = 1200;
 
     protected $product, $erp_product_iteration, $variant;
 

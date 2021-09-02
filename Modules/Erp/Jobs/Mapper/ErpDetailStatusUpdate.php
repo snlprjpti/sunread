@@ -14,6 +14,9 @@ class ErpDetailStatusUpdate implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 10;
+    public $timeout = 1200;
+
     protected $id;
     
     public function __construct(int $id)
