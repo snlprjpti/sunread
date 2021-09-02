@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 
-class AttributeOptionChildProduct extends Model
+class AttributeOptionsChildProduct extends Model
 {
     protected $fillable = [ "product_id", "attribute_option_id" ];
 

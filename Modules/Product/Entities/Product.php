@@ -89,8 +89,8 @@ class Product extends Model
         return $this->hasMany(AttributeConfigurableProduct::class);
     }
 
-    public function attribute_option_child_products(): HasMany
+    public function attribute_options_child_products(): HasMany
     {
-        return $this->hasMany(AttributeOptionChildProduct::class);
+        return $this->hasMany(AttributeOptionsChildProduct::class);
     }
 }

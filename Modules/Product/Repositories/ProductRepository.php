@@ -342,14 +342,14 @@ class ProductRepository extends BaseRepository
             $fetched["attributes"] = $this->getData($id, $scope);
 
             if ($product->type == "configurable") {
-                $configurable_childs = $this->model->with("attribute_configurable_products")->whereParentId($id)->get();
+                $configurable_childs = $this->model->with("attribute_options_child_products")->whereParentId($id)->get();
 
                 foreach($configurable_childs as $configurable_child)
                 {
-                    $fetched["configurable_attributes"][] = $configurable_child->attribute_configurable_products->map(function ($configurable_attribute) {      
+                    $fetched["configurable_attributes"][] = $configurable_child->attribute_options_child_products->map(function ($configurable_attribute) {      
                         return [
                             "product_id" => $configurable_attribute->product_id,
-                            "attribute_id" => $configurable_attribute->attribute_id,
+                            "attribute_id" => AttributeOption::find($configurable_attribute->attribute_option_id)?->attribute_id,
                             "attribute_option_id" => $configurable_attribute->attribute_option_id
                         ];
                     })->toArray();

@@ -182,7 +182,7 @@ class ProductAttributeRepository extends ProductRepository
 
         try
         {
-            foreach($data as $attribute) { 
+            foreach($data as $attribute) {
                 //removed some attributes in case of configurable products
                 if($product_type && in_array($attribute['attribute_slug'], $this->non_required_attributes)) continue;
 

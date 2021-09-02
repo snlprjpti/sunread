@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Product\Entities\AttributeConfigurableProduct;
+use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Entities\ProductAttributeString;
 use Modules\Product\Entities\ProductAttributeText;
@@ -213,7 +214,6 @@ class ProductConfigurableRepository extends BaseRepository
         {
             $visibility = $this->childVisibilitySetup($variant_options, $variant);
 
-            dump($visibility);
             $product_attributes = array_merge([
                 [
                     // Attrubute name
@@ -227,12 +227,15 @@ class ProductConfigurableRepository extends BaseRepository
                     "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ]
-            ], $productAttributes, $variant_options, $visibility);
+            ], $productAttributes, $variant_options, [ $visibility ]);
 
             $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
 
-            array_map(function($child_attribute) use($variant) {
-                AttributeConfigurableProduct::updateOrCreate(array_merge($child_attribute, [ "product_id" => $variant->id ]));
+            array_map(function($child_attribute_option) use($variant) {
+                AttributeOptionsChildProduct::updateOrCreate([
+                    "attribute_option_id" => $child_attribute_option,
+                    "product_id" => $variant->id 
+                ]);
             }, $this->configurable_attribute_options);
 
             $variant->channels()->sync($request->get("channels"));
@@ -243,48 +246,80 @@ class ProductConfigurableRepository extends BaseRepository
         }
     }
 
-    private function childVisibilitySetup(array $variant_options, object $variant)
+    private function childVisibilitySetup(array $variant_options, object $variant): array
     {
-        if($this->group_by_attribute) $group_by_option = $variant_options[$this->group_by_attribute->attribute_id]["value"];
+        try 
+        {
+            if($this->group_by_attribute) $group_by_option = $variant_options[$this->group_by_attribute->attribute_id]["value"];
 
-        if(isset($group_by_option)) {
-            if(!isset($this->state[$group_by_option])) {
-                $this->state[$group_by_option] = $variant;
-                return $this->getVisibility("Catalog, Search");
+            if(isset($group_by_option)) {
+                if(!isset($this->state[$group_by_option])) {
+                    $this->state[$group_by_option] = $variant;
+                    $visibility = $this->getVisibility("Catalog, Search");
+                }
+                else $visibility = $this->getVisibility("Not Visible Individually");
             }
-            else return $this->getVisibility("Not Visible Individually");
+    
+            else $visibility = $this->getVisibility("Not Visible Individually"); 
         }
-
-        else return $this->getVisibility("Not Visible Individually");   
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        } 
+        
+        return $visibility;
     }
 
-    private function parentVisibilitySetup(object $product, array $scope)
+    private function parentVisibilitySetup(object $product, array $scope): void
     {
-        $this->group_by_attribute = AttributeConfigurableProduct::whereProductId($product->id)->whereUsedInGrouping(1)->first(); 
+        try 
+        {
+            $this->group_by_attribute = AttributeConfigurableProduct::whereProductId($product->id)->whereUsedInGrouping(1)->first(); 
 
-        $parent_product_attributes =  ProductAttribute::where(array_merge($scope, [
-            "product_id" => $product->id,
-            "attribute_id" => 11
-        ]))->first();
-        $product_attribute_string = ProductAttributeString::find($parent_product_attributes->value_id);
+            $parent_product_attributes =  ProductAttribute::where(array_merge($scope, [
+                "product_id" => $product->id,
+                "attribute_id" => 11
+            ]))->first();
+            $product_attribute_string = ProductAttributeString::find($parent_product_attributes->value_id);
 
-        if($this->group_by_attribute) $product_attribute_string->update(["value" => $this->getVisibilityId("Not Visible Individually")]);
-        else $product_attribute_string->update(["value" => $this->getVisibilityId("Catalog, Search")]);
+            if($this->group_by_attribute) $product_attribute_string->update(["value" => $this->getVisibilityId("Not Visible Individually")]);
+            else $product_attribute_string->update(["value" => $this->getVisibilityId("Catalog, Search")]);
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        } 
     }
 
     private function getVisibilityId(string $slug): int
     {
-        $visibility_att = Attribute::whereSlug("visibility")->first();
-        $attribute_option = AttributeOption::whereAttributeId($visibility_att->id)->whereName($slug)->first();
+        try 
+        {
+            $visibility_att = Attribute::whereSlug("visibility")->first();
+            $attribute_option = AttributeOption::whereAttributeId($visibility_att->id)->whereName($slug)->first();
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        } 
         return $attribute_option->id;
     }
 
     private function getVisibility(string $slug): array
     {
-        return [
-            "attribute_slug" => "visibility",
-            "value" => $this->getVisibilityId($slug),
-            "value_type" => "Modules\Product\Entities\ProductAttributeString"
-        ];
+        try 
+        {
+            $visibility =  [
+                "attribute_slug" => "visibility",
+                "value" => $this->getVisibilityId($slug),
+                "value_type" => "Modules\Product\Entities\ProductAttributeString"
+            ];
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        } 
+
+        return $visibility;
     }
 }
