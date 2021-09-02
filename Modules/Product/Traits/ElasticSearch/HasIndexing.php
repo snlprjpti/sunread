@@ -259,7 +259,7 @@ trait HasIndexing
                     ];
                 }
             }
-            $this->client->bulk($params);
+            if(isset($params)) $this->client->bulk($params);
         }
         catch(Exception $exception)
         {
