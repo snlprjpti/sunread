@@ -6,6 +6,8 @@ use Exception;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Website;
+use Modules\Product\Entities\AttributeConfigurableProduct;
+use Modules\Product\Entities\AttributeOptionsChildProduct;
 
 trait ConfigurableProductHandler
 {
@@ -15,33 +17,41 @@ trait ConfigurableProductHandler
     {
         try
         {
+            $items = [];
             $stores = Website::find($parent->website_id)->channels->mapWithKeys(function ($channel) {
                 return $channel->stores;
             });
-            $variants = $parent->variants()->with("categories", "product_attributes", "catalog_inventories")->get();
-
-            $state = [];
-            $items = [];
-            foreach($variants as $variant)
+            $variants = $parent->variants()->with("categories", "product_attributes", "catalog_inventories", "attribute_options_child_products")->get();
+            
+            foreach($stores as $store)
             {
-                $variant_attributes = $variant->attribute_configurable_products()->pluck("attribute_id", "attribute_option_id")->toArray();
-                $color_attribute = Attribute::whereSlug("color")->first();
-                $group_by_attribute = in_array($color_attribute->id, $variant_attributes) ? $color_attribute->id : $variant_attributes[array_key_first($variant_attributes)];
-                $group_by_option = array_keys($variant_attributes, $group_by_attribute)[0];
+                $variant_attribute_options = $variants->map(function($variant) {
+                    return $variant->attribute_options_child_products->pluck("attribute_option_id")->toArray();
+                })->flatten(1)->unique();
 
-                foreach($stores as $store)
+                if ($this->checkVisibility($parent, $store)) {
+                    $product_format = $parent->documentDataStructure($store); 
+                    $items[$parent->id][$store->id] = array_merge($product_format, $this->getAttributeData($variant_attribute_options));
+                }
+                foreach($variants as $variant)
                 {
-                    if(!isset($state[$group_by_option][$store->id])) {
-                        $state[$group_by_option][$store->id] = $variant;
+                    if (!$this->checkVisibility($variant, $store)) continue;
+                    
+                    $product_format = $variant->documentDataStructure($store); 
 
-                        $items[$variant->id][$store->id] = $variant->documentDataStructure($store); 
+                    $group_by_attribute = AttributeConfigurableProduct::whereProductId($parent->id)->whereUsedInGrouping(1)->first();
+                    $is_group_attribute = $variant->value([
+                        "scope" => "store",
+                        "scope_id" => $store->id,
+                        "attribute_id" => $group_by_attribute->attribute_id
+                    ]);
 
-                        $items = $this->getGroupAttributes($items, $variant_attributes, $variant, $store, $group_by_attribute, "main");    
+                    $related_variants = AttributeOptionsChildProduct::whereIn("product_id", $variants->pluck("id")->toArray())->whereAttributeOptionId($is_group_attribute?->id)->get();
+                    if($related_variants) {
+                        $variant_attribute_options = AttributeOptionsChildProduct::whereIn("product_id", $related_variants->pluck("product_id")->toArray())->where("attribute_option_id", "!=", $is_group_attribute?->id)->get()->pluck("attribute_option_id");
                     }
-                    else {
-                        $prev_product = $state[$group_by_option][$store->id];
-                        $items = $this->getGroupAttributes($items, $variant_attributes, $prev_product, $store, $group_by_attribute);  
-                    }
+
+                    $items[$variant->id][$store->id] = array_merge($product_format, $this->getAttributeData($variant_attribute_options));              
                 }
             }
             
@@ -53,30 +63,50 @@ trait ConfigurableProductHandler
         }
     }
 
-    public function getGroupAttributes(array $items, array $variant_attributes, object $variant, object $store, int $group_by_attribute, ?string $main = null): array
+    public function getAttributeData(object $variant_options): array
     {
-        foreach($variant_attributes as $key => $variant_attribute)
+        try
         {
-            if($variant_attribute == $group_by_attribute) continue;
-
-            $attribute_data = Attribute::find($variant_attribute);
-            if($attribute_data) {
-
-                $attribute_option = AttributeOption::find($key);
-                $items[$variant->id][$store->id]["configurable_{$attribute_data->slug}"][] = $key;
-                $items[$variant->id][$store->id]["configurable_{$attribute_data->slug}_value"][] = $attribute_option?->name;
-
-                $items[$variant->id][$store->id]["configurable"][$attribute_data->slug][] = [
-                    "label" => $attribute_option?->name,
-                    "value" => $key
+            $items = [];
+            $variant_options->map(function($variant_option) use(&$items) {
+                $attribute_option = AttributeOption::find($variant_option);
+                
+                $items["configurable_{$attribute_option->attribute->slug}"][] = $variant_option;
+                $items["configurable_{$attribute_option->attribute->slug}_value"][] = $attribute_option->name;
+                $items["configurable"][$attribute_option->attribute->slug][] = [
+                    "label" => $attribute_option->name,
+                    "value" => $variant_option
                 ];
+            }); 
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
-                if($main) unset($items[$variant->id][$store->id][$attribute_data->slug], $items[$variant->id][$store->id]["{$attribute_data->slug}_value"]);   
-            }
-        } 
-        
         return $items;
     }
 
- 
+    public function checkVisibility(object $product, object $store): bool
+    {
+        try
+        {
+            $visibility = Attribute::whereSlug("visibility")->first();
+            $visibility_option = AttributeOption::whereAttributeId($visibility?->id)->whereName("Not Visible Individually")->first();
+
+            $is_visibility = $product->value([
+                "scope" => "store",
+                "scope_id" => $store->id,
+                "attribute_id" => $visibility?->id
+            ]);
+            
+           $bool = ($is_visibility?->id != $visibility_option?->id);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $bool;
+    }
 }
