@@ -17,7 +17,7 @@ class ErpMigrateAttributeConfigurableProduct implements ShouldQueue
 
     protected $product;
 
-    public function __construct(object $product, object $data)
+    public function __construct(mixed $product, mixed $data)
     {
         $this->product = $product;
         $this->data = $data;
