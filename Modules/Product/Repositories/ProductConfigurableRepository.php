@@ -94,14 +94,13 @@ class ProductConfigurableRepository extends BaseRepository
                 foreach($super_attribute["value"] as $super_val) $this->product_attribute_repository->singleOptionValidation($attribute, $super_val);
                 $super_attributes[$attribute->id] = $super_attribute["value"];
 
-                $parent_attributes[] = [
+                $parent_attributes = [
                     "product_id" => $product->id,
-                    "attribute_id" => $super_attribute['attribute_id'],
-                    "used_in_grouping" => isset($super_attribute['used_in_grouping']) ? 1 : 0
-                ];
+                    "attribute_id" => $super_attribute['attribute_id']
+                ]; 
+                $grp_attribute["used_in_grouping"] = ($request->grouping_attribute == $super_attribute['attribute_id']) ? 1 : 0;
+                AttributeConfigurableProduct::updateOrCreate($parent_attributes, $grp_attribute); 
             }
-
-            AttributeConfigurableProduct::insert($parent_attributes);  
             
             $this->parentVisibilitySetup($product, $scope);
 
@@ -189,7 +188,7 @@ class ProductConfigurableRepository extends BaseRepository
         {
             foreach($product->variants as $child_variant)
             {
-                    $exist_variant = $child_variant->attribute_option_child_products()
+                    $exist_variant = $child_variant->attribute_options_child_products()
                     ->whereIn("attribute_option_id", $this->configurable_attribute_options)
                     ->get();
 

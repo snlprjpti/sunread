@@ -76,9 +76,8 @@ class ProductConfigurableController extends BaseController
                 $this->repository->createVariants($created, $request, $scope, $attributes);
             });
 
-            ConfigurableIndexing::dispatchSync($created);
-            // $batch = Bus::batch([])->dispatch();
-            // $batch->add(new ConfigurableIndexing($created));
+            $batch = Bus::batch([])->dispatch();
+            $batch->add(new ConfigurableIndexing($created));
         }
         catch(Exception $exception)
         {
@@ -118,8 +117,8 @@ class ProductConfigurableController extends BaseController
 
                 $updated->load("variants");
             });
-            // $batch = Bus::batch([])->dispatch();
-            // $batch->add(new ConfigurableIndexing($updated));
+            $batch = Bus::batch([])->dispatch();
+            $batch->add(new ConfigurableIndexing($updated));
         }
         catch(Exception $exception)
         {

@@ -21,6 +21,8 @@ trait ConfigurableProductHandler
             $stores = Website::find($parent->website_id)->channels->mapWithKeys(function ($channel) {
                 return $channel->stores;
             });
+            $this->bulkConfigurableRemoving($parent, $stores);
+
             $variants = $parent->variants()->with("categories", "product_attributes", "catalog_inventories", "attribute_options_child_products")->get();
             
             foreach($stores as $store)
@@ -54,7 +56,7 @@ trait ConfigurableProductHandler
                     $items[$variant->id][$store->id] = array_merge($product_format, $this->getAttributeData($variant_attribute_options));              
                 }
             }
-            
+
             $this->configurableIndexing($items);
         }
         catch (Exception $exception)
@@ -70,13 +72,16 @@ trait ConfigurableProductHandler
             $items = [];
             $variant_options->map(function($variant_option) use(&$items) {
                 $attribute_option = AttributeOption::find($variant_option);
+                $attribute = $attribute_option->attribute;
                 
-                $items["configurable_{$attribute_option->attribute->slug}"][] = $variant_option;
-                $items["configurable_{$attribute_option->attribute->slug}_value"][] = $attribute_option->name;
-                $items["configurable"][$attribute_option->attribute->slug][] = [
+                $items["configurable_{$attribute->slug}"][] = $variant_option;
+                $items["configurable_{$attribute->slug}_value"][] = $attribute_option->name;
+                $items["configurable"][$attribute->slug][] = [
                     "label" => $attribute_option->name,
                     "value" => $variant_option
                 ];
+                if(isset($items[$attribute->slug]) && isset($items["{$attribute->slug}_value"]))
+                unset($items[$attribute->slug], $items["{$attribute->slug}_value"]);
             }); 
         }
         catch (Exception $exception)

@@ -28,15 +28,6 @@ class ConfigurableIndexing implements ShouldQueue
     {
         try
         {
-            // $visibility = Attribute::whereSlug("visibility")->first();
-            // $visibility_option = AttributeOption::whereAttributeId($visibility?->id)->whereName("Not Visible Individually")->first();
-            // $is_visibility = $this->parent->value([
-            //     "scope" => "store",
-            //     "scope_id" => $this->store->id,
-            //     "attribute_id" => $visibility?->id
-            // ]);
-            
-            // if($is_visibility != $visibility_option?->id) 
             $this->createProduct($this->parent);
         }
         catch (Exception $exception)

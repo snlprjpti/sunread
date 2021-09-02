@@ -234,6 +234,39 @@ trait HasIndexing
         }
     }
 
+    public function bulkConfigurableRemoving(object $parent, object $stores): void
+    {
+        try
+        {
+            foreach($stores as $store)
+            {
+                $createParams["index"] = $this->setIndexName($store->id);
+                $this->createIndexIfNotExist($createParams);
+                $params["body"][] = [
+                    "delete" => [
+                        "_index" => $createParams["index"],
+                        "_id" => $parent->id
+                    ]
+                ];
+
+                foreach($parent->variants as $variant)
+                {
+                    $params["body"][] = [
+                        "delete" => [
+                            "_index" => $createParams["index"],
+                            "_id" => $variant->id
+                        ]
+                    ];
+                }
+            }
+            $this->client->bulk($params);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
     public function searchIndex(array $data, object $store): ?array
     {
         try
