@@ -147,7 +147,8 @@ class BaseController extends Controller
                 $class = $exception->getModel();
                 $path = explode('\\', $class);
                 $model  = array_pop($path);
-                $exception_message = $this->lang('not-found', [ 'name' => $model ]);
+                $model_name = preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $model);
+                $exception_message = $this->lang('not-found', [ 'name' => $model_name ]);
             break;
 
             case QueryException::class:
