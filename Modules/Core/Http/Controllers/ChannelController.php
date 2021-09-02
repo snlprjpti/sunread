@@ -95,7 +95,7 @@ class ChannelController extends BaseController
             $data = $this->repository->validateData($request, [
                 "code" => "required|unique:channels,code,{$id}",
                 "hostname" => [ "nullable", "unique:websites,hostname", "unique:channels,hostname,{$id}", new FQDN()]
-            ], function () use ($id, $request) {
+            ], function () use ($id) {
                 $channel = $this->model->findOrFail($id);
                 return [
                     "website_id" => $channel->website_id

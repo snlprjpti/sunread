@@ -98,7 +98,7 @@ class StoreController extends BaseController
         {
             $data = $this->repository->validateData($request,[
                 "code" => "required|unique:stores,code,{$id}"
-            ], function () use ($id, $request) {
+            ], function () use ($id) {
                 $store = $this->model->findOrFail($id);
                 return [
                     "channel_id" => $store->channel_id
