@@ -19,6 +19,7 @@ variables:
   ELASTIC_PREFIX: sail_racing_store_
   QUEUE_CONNECTION: database
   APP_ENV: ci
+  REDIS_HOST: 94.237.40.213
   REDIS_PASSWORD: Hdl@Hz876!
 
 cache:
