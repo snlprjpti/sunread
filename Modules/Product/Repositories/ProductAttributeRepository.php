@@ -183,6 +183,9 @@ class ProductAttributeRepository extends ProductRepository
         try
         {
             foreach($data as $attribute) {
+
+                $scope_arr = $scope;
+
                 //removed some attributes in case of configurable products
                 if($product_type && in_array($attribute['attribute_slug'], $this->non_required_attributes)) continue;
 
@@ -195,12 +198,12 @@ class ProductAttributeRepository extends ProductRepository
                 }
 
                 $db_attribute = Attribute::whereSlug($attribute['attribute_slug'])->first();
-                if($this->product_repository->scopeFilter($scope["scope"], $db_attribute->scope)) $scope = $this->product_repository->getParentScope($scope); 
+                if($this->product_repository->scopeFilter($scope_arr["scope"], $db_attribute->scope)) $scope_arr = $this->product_repository->getParentScope($scope_arr); 
            
                 $match = [
                     "product_id" => $product->id,
-                    "scope" => $scope["scope"],
-                    "scope_id" => $scope["scope_id"],
+                    "scope" => $scope_arr["scope"],
+                    "scope_id" => $scope_arr["scope_id"],
                     "attribute_id" => $db_attribute->id
                 ];
 
