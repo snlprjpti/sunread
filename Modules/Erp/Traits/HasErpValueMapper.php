@@ -21,6 +21,7 @@ use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
+use Modules\Erp\Jobs\Mapper\ErpMigratorJob;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 
 trait HasErpValueMapper
@@ -57,30 +58,7 @@ trait HasErpValueMapper
                     if ( $detail->status == 1 ) continue;
 
                     if ( !$detail->value["webAssortmentWeb_Active"] == true && !$detail->value["webAssortmentWeb_Setup"] == "SR" ) continue;
-
-                    $check_variants = ($this->getDetailCollection("productVariants", $detail->sku)->count() > 1);
-                    $type = ($check_variants) ? "configurable" : "simple";
-
-                    $match = [
-                        "website_id" => 1,
-                        "sku" => $detail->sku
-                    ];
-                    $product_data = array_merge($match, [
-                        "attribute_set_id" => 1,
-                        "type" => $type,
-                    ]);
-        
-                    $product = Product::updateOrCreate($match, $product_data);
-                    ErpMigrateProductImageJob::dispatchSync($product, $detail);
-
-                    if ($check_variants) ErpGenerateVariantProductJob::dispatchSync($product, $detail);
-
-                    //visibility attribute value
-                    $visibility = ($check_variants) ? 5 : 8;
-                    
-                    ErpMigrateProductAttributeJob::dispatchSync($product, $detail, false, $visibility);
-                    ErpMigrateProductInventoryJob::dispatchSync($product, $detail);
-                    ErpDetailStatusUpdate::dispatchSync($detail->id);
+                    ErpMigratorJob::dispatch($detail);
                 }
             }
         }
