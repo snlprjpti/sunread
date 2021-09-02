@@ -3,6 +3,7 @@
 namespace Modules\Core\Traits;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Configuration as EntitiesConfiguration;
 
 trait Configuration
@@ -27,7 +28,10 @@ trait Configuration
     }
 
     public function checkCondition(object $request): object
-    {
+    {   
+        if(Redis::exists("configuration-data-$request->scope-$request->scope_id-$request->path")) {
+            return collect(unserialize(Redis::get("configuration-data-$request->scope-$request->scope_id-$request->path")));
+        }
         return $this->configuration->where([
             ['scope', $request->scope],
             ['scope_id', $request->scope_id],

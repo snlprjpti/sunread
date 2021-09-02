@@ -119,8 +119,13 @@ return [
 
     'redis' => [
 
-        'cluster' => env('REDIS_CLUSTER', false),
         'client' => env('REDIS_CLIENT', 'predis'),
+
+        'options' => [
+            'cluster' => env('REDIS_CLUSTER', 'redis'),
+            'prefix' => env('REDIS_PREFIX', ''),
+        ],
+
         'default' => [
            'host'     => env('REDIS_HOST', 'localhost'),
             'port'     =>(int) env('REDIS_PORT', 6379),

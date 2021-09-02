@@ -16,7 +16,7 @@ class ConfigurationCache implements ShouldQueue
 
    public $configurationData;
 
-    public function __construct($configurationData)
+    public function __construct(object $configurationData)
     {
         $this->configurationData = $configurationData;
     }
@@ -26,7 +26,12 @@ class ConfigurationCache implements ShouldQueue
     {
         try
         {
-            Redis::set("get-all-configuration-data", $this->configurationData);
+            foreach($this->configurationData as $config){
+            if(Redis::exists("configuration-data-$config->scope-$config->scope_id-$config->path")) {
+                Redis::del("configuration-data-$config->scope-$config->scope_id-$config->path");
+            }
+            Redis::set("configuration-data-$config->scope-$config->scope_id-$config->path", serialize($config->value));
+            }
         }
         catch (Exception $exception)
         {
