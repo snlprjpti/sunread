@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 
-class AttributeConfigurableProduct extends Model
+class AttributeOptionChildProduct extends Model
 {
-    protected $fillable = [ "product_id", "attribute_id", "used_in_grouping" ];
+    protected $fillable = [ "product_id", "attribute_option_id" ];
 
-    public function attribute(): BelongsTo
+    public function attribute_option(): BelongsTo
     {
-        return $this->belongsTo(Attribute::class);
+        return $this->belongsTo(AttributeOption::class);
     }
     
     public function product(): BelongsTo
