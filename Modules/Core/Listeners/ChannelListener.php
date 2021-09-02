@@ -7,29 +7,29 @@ use Modules\Core\Jobs\CoreCacheJob;
 
 class ChannelListener
 {
-    public function create($channel)
+    public function create(object $channel): void
     {
         CoreCacheJob::dispatch( "createChannelCache", $channel );
     }
 
-    public function beforeUpdate($channel_id)
+    public function beforeUpdate(int $channel_id): void
     {
         $channel = Channel::findOrFail($channel_id);
         CoreCacheJob::dispatch( "updateBeforeChannelCache", collect($channel) );
     }
 
-    public function update($channel)
+    public function update(object $channel): void
     {
         CoreCacheJob::dispatch( "updateChannelCache", $channel );
     }
 
-    public function beforeDelete($channel_id)
+    public function beforeDelete(int $channel_id): void
     {
         $channel = Channel::findOrFail($channel_id);
         CoreCacheJob::dispatch( "deleteBeforeChannelCache", collect($channel) );
     }
 
-    public function delete($channel)
+    public function delete(object $channel): void
     {
         CoreCacheJob::dispatch( "deleteChannelCache", collect($channel) );
     }

@@ -7,23 +7,23 @@ use Modules\Core\Jobs\CoreCacheJob;
 
 class StoreListener
 {
-    public function create($store)
+    public function create(object $store): void
     {
         CoreCacheJob::dispatch( "createStoreCache", $store );
     }
 
-    public function beforeUpdate($store_id)
+    public function beforeUpdate(int $store_id): void
     {
         $store = Store::findOrFail($store_id);
         CoreCacheJob::dispatch( "deleteStoreCache", collect($store) );
     }
 
-    public function update($store)
+    public function update(object $store): void
     {
         CoreCacheJob::dispatch( "createStoreCache", $store );
     }
 
-    public function delete($store)
+    public function delete(object $store): void
     {
         CoreCacheJob::dispatch( "deleteStoreCache", collect($store) );
     }
