@@ -14,14 +14,15 @@ use Modules\Core\Traits\Configuration as TraitsConfiguration;
 
 class ConfigurationController extends BaseController
 {
-    protected $repository;
+    protected $repository, $helper;
     use TraitsConfiguration;
 
-    public function __construct(Configuration $configuration, ConfigurationRepository $configurationRepository)
+    public function __construct(Configuration $configuration, ConfigurationRepository $configurationRepository, ConfigurationHelper $helper)
     {
         $this->model = $configuration;
         $this->model_name = "Configuration";
         $this->repository = $configurationRepository;
+        $this->helper = $helper;
         $this->createModel();
 
         parent::__construct($this->model, $this->model_name);

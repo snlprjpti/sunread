@@ -24,19 +24,21 @@ trait Configuration
 
     public function has(object $request)
     {
+        if(Redis::exists("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}")) {
+            return (boolean) true;
+        } else{
         return (boolean) $this->checkCondition($request)->count();
+        }
     }
 
     public function checkCondition(object $request): object
     {   
-        if(Redis::exists("configuration-data-$request->scope-$request->scope_id-$request->path")) {
-            return collect(unserialize(Redis::get("configuration-data-$request->scope-$request->scope_id-$request->path")));
-        }
         return $this->configuration->where([
             ['scope', $request->scope],
             ['scope_id', $request->scope_id],
             ['path', $request->path]
         ]);  
+        
     }
 
     public function cacheQuery(object $request, array $pluck): array

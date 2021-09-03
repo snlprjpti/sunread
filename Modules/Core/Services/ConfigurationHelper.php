@@ -75,14 +75,18 @@ class ConfigurationHelper
     {
         try
         {
-            if(Redis::exists("configuration-data-$request->scope-$request->scope_id-$request->path")) {
-                return unserialize(Redis::get("configuration-data-$request->scope-$request->scope_id-$request->path"));
+            if(Redis::exists("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}")) {
+                return unserialize(Redis::get("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}"));
             }
             $value = $this->model->where([
                 ["scope", $request->scope],
                 ["scope_id", $request->scope_id],
                 ["path", $request->path]
             ])->first()?->value;
+            
+            if($value){
+            Redis::set("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}", serialize($value));
+            }
         }
         catch ( Exception $exception )
         {
