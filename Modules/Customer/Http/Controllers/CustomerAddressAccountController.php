@@ -24,7 +24,7 @@ class CustomerAddressAccountController extends BaseController
         $this->repository = $customerAddressRepository;
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
-        $this->customer = auth()->guard("customer")->check() ? auth()->guard("customer")->user() : new Customer();
+        $this->customer = auth()->guard("customer")->user();
         $exception_statuses = [
             ActionUnauthorizedException::class => 403
         ];
@@ -65,7 +65,7 @@ class CustomerAddressAccountController extends BaseController
     {
         try
         {
-            if($request->default_shipping_address == 0 && $request->default_billing_address == 0) throw new Exception("Address Must be Set.");
+            if($request->default_shipping_address == 0 && $request->default_billing_address == 0) throw new Exception("Choose Atleast One.");
             $customer_id = $this->customer->id;
 
             $data = $this->repository->validateData($request, array_merge($this->repository->regionAndCityRules($request), [
