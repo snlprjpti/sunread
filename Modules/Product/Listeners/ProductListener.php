@@ -10,23 +10,23 @@ class ProductListener
 {
     public function indexing($product)
     {
-        // if (!$product->parent_id && $product->type == "simple") {
-        //     $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
-        //         return $channel->stores;
-        //     });
+        if (!$product->parent_id && $product->type == "simple") {
+            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+                return $channel->stores;
+            });
     
-        //     $batch = Bus::batch([])->dispatch();
-        //     foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
-        // }
+            $batch = Bus::batch([])->dispatch();
+            foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
+        }
     }
 
     public function remove($product)
     {
-        // $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
-        //     return $channel->stores;
-        // });
+        $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            return $channel->stores;
+        });
         
-        // $batch = Bus::batch([])->dispatch();
-        // foreach($stores as $store) $batch->add(new SingleIndexing(collect($product), $store, "delete"));
+        $batch = Bus::batch([])->dispatch();
+        foreach($stores as $store) $batch->add(new SingleIndexing(collect($product), $store, "delete"));
     }
 }

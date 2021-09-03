@@ -9,6 +9,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeOption;
 use Modules\Product\Traits\ElasticSearch\ConfigurableProductHandler;
 
 class ConfigurableIndexing implements ShouldQueue

@@ -11,6 +11,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Modules\Attribute\Entities\Attribute;
+use Modules\Attribute\Entities\AttributeOption;
 use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
 class SingleIndexing implements ShouldQueue
@@ -30,7 +32,18 @@ class SingleIndexing implements ShouldQueue
     {
         try
         {
-            if(!$this->method) $this->singleIndexing($this->product, $this->store);
+            if(!$this->method) {
+                $visibility = Attribute::whereSlug("visibility")->first();
+
+                $is_visibility = $this->product->value([
+                    "scope" => "store",
+                    "scope_id" => $this->store->id,
+                    "attribute_id" => $visibility?->id
+                ]);
+                
+                if($is_visibility?->name != "Not Visible Individually") $this->singleIndexing($this->product, $this->store);
+                else $this->removeIndex(collect($this->product), $this->store);
+            }
             else $this->removeIndex($this->product, $this->store);
         }
         catch (Exception $exception)

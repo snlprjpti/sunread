@@ -31,7 +31,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         $this->sortByKeys = [ "sort_by_id", "sort_by_name", "sort_by_price" ];
 
-        $this->staticFilterKeys = ["color", "size", "collection", "configurable_size"];
+        $this->staticFilterKeys = ["color", "size", "collection", "configurable_size", "configurable_color"];
     }
 
     public function search(object $request): array
@@ -70,6 +70,10 @@ class ProductSearchRepository extends ElasticSearchRepository
                         if($key == "size") {
                             $size = [$this->term("configurable_size", $value), $this->term($key, $value)];
                             $filter[] = $this->OrwhereQuery($size); 
+                        }
+                        if($key == "color") {
+                            $color = [$this->term("configurable_color", $value), $this->term($key, $value)];
+                            $filter[] = $this->OrwhereQuery($color); 
                         }
                         else $filter[] = $this->term($key, $value);
                     } 
@@ -163,6 +167,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             $fetched = $this->searchIndex($query, $store);
 
             $fetched["aggregations"]["size"]["buckets"] = array_merge($fetched["aggregations"]["size"]["buckets"], $fetched["aggregations"]["configurable_size"]["buckets"]);
+            $fetched["aggregations"]["color"]["buckets"] = array_merge($fetched["aggregations"]["color"]["buckets"], $fetched["aggregations"]["configurable_color"]["buckets"]);
             
             foreach(["color", "size", "collection"] as $field) 
             {
@@ -212,6 +217,9 @@ class ProductSearchRepository extends ElasticSearchRepository
             $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
             $fetched = [
+                "_source"=>[
+                    "exclude"=> "configurable_*",
+                ],
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
                 "query"=> (count($filter["query"]) > 0) ? $filter["query"] : [

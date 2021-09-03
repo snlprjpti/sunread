@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAttributeConfigurableProductsTable extends Migration
+class CreateAttributeOptionsChildProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,14 @@ class CreateAttributeConfigurableProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('attribute_configurable_products', function (Blueprint $table) {
+        Schema::create('attribute_options_child_products', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('attribute_id');
-            $table->boolean('used_in_grouping')->default(0);
-          
+            $table->unsignedBigInteger('attribute_option_id');
+            
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
-            $table->unique(['product_id', 'attribute_id'], 'configurable_compound_unique');
+            $table->foreign('attribute_option_id')->references('id')->on('attribute_options')->onDelete('cascade');
+            $table->unique(['product_id', 'attribute_option_id'], 'configurable_compound_unique');
 
             $table->timestamps();
         });
@@ -34,6 +33,6 @@ class CreateAttributeConfigurableProductsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('attribute_configurable_products');
+        Schema::dropIfExists('attribute_options_child_products');
     }
 }

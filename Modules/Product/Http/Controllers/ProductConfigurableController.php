@@ -75,6 +75,7 @@ class ProductConfigurableController extends BaseController
 
                 $this->repository->createVariants($created, $request, $scope, $attributes);
             });
+
             $batch = Bus::batch([])->dispatch();
             $batch->add(new ConfigurableIndexing($created));
         }

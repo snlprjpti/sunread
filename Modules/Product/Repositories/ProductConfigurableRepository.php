@@ -15,10 +15,14 @@ use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Product\Entities\AttributeConfigurableProduct;
+use Modules\Product\Entities\AttributeOptionsChildProduct;
+use Modules\Product\Entities\ProductAttribute;
+use Modules\Product\Entities\ProductAttributeString;
+use Modules\Product\Entities\ProductAttributeText;
 
 class ProductConfigurableRepository extends BaseRepository
 {
-    protected $attribute, $product_repository, $non_required_attributes, $product_attribute_repository, $configurable_attributes;
+    protected $attribute, $product_repository, $non_required_attributes, $product_attribute_repository, $configurable_attribute_options, $state, $group_by_attribute;
 
     public function __construct(Product $product, Attribute $attribute, ProductRepository $product_repository, ProductAttributeRepository $productAttributeRepository)
     {
@@ -82,18 +86,29 @@ class ProductConfigurableRepository extends BaseRepository
        {    
             //create product-superattribute
             $super_attributes = [];
-            $this->configurable_attributes = [];
+            $this->configurable_attribute_options = [];
             
             foreach ($request->get("super_attributes") as $super_attribute) {
                 $attribute = $this->attributeCache()->find($super_attribute['attribute_id']);
                 if ($attribute->is_user_defined == 0 && $attribute->type != "select") continue;
+                foreach($super_attribute["value"] as $super_val) $this->product_attribute_repository->singleOptionValidation($attribute, $super_val);
                 $super_attributes[$attribute->id] = $super_attribute["value"];
+
+                $parent_attributes = [
+                    "product_id" => $product->id,
+                    "attribute_id" => $super_attribute['attribute_id']
+                ]; 
+                $grp_attribute["used_in_grouping"] = ($request->grouping_attribute == $super_attribute['attribute_id']) ? 1 : 0;
+                AttributeConfigurableProduct::updateOrCreate($parent_attributes, $grp_attribute); 
             }
+            
+            $this->parentVisibilitySetup($product, $scope);
 
             $productAttributes = collect($request_attributes)->reject(function ($item) {
-                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku"));
+                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility"));
             })->toArray();
 
+            $this->state = [];
             //generate multiple product(variant) combination on the basis of color, size (super_attributes/user defined attributes) for variants
             foreach (array_permutation($super_attributes) as $permutation) {
                 $product_variant_data[] = $this->addVariant($product, $permutation, $request, $productAttributes, $scope, $method);
@@ -126,14 +141,12 @@ class ProductConfigurableRepository extends BaseRepository
                 "type" => "simple",
                 "attribute_set_id" => $product->attribute_set_id
             ];
+
             $product_attributes = [];
-            $this->configurable_attributes = [];
+            $this->configurable_attribute_options = [];
 
             $variant_options = collect($permutation)->map(function ($option, $key) {
-                $this->configurable_attributes[] = [
-                    "attribute_id" => $key,
-                    "attribute_option_id" => $option
-                ];
+                $this->configurable_attribute_options[] = $option;
                 return [
                     "attribute_slug" => $this->attributeCache()->find($key)->slug,
                     "value" => $option,
@@ -175,12 +188,11 @@ class ProductConfigurableRepository extends BaseRepository
         {
             foreach($product->variants as $child_variant)
             {
-                    $exist_variant = $child_variant->attribute_configurable_products()
-                    ->whereIn("attribute_id", collect($this->configurable_attributes)->pluck("attribute_id")->toArray())
-                    ->whereIn("attribute_option_id",collect($this->configurable_attributes)->pluck("attribute_option_id")->toArray())
+                    $exist_variant = $child_variant->attribute_options_child_products()
+                    ->whereIn("attribute_option_id", $this->configurable_attribute_options)
                     ->get();
 
-                    if($exist_variant && count($exist_variant) == count($this->configurable_attributes)) 
+                    if($exist_variant && count($exist_variant) == count($this->configurable_attribute_options)) 
                     {
                         $data = $child_variant;
                         break;
@@ -199,6 +211,8 @@ class ProductConfigurableRepository extends BaseRepository
     {
         try 
         {
+            $visibility = $this->childVisibilitySetup($variant_options, $variant);
+
             $product_attributes = array_merge([
                 [
                     // Attrubute name
@@ -212,13 +226,16 @@ class ProductConfigurableRepository extends BaseRepository
                     "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ]
-            ], $productAttributes, $variant_options);
+            ], $productAttributes, $variant_options, [ $visibility ]);
 
             $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
 
-            array_map(function($child_attribute) use($variant) {
-                AttributeConfigurableProduct::updateOrCreate(array_merge($child_attribute, [ "product_id" => $variant->id ]));
-            }, $this->configurable_attributes);
+            array_map(function($child_attribute_option) use($variant) {
+                AttributeOptionsChildProduct::updateOrCreate([
+                    "attribute_option_id" => $child_attribute_option,
+                    "product_id" => $variant->id 
+                ]);
+            }, $this->configurable_attribute_options);
 
             $variant->channels()->sync($request->get("channels"));
         }
@@ -226,5 +243,82 @@ class ProductConfigurableRepository extends BaseRepository
         {
             throw $exception;
         }
+    }
+
+    private function childVisibilitySetup(array $variant_options, object $variant): array
+    {
+        try 
+        {
+            if($this->group_by_attribute) $group_by_option = $variant_options[$this->group_by_attribute->attribute_id]["value"];
+
+            if(isset($group_by_option)) {
+                if(!isset($this->state[$group_by_option])) {
+                    $this->state[$group_by_option] = $variant;
+                    $visibility = $this->getVisibility("Catalog, Search");
+                }
+                else $visibility = $this->getVisibility("Not Visible Individually");
+            }
+    
+            else $visibility = $this->getVisibility("Not Visible Individually"); 
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        } 
+        
+        return $visibility;
+    }
+
+    private function parentVisibilitySetup(object $product, array $scope): void
+    {
+        try 
+        {
+            $this->group_by_attribute = AttributeConfigurableProduct::whereProductId($product->id)->whereUsedInGrouping(1)->first(); 
+
+            $parent_product_attributes =  ProductAttribute::where(array_merge($scope, [
+                "product_id" => $product->id,
+                "attribute_id" => 11
+            ]))->first();
+            $product_attribute_string = ProductAttributeString::find($parent_product_attributes->value_id);
+
+            if($this->group_by_attribute) $product_attribute_string->update(["value" => $this->getVisibilityId("Not Visible Individually")]);
+            else $product_attribute_string->update(["value" => $this->getVisibilityId("Catalog, Search")]);
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        } 
+    }
+
+    private function getVisibilityId(string $slug): int
+    {
+        try 
+        {
+            $visibility_att = Attribute::whereSlug("visibility")->first();
+            $attribute_option = AttributeOption::whereAttributeId($visibility_att->id)->whereName($slug)->first();
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        } 
+        return $attribute_option->id;
+    }
+
+    private function getVisibility(string $slug): array
+    {
+        try 
+        {
+            $visibility =  [
+                "attribute_slug" => "visibility",
+                "value" => $this->getVisibilityId($slug),
+                "value_type" => "Modules\Product\Entities\ProductAttributeString"
+            ];
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        } 
+
+        return $visibility;
     }
 }
