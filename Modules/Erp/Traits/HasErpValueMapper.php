@@ -23,6 +23,7 @@ use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
 use Modules\Erp\Jobs\Mapper\ErpMigratorJob;
 use Modules\Product\Entities\AttributeConfigurableProduct;
+use Modules\Product\Entities\AttributeOptionsChildProduct;
 
 trait HasErpValueMapper
 {
@@ -103,15 +104,18 @@ trait HasErpValueMapper
 
             $start_time = $start_time < $max_time ? $start_time : $max_time - 1;
             $end_time = $end_time < $max_time ? $end_time : $max_time;
-            $attribute = new Attribute();
 
             $attribute_data = [
                 [
                     "attribute_id" => $this->getAttributeId("name"),
-                    "value" => $erp_product_iteration->value["description"] ?? $erp_product_iteration->sku
+                    "value" => $erp_product_iteration->value["description"]
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("price"),
+                    "value" => $price_value["unitPrice"], 
+                ],
+                [
+                    "attribute_id" => $this->getAttributeId("cost"),
                     "value" => $price_value["unitPrice"], 
                 ],
                 [
@@ -228,7 +232,7 @@ trait HasErpValueMapper
 
                 $start_time = $start_time < $max_time ? $start_time : $max_time - 1;
                 $end_time = $end_time < $max_time ? $end_time : $max_time;
-                $attribute = new Attribute();
+
                 return [ 
                     [
                         "attribute_id" => $this->getAttributeId("price"),
@@ -457,22 +461,35 @@ trait HasErpValueMapper
                     if ( !empty($variant['pfVerticalComponentCode']) )
                     {
                         $configurable_product_attributes = [];
-                        $attribute_option = AttributeOption::whereCode($variant['pfVerticalComponentCode'])->first();
+                        $attribute_option = AttributeOption::whereCode($variant['pfVerticalComponentCode'])
+                        ->orWhere('name', $variant['pfHorizontalComponentCode'])
+                        ->first();
+
                         if ($attribute_option)
                         {
-                            $configurable_product_attributes["product_id"] = $variant_product->id;
-                            $configurable_product_attributes["attribute_id"] = $attribute_option->attribute_id;
-                            $configurable_product_attributes["attribute_option_id"] = $attribute_option->id;
+                            $configurable_product_attributes["product_id"] = $product->id;
+                            $configurable_product_attributes["attribute_id"] = $attribute_option?->attribute_id;
+
+                            $configurable_product_attributes["used_in_grouping"] = ($attribute_option?->attribute_id == $this->getAttributeId("color")) ? 1 : 0;
                             AttributeConfigurableProduct::updateOrCreate($configurable_product_attributes);
+                            AttributeOptionsChildProduct::updateOrCreate([
+                                "attribute_option_id" => $attribute_option?->id,
+                                "product_id" => $variant_product->id 
+                            ]);
                         }
-                        // ErpMigrateAttributeConfigurableProduct::dispatchSync($variant_product, $variant);
                     }
 
                     $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
         
-                    ErpMigrateProductImageJob::dispatchSync($variant_product, $erp_product_iteration, $variant);
-                    ErpMigrateProductAttributeJob::dispatchSync($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
-                    ErpMigrateProductInventoryJob::dispatchSync($variant_product, $erp_product_iteration);
+                    // ErpMigrateProductImageJob::dispatchSync($variant_product, $erp_product_iteration, $variant);
+                    $this->mapstoreImages($product, $erp_product_iteration, $variant);
+
+                    // ErpMigrateProductAttributeJob::dispatchSync($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
+                    $this->createAttributeValue($product, $erp_product_iteration, $ean_code, 8, $variant);
+
+                    // ErpMigrateProductInventoryJob::dispatchSync($variant_product, $erp_product_iteration);
+                    $this->createInventory($variant_product, $erp_product_iteration);
+
                 }
             }
         }
