@@ -17,7 +17,15 @@ trait HasAttributeScope
     {
         try
         {
-            $this->attribute_val = Attribute::findorFail($data["attribute_id"]);
+            if(isset($data["attribute_id"])) {
+                $this->attribute_val = Attribute::find($data["attribute_id"]);
+            }
+
+            if(isset($data["attribute_slug"])) {
+                $this->attribute_val = Attribute::find($data["attribute_slug"]);
+                $data["attribute_id"] = $this->attribute_val->id;
+                unset($data["attribute_slug"]);
+            } 
 
             $existAttributeData = $this->product_attributes()->where($data)->first();
             $default = $existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($data);
