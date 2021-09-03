@@ -22,7 +22,7 @@ trait HasAttributeScope
             }
 
             if(isset($data["attribute_slug"])) {
-                $this->attribute_val = Attribute::find($data["attribute_slug"]);
+                $this->attribute_val = Attribute::whereSlug($data["attribute_slug"])->first();
                 $data["attribute_id"] = $this->attribute_val->id;
                 unset($data["attribute_slug"]);
             } 
