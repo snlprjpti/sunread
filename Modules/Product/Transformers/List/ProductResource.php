@@ -16,8 +16,6 @@ class ProductResource extends JsonResource
             "scope" => $request->scope ?? "website",
             "scope_id" => $request->scope_id ?? $this->website_id
         ];
-        $name_id = Attribute::whereSlug("name")->first()->id;
-        $visibility_id = Attribute::whereSlug("visibility")->first()->id;
 
         $images = $this->images()->get()->filter(fn ($img) => $img->types()->where("slug", "base_image")->first() )->first();
         
@@ -25,13 +23,13 @@ class ProductResource extends JsonResource
 
         return [
             "id" => $this->id,
-            "name" => $this->value(array_merge($scope, [ "attribute_id" => $name_id])),
+            "name" => $this->value(array_merge($scope, [ "attribute_slug" => "name" ])),
             "type" => $this->type,
             "sku" => $this->sku,           
             "stock" => (int) $stock?->quantity,
             "status" => (bool) $this->status,
             "categories" => CategoryResource::collection($this->whenLoaded("categories")),
-            "visibility" => $this->value(array_merge($scope, [ "attribute_id" => $visibility_id]))?->name,
+            "visibility" => $this->value(array_merge($scope, [ "attribute_slug" => "visibility" ]))?->name,
             "images" => $images ? Storage::url($images->path) : null,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
