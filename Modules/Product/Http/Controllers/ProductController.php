@@ -206,14 +206,14 @@ class ProductController extends BaseController
 
     public function product_attributes(Request $request, int $id): JsonResponse
     {
-        // try
-        // {
+        try
+        {
             $fetched = $this->repository->product_attribute_data($id, $request);
-        // }
-        // catch( Exception $exception )
-        // {
-        //     return $this->handleException($exception);
-        // }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
 
         return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
