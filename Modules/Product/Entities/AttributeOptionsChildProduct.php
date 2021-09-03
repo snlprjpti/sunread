@@ -16,7 +16,7 @@ class AttributeOptionsChildProduct extends Model
         return $this->belongsTo(AttributeOption::class);
     }
     
-    public function product(): BelongsTo
+    public function variant_product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
