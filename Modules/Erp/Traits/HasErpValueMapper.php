@@ -490,7 +490,7 @@ trait HasErpValueMapper
                         return $filter_attribute_option->attribute_option->attribute->id == $this->getAttributeId("color");
                     })->groupBy("attribute_option_id");
 
-                foreach ( $attr_option_products as $key => $attr_option_product )
+                foreach ( $attr_option_products as $attr_option_product )
                 {
                     foreach ($attr_option_product->pluck("variant_product") as $key => $variant_product)
                     {
