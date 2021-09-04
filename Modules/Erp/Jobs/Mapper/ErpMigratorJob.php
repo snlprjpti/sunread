@@ -42,16 +42,16 @@ class ErpMigratorJob implements ShouldQueue
             ]);
 
             $product = Product::updateOrCreate($match, $product_data);
-            ErpMigrateProductImageJob::dispatchSync($product, $this->detail);
+            $this->mapstoreImages($product, $this->detail);
 
-            if ($check_variants) ErpGenerateVariantProductJob::dispatchSync($product, $this->detail);
+
+            if ($check_variants) $this->createVariants($product, $this->detail);
 
             //visibility attribute value
             $visibility = ($check_variants) ? 5 : 8;
-            
-            ErpMigrateProductAttributeJob::dispatchSync($product, $this->detail, false, $visibility);
-            ErpMigrateProductInventoryJob::dispatchSync($product, $this->detail);
-            ErpDetailStatusUpdate::dispatchSync($this->detail->id);
+            $this->createAttributeValue($product, $this->detail, false, $visibility);
+            $this->createInventory($product, $this->detail);
+            $this->detail->update(["status" => 1]);
         }
         catch ( Exception $exception )
         {
