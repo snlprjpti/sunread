@@ -20,14 +20,14 @@ class CategoryValueTableSeeder extends Seeder
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "name",
-                "value" => "Root"
+                "value" => "Electronics"
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "slug",
-                "value" => "root"
+                "value" => "electronics"
             ],
             [
                 "category_id" => 1,
@@ -48,7 +48,7 @@ class CategoryValueTableSeeder extends Seeder
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "description",
-                "value" => "Good"
+                "value" => "Electronics"
             ],
             [
                 "category_id" => 1,
@@ -62,21 +62,21 @@ class CategoryValueTableSeeder extends Seeder
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "meta_title",
-                "value" => "Root"
+                "value" => "Electronics"
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "meta_description",
-                "value" => "Root"
+                "value" => "Electronics"
             ],
             [
                 "category_id" => 1,
                 "scope" => "website",
                 "scope_id" => 1,
                 "attribute" => "meta_keywords",
-                "value" => "Root"
+                "value" => "Electronics"
             ],
         ];
 
