@@ -326,9 +326,7 @@ trait HasErpValueMapper
                         "name" => $erp_product_iteration->value["webAssortmentColor_Description"] ?? "",
                         "code" => $erp_product_iteration->value["webAssortmentColor_Code"] ?? ""
                     ];
-                    $match = $data;
-                    unset($match["name"]);
-                    $attribute_option = AttributeOption::updateOrCreate($match, $data);
+                    $attribute_option = AttributeOption::updateOrCreate($data);
                     break;
                 
                 case 'size':
@@ -337,9 +335,7 @@ trait HasErpValueMapper
                         "name" => $erp_product_iteration["pfHorizontalComponentCode"] ?? "",
                         "code" => $erp_product_iteration["pfVerticalComponentCode"] ?? ""
                     ];
-                    $match = $data;
-                    unset($match["code"]);
-                    $attribute_option = AttributeOption::updateOrCreate($match, $data);
+                    $attribute_option = AttributeOption::updateOrCreate($data);
                     break;
             }
             
