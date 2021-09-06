@@ -436,7 +436,8 @@ class ProductRepository extends BaseRepository
                             "scope" => $attribute->scope,
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required,
-                            "is_user_defined" => (bool) $attribute->is_user_defined
+                            "is_user_defined" => (bool) $attribute->is_user_defined,
+                            "is_synchronized" => (bool) $attribute->is_synchronized
                         ];
                         if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
