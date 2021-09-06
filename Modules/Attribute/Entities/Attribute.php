@@ -16,7 +16,7 @@ class Attribute extends Model
     use Sluggable, HasFactory, HasTranslation, HasMapper;
 
     public static $SEARCHABLE = [ "name", "type" ];
-    protected $fillable = [ "slug", "name", "type", "scope", "validation", "is_required", "is_unique", "is_searchable", "search_weight", "is_user_defined", "is_visible_on_storefront", "use_in_layered_navigation", "position", "comparable_on_storefront", "default_value" ];
+    protected $fillable = [ "slug", "name", "type", "scope", "validation", "is_required", "is_unique", "is_searchable", "search_weight", "is_user_defined", "is_visible_on_storefront", "use_in_layered_navigation", "position", "comparable_on_storefront", "default_value", "is_synchronized" ];
     protected $appends = [ 'type_validation' ];
     protected $with = [ "attribute_options" ];
     
