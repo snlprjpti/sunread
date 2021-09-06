@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
+use Modules\Customer\Exceptions\AddressAlreadyCreatedException;
 
 class CustomerAddressRepository extends BaseRepository
 {
@@ -47,7 +48,7 @@ class CustomerAddressRepository extends BaseRepository
     public function unsetDefaultAddresses(array $data, int $customer_id, int $address_id): void
     {
         DB::beginTransaction();
-        
+
         try
         {
             $customer = Customer::findOrFail($customer_id);
@@ -87,11 +88,81 @@ class CustomerAddressRepository extends BaseRepository
         {
             DB::rollBack();
             throw $exception;
-        }        
+        }
 
         Event::dispatch("{$this->model_key}.updated-default.after", $updated);
         DB::commit();
 
         return $updated;
+    }
+
+
+    public function checkShippingAddress(int $customer_id): object
+    {
+        try
+        {
+            $address = $this->model->whereCustomerId($customer_id)->whereDefaultShippingAddress(1);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $address;
+    }
+
+    public function checkBillingAddress(int $customer_id): object
+    {
+        try
+        {
+            $address = $this->model->whereCustomerId($customer_id)->whereDefaultBillingAddress(1);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $address;
+    }
+
+    public function insert(object $request, int $customer_id): object
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.create.before");
+
+        try
+        {
+            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request), [
+                "default_shipping_address" => "boolean|required_without:default_billing_address",
+                "default_billing_address" => "boolean|required_without:default_shipping_address"
+            ]), function () use ($customer_id) {
+                return [
+                    "customer_id" => Customer::findOrFail($customer_id)->id,
+                ];
+            });
+
+            if ($request->default_shipping_address == 1) {
+                if ($this->checkShippingAddress($customer_id)->count() > 0 ) throw new AddressAlreadyCreatedException("Shipping Address Already Exist");
+                $data["default_billing_address"] = 0;
+                $created = $this->model->create($data);
+            }
+
+            if ($request->default_billing_address == 1) {
+                if ($this->checkBillingAddress($customer_id)->count() > 0) throw new AddressAlreadyCreatedException("Billing Address Already Exist");
+                $data["default_shipping_address"] = 0;
+                $data["default_billing_address"] = 1;
+                $created = $this->model->create($data);
+            }
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.create.after", $created);
+        DB::commit();
+
+        return $created;
     }
 }
