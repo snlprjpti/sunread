@@ -395,7 +395,9 @@ trait HasErpValueMapper
                 return is_array($value) ? $value : json_decode($value, true) ?? $value;
             });
     
-            if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"])->orWhere("color_code", $variant["pfHorizontalComponentCode"]);
+            if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"])->where(function ($q) use($variant) {
+                $q->where("color_code", $variant["pfHorizontalComponentCode"]);
+            });
     
             if ( $images->count() > 0 )
             {
