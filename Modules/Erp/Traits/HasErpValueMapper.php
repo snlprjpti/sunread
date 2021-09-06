@@ -384,51 +384,58 @@ trait HasErpValueMapper
 
     private function mapstoreImages( object $product, object $erp_product_iteration, array $variant = [] ): void
     {
-        $product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
-        $images = $this->getValue($product_images, function ($value) {
-            return is_array($value) ? $value : json_decode($value, true) ?? $value;
-        });
-
-        if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"])->orWhere("color_code", $variant["pfHorizontalComponentCode"]);
-
-        if ( $images->count() > 0 )
+        try
         {
-            $position = 0;
-            foreach( $images as $image )
+            $product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
+            $images = $this->getValue($product_images, function ($value) {
+                return is_array($value) ? $value : json_decode($value, true) ?? $value;
+            });
+    
+            if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"])->orWhere("color_code", $variant["pfHorizontalComponentCode"]);
+    
+            if ( $images->count() > 0 )
             {
-                $position++;
-                $data["path"] = $image["url"];
-                $data["position"] = $position;
-                $data["product_id"] = $product->id;
-                
-                $type_ids = [];
-                switch ( $image["image_type"] )
+                $position = 0;
+                foreach( $images as $image )
                 {
-                    case "a" :
-                        $type_ids[] = 1;
-                    break;
-        
-                    case "b" :
-                        $type_ids[] = 2;
-                    break;
-        
-                    case "c" :
-                        $type_ids[] = 3;
-                    break;
-
-                    case "d" :
-                        $type_ids[] = 4;
-                    break;
-
-                    default :
-                        $type_ids[] = 1;
-                    break;
+                    $position++;
+                    $data["path"] = $image["url"];
+                    $data["position"] = $position;
+                    $data["product_id"] = $product->id;
+                    
+                    switch ( $image["image_type"] )
+                    {
+                        case "a" :
+                            $type_id = 1;
+                        break;
+            
+                        case "b" :
+                            $type_id = 2;
+                        break;
+            
+                        case "c" :
+                            $type_id = 3;
+                        break;
+    
+                        case "d" :
+                            $type_id = 4;
+                        break;
+    
+                        default :
+                            $type_id = 5;
+                        break;
+                    }
+                    
+                   $product_image = ProductImage::updateOrCreate($data);
+                   $product_image->types()->sync($type_id);
                 }
-                
-               $product_image = ProductImage::updateOrCreate($data);
-               $product_image->types()->sync($type_ids);
             }
         }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
     }
     
     // This fn create variants based on parent product
