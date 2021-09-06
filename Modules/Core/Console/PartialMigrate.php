@@ -23,7 +23,7 @@ class PartialMigrate extends Command
         Schema::disableForeignKeyConstraints();
         DB::table('products')->truncate();
         DB::table('attribute_configurable_products')->truncate();
-        DB::table('attribute_configurable_products')->truncate();
+        DB::table('attribute_options_child_products')->truncate();
         DB::table('category_product')->truncate();
         DB::table('channel_product')->truncate();
         DB::table('catalog_inventories')->truncate();
@@ -38,6 +38,7 @@ class PartialMigrate extends Command
         DB::table('product_images')->truncate();
         DB::table('product_tax_groups')->truncate();
         DB::table('attributes')->truncate();
+        DB::table('attribute_sets')->truncate();
         DB::table('attribute_options')->truncate();
         DB::table('attribute_option_translations')->truncate();
         DB::table('attribute_groups')->truncate();
@@ -50,7 +51,8 @@ class PartialMigrate extends Command
 
         Artisan::call("migrate");
         $this->info("Migrated");
-
+        
+        Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeSetTableSeeder"]);
         Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeTableSeeder"]);
         Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeGroupTableSeeder"]);
         Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeOptionTableSeeder"]);
