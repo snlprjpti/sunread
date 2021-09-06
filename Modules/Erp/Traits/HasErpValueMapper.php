@@ -136,7 +136,7 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("description"),
-                    "value" => $description, 
+                    "value" => $description ?? $erp_product_iteration->value["description"], 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("short_description"),
@@ -148,7 +148,7 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_keywords"),
-                    "value" => $description, 
+                    "value" => $description ?? $erp_product_iteration->value["description"], 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_title"),
@@ -156,7 +156,7 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_description"),
-                    "value" => $description, 
+                    "value" => $description ?? $erp_product_iteration->value["description"], 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("status"),
@@ -558,7 +558,7 @@ trait HasErpValueMapper
                     "product_id" => $product->id,
                     "website_id" => $product->website_id,
                     "manage_stock" =>  0,
-                    "is_in_stock" => (bool) ($value > 0) ? 1 : 0,
+                    "is_in_stock" => ($value > 0) ? 1 : 0,
                 ];
         
                 $match = [
