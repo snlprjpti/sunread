@@ -332,8 +332,7 @@ trait HasErpValueMapper
                 case 'size':
                     $data = [
                         "attribute_id" => $this->getAttributeId("size"),
-                        "name" => $erp_product_iteration["pfHorizontalComponentCode"] ?? "",
-                        "code" => $erp_product_iteration["pfVerticalComponentCode"] ?? ""
+                        "name" => $erp_product_iteration["pfHorizontalComponentCode"] ?? ""
                     ];
                     $attribute_option = AttributeOption::updateOrCreate($data);
                     break;
