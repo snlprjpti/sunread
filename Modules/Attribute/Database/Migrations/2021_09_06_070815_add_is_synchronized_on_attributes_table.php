@@ -14,7 +14,7 @@ class AddIsSynchronizedOnAttributesTable extends Migration
     public function up()
     {
         Schema::table('attributes', function (Blueprint $table) {
-            $table->boolean('is_synchronized')->default(0)->nullable();
+            $table->boolean('is_synchronized')->default(0)->nullable()->after('use_in_layered_navigation');
         });
     }
 
