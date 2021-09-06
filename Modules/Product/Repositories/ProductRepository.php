@@ -42,8 +42,7 @@ class ProductRepository extends BaseRepository
             "parent_id" => "sometimes|nullable|exists:products,id",
             "brand_id" => "sometimes|nullable|exists:brands,id",
             "attributes" => "required|array",
-            "scope" => "sometimes|in:website,channel,store",
-            "website_id" => "required|exists:websites,id"
+            "scope" => "sometimes|in:website,channel,store"
         ];
 
         $this->attribute_set_repository = $attribute_set_repository;
