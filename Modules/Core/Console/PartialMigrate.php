@@ -29,6 +29,8 @@ class PartialMigrate extends Command
         DB::table('catalog_inventories')->truncate();
         DB::table('catalog_inventory_items')->truncate();     
         DB::table('product_attributes')->truncate();
+        DB::table('product_images')->truncate(); 
+        DB::table('image_type_product_image')->truncate();
         DB::table('product_attribute_boolean')->truncate();
         DB::table('product_attribute_decimal')->truncate();
         DB::table('product_attribute_integer')->truncate();
