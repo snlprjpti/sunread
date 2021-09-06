@@ -33,8 +33,6 @@ class ProductConfigurableRepository extends BaseRepository
             "super_attributes" => "required|array",
             "attributes" => "required|array",
             "scope" => "sometimes|in:website,channel,store",
-            "website_id" => "required|exists:websites,id",
-            "website_id" => "required|exists:websites,id",
             "grouping_attributes" => "sometimes|exists:attributes,id",
             "update_attributes" => "required_with:update_variants|array",
             "update_attributes.*" => "exists:attributes,id",
