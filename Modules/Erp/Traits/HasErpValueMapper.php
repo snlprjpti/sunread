@@ -400,7 +400,7 @@ trait HasErpValueMapper
                 return is_array($value) ? $value : json_decode($value, true) ?? $value;
             });
     
-            if ( !empty($variant) ) $images = $images->filter(function($image) use ($variant) {
+            if ( !empty($variant) ) $images = $images->filter(function ($image) use ($variant) {
                 return $image["color_code"] == $variant["pfVerticalComponentCode"] || $image["color_code"] == $variant["pfHorizontalComponentCode"];                   
             });
     
