@@ -37,6 +37,7 @@ return [
         'no_parent_belong_to_website' => "Patent Category does not belong to this website",
         'inventory_cannot_be_zero' => 'Inventory quantity cannot be less than zero',
         'range-required' => ':name range is required',
+        'choose-address' => 'Type of address is required.'
     ],
     'users' => [
         'forget-password' => [

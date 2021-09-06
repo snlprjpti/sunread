@@ -29,8 +29,8 @@ class ErpMigratorJob implements ShouldQueue
     {
         try
         {
-            $check_variants = ($this->getDetailCollection("productVariants", $this->detail->sku)->count() > 1);
-            $type = ($check_variants) ? "configurable" : "simple";
+            $check_variants = ($this->getDetailCollection("productVariants", $this->detail->sku)->count() <= 1);
+            $type = ($check_variants) ? "simple" : "configurable";
 
             $match = [
                 "website_id" => 1,
@@ -41,17 +41,19 @@ class ErpMigratorJob implements ShouldQueue
                 "type" => $type,
             ]);
 
-            $product = Product::updateOrCreate($match, $product_data);
-            ErpMigrateProductImageJob::dispatchSync($product, $this->detail);
+            if ($check_variants) $product_data["parent_id"] = null;
 
-            if ($check_variants) ErpGenerateVariantProductJob::dispatchSync($product, $this->detail);
+            $product = Product::updateOrCreate($match, $product_data);
+            $this->mapstoreImages($product, $this->detail);
+
+
+            if ($check_variants) $this->createVariants($product, $this->detail);
 
             //visibility attribute value
             $visibility = ($check_variants) ? 5 : 8;
-            
-            ErpMigrateProductAttributeJob::dispatchSync($product, $this->detail, false, $visibility);
-            ErpMigrateProductInventoryJob::dispatchSync($product, $this->detail);
-            ErpDetailStatusUpdate::dispatchSync($this->detail->id);
+            $this->createAttributeValue($product, $this->detail, false, $visibility);
+            $this->createInventory($product, $this->detail);
+            $this->detail->update(["status" => 1]);
         }
         catch ( Exception $exception )
         {
