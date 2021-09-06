@@ -249,27 +249,6 @@ class AttributeTableSeeder extends Seeder
                 "is_required" => 1
             ],
             [
-                "name" => "Base Image",
-                "slug" => "base_image",
-                "type" => "image",
-                "scope" => "website",
-                "is_required" => 0
-            ],
-            [
-                "name" => "Small Image",
-                "slug" => "small_image",
-                "type" => "image",
-                "scope" => "website",
-                "is_required" => 0
-            ],
-            [
-                "name" => "Thumbnail Image",
-                "slug" => "thumbnail_image",
-                "type" => "image",
-                "scope" => "website",
-                "is_required" => 0
-            ],
-            [
                 "name" => "Color",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
@@ -332,13 +311,6 @@ class AttributeTableSeeder extends Seeder
                 "type" => "text",
                 "is_unique" => 1,
                 "scope" => "store"
-            ],
-            [
-                "name" => "Section Background Image",
-                "slug" => "section_background_image",
-                "type" => "image",
-                "scope" => "website",
-                "is_required" => 0
             ],
             [
                 "name" => "Gallery",
