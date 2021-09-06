@@ -98,7 +98,8 @@ class ProductConfigurableController extends BaseController
                 return [
                     "scope" => $request->scope ?? "website",
                     "scope_id" => $request->scope_id ?? $product->website_id,
-                    "type" => "configurable"
+                    "type" => "configurable",
+                    "website_id" => $product->website_id
                 ];
             });
 
