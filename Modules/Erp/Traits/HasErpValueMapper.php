@@ -186,6 +186,7 @@ trait HasErpValueMapper
 
             foreach ( $attribute_data as $attributeData )
             {
+                if (empty($attributeData["value"])) continue;
                 $attribute = Attribute::find($attributeData["attribute_id"]);
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
                 $value = $attribute_type::create(["value" => $attributeData["value"]]);
