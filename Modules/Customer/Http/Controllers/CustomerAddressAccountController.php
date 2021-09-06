@@ -11,7 +11,6 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 use Modules\Customer\Exceptions\ActionUnauthorizedException;
-use Modules\Customer\Exceptions\AddressAlreadyCreatedException;
 use Modules\Customer\Repositories\CustomerAddressRepository;
 use Modules\Customer\Transformers\CustomerAddressResource;
 
@@ -45,13 +44,8 @@ class CustomerAddressAccountController extends BaseController
     {
         try
         {
-            $customer_id = $this->customer->id;
-            if($type == "shipping") {
-                $fetched  = $this->repository->checkShippingAddress($customer_id)->firstOrFail();
-            }
-            else {
-                $fetched = $this->repository->checkBillingAddress($customer_id)->firstOrFail();
-            }
+            if($type == "shipping") $fetched = $this->repository->checkShippingAddress($this->customer->id)->firstOrFail();
+            else $fetched = $this->repository->checkBillingAddress($this->customer->id)->firstOrFail();
         }
         catch (Exception $exception)
         {
@@ -65,10 +59,9 @@ class CustomerAddressAccountController extends BaseController
     {
         try
         {
-            if($request->default_shipping_address == 0 && $request->default_billing_address == 0) throw new Exception("Choose Atleast One.");
-            $customer_id = $this->customer->id;
+            if($request->default_shipping_address == 0 && $request->default_billing_address == 0) throw new Exception(trans("choose-address"));
 
-            $created = $this->repository->insert($request, $customer_id);
+            $created = $this->repository->insert($request, $this->customer->id);
         }
         catch (Exception $exception)
         {
@@ -82,13 +75,8 @@ class CustomerAddressAccountController extends BaseController
     {
         try
         {
-            $customer_id = $this->customer->id;
-            if($type == "shipping") {
-                $address  = $this->repository->checkShippingAddress($customer_id)->firstOrFail();
-            }
-            else {
-                $address = $this->repository->checkBillingAddress($customer_id)->firstOrFail();
-            }
+            if($type == "shipping") $address = $this->repository->checkShippingAddress($this->customer->id)->firstOrFail();
+            else $address = $this->repository->checkBillingAddress($this->customer->id)->firstOrFail();
 
             $data = $this->repository->validateData($request);
             $updated = $this->repository->update($data, $address->id);
@@ -105,14 +93,8 @@ class CustomerAddressAccountController extends BaseController
     {
         try
         {
-            $customer_id = $this->customer->id;
-            if($type == "shipping") {
-                $address  = $this->repository->checkShippingAddress($customer_id)->firstOrFail();
-            }
-            else {
-                $address = $this->repository->checkBillingAddress($customer_id)->firstOrFail();
-            }
-
+            if($type == "shipping") $address = $this->repository->checkShippingAddress($this->customer->id)->firstOrFail();
+            else $address = $this->repository->checkBillingAddress($this->customer->id)->firstOrFail();
             $this->repository->delete($address->id);
         }
         catch (Exception $exception)
@@ -122,5 +104,4 @@ class CustomerAddressAccountController extends BaseController
 
         return $this->successResponseWithMessage($this->lang("delete-success"));
     }
-
 }
