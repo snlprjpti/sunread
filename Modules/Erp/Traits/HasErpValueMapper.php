@@ -52,6 +52,7 @@ trait HasErpValueMapper
             $erp_details = ErpImport::where("type", "listProducts")->first()->erp_import_details;
 
             $chunked = $erp_details->chunk(100); 
+            $count = 0;
             foreach ( $chunked as $chunk )
             {
                 foreach ( $chunk as $detail )
@@ -59,7 +60,10 @@ trait HasErpValueMapper
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
+                    //loop breaked for testing
+                    if ( $count == 10 ) break;
                     ErpMigratorJob::dispatch($detail);
+                    $count++;
                 }
             }
         }
@@ -112,11 +116,11 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("price"),
-                    "value" => $price_value["unitPrice"], 
+                    "value" => ($variants->count() > 1) ? $price_value["unitPrice"] : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("cost"),
-                    "value" => $price_value["unitPrice"], 
+                    "value" => ($variants->count() > 1) ? $price_value["unitPrice"] : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("special_from_date"),
@@ -182,6 +186,7 @@ trait HasErpValueMapper
 
             foreach ( $attribute_data as $attributeData )
             {
+                if (empty($attributeData["value"])) continue;
                 $attribute = Attribute::find($attributeData["attribute_id"]);
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
                 $value = $attribute_type::create(["value" => $attributeData["value"]]);

@@ -8,6 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Traits\HasErpValueMapper;
 use Modules\Product\Entities\Product;
 
@@ -49,8 +50,8 @@ class ErpMigratorJob implements ShouldQueue
             if (!$check_variants) $this->createVariants($product, $this->detail);
             $this->mapstoreImages($product, $this->detail);
 
-            $this->createInventory($product, $this->detail);
-            $this->detail->update(["status" => 1]);
+            if ($check_variants) $this->createInventory($product, $this->detail);
+            ErpImportDetail::whereId($this->detail->id)->first()?->update(["status" => 1]);
         }
         catch ( Exception $exception )
         {
