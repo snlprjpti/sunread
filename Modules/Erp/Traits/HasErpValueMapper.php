@@ -139,6 +139,10 @@ trait HasErpValueMapper
                     "value" => Str::limit($description, 100), 
                 ],
                 [
+                    "attribute_id" => $this->getAttributeId("url_key"),
+                    "value" => Str::slug($erp_product_iteration->value["description"]), 
+                ],
+                [
                     "attribute_id" => $this->getAttributeId("meta_keywords"),
                     "value" => $description, 
                 ],
