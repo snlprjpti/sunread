@@ -140,7 +140,7 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("url_key"),
-                    "value" => Str::slug($erp_product_iteration->value["description"]), 
+                    "value" => Str::slug($product->sku), 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_keywords"),
@@ -493,21 +493,40 @@ trait HasErpValueMapper
                     $this->createInventory($variant_product, $erp_product_iteration);
                 }
 
-                
-                $attr_option_products = AttributeOptionsChildProduct::whereIn("product_id", $variant_product_ids)
-                    ->with(["attribute_option", "attribute_option.attribute", "variant_product.product_attributes"])
-                    ->get()
-                    ->filter(function ($filter_attribute_option) {
-                        return $filter_attribute_option->attribute_option->attribute->id == $this->getAttributeId("color");
-                    })->groupBy("attribute_option_id");
+                $this->updateVisibility($variant_product_ids, $product);
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+    }
 
-                foreach ( $attr_option_products as $attr_option_product )
+    private function updateVisibility(array $variant_product_ids, object $product): void
+    {
+        try
+        {
+            $attribute_configurable_product = AttributeConfigurableProduct::whereProductId($product->id)->get();
+            if ( $attribute_configurable_product->count() == 1)
+            {
+                $product->product_attributes->where("attribute_id", $this->getAttributeId("visibility"))->first()?->value->update(["value" => 8]);
+                $variant_products = Product::whereIn("id", $variant_product_ids)->with(["product_attributes"])->get();
+                foreach ( $variant_products as $variant_pro ) $variant_pro->product_attributes->where("attribute_id", $this->getAttributeId("visibility"))->first()?->value->update(["value" => 5]);
+            }
+    
+            $attr_option_products = AttributeOptionsChildProduct::whereIn("product_id", $variant_product_ids)
+                ->with(["attribute_option", "attribute_option.attribute", "variant_product.product_attributes"])
+                ->get()
+                ->filter(function ($filter_attribute_option) {
+                    return $filter_attribute_option->attribute_option->attribute->id == $this->getAttributeId("color");
+                })->groupBy("attribute_option_id");
+
+            foreach ( $attr_option_products as $attr_option_product )
+            {
+                foreach ($attr_option_product->pluck("variant_product") as $key => $variant_product)
                 {
-                    foreach ($attr_option_product->pluck("variant_product") as $key => $variant_product)
-                    {
-                        if ($key == 0) continue;
-                        $variant_product->product_attributes->where("attribute_id", $this->getAttributeId("visibility"))->first()?->value->update(["value" => 5]);
-                    }
+                    if ($key == 0) continue;
+                    $variant_product->product_attributes->where("attribute_id", $this->getAttributeId("visibility"))->first()?->value->update(["value" => 5]);
                 }
             }
         }
