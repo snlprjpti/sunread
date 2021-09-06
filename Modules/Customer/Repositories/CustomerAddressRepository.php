@@ -127,6 +127,9 @@ class CustomerAddressRepository extends BaseRepository
 
     public function insert(object $request, int $customer_id): object
     {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.create.before");
+
         try
         {
             $data = $this->validateData($request, array_merge($this->regionAndCityRules($request), [
@@ -141,20 +144,24 @@ class CustomerAddressRepository extends BaseRepository
             if ($request->default_shipping_address == 1) {
                 if ($this->checkShippingAddress($customer_id)->count() > 0 ) throw new AddressAlreadyCreatedException("Shipping Address Already Exist");
                 $data["default_billing_address"] = 0;
-                $created = $this->create($data);
+                $created = $this->model->create($data);
             }
 
             if ($request->default_billing_address == 1) {
                 if ($this->checkBillingAddress($customer_id)->count() > 0) throw new AddressAlreadyCreatedException("Billing Address Already Exist");
                 $data["default_shipping_address"] = 0;
                 $data["default_billing_address"] = 1;
-                $created = $this->create($data);
+                $created = $this->model->create($data);
             }
         }
         catch (Exception $exception)
         {
+            DB::rollBack();
             throw $exception;
         }
+
+        Event::dispatch("{$this->model_key}.create.after", $created);
+        DB::commit();
 
         return $created;
     }
