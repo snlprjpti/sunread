@@ -29,8 +29,8 @@ class ErpMigratorJob implements ShouldQueue
     {
         try
         {
-            $check_variants = ($this->getDetailCollection("productVariants", $this->detail->sku)->count() > 1);
-            $type = ($check_variants) ? "configurable" : "simple";
+            $check_variants = ($this->getDetailCollection("productVariants", $this->detail->sku)->count() <= 1);
+            $type = ($check_variants) ? "simple" : "configurable";
 
             $match = [
                 "website_id" => 1,
@@ -40,6 +40,8 @@ class ErpMigratorJob implements ShouldQueue
                 "attribute_set_id" => 1,
                 "type" => $type,
             ]);
+
+            if ($check_variants) $product_data["parent_id"] = null;
 
             $product = Product::updateOrCreate($match, $product_data);
             $this->mapstoreImages($product, $this->detail);
