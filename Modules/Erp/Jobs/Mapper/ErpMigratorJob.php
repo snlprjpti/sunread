@@ -44,14 +44,11 @@ class ErpMigratorJob implements ShouldQueue
             if ($check_variants) $product_data["parent_id"] = null;
 
             $product = Product::updateOrCreate($match, $product_data);
-            $this->mapstoreImages($product, $this->detail);
-
-
-            if ($check_variants) $this->createVariants($product, $this->detail);
-
             //visibility attribute value
             $visibility = ($check_variants) ? 5 : 8;
             $this->createAttributeValue($product, $this->detail, false, $visibility);
+            if ($check_variants) $this->createVariants($product, $this->detail);
+            $this->mapstoreImages($product, $this->detail);
             $this->createInventory($product, $this->detail);
             $this->detail->update(["status" => 1]);
         }
