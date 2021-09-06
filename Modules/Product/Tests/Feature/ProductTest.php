@@ -132,7 +132,7 @@ class ProductTest extends BaseTestCase
     public function getInvalidUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
-            "website_id" => null
+            "parent_id" => 0
         ]);
     }
 
