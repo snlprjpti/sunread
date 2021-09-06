@@ -47,10 +47,10 @@ class CustomerAddressAccountController extends BaseController
         {
             $customer_id = $this->customer->id;
             if($type == "shipping") {
-                $fetched  = $this->checkShippingAddress($customer_id)->firstOrFail();
+                $fetched  = $this->repository->checkShippingAddress($customer_id)->firstOrFail();
             }
             else {
-                $fetched = $this->checkBillingAddress($customer_id)->firstOrFail();
+                $fetched = $this->repository->checkBillingAddress($customer_id)->firstOrFail();
             }
         }
         catch (Exception $exception)
@@ -68,27 +68,7 @@ class CustomerAddressAccountController extends BaseController
             if($request->default_shipping_address == 0 && $request->default_billing_address == 0) throw new Exception("Choose Atleast One.");
             $customer_id = $this->customer->id;
 
-            $data = $this->repository->validateData($request, array_merge($this->repository->regionAndCityRules($request), [
-                "default_shipping_address" => "boolean|required_without:default_billing_address",
-                "default_billing_address" => "boolean|required_without:default_shipping_address"
-            ]), function () use ($customer_id) {
-                return [
-                    "customer_id" => Customer::findOrFail($customer_id)->id,
-                ];
-            });
-
-            if ($request->default_shipping_address == 1) {
-                if ($this->model->whereCustomerId($customer_id)->whereDefaultShippingAddress(1)->count() > 0 ) throw new AddressAlreadyCreatedException();
-                $data["default_billing_address"] = 0;
-                $created = $this->repository->create($data);
-            }
-
-            if ($request->default_billing_address == 1) {
-                if ($this->model->whereCustomerId($customer_id)->whereDefaultBillingAddress(1)->count() > 0) throw new AddressAlreadyCreatedException();
-                $data["default_shipping_address"] = 0;
-                $data["default_billing_address"] = 1;
-                $created = $this->repository->create($data);
-            }
+            $created = $this->repository->insert($request, $customer_id);
         }
         catch (Exception $exception)
         {
@@ -104,10 +84,10 @@ class CustomerAddressAccountController extends BaseController
         {
             $customer_id = $this->customer->id;
             if($type == "shipping") {
-                $address  = $this->checkShippingAddress($customer_id)->firstOrFail();
+                $address  = $this->repository->checkShippingAddress($customer_id)->firstOrFail();
             }
             else {
-                $address = $this->checkBillingAddress($customer_id)->firstOrFail();
+                $address = $this->repository->checkBillingAddress($customer_id)->firstOrFail();
             }
 
             $data = $this->repository->validateData($request);
@@ -127,10 +107,10 @@ class CustomerAddressAccountController extends BaseController
         {
             $customer_id = $this->customer->id;
             if($type == "shipping") {
-                $address  = $this->checkShippingAddress($customer_id)->firstOrFail();
+                $address  = $this->repository->checkShippingAddress($customer_id)->firstOrFail();
             }
             else {
-                $address = $this->checkBillingAddress($customer_id)->firstOrFail();
+                $address = $this->repository->checkBillingAddress($customer_id)->firstOrFail();
             }
 
             $this->repository->delete($address->id);
@@ -143,15 +123,4 @@ class CustomerAddressAccountController extends BaseController
         return $this->successResponseWithMessage($this->lang("delete-success"));
     }
 
-    protected function checkShippingAddress(int $customer_id): object
-    {
-        $address = $this->model->whereCustomerId($customer_id)->whereDefaultShippingAddress(1);
-        return $address;
-    }
-
-    protected function checkBillingAddress(int $customer_id): object
-    {
-        $address = $this->model->whereCustomerId($customer_id)->whereDefaultBillingAddress(1);
-        return $address;
-    }
 }
