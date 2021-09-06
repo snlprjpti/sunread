@@ -87,7 +87,7 @@ trait HasErpValueMapper
             $description_value = $this->getDetailCollection("productDescriptions", $erp_product_iteration->sku);
             $description = ($description_value->count() > 1) ? json_decode($this->getValue($description_value)->first(), true)["description"] ?? "" : "";
             
-            // get price for specific product need more clearification
+            // get price for specific product
             $price = $this->getDetailCollection("salePrices", $erp_product_iteration->sku);
             $default_price_data = [
                 "unitPrice" => 0.0,
@@ -389,7 +389,7 @@ trait HasErpValueMapper
             return is_array($value) ? $value : json_decode($value, true) ?? $value;
         });
 
-        if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"]);
+        if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"])->orWhere("color_code", $variant["pfHorizontalComponentCode"]);
 
         if ( $images->count() > 0 )
         {
@@ -448,26 +448,24 @@ trait HasErpValueMapper
                         "parent_id" => $product->id,
                         "attribute_set_id" => 1,
                         "website_id" => 1,
-                        "sku" => "{$product->sku}-{$variant['code']}",
+                        "sku" => "{$product->sku}_{$variant['code']}",
                         "type" => "simple",
                     ];
 
                     $match = [
                         "website_id" => 1,
-                        "sku" => "{$product->sku}-{$variant['code']}",
+                        "sku" => "{$product->sku}_{$variant['code']}",
                     ];
 
                     $variant_product = Product::updateOrCreate($match, $product_data);
                     $variant_product_ids[] = $variant_product->id;
                     $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
         
-                    $this->mapstoreImages($product, $erp_product_iteration, $variant);                    
-                    $this->createAttributeValue($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
-
                     $attribute_option = AttributeOption::whereCode($variant['pfVerticalComponentCode'])
                     ->orWhere('name', $variant['pfHorizontalComponentCode'])
                     ->first();
 
+                    $this->createAttributeValue($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
                     if ($attribute_option)
                     {
                         $configurable_product_attributes["product_id"] = $product->id;
@@ -480,8 +478,10 @@ trait HasErpValueMapper
                             "product_id" => $variant_product->id 
                         ]);
                     }
+                    $this->mapstoreImages($product, $erp_product_iteration, $variant);
                     $this->createInventory($variant_product, $erp_product_iteration);
                 }
+
                 
                 $attr_option_products = AttributeOptionsChildProduct::whereIn("product_id", $variant_product_ids)
                     ->with(["attribute_option", "attribute_option.attribute", "variant_product.product_attributes"])
