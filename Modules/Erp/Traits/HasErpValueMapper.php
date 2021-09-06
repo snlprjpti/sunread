@@ -332,7 +332,8 @@ trait HasErpValueMapper
                 case 'size':
                     $data = [
                         "attribute_id" => $this->getAttributeId("size"),
-                        "name" => $erp_product_iteration["pfHorizontalComponentCode"] ?? ""
+                        "name" => $erp_product_iteration["pfHorizontalComponentCode"] ?? "",
+                        "code" => $erp_product_iteration["webAssortmentColor_Code"] ?? ""
                     ];
                     $attribute_option = AttributeOption::updateOrCreate($data);
                     break;
@@ -475,7 +476,7 @@ trait HasErpValueMapper
                     $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
         
                     $attribute_option = AttributeOption::whereCode($variant['pfVerticalComponentCode'])
-                    ->orWhere('name', $variant['pfHorizontalComponentCode'])
+                    ->where('name', $variant['pfHorizontalComponentCode'])
                     ->first();
 
                     $this->createAttributeValue($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
