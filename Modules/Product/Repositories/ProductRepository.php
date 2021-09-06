@@ -8,10 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Modules\Core\Entities\Store;
 use Modules\Core\Rules\ScopeRule;
-use Illuminate\Support\Facades\DB;
 use Modules\Core\Entities\Channel;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Event;
 use Intervention\Image\Facades\Image;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
@@ -30,8 +27,8 @@ use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\ImageType;
-use Modules\Product\Jobs\MapProductImageTypeValueJob;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
+use Modules\Product\Transformers\VariantProductResource;
 
 class ProductRepository extends BaseRepository
 {
@@ -45,8 +42,7 @@ class ProductRepository extends BaseRepository
             "parent_id" => "sometimes|nullable|exists:products,id",
             "brand_id" => "sometimes|nullable|exists:brands,id",
             "attributes" => "required|array",
-            "scope" => "sometimes|in:website,channel,store",
-            "website_id" => "required|exists:websites,id"
+            "scope" => "sometimes|in:website,channel,store"
         ];
 
         $this->attribute_set_repository = $attribute_set_repository;
@@ -341,20 +337,7 @@ class ProductRepository extends BaseRepository
             ];
             $fetched["attributes"] = $this->getData($id, $scope);
 
-            if ($product->type == "configurable") {
-                $configurable_childs = $this->model->with("attribute_options_child_products")->whereParentId($id)->get();
-
-                foreach($configurable_childs as $configurable_child)
-                {
-                    $fetched["configurable_attributes"][] = $configurable_child->attribute_options_child_products->map(function ($configurable_attribute) {      
-                        return [
-                            "product_id" => $configurable_attribute->product_id,
-                            "attribute_id" => AttributeOption::find($configurable_attribute->attribute_option_id)?->attribute_id,
-                            "attribute_option_id" => $configurable_attribute->attribute_option_id
-                        ];
-                    })->toArray();
-                }
-            }
+            if ($product->type == "configurable") $fetched = array_merge($fetched, $this->getConfigurableData($product));
         }
         catch ( Exception $exception )
         {
@@ -363,7 +346,40 @@ class ProductRepository extends BaseRepository
         
         return $fetched;
     }
-    
+
+    public function getConfigurableData(object $product): array
+    {
+        try
+        {    
+            $fetched = [];       
+            $variants = $product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
+            $fetched["variants"] = VariantProductResource::collection($variants);
+            
+            $variant_attribute_options = $variants->map(function($variant) {
+                return $variant->attribute_options_child_products->pluck("attribute_option_id")->toArray();
+            })->flatten(1)->unique();
+
+            $items = [];
+            $variant_attribute_options->map(function($variant_attribute_option) use(&$items) {
+                $attribute_option = AttributeOption::find($variant_attribute_option);
+                $attribute = $attribute_option->attribute;
+
+                $items[$attribute->id]["attribute_id"] = $attribute->id;
+                $items[$attribute->id]["attribute_option_id"][] = $attribute_option->id;
+            })->toArray(); 
+            $fetched["configurable"]["attributes"] = array_values($items);
+
+            $group_attribute = AttributeConfigurableProduct::whereProductId($product->id)->whereUsedInGrouping(1)->first();
+            if($group_attribute) $fetched["configurable"]["group_attribute"] = $group_attribute->attribute_id;
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
     public function getParentScope(array $scope): array
     {
         try
@@ -420,7 +436,8 @@ class ProductRepository extends BaseRepository
                             "scope" => $attribute->scope,
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required,
-                            "is_user_defined" => (bool) $attribute->is_user_defined
+                            "is_user_defined" => (bool) $attribute->is_user_defined,
+                            "is_synchronized" => (bool) $attribute->is_synchronized
                         ];
                         if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));

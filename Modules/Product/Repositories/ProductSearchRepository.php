@@ -172,12 +172,13 @@ class ProductSearchRepository extends ElasticSearchRepository
             foreach(["color", "size", "collection"] as $field) 
             {
                 $state = [];
-                $filter["label"] = $field;
+                $filter["label"] = Attribute::whereSlug($field)->first()?->name;
+                $filter["name"] = $field;
                 $filter["values"] = collect($fetched["aggregations"][$field]["buckets"])->map(function($bucket) use(&$state) {
                     if(!in_array($bucket["key"], $state)) {
                         $state[] = $bucket["key"];
                         return [
-                            "label" => AttributeOption::find($bucket["key"])?->name,
+                            "name" => AttributeOption::find($bucket["key"])?->name,
                             "value" =>  $bucket["key"]  
                         ];
                     }
@@ -188,13 +189,16 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $filters[] = [
                 "label" => "Sort By",
+                "name" => "sort_by",
                 "values" => [
                     [
-                        "name" => "Name",
+                        "label" => "Name",
+                        "name" => "name",
                         "value" =>  "asc"
                     ],
                     [
-                        "name" => "Price",
+                        "label" => "Price",
+                        "name" => "price",
                         "value" =>  "asc"
                     ]
                 ]

@@ -33,7 +33,11 @@ class ProductConfigurableRepository extends BaseRepository
             "super_attributes" => "required|array",
             "attributes" => "required|array",
             "scope" => "sometimes|in:website,channel,store",
-            "website_id" => "required|exists:websites,id"
+            "grouping_attributes" => "sometimes|exists:attributes,id",
+            "update_attributes" => "required_with:update_variants|array",
+            "update_attributes.*" => "exists:attributes,id",
+            "update_variants" => "array|required_with:update_attributes",
+            "update_variants.*" => "exists:products,id"
         ];
         $this->attribute = $attribute;
         $this->product_repository = $product_repository;
@@ -160,7 +164,8 @@ class ProductConfigurableRepository extends BaseRepository
             if(isset($child_variant))
             {
                 $product_variant = $this->update($data, $child_variant->id, function ($variant) use ($product, $permutation_modify, $request, &$product_attributes, $productAttributes, $scope, $variant_options) {
-                    $this->syncConfigurableAttributes($product, $permutation_modify, $request, $product_attributes, $productAttributes, $scope, $variant_options, $variant);
+                    $update_attributes = $request->update_attributes ? Attribute::whereIn("id", $request->update_attributes)->get()->pluck("slug")->toArray() : null;
+                    $this->syncConfigurableAttributes($product, $permutation_modify, $request, $product_attributes, $productAttributes, $scope, $variant_options, $variant, $update_attributes);
                 });
             }
             else
@@ -207,7 +212,7 @@ class ProductConfigurableRepository extends BaseRepository
         return $data ?? null;
     }
 
-    private function syncConfigurableAttributes(object $product, array $permutation_modify, object $request, array &$product_attributes, array $productAttributes, array $scope, array $variant_options, object $variant): void
+    private function syncConfigurableAttributes(object $product, array $permutation_modify, object $request, array &$product_attributes, array $productAttributes, array $scope, array $variant_options, object $variant, ?array $update_attributes = null): void
     {
         try 
         {
@@ -228,7 +233,7 @@ class ProductConfigurableRepository extends BaseRepository
                 ]
             ], $productAttributes, $variant_options, [ $visibility ]);
 
-            $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
+            $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store", update_attributes:$update_attributes);
 
             array_map(function($child_attribute_option) use($variant) {
                 AttributeOptionsChildProduct::updateOrCreate([

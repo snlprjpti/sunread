@@ -37,7 +37,8 @@ class AttributeRepository extends BaseRepository
             "is_searchable" => "sometimes|boolean",
             "is_unique" => "sometimes|boolean",
             "search_weight" => "required_if:is_searchable,==,1|nullable|numeric",
-            "translations" => "nullable|array"
+            "translations" => "nullable|array",
+            "is_synchronized" => "sometimes|boolean"
         ];
     }
 

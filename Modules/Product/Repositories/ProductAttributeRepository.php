@@ -175,7 +175,7 @@ class ProductAttributeRepository extends ProductRepository
         }
     }
 
-    public function syncAttributes(array $data, object $product, array $scope, object $request, string $method = "store", ?string $product_type = null): bool
+    public function syncAttributes(array $data, object $product, array $scope, object $request, string $method = "store", ?string $product_type = null, ?array $update_attributes = null): bool
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.sync.before");
@@ -186,6 +186,7 @@ class ProductAttributeRepository extends ProductRepository
 
                 $scope_arr = $scope;
 
+                if($update_attributes && !in_array($product->id, $request->update_variants) && in_array($attribute["attribute_slug"], $update_attributes)) continue;
                 //removed some attributes in case of configurable products
                 if($product_type && in_array($attribute['attribute_slug'], $this->non_required_attributes)) continue;
 

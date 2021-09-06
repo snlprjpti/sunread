@@ -23,7 +23,7 @@ class CustomerAddressAccountController extends BaseController
         $this->repository = $customerAddressRepository;
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
-        $this->customer = auth()->guard("customer")->check() ? auth()->guard("customer")->user() : new Customer();
+        $this->customer = auth()->guard("customer")->user();
         $exception_statuses = [
             ActionUnauthorizedException::class => 403
         ];
@@ -40,27 +40,28 @@ class CustomerAddressAccountController extends BaseController
         return new CustomerAddressResource($data);
     }
 
-    public function show(): JsonResponse
+    public function show(string $type): JsonResponse
     {
         try
         {
-            $fetched = $this->customer->addresses;
+            if($type == "shipping") $fetched = $this->repository->checkShippingAddress($this->customer->id)->firstOrFail();
+            else $fetched = $this->repository->checkBillingAddress($this->customer->id)->firstOrFail();
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang("fetch-success"));
+        return $this->successResponse($this->resource($fetched), $this->lang("fetch-success"));
     }
 
     public function create(Request $request): JsonResponse
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $data["customer_id"] = $this->customer->id;
-            $created = $this->repository->create($data);
+            if($request->default_shipping_address == 0 && $request->default_billing_address == 0) throw new Exception($this->lang("response.choose-address"));
+
+            $created = $this->repository->insert($request, $this->customer->id);
         }
         catch (Exception $exception)
         {
@@ -70,13 +71,15 @@ class CustomerAddressAccountController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang("create-success"));
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request, string $type): JsonResponse
     {
         try
         {
-            $this->checkAuthority($id);
+            if($type == "shipping") $address = $this->repository->checkShippingAddress($this->customer->id)->firstOrFail();
+            else $address = $this->repository->checkBillingAddress($this->customer->id)->firstOrFail();
+
             $data = $this->repository->validateData($request);
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->update($data, $address->id);
         }
         catch (Exception $exception)
         {
@@ -86,24 +89,19 @@ class CustomerAddressAccountController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
-    public function delete(Request $request, int $id): JsonResponse
+    public function delete(string $type): JsonResponse
     {
         try
         {
-            $this->checkAuthority($id);
-            $this->repository->delete($id);
+            if($type == "shipping") $address = $this->repository->checkShippingAddress($this->customer->id)->firstOrFail();
+            else $address = $this->repository->checkBillingAddress($this->customer->id)->firstOrFail();
+            $this->repository->delete($address->id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
-    
-        return $this->successResponseWithMessage($this->lang("delete-success"));
-    }
 
-    protected function checkAuthority($id): void
-    {
-        $customer_address_ids = $this->customer->addresses->pluck("id")->toArray() ?? [];
-        if (!in_array($id, $customer_address_ids)) throw new ActionUnauthorizedException("Action not authorized.");
+        return $this->successResponseWithMessage($this->lang("delete-success"));
     }
 }
