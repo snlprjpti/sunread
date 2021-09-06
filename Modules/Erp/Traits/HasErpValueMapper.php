@@ -59,7 +59,7 @@ trait HasErpValueMapper
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
-                    ErpMigratorJob::dispatchSync($detail);
+                    ErpMigratorJob::dispatch($detail);
                 }
             }
         }
@@ -353,7 +353,7 @@ trait HasErpValueMapper
             if ( $attribute_groups->count() > 1 )
             {
                 $this->getValue($attribute_groups, function ($value) use (&$attach_value, $attribute_name) {
-                    if ( $value["attributetype"] == $attribute_name ) $attach_value .= Str::finish($value["description"], ".\\r\\n ");
+                    if ( $value["attributetype"] == $attribute_name ) $attach_value .= Str::finish($value["description"], ".\r\n ");
                 });
             }
         }
@@ -361,7 +361,7 @@ trait HasErpValueMapper
         {
             throw $exception;
         }
-        return $attach_value;
+        return nl2br($attach_value);
     }
 
     // This fn will get value form erp detail value field 
