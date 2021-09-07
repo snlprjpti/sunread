@@ -38,6 +38,7 @@ class ConfigurationController extends BaseController
         {
             return $this->handleException($exception);
         }
+        
 
         return $this->successResponse($fetched, $this->lang('fetch-list-success'));
     }
