@@ -103,7 +103,7 @@ class LogCatalogInventoryItem implements ShouldQueue
                 break;
             }
 
-            if ( $new_quantity < 0 ) throw new InventoryCannotBeLessThanZero();
+            // if ( $new_quantity < 0 ) throw new InventoryCannotBeLessThanZero();
         }
         catch (Exception $exception)
         {

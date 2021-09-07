@@ -13,6 +13,7 @@ use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Jobs\Mapper\ErpDetailStatusUpdate;
 use Modules\Erp\Jobs\Mapper\ErpGenerateVariantProductJob;
@@ -24,6 +25,7 @@ use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
 use Modules\Erp\Jobs\Mapper\ErpMigratorJob;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
+use Modules\Product\Entities\ProductAttributeString;
 
 trait HasErpValueMapper
 {
@@ -52,6 +54,7 @@ trait HasErpValueMapper
             $erp_details = ErpImport::where("type", "listProducts")->first()->erp_import_details;
 
             $chunked = $erp_details->chunk(100); 
+            $count = 0;
             foreach ( $chunked as $chunk )
             {
                 foreach ( $chunk as $detail )
@@ -59,9 +62,30 @@ trait HasErpValueMapper
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
+
+                    //loop breaked for testing
+                    if ( $count == 10 ) break;
                     ErpMigratorJob::dispatch($detail);
+                    $count++;
                 }
             }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+    }
+
+    private function createOption(object $erp_product_iteration): void
+    {
+        try
+        {
+            $data = [
+                "attribute_id" => $this->getAttributeId("color"),
+                "name" => $erp_product_iteration->value["webAssortmentColor_Description"],
+                "code" => $erp_product_iteration->value["webAssortmentColor_Code"]
+            ];
+            if ( !empty($data["name"]) || !empty($data["code"]) ) AttributeOption::updateOrCreate($data);
         }
         catch ( Exception $exception )
         {
@@ -73,7 +97,6 @@ trait HasErpValueMapper
     {
         try
         {
-            $this->getAttributeOptionValue($erp_product_iteration, "color");
             $ean_code = $this->getDetailCollection("eanCodes", $erp_product_iteration->sku);
             $variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
 
@@ -85,9 +108,9 @@ trait HasErpValueMapper
             }
 
             $description_value = $this->getDetailCollection("productDescriptions", $erp_product_iteration->sku);
-            $description = ($description_value->count() > 1) ? json_decode($this->getValue($description_value)->first(), true)["description"] ?? "" : "";
+            $description = ($description_value->count() > 0) ? json_decode($this->getValue($description_value)->first(), true)["description"] ?? "" : "";
             
-            // get price for specific product need more clearification
+            // get price for specific product
             $price = $this->getDetailCollection("salePrices", $erp_product_iteration->sku);
             $default_price_data = [
                 "unitPrice" => 0.0,
@@ -104,7 +127,7 @@ trait HasErpValueMapper
 
             $start_time = $start_time < $max_time ? $start_time : $max_time - 1;
             $end_time = $end_time < $max_time ? $end_time : $max_time;
-
+            // dd($variants->count() > 1);
             $attribute_data = [
                 [
                     "attribute_id" => $this->getAttributeId("name"),
@@ -112,11 +135,11 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("price"),
-                    "value" => $price_value["unitPrice"], 
+                    "value" => ($variants->count() <= 1) ? $price_value["unitPrice"] : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("cost"),
-                    "value" => $price_value["unitPrice"], 
+                    "value" => ($variants->count() <= 1) ? $price_value["unitPrice"] : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("special_from_date"),
@@ -132,15 +155,19 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("description"),
-                    "value" => $description, 
+                    "value" => $description ?? $erp_product_iteration->value["description"], 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("short_description"),
                     "value" => Str::limit($description, 100), 
                 ],
                 [
+                    "attribute_id" => $this->getAttributeId("url_key"),
+                    "value" => $this->createSlug($erp_product_iteration->value["description"]), 
+                ],
+                [
                     "attribute_id" => $this->getAttributeId("meta_keywords"),
-                    "value" => $description, 
+                    "value" => $description ?? $erp_product_iteration->value["description"], 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_title"),
@@ -148,7 +175,7 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_description"),
-                    "value" => $description, 
+                    "value" => $description ?? $erp_product_iteration->value["description"], 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("status"),
@@ -156,11 +183,11 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("color"),
-                    "value" => ($this->getDetailCollection("productVariants", $erp_product_iteration->sku)->count() > 1) ? $this->getAttributeOptionValue($erp_product_iteration, "color") : "", 
+                    "value" => ($product->type == "simple") ? $this->getAttributeOptionValue($variant, "color") : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("size"),
-                    "value" => ($this->getDetailCollection("productVariants", $erp_product_iteration->sku)->count() > 1) ? $this->getAttributeOptionValue($variant, "size") : "", 
+                    "value" => ($product->type == "simple") ? $this->getAttributeOptionValue($variant, "size") : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("features"),
@@ -175,9 +202,10 @@ trait HasErpValueMapper
                     "value" => $ean_code_value, 
                 ],
             ];
-
+            
             foreach ( $attribute_data as $attributeData )
             {
+                if (empty($attributeData["value"])) continue;
                 $attribute = Attribute::find($attributeData["attribute_id"]);
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
                 $value = $attribute_type::create(["value" => $attributeData["value"]]);
@@ -201,6 +229,56 @@ trait HasErpValueMapper
         {
             throw $exception;
         }
+    }
+
+    public function createSlug(string $title, int $id = 0): string
+    {
+       try
+       {
+            // Slugify
+            $slug = Str::slug($title);
+            $original_slug = $slug;
+
+            // Throw Error if slug could not be generated
+            if ($slug == "") throw new SlugCouldNotBeGenerated();
+
+            // Get any that could possibly be related.
+            // This cuts the queries down by doing it once.
+            $allSlugs = $this->getRelatedSlugs($slug, $id);
+
+            // If we haven't used it before then we are all good.
+            if (!$allSlugs->contains('value', $slug)) return $slug;
+
+            //if used,then count them
+            $count = $allSlugs->count();
+
+            // Loop through generated slugs
+            while ($this->checkIfSlugExist($slug, $id) && $slug != "") {
+                $slug = "{$original_slug}-{$count}";
+                $count++;
+            }
+       }
+       catch ( Exception $exception )
+       {
+           throw $exception;
+       }
+
+        // Finally return Slug
+        return $slug;
+    }
+
+    private function getRelatedSlugs(string $slug, int $id = 0): object
+    {
+        return ProductAttributeString::whereRaw("value RLIKE '^{$slug}(-[0-9]+)?$'")
+            ->where('id', '<>', $id)
+            ->get();
+    }
+
+    private function checkIfSlugExist(string $slug, int $id = 0): ?bool
+    {
+        return ProductAttributeString::select('value')->where('value', $slug)
+            ->where('id', '<>', $id)
+            ->exists();
     }
 
     public function getAttributeId(string $slug): ?int
@@ -306,32 +384,22 @@ trait HasErpValueMapper
         return $channel;
     }
 
-    private function getAttributeOptionValue(mixed $erp_product_iteration, string $attribute_slug): ?int
+    private function getAttributeOptionValue(mixed $variant_iteration, string $attribute_slug): ?int
     {
         try
         {
             switch ($attribute_slug) {
                 case 'color':
-                    $data = [
-                        "attribute_id" => $this->getAttributeId("color"),
-                        "name" => $erp_product_iteration->value["webAssortmentColor_Description"] ?? "",
-                        "code" => $erp_product_iteration->value["webAssortmentColor_Code"] ?? ""
-                    ];
-                    $match = $data;
-                    unset($match["name"]);
-                    $attribute_option = AttributeOption::updateOrCreate($match, $data);
-                    break;
+                    $attribute_option = AttributeOption::whereCode($variant_iteration["pfVerticalComponentCode"])->first();
+                break;
                 
                 case 'size':
                     $data = [
                         "attribute_id" => $this->getAttributeId("size"),
-                        "name" => $erp_product_iteration["pfHorizontalComponentCode"] ?? "",
-                        "code" => $erp_product_iteration["pfVerticalComponentCode"] ?? ""
+                        "name" => $variant_iteration["pfHorizontalComponentCode"]
                     ];
-                    $match = $data;
-                    unset($match["code"]);
-                    $attribute_option = AttributeOption::updateOrCreate($match, $data);
-                    break;
+                    if ( !empty($data["name"]) ) $attribute_option = AttributeOption::updateOrCreate($data);
+                break;
             }
             
         }
@@ -340,7 +408,7 @@ trait HasErpValueMapper
             throw $exception;
         }
 
-        return $attribute_option->id;
+        return isset($attribute_option) ? $attribute_option?->id : null;
     }
 
     //This fn is for concat features and size and care values 
@@ -361,7 +429,7 @@ trait HasErpValueMapper
         {
             throw $exception;
         }
-        return nl2br($attach_value);
+        return $attach_value;
     }
 
     // This fn will get value form erp detail value field 
@@ -384,51 +452,60 @@ trait HasErpValueMapper
 
     private function mapstoreImages( object $product, object $erp_product_iteration, array $variant = [] ): void
     {
-        $product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
-        $images = $this->getValue($product_images, function ($value) {
-            return is_array($value) ? $value : json_decode($value, true) ?? $value;
-        });
-
-        if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"]);
-
-        if ( $images->count() > 0 )
+        try
         {
-            $position = 0;
-            foreach( $images as $image )
+            $product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
+            $images = $this->getValue($product_images, function ($value) {
+                return is_array($value) ? $value : json_decode($value, true) ?? $value;
+            });
+    
+            if ( !empty($variant) ) $images = $images->filter(function ($image) use ($variant) {
+                return $image["color_code"] == $variant["pfVerticalComponentCode"] || $image["color_code"] == $variant["pfHorizontalComponentCode"];                   
+            });
+    
+            if ( $images->count() > 0 )
             {
-                $position++;
-                $data["path"] = $image["url"];
-                $data["position"] = $position;
-                $data["product_id"] = $product->id;
-                
-                $type_ids = [];
-                switch ( $image["image_type"] )
+                $position = 0;
+                foreach( $images as $image )
                 {
-                    case "a" :
-                        $type_ids[] = 1;
-                    break;
-        
-                    case "b" :
-                        $type_ids[] = 2;
-                    break;
-        
-                    case "c" :
-                        $type_ids[] = 3;
-                    break;
-
-                    case "d" :
-                        $type_ids[] = 4;
-                    break;
-
-                    default :
-                        $type_ids[] = 1;
-                    break;
+                    $position++;
+                    $data["path"] = $image["url"];
+                    $data["position"] = $position;
+                    $data["product_id"] = $product->id;
+                    
+                    switch ( $image["image_type"] )
+                    {
+                        case "a" :
+                            $type_id = 1;
+                        break;
+            
+                        case "b" :
+                            $type_id = 2;
+                        break;
+            
+                        case "c" :
+                            $type_id = 3;
+                        break;
+    
+                        case "d" :
+                            $type_id = 4;
+                        break;
+    
+                        default :
+                            $type_id = 5;
+                        break;
+                    }
+                    
+                   $product_image = ProductImage::updateOrCreate($data);
+                   $product_image->types()->sync($type_id);
                 }
-                
-               $product_image = ProductImage::updateOrCreate($data);
-               $product_image->types()->sync($type_ids);
             }
         }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
     }
     
     // This fn create variants based on parent product
@@ -441,62 +518,86 @@ trait HasErpValueMapper
             if ( $variants->count() > 1 )
             {		
                 $ean_codes = $this->getDetailCollection("eanCodes", $erp_product_iteration->sku);
-                $variant_product_ids = [];
                 foreach ( $this->getValue($variants) as $variant )
                 {
                     $product_data = [
                         "parent_id" => $product->id,
                         "attribute_set_id" => 1,
                         "website_id" => 1,
-                        "sku" => "{$product->sku}-{$variant['code']}",
+                        "sku" => "{$product->sku}_{$variant['code']}",
                         "type" => "simple",
                     ];
 
                     $match = [
                         "website_id" => 1,
-                        "sku" => "{$product->sku}-{$variant['code']}",
+                        "sku" => "{$product->sku}_{$variant['code']}",
                     ];
 
                     $variant_product = Product::updateOrCreate($match, $product_data);
-                    $variant_product_ids[] = $variant_product->id;
                     $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
-        
-                    $this->mapstoreImages($product, $erp_product_iteration, $variant);                    
+
                     $this->createAttributeValue($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
+                    $attribute_options = AttributeOption::get()->filter(function ($attribute_option) use ($variant) {
+                        return $attribute_option->code == $variant["pfVerticalComponentCode"] || $attribute_option->name == $variant["pfHorizontalComponentCode"];
+                    });
 
-                    $attribute_option = AttributeOption::whereCode($variant['pfVerticalComponentCode'])
-                    ->orWhere('name', $variant['pfHorizontalComponentCode'])
-                    ->first();
-
-                    if ($attribute_option)
+                    if ($attribute_options->count() > 1)
                     {
-                        $configurable_product_attributes["product_id"] = $product->id;
-                        $configurable_product_attributes["attribute_id"] = $attribute_option?->attribute_id;
+                        foreach ( $attribute_options as $attribute_option )
+                        {
+                            $configurable_product_attributes["product_id"] = $product->id;
+                            $configurable_product_attributes["attribute_id"] = $attribute_option?->attribute_id;
 
-                        $configurable_product_attributes["used_in_grouping"] = ($attribute_option?->attribute_id == $this->getAttributeId("color")) ? 1 : 0;
-                        AttributeConfigurableProduct::updateOrCreate($configurable_product_attributes);
-                        AttributeOptionsChildProduct::updateOrCreate([
-                            "attribute_option_id" => $attribute_option?->id,
-                            "product_id" => $variant_product->id 
-                        ]);
+                            $configurable_product_attributes["used_in_grouping"] = ($attribute_option?->attribute_id == $this->getAttributeId("color")) ? 1 : 0;
+                            AttributeConfigurableProduct::updateOrCreate($configurable_product_attributes);
+                            AttributeOptionsChildProduct::updateOrCreate([
+                                "attribute_option_id" => $attribute_option?->id,
+                                "product_id" => $variant_product->id 
+                            ]);
+                        }
                     }
+                    $this->mapstoreImages($product, $erp_product_iteration, $variant);
                     $this->createInventory($variant_product, $erp_product_iteration);
                 }
-                
-                $attr_option_products = AttributeOptionsChildProduct::whereIn("product_id", $variant_product_ids)
-                    ->with(["attribute_option", "attribute_option.attribute", "variant_product.product_attributes"])
-                    ->get()
-                    ->filter(function ($filter_attribute_option) {
-                        return $filter_attribute_option->attribute_option->attribute->id == $this->getAttributeId("color");
-                    })->groupBy("attribute_option_id");
 
-                foreach ( $attr_option_products as $attr_option_product )
+                $this->updateVisibility($product);
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+    }
+
+    private function updateVisibility(object $product): void
+    {
+        try
+        {
+            $attribute_configurable_product = AttributeConfigurableProduct::whereProductId($product->id)->get();
+            if ( $attribute_configurable_product->count() == 1)
+            {
+                $product->product_attributes->where("attribute_id", $this->getAttributeId("visibility"))->first()?->value->update(["value" => 8]);
+                $variant_products = Product::whereIn("id", $product->variants->pluck("id")->toArray())->with(["product_attributes"])->get();
+                foreach ( $variant_products as $variant_pro ) 
                 {
-                    foreach ($attr_option_product->pluck("variant_product") as $key => $variant_product)
-                    {
-                        if ($key == 0) continue;
-                        $variant_product->product_attributes->where("attribute_id", $this->getAttributeId("visibility"))->first()?->value->update(["value" => 5]);
-                    }
+                    $value_id = $variant_pro->product_attributes->where("attribute_id", $this->getAttributeId("visibility"))->first()?->value->id;
+                    ProductAttributeString::whereId($value_id)->update(["value" => 5]);
+                }
+            }
+            $attr_option_products = AttributeOptionsChildProduct::whereIn("product_id", $product->variants->pluck("id")->toArray())
+                ->with(["attribute_option", "attribute_option.attribute", "variant_product.product_attributes"])
+                ->get()
+                ->filter(function ($filter_attribute_option) {
+                    return $filter_attribute_option->attribute_option->attribute->id == $this->getAttributeId("color");
+                })->groupBy("attribute_option_id");
+
+            foreach ( $attr_option_products as $attr_option_product )
+            {
+                foreach ($attr_option_product->pluck("variant_product")->sortBy("id") as $key => $variant_product)
+                {
+                    if ($key == 0) continue;
+                    $value_id = $variant_product->product_attributes->where("attribute_id", $this->getAttributeId("visibility"))->first()?->value->id;
+                    $value = ProductAttributeString::whereId($value_id)->first()->update(["value" => 5]);
                 }
             }
         }
@@ -521,7 +622,7 @@ trait HasErpValueMapper
                     "product_id" => $product->id,
                     "website_id" => $product->website_id,
                     "manage_stock" =>  0,
-                    "is_in_stock" => (bool) ($value > 0) ? 1 : 0,
+                    "is_in_stock" => ($value > 0) ? 1 : 0,
                 ];
         
                 $match = [

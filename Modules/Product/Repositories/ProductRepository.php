@@ -60,7 +60,7 @@ class ProductRepository extends BaseRepository
             $no_config_rules = (isset($data["use_config_manage_stock"]) && $data["use_config_manage_stock"] == 1) ? 0 : 1;
 
             $validator = Validator::make($data, [
-                "quantity" => "required|decimal",
+                "quantity" => "required|numeric",
                 "use_config_manage_stock" => "required|boolean|in:$config_rules",
                 "manage_stock" => "required|boolean|in:$no_config_rules"
             ]);
