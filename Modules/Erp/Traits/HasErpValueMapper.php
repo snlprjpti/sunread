@@ -85,9 +85,7 @@ trait HasErpValueMapper
                 "name" => $erp_product_iteration->value["webAssortmentColor_Description"],
                 "code" => $erp_product_iteration->value["webAssortmentColor_Code"]
             ];
-            $match = $data;
-            unset($match["code"]);
-            if ( !empty($data["name"]) || !empty($data["code"]) ) AttributeOption::updateOrCreate($match, $data);  
+            if ( !empty($data["name"]) || !empty($data["code"]) ) AttributeOption::updateOrCreate($data);
         }
         catch ( Exception $exception )
         {
