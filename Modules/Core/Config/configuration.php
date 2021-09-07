@@ -237,7 +237,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
                                 "is_required" => 1
                             ],
@@ -249,7 +249,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
                                 "is_required" => 1
                             ]
