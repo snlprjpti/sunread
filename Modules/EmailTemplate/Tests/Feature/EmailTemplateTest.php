@@ -15,7 +15,7 @@ class EmailTemplateTest extends BaseTestCase
 
         $this->admin = $this->createAdmin();
         $this->model_name = "Email Template";
-        $this->route_prefix = "admin.email-template";
+        $this->route_prefix = "admin.email-templates";
     }
 
     public function getInvalidCreateData(): array
