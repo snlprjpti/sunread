@@ -23,7 +23,8 @@ class AttributeTableSeeder extends Seeder
                 "is_required" => 1,
                 "is_searchable" => 1,
                 "search_weight" => 6,
-                "scope" => "store"
+                "scope" => "store",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "SKU",
@@ -34,7 +35,8 @@ class AttributeTableSeeder extends Seeder
                 "is_unique" => 1,
                 "is_visible_on_storefront" => 1,
                 "comparable_on_storefront" => 1,
-                "scope" => "website"
+                "scope" => "website",
+                "is_synchronized" => 0
             ],
             // [
             //     "name" => "New",
@@ -52,7 +54,8 @@ class AttributeTableSeeder extends Seeder
                 "validation" => "decimal",
                 "is_required" => 1,
                 "use_in_layered_navigation" => 1,
-                "scope" => "channel"
+                "scope" => "channel",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Cost",
@@ -60,7 +63,8 @@ class AttributeTableSeeder extends Seeder
                 "validation" => "decimal",
                 "is_required" => 1,
                 "use_in_layered_navigation" => 1,
-                "scope" => "channel"
+                "scope" => "channel",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Special Price",
@@ -94,7 +98,8 @@ class AttributeTableSeeder extends Seeder
                     ]
                 ],
                 "default_value" => "In stock",
-                "scope" => "website"
+                "scope" => "website",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Has Weight",
@@ -171,7 +176,8 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Categories",
                 "slug" => "category_ids",
                 "type" => "multiselect",
-                "scope" => "website"
+                "scope" => "website",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Set Product as New from Date",
@@ -246,7 +252,8 @@ class AttributeTableSeeder extends Seeder
                 ],
                 "default_value" => "Yes",
                 "scope" => "website",
-                "is_required" => 1
+                "is_required" => 1,
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Color",
@@ -317,7 +324,8 @@ class AttributeTableSeeder extends Seeder
                 "slug" => "gallery",
                 "type" => "multiimages",
                 "scope" => "website",
-                "is_required" => 0
+                "is_required" => 0,
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Collection",
@@ -357,7 +365,8 @@ class AttributeTableSeeder extends Seeder
                 "search_weight" => $attribute["search_weight"] ?? null,
                 "is_user_defined" => $attribute["is_user_defined"] ?? 0,
                 "is_visible_on_storefront" => $attribute["is_visible_on_storefront"] ?? 0,
-                "default_value" => $default_value
+                "default_value" => $default_value,
+                "is_synchronized" => $attribute["is_synchronized"] ?? 1,
             ];
 
             $attribute_data = Attribute::withoutEvents( function () use ($attribute_array) {
