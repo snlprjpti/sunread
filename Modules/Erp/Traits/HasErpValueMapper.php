@@ -233,43 +233,50 @@ trait HasErpValueMapper
         }
     }
 
-    public function createSlug($title, $id = 0)
+    public function createSlug(string $title, int $id = 0): string
     {
-        // Slugify
-        $slug = Str::slug($title);
-        $original_slug = $slug;
+       try
+       {
+            // Slugify
+            $slug = Str::slug($title);
+            $original_slug = $slug;
 
-        // Throw Error if slug could not be generated
-        if ($slug == "") throw new SlugCouldNotBeGenerated();
+            // Throw Error if slug could not be generated
+            if ($slug == "") throw new SlugCouldNotBeGenerated();
 
-        // Get any that could possibly be related.
-        // This cuts the queries down by doing it once.
-        $allSlugs = $this->getRelatedSlugs($slug, $id);
+            // Get any that could possibly be related.
+            // This cuts the queries down by doing it once.
+            $allSlugs = $this->getRelatedSlugs($slug, $id);
 
-        // If we haven't used it before then we are all good.
-        if (!$allSlugs->contains('value', $slug)) return $slug;
+            // If we haven't used it before then we are all good.
+            if (!$allSlugs->contains('value', $slug)) return $slug;
 
-        //if used,then count them
-        $count = $allSlugs->count();
+            //if used,then count them
+            $count = $allSlugs->count();
 
-        // Loop through generated slugs
-        while ($this->checkIfSlugExist($slug, $id) && $slug != "") {
-            $slug = "{$original_slug}-{$count}";
-            $count++;
-        }
+            // Loop through generated slugs
+            while ($this->checkIfSlugExist($slug, $id) && $slug != "") {
+                $slug = "{$original_slug}-{$count}";
+                $count++;
+            }
+       }
+       catch ( Exception $exception )
+       {
+           throw $exception;
+       }
 
         // Finally return Slug
         return $slug;
     }
 
-    private function getRelatedSlugs($slug, $id = 0)
+    private function getRelatedSlugs(string $slug, int $id = 0): object
     {
         return ProductAttributeString::whereRaw("value RLIKE '^{$slug}(-[0-9]+)?$'")
             ->where('id', '<>', $id)
             ->get();
     }
 
-    private function checkIfSlugExist($slug, $id = 0)
+    private function checkIfSlugExist(string $slug, int $id = 0): object
     {
         return ProductAttributeString::select('value')->where('value', $slug)
             ->where('id', '<>', $id)
