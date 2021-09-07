@@ -276,7 +276,7 @@ trait HasErpValueMapper
             ->get();
     }
 
-    private function checkIfSlugExist(string $slug, int $id = 0): object
+    private function checkIfSlugExist(string $slug, int $id = 0): ?bool
     {
         return ProductAttributeString::select('value')->where('value', $slug)
             ->where('id', '<>', $id)
