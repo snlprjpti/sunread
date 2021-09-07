@@ -20,7 +20,7 @@ class ErpMigrateAttributeOptionJob implements ShouldQueue
 
     }
 
-    public function handle()
+    public function handle(): void
     {
         try
         {
@@ -31,8 +31,6 @@ class ErpMigrateAttributeOptionJob implements ShouldQueue
             {
                 foreach ( $chunk as $detail )
                 {
-                    if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
-                    if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
                     $this->createOption($detail);
                 }
             }
