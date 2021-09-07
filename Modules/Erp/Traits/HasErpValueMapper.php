@@ -13,6 +13,7 @@ use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Erp\Entities\ErpImportDetail;
 use Modules\Erp\Jobs\Mapper\ErpDetailStatusUpdate;
 use Modules\Erp\Jobs\Mapper\ErpGenerateVariantProductJob;
@@ -164,7 +165,7 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("url_key"),
-                    "value" => Str::slug($product->sku), 
+                    "value" => $this->createSlug($erp_product_iteration->value["description"]), 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_keywords"),
@@ -230,6 +231,49 @@ trait HasErpValueMapper
         {
             throw $exception;
         }
+    }
+
+    public function createSlug($title, $id = 0)
+    {
+        // Slugify
+        $slug = Str::slug($title);
+        $original_slug = $slug;
+
+        // Throw Error if slug could not be generated
+        if ($slug == "") throw new SlugCouldNotBeGenerated();
+
+        // Get any that could possibly be related.
+        // This cuts the queries down by doing it once.
+        $allSlugs = $this->getRelatedSlugs($slug, $id);
+
+        // If we haven't used it before then we are all good.
+        if (!$allSlugs->contains('value', $slug)) return $slug;
+
+        //if used,then count them
+        $count = $allSlugs->count();
+
+        // Loop through generated slugs
+        while ($this->checkIfSlugExist($slug, $id) && $slug != "") {
+            $slug = "{$original_slug}-{$count}";
+            $count++;
+        }
+
+        // Finally return Slug
+        return $slug;
+    }
+
+    private function getRelatedSlugs($slug, $id = 0)
+    {
+        return ProductAttributeString::whereRaw("value RLIKE '^{$slug}(-[0-9]+)?$'")
+            ->where('id', '<>', $id)
+            ->get();
+    }
+
+    private function checkIfSlugExist($slug, $id = 0)
+    {
+        return ProductAttributeString::select('value')->where('value', $slug)
+            ->where('id', '<>', $id)
+            ->exists();
     }
 
     public function getAttributeId(string $slug): ?int
