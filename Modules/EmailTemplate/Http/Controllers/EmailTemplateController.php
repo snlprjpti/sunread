@@ -107,4 +107,18 @@ class EmailTemplateController extends BaseController
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
+
+    public function getVariables(): JsonResponse
+    {
+        try
+        {
+            $fetched = config("variable");
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
+    }
 }
