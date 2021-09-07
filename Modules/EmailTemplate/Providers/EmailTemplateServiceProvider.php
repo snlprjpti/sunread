@@ -4,6 +4,8 @@ namespace Modules\EmailTemplate\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\EmailTemplate\Entities\EmailTemplate;
+use Modules\EmailTemplate\Observers\EmailTemplateObservers;
 
 class EmailTemplateServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,7 @@ class EmailTemplateServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObservers();
     }
 
     /**
@@ -108,5 +111,10 @@ class EmailTemplateServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    public function registerObservers()
+    {
+        EmailTemplate::observe(EmailTemplateObservers::class);
     }
 }
