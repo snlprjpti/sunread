@@ -127,7 +127,7 @@ trait HasErpValueMapper
 
             $start_time = $start_time < $max_time ? $start_time : $max_time - 1;
             $end_time = $end_time < $max_time ? $end_time : $max_time;
-            // dd($variants->count() > 1);
+
             $attribute_data = [
                 [
                     "attribute_id" => $this->getAttributeId("name"),
@@ -459,9 +459,7 @@ trait HasErpValueMapper
                 return is_array($value) ? $value : json_decode($value, true) ?? $value;
             });
     
-            if ( !empty($variant) ) $images = $images->filter(function ($image) use ($variant) {
-                return $image["color_code"] == $variant["pfVerticalComponentCode"] || $image["color_code"] == $variant["pfHorizontalComponentCode"];                   
-            });
+            if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"]);
     
             if ( $images->count() > 0 )
             {
@@ -476,19 +474,11 @@ trait HasErpValueMapper
                     switch ( $image["image_type"] )
                     {
                         case "a" :
-                            $type_id = 1;
+                            $type_id = [1,2];
                         break;
             
                         case "b" :
-                            $type_id = 2;
-                        break;
-            
-                        case "c" :
                             $type_id = 3;
-                        break;
-    
-                        case "d" :
-                            $type_id = 4;
                         break;
     
                         default :
