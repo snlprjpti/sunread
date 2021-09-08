@@ -33,9 +33,9 @@ class ProductConfigurableRepository extends BaseRepository
             "super_attributes" => "required|array",
             "attributes" => "required|array",
             "scope" => "sometimes|in:website,channel,store",
-            "grouping_attributes" => "sometimes|exists:attributes,id",
+            "grouping_attributes" => "sometimes|exists:attributes,slug",
             "update_attributes" => "required_with:update_variants|array",
-            "update_attributes.*" => "exists:attributes,id",
+            "update_attributes.*" => "exists:attributes,slug",
             "update_variants" => "array|required_with:update_attributes",
             "update_variants.*" => "exists:products,id"
         ];
@@ -93,16 +93,16 @@ class ProductConfigurableRepository extends BaseRepository
             $this->configurable_attribute_options = [];
             
             foreach ($request->get("super_attributes") as $super_attribute) {
-                $attribute = $this->attributeCache()->find($super_attribute['attribute_id']);
+                $attribute = Attribute::with([ "attribute_options" ])->whereSlug($super_attribute['attribute_slug'])->firstOrFail();
                 if ($attribute->is_user_defined == 0 && $attribute->type != "select") continue;
                 foreach($super_attribute["value"] as $super_val) $this->product_attribute_repository->singleOptionValidation($attribute, $super_val);
                 $super_attributes[$attribute->id] = $super_attribute["value"];
 
                 $parent_attributes = [
                     "product_id" => $product->id,
-                    "attribute_id" => $super_attribute['attribute_id']
+                    "attribute_id" => $attribute->id
                 ]; 
-                $grp_attribute["used_in_grouping"] = ($request->grouping_attribute == $super_attribute['attribute_id']) ? 1 : 0;
+                $grp_attribute["used_in_grouping"] = ($request->grouping_attribute == $attribute->slug) ? 1 : 0;
                 AttributeConfigurableProduct::updateOrCreate($parent_attributes, $grp_attribute); 
             }
             
@@ -137,7 +137,7 @@ class ProductConfigurableRepository extends BaseRepository
 
         try 
         {
-            $permutation_modify = $this->attributeOptionsCache()->whereIn('id', $permutation)->pluck('name')->toArray();
+            $permutation_modify = AttributeOption::with([ "attribute" ])->whereIn('id', $permutation)->pluck('name')->toArray();
             $data = [
                 "parent_id" => $product->id,
                 "website_id" => $product->website_id,
@@ -151,10 +151,11 @@ class ProductConfigurableRepository extends BaseRepository
 
             $variant_options = collect($permutation)->map(function ($option, $key) {
                 $this->configurable_attribute_options[] = $option;
+                $att_data = Attribute::find($key);
                 return [
-                    "attribute_slug" => $this->attributeCache()->find($key)->slug,
+                    "attribute_slug" => $att_data->slug,
                     "value" => $option,
-                    "value_type" => config("attribute_types")[($this->attributeCache()->find($key)->type) ?? "string"]
+                    "value_type" => config("attribute_types")[($att_data->type) ?? "string"]
                 ];
             })->toArray();
 
@@ -164,8 +165,7 @@ class ProductConfigurableRepository extends BaseRepository
             if(isset($child_variant))
             {
                 $product_variant = $this->update($data, $child_variant->id, function ($variant) use ($product, $permutation_modify, $request, &$product_attributes, $productAttributes, $scope, $variant_options) {
-                    $update_attributes = $request->update_attributes ? Attribute::whereIn("id", $request->update_attributes)->get()->pluck("slug")->toArray() : null;
-                    $this->syncConfigurableAttributes($product, $permutation_modify, $request, $product_attributes, $productAttributes, $scope, $variant_options, $variant, $update_attributes);
+                    $this->syncConfigurableAttributes($product, $permutation_modify, $request, $product_attributes, $productAttributes, $scope, $variant_options, $variant, $request->update_attributes);
                 });
             }
             else
