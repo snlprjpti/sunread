@@ -27,7 +27,6 @@ class CustomerAddressAccountTest extends TestCase
         $this->customer = $this->createCustomer();
         $this->model_name = "Customer Address";
         $this->route_prefix = "customers.address";
-        $this->type = Arr::random(['billing','shipping']);
     }
 
     public function getCreateData(): array
@@ -76,39 +75,15 @@ class CustomerAddressAccountTest extends TestCase
         ]);
     }
 
-//    public function testCustomerCanFetchOwnAddresses()
-//    {
-//        dd($this->customer->id);
+    public function testCustomerCanFetchOwnAddresses()
+    {
 
-//        dd(CustomerAddress::whereCustomerId($this->customer->id)->get());
+        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show"));
 
-//        $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show", $this->type));
-//        dd($response->json());
-//
-//        $response->assertStatus(200);
-//        $response->assertJsonFragment([
-//            "status" => "success",
-//            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
-//        ]);
-//    }
-//
-//    public function testCustomerCannotUpdateOtherAddress()
-//    {
-//        $post_data = $this->getUpdateData();
-//        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update", $this->type, $post_data));
-//        $response->assertStatus(403);
-//        $response->assertJsonFragment([
-//            "status" => "error"
-//        ]);
-//    }
-//
-//    public function testCustomerCannotDeleteOthersAddress()
-//    {
-//        $response = $this->withHeaders($this->headers)->delete(route("{$this->route_prefix}.delete", $this->type));
-//
-//        $response->assertStatus(403);
-//        $response->assertJsonFragment([
-//            "status" => "error"
-//        ]);
-//    }
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
+        ]);
+    }
 }
