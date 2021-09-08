@@ -168,9 +168,9 @@ class CustomerAddressRepository extends BaseRepository
         {
             foreach ($this->rules as $key => $value)
             {
-                $newRules[ $name."." . $key] = $value;
+                $new_rules[ $name."." . $key] = $value;
             }
-            $this->rules = $newRules;
+            $this->rules = $new_rules;
 
             $data = $this->validateData($request, array_merge($this->regionAndCityRules($request)), function () use ($customer_id) {
                 return [
@@ -182,8 +182,9 @@ class CustomerAddressRepository extends BaseRepository
             unset($data[$name]);
             $data = array_merge($old_data,$data);
             $this->rules = [];
-            foreach ($newRules as $key => $value) {
-                $key = substr($key, 9);
+            foreach ($new_rules as $key => $value) {
+
+                $key = trim($key, $name.".");
                 $this->rules[$key] = $value;
             }
         }
