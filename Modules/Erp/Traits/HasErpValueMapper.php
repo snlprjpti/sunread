@@ -625,7 +625,6 @@ trait HasErpValueMapper
                     "catalog_inventory_id" => $catalog_inventory->id,
                     "event" => "ERP Addition",
                     "adjustment_type" => "addition",
-                    "adjusted_by" => "",
                     "quantity" => $value
                 ]);
             }
