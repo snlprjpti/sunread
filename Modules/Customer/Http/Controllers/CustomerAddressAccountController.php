@@ -47,7 +47,7 @@ class CustomerAddressAccountController extends BaseController
         {
             if($request->default_shipping_address == 0 && $request->default_billing_address == 0) throw new Exception($this->lang("response.choose-address"));
 
-            $created = $this->repository->insert($request, $this->customer->id);
+            $created = $this->repository->createOrUpdate($request, $this->customer->id);
         }
         catch (Exception $exception)
         {

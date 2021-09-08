@@ -124,7 +124,7 @@ class CustomerAddressRepository extends BaseRepository
         return $address;
     }
 
-    public function insert(object $request, int $customer_id): array
+    public function createOrUpdate(object $request, int $customer_id): array
     {
         try
         {
