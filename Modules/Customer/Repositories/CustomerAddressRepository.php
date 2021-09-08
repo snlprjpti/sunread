@@ -129,7 +129,6 @@ class CustomerAddressRepository extends BaseRepository
         try
         {
             if($request->shipping) {
-
                 $data = $this->validateAddress($request, $customer_id, "shipping");
                 $shipping = $this->checkShippingAddress($customer_id)->first();
                 if ($shipping) {
@@ -142,7 +141,6 @@ class CustomerAddressRepository extends BaseRepository
 
             if($request->billing) {
                 $data = $this->validateAddress($request, $customer_id, "billing");
-
                 $billing = $this->checkBillingAddress($customer_id)->first();
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
