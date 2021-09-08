@@ -170,6 +170,7 @@ class CustomerAddressRepository extends BaseRepository
             }
             $this->rules = $new_rules;
 
+
             $data = $this->validateData($request, array_merge($this->regionAndCityRules($request)), function () use ($customer_id) {
                 return [
                     "customer_id" => Customer::findOrFail($customer_id)->id,
@@ -182,8 +183,11 @@ class CustomerAddressRepository extends BaseRepository
             $this->rules = [];
             foreach ($new_rules as $key => $value) {
 
-                $key = trim($key, $name.".");
-                $this->rules[$key] = $value;
+                if ($key == "shipping.postcode")
+                {
+                    $key = str_replace("$name.", "", $key);
+                    $this->rules[$key] = $value;
+                }
             }
         }
         catch (Exception $exception)

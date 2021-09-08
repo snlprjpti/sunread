@@ -64,10 +64,9 @@ class CustomerAddressAccountTest extends TestCase
 
     public function testCustomerCanAddOwnAddress()
     {
-        $post_data = $this->getCreateData();
-
+        $post_data["shipping"] = $this->getCreateData();
+        $post_data["billing"] = $this->getCreateData();
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.create"), $post_data);
-
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
