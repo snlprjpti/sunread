@@ -119,6 +119,6 @@ class EmailTemplateController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success', [ 'name'=> 'variables' ]));
     }
 }

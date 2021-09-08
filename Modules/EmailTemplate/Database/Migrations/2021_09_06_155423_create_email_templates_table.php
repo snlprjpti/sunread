@@ -14,6 +14,7 @@ class CreateEmailTemplatesTable extends Migration
             $table->string("template_subject");
             $table->text("template_content");
             $table->string("template_style")->nullable();
+            $table->boolean("is_default")->default(0);
             $table->timestamps();
         });
     }
