@@ -23,6 +23,7 @@ use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
 use Modules\Erp\Jobs\Mapper\ErpMigratorJob;
+use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\ProductAttributeString;
@@ -543,7 +544,7 @@ trait HasErpValueMapper
                         }
                     }
                     $this->mapstoreImages($product, $erp_product_iteration, $variant);
-                    $this->createInventory($variant_product, $erp_product_iteration);
+                    $this->createInventory($variant_product, $erp_product_iteration, $variant);
                 }
 
                 $this->updateVisibility($product);
@@ -593,7 +594,7 @@ trait HasErpValueMapper
         }
     }
 
-    private function createInventory(object $product, object $erp_product_iteration): void
+    private function createInventory(object $product, object $erp_product_iteration, mixed $variant = null): void
     {
         try
         {
@@ -602,6 +603,8 @@ trait HasErpValueMapper
             if ( $inventory->count() > 1 )
             {
                 $value = array_sum($this->getValue($inventory)->pluck("Inventory")->toArray());
+                if ( $variant ) $value = array_sum($this->getValue($inventory)->where("Code", $variant["code"])->pluck("Inventory")->toArray());
+
                 $data = [
                     "quantity" => $value,
                     "use_config_manage_stock" => 1,
@@ -616,7 +619,15 @@ trait HasErpValueMapper
                     "website_id" => $product->website_id
                 ];
     
-                CatalogInventory::updateOrCreate($match, $data);
+                $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
+                LogCatalogInventoryItem::dispatchSync([
+                    "product_id" => $catalog_inventory->product_id,
+                    "website_id" => $catalog_inventory->website_id,
+                    "event" => "ERP Addition",
+                    "adjustment_type" => "addition",
+                    "adjusted_by" => "",
+                    "quantity" => $value
+                ]);
             }
         }
         catch ( Exception $exception )
