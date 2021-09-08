@@ -47,7 +47,7 @@ class ProductConfigurableTest extends BaseTestCase
             {
                 if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status"])) continue;
                 $attributes[] = [
-                    "attribute_id" => $attribute->id,
+                    "attribute_slug" => $attribute->slug,
                     "value" => $this->value($attribute)
                 ];
             }
@@ -58,7 +58,7 @@ class ProductConfigurableTest extends BaseTestCase
         foreach($super_attributes as $super_attribute)
         {
             $variant_attributes[] = [
-                "attribute_id" => $super_attribute->id,
+                "attribute_slug" => $super_attribute->slug,
                 "value" => $super_attribute->attribute_options->take(2)->pluck('id')->toArray()
             ];
         }
