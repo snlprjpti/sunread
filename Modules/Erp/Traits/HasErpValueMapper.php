@@ -23,6 +23,7 @@ use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
 use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
 use Modules\Erp\Jobs\Mapper\ErpMigratorJob;
+use Modules\Inventory\Entities\CatalogInventoryItem;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
@@ -620,9 +621,8 @@ trait HasErpValueMapper
                 ];
     
                 $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
-                LogCatalogInventoryItem::dispatchSync([
-                    "product_id" => $catalog_inventory->product_id,
-                    "website_id" => $catalog_inventory->website_id,
+                CatalogInventoryItem::create([
+                    "catalog_inventory_id" => $catalog_inventory->id,
                     "event" => "ERP Addition",
                     "adjustment_type" => "addition",
                     "adjusted_by" => "",
