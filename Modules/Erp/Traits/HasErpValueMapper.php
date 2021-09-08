@@ -621,12 +621,17 @@ trait HasErpValueMapper
                 ];
     
                 $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
-                CatalogInventoryItem::create([
+                $catalog_inventory_item_data = [
                     "catalog_inventory_id" => $catalog_inventory->id,
                     "event" => "ERP Addition",
                     "adjustment_type" => "addition",
                     "quantity" => $value
-                ]);
+                ];
+                $catalog_inventory_item_match = [
+                    "catalog_inventory_id" => $catalog_inventory->id,
+                    "quantity" => $value
+                ];
+                CatalogInventoryItem::updateOrCreate($catalog_inventory_item_match, $catalog_inventory_item_data);
             }
         }
         catch ( Exception $exception )
