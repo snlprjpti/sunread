@@ -127,7 +127,7 @@ trait HasErpValueMapper
 
             $start_time = $start_time < $max_time ? $start_time : $max_time - 1;
             $end_time = $end_time < $max_time ? $end_time : $max_time;
-            // dd($variants->count() > 1);
+
             $attribute_data = [
                 [
                     "attribute_id" => $this->getAttributeId("name"),
@@ -150,12 +150,16 @@ trait HasErpValueMapper
                     "value" => Carbon::parse(date("Y-m-d", $end_time)), 
                 ],
                 [
+                    "attribute_id" => $this->getAttributeId("tax_class_id"),
+                    "value" => 1, 
+                ],
+                [
                     "attribute_id" => $this->getAttributeId("visibility"),
                     "value" => $visibility, 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("description"),
-                    "value" => $description ?? $erp_product_iteration->value["description"], 
+                    "value" => empty($description) ? $erp_product_iteration->value["description"] : $description, 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("short_description"),
@@ -167,7 +171,7 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_keywords"),
-                    "value" => $description ?? $erp_product_iteration->value["description"], 
+                    "value" => empty($description) ? $erp_product_iteration->value["description"] : $description, 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_title"),
@@ -175,7 +179,7 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("meta_description"),
-                    "value" => $description ?? $erp_product_iteration->value["description"], 
+                    "value" => empty($description) ? $erp_product_iteration->value["description"] : $description, 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("status"),
@@ -421,7 +425,7 @@ trait HasErpValueMapper
             if ( $attribute_groups->count() > 1 )
             {
                 $this->getValue($attribute_groups, function ($value) use (&$attach_value, $attribute_name) {
-                    if ( $value["attributetype"] == $attribute_name ) $attach_value .= Str::finish($value["description"], ".\r\n ");
+                    if ( $value["attributetype"] == $attribute_name ) if (!empty($value["description"])) $attach_value .= Str::finish($value["description"], ".\r\n ");
                 });
             }
         }
@@ -459,45 +463,27 @@ trait HasErpValueMapper
                 return is_array($value) ? $value : json_decode($value, true) ?? $value;
             });
     
-            if ( !empty($variant) ) $images = $images->filter(function ($image) use ($variant) {
-                return $image["color_code"] == $variant["pfVerticalComponentCode"] || $image["color_code"] == $variant["pfHorizontalComponentCode"];                   
-            });
+            if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"]);
     
             if ( $images->count() > 0 )
             {
+                if ($product->type == "configurable")
+                {
+                    $configurable_images = [];
+                    foreach ($images->groupBy("color_code") as $color_images) $configurable_images[] = $color_images->first();
+                    $images = $configurable_images;
+                }
                 $position = 0;
                 foreach( $images as $image )
                 {
-                    $position++;
                     $data["path"] = $image["url"];
                     $data["position"] = $position;
                     $data["product_id"] = $product->id;
-                    
-                    switch ( $image["image_type"] )
-                    {
-                        case "a" :
-                            $type_id = 1;
-                        break;
-            
-                        case "b" :
-                            $type_id = 2;
-                        break;
-            
-                        case "c" :
-                            $type_id = 3;
-                        break;
-    
-                        case "d" :
-                            $type_id = 4;
-                        break;
-    
-                        default :
-                            $type_id = 5;
-                        break;
-                    }
-                    
+                    if ($position == 0) $type_ids = [1,2,3];
+                    else $type_ids = 5;
+                    $position++;
                    $product_image = ProductImage::updateOrCreate($data);
-                   $product_image->types()->sync($type_id);
+                   $product_image->types()->sync($type_ids);
                 }
             }
         }
@@ -524,13 +510,13 @@ trait HasErpValueMapper
                         "parent_id" => $product->id,
                         "attribute_set_id" => 1,
                         "website_id" => 1,
-                        "sku" => "{$product->sku}_{$variant['code']}",
+                        "sku" => "{$product->sku}_{$variant['pfVerticalComponentCode']}_{$variant['pfHorizontalComponentCode']}",
                         "type" => "simple",
                     ];
 
                     $match = [
                         "website_id" => 1,
-                        "sku" => "{$product->sku}_{$variant['code']}",
+                        "sku" => "{$product->sku}_{$variant['pfVerticalComponentCode']}_{$variant['pfHorizontalComponentCode']}",
                     ];
 
                     $variant_product = Product::updateOrCreate($match, $product_data);

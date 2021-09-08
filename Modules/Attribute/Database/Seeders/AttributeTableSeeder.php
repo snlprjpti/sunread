@@ -164,11 +164,11 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "store"
             ],
             [
-                "name" => "Tax Class",
+                "name" => "Tax Group",
                 "slug" => "tax_class_id",
                 "type" => "select",
                 "is_required" => 1,
-                "default_value" => "Taxable Goods",
+                "default_value" => "General",
                 "options" => [],
                 "scope" => "channel"
             ],
@@ -220,7 +220,7 @@ class AttributeTableSeeder extends Seeder
                 "slug" => "meta_keywords",
                 "type" => "textarea",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Meta Title",
@@ -234,7 +234,7 @@ class AttributeTableSeeder extends Seeder
                 "slug" => "meta_description",
                 "type" => "textarea",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Product Status",
