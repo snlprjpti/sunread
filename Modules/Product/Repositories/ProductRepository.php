@@ -370,7 +370,7 @@ class ProductRepository extends BaseRepository
             $fetched["configurable"]["attributes"] = array_values($items);
 
             $group_attribute = AttributeConfigurableProduct::whereProductId($product->id)->whereUsedInGrouping(1)->first();
-            if($group_attribute) $fetched["configurable"]["group_attribute"] = $group_attribute->attribute_id;
+            if($group_attribute) $fetched["configurable"]["group_attribute"] = $group_attribute->attribute?->slug;
         }
         catch ( Exception $exception )
         {
