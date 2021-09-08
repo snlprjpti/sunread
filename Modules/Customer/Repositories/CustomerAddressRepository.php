@@ -128,27 +128,21 @@ class CustomerAddressRepository extends BaseRepository
     {
         try
         {
-            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request), [
-                "default_shipping_address" => "boolean|required_without:default_billing_address",
-                "default_billing_address" => "boolean|required_without:default_shipping_address"
-            ]), function () use ($customer_id) {
-                return [
-                    "customer_id" => Customer::findOrFail($customer_id)->id,
-                ];
-            });
+            if($request->shipping) {
 
-            if ($request->default_shipping_address == 1) {
+                $data = $this->validateAddress($request, $customer_id, "shipping");
                 $shipping = $this->checkShippingAddress($customer_id)->first();
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
-                }
-                else {
-                    $data["default_billing_address"] = 0;
+                } else {
+                    $data["default_shipping_address"] = 1;
                     $created["shipping"] = $this->create($data);
                 }
             }
 
-            if ($request->default_billing_address == 1) {
+            if($request->billing) {
+                $data = $this->validateAddress($request, $customer_id, "billing");
+
                 $billing = $this->checkBillingAddress($customer_id)->first();
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
@@ -166,5 +160,38 @@ class CustomerAddressRepository extends BaseRepository
         }
 
         return $created;
+    }
+
+    public function validateAddress(object $request, int $customer_id, string $name): array
+    {
+        try
+        {
+            foreach ($this->rules as $key => $value)
+            {
+                $newRules[ $name."." . $key] = $value;
+            }
+            $this->rules = $newRules;
+
+            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request)), function () use ($customer_id) {
+                return [
+                    "customer_id" => Customer::findOrFail($customer_id)->id,
+                ];
+            });
+
+            $old_data = $data[$name];
+            unset($data[$name]);
+            $data = array_merge($old_data,$data);
+            $this->rules = [];
+            foreach ($newRules as $key => $value) {
+                $key = substr($key, 9);
+                $this->rules[$key] = $value;
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 }
