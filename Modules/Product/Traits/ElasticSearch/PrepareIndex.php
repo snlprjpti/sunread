@@ -9,7 +9,7 @@ use Modules\Product\Jobs\SingleIndexing;
 
 trait PrepareIndex
 {
-    public function preparingData(object $products, ?string $method = null): void
+    public function preparingIndexData(object $products, ?string $method = null): void
     {
         try
         {
