@@ -2,9 +2,11 @@
 
 namespace Modules\Country\Http\Controllers\StoreFront;
 
+use Elasticsearch\Endpoints\Count;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Entities\Website;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Country;
@@ -29,13 +31,14 @@ class CityController extends BaseController
         return CityResource::collection($data);
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, int $country_id, int $region_id): JsonResponse
     {
         try
         {
             $request->without_pagination = true;
-            $fetched = $this->repository->fetchAll($request, callback:function () use($request){
-                return ($request->region_id) ? $this->model::whereRegionId($request->region_id) : $this->model;
+            $fetched = $this->repository->fetchAll($request, callback:function () use($region_id){
+                return ($region_id) ? $this->model::whereRegionId($region_id) : $this->model;
+
             });
         }
         catch (Exception $exception)

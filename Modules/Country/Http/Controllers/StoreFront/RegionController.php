@@ -30,13 +30,13 @@ class RegionController extends BaseController
         return RegionResource::collection($data);
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, int $country_id): JsonResponse
     {
         try
         {
             $request->without_pagination = true;
-            $fetched = $this->repository->fetchAll($request, callback:function () use($request){
-                return $this->model::whereCountryId($request->country_id);
+            $fetched = $this->repository->fetchAll($request, callback:function () use($country_id){
+                return $this->model::whereCountryId($country_id);
             });
         }
         catch (Exception $exception)
