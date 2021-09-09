@@ -14,7 +14,7 @@ class ExchangeRateTest extends BaseTestCase
         parent::setUp();
         $this->admin = $this->createAdmin();
 
-        $this->model_name = "Exchange rate";
+        $this->model_name = "Exchange Rate";
         $this->route_prefix = "admin.exchange_rates";
     }
 

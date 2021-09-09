@@ -22,7 +22,7 @@ class UrlRewriteController extends BaseController
         $this->model = $urlRewrite;
         $this->model_name = "Url Rewrite";
         $this->repository = $urlRewriteRepository;
-        parent::__construct($this->model, $this->model_name);    
+        parent::__construct($this->model, $this->model_name);
     }
 
     public function collection(object $data): ResourceCollection
@@ -40,13 +40,13 @@ class UrlRewriteController extends BaseController
         try
         {
             $this->validateListFiltering($request);
-            $fetched = $this->getFilteredList($request);    
+            $fetched = $this->getFilteredList($request);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
-        
+
         return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
@@ -85,7 +85,7 @@ class UrlRewriteController extends BaseController
     {
         try
         {
-            if(!(UrlRewrite::find($id))) throw new ModelNotFoundException(); 
+            UrlRewrite::findOrFail($id);
             $validated_data = $this->repository->validateUrlRewrite($request);
             $urlRewrite = new Request($this->repository->geturlRewriteData($validated_data, $id));
 

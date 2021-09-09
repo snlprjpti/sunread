@@ -127,7 +127,8 @@ class ProductController extends BaseController
                 return [
                     "scope" => $request->scope ?? "website",
                     "scope_id" => $request->scope_id ?? $product->website_id,
-                    "type" => "simple"
+                    "type" => "simple",
+                    "website_id" => $product->website_id
                 ];
             });
 

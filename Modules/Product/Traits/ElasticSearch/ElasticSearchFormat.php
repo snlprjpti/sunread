@@ -3,6 +3,7 @@
 namespace Modules\Product\Traits\ElasticSearch;
 
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
@@ -57,19 +58,23 @@ trait ElasticSearchFormat
                     "scope_id" => $store->id,
                     "attribute_id" => $attributeId
                 ];
-    
-                $data[$attribute->slug] = $this->value($match);
+
                 if(in_array($attribute->type, $this->options_fields))
                 {
-                    $value = $data[$attribute->slug];
-                    if (is_array($value)) {
-                        foreach($value as $key => $val)
+                    $values = $this->value($match);
+                    if ($values instanceof Collection) {
+                        $data[$attribute->slug] = $values->pluck("id")->toArray();
+                        foreach($values as $key => $val)
                         {
-                            $data["{$attribute->slug}_{$key}_value"] = $this->getAttributeOption($attribute, $val);
+                            $data["{$attribute->slug}_{$key}_value"] = $val?->name;
                         }
                     }
-                    else $data["{$attribute->slug}_value"] = $this->getAttributeOption($attribute, $value);
+                    else {
+                        $data[$attribute->slug] = $values?->id;
+                        $data["{$attribute->slug}_value"] = $values?->name;
+                    }
                 }
+                else  $data[$attribute->slug] = $this->value($match);
             }
         }
         catch (Exception $exception)

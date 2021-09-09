@@ -25,15 +25,13 @@ Route::group(["middleware" => ["api"]], function () {
             Route::get("/", [CustomerAccountController::class, "show"])->name("show");
             Route::put("/", [CustomerAccountController::class, "update"])->name("update");
             Route::post("image", [CustomerAccountController::class, "uploadProfileImage"])->name("image.update");
-            Route::delete("image", [CustomerAccountController::class, "deleteProfileImage"])->name("image.delete");    
+            Route::delete("image", [CustomerAccountController::class, "deleteProfileImage"])->name("image.delete");
         });
-        
+
         // CUSTOMER ADDRESS
         Route::group(["prefix" => "addresses", "as" => "address."], function () {
             Route::get("/", [CustomerAddressAccountController::class, "show"])->name("show");
             Route::post("/", [CustomerAddressAccountController::class, "create"])->name("create");
-            Route::put("/{id}", [CustomerAddressAccountController::class, "update"])->name("update");
-            Route::delete("/{id}", [CustomerAddressAccountController::class, "delete"])->name("delete");
         });
     });
 

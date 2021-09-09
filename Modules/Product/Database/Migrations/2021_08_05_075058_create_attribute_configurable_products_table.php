@@ -17,12 +17,11 @@ class CreateAttributeConfigurableProductsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('attribute_id');
-            $table->unsignedBigInteger('attribute_option_id');
+            $table->boolean('used_in_grouping')->default(0);
+          
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('cascade');
-            $table->foreign('attribute_option_id')->references('id')->on('attribute_options')->onDelete('cascade');
-            
-            $table->unique(['product_id', 'attribute_id', 'attribute_option_id'], 'configurable_compound_unique');
+            $table->unique(['product_id', 'attribute_id'], 'configurable_compound_unique');
 
             $table->timestamps();
         });

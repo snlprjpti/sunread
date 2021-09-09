@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Modules\Core\Console\PartialMigrate;
+use Modules\Erp\Console\ErpAttributeOptionMigrate;
 use Modules\Erp\Console\ErpImport;
 use Modules\Erp\Console\ErpMigrate;
 use Modules\Product\Console\ElasticSearchImport;
@@ -21,7 +22,8 @@ class Kernel extends ConsoleKernel
         ErpMigrate::class,
         // CategoryMigrate::class,
         PartialMigrate::class,
-        ElasticSearchImport::class
+        ElasticSearchImport::class,
+        ErpAttributeOptionMigrate::class,
     ];
 
     /**
@@ -32,9 +34,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->command("erp:import");
-        $schedule->command("erp:migrate");
+        $schedule->command('telescope:clear')->hourly();
     }
 
     /**

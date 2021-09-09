@@ -195,6 +195,18 @@ return[
                                 "scope" => "store",
                                 "is_required" => 0
                             ],
+                            [
+                                "title" => "Pagination Limit",
+                                "path" => "pagination_limit",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "numeric",
+                                "scope" => "global",
+                                "is_required" => 1
+                            ]
                         ]
                     ]
                 ]
@@ -225,7 +237,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
                                 "is_required" => 1
                             ],
@@ -237,7 +249,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
                                 "is_required" => 1
                             ]

@@ -73,10 +73,10 @@ class ProductAttributeRepository extends ProductRepository
             })->flatten(1);
 
             // get all request attribute id
-            $request_attribute_ids = array_map( function ($request_attribute) {
+            $request_attribute_slugs = array_map( function ($request_attribute) {
 
-                if(!isset($request_attribute["attribute_id"])) throw ValidationException::withMessages(["attribute_id" => "Invalid attribute format."]);
-                return $request_attribute["attribute_id"];
+                if(!isset($request_attribute["attribute_slug"])) throw ValidationException::withMessages(["attribute_slug" => "Invalid attribute format."]);
+                return $request_attribute["attribute_slug"];
                 
             }, $request->get("attributes"));
 
@@ -84,7 +84,7 @@ class ProductAttributeRepository extends ProductRepository
 
             $all_product_attributes = [];
 
-            if($product_type) $super_attributes = Arr::pluck($request->super_attributes, 'attribute_id');
+            if($product_type) $super_attributes = Arr::pluck($request->super_attributes, 'attribute_slug');
             
             foreach ( $attributes as $attribute )
             {
@@ -94,9 +94,9 @@ class ProductAttributeRepository extends ProductRepository
                 if($method == "update" && $product_type && in_array($attribute->slug, $this->non_required_attributes)) continue;
 
                 //Super attribute filter in case of configurable products
-                if(isset($super_attributes) && (in_array($attribute->id, $super_attributes))) continue;
+                if(isset($super_attributes) && (in_array($attribute->slug, $super_attributes))) continue;
 
-                $single_attribute_collection = $request_attribute_collection->where('attribute_id', $attribute->id);
+                $single_attribute_collection = $request_attribute_collection->where('attribute_slug', $attribute->slug);
                 $default_value_exist = $single_attribute_collection->pluck("use_default_value")->first();
 
                 $product_attribute["attribute_slug"] = $attribute->slug;
@@ -106,7 +106,7 @@ class ProductAttributeRepository extends ProductRepository
                     $all_product_attributes[] = $product_attribute;
                     continue;
                 }
-                $product_attribute["value"] = in_array($attribute->id, $request_attribute_ids) ? $single_attribute_collection->pluck("value")->first() : null;
+                $product_attribute["value"] = in_array($attribute->slug, $request_attribute_slugs) ? $single_attribute_collection->pluck("value")->first() : null;
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 
                 $validator = Validator::make($product_attribute, [
@@ -175,15 +175,18 @@ class ProductAttributeRepository extends ProductRepository
         }
     }
 
-    public function syncAttributes(array $data, object $product, array $scope, object $request, string $method = "store", ?string $product_type = null): bool
+    public function syncAttributes(array $data, object $product, array $scope, object $request, string $method = "store", ?string $product_type = null, ?array $update_attributes = null): bool
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.sync.before");
 
         try
         {
-            foreach($data as $attribute) { 
+            foreach($data as $attribute) {
 
+                $scope_arr = $scope;
+
+                if($update_attributes && !in_array($product->id, $request->update_variants) && in_array($attribute["attribute_slug"], $update_attributes)) continue;
                 //removed some attributes in case of configurable products
                 if($product_type && in_array($attribute['attribute_slug'], $this->non_required_attributes)) continue;
 
@@ -196,12 +199,12 @@ class ProductAttributeRepository extends ProductRepository
                 }
 
                 $db_attribute = Attribute::whereSlug($attribute['attribute_slug'])->first();
-                if($this->product_repository->scopeFilter($scope["scope"], $db_attribute->scope)) $scope = $this->product_repository->getParentScope($scope); 
+                if($this->product_repository->scopeFilter($scope_arr["scope"], $db_attribute->scope)) $scope_arr = $this->product_repository->getParentScope($scope_arr); 
            
                 $match = [
                     "product_id" => $product->id,
-                    "scope" => $scope["scope"],
-                    "scope_id" => $scope["scope_id"],
+                    "scope" => $scope_arr["scope"],
+                    "scope_id" => $scope_arr["scope_id"],
                     "attribute_id" => $db_attribute->id
                 ];
 

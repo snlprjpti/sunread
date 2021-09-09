@@ -18,7 +18,7 @@ class ExchangeRateController extends BaseController
     public function __construct(ExchangeRate $exchangeRate, ExchangeRateRepository $exchangeRateRepository)
     {
         $this->model = $exchangeRate;
-        $this->model_name = "Exchange rate";
+        $this->model_name = "Exchange Rate";
         $this->repository = $exchangeRateRepository;
 
         parent::__construct($this->model, $this->model_name);
@@ -33,7 +33,7 @@ class ExchangeRateController extends BaseController
     {
         return new ExchangeRateResource($data);
     }
-    
+
     public function index(Request $request): JsonResponse
     {
         try

@@ -46,7 +46,7 @@ class ProductTest extends BaseTestCase
             {
                 if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status"])) continue;
                 $attributes[] = [
-                    "attribute_id" => $attribute->id,
+                    "attribute_slug" => $attribute->slug,
                     "value" => $this->value($attribute)
                 ];
             }
@@ -132,7 +132,7 @@ class ProductTest extends BaseTestCase
     public function getInvalidUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
-            "website_id" => null
+            "parent_id" => 0
         ]);
     }
 

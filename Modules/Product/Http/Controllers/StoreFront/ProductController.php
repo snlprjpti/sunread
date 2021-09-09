@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Modules\Category\Repositories\StoreFront\CategoryRepository;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Transformers\StoreFront\PageResource;
 use Modules\Product\Entities\Product;
@@ -16,15 +17,18 @@ use Modules\Product\Repositories\StoreFront\ProductRepository as StoreFrontProdu
 
 class ProductController extends BaseController
 {
-    protected $repository, $search_repository, $store_fornt_repository;
+    protected $repository, $search_repository, $category_repository;
 
-    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository, StoreFrontProductRepository $store_fornt_repository)
+    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository, CategoryRepository $category_repository)
     {
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $repository;
         $this->search_repository = $search_repository;
-        $this->store_fornt_repository = $store_fornt_repository;
+        $this->category_repository = $category_repository;
+
+        $this->middleware('validate.website.host')->only(['index', 'filter']);
+        $this->middleware('validate.store.code')->only(['index', 'filter']);
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -33,13 +37,15 @@ class ProductController extends BaseController
     {
         try
         {
+            $fetched = [];
             $request->validate([
-                "page" => "numeric|min:1",
-                "limit" => "numeric|min:5"
+                "page" => "numeric|min:1"
             ]);
             
-            $data = $this->search_repository->getFilterProducts($request, $category_id);
-            $fetched = collect($data["hits"]["hits"])->pluck("_source")->toArray();
+            $store = $this->search_repository->getStore($request);
+            $data = $this->search_repository->getFilterProducts($request, $category_id, $store);
+            $fetched["categories"] = $this->category_repository->getPages($category_id, $store);
+            $fetched["products"] = collect($data["hits"]["hits"])->pluck("_source")->toArray();
         }
         catch( Exception $exception )
         {
@@ -49,11 +55,12 @@ class ProductController extends BaseController
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
-    public function filter(int $category_id): JsonResponse
+    public function filter(Request $request, int $category_id): JsonResponse
     {
         try
         {
-            $fetched = $this->search_repository->getFilterOptions($category_id);
+            $store = $this->search_repository->getStore($request);
+            $fetched = $this->search_repository->getFilterOptions($category_id, $store);
         }
         catch( Exception $exception )
         {
