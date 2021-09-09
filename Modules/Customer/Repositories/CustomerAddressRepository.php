@@ -135,6 +135,7 @@ class CustomerAddressRepository extends BaseRepository
             if($request->shipping) {
                 $data = $this->validateAddress($request, $customer_id, "shipping");
                 $shipping = $this->checkShippingAddress($customer_id)->first();
+                $data = $this->checkRegionAndCity($data);
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
                 } else {
@@ -203,18 +204,29 @@ class CustomerAddressRepository extends BaseRepository
     {
         try
         {
-            if(isset($data["region_id"])) $data["region"] = null;
-            if(empty($data["region_id"]) && isset($data["region"]))
-            {
-                $region = Region::whereCountryId($data["country_id"])->count();
-                if($region > 0) $data["region"] = null;
+            if(isset($data["region_id"])) {
+                $data["region"] = null;
             }
+            elseif (empty($data["region_id"]) && isset($data["region"])) {
 
-            if(isset($data["city_id"])) $data["city"] = null;
-            if(empty($data["city_id"]) && isset($data["city"], $data["region_id"]))
-            {
+                $region = Region::whereCountryId($data["country_id"])->count();
+                if($region > 0) {
+                    $data["region"] = null;
+                    $data["city"] = null;
+                }
+            }
+            elseif (empty($data["region_id"]) && isset($data["city_id"])) {
+
+                $data["city"] = null;
+            }
+            elseif (empty($data["city_id"]) && isset($data["city"])) {
+
                 $cities = City::whereRegionId($data["region_id"])->count();
                 if($cities > 0) $data["city"] = null;
+            }
+            elseif(isset($data["region_id"], $data["city_id"])) {
+
+                $data["city"] = null;
             }
         }
         catch (Exception $exception)
