@@ -23,7 +23,7 @@ Route::group(["middleware" => ["api"]], function () {
         // CUSTOMER PROFILE
         Route::group(["prefix" => "accounts", "as" => "account."], function () {
             Route::get("/", [CustomerAccountController::class, "show"])->name("show");
-            Route::put("/", [CustomerAccountController::class, "update"])->name("update");
+            Route::post("/", [CustomerAccountController::class, "update"])->name("update");
             Route::post("image", [CustomerAccountController::class, "uploadProfileImage"])->name("image.update");
             Route::delete("image", [CustomerAccountController::class, "deleteProfileImage"])->name("image.delete");
         });
