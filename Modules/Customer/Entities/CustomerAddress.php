@@ -13,7 +13,7 @@ class CustomerAddress extends Model
 {
     use HasFactory;
     protected $fillable = [ "customer_id", "first_name", "middle_name", "last_name", "address1", "address2", "address3", "country_id", "region_id", "city_id", "postcode", "phone", "vat_number", "default_billing_address", "default_shipping_address", "region", "city" ];
-    protected $with = [ "country", "region", "city" ];
+    protected $with = [ "country", "regions", "cities" ];
 
     public function getNameAttribute(): ?string
     {
@@ -29,13 +29,13 @@ class CustomerAddress extends Model
         return $this->belongsTo(Country::class);
     }
 
-    public function region(): BelongsTo
+    public function regions(): BelongsTo
     {
-        return $this->belongsTo(Region::class);
+        return $this->belongsTo(Region::class, "region_id","id");
     }
 
-    public function city(): BelongsTo
+    public function cities(): BelongsTo
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(City::class, "city_id", "id");
     }
 }
