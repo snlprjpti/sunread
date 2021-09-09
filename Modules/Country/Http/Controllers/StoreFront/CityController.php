@@ -29,15 +29,13 @@ class CityController extends BaseController
         return CityResource::collection($data);
     }
 
-    public function index(Request $request, int $country_id, int $region_id): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try
         {
             $request->without_pagination = true;
-            $fetched = $this->repository->fetchAll($request, callback:function () use($country_id, $region_id){
-                return ($region_id) ? $this->model::whereRegionId($region_id) : Country::find($country_id)->regions->mapWithKeys(function ($regions){
-                     return $regions->cities;
-                });
+            $fetched = $this->repository->fetchAll($request, callback:function () use($request){
+                return ($request->region_id) ? $this->model::whereRegionId($request->region_id) : $this->model;
             });
         }
         catch (Exception $exception)
