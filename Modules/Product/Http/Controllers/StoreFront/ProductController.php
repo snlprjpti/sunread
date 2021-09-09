@@ -42,9 +42,8 @@ class ProductController extends BaseController
             ]);
             
             $store = $this->search_repository->getStore($request);
-            $data = $this->search_repository->getFilterProducts($request, $category_id, $store);
+            $fetched = $this->search_repository->getFilterProducts($request, $category_id, $store);
             $fetched["categories"] = $this->category_repository->getPages($category_id, $store);
-            $fetched["products"] = collect($data["hits"]["hits"])->pluck("_source")->toArray();
         }
         catch( Exception $exception )
         {
