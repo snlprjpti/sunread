@@ -5,6 +5,8 @@ namespace Modules\Customer\Repositories;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Modules\Country\Entities\City;
+use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
@@ -32,7 +34,9 @@ class CustomerAddressRepository extends BaseRepository
             "phone" => "required",
             "vat_number" => "sometimes",
             "default_billing_address" => "sometimes|boolean",
-            "default_shipping_address" => "sometimes|boolean"
+            "default_shipping_address" => "sometimes|boolean",
+            "region" => "sometimes",
+            "city" => "sometimes"
         ];
     }
 
@@ -185,6 +189,32 @@ class CustomerAddressRepository extends BaseRepository
             foreach ($new_rules as $key => $value) {
                 $key = str_replace("$name.", "", $key);
                 $this->rules[$key] = $value;
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    public function checkRegionAndCity(array $data): array
+    {
+        try
+        {
+            if(isset($data["region_id"])) $data["region"] = null;
+            if(empty($data["region_id"]) && isset($data["region"]))
+            {
+                $region = Region::whereCountryId($data["country_id"])->count();
+                if($region > 0) $data["region"] = null;
+            }
+
+            if(isset($data["city_id"])) $data["city"] = null;
+            if(empty($data["city_id"]) && isset($data["city"], $data["region_id"]))
+            {
+                $cities = City::whereRegionId($data["region_id"])->count();
+                if($cities > 0) $data["city"] = null;
             }
         }
         catch (Exception $exception)
