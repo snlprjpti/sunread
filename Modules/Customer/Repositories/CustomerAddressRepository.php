@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Event;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
-use Modules\Customer\Exceptions\AddressAlreadyCreatedException;
 
 class CustomerAddressRepository extends BaseRepository
 {
@@ -125,44 +124,74 @@ class CustomerAddressRepository extends BaseRepository
         return $address;
     }
 
-    public function insert(object $request, int $customer_id): object
+    public function createOrUpdate(object $request, int $customer_id): array
     {
-        DB::beginTransaction();
-        Event::dispatch("{$this->model_key}.create.before");
-
         try
         {
-            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request), [
-                "default_shipping_address" => "boolean|required_without:default_billing_address",
-                "default_billing_address" => "boolean|required_without:default_shipping_address"
-            ]), function () use ($customer_id) {
+            if($request->shipping) {
+                $data = $this->validateAddress($request, $customer_id, "shipping");
+                $shipping = $this->checkShippingAddress($customer_id)->first();
+                if ($shipping) {
+                    $created["shipping"] = $this->update($data, $shipping->id);
+                } else {
+                    $data["default_shipping_address"] = 1;
+                    $data["default_billing_address"] = 0;
+                    $created["shipping"] = $this->create($data);
+                }
+            }
+
+            if($request->billing) {
+                $data = $this->validateAddress($request, $customer_id, "billing");
+                $billing = $this->checkBillingAddress($customer_id)->first();
+                if ($billing) {
+                    $created["billing"] = $this->update($data, $billing->id);
+                }
+                else {
+                    $data["default_shipping_address"] = 0;
+                    $data["default_billing_address"] = 1;
+                    $created["billing"] = $this->create($data);
+                }
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $created;
+    }
+
+    public function validateAddress(object $request, int $customer_id, string $name): array
+    {
+        try
+        {
+            foreach ($this->rules as $key => $value)
+            {
+                $new_rules[ $name."." . $key] = $value;
+            }
+            $this->rules = $new_rules;
+
+            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request)), function () use ($customer_id) {
                 return [
                     "customer_id" => Customer::findOrFail($customer_id)->id,
                 ];
             });
 
-            if ($request->default_shipping_address == 1) {
-                if ($this->checkShippingAddress($customer_id)->count() > 0 ) throw new AddressAlreadyCreatedException("Shipping Address Already Exist");
-                $data["default_billing_address"] = 0;
-                $created = $this->model->create($data);
-            }
+            $old_data = $data[$name];
+            unset($data[$name]);
+            $data = array_merge($old_data,$data);
 
-            if ($request->default_billing_address == 1) {
-                if ($this->checkBillingAddress($customer_id)->count() > 0) throw new AddressAlreadyCreatedException("Billing Address Already Exist");
-                $data["default_shipping_address"] = 0;
-                $data["default_billing_address"] = 1;
-                $created = $this->model->create($data);
+            $this->rules = [];
+            foreach ($new_rules as $key => $value) {
+                $key = str_replace("$name.", "", $key);
+                $this->rules[$key] = $value;
             }
         }
         catch (Exception $exception)
         {
-            DB::rollBack();
             throw $exception;
         }
 
-        Event::dispatch("{$this->model_key}.create.after", $created);
-        DB::commit();
-
-        return $created;
+        return $data;
     }
 }
