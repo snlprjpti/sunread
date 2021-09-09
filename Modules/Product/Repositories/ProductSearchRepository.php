@@ -104,8 +104,14 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function getFilterProducts(object $request, int $category_id, object $store): ?array
     {
+        $data = [];
         $filter = $this->filterAndSort($request, $category_id);
-        return $this->finalQuery($filter, $request, $store);
+        
+        $data = $this->finalQuery($filter, $request, $store);
+        $data["products"] = collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray();
+        $data["last_page"] = (int) ceil(count($data["products"])/$data["limit"]);
+        $data["total"] = count($data["products"]);
+        return $data;
     }
 
     public function getProduct(object $request): ?array
@@ -241,7 +247,11 @@ class ProductSearchRepository extends ElasticSearchRepository
             throw $exception;
         }
 
-        return $data;
+        return [
+            "products" => $data,
+            "current_page" => $page,
+            "limit" => $limit
+        ];
     }
 
     public function reIndex(int $id, ?callable $callback = null): object
