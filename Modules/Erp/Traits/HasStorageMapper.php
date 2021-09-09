@@ -50,7 +50,7 @@ trait HasStorageMapper
         try
         {
             // Filter Images only
-            $files = array_filter(Storage::files("/{$this->erp_folder}/COLECT.IO"), fn ($file) => Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]));
+            $files = array_filter(Storage::files("/{$this->erp_folder}/final_images"), fn ($file) => Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]));
 
             $hases = [];
             $files = array_map(function ($file) use (&$hases) {

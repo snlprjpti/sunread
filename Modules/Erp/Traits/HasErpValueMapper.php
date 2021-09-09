@@ -460,19 +460,21 @@ trait HasErpValueMapper
     {
         try
         {
-            $product_images = $this->getDetailCollection("productImages", $product->sku); 
+            $product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
             $images = $this->getValue($product_images, function ($value) {
                 return is_array($value) ? $value : json_decode($value, true) ?? $value;
             });
     
-            if ( !empty($variant) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"]);
+            if ( isset($variant["pfVerticalComponentCode"]) ) $images = $images->where("color_code", $variant["pfVerticalComponentCode"]);
     
             if ( $images->count() > 0 )
             {
-                if (empty($variant))
+                if ($product->type == "configurable")
                 {
                     $configurable_images = [];
-                    foreach ($images->groupBy("color_code") as $color_images) $configurable_images[] = $color_images->first();
+                    foreach ($images->groupBy("color_code") as $color_images) {
+                        $configurable_images[] = $color_images->first();
+                    }
                     $images = $configurable_images;
                 }
                 $position = 0;
@@ -481,8 +483,12 @@ trait HasErpValueMapper
                     $data["path"] = $image["url"];
                     $data["position"] = $position;
                     $data["product_id"] = $product->id;
-                    if ($position == 0) $type_ids = [1,2,3];
-                    else $type_ids = 5;
+                    if ($position == 0) {
+                        $type_ids = [1,2,3];
+                    }
+                    else { 
+                        $type_ids = 5;
+                    }
                     $position++;
                    $product_image = ProductImage::updateOrCreate($data);
                    $product_image->types()->sync($type_ids);
