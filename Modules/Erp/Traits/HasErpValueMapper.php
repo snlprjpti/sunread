@@ -460,7 +460,7 @@ trait HasErpValueMapper
     {
         try
         {
-            $product_images = $this->getDetailCollection("productImages", $erp_product_iteration->sku); 
+            $product_images = $this->getDetailCollection("productImages", $product->sku); 
             $images = $this->getValue($product_images, function ($value) {
                 return is_array($value) ? $value : json_decode($value, true) ?? $value;
             });
