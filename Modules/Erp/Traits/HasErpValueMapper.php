@@ -66,7 +66,7 @@ trait HasErpValueMapper
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
 
                     //loop breaked for testing
-                    if ( $count == 10 ) break;
+                    if ( $count == 30 ) break;
                     ErpMigratorJob::dispatch($detail);
                     $count++;
                 }
@@ -119,8 +119,8 @@ trait HasErpValueMapper
                 "startingDate" => "",
                 "endingDate" => ""
             ];
-            $this->storeScopeWiseValue($price, $product);
-            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
+            if ($product->type == "simple") $this->storeScopeWiseValue($price, $product);
+            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
 
             // Condition for invalid date/times
             $max_time = strtotime("2030-12-28");
@@ -306,7 +306,7 @@ trait HasErpValueMapper
         try
         {
             $price_data = $this->getValue($prices)->filter(function ($price_value) {
-                return $price_value["salesCode"] == "WEB" && $price_value["currencyCode"] !== "USD";
+                return $price_value["salesCode"] == "WEB" && $price_value["currencyCode"] !== "";
             })->map(function ($price_value) {
 
                 // Condition for invalid date/times
@@ -321,17 +321,17 @@ trait HasErpValueMapper
                     [
                         "attribute_id" => $this->getAttributeId("price"),
                         "value" => $price_value["unitPrice"],
-                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"] 
+                        "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"] 
                     ],
                     [
                         "attribute_id" => $this->getAttributeId("special_from_date"),
                         "value" => Carbon::parse(date("Y-m-d", $start_time)),
-                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
+                        "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"]
                     ],
                     [
                         "attribute_id" => $this->getAttributeId("special_to_date"),
                         "value" => Carbon::parse(date("Y-m-d", $end_time)),
-                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
+                        "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"]
                     ] 
                 ];
             });
@@ -490,8 +490,8 @@ trait HasErpValueMapper
                         $type_ids = 5;
                     }
                     $position++;
-                   $product_image = ProductImage::updateOrCreate($data);
-                   $product_image->types()->sync($type_ids);
+                    $product_image = ProductImage::updateOrCreate($data);
+                    $product_image->types()->sync($type_ids);
                 }
             }
         }
@@ -550,7 +550,7 @@ trait HasErpValueMapper
                             ]);
                         }
                     }
-                    $this->mapstoreImages($product, $erp_product_iteration, $variant);
+                    $this->mapstoreImages($variant_product, $erp_product_iteration, $variant);
                     $this->createInventory($variant_product, $erp_product_iteration, $variant);
                 }
 
