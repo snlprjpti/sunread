@@ -17,15 +17,16 @@ use Modules\Product\Repositories\StoreFront\ProductRepository as StoreFrontProdu
 
 class ProductController extends BaseController
 {
-    protected $repository, $search_repository, $category_repository;
+    protected $repository, $search_repository, $category_repository, $store_fornt_repository;
 
-    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository, CategoryRepository $category_repository)
+    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository, CategoryRepository $category_repository, StoreFrontProductRepository $store_fornt_repository)
     {
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $repository;
         $this->search_repository = $search_repository;
         $this->category_repository = $category_repository;
+        $this->store_fornt_repository = $store_fornt_repository;
 
         $this->middleware('validate.website.host')->only(['index', 'filter']);
         $this->middleware('validate.store.code')->only(['index', 'filter']);
