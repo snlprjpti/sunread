@@ -30,10 +30,8 @@ Route::group(["middleware" => ["api"]], function () {
 
         // CUSTOMER ADDRESS
         Route::group(["prefix" => "addresses", "as" => "address."], function () {
-            Route::get("/{type}", [CustomerAddressAccountController::class, "show"])->name("show");
+            Route::get("/", [CustomerAddressAccountController::class, "show"])->name("show");
             Route::post("/", [CustomerAddressAccountController::class, "create"])->name("create");
-            Route::put("/{type}", [CustomerAddressAccountController::class, "update"])->name("update");
-            Route::delete("/{type}", [CustomerAddressAccountController::class, "delete"])->name("delete");
         });
     });
 
