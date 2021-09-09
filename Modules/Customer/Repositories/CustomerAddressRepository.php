@@ -135,6 +135,7 @@ class CustomerAddressRepository extends BaseRepository
                     $created["shipping"] = $this->update($data, $shipping->id);
                 } else {
                     $data["default_shipping_address"] = 1;
+                    $data["default_billing_address"] = 0;
                     $created["shipping"] = $this->create($data);
                 }
             }
@@ -170,7 +171,6 @@ class CustomerAddressRepository extends BaseRepository
             }
             $this->rules = $new_rules;
 
-
             $data = $this->validateData($request, array_merge($this->regionAndCityRules($request)), function () use ($customer_id) {
                 return [
                     "customer_id" => Customer::findOrFail($customer_id)->id,
@@ -180,14 +180,11 @@ class CustomerAddressRepository extends BaseRepository
             $old_data = $data[$name];
             unset($data[$name]);
             $data = array_merge($old_data,$data);
+
             $this->rules = [];
             foreach ($new_rules as $key => $value) {
-
-                if ($key == "shipping.postcode")
-                {
-                    $key = str_replace("$name.", "", $key);
-                    $this->rules[$key] = $value;
-                }
+                $key = str_replace("$name.", "", $key);
+                $this->rules[$key] = $value;
             }
         }
         catch (Exception $exception)

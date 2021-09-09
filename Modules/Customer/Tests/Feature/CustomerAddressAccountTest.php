@@ -76,7 +76,6 @@ class CustomerAddressAccountTest extends TestCase
 
     public function testCustomerCanFetchOwnAddresses()
     {
-
         $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show"));
 
         $response->assertStatus(200);
