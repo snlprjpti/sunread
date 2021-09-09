@@ -77,7 +77,7 @@ class CustomerAccountTest extends TestCase
     public function testCustomerCanUpdateProfile()
     {
         $post_data = $this->getUpdateData();
-        $response = $this->withHeaders($this->headers)->put(route("{$this->route_prefix}.update", $post_data));
+        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.update", $post_data));
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
