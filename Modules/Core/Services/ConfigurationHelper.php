@@ -42,7 +42,7 @@ class ConfigurationHelper
 
             $values = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data, $element["default"]);
             $fetched = $this->getProviderData($element, $values);
-            if($element["type"] == "file") $fetched = Storage::url($fetched);
+            if($fetched && $element["type"] == "file") $fetched = Storage::url($fetched);
         }
         catch( Exception $exception )
         {

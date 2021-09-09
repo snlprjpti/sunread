@@ -60,7 +60,7 @@ class ProductRepository extends BaseRepository
             $no_config_rules = (isset($data["use_config_manage_stock"]) && $data["use_config_manage_stock"] == 1) ? 0 : 1;
 
             $validator = Validator::make($data, [
-                "quantity" => "required|decimal",
+                "quantity" => "required|numeric",
                 "use_config_manage_stock" => "required|boolean|in:$config_rules",
                 "manage_stock" => "required|boolean|in:$no_config_rules"
             ]);
@@ -118,9 +118,9 @@ class ProductRepository extends BaseRepository
         {
             if (isset($value["value"]))
             {
-                $id = ($method == "update") ? $product->id : "";
+                // $id = ($method == "update") ? $product->id : "";
                 $validator = Validator::make(["sku" => $value["value"] ], [
-                    "sku" => "required|unique:products,sku,".$id
+                    "sku" => "required|unique:products,sku,".$product->id
                 ]);
     
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
@@ -370,7 +370,7 @@ class ProductRepository extends BaseRepository
             $fetched["configurable"]["attributes"] = array_values($items);
 
             $group_attribute = AttributeConfigurableProduct::whereProductId($product->id)->whereUsedInGrouping(1)->first();
-            if($group_attribute) $fetched["configurable"]["group_attribute"] = $group_attribute->attribute_id;
+            if($group_attribute) $fetched["configurable"]["group_attribute"] = $group_attribute->attribute?->slug;
         }
         catch ( Exception $exception )
         {
