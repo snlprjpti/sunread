@@ -147,21 +147,6 @@ class ProductTest extends BaseTestCase
         ]);
     }
 
-    public function testAdminCanUpdateResource()
-    {
-        if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
-
-        $post_data = $this->getUpdateData();
-        $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
-        dd($response);
-
-        $response->assertOk();
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
-        ]);
-    }
-
     /**
      * Product Image Tests
      */
