@@ -469,7 +469,7 @@ trait HasErpValueMapper
     
             if ( $images->count() > 0 )
             {
-                if ($product->type == "configurable")
+                if (empty($variant))
                 {
                     $configurable_images = [];
                     foreach ($images->groupBy("color_code") as $color_images) $configurable_images[] = $color_images->first();
