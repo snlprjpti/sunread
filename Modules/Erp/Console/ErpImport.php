@@ -26,13 +26,13 @@ class ErpImport extends Command
     public function handle(): bool
     {
         // Import from API
-        ListProducts::dispatch();
-        ErpAttributeGroups::dispatch();
-        EanCodes::dispatch();
-        SalePrices::dispatch();
-        WebInventories::dispatch();
-        WebAssortments::dispatch();
-        ProductVariants::dispatch();
+        // ListProducts::dispatch();
+        // ErpAttributeGroups::dispatch();
+        // EanCodes::dispatch();
+        // SalePrices::dispatch();
+        // WebInventories::dispatch();
+        // WebAssortments::dispatch();
+        // ProductVariants::dispatch();
 
         // Import from FTP
         ProductImages::dispatch();
