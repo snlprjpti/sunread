@@ -215,18 +215,16 @@ class CustomerAddressRepository extends BaseRepository
                     $data["city"] = null;
                 }
             }
-            elseif (empty($data["region_id"]) && isset($data["city_id"])) {
 
+            if(isset($data["region_id"], $data["city_id"])) {
                 $data["city"] = null;
             }
-            elseif (empty($data["city_id"]) && isset($data["city"])) {
-
+            elseif (empty($data["region_id"]) && isset($data["city_id"])) {
+                $data["city"] = null;
+            }
+            elseif (empty($data["city_id"]) && isset($data["city"], $data["region_id"])) {
                 $cities = City::whereRegionId($data["region_id"])->count();
                 if($cities > 0) $data["city"] = null;
-            }
-            elseif(isset($data["region_id"], $data["city_id"])) {
-
-                $data["city"] = null;
             }
         }
         catch (Exception $exception)
