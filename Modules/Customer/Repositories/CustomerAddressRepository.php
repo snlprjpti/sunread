@@ -5,8 +5,6 @@ namespace Modules\Customer\Repositories;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Modules\Country\Entities\City;
-use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
@@ -126,112 +124,5 @@ class CustomerAddressRepository extends BaseRepository
         }
 
         return $address;
-    }
-
-    public function createOrUpdate(object $request, int $customer_id): array
-    {
-        try
-        {
-            if($request->shipping) {
-                $data = $this->validateAddress($request, $customer_id, "shipping");
-                $shipping = $this->checkShippingAddress($customer_id)->first();
-                $data = $this->checkRegionAndCity($data);
-                if ($shipping) {
-                    $created["shipping"] = $this->update($data, $shipping->id);
-                } else {
-                    $data["default_shipping_address"] = 1;
-                    $data["default_billing_address"] = 0;
-                    $created["shipping"] = $this->create($data);
-                }
-            }
-
-            if($request->billing) {
-                $data = $this->validateAddress($request, $customer_id, "billing");
-                $billing = $this->checkBillingAddress($customer_id)->first();
-                if ($billing) {
-                    $created["billing"] = $this->update($data, $billing->id);
-                }
-                else {
-                    $data["default_shipping_address"] = 0;
-                    $data["default_billing_address"] = 1;
-                    $created["billing"] = $this->create($data);
-                }
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $created;
-    }
-
-    public function validateAddress(object $request, int $customer_id, string $name): array
-    {
-        try
-        {
-            foreach ($this->rules as $key => $value)
-            {
-                $new_rules[ $name."." . $key] = $value;
-            }
-            $this->rules = $new_rules;
-
-            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request)), function () use ($customer_id) {
-                return [
-                    "customer_id" => Customer::findOrFail($customer_id)->id,
-                ];
-            });
-
-            $old_data = $data[$name];
-            unset($data[$name]);
-            $data = array_merge($old_data,$data);
-
-            $this->rules = [];
-            foreach ($new_rules as $key => $value) {
-                $key = str_replace("$name.", "", $key);
-                $this->rules[$key] = $value;
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $data;
-    }
-
-    public function checkRegionAndCity(array $data): array
-    {
-        try
-        {
-            if(isset($data["region_id"])) {
-                $data["region"] = null;
-            }
-            elseif (empty($data["region_id"]) && isset($data["region"])) {
-
-                $region = Region::whereCountryId($data["country_id"])->count();
-                if($region > 0) {
-                    $data["region"] = null;
-                    $data["city"] = null;
-                }
-            }
-
-            if(isset($data["region_id"], $data["city_id"])) {
-                $data["city"] = null;
-            }
-            elseif (empty($data["region_id"]) && isset($data["city_id"])) {
-                $data["city"] = null;
-            }
-            elseif (empty($data["city_id"]) && isset($data["city"], $data["region_id"])) {
-                $cities = City::whereRegionId($data["region_id"])->count();
-                if($cities > 0) $data["city"] = null;
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $data;
     }
 }
