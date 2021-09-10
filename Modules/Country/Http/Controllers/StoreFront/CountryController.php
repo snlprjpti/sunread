@@ -33,6 +33,8 @@ class CountryController extends BaseController
         try
         {
             $request->without_pagination = true;
+            $request->sort_by = "name";
+            $request->sort_order = "ASC";
             $fetched = $this->repository->fetchAll($request);
         }
         catch (Exception $exception)
