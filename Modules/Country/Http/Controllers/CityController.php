@@ -38,6 +38,8 @@ class CityController extends BaseController
     {
         try
         {
+            $request->sort_by = "name";
+            $request->sort_order = "ASC";
             $fetched = $this->repository->fetchAll($request);
         }
         catch (Exception $exception)

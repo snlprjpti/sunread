@@ -35,6 +35,8 @@ class RegionController extends BaseController
         try
         {
             $request->without_pagination = true;
+            $request->sort_by = "name";
+            $request->sort_order = "ASC";
             $fetched = $this->repository->fetchAll($request, callback:function () use($country_id){
                 return $this->model::whereCountryId($country_id);
             });
