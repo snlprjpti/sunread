@@ -259,7 +259,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Color",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "default_value" => "Red",
+                "default_value" => "",
                 "is_user_defined" => 1,
                 "options" => [
                     [
@@ -284,7 +284,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Size",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "default_value" => "S",
+                "default_value" => "",
                 "is_user_defined" => 1,
                 "options" => [
                     [
