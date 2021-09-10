@@ -96,33 +96,4 @@ class CustomerAddressRepository extends BaseRepository
 
         return $updated;
     }
-
-
-    public function checkShippingAddress(int $customer_id): object
-    {
-        try
-        {
-            $address = $this->model->whereCustomerId($customer_id)->whereDefaultShippingAddress(1);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $address;
-    }
-
-    public function checkBillingAddress(int $customer_id): object
-    {
-        try
-        {
-            $address = $this->model->whereCustomerId($customer_id)->whereDefaultBillingAddress(1);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $address;
-    }
 }
