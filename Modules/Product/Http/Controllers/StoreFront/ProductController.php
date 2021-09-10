@@ -74,7 +74,7 @@ class ProductController extends BaseController
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
-    public function show(Request $request, string $sku)
+    public function show(Request $request, string $sku): JsonResponse
     {
         try
         {

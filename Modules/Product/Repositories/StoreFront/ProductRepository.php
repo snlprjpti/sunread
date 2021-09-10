@@ -21,7 +21,7 @@ class ProductRepository extends BaseRepository
 		$this->model_name = "Product";
 	}
 
-	public function productDetail(object $request, string $sku)
+	public function productDetail(object $request, string $sku): ?array
 	{
 		try
 		{
