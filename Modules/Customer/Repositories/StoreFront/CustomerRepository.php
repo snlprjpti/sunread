@@ -63,7 +63,7 @@ class CustomerRepository extends BaseRepository
         try
         {
             $merge = array_merge($this->getPasswordRules($request), [
-                ["email" => "required|email|unique:customers,email,{$customer->id}"]
+                "email" => "required|email|unique:customers,email,{$customer->id}"
             ]);
 
             $data = $this->validateData($request, $merge, function () use($customer) {
@@ -73,6 +73,7 @@ class CustomerRepository extends BaseRepository
                     "status" => 1,
                     "is_lock" => 1,
                     "customer_group_id" => 1,
+                    "email" => $customer->email
                 ];
             });
 
