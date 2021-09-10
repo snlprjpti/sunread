@@ -33,8 +33,8 @@ class CustomerAddressRepository extends BaseRepository
             "vat_number" => "sometimes",
             "default_billing_address" => "sometimes|boolean",
             "default_shipping_address" => "sometimes|boolean",
-            "region" => "sometimes",
-            "city" => "sometimes"
+            "region_name" => "sometimes",
+            "city_name" => "sometimes"
         ];
     }
 

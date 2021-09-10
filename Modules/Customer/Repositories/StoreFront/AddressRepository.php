@@ -33,18 +33,18 @@ class AddressRepository extends BaseRepository
             "vat_number" => "sometimes",
             "default_billing_address" => "sometimes|boolean",
             "default_shipping_address" => "sometimes|boolean",
-            "region" => "sometimes",
-            "city" => "sometimes"
+            "region_name" => "sometimes",
+            "city_name" => "sometimes"
         ];
     }
 
     public function regionAndCityRules(object $request, string $name): array
     {
         return [
-            "{$name}.region_id" => "required_without:{$name}.region|exists:regions,id,country_id,{$request->{$name}["country_id"]}",
-            "{$name}.city_id" => "required_without:{$name}.city",
-            "{$name}.region" => "required_without:{$name}.region_id",
-            "{$name}.city" => "required_without:{$name}.city_id",
+            "{$name}.region_id" => "required_without:{$name}.region_name|exists:regions,id,country_id,{$request->{$name}["country_id"]}",
+            "{$name}.city_id" => "required_without:{$name}.city_name",
+            "{$name}.region_name" => "required_without:{$name}.region_id",
+            "{$name}.city_name" => "required_without:{$name}.city_id",
         ];
     }
 
@@ -155,9 +155,9 @@ class AddressRepository extends BaseRepository
         try
         {
             if(isset($data["region_id"])) {
-                $data["region"] = null;
+                $data["region_name"] = null;
                 if(isset($data["city_id"])) {
-                    $data["city"] = null;
+                    $data["city_name"] = null;
                 }
                 else {
                     $cities = City::whereRegionId($data["region_id"])->count();
