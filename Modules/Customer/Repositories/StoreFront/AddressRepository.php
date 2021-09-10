@@ -3,15 +3,13 @@
 namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
+use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
-use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
-use Modules\Customer\Repositories\CustomerAddressRepository;
-use phpDocumentor\Reflection\Types\Parent_;
 
-class AddressRepository extends CustomerAddressRepository
+class AddressRepository extends BaseRepository
 {
     public function __construct(CustomerAddress $customer_address)
     {
@@ -38,14 +36,15 @@ class AddressRepository extends CustomerAddressRepository
             "region" => "sometimes",
             "city" => "sometimes"
         ];
-        parent::__construct($this->model);
     }
 
-    public function regionAndCityRules(object $request): array
+    public function regionAndCityRules(object $request, string $name): array
     {
         return [
-            "region_id" => "sometimes|nullable|exists:regions,id,country_id,{$request->country_id}",
-            "city_id" => "sometimes|nullable|exists:cities,id,region_id,{$request->region_id}",
+            "{$name}.region_id" => "required_without:{$name}.region|exists:regions,id,country_id,{$request->{$name}["country_id"]}",
+            "{$name}.city_id" => "required_without:{$name}.city",
+            "{$name}.region" => "required_without:{$name}.region_id",
+            "{$name}.city" => "required_without:{$name}.city_id",
         ];
     }
 
@@ -84,7 +83,7 @@ class AddressRepository extends CustomerAddressRepository
             if($request->shipping) {
                 $data = $this->validateAddress($request, $customer_id, "shipping");
                 $shipping = $this->checkShippingAddress($customer_id)->first();
-                $data = $this->checkRegionAndCity($data);
+                $data = $this->checkRegionAndCity($data, "shipping");
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
                 } else {
@@ -97,6 +96,7 @@ class AddressRepository extends CustomerAddressRepository
             if($request->billing) {
                 $data = $this->validateAddress($request, $customer_id, "billing");
                 $billing = $this->checkBillingAddress($customer_id)->first();
+                $data = $this->checkRegionAndCity($data, "billing");
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
                 }
@@ -125,7 +125,7 @@ class AddressRepository extends CustomerAddressRepository
             }
             $this->rules = $new_rules;
 
-            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request)), function () use ($customer_id) {
+            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request, $name)), function () use ($customer_id) {
                 return [
                     "customer_id" => Customer::findOrFail($customer_id)->id,
                 ];
@@ -140,6 +140,7 @@ class AddressRepository extends CustomerAddressRepository
                 $key = str_replace("$name.", "", $key);
                 $this->rules[$key] = $value;
             }
+
         }
         catch (Exception $exception)
         {
@@ -149,31 +150,23 @@ class AddressRepository extends CustomerAddressRepository
         return $data;
     }
 
-    public function checkRegionAndCity(array $data): array
+    public function checkRegionAndCity(array $data, string $name): array
     {
         try
         {
             if(isset($data["region_id"])) {
                 $data["region"] = null;
-            }
-            elseif (empty($data["region_id"]) && isset($data["region"])) {
-
-                $region = Region::whereCountryId($data["country_id"])->count();
-                if($region > 0) {
-                    $data["region"] = null;
+                if(isset($data["city_id"])) {
                     $data["city"] = null;
                 }
+                else {
+                    $cities = City::whereRegionId($data["region_id"])->count();
+                    if($cities > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "{$name} City" ]));
+                }
             }
-
-            if(isset($data["region_id"], $data["city_id"])) {
-                $data["city"] = null;
-            }
-            elseif (empty($data["region_id"]) && isset($data["city_id"])) {
-                $data["city"] = null;
-            }
-            elseif (empty($data["city_id"]) && isset($data["city"], $data["region_id"])) {
-                $cities = City::whereRegionId($data["region_id"])->count();
-                if($cities > 0) $data["city"] = null;
+            else {
+                $region = Region::whereCountryId($data["country_id"])->count();
+                if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "{$name} Region" ]));
             }
         }
         catch (Exception $exception)
