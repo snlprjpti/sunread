@@ -7,15 +7,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\CustomerAddress;
-use Modules\Customer\Repositories\CustomerAddressRepository;
+use Modules\Customer\Repositories\StoreFront\AddressRepository;
 
 class CustomerAddressAccountController extends BaseController
 {
     protected $repository, $customer;
 
-    public function __construct(CustomerAddressRepository $customerAddressRepository, CustomerAddress $customerAddress)
+    public function __construct(AddressRepository $addressRepository, CustomerAddress $customerAddress)
     {
-        $this->repository = $customerAddressRepository;
+        $this->repository = $addressRepository;
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
         $this->customer = auth()->guard("customer")->user();
