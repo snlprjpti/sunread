@@ -63,24 +63,21 @@ class ProductSearchRepository extends ElasticSearchRepository
             if($category_id) $filter[]= $this->term("categories.id", $category_id);
     
             if ($request && count($request->all()) > 0) {
+                if ($request->sort_by) $sort = $this->sort($request->sort_by, $request->sort_order ?? "asc");
+                
                 foreach($request->all() as $key => $value) 
                 {
-                    if (str_starts_with($key, 'sort_by_')) $sort = $this->sort(substr($key,8), $value ?? "asc");
                     if(in_array($key, $this->attributeFilterKeys) && $value) {
-                        if($key == "size") {
-                            $size = [$this->term("configurable_size", $value), $this->term($key, $value)];
+                        if($key == "size" || $key == "color") {
+                            $size = [$this->terms("configurable_{$key}", $value), $this->terms($key, $value)];
                             $filter[] = $this->OrwhereQuery($size); 
                         }
-                        if($key == "color") {
-                            $color = [$this->term("configurable_color", $value), $this->term($key, $value)];
-                            $filter[] = $this->OrwhereQuery($color); 
-                        }
-                        else $filter[] = $this->term($key, $value);
+                        else $filter[] = $this->terms($key, $value);
                     } 
                 }
             }
     
-            $query = $this->whereQuery($filter);       
+            $query = $this->whereQuery($filter);   
         }
         catch (Exception $exception)
         {

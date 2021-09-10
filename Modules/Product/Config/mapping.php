@@ -11,7 +11,8 @@ return [
                     "type" => "keyword",
                     "ignore_above" => 256
                 ]
-            ]
+            ],
+            "fielddata"=> true
         ],
         "sku" =>  [
             "type" => "text",
