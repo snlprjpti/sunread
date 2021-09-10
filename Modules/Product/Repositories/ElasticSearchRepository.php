@@ -76,7 +76,7 @@ class ElasticSearchRepository
     public function sort(string $field, ?string $order): array
     {
         return [
-            [$field => ["order" => $order, "mode" => "avg"]]
+            [$field => ["order" => $order]]
         ];
     }
 
