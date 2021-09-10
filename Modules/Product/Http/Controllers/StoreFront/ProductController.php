@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Modules\Category\Entities\CategoryValue;
 use Modules\Category\Repositories\StoreFront\CategoryRepository;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Transformers\StoreFront\PageResource;
@@ -32,19 +33,25 @@ class ProductController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function index(Request $request, int $category_id): JsonResponse
+    public function index(Request $request, string $category_slug): JsonResponse
     {
         try
         {
             $fetched = [];
             $request->validate([
-                "page" => "numeric|min:1"
+                "page" => "numeric|min:1",
+                "color" => "sometimes|array",
+                "color.*" => "sometimes|exists:attribute_options,id",
+                "size" => "sometimes|array",
+                "size.*" => "sometimes|exists:attribute_options,id",
+                "collection" => "sometimes|array",
+                "collection.*" => "sometimes|exists:attribute_options,id",
             ]);
             
             $store = $this->search_repository->getStore($request);
-            $data = $this->search_repository->getFilterProducts($request, $category_id, $store);
-            $fetched["categories"] = $this->category_repository->getPages($category_id, $store);
-            $fetched["products"] = collect($data["hits"]["hits"])->pluck("_source")->toArray();
+            $category = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->firstOrFail();
+            $fetched = $this->search_repository->getFilterProducts($request, $category->category_id, $store);
+            $fetched["categories"] = $this->category_repository->getPages($category->category_id, $store);
         }
         catch( Exception $exception )
         {
@@ -54,12 +61,13 @@ class ProductController extends BaseController
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
-    public function filter(Request $request, int $category_id): JsonResponse
+    public function filter(Request $request, string $category_slug): JsonResponse
     {
         try
         {
             $store = $this->search_repository->getStore($request);
-            $fetched = $this->search_repository->getFilterOptions($category_id, $store);
+            $category = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->firstOrFail();
+            $fetched = $this->search_repository->getFilterOptions($category->category_id, $store);
         }
         catch( Exception $exception )
         {
