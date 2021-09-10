@@ -15,20 +15,20 @@ use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 class ProductRepository extends BaseRepository
 {
 
-	public function __construct(Product $product)
-	{
-		$this->model = $product;
-		$this->model_name = "Product";
-	}
+    public function __construct(Product $product)
+    {
+        $this->model = $product;
+        $this->model_name = "Product";
+    }
 
-	public function productDetail(object $request, string $sku): ?array
-	{
-		try
-		{
-			$website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
+    public function productDetail(object $request, string $sku): ?array
+    {
+        try
+        {
+            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
             $channel = Channel::whereWebsiteId($website->id)->whereCode($request->header("hc-channel"))->firstOrFail();
             $store = Store::whereChannelId($channel->id)->whereCode($request->header("hc-store"))->firstOrFail();
-			$request->sf_store = $store;
+            $request->sf_store = $store;
             $relations = [
                 "catalog_inventories",
                 "images",
@@ -49,7 +49,7 @@ class ProductRepository extends BaseRepository
 
             ];
             $product = Product::whereWebsiteId($website->id)->whereSku($sku)->whereStatus(1)->with($relations)->firstOrFail();
-			$data = [];
+            $data = [];
             $data["id"] = $product->id;
             $data["sku"] = $product->sku;
             
@@ -119,7 +119,6 @@ class ProductRepository extends BaseRepository
                                     "title" => $attribute_option_child_product->attribute_option->name,
                                     "code" => $attribute_option_child_product->attribute_option->code,
                                     "bundle_products" => $attribute_option_child_products
-                                    // ->where("attribute_id", "<>", $initial_attribute_id)
                                     ->unique("attribute_id")
                                     ->map( function ($attribute_bundle_product) use ($attribute_option_child_products, $initial_attribute_option_id, $store) {
                                         return [
@@ -182,13 +181,13 @@ class ProductRepository extends BaseRepository
                 $product_images = array_merge($product_images, $images);
             })->toArray();
             $data["gallery"] = $product_images;
-		}
-		catch (Exception $exception)
-		{
-			throw $exception;
-		}
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
-		return $data;
-	}
+        return $data;
+    }
 
 }
