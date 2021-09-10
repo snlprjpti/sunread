@@ -36,8 +36,6 @@ class CityController extends BaseController
         try
         {
             $request->without_pagination = true;
-            $request->sort_by = "name";
-            $request->sort_order = "ASC";
             $fetched = $this->repository->fetchAll($request, callback:function () use($region_id){
                 return ($region_id) ? $this->model::whereRegionId($region_id) : $this->model;
 
