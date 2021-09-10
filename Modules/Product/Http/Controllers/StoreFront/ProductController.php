@@ -49,7 +49,7 @@ class ProductController extends BaseController
             ]);
             
             $store = $this->search_repository->getStore($request);
-            $category = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->first();
+            $category = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->firstOrFail();
             $fetched = $this->search_repository->getFilterProducts($request, $category->category_id, $store);
             $fetched["categories"] = $this->category_repository->getPages($category->category_id, $store);
         }
@@ -66,7 +66,7 @@ class ProductController extends BaseController
         try
         {
             $store = $this->search_repository->getStore($request);
-            $category = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->first();
+            $category = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->firstOrFail();
             $fetched = $this->search_repository->getFilterOptions($category->category_id, $store);
         }
         catch( Exception $exception )
