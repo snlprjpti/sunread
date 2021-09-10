@@ -88,14 +88,15 @@ class ProductRepository extends BaseRepository
                     $variant_ids = $product->variants->pluck("id")->toArray();
                     $attribute_option_child_products = AttributeOptionsChildProduct::whereIn("product_id", $variant_ids)->with(["attribute_option", "variant_product"])->get();
                     // dd($attribute_option_child_products);
+                    $initial_attribute_id = $attribute_configurable_product->attribute_id;
                     return [
                            "attribute_id" => $attribute_configurable_product->attribute_id,
                            "title" => $attribute_configurable_product->attribute->name,
                            "slug" => $attribute_configurable_product->attribute->name,
                            "values" => $attribute_option_child_products->filter(function ($attribute_option_child_product) use ($attribute_configurable_product) {
                                     return $attribute_option_child_product->attribute_option->attribute_id == $attribute_configurable_product->attribute_id;
-                                })->unique("attribute_option_id")->map(function ($attribute_option_child_product) use ($attribute_option_child_products) {
-                                    dd($attribute_option_child_products)  ;
+                                })->unique("attribute_option_id")->map(function ($attribute_option_child_product) use ($attribute_option_child_products, $initial_attribute_id) {
+                                    dd($attribute_option_child_products->where("product_id", $attribute_option_child_product->product_id)->filter(fn ($skip_attribute) => $initial_attribute_id !== $skip_attribute->attribute )->toArray());
                                     return [
                                         "option_id" => $attribute_option_child_product->attribute_option_id,
                                         "title" => $attribute_option_child_product->attribute_option->name,
