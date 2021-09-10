@@ -87,7 +87,9 @@ trait HasErpValueMapper
                 "name" => $erp_product_iteration->value["webAssortmentColor_Description"],
                 "code" => $erp_product_iteration->value["webAssortmentColor_Code"]
             ];
-            if ( !empty($data["name"]) || !empty($data["code"]) ) AttributeOption::updateOrCreate($data);
+            $match = $data;
+            unset($match["name"]);
+            if ( !empty($data["name"]) || !empty($data["code"]) ) AttributeOption::updateOrCreate($match,$data);
         }
         catch ( Exception $exception )
         {
@@ -340,7 +342,7 @@ trait HasErpValueMapper
             {
                 foreach ($price as $attributeData)
                 {
-                    $channel_id  = $this->getChannelId($attributeData["channel_code"])->id ?? 1;
+                    $channel_id  = $this->getChannelId($attributeData["channel_code"])?->id ?? 1;
                     $attribute = Attribute::find($attributeData["attribute_id"]);
                     $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
                     $value = $attribute_type::create(["value" => $attributeData["value"]]);
