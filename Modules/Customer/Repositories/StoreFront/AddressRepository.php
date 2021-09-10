@@ -160,11 +160,14 @@ class AddressRepository extends BaseRepository
                     $data["city_name"] = null;
                 }
                 else {
+                    $data["city_id"] = null;
                     $cities = City::whereRegionId($data["region_id"])->count();
                     if($cities > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "{$name} City" ]));
                 }
             }
             else {
+                $data["region_id"] = null;
+                $data["city_id"] = null;
                 $region = Region::whereCountryId($data["country_id"])->count();
                 if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "{$name} Region" ]));
             }
