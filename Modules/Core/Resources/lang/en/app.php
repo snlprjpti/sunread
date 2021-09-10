@@ -39,6 +39,7 @@ return [
         'range-required' => ':name range is required',
         'choose-address' => 'Type of address is required.',
         'product-not-found-individually' => 'This product cannot be displayed individually',
+        'please-choose' => 'Please choose :name',
     ],
     'users' => [
         'forget-password' => [

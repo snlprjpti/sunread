@@ -530,6 +530,7 @@ trait HasErpValueMapper
                     ];
 
                     $variant_product = Product::updateOrCreate($match, $product_data);
+                    $variant_product->categories()->sync(1);
                     $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
 
                     $this->createAttributeValue($variant_product, $erp_product_iteration, $ean_code, 8, $variant);

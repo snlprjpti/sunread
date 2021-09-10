@@ -86,7 +86,7 @@ class ProductController extends BaseController
                 "scope" => $data["scope"],
                 "scope_id" => $data["scope_id"]
             ];
-            // dd($request->all());
+
             $created = $this->repository->create($data, function(&$created) use($request, $scope) {
                 $attributes = $this->product_attribute_repository->validateAttributes($created, $request, $scope);
                 $this->product_attribute_repository->syncAttributes($attributes, $created, $scope, $request);

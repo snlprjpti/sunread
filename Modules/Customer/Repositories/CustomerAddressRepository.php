@@ -32,7 +32,9 @@ class CustomerAddressRepository extends BaseRepository
             "phone" => "required",
             "vat_number" => "sometimes",
             "default_billing_address" => "sometimes|boolean",
-            "default_shipping_address" => "sometimes|boolean"
+            "default_shipping_address" => "sometimes|boolean",
+            "region_name" => "sometimes",
+            "city_name" => "sometimes"
         ];
     }
 
@@ -93,105 +95,5 @@ class CustomerAddressRepository extends BaseRepository
         DB::commit();
 
         return $updated;
-    }
-
-
-    public function checkShippingAddress(int $customer_id): object
-    {
-        try
-        {
-            $address = $this->model->whereCustomerId($customer_id)->whereDefaultShippingAddress(1);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $address;
-    }
-
-    public function checkBillingAddress(int $customer_id): object
-    {
-        try
-        {
-            $address = $this->model->whereCustomerId($customer_id)->whereDefaultBillingAddress(1);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $address;
-    }
-
-    public function createOrUpdate(object $request, int $customer_id): array
-    {
-        try
-        {
-            if($request->shipping) {
-                $data = $this->validateAddress($request, $customer_id, "shipping");
-                $shipping = $this->checkShippingAddress($customer_id)->first();
-                if ($shipping) {
-                    $created["shipping"] = $this->update($data, $shipping->id);
-                } else {
-                    $data["default_shipping_address"] = 1;
-                    $data["default_billing_address"] = 0;
-                    $created["shipping"] = $this->create($data);
-                }
-            }
-
-            if($request->billing) {
-                $data = $this->validateAddress($request, $customer_id, "billing");
-                $billing = $this->checkBillingAddress($customer_id)->first();
-                if ($billing) {
-                    $created["billing"] = $this->update($data, $billing->id);
-                }
-                else {
-                    $data["default_shipping_address"] = 0;
-                    $data["default_billing_address"] = 1;
-                    $created["billing"] = $this->create($data);
-                }
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $created;
-    }
-
-    public function validateAddress(object $request, int $customer_id, string $name): array
-    {
-        try
-        {
-            foreach ($this->rules as $key => $value)
-            {
-                $new_rules[ $name."." . $key] = $value;
-            }
-            $this->rules = $new_rules;
-
-            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request)), function () use ($customer_id) {
-                return [
-                    "customer_id" => Customer::findOrFail($customer_id)->id,
-                ];
-            });
-
-            $old_data = $data[$name];
-            unset($data[$name]);
-            $data = array_merge($old_data,$data);
-
-            $this->rules = [];
-            foreach ($new_rules as $key => $value) {
-                $key = str_replace("$name.", "", $key);
-                $this->rules[$key] = $value;
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $data;
     }
 }
