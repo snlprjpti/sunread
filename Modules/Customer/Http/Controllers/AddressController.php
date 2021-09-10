@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\Country\Entities\Country;
-use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 use Modules\Core\Http\Controllers\BaseController;
@@ -73,7 +71,6 @@ class AddressController extends BaseController
                 ];
             });
 
-            $data = $this->repository->checkRegionAndCity($data);
             $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $created->id);
             });
@@ -112,8 +109,6 @@ class AddressController extends BaseController
                 ];
             });
 
-            $data = $this->repository->checkRegionAndCity($data);
-
             $updated = $this->repository->update($data, $address_id, function($updated) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $updated->id);
             });
@@ -151,8 +146,6 @@ class AddressController extends BaseController
                 "default_shipping_address" => "required_without:default_billing_address|boolean",
             ]);
 
-            $data = $this->repository->checkRegionAndCity($data);
-
             $updated = $this->repository->updateDefaultAddress($data, $customer_id, $address_id, function($updated) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $updated->id);
             });
@@ -161,7 +154,7 @@ class AddressController extends BaseController
         {
             return $this->handleException($exception);
         }
-
+        
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 
