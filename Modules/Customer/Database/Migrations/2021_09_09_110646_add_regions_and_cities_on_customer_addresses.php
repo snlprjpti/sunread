@@ -9,16 +9,16 @@ class AddRegionsAndCitiesOnCustomerAddresses extends Migration
     public function up(): void
     {
         Schema::table('customer_addresses', function (Blueprint $table) {
-            $table->string('region')->nullable();
-            $table->string('city')->nullable();
+            $table->string('region_name')->nullable();
+            $table->string('city_name')->nullable();
         });
     }
 
     public function down(): void
     {
         Schema::table('customer_addresses', function (Blueprint $table) {
-            $table->dropColumn(['region']);
-            $table->dropColumn(['city']);
+            $table->dropColumn(['region_name']);
+            $table->dropColumn(['city_name']);
         });
     }
 }
