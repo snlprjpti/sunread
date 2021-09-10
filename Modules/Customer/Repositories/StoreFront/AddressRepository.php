@@ -156,9 +156,7 @@ class AddressRepository extends BaseRepository
         {
             if(isset($data["region_id"])) {
                 $data["region_name"] = null;
-                if(isset($data["city_id"])) {
-                    $data["city_name"] = null;
-                }
+                if(isset($data["city_id"])) $data["city_name"] = null;
                 else {
                     $data["city_id"] = null;
                     $cities = City::whereRegionId($data["region_id"])->count();
