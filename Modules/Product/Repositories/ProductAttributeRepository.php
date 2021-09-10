@@ -15,6 +15,8 @@ use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Tax\Entities\CustomerTaxGroup;
+use Illuminate\Support\Str;
+use Modules\Product\Entities\ProductAttributeString;
 
 class ProductAttributeRepository extends ProductRepository
 {
@@ -107,6 +109,7 @@ class ProductAttributeRepository extends ProductRepository
                     continue;
                 }
                 $product_attribute["value"] = in_array($attribute->slug, $request_attribute_slugs) ? $single_attribute_collection->pluck("value")->first() : null;
+                if($attribute->slug == "url_key") $product_attribute["value"] = $this->createUniqueSlug($product, $request_attribute_collection, $product_attribute["value"]);
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 
                 $validator = Validator::make($product_attribute, [
@@ -239,5 +242,43 @@ class ProductAttributeRepository extends ProductRepository
         DB::commit();
 
         return true;
+    }
+
+    public function createUniqueSlug(object $product, object $collection, ?string $slug)
+    {
+        try
+        {
+            $name = $collection->where('attribute_slug', "name")->pluck("value")->first();
+            if(!$slug) $slug = Str::slug($name);
+            $original_slug = $slug;
+    
+            $count = 1;
+    
+            while ($this->checkSlug($product, $slug)) {
+                $slug = "{$original_slug}-{$count}";
+                $count++;
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+        return $slug;
+    }
+
+    public function checkSlug(object $product, ?string $slug): ?object
+    {
+        try
+        {
+            $data = $this->model->where('product_id', '!=', $product->id)->whereAttributeId(18)->whereHasMorph("value", [ProductAttributeString::class], function ($query) use ($slug) {
+                $query->whereValue($slug);
+            })->first();
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 }
