@@ -11,6 +11,7 @@ use Modules\Category\Repositories\StoreFront\CategoryRepository;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Transformers\StoreFront\PageResource;
 use Modules\Product\Entities\Product;
+use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductRepository;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Modules\Product\Repositories\StoreFront\ProductRepository as StoreFrontProductRepository;
@@ -30,8 +31,11 @@ class ProductController extends BaseController
 
         $this->middleware('validate.website.host')->only(['index', 'filter']);
         $this->middleware('validate.store.code')->only(['index', 'filter']);
+        $exception_statuses = [
+            ProductNotFoundIndividuallyException::class => 404
+        ];
 
-        parent::__construct($this->model, $this->model_name);
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function index(Request $request, int $category_id): JsonResponse
@@ -81,6 +85,6 @@ class ProductController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($data,  $this->lang('fetch-success'));
+        return $this->successResponse($data, $this->lang('fetch-success'));
     }
 }
