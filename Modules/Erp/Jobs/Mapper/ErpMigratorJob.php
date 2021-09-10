@@ -43,6 +43,7 @@ class ErpMigratorJob implements ShouldQueue
             ]);
             if ($check_variants) $product_data["parent_id"] = null;
             $product = Product::updateOrCreate($match, $product_data);
+            $product->categories()->sync(1);
             //visibility attribute value
             $visibility = ($check_variants) ? 8 : 5;
             $this->createAttributeValue($product, $this->detail, false, $visibility);
