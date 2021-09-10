@@ -244,7 +244,7 @@ class ProductAttributeRepository extends ProductRepository
         return true;
     }
 
-    public function createUniqueSlug(object $product, object $collection, ?string $slug)
+    public function createUniqueSlug(object $product, object $collection, ?string $slug): string
     {
         try
         {
@@ -263,6 +263,7 @@ class ProductAttributeRepository extends ProductRepository
         {
             throw $exception;
         }
+
         return $slug;
     }
 
