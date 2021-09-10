@@ -12,8 +12,8 @@ use Modules\Country\Entities\Region;
 class CustomerAddress extends Model
 {
     use HasFactory;
-    protected $fillable = [ "customer_id", "first_name", "middle_name", "last_name", "address1", "address2", "address3", "country_id", "region_id", "city_id", "postcode", "phone", "vat_number", "default_billing_address", "default_shipping_address", "region", "city" ];
-    protected $with = [ "country", "regions", "cities" ];
+    protected $fillable = [ "customer_id", "first_name", "middle_name", "last_name", "address1", "address2", "address3", "country_id", "region_id", "city_id", "postcode", "phone", "vat_number", "default_billing_address", "default_shipping_address", "region_name", "city_name" ];
+    protected $with = [ "country", "region", "city" ];
 
     public function getNameAttribute(): ?string
     {
@@ -29,13 +29,13 @@ class CustomerAddress extends Model
         return $this->belongsTo(Country::class);
     }
 
-    public function regions(): BelongsTo
+    public function region(): BelongsTo
     {
-        return $this->belongsTo(Region::class, "region_id","id");
+        return $this->belongsTo(Region::class);
     }
 
-    public function cities(): BelongsTo
+    public function city(): BelongsTo
     {
-        return $this->belongsTo(City::class, "city_id", "id");
+        return $this->belongsTo(City::class);
     }
 }
