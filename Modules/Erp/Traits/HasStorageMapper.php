@@ -108,7 +108,7 @@ trait HasStorageMapper
             $file_info = [
                 "sku" => $file_arr[0],
                 "color_code" => $file_arr[1],
-                "image_type" => $file_arr[2],
+                "image_type" =>  array_key_exists(2, $file_arr) ? $file_arr[2] : "a",
                 "url" => $file
             ];
             $hash = md5($erp_import_id.$file_info["sku"].json_encode($file_info));
