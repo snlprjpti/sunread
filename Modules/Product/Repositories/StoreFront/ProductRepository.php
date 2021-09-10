@@ -3,15 +3,14 @@
 namespace Modules\Product\Repositories\StoreFront;
 
 use Exception;
-use Illuminate\Support\Arr;
 use Modules\Category\Transformers\StoreFront\CategoryResource;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\Product;
+use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 
 class ProductRepository extends BaseRepository
 {
@@ -41,14 +40,15 @@ class ProductRepository extends BaseRepository
                 "attribute_configurable_products",
                 "attribute_configurable_products.attribute",
                 "variants",
+                "parent.variants.attribute_options_child_products.attribute_option",
+                "parent.variants.product_attributes",
                 "variants.attribute_configurable_products",
                 "variants.attribute_configurable_products.attribute",
                 "variants.attribute_configurable_products.attribute_option",
                 "attribute_options_child_products"
 
             ];
-            $product = Product::whereWebsiteId($website->id)->whereSku($sku)->with($relations)->firstOrFail();
-
+            $product = Product::whereWebsiteId($website->id)->whereSku($sku)->whereStatus(1)->with($relations)->firstOrFail();
 			$data = [];
             $data["id"] = $product->id;
             $data["sku"] = $product->sku;
@@ -59,6 +59,9 @@ class ProductRepository extends BaseRepository
                     "scope_id" => $store->id,
                     "attribute_id" => $product_attribute->attribute->id
                 ];
+                if ( $product_attribute->attribute->slug == "visibility" ) {
+                    if ( $product->value($match)?->name == "Not Visible Individually" ) throw new ProductNotFoundIndividuallyException();
+                }
                 return (!$product_attribute->attribute->is_user_defined) ? [ $product_attribute->attribute->slug => ($product_attribute->attribute->type == "select") ? $product->value($match)?->name : $product->value($match) ] : [];
             })->toArray();
             $data = array_merge($data, $product_details);
@@ -72,137 +75,95 @@ class ProductRepository extends BaseRepository
                         "scope_id" => $store->id,
                         "attribute_id" => $product_attribute->attribute_id
                     ];
-                    return [
+                    $attribute_options = [
                         "name" => $product_attribute->attribute->name,
                         "slug" => $product_attribute->attribute->slug,
-                        "value" => $product->value($match),
-                        "possible_options" => $product_attribute->attribute->attribute_options->pluck("name", "id")->toArray(),
+                        "value" => $product->value($match),    
                     ];
-                })->toArray();
-            }
-            // $data["categories"] = CategoryResource::collection($product->categories);
-            // dd($product->attribute_configurable_products);
-            if ( $product->type == "configurable") {
-                $data["extension_attributes"][] = [
-                   "attribute_configurable_products" => $product->attribute_configurable_products->map(function ($attribute_configurable_product) use ($product) {
-                    $variant_ids = $product->variants->pluck("id")->toArray();
-                    $attribute_option_child_products = AttributeOptionsChildProduct::whereIn("product_id", $variant_ids)->with(["attribute_option", "variant_product"])->get();
-                    // dd($attribute_option_child_products);
-                    $initial_attribute_id = $attribute_configurable_product->attribute_id;
-                    return [
-                           "attribute_id" => $attribute_configurable_product->attribute_id,
-                           "title" => $attribute_configurable_product->attribute->name,
-                           "slug" => $attribute_configurable_product->attribute->name,
-                           "values" => $attribute_option_child_products->filter(function ($attribute_option_child_product) use ($attribute_configurable_product) {
-                                    return $attribute_option_child_product->attribute_option->attribute_id == $attribute_configurable_product->attribute_id;
-                                })->unique("attribute_option_id")->map(function ($attribute_option_child_product) use ($attribute_option_child_products, $initial_attribute_id) {
-                                    dd($attribute_option_child_products->where("product_id", $attribute_option_child_product->product_id)->filter(fn ($skip_attribute) => $initial_attribute_id !== $skip_attribute->attribute )->toArray());
-                                    return [
-                                        "option_id" => $attribute_option_child_product->attribute_option_id,
-                                        "title" => $attribute_option_child_product->attribute_option->name,
-                                        "code" => $attribute_option_child_product->attribute_option->code,
-                                        "bundle_products" => []
-                                    ];
-                                })->toArray(),
-                       ];
-                   })->toArray(), 
-                ];
-                dd($data);
-
-                $variant_ids = $product->variants->pluck("id")->toArray();
-                $attribute_configurable_products = AttributeConfigurableProduct::whereIn("product_id", $variant_ids)
-                ->with([ "product", "attribute", "attribute_option", "attribute_option.attribute"])->get();
-                
-                $configurable_products = [];
-                foreach( $attribute_configurable_products->groupBy("attribute_id") as $index => $group_products )
-                {
-                    $initial_attribute_id = $group_products->first()?->attribute_id;
-                    $configurable_products[] = [
-                        "attribute_id" => $group_products->first()?->attribute_id,
-                        "name" => $group_products->first()?->attribute->name,
-                        "slug" => $group_products->first()?->attribute->slug,
-                        "values" => $group_products->unique("attribute_option_id")->map(function ($group_product_value) use ($attribute_configurable_products, $initial_attribute_id) {
-                            $initial_attribute_option_id = $group_product_value->attribute_option_id; 
+                    if ($product->parent_id) {
+                        $other_variant_ids = $product->parent->variants->where("id", "<>", $product->id)->pluck("id")->toArray();
+                        $variant_attribute_options = AttributeOptionsChildProduct::whereIn("id", $other_variant_ids)->with(["attribute_option"])->get();
+                        $options["possible_options"] = $variant_attribute_options->filter( fn ($variant_attribute_option) => $variant_attribute_option->attribute_option->attribute_id == $product_attribute->attribute_id)
+                        ->unique("attribute_option_id")
+                        ->map( function ($other_variant_option) { 
                             return [
-                                "option_id" => $group_product_value->attribute_option_id,
-                                "name" => $group_product_value->attribute_option->name,
-                                "code" => $group_product_value->attribute_option->code,
-                                "bundle_product_options" => $attribute_configurable_products
-                                ->where("attribute_id", "<>", $initial_attribute_id)
-                                ->unique("attribute_id")
-                                ->map( function ($bundle_product_option) use ($attribute_configurable_products, $initial_attribute_option_id, $initial_attribute_id) {
-                                    return [
-                                        "attribute_id" => $bundle_product_option->attribute_id,
-                                        "name" => $bundle_product_option->attribute->name,
-                                        "slug" => $bundle_product_option->attribute->slug,
-                                        "link_products" => $attribute_configurable_products
-                                        ->where("attribute_id", $initial_attribute_id)
-                                        ->where("attribute_option_id", $initial_attribute_option_id)
-                                        ->map( function ($link_product) {
-                                            return [
-                                                "sku" => $link_product->product->sku 
-                                            ];
-                                        })->toArray()
-                                    ];
-                                })->toArray(),
-                            ];
-                        })->toArray(),
-                    ];
-                }
-
-                dd($configurable_products);
-
-
-
-
-
-               $configurable_products = $attribute_configurable_products->groupBy("attribute_id")->map(function ($group_attribute) {
-                    // dd($group_attribute->first()?->attribute);
-
-                    return [
-                        "attribute_id" => $group_attribute->first()?->attribute_id,
-                        "name" => $group_attribute->first()?->attribute->name,
-                        "slug" => $group_attribute->first()?->attribute->slug,
-                        "values" => $group_attribute->map( function ($configurable_attribute) {
-                            return [
-                                "option_id" => $configurable_attribute->attribute_option_id,
-                                "name" => $configurable_attribute->attribute_option->name,
-                                "code" => $configurable_attribute->attribute_option->code,
-                                "bundel_product_options" => ""
-                            ];
-                        })->toArray(),
-                    ];
-                })->toArray();
-                dd($configurable_products);
-                dd("asd");
-                dd($attribute_configurable_products->groupBy("attribute_id"));
-                
-                
-                
-                dump($attribute_configurable_products->pluck("id"));
-                dd($variant_ids);
-
-
-                $product->variants->map(function ($variant) {
-                    return $variant->attribute_configurable_products->map(function ($product_attr) {
-                        dump($product_attr->attribute_id);
-                        // dd($product_attr->);
-                        dd([
-                            "attribute_id" => $product_attr->attribute_id,
-                            "title" => $product_attr->attribute->name,
-                            "slug" => $product_attr->attribute->slug,
-                            "values" => [
+                                "option_id" => $other_variant_option->attribute_option_id,
+                                "name" => $other_variant_option->attribute_option->name,
+                                "code" => $other_variant_option->attribute_option->code,
                                 
-                            ]
-                        ]);
-
-                        return;  
-                    });
-                });
+                            ]; 
+                        })->toArray();
+                    }
+                    return array_merge($attribute_options, $options);
+                })->toArray();
             }
+            $data["categories"] = CategoryResource::collection($product->categories);
 
+            if ( $product->type == "configurable") {
+                $data["extension_attributes"] = [
+                   "attribute_configurable_products" => $product->attribute_configurable_products->map(function ($attribute_configurable_product) use ($product, $store) {
+                    $variant_ids = $product->variants->pluck("id")->toArray();
+                    $attribute_option_child_products = AttributeOptionsChildProduct::whereIn("product_id", $variant_ids)->with(["attribute_option.attribute", "variant_product.product_attributes.attribute", "variant_product.catalog_inventories"])->get();
+                    $initial_attribute_id = $attribute_configurable_product->attribute_id;
+                    $attribute_configurable_products = [
+                        "attribute_id" => $attribute_configurable_product->attribute_id,
+                        "title" => $attribute_configurable_product->attribute->name,
+                        "slug" => $attribute_configurable_product->attribute->name,
+                        "values" => $attribute_option_child_products->filter(function ($attribute_option_child_product) use ($attribute_configurable_product) {
+                                return $attribute_option_child_product->attribute_option->attribute_id == $attribute_configurable_product->attribute_id;
+                            })->unique("attribute_option_id")
+                            ->map(function ($attribute_option_child_product) use ($attribute_option_child_products, $initial_attribute_id, $store, &$initial_attribute_option_id) {
+                                $initial_attribute_option_id = $attribute_option_child_product->attribute_option_id; 
+                                return [
+                                    "option_id" => $attribute_option_child_product->attribute_option_id,
+                                    "title" => $attribute_option_child_product->attribute_option->name,
+                                    "code" => $attribute_option_child_product->attribute_option->code,
+                                    "bundle_products" => $attribute_option_child_products
+                                    // ->where("attribute_id", "<>", $initial_attribute_id)
+                                    ->unique("attribute_id")
+                                    ->map( function ($attribute_bundle_product) use ($attribute_option_child_products, $initial_attribute_option_id, $store) {
+                                        return [
+                                            "attribute_id" => $attribute_bundle_product->attribute_option->attribute_id,
+                                            "name" => $attribute_bundle_product->attribute_option->attribute->name,
+                                            "slug" => $attribute_bundle_product->attribute_option->attribute->slug,
+                                            "link_products" => $attribute_option_child_products
+                                            ->where("attribute_option_id", $initial_attribute_option_id)
+                                            ->map( function ($link_product) use ($store) {
+                                                $attribute_slugs = ["name", "special_price", "special_from_date", "special_to_date",];
+                                                return array_merge([
+                                                    "sku" => $link_product->variant_product->sku,
+                                                    "option_id" => $link_product->attribute_option_id,], $link_product->variant_product
+                                                    ->product_attributes
+                                                    ->filter(fn ($product_attribute) => in_array($product_attribute->attribute->slug, $attribute_slugs))
+                                                    ->mapWithKeys( function ($product_detail_attribute) use ($store, $link_product) {
+                                                        $match = [
+                                                            "scope" => "store",
+                                                            "scope_id" => $store->id,
+                                                            "attribute_id" => $product_detail_attribute->attribute_id 
+                                                        ];
+                                                        return [ $product_detail_attribute->attribute->slug => $link_product->variant_product->value($match) ];
+                                                    })->toArray(), ["stock_items" => ["qty" =>  $link_product->variant_product->catalog_inventories->first()?->quantity, "is_in_stock" => (bool) $link_product->variant_product->catalog_inventories->first()?->is_in_stock ]]);
+                                            })->toArray()
+                                        ];
+                                    })->toArray(),
+                                ];
+                            })->toArray(),
+                        "possible_options" => $attribute_option_child_products->filter(fn ($attribute_option) => $attribute_option->attribute_option->attribute->id !== $initial_attribute_id)
+                        ->unique("attribute_option_id")
+                        ->map( function ($possible_attribute_option) {
+                            return [
+                                "option_id" => $possible_attribute_option->attribute_option_id,
+                                "name" => $possible_attribute_option->attribute_option->name,
+                                "code" => $possible_attribute_option->attribute_option->code
+                            ];
+                        })->toArray()
+                       ];
+                    return $attribute_configurable_products;
+                   })->toArray(),             
+                ];            
+            }
             $inventory = $product->catalog_inventories->first();
-            if ($product->type == "simple") $data["stock_items"] = ["qty" =>  $inventory->quantity, "is_in_stock" => (bool) $inventory->is_in_stock ];
+            if ($product->type == "simple") $data["stock_items"] = ["qty" =>  $inventory?->quantity ?? 0.00, "is_in_stock" => (bool) $inventory?->is_in_stock ];
 
             $data["custom_attribute"] =  $product->product_attributes->mapWithKeys( function ($product_attribute) use ($store) {
                 $match = [
@@ -220,9 +181,7 @@ class ProductRepository extends BaseRepository
                 })->toArray();
                 $product_images = array_merge($product_images, $images);
             })->toArray();
-
             $data["gallery"] = $product_images;
-            // dd($data);
 		}
 		catch (Exception $exception)
 		{
@@ -231,4 +190,5 @@ class ProductRepository extends BaseRepository
 
 		return $data;
 	}
+
 }
