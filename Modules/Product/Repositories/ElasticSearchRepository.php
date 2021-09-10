@@ -52,6 +52,15 @@ class ElasticSearchRepository
         ];
     }
 
+    public function terms(string $field, ?array $data): array
+    {
+        return [
+            "terms" => [
+                $field => $data
+            ]
+        ];
+    }
+
     public function range(string $field, $value1, $value2): array
     {
         return [
