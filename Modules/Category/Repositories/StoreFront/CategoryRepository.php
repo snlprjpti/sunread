@@ -5,10 +5,6 @@ namespace Modules\Category\Repositories\StoreFront;
 use Exception;
 use Modules\Category\Entities\Category;
 use Modules\Category\Transformers\StoreFront\CategoryResource;
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
-use Modules\Core\Entities\Website;
-use Modules\Core\Facades\Resolver;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 
@@ -28,17 +24,13 @@ class CategoryRepository extends BaseRepository
         try
         {
             $fetched = [];
+            $coreCache = $this->getCoreCache($request);
 
-            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
-            $channel = Channel::whereWebsiteId($website->id)->whereCode($request->header("hc-channel"))->firstOrFail();
-            $store = Store::whereChannelId($channel->id)->whereCode($request->header("hc-store"))->firstOrFail();
-
-            $categories = $this->model->withDepth()->having('depth', '=', 0)->whereWebsiteId($website->id)->get();
+            $categories = $this->model->withDepth()->having('depth', '=', 0)->whereWebsiteId($coreCache->website->id)->get();
             $scope = [
                 "scope" => "store",
-                "scope_id" => $store->id
+                "scope_id" => $coreCache->store->id
             ]; 
-            $request->sf_store = $store;
 
             foreach($categories as $category)
             {
@@ -47,7 +39,7 @@ class CategoryRepository extends BaseRepository
                 $fetched["categories"][] = new CategoryResource($category);
             }
 
-            $fetched["logo"] = SiteConfig::fetch("logo", "channel", $channel->id); 
+            $fetched["logo"] = SiteConfig::fetch("logo", "channel", $coreCache->channel->id); 
         }
         catch (Exception $exception)
         {
