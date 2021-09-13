@@ -122,7 +122,7 @@ trait HasErpValueMapper
                 "endingDate" => ""
             ];
             if ($product->type == "simple") $this->storeScopeWiseValue($price, $product);
-            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
+            $price_value = ($price->count() > 0) ? $this->getValue($price)->where("currencyCode", "")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
 
             // Condition for invalid date/times
             $max_time = strtotime("2030-12-28");
@@ -616,7 +616,7 @@ trait HasErpValueMapper
                 if ( $variant ) $value = array_sum($this->getValue($inventory)->where("Code", $variant["code"])->pluck("Inventory")->toArray());
 
                 $data = [
-                    "quantity" => $value,
+                    "quantity" => ($product->type == "simple") ? $value : 0,
                     "use_config_manage_stock" => 1,
                     "product_id" => $product->id,
                     "website_id" => $product->website_id,
