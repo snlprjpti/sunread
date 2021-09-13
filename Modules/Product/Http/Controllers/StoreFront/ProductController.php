@@ -30,8 +30,10 @@ class ProductController extends BaseController
         $this->category_repository = $category_repository;
         $this->store_fornt_repository = $store_fornt_repository;
 
-        $this->middleware('validate.website.host')->only(['index', 'filter']);
-        $this->middleware('validate.store.code')->only(['index', 'filter']);
+        $this->middleware('validate.website.host')->only(['index', 'filter', 'show']);
+        $this->middleware('validate.store.code')->only(['index', 'filter', 'show']);
+        $this->middleware('validate.channel.code')->only(['show']);
+
         $exception_statuses = [
             ProductNotFoundIndividuallyException::class => 404
         ];
