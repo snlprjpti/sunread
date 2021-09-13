@@ -49,7 +49,6 @@ class UpdateProductInventoryJob implements ShouldQueue
                     "website_id" => $this->product->parent->website_id
                 ];
 
-                unset($data["quantity"]); 
                 CatalogInventory::updateOrCreate($match, $data);
             }
         }
