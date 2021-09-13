@@ -38,7 +38,8 @@ return [
         'inventory_cannot_be_zero' => 'Inventory quantity cannot be less than zero',
         'range-required' => ':name range is required',
         'choose-address' => 'Type of address is required.',
-        'please-choose' => 'Please choose :name'
+        'product-not-found-individually' => 'This product cannot be displayed individually',
+        'please-choose' => 'Please choose :name',
     ],
     'users' => [
         'forget-password' => [
