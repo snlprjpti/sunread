@@ -80,6 +80,7 @@ class ProductRepository extends BaseRepository
                         "slug" => $product_attribute->attribute->slug,
                         "value" => $product->value($match),    
                     ];
+                    $options = [];
                     if ($product->parent_id) {
                         $other_variant_ids = $product->parent->variants->where("id", "<>", $product->id)->pluck("id")->toArray();
                         $variant_attribute_options = AttributeOptionsChildProduct::whereIn("id", $other_variant_ids)->with(["attribute_option"])->get();
