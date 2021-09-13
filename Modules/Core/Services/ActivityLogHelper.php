@@ -39,7 +39,9 @@ class ActivityLogHelper {
 
         if ($model_name == "Attribute" || $model_name == "AttributeSet" || $model_name == "AttributeOption") $this->attributeCache($model);
 
-        if ($model_name == "Product") UpdateProductInventoryJob::dispatch($model, $event);
+        if ($event !== "deleted" && $model_name == "Product" && isset($model->parent)) {
+            UpdateProductInventoryJob::dispatch($model, $event);            
+        }
 
         if(Cache::get($model::class)) $this->modelCache($model);
 
