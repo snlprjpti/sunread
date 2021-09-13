@@ -616,7 +616,7 @@ trait HasErpValueMapper
                 if ( $variant ) $value = array_sum($this->getValue($inventory)->where("Code", $variant["code"])->pluck("Inventory")->toArray());
 
                 $data = [
-                    "quantity" => ($product->type == "simple") ? $value : 0,
+                    "quantity" => $value,
                     "use_config_manage_stock" => 1,
                     "product_id" => $product->id,
                     "website_id" => $product->website_id,
