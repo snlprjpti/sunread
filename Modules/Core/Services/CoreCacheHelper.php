@@ -346,7 +346,7 @@ class CoreCacheHelper
         }
     }
 
-    public function getChannelWithoutWebsite(string $channel_code): ?object
+    public function getChannelWithCode(string $channel_code): ?object
     {
         try
         {
@@ -369,7 +369,7 @@ class CoreCacheHelper
         }
     }
 
-    public function getStoreWithoutWebsite(string $store_code): ?object
+    public function getStoreWithCode(string $store_code): ?object
     {
         try
         {
