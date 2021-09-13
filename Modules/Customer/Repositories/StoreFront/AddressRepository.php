@@ -3,6 +3,7 @@
 namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
+use Illuminate\Http\Request;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
@@ -38,13 +39,13 @@ class AddressRepository extends BaseRepository
         ];
     }
 
-    public function regionAndCityRules(object $request, string $name): array
+    public function regionAndCityRules(object $request): array
     {
         return [
-            "{$name}.region_id" => "required_without:{$name}.region_name|exists:regions,id,country_id,{$request->{$name}["country_id"]}",
-            "{$name}.city_id" => "required_without:{$name}.city_name",
-            "{$name}.region_name" => "required_without:{$name}.region_id",
-            "{$name}.city_name" => "required_without:{$name}.city_id",
+            "region_id" => "required_without:region_name|exists:regions,id,country_id,{$request->country_id}",
+            "city_id" => "required_without:city_name",
+            "region_name" => "required_without:region_id",
+            "city_name" => "required_without:city_id",
         ];
     }
 
@@ -81,7 +82,12 @@ class AddressRepository extends BaseRepository
         try
         {
             if($request->shipping) {
-                $data = $this->validateAddress($request, $customer_id, "shipping");
+                $shipping = new Request($request->shipping);
+                $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer_id) {
+                    return [
+                        "customer_id" => Customer::findOrFail($customer_id)->id,
+                    ];
+                });
                 $shipping = $this->checkShippingAddress($customer_id)->first();
                 $data = $this->checkRegionAndCity($data, "shipping");
                 if ($shipping) {
@@ -94,7 +100,12 @@ class AddressRepository extends BaseRepository
             }
 
             if($request->billing) {
-                $data = $this->validateAddress($request, $customer_id, "billing");
+                $billing = new Request($request->billing);
+                $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer_id) {
+                    return [
+                        "customer_id" => Customer::findOrFail($customer_id)->id,
+                    ];
+                });
                 $billing = $this->checkBillingAddress($customer_id)->first();
                 $data = $this->checkRegionAndCity($data, "billing");
                 if ($billing) {
@@ -113,41 +124,6 @@ class AddressRepository extends BaseRepository
         }
 
         return $created;
-    }
-
-    public function validateAddress(object $request, int $customer_id, string $name): array
-    {
-        try
-        {
-            foreach ($this->rules as $key => $value)
-            {
-                $new_rules[ $name."." . $key] = $value;
-            }
-            $this->rules = $new_rules;
-
-            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request, $name)), function () use ($customer_id) {
-                return [
-                    "customer_id" => Customer::findOrFail($customer_id)->id,
-                ];
-            });
-
-            $old_data = $data[$name];
-            unset($data[$name]);
-            $data = array_merge($old_data,$data);
-
-            $this->rules = [];
-            foreach ($new_rules as $key => $value) {
-                $key = str_replace("$name.", "", $key);
-                $this->rules[$key] = $value;
-            }
-
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $data;
     }
 
     public function checkRegionAndCity(array $data, string $name): array
