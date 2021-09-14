@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
+use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
 
@@ -17,14 +18,15 @@ class CategoryRepository extends BaseRepository
 {
     use HasScope;
 
-    protected $repository, $config_fields;
+    protected $repository, $config_fields, $categoryValueRepository;
     protected bool $without_pagination = true;
 
-    public function __construct(Category $category, CategoryValue $categoryValue)
+    public function __construct(Category $category, CategoryValue $categoryValue, CategoryValueRepository $categoryValueRepository)
     {
         $this->model = $category;
         $this->value_model = $categoryValue;
         $this->model_key = "catalog.categories";
+        $this->categoryValueRepository = $categoryValueRepository;
         
         $this->rules = [
             // category validation
@@ -73,14 +75,14 @@ class CategoryRepository extends BaseRepository
         return $fetched;
     }
 
-    public function createUniqueSlug(object $request, ?int $id = null)
+    public function createUniqueSlug(array $data, ?object $category = null)
     {
-        $slug = Str::slug($request->items["name"]["value"]);
+        $slug = isset($data["name"]["value"]) ? Str::slug($data["name"]["value"]) : $category->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug");
         $original_slug = $slug;
 
         $count = 1;
 
-        while ($this->checkSlug($request, $slug, $id)) {
+        while ($this->checkSlug($data, $slug, $category)) {
             $slug = "{$original_slug}-{$count}";
             $count++;
         }
@@ -125,6 +127,41 @@ class CategoryRepository extends BaseRepository
         DB::commit();
 
         return $category;
+    }
+
+    public function createCategory(object $request): ?object
+    {
+        try
+        {
+            dd($request);
+            $data = $this->validateData($request, array_merge($this->categoryValueRepository->getValidationRules($request), [
+                "items.slug.value" => new SlugUniqueRule($request),
+                "website_id" => "required|exists:websites,id"
+            ]), function () use ($request) {
+                return [
+                    "scope" => "website",
+                    "scope_id" => $request->website_id
+                ];
+            });
+            dd($data);
+
+            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->createUniqueSlug($data);
+
+            if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
+            throw ValidationException::withMessages(["website_id" => __("core::app.response.no_parent_belong_to_website")]);
+
+            $created = $this->create($data, function ($created) use ($data) {
+                $this->categoryValueRepository->createOrUpdate($data, $created);
+                if(isset($data["channels"])) $created->channels()->sync($data["channels"]);
+                if(isset($data["products"])) $created->products()->sync($data["products"]);
+            });
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $created;
     }
 }
 

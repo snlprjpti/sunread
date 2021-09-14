@@ -58,7 +58,7 @@ class CategoryController extends BaseController
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)],
-                "website_id" => "sometimes|exists:websites,id"
+                "website_id" => "required|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll(request: $request, callback: function () use ($request) {
                 return $this->model->whereWebsiteId($request->website_id)->orderBy("_lft", "asc");
@@ -86,7 +86,7 @@ class CategoryController extends BaseController
                 ];
             });
 
-            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
+            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data);
 
             if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
             throw ValidationException::withMessages(["website_id" => $this->lang("response.no_parent_belong_to_website")]);
@@ -146,19 +146,19 @@ class CategoryController extends BaseController
     {
         try
         {
+            $category = $this->model->findOrFail($id);
             $data = $this->repository->validateData($request, array_merge($this->categoryValueRepository->getValidationRules($request, $id, "update"), [
-                "items.slug.value" => new SlugUniqueRule($request, $id),
+                "items.slug.value" => new SlugUniqueRule($request, $category),
                 "scope" => "required|in:website,channel,store",
                 "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
-            ]), function () use ($id, $request) {
-                $catgeory = $this->model->findOrFail($id);
+            ]), function () use ($category) {
                 return [
-                    "parent_id" => $catgeory->parent_id,
-                    "website_id" => $catgeory->website_id
+                    "parent_id" => $category->parent_id,
+                    "website_id" => $category->website_id
                 ];
             });
             
-            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($request);
+            if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data, $category);
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->categoryValueRepository->createOrUpdate($data, $updated);

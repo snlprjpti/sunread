@@ -3,7 +3,6 @@
 namespace Modules\Category\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use Modules\Category\Entities\Category;
 use Modules\Category\Traits\HasScope;
 
 class SlugUniqueRule implements Rule
@@ -14,13 +13,12 @@ class SlugUniqueRule implements Rule
      *
      * @return void
      */
-    public $data, $id; 
+    public $data, $category; 
 
-    public function __construct($data, $id=null)
+    public function __construct(object $data, ?object $category = null)
     {
         $this->data = $data;
-        $this->id = $id;
-        $this->model = new Category();
+        $this->category = $category;
     }
 
     /**
@@ -32,7 +30,9 @@ class SlugUniqueRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        return (bool) !$this->checkSlug($this->data, $value, $this->id);
+        $arr = $this->data->toArray(); 
+        if($this->category) $arr["parent_id"] = $this->category->parent_id;
+        return (bool) !$this->checkSlug($arr, $value, $this->category);
     }
 
     /**
