@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Exception;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
 use Modules\Page\Repositories\StoreFront\PageRepository;
@@ -43,7 +44,7 @@ class PageController extends BaseController
     {
         try
         {
-            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
+            $website = CoreCache::getWebsite($request->header("hc-host"));
             $fetched = $this->repository->fetchAll($request, callback:function () use ($website) {
                 return $this->model->whereWebsiteId($website->id);
             });
