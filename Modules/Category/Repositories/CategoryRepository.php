@@ -18,15 +18,14 @@ class CategoryRepository extends BaseRepository
 {
     use HasScope;
 
-    protected $repository, $config_fields, $categoryValueRepository;
+    protected $repository, $config_fields;
     protected bool $without_pagination = true;
 
-    public function __construct(Category $category, CategoryValue $categoryValue, CategoryValueRepository $categoryValueRepository)
+    public function __construct(Category $category, CategoryValue $categoryValue)
     {
         $this->model = $category;
         $this->value_model = $categoryValue;
         $this->model_key = "catalog.categories";
-        $this->categoryValueRepository = $categoryValueRepository;
         
         $this->rules = [
             // category validation
@@ -127,41 +126,6 @@ class CategoryRepository extends BaseRepository
         DB::commit();
 
         return $category;
-    }
-
-    public function createCategory(object $request): ?object
-    {
-        try
-        {
-            dd($request);
-            $data = $this->validateData($request, array_merge($this->categoryValueRepository->getValidationRules($request), [
-                "items.slug.value" => new SlugUniqueRule($request),
-                "website_id" => "required|exists:websites,id"
-            ]), function () use ($request) {
-                return [
-                    "scope" => "website",
-                    "scope_id" => $request->website_id
-                ];
-            });
-            dd($data);
-
-            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->createUniqueSlug($data);
-
-            if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
-            throw ValidationException::withMessages(["website_id" => __("core::app.response.no_parent_belong_to_website")]);
-
-            $created = $this->create($data, function ($created) use ($data) {
-                $this->categoryValueRepository->createOrUpdate($data, $created);
-                if(isset($data["channels"])) $created->channels()->sync($data["channels"]);
-                if(isset($data["products"])) $created->products()->sync($data["products"]);
-            });
-        }
-        catch(Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $created;
     }
 }
 

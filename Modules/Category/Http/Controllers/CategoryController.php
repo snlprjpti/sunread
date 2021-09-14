@@ -28,6 +28,7 @@ class CategoryController extends BaseController
     {
         $this->repository = $categoryRepository;
         $this->categoryValueRepository = $categoryValueRepository;
+        
         $this->model = $category;
         $this->model_name = "Category";
 
