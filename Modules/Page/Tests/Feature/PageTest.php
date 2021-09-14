@@ -12,7 +12,7 @@ use Modules\Page\Entities\PageScope;
 
 class PageTest extends BaseTestCase
 {
-    protected $attributes = [], $config_fields;
+    public $attributes = [], $config_fields, $filter;
 
     public function setUp(): void
     {
@@ -24,8 +24,24 @@ class PageTest extends BaseTestCase
         $this->model_name = "Page";
         $this->route_prefix = "admin.pages";
 
+        $this->filter = [
+            "website_id" => 1
+        ];
+
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->hasStatusTest = true;
+    }
+
+    public function testAdminCanFetchResources()
+    {
+        if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
     }
 
     public function getCreateData(): array
