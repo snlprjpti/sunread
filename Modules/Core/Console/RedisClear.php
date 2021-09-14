@@ -19,6 +19,7 @@ class RedisClear extends Command
     public function handle(): bool
     {
         Redis::del(Redis::keys("*"));
+        $this->info("Redis cache cleared");
         return true;
     }
 }
