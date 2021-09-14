@@ -25,6 +25,7 @@ class PageController extends BaseController
         $this->model_name = "Page";
 
         $this->middleware('validate.website.host')->only(['show', 'index']);
+        $this->middleware('validate.channel.code')->only(['show']);
         $this->middleware('validate.store.code')->only(['show']);
 
         parent::__construct($this->model, $this->model_name);
