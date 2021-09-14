@@ -9,37 +9,38 @@ class EmailTemplateSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table("email_templates")->insert([
+        $templates = [
             [
                 "template_name" => "Header",
                 "template_subject" => "Header",
-                "template_content" => "",
+                "template_content" => '<!DOCTYPE html> <head> </head> <body> <table class="wrapper" width="100%"><tr><td class="wrapper-inner" align="center"><table class="main" align="center"><tr><td class="header"><a class="logo" href="/"></a></td></tr><tr><td class="main-content">',
                 "is_default" => 1
             ],
             [
                 "template_name" => "Footer",
                 "template_subject" => "Footer",
-                "template_content" => '</td></tr><tr><td class="footer"><p class="closing">{{trans "Thank you, %store_name" store_name=$store.frontend_name}}!</p></td></tr></table></td></tr></table></body>',
+                "template_content" => '</td></tr><tr><td class="footer"><p class="closing">Thank you!</p></td></tr></table></td></tr></table></body></html>',
                 "is_default" => 1
             ],
             [
                 "template_name" => "Forgot-Admin-Password",
                 "template_subject" => "Password Reset Confirmation",
-                "template_content" => "",
+                "template_content" => '[{"id":1},{"content":"texts"},{"id":2}]',
                 "is_default" => 1
-            ],
-            [
-                "template_name" => "Forgot-Customer-Password",
-                "template_subject" => "Password Reset Confirmation",
-                "template_content" => "",
-                "is_default" => 1
-            ],
-            [
-                "template_name" => "Forgot-Customer-Password",
-                "template_subject" => "Password Reset Confirmation",
-                "template_content" => "",
-                "is_default" => 1
-            ],
-        ]);
+            ]
+        ];
+
+        $data = array_map(function ($template) {
+            return [
+                "template_name" => $template["template_name"],
+                "template_subject" => $template["template_subject"],
+                "template_content" => $template["template_content"],
+                "is_default" => $template["is_default"],
+                "created_at" => now(),
+                "updated_at" => now()
+            ];
+        }, $templates);
+
+        DB::table("email_templates")->insert($data);
     }
 }
