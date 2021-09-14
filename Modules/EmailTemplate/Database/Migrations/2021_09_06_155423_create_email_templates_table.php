@@ -12,7 +12,7 @@ class CreateEmailTemplatesTable extends Migration
             $table->id();
             $table->string("template_name");
             $table->string("template_subject");
-            $table->text("template_content");
+            $table->longtext("template_content");
             $table->string("template_style")->nullable();
             $table->boolean("is_default")->default(0);
             $table->timestamps();
