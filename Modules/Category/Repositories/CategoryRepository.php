@@ -76,7 +76,7 @@ class CategoryRepository extends BaseRepository
 
     public function createUniqueSlug(array $data, ?object $category = null)
     {
-        $slug = isset($data["name"]["value"]) ? Str::slug($data["name"]["value"]) : $category->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug");
+        $slug = isset($data["items"]["name"]["value"]) ? Str::slug($data["items"]["name"]["value"]) : $category->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug");
         $original_slug = $slug;
 
         $count = 1;
