@@ -5,22 +5,30 @@ namespace Modules\Category\Repositories\StoreFront;
 use Exception;
 use Modules\Category\Entities\Category;
 use Modules\Category\Transformers\StoreFront\CategoryResource;
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
-use Modules\Core\Entities\Website;
-use Modules\Core\Facades\Resolver;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 
 class CategoryRepository extends BaseRepository
 {
-    protected $repository, $page_groups, $config_fields;
+    protected $repository;
 
     public function __construct(Category $category)
     {
         $this->model = $category;
-        $this->page_groups = ["hero_banner", "usp_banner_1", "usp_banner_2", "usp_banner_3"];
-        $this->config_fields = config("category.attributes");
+    }
+
+    public function checkMenuStatus(object $category, array $scope): bool
+    {
+        try
+        {
+            $include_value = $category->value($scope, "include_in_menu");
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return (isset($include_value) && $include_value == "1");
     }
 
     public function getMenu(object $request): array
@@ -28,26 +36,17 @@ class CategoryRepository extends BaseRepository
         try
         {
             $fetched = [];
+            $coreCache = $this->getCoreCache($request);
 
-            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
-            $channel = Channel::whereWebsiteId($website->id)->whereCode($request->header("hc-channel"))->firstOrFail();
-            $store = Store::whereChannelId($channel->id)->whereCode($request->header("hc-store"))->firstOrFail();
-
-            $categories = $this->model->withDepth()->having('depth', '=', 0)->whereWebsiteId($website->id)->get();
+            $categories = $this->model->withDepth()->having('depth', '=', 0)->whereWebsiteId($coreCache->website->id)->get();
             $scope = [
                 "scope" => "store",
-                "scope_id" => $store->id
+                "scope_id" => $coreCache->store->id
             ]; 
-            $request->sf_store = $store;
 
-            foreach($categories as $category)
-            {
-                $include_value = $category->value($scope, "include_in_menu");
-                if(!isset($include_value) || $include_value == "0") continue;
-                $fetched["categories"][] = new CategoryResource($category);
-            }
+            $fetched["categories"] = $this->getCategories($categories, $scope);
 
-            $fetched["logo"] = SiteConfig::fetch("logo", "channel", $channel->id); 
+            $fetched["logo"] = SiteConfig::fetch("logo", "channel", $coreCache->channel->id); 
         }
         catch (Exception $exception)
         {
@@ -57,33 +56,23 @@ class CategoryRepository extends BaseRepository
         return $fetched;     
     }
 
-    public function getPages(int $id, object $store): array
-    { 
-        $category = $this->model->findOrFail($id);
-        $scope = [
-            "scope" => "store",
-            "scope_id" => $store->id
-        ];
-        $data = [];
-
-        $data["id"] = $category->id;
-        foreach(["name", "slug", "description"] as $key)
+    public function getCategories(object $categories, array $scope): array
+    {
+        try
         {
-            $data[$key] = $category->value($scope, $key);
-        }
-
-        foreach($this->page_groups as $group)
-        {
-            $item = [];
-            $slugs = collect($this->config_fields[$group]["elements"])->pluck("slug");
-            foreach($slugs as $slug)
+            $fetched = [];
+            foreach($categories as $category)
             {
-                $item[$slug] = $category->value($scope, $slug);
+                if(!$this->checkMenuStatus($category, $scope)) continue;
+                $fetched[] = new CategoryResource($category);
             }
-            $data["pages"][$group] = $item;
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
         }
 
-        return $data;
-    }
+        return $fetched;
+    } 
 }
 

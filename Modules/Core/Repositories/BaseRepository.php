@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Exceptions\DeleteUnauthorized;
+use Modules\Core\Facades\CoreCache;
 
 class BaseRepository
 {
@@ -335,5 +336,22 @@ class BaseRepository
         }
 
         return (string) $filename;
+    }
+
+    public function getCoreCache(object $request): object
+    {
+        try
+        {
+            $data = [];
+            if($request->header("hc-host")) $data["website"] = CoreCache::getWebsite($request->header("hc-host"));
+            if($request->header("hc-channel")) $data["channel"] = CoreCache::getChannel($data["website"], $request->header("hc-channel"));
+            if($request->header("hc-store")) $data["store"] = CoreCache::getStore($data["website"], $data["channel"], $request->header("hc-store"));
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return (object) $data;
     }
 }

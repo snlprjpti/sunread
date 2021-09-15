@@ -38,7 +38,7 @@ return [
         'inventory_cannot_be_zero' => 'Inventory quantity cannot be less than zero',
         'range-required' => ':name range is required',
         'choose-address' => 'Type of address is required.',
-        'please-choose' => 'Please choose :name'
+        'please-choose' => 'Please choose :name',
     ],
     'users' => [
         'forget-password' => [

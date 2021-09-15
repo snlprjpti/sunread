@@ -9,6 +9,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Core\Entities\ActivityLog;
+use Modules\Product\Jobs\UpdateProductInventoryJob;
 use Modules\Review\Entities\ReviewVote;
 
 class ActivityLogHelper {
@@ -37,6 +38,10 @@ class ActivityLogHelper {
         if($model_name == "ReviewVote") $this->reviewVoteCache($model);
 
         if ($model_name == "Attribute" || $model_name == "AttributeSet" || $model_name == "AttributeOption") $this->attributeCache($model);
+
+        if ($event !== "deleted" && $model_name == "Product" && isset($model->parent)) {
+            UpdateProductInventoryJob::dispatch($model, $event);            
+        }
 
         if(Cache::get($model::class)) $this->modelCache($model);
 
