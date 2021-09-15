@@ -36,7 +36,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('telescope:clear')->hourly();
+        $schedule->command('telescope:prune')->hourly();
     }
 
     /**
