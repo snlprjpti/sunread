@@ -55,9 +55,6 @@ class EmailTemplateController extends BaseController
             $data = $this->repository->validateData($request, callback:function ($request) {
                 return ["slug" => $request->slug ?? $this->model->createSlug($request->name)];
             });
-
-//            $data["content"] = $this->repository->validateTemplateContent($data["content"]);
-
             $created = $this->repository->create($data);
         }
         catch (Exception $exception)
@@ -73,11 +70,7 @@ class EmailTemplateController extends BaseController
         try
         {
             $fetched = $this->repository->fetch($id);
-            $data = (json_decode($fetched->template_content, true));
-
-            if (json_last_error() == JSON_ERROR_NONE) {
-                $fetched->template_content = $this->repository->getTemplate($data);
-            }
+            $fetched->content = $this->repository->getTemplate($fetched->content);
         }
         catch( Exception $exception )
         {

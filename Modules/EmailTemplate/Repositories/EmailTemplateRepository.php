@@ -2,6 +2,7 @@
 
 namespace Modules\EmailTemplate\Repositories;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\EmailTemplate\Entities\EmailTemplate;
@@ -60,19 +61,37 @@ class EmailTemplateRepository extends BaseRepository
         dd($format);
     }
 
-    public function getTemplate(array $datas): string
+    public function getTemplate(string $content): string
     {
-        $htmlTemplate = "";
-        foreach($datas as $data)
+
+//        $x = preg_replace("/^{include template/", 'x', $content);
+
+//        dd($x);
+        preg_match_all("#\{(.*?)\}#", $content, $matches);
+
+        if(count($matches[1]) > 0)
         {
-            if(is_int($data)) {
-                $template = $this->model->find( $data ) ?? null;
-                $htmlTemplate .= $template->template_content;
-            }
-            else {
-                $htmlTemplate .= $data;
+            foreach($matches[1] as $match) {
+                $slug = preg_replace('/^include template=/', '', $match);
+
+                $template = EmailTemplate::whereSlug($slug)->first() ?? $match;
+                $temp[] = $template->content ?? $match;
+
+//                $x[$slug] = strtr ($content, ["{include template={$slug}}" => $temp]);
             }
         }
-       return $htmlTemplate;
+
+        $template = str_replace($matches[1],  $temp, $content);
+
+        $template = str_replace(["{","}"],'',$template);
+
+        return $template;
+
+
+        $new  = str_replace($content, preg_match_all("#\{(.*?)\}#", $content, $matches), $temp[""]);
+
+        dd($new);
+
+        return $temp;
     }
 }
