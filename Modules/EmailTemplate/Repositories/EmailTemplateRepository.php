@@ -41,4 +41,38 @@ class EmailTemplateRepository extends BaseRepository
         $fromAddress = 'admin@gmail.com';
         Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($subject, $htmlBody, $fromAddress));
     }
+
+    public function validateTemplateContent(array $data)
+    {
+        $format = [];
+        foreach ($data as $key => $value)
+        {
+            dd(is_int($value));
+            if(is_int($value)) {
+                dd("dasdasdasdasdasd");
+                $id["id"] = $value;
+                dd($id);
+            }
+            else {
+                $content["content"] = $value;
+            }
+        }
+        dd($format);
+    }
+
+    public function getTemplate(array $datas): string
+    {
+        $htmlTemplate = "";
+        foreach($datas as $data)
+        {
+            if(is_int($data)) {
+                $template = $this->model->find( $data ) ?? null;
+                $htmlTemplate .= $template->template_content;
+            }
+            else {
+                $htmlTemplate .= $data;
+            }
+        }
+       return $htmlTemplate;
+    }
 }

@@ -54,6 +54,8 @@ class EmailTemplateController extends BaseController
         {
             $data = $this->repository->validateData($request);
 
+            $data["template_content"] = $this->repository->validateTemplateContent($data["template_content"]);
+
             $created = $this->repository->create($data);
         }
         catch (Exception $exception)
@@ -69,7 +71,11 @@ class EmailTemplateController extends BaseController
         try
         {
             $fetched = $this->repository->fetch($id);
-            $this->repository->sendEmailDemo();
+            $data = (json_decode($fetched->template_content, true));
+
+            if (json_last_error() == JSON_ERROR_NONE) {
+                $fetched->template_content = $this->repository->getTemplate($data);
+            }
         }
         catch( Exception $exception )
         {
