@@ -9,5 +9,5 @@ class EmailTemplate extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ "template_name", "template_subject", "template_content", "template_style" ];
+    protected $fillable = [ "name", "slug", "subject", "content", "style" ];
 }
