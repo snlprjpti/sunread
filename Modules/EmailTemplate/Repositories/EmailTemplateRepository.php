@@ -15,10 +15,10 @@ class EmailTemplateRepository extends BaseRepository
         $this->model = $emailTemplate;
         $this->model_key = "email_template";
         $this->rules = [
-            "template_name" => "required",
-            "template_subject" => "required",
-            "template_content" => "required",
-            "template_style" => "sometimes",
+            "name" => "required",
+            "subject" => "required",
+            "content" => "required",
+            "style" => "sometimes",
         ];
     }
 

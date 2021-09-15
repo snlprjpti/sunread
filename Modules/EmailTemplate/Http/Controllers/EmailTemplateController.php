@@ -52,9 +52,11 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, callback:function ($request) {
+                return ["slug" => $request->slug ?? $this->model->createSlug($request->name)];
+            });
 
-            $data["template_content"] = $this->repository->validateTemplateContent($data["template_content"]);
+//            $data["content"] = $this->repository->validateTemplateContent($data["content"]);
 
             $created = $this->repository->create($data);
         }

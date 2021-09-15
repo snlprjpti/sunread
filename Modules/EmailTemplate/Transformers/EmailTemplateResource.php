@@ -10,10 +10,11 @@ class EmailTemplateResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "template_name" => $this->template_name,
-            "template_subject" => $this->template_subject,
-            "template_content" => $this->template_content,
-            "template_style" => $this->template_style,
+            "name" => $this->name,
+            "slug" => $this->slug,
+            "subject" => $this->subject,
+            "content" => $this->content,
+            "style" => $this->style,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
