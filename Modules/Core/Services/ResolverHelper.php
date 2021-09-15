@@ -66,7 +66,7 @@ class ResolverHelper {
 
             if($channel_code) $channel = CoreCache::getChannel($website, $channel_code);
             else {
-                $channel= $this->checkCondition("website_default_channel", $website)?->firstOrFail(); 
+                $channel= $this->checkCondition("website_default_channel", $website); 
                 if(!$channel) {
                     $cache = CoreCache::getWebsiteAllChannel($website);
                     if(!$cache) throw new ModelNotFoundException(__("core::app.response.not-found", ["name" => "Channel"]));
@@ -90,7 +90,7 @@ class ResolverHelper {
 
             if($store_code) $store = CoreCache::getStore($website, $channel, $store_code);
             else {
-                $store = $this->checkCondition("website_default_store", $website)?->firstOrFail();
+                $store = $this->checkCondition("website_default_store", $website);
                 if(!$store) {
                     $cache = CoreCache::getWebsiteAllStore($website);
                     if(!$cache) throw new ModelNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
