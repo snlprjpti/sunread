@@ -32,7 +32,7 @@ class ProductTest extends StoreFrontBaseTestCase
             "hc-channel" => "international",
             "hc-store" => "international-store" 
         ];
-        $response = $this->withHeaders($default_headers)->get($this->getRoute("show", [$this->default_resource->sku]));
+        $response = $this->withHeaders($default_headers)->get($this->getRoute("show", [$this->default_resource->id]));
 
         $response->assertOk();
         $response->assertJsonFragment([
