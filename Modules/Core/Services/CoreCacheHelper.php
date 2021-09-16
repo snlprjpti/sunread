@@ -298,9 +298,9 @@ class CoreCacheHelper
         {
             $keys = Redis::keys("sf_s_website_{$website->hostname}_*");
             if(!$keys) {
-                $stores = $this->website->find($website->id)->channels->mapWithKeys(function ($channel) {
+                $stores = $this->website->find($website->id)->channels->map(function ($channel) {
                     return $channel->stores;
-                });
+                })->flatten(1);
                 foreach($stores as $store) {
                     $channel = $this->channel->findOrFail($store->channel_id);
                     $store["website_id"] = $website->id;

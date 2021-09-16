@@ -61,7 +61,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Cost",
                 "type" => "price",
                 "validation" => "decimal",
-                "is_required" => 1,
+                "is_required" => 0,
                 "use_in_layered_navigation" => 1,
                 "scope" => "channel",
                 "is_synchronized" => 0

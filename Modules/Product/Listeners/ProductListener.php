@@ -11,9 +11,9 @@ class ProductListener
     public function indexing($product)
     {
         if (!$product->parent_id && $product->type == "simple") {
-            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
     
             $batch = Bus::batch([])->dispatch();
             foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));

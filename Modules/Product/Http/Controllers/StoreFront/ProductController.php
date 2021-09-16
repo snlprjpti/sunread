@@ -81,11 +81,11 @@ class ProductController extends BaseController
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
-    public function show(Request $request, string $sku): JsonResponse
+    public function show(Request $request, mixed $identifier): JsonResponse
     {
         try
         {
-            $data = $this->store_fornt_repository->productDetail($request, $sku);
+            $data = $this->store_fornt_repository->productDetail($request, $identifier);
         }
         catch( Exception $exception )
         {
