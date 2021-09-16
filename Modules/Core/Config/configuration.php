@@ -208,8 +208,8 @@ return[
                                 "is_required" => 1
                             ],
                             [
-                                "title" => "Store Language",
-                                "path" => "store_language",
+                                "title" => "Locale",
+                                "path" => "store_locale",
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Locale",
                                 "pluck" => ["name", "id"],
