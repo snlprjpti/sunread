@@ -39,10 +39,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
-            $channel = Channel::whereWebsiteId($website->id)->whereCode($request->header("hc-channel"))->firstOrFail();
-            $store = Store::whereChannelId($channel->id)->whereCode($request->header("hc-store"))->firstOrFail();
-            $request->sf_store = $store;
+            $coreCache = $this->getCoreCache($request);
             $relations = [
                 "catalog_inventories",
                 "images",
@@ -65,10 +62,12 @@ class ProductRepository extends BaseRepository
             $product_attr = ProductAttribute::query()->with(["value"]);
             $attribute_id = Attribute::whereSlug("url_key")->first()?->id;
             $product_attr = $product_attr->whereAttributeId($attribute_id)->get()->filter( fn ($attr_product) => $attr_product->value->value == $identifier)->first();
-            $product = Product::whereId($identifier)->orWhere("id", $product_attr?->product_id)->whereWebsiteId($website->id)->whereStatus(1)->with($relations)->firstOrFail();
+            $product = Product::whereId($identifier)->orWhere("id", $product_attr?->product_id)->whereWebsiteId($coreCache->website->id)->whereStatus(1)->with($relations)->firstOrFail();
+
             $data = [];
             $data["id"] = $product->id;
             $data["sku"] = $product->sku;
+            $store = $coreCache->store;
             
             $product_details = $product->product_attributes->mapWithKeys( function ($product_attribute) use ($store, $product){
                 $match = [
