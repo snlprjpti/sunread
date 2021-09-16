@@ -257,9 +257,9 @@ class ProductSearchRepository extends ElasticSearchRepository
         {
             $indexed = $this->model->findOrFail($id);
 			if ($callback) $callback($indexed);
-            $stores = Website::find($indexed->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($indexed->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
     
             foreach($stores as $store) SingleIndexing::dispatch($indexed, $store);
         }
