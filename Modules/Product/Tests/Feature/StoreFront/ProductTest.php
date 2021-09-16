@@ -48,7 +48,7 @@ class ProductTest extends StoreFrontBaseTestCase
             "hc-channel" => "international",
             "hc-store" => "international-store" 
         ];
-        $response = $this->withHeaders($default_headers)->get($this->getRoute("show", [rand(1,10)]));
+        $response = $this->withHeaders($default_headers)->get($this->getRoute("show", [rand(10,100)]));
 
         $response->assertNotFound();
         $response->assertJsonFragment([
