@@ -9,28 +9,28 @@ class ChannelListener
 {
     public function create(object $channel): void
     {
-        CoreCacheJob::dispatch( "createChannelCache", $channel );
+        CoreCacheJob::dispatch( "createChannelCache", $channel )->onQueue("high");
     }
 
     public function beforeUpdate(int $channel_id): void
     {
         $channel = Channel::findOrFail($channel_id);
-        CoreCacheJob::dispatch( "updateBeforeChannelCache", collect($channel) );
+        CoreCacheJob::dispatch( "updateBeforeChannelCache", collect($channel) )->onQueue("high");
     }
 
     public function update(object $channel): void
     {
-        CoreCacheJob::dispatch( "updateChannelCache", $channel );
+        CoreCacheJob::dispatch( "updateChannelCache", $channel )->onQueue("high");
     }
 
     public function beforeDelete(int $channel_id): void
     {
         $channel = Channel::findOrFail($channel_id);
-        CoreCacheJob::dispatch( "deleteBeforeChannelCache", collect($channel) );
+        CoreCacheJob::dispatch( "deleteBeforeChannelCache", collect($channel) )->onQueue("high");
     }
 
     public function delete(object $channel): void
     {
-        CoreCacheJob::dispatch( "deleteChannelCache", collect($channel) );
+        CoreCacheJob::dispatch( "deleteChannelCache", collect($channel) )->onQueue("high");
     }
 }
