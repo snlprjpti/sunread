@@ -178,9 +178,9 @@ trait HasIndexing
             foreach($products as $product)
             {
                 $product->load("categories", "product_attributes", "catalog_inventories");
-                $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+                $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                     return $channel->stores;
-                });
+                })->flatten(1);
     
                 foreach($stores as $store)
                 {
@@ -304,9 +304,9 @@ trait HasIndexing
     {
         try
         {
-            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
         }
         catch(Exception $exception)
         {

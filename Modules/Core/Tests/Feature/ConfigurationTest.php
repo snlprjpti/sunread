@@ -61,7 +61,6 @@ class ConfigurationTest extends BaseTestCase
     public function testAdminCanFetchResources()
     {
         $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.index"));
-
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",

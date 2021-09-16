@@ -11,7 +11,8 @@ return [
                     "type" => "keyword",
                     "ignore_above" => 256
                 ]
-            ]
+            ],
+            "fielddata"=> true
         ],
         "sku" =>  [
             "type" => "text",
@@ -282,6 +283,33 @@ return [
                 ]
             ],
             "fielddata"=> true
+        ],
+        "ean-code" => [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ],      
+        ],
+        "size-and-care" => [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ],      
+        ],
+        "features" => [
+            "type" => "text",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ],      
         ],
         "categories"=> [
             "properties"=> [

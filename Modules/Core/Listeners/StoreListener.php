@@ -2,30 +2,29 @@
 
 namespace Modules\Core\Listeners;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Store;
-use Modules\Core\Facades\CoreCache;
+use Modules\Core\Jobs\CoreCacheJob;
 
 class StoreListener
 {
-//    public function create($store)
-//    {
-//        CoreCache::createStoreCache($store);
-//    }
-//
-//    public function beforeUpdate($store)
-//    {
-//        CoreCache::updateBeforeStoreCache($store);
-//    }
-//
-//    public function update($store)
-//    {
-//        CoreCache::createStoreCache($store);
-//    }
-//
-//    public function delete($store)
-//    {
-//        CoreCache::deleteStoreCache($store);
-//    }
+    public function create(object $store): void
+    {
+        CoreCacheJob::dispatch( "createStoreCache", $store )->onQueue("high");
+    }
+
+    public function beforeUpdate(int $store_id): void
+    {
+        $store = Store::findOrFail($store_id);
+        CoreCacheJob::dispatch( "deleteStoreCache", collect($store) )->onQueue("high");
+    }
+
+    public function update(object $store): void
+    {
+        CoreCacheJob::dispatch( "createStoreCache", $store )->onQueue("high");
+    }
+
+    public function delete(object $store): void
+    {
+        CoreCacheJob::dispatch( "deleteStoreCache", collect($store) )->onQueue("high");
+    }
 }

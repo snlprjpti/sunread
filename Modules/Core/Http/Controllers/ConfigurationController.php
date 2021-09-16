@@ -3,22 +3,26 @@
 namespace Modules\Core\Http\Controllers;
 
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Configuration;
+use Modules\Core\Jobs\ConfigurationCache;
 use Modules\Core\Repositories\ConfigurationRepository;
+use Modules\Core\Services\ConfigurationHelper;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
 
 class ConfigurationController extends BaseController
 {
-    protected $repository;
+    protected $repository, $helper;
     use TraitsConfiguration;
 
-    public function __construct(Configuration $configuration, ConfigurationRepository $configurationRepository)
+    public function __construct(Configuration $configuration, ConfigurationRepository $configurationRepository, ConfigurationHelper $helper)
     {
         $this->model = $configuration;
         $this->model_name = "Configuration";
         $this->repository = $configurationRepository;
+        $this->helper = $helper;
         $this->createModel();
 
         parent::__construct($this->model, $this->model_name);
@@ -34,6 +38,7 @@ class ConfigurationController extends BaseController
         {
             return $this->handleException($exception);
         }
+        
 
         return $this->successResponse($fetched, $this->lang('fetch-list-success'));
     }
@@ -51,6 +56,7 @@ class ConfigurationController extends BaseController
             if(!$request->scope_id) $data["scope_id"] = 0;
 
             $created_data = $this->repository->add((object) $data);
+            if(isset($created_data->data)) ConfigurationCache::dispatch($created_data->data);
         }
         catch( Exception $exception )
         {

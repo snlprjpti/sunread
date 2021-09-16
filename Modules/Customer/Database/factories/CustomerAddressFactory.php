@@ -13,9 +13,9 @@ class CustomerAddressFactory extends Factory
 
     public function definition(): array
     {
-        $country = Country::latest()->first();
-        $region = $country?->regions()->first();
-        $city = $region?->cities()->first();
+        $city = City::first();
+        $region = $city?->region()->first();
+        $country = $region?->country()->first();
 
         return [
             "customer_id" => Customer::inRandomOrder()->first()->id,

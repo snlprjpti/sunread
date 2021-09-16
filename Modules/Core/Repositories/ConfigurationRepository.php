@@ -242,7 +242,7 @@ class ConfigurationRepository extends BaseRepository
 
     public function getValues(object $request): mixed
     {
-        return $this->checkCondition($request)->first()->value;
+        return $this->checkCondition($request)->first()?->value;
     }
 
     public function getDefaultValues(object $data, mixed $configValue=null): mixed

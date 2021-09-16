@@ -3,6 +3,7 @@
 namespace Modules\Category\Traits;
 
 use Illuminate\Support\Facades\Storage;
+use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
@@ -61,10 +62,13 @@ trait HasScope
         return $this->value_model->whereCategoryId($data["category_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);  
     }
 
-    public function checkSlug(object $request, ?string $slug, ?int $id = null): ?object
+    public function checkSlug(array $data, ?string $slug, ?object $category = null): ?object
     {
-        return $this->model->whereParentId($request->parent_id)->whereWebsiteId($request->website_id)->whereHas("values", function ($query) use ($slug, $request, $id) {
-            if($id) $query = $query->where('category_id', '!=', $id);
+        $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : $category?->parent_id;
+        $website_id = isset($data["website_id"]) ? $data["website_id"] : $category?->website_id;
+        
+        return Category::whereParentId($parent_id)->whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $category) {
+            if($category) $query = $query->where('category_id', '!=', $category->id);
             $query->whereAttribute("slug")->whereValue($slug);
         })->first();
     }

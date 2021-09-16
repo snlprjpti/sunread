@@ -20,6 +20,9 @@ class SingleIndexing implements ShouldQueue
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 
     public $product, $store, $method;
+    
+    public $tries = 10;
+    public $timeout = 90000;
 
     public function __construct(object $product, object $store, ?string $method = null)
     {

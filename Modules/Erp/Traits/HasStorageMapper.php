@@ -50,7 +50,7 @@ trait HasStorageMapper
         try
         {
             // Filter Images only
-            $files = array_filter(Storage::files("/{$this->erp_folder}/COLECT.IO"), fn ($file) => Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]));
+            $files = array_filter(Storage::files("/{$this->erp_folder}/final_images"), fn ($file) => Str::contains($file, [".jpg", ".jpeg", ".png", ".bmp"]));
 
             $hases = [];
             $files = array_map(function ($file) use (&$hases) {
@@ -108,7 +108,7 @@ trait HasStorageMapper
             $file_info = [
                 "sku" => $file_arr[0],
                 "color_code" => $file_arr[1],
-                "image_type" => $file_arr[2],
+                "image_type" =>  array_key_exists(2, $file_arr) ? $file_arr[2] : "a",
                 "url" => $file
             ];
             $hash = md5($erp_import_id.$file_info["sku"].json_encode($file_info));

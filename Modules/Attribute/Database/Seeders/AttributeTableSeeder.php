@@ -61,7 +61,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Cost",
                 "type" => "price",
                 "validation" => "decimal",
-                "is_required" => 1,
+                "is_required" => 0,
                 "use_in_layered_navigation" => 1,
                 "scope" => "channel",
                 "is_synchronized" => 0
@@ -115,7 +115,7 @@ class AttributeTableSeeder extends Seeder
                         "code" => 0
                     ]
                 ],
-                "default_value" => "Yes",
+                "default_value" => "No",
                 "scope" => "website"
             ],
             // [
@@ -164,11 +164,11 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "store"
             ],
             [
-                "name" => "Tax Class",
+                "name" => "Tax Group",
                 "slug" => "tax_class_id",
                 "type" => "select",
                 "is_required" => 1,
-                "default_value" => "Taxable Goods",
+                "default_value" => "General",
                 "options" => [],
                 "scope" => "channel"
             ],
@@ -220,21 +220,21 @@ class AttributeTableSeeder extends Seeder
                 "slug" => "meta_keywords",
                 "type" => "textarea",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Meta Title",
                 "slug" => "meta_title",
                 "type" => "text",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Meta Description",
                 "slug" => "meta_description",
                 "type" => "textarea",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Product Status",
@@ -242,11 +242,11 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "options" => [
                     [
-                        "name" => "Yes",
+                        "name" => "Enabled",
                         "code" => 1
                     ],
                     [
-                        "name" => "No",
+                        "name" => "Disabled",
                         "code" => 0
                     ]
                 ],
@@ -259,7 +259,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Color",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "default_value" => "Red",
+                "default_value" => "",
                 "is_user_defined" => 1,
                 "options" => [
                     [
@@ -284,7 +284,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Size",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "default_value" => "S",
+                "default_value" => "",
                 "is_user_defined" => 1,
                 "options" => [
                     [

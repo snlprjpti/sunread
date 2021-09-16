@@ -32,8 +32,8 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [ 
-                        [ "value" => "1", "label" => "Yes" ],
-                        [ "value" => "0", "label" => "No" ]
+                        [ "value" => "1", "label" => "Enabled" ],
+                        [ "value" => "0", "label" => "Disabled" ]
                     ],
                     "rules" => "nullable|in:0,1",
                     "is_required" => 0

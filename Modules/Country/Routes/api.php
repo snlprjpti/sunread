@@ -8,4 +8,12 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('regions', RegionController::class)->only(['index', 'show']);
         Route::resource('cities', CityController::class)->only(['index', 'show']);
     });
+
+//    PUBLIC COUNTRY ROUTES
+    Route::group(['prefix'=> 'public/countries', 'as' => 'public.'], function () {
+
+        Route::get('/', [ \Modules\Country\Http\Controllers\StoreFront\CountryController::class, "index" ]);
+        Route::get('/{country_id}/regions', [ \Modules\Country\Http\Controllers\StoreFront\RegionController::class, "index" ]);
+        Route::get('/{country_id}/regions/{region_id}/cities', [ \Modules\Country\Http\Controllers\StoreFront\CityController::class, "index" ]);
+    });
 });
