@@ -4,14 +4,16 @@ namespace Modules\Category\Transformers\StoreFront;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Entities\Store;
+use Modules\Core\Facades\CoreCache;
 
 class CategoryResource extends JsonResource
 {
     public function toArray($request): array
     {  
+        $store = CoreCache::getStoreWithCode($request->header("hc-store"));
         $data = [
             "scope" => "store",
-            "scope_id" => $request->sf_store->id
+            "scope_id" => $store->id
         ];
 
         return [

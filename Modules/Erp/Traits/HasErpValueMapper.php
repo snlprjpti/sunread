@@ -56,7 +56,6 @@ trait HasErpValueMapper
             $erp_details = ErpImport::where("type", "listProducts")->first()->erp_import_details;
 
             $chunked = $erp_details->chunk(100); 
-            $count = 0;
             foreach ( $chunked as $chunk )
             {
                 foreach ( $chunk as $detail )
@@ -64,11 +63,7 @@ trait HasErpValueMapper
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
-
-                    //loop breaked for testing
-                    if ( $count == 30 ) break;
                     ErpMigratorJob::dispatch($detail);
-                    $count++;
                 }
             }
         }
@@ -122,7 +117,7 @@ trait HasErpValueMapper
                 "endingDate" => ""
             ];
             if ($product->type == "simple") $this->storeScopeWiseValue($price, $product);
-            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
+            $price_value = ($price->count() > 0) ? $this->getValue($price)->where("currencyCode", "")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
 
             // Condition for invalid date/times
             $max_time = strtotime("2030-12-28");

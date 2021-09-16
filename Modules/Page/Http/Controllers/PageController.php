@@ -42,8 +42,11 @@ class PageController extends BaseController
     {
         try
         {
+            $request->validate([
+                "website_id" => "required|exists:websites,id"
+            ]);
             $fetched = $this->repository->fetchAll($request, [ "page_scopes", "page_attributes", "website" ], function () use ($request) {
-                return ($request->website_id) ? $this->model->whereWebsiteId($request->website_id) : $this->model;
+                return $this->model->whereWebsiteId($request->website_id);
             });
         }
         catch (Exception $exception)

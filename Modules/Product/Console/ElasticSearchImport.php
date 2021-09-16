@@ -32,9 +32,9 @@ class ElasticSearchImport extends Command
         $batch = Bus::batch([])->dispatch();
         foreach($products as $product)
         {
-            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
             
             foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
         }

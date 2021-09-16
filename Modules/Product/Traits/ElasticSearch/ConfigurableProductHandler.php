@@ -18,9 +18,9 @@ trait ConfigurableProductHandler
         try
         {
             $items = [];
-            $stores = Website::find($parent->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($parent->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
             $this->bulkConfigurableRemoving($parent, $stores);
 
             $variants = $parent->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();

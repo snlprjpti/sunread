@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
+use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
 
@@ -73,14 +74,14 @@ class CategoryRepository extends BaseRepository
         return $fetched;
     }
 
-    public function createUniqueSlug(object $request, ?int $id = null)
+    public function createUniqueSlug(array $data, ?object $category = null)
     {
-        $slug = Str::slug($request->items["name"]["value"]);
+        $slug = isset($data["items"]["name"]["value"]) ? Str::slug($data["items"]["name"]["value"]) : $category->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug");
         $original_slug = $slug;
 
         $count = 1;
 
-        while ($this->checkSlug($request, $slug, $id)) {
+        while ($this->checkSlug($data, $slug, $category)) {
             $slug = "{$original_slug}-{$count}";
             $count++;
         }

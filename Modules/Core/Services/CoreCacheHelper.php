@@ -298,9 +298,9 @@ class CoreCacheHelper
         {
             $keys = Redis::keys("sf_s_website_{$website->hostname}_*");
             if(!$keys) {
-                $stores = $this->website->find($website->id)->channels->mapWithKeys(function ($channel) {
+                $stores = $this->website->find($website->id)->channels->map(function ($channel) {
                     return $channel->stores;
-                });
+                })->flatten(1);
                 foreach($stores as $store) {
                     $channel = $this->channel->findOrFail($store->channel_id);
                     $store["website_id"] = $website->id;
@@ -346,7 +346,7 @@ class CoreCacheHelper
         }
     }
 
-    public function getChannelWithoutWebsite(string $channel_code): ?object
+    public function getChannelWithCode(string $channel_code): ?object
     {
         try
         {
@@ -369,7 +369,7 @@ class CoreCacheHelper
         }
     }
 
-    public function getStoreWithoutWebsite(string $store_code): ?object
+    public function getStoreWithCode(string $store_code): ?object
     {
         try
         {
