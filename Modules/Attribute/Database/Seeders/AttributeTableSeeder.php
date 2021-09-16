@@ -242,11 +242,11 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "options" => [
                     [
-                        "name" => "Yes",
+                        "name" => "Enabled",
                         "code" => 1
                     ],
                     [
-                        "name" => "No",
+                        "name" => "Disabled",
                         "code" => 0
                     ]
                 ],
