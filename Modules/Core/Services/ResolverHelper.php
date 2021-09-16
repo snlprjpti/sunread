@@ -47,7 +47,7 @@ class ResolverHelper {
 
             $store = $this->getStore($request, $website, $channel);
             $websiteData["store"] = collect($store)->only(["id","name","code"])->toArray();
-            $language = SiteConfig::fetch("store_language", "store", $store->id);
+            $language = SiteConfig::fetch("store_locale", "store", $store->id);
             $websiteData["store"]["locale"] = $language?->code;
 
             $websiteData["pages"] = $this->getPages($website);
