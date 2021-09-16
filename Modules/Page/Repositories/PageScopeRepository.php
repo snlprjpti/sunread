@@ -51,6 +51,7 @@ class PageScopeRepository extends BaseRepository
                 }
                 $page_scopes[] = $this->create($data);
             }
+
             $parent->page_scopes()->whereNotIn('id', array_filter(Arr::pluck($page_scopes, 'id')))->delete();
         }
         catch (Exception $exception)

@@ -5,6 +5,11 @@ namespace Modules\Product\Repositories\StoreFront;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
+use Illuminate\Validation\ValidationException;
+use Modules\Category\Entities\Category;
+use Modules\Category\Entities\CategoryValue;
+use Modules\Category\Exceptions\CategoryNotFoundException;
+use Modules\Category\Repositories\StoreFront\CategoryRepository;
 use Modules\Category\Transformers\StoreFront\CategoryResource;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
@@ -14,14 +19,20 @@ use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
+use Modules\Product\Repositories\ProductSearchRepository;
 
 class ProductRepository extends BaseRepository
 {
+    public $search_repository, $categoryRepository, $page_groups, $config_fields;
 
-    public function __construct(Product $product)
+    public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository)
     {
         $this->model = $product;
+        $this->search_repository = $search_repository;
+        $this->categoryRepository = $categoryRepository;
         $this->model_name = "Product";
+        $this->page_groups = ["hero_banner", "usp_banner_1", "usp_banner_2", "usp_banner_3"];
+        $this->config_fields = config("category.attributes");
     }
 
     public function productDetail(object $request, string $identifier): ?array
@@ -195,6 +206,119 @@ class ProductRepository extends BaseRepository
         }
 
         return $data;
+    }
+
+    public function getCategory(array $scope, string $category_slug): object
+    {
+        try
+        {
+            $category_value = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->firstOrFail();
+            $category = $category_value->category;
+
+            if(!$this->categoryRepository->checkMenuStatus($category, $scope)) throw new CategoryNotFoundException();
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $category;  
+    }
+
+    public function getOptions(object $request, string $category_slug): ?array
+    {
+        try
+        {
+            $coreCache = $this->getCoreCache($request);
+            $scope = [
+                "scope" => "store",
+                "scope_id" => $coreCache->store->id
+            ]; 
+
+            $category = $this->getCategory($scope, $category_slug);
+
+            $fetched = $this->search_repository->getFilterOptions($category->id, $coreCache->store);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function categoryWiseProduct(object $request, string $category_slug): ?array
+    {
+        try
+        {
+            $fetched = [];
+
+            $coreCache = $this->getCoreCache($request);
+            $scope = [
+                "scope" => "store",
+                "scope_id" => $coreCache->store->id
+            ]; 
+
+            $category = $this->getCategory($scope, $category_slug);
+
+            $fetched = $this->search_repository->getFilterProducts($request, $category->id, $coreCache->store);
+
+            $categories = $this->getPages($category, $scope);
+            if($category->parent_id) $parent = Category::findOrFail($category->parent_id);
+            $categories["categories"] = $this->categoryRepository->getCategories(isset($parent) ? $parent->children : $category->children, $scope);
+            $categories["breadcumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null);
+            $fetched["category"] = $categories;   
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function getPages(object $category, array $scope): array
+    {
+        try
+        {
+            $data = [];
+
+            $data["id"] = $category->id;
+            foreach(["name", "slug", "description"] as $key) $data[$key] = $category->value($scope, $key);
+    
+            foreach($this->page_groups as $group)
+            {
+                $item = [];
+                $slugs = collect($this->config_fields[$group]["elements"])->pluck("slug");
+                foreach($slugs as $slug)
+                {
+                    $item[$slug] = $category->value($scope, $slug);
+                }
+                $data["pages"][$group] = $item;
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    public function getBreadCumbs(object $category, ?object $parent): array
+    {
+        try
+        {
+            $breadcumbs = [];
+            if($parent) $breadcumbs[] = new CategoryResource($parent);
+            $breadcumbs[] = new CategoryResource($category);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $breadcumbs;
     }
 
 }

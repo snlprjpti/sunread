@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Modules\Category\Entities\CategoryValue;
+use Modules\Category\Exceptions\CategoryNotFoundException;
 use Modules\Category\Repositories\StoreFront\CategoryRepository;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Transformers\StoreFront\PageResource;
@@ -32,10 +33,11 @@ class ProductController extends BaseController
 
         $this->middleware('validate.website.host')->only(['index', 'filter', 'show']);
         $this->middleware('validate.store.code')->only(['index', 'filter', 'show']);
-        $this->middleware('validate.channel.code')->only(['show']);
+        $this->middleware('validate.channel.code')->only(['index', 'filter', 'show']);
 
         $exception_statuses = [
-            ProductNotFoundIndividuallyException::class => 404
+            ProductNotFoundIndividuallyException::class => 404,
+            CategoryNotFoundException::class => 404
         ];
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);
@@ -45,7 +47,6 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = [];
             $request->validate([
                 "page" => "numeric|min:1",
                 "color" => "sometimes|array",
@@ -55,11 +56,8 @@ class ProductController extends BaseController
                 "collection" => "sometimes|array",
                 "collection.*" => "sometimes|exists:attribute_options,id",
             ]);
-            
-            $store = $this->search_repository->getStore($request);
-            $category = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->firstOrFail();
-            $fetched = $this->search_repository->getFilterProducts($request, $category->category_id, $store);
-            $fetched["categories"] = $this->category_repository->getPages($category->category_id, $store);
+
+            $fetched = $this->store_fornt_repository->categoryWiseProduct($request, $category_slug);
         }
         catch( Exception $exception )
         {
@@ -73,9 +71,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $store = $this->search_repository->getStore($request);
-            $category = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->firstOrFail();
-            $fetched = $this->search_repository->getFilterOptions($category->category_id, $store);
+            $fetched = $this->store_fornt_repository->getOptions($request, $category_slug);
         }
         catch( Exception $exception )
         {

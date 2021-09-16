@@ -3,11 +3,10 @@
 namespace Modules\Core\Services;
 
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Validation\ValidationException;
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Page\Entities\Page;
 
@@ -34,22 +33,18 @@ class ResolverHelper {
         try
         {
             $websiteData = [];
-            $domain = $this->getDomain();
 
             $fallback_id = config("website.fallback_id");
-            if ($request->hasHeader('hc-host')) {
-                $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
-            }
-            else {
-                $website = Website::whereId($fallback_id)->firstOrFail();
-            }
-            $websiteData = $website->only(["id","name","code", "hostname"]);
+            if ($request->hasHeader('hc-host')) $website = CoreCache::getWebsite($request->header("hc-host"));
+            else $website = Website::whereId($fallback_id)->firstOrFail();
+
+            $websiteData = collect($website)->only(["id","name","code", "hostname"])->toArray();
 
             $channel = $this->getChannel($request, $website);
-            $websiteData["channel"] = $channel->only(["id","name","code"]);
+            $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
 
             $store = $this->getStore($request, $website, $channel);
-            $websiteData["store"] = $store->only(["id","name","code"]);
+            $websiteData["store"] = collect($store)->only(["id","name","code"])->toArray();
 
             $websiteData["pages"] = $this->getPages($website);
 
@@ -69,10 +64,14 @@ class ResolverHelper {
         {
             $channel_code = $request->header("hc-channel");
 
-            if($channel_code) $channel = Channel::whereCode($channel_code)->whereWebsiteId($website->id)->firstOrFail();
+            if($channel_code) $channel = CoreCache::getChannel($website, $channel_code);
             else {
-                $channel= $this->checkCondition("website_default_channel", $website)?->firstOrFail(); 
-                if(!$channel) $channel = $website->channels()->firstOrFail();
+                $channel= $this->checkCondition("website_default_channel", $website); 
+                if(!$channel) {
+                    $cache = CoreCache::getWebsiteAllChannel($website);
+                    if(!$cache) throw new ModelNotFoundException(__("core::app.response.not-found", ["name" => "Channel"]));
+                    $channel = json_decode($cache[0]);
+                }
             }    
         }
         catch( Exception $exception )
@@ -89,10 +88,14 @@ class ResolverHelper {
         {
             $store_code = $request->header("hc-store");
 
-            if($store_code) $store = Store::whereChannelId($channel->id)->whereCode($store_code)->firstOrFail();
+            if($store_code) $store = CoreCache::getStore($website, $channel, $store_code);
             else {
-                $store = $this->checkCondition("website_default_store", $website)?->firstOrFail();
-                if(!$store) $store = $channel->stores()->firstOrFail();
+                $store = $this->checkCondition("website_default_store", $website);
+                if(!$store) {
+                    $cache = CoreCache::getWebsiteAllStore($website);
+                    if(!$cache) throw new ModelNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
+                    $store = json_decode($cache[0]);
+                }
             }
         }
         catch( Exception $exception )
