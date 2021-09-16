@@ -57,7 +57,10 @@ class EmailTemplateServiceProvider extends ServiceProvider
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
         $this->mergeConfigFrom(
-            module_path($this->moduleName, 'Config/email_variable.php'), 'variable'
+            module_path($this->moduleName, 'Config/email_template.php'), 'email_template',
+        );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/email_variable.php'), 'email_variable',
         );
     }
 
