@@ -9,18 +9,24 @@ class LocalesTableSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('locales')->delete();
+        if ( in_array(app()->environment(), ["testing", "ci"]) ) {
+            $locales = include("data/testing/locales.php");
+        } else {
+            $locales = include("data/locales.php");
+        }
 
-        DB::table('locales')->insert([
-            [
-                'id' => 1,
-                'code' => 'en',
-                'name' => 'English',
-            ], [
-                'id' => 2,
-                'code' => 'fr',
-                'name' => 'French',
-            ]
-        ]);
+        $data = array_map(function ($locale) {
+            return [
+                "code" => $locale["code"],
+                "name" => $locale["name"],
+                "created_at" => now(),
+                "updated_at" => now()
+            ];
+        }, $locales);
+
+        $chunks = array_chunk($data, 100);
+        foreach ($chunks as $chunk) {
+            DB::table("locales")->insert($chunk);
+        }
     }
 }

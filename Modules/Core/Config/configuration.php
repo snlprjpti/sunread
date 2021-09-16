@@ -206,6 +206,19 @@ return[
                                 "rules" => "numeric",
                                 "scope" => "global",
                                 "is_required" => 1
+                            ],
+                            [
+                                "title" => "Store Language",
+                                "path" => "store_language",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\Locale",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:locales,id",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1
                             ]
                         ]
                     ]
