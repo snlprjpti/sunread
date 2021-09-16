@@ -44,7 +44,7 @@ trait Configuration
     public function cacheQuery(object $request, array $pluck): array
     {
         $resources = Cache::rememberForever($request->provider, function() use ($request) {
-           return $request->provider::get()->toArray();
+           return $request->provider::orderBy("name", "asc")->get()->toArray();
         });
         $data = [];
         foreach($resources as $resource)
