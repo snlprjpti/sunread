@@ -3,6 +3,8 @@
 namespace Modules\Product\Repositories\StoreFront;
 
 use Exception;
+use Illuminate\Support\Facades\Storage;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Category\Transformers\StoreFront\CategoryResource;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
@@ -10,6 +12,7 @@ use Modules\Core\Entities\Website;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\Product;
+use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 
 class ProductRepository extends BaseRepository
@@ -21,7 +24,7 @@ class ProductRepository extends BaseRepository
         $this->model_name = "Product";
     }
 
-    public function productDetail(object $request, string $sku): ?array
+    public function productDetail(object $request, string $identifier): ?array
     {
         try
         {
@@ -48,7 +51,10 @@ class ProductRepository extends BaseRepository
                 "attribute_options_child_products"
 
             ];
-            $product = Product::whereWebsiteId($website->id)->whereSku($sku)->whereStatus(1)->with($relations)->firstOrFail();
+            $product_attr = ProductAttribute::query()->with(["value"]);
+            $attribute_id = Attribute::whereSlug("url_key")->first()?->id;
+            $product_attr = $product_attr->whereAttributeId($attribute_id)->get()->filter( fn ($attr_product) => $attr_product->value->value == $identifier)->first();
+            $product = Product::whereId($identifier)->orWhere("id", $product_attr?->product_id)->whereWebsiteId($website->id)->whereStatus(1)->with($relations)->firstOrFail();
             $data = [];
             $data["id"] = $product->id;
             $data["sku"] = $product->sku;
@@ -129,7 +135,7 @@ class ProductRepository extends BaseRepository
                                             "link_products" => $attribute_option_child_products
                                             ->where("attribute_option_id", $initial_attribute_option_id)
                                             ->map( function ($link_product) use ($store) {
-                                                $attribute_slugs = ["name", "special_price", "special_from_date", "special_to_date",];
+                                                $attribute_slugs = ["name",  "price", "special_price", "special_from_date", "special_to_date"];
                                                 return array_merge([
                                                     "sku" => $link_product->variant_product->sku,
                                                     "option_id" => $link_product->attribute_option_id,], $link_product->variant_product
@@ -177,7 +183,7 @@ class ProductRepository extends BaseRepository
             $product_images = [];
             $product->images->map( function ($image) use (&$product_images){
                 $images = $image->types->map( function ($type) use ($image) {
-                    return [ "type" => ($type->slug == "gallery") ? "normal" : $type->slug, "path" => $image->path];
+                    return [ "type" => ($type->slug == "gallery") ? "normal" : $type->slug, "path" => ($image->path) ? Storage::url($image->path) : ""];
                 })->toArray();
                 $product_images = array_merge($product_images, $images);
             })->toArray();
