@@ -105,8 +105,9 @@ class ProductSearchRepository extends ElasticSearchRepository
         $filter = $this->filterAndSort($request, $category_id);
         
         $data = $this->finalQuery($filter, $request, $store);
+        $total = $data["products"]["hits"]["total"]["value"];
         $data["products"] = collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray();
-        $data["last_page"] = (int) ceil(count($data["products"])/$data["limit"]);
+        $data["last_page"] = (int) ceil($total/$data["limit"]);
         $data["total"] = count($data["products"]);
         return $data;
     }
