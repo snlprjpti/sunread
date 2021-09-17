@@ -108,7 +108,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         $total = $data["products"]["hits"]["total"]["value"];
         $data["products"] = collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray();
         $data["last_page"] = (int) ceil($total/$data["limit"]);
-        $data["total"] = count($data["products"]);
+        $data["total"] = $total;
         return $data;
     }
 
