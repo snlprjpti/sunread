@@ -52,9 +52,7 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, callback:function ($request) {
-                return ["slug" => $request->slug ?? $this->model->createSlug($request->name)];
-            });
+            $data = $this->repository->validateData($request);
             $created = $this->repository->create($data);
         }
         catch (Exception $exception)
@@ -70,7 +68,7 @@ class EmailTemplateController extends BaseController
         try
         {
             $fetched = $this->repository->fetch($id);
-            $fetched->content = $this->repository->getTemplate($fetched->content);
+//            $fetched->content = $this->repository->getTemplate($fetched->content);
         }
         catch( Exception $exception )
         {
@@ -108,5 +106,33 @@ class EmailTemplateController extends BaseController
         }
 
         return $this->successResponseWithMessage($this->lang('delete-success'));
+    }
+
+    public function templateGroup(Request $request)
+    {
+        try
+        {
+            $fetched = $this->repository->getConfigData($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+    }
+
+    public function templateVariable(Request $request)
+    {
+        try
+        {
+            $fetched = $this->repository->getConfigVariable($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
     }
 }

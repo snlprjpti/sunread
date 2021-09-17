@@ -2,7 +2,6 @@
 
 namespace Modules\EmailTemplate\Repositories;
 
-use Illuminate\Support\Arr;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Exception;
@@ -17,6 +16,7 @@ class EmailTemplateRepository extends BaseRepository
             "name" => "required",
             "subject" => "required",
             "content" => "required",
+            "email_template_code" => "required",
             "style" => "sometimes",
         ];
     }
@@ -41,8 +41,6 @@ class EmailTemplateRepository extends BaseRepository
         {
             $config_data = config("email_variable");
 
-            $data = [];
-
             foreach($config_data as $key=>$elements)
             {
                 foreach($elements as $value)
@@ -59,7 +57,7 @@ class EmailTemplateRepository extends BaseRepository
                             $parent["variables"][] = $v;
                         }
                     }
-                    $group["groups"][] = $parent;
+                    $data["groups"][] = $parent;
                 }
             }
         }
@@ -68,7 +66,7 @@ class EmailTemplateRepository extends BaseRepository
             throw $exception;
         }
 
-        return $group;
+        return $data;
     }
 
 //    public function sendEmailDemo(): void

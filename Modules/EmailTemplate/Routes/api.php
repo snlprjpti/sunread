@@ -4,9 +4,9 @@ Route::group(["prefix" => "admin", "as" => "admin.", "middleware" => ["api", "ad
 
     Route::group(["prefix" => "email-templates", "as" => "email-templates."], function () {
 
-        Route::get("/groups", [\Modules\EmailTemplate\Http\Controllers\EmailTemplateGroupController::class, "index"])->name("groups");
-        Route::get("/variables", [\Modules\EmailTemplate\Http\Controllers\EmailTemplateGroupController::class, "variable"])->name("variables");
-        Route::resource("/", EmailTemplateController::class);
+        Route::get("/groups", [\Modules\EmailTemplate\Http\Controllers\EmailTemplateController::class, "templateGroup"])->name("groups");
+        Route::get("/variables", [\Modules\EmailTemplate\Http\Controllers\EmailTemplateController::class, "templateVariable"])->name("variables");
 
     });
+    Route::resource("/email-templates", EmailTemplateController::class);
 });
