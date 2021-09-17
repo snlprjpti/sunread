@@ -93,4 +93,12 @@ class Product extends Model
     {
         return $this->hasMany(AttributeOptionsChildProduct::class);
     }
+
+    /**
+     * Get the product builder values that owns the product.
+     */
+    public function productBuilderValues(): HasMany
+    {
+        return $this->hasMany(ProductBuilder::class);
+    }
 }

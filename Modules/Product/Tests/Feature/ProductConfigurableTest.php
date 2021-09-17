@@ -45,7 +45,7 @@ class ProductConfigurableTest extends BaseTestCase
         {
             foreach ($attribute_group->attributes as $attribute)
             {
-                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status"])) continue;
+                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status", "component"])) continue;
                 $attributes[] = [
                     "attribute_slug" => $attribute->slug,
                     "value" => $this->value($attribute)
