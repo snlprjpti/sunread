@@ -3,17 +3,17 @@
 namespace Modules\Product\Repositories;
 
 use Exception;
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Modules\Core\Entities\Store;
 use Modules\Core\Rules\ScopeRule;
 use Modules\Core\Entities\Channel;
 use Intervention\Image\Facades\Image;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
+use Modules\Product\Entities\ImageType;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\ProductImage;
 use Modules\Attribute\Entities\AttributeSet;
@@ -21,20 +21,19 @@ use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
+use Modules\Product\Rules\WebsiteWiseScopeRule;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Attribute\Repositories\AttributeRepository;
+use Modules\Product\Transformers\VariantProductResource;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Product\Entities\AttributeConfigurableProduct;
-use Modules\Product\Entities\ImageType;
-use Modules\Product\Rules\WebsiteWiseScopeRule;
-use Modules\Product\Transformers\VariantProductResource;
 
 class ProductRepository extends BaseRepository
 {
-    protected $attribute, $attribute_set_repository, $channel_model, $store_model, $image_repository;
-    
-    public function __construct(Product $product, AttributeSetRepository $attribute_set_repository, AttributeRepository $attribute_repository, ProductImageRepository $image_repository,Channel $channel_model, Store $store_model)
+    protected $attribute, $attribute_set_repository, $channel_model, $store_model, $image_repository, $productBuilderRepository, $pageAttributeRepository;
+
+    public function __construct(Product $product, ProductBuilderRepository $productBuilderRepository, AttributeSetRepository $attribute_set_repository, AttributeRepository $attribute_repository, ProductImageRepository $image_repository,Channel $channel_model, Store $store_model)
     {
         $this->model = $product;
         $this->model_key = "catalog.products";
@@ -50,6 +49,8 @@ class ProductRepository extends BaseRepository
         $this->channel_model = $channel_model;
         $this->store_model = $store_model;
         $this->image_repository = $image_repository;
+        $this->productBuilderRepository = $productBuilderRepository;
+
     }
 
     public function validataInventoryData(array $data): array
@@ -180,7 +181,6 @@ class ProductRepository extends BaseRepository
         try
         {
             $request_images = $value["value"];
-
             if ($method == "update" && isset($request_images["existing"])) {
                 $this->updateImageType($request_images, $product);
             }
@@ -336,6 +336,7 @@ class ProductRepository extends BaseRepository
                 "website_id" => $product->website_id
             ];
             $fetched["attributes"] = $this->getData($id, $scope);
+            $fetched["product_builders"] = $this->productBuilderRepository->getProductBuilder($id, $scope);
 
             if ($product->type == "configurable") $fetched = array_merge($fetched, $this->getConfigurableData($product));
         }

@@ -22,7 +22,7 @@ class ChannelRepository extends BaseRepository
         try
         {
             $website = CoreCache::getWebsite($request->header("hc-host"));
-            $channels = $this->model->whereWebsiteId($website->id)->get();
+            $channels = $this->model->with("default_store")->whereWebsiteId($website->id)->get();
         }
         catch (Exception $exception)
         {

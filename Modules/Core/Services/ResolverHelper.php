@@ -5,6 +5,7 @@ namespace Modules\Core\Services;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Request;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
@@ -42,9 +43,16 @@ class ResolverHelper {
 
             $channel = $this->getChannel($request, $website);
             $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
+            $websiteData["channel"]["default_store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
+            if($channel->default_store_id) {
+                $d_language = SiteConfig::fetch("store_locale", "store", $channel->default_store_id);
+                $websiteData["channel"]["default_store"]["locale"] = $d_language?->code;
+            }
 
             $store = $this->getStore($request, $website, $channel);
             $websiteData["store"] = collect($store)->only(["id","name","code"])->toArray();
+            $language = SiteConfig::fetch("store_locale", "store", $store->id);
+            $websiteData["store"]["locale"] = $language?->code;
 
             $websiteData["pages"] = $this->getPages($website);
 
