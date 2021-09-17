@@ -4,6 +4,7 @@ namespace Modules\Core\Transformers\StoreFront;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Facades\SiteConfig;
+use Modules\Core\Transformers\StoreResource;
 
 class ChannelResource extends JsonResource
 {
@@ -13,7 +14,8 @@ class ChannelResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "code" => $this->code,
-            "icon" => SiteConfig::fetch("channel_icon", "channel", $this->id)
+            "icon" => SiteConfig::fetch("channel_icon", "channel", $this->id),
+            "default_store" => new StoreResource($this->whenLoaded("default_store")),
         ];
     }
 }
