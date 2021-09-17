@@ -13,7 +13,7 @@ class StoreResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "code" => $this->code,
-            "locale" => SiteConfig::fetch("store_locale", "store", $this->id)
+            "locale" => SiteConfig::fetch("store_locale", "store", $this->id)?->code
         ];
     }
 }

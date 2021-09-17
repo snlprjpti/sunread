@@ -16,7 +16,6 @@ class StoreResource extends JsonResource
             "position" => $this->position,
             "channel" => new ChannelResource($this->whenLoaded("channel")),
             "status" => (bool) $this->status,
-            "locale" => SiteConfig::fetch("store_locale", "store", $this->id),
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
