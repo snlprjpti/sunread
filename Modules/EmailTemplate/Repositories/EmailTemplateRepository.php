@@ -42,16 +42,24 @@ class EmailTemplateRepository extends BaseRepository
             $config_data = config("email_variable");
 
             $data = [];
+
             foreach($config_data as $key=>$elements)
             {
                 foreach($elements as $value)
                 {
-                    if(in_array( $request->template, $value["availability"]) || $value["availability"] == ["all"]) {
+                    $parent = [];
+                    foreach($value["variables"] as $v)
+                    {
+                        if(in_array( $request->template, $v["availability"]) || $v["availability"] == ["all"]) {
 
-                        $element = $value;
-                        unset($element["availability"], $element["source"], $element["type"]);
-                        $data[$key][] = $element;
+                            unset($v["availability"], $v["source"], $v["type"]);
+
+                            $parent["label"] = $value["label"];
+                            $parent["code"] = $value["code"];
+                            $parent["variables"][] = $v;
+                        }
                     }
+                    $group["groups"][] = $parent;
                 }
             }
         }
@@ -60,7 +68,7 @@ class EmailTemplateRepository extends BaseRepository
             throw $exception;
         }
 
-        return $data;
+        return $group;
     }
 
 //    public function sendEmailDemo(): void
