@@ -14,7 +14,8 @@ $types = [
 	"image" => "text",
 	"file" => "text",
 	"checkbox" => "text",
-	"multiimages" => "text"
+	"multiimages" => "text",
+	"builder" => "text"
 ];
 
 return array_map(function($data) {

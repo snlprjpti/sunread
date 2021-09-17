@@ -15,4 +15,5 @@ return [
 	"file" => "file",
 	"checkbox" => null,
 	"multiimages" => "array",
+	"builder" => "array"
 ];

@@ -346,8 +346,16 @@ class AttributeTableSeeder extends Seeder
                         "name" => "Collection4",
                     ],
                 ]
-            ]
+            ],
+            [
+                "name" => "Component",
+                "slug" => "component",
+                "type" => "builder",
+                "scope" => "store",
+            ],
         ];
+
+
 
         array_map(function($attribute){
             $default_value = isset($attribute["default_value"]) && !in_array($attribute["type"], ["select", "multiselect", "checkbox"]) ? $attribute["default_value"] : null;
