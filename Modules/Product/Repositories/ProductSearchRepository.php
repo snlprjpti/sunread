@@ -248,7 +248,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         return [
             "products" => $data,
             "current_page" => (int) $page,
-            "limit" => $limit
+            "limit" => (int) $limit
         ];
     }
 
