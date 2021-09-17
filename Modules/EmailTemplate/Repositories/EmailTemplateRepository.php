@@ -2,12 +2,9 @@
 
 namespace Modules\EmailTemplate\Repositories;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Arr;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\EmailTemplate\Entities\EmailTemplate;
-use Modules\EmailTemplate\Entities\EmailVariable;
-use Modules\EmailTemplate\Mail\SampleTemplate;
 use Exception;
 
 class EmailTemplateRepository extends BaseRepository
@@ -36,6 +33,34 @@ class EmailTemplateRepository extends BaseRepository
         }
 
         return $config_data;
+    }
+
+    public function getConfigVariable(object $request): array
+    {
+        try
+        {
+            $config_data = config("email_variable");
+
+            $data = [];
+            foreach($config_data as $key=>$elements)
+            {
+                foreach($elements as $value)
+                {
+                    if(in_array( $request->template, $value["availability"]) || $value["availability"] == ["all"]) {
+
+                        $element = $value;
+                        unset($element["availability"], $element["source"], $element["type"]);
+                        $data[$key][] = $element;
+                    }
+                }
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 
 //    public function sendEmailDemo(): void

@@ -31,4 +31,18 @@ class EmailTemplateGroupController extends BaseController
 
         return $this->successResponse($fetched, $this->lang('fetch-list-success'));
     }
+
+    public function variable(Request $request)
+    {
+        try
+        {
+            $fetched = $this->repository->getConfigVariable($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+    }
 }
