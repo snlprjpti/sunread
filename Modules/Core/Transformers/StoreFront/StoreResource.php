@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Core\Transformers;
+namespace Modules\Core\Transformers\StoreFront;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Facades\SiteConfig;
@@ -13,10 +13,7 @@ class StoreResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "code" => $this->code,
-            "position" => $this->position,
-            "channel" => new ChannelResource($this->whenLoaded("channel")),
-            "status" => (bool) $this->status,
-            "created_at" => $this->created_at->format("M d, Y H:i A")
+            "locale" => SiteConfig::fetch("store_locale", "store", $this->id)?->code
         ];
     }
 }

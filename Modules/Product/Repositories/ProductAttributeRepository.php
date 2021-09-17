@@ -20,13 +20,14 @@ use Modules\Product\Entities\ProductAttributeString;
 
 class ProductAttributeRepository extends ProductRepository
 {
-    protected $option_fields, $attributeMapperSlug, $functionMapper, $product_repository, $non_option_slug, $non_required_attributes;
+    protected $option_fields, $attributeMapperSlug, $functionMapper, $product_repository, $non_option_slug, $non_required_attributes, $productBuilderRepository;
 
-    public function __construct(ProductAttribute $productAttribute, ProductRepository $product_repository)
+    public function __construct(ProductAttribute $productAttribute, ProductRepository $product_repository, ProductBuilderRepository $productBuilderRepository)
     {
         $this->model = $productAttribute;
         $this->model_key = "catalog.products.attibutes";
         $this->product_repository = $product_repository;
+        $this->productBuilderRepository = $productBuilderRepository;
 
         $this->option_fields = [ "select", "multiselect", "checkbox", "multiimages" ];
 
@@ -36,7 +37,7 @@ class ProductAttributeRepository extends ProductRepository
             "status" => "status",
             "quantity_and_stock_status" => "catalogInventory",
             "category_ids" => "categories",
-            "gallery" => "gallery"
+            "gallery" => "gallery",
         ];
         $this->non_required_attributes = [ "price", "cost", "special_price", "special_from_date", "special_to_date", "quantity_and_stock_status" ];
         $this->non_option_slug = [ "tax_class_id", "category_ids" ];
@@ -76,7 +77,6 @@ class ProductAttributeRepository extends ProductRepository
 
             // get all request attribute id
             $request_attribute_slugs = array_map( function ($request_attribute) {
-
                 if(!isset($request_attribute["attribute_slug"])) throw ValidationException::withMessages(["attribute_slug" => "Invalid attribute format."]);
                 return $request_attribute["attribute_slug"];
                 
@@ -198,6 +198,11 @@ class ProductAttributeRepository extends ProductRepository
                     // store mapped attributes on respective function. ( sku, categories.)
                     $function_name = $this->functionMapper[$attribute["attribute_slug"]];
                     $this->product_repository->$function_name($product, $request, $method, $attribute);
+                    continue;
+                }
+
+                if($attribute["attribute_slug"] == 'component'){
+                    $this->productBuilderRepository->component($product, $method, $attribute, $scope_arr);
                     continue;
                 }
 

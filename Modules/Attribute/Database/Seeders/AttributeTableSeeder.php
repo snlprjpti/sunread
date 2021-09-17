@@ -115,7 +115,7 @@ class AttributeTableSeeder extends Seeder
                         "code" => 0
                     ]
                 ],
-                "default_value" => "Yes",
+                "default_value" => "No",
                 "scope" => "website"
             ],
             // [
@@ -227,7 +227,7 @@ class AttributeTableSeeder extends Seeder
                 "slug" => "meta_title",
                 "type" => "text",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Meta Description",
@@ -242,11 +242,11 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "options" => [
                     [
-                        "name" => "Yes",
+                        "name" => "Enabled",
                         "code" => 1
                     ],
                     [
-                        "name" => "No",
+                        "name" => "Disabled",
                         "code" => 0
                     ]
                 ],
@@ -346,8 +346,16 @@ class AttributeTableSeeder extends Seeder
                         "name" => "Collection4",
                     ],
                 ]
-            ]
+            ],
+            [
+                "name" => "Component",
+                "slug" => "component",
+                "type" => "builder",
+                "scope" => "store",
+            ],
         ];
+
+
 
         array_map(function($attribute){
             $default_value = isset($attribute["default_value"]) && !in_array($attribute["type"], ["select", "multiselect", "checkbox"]) ? $attribute["default_value"] : null;
