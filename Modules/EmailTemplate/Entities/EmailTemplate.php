@@ -10,5 +10,5 @@ class EmailTemplate extends Model
 {
     use HasFactory, Sluggable;
 
-    protected $fillable = [ "name", "slug", "subject", "content", "style" ];
+    protected $fillable = [ "name", "email_template_code", "subject", "content", "style" ];
 }
