@@ -13,18 +13,12 @@ use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Erp\Entities\ErpImportDetail;
-use Modules\Erp\Jobs\Mapper\ErpDetailStatusUpdate;
-use Modules\Erp\Jobs\Mapper\ErpGenerateVariantProductJob;
-use Modules\Erp\Jobs\Mapper\ErpMigrateAttributeConfigurableProduct;
 use Modules\Inventory\Entities\CatalogInventory;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
 use Modules\Erp\Jobs\Mapper\ErpMigratorJob;
 use Modules\Inventory\Entities\CatalogInventoryItem;
-use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\ProductAttributeString;
@@ -141,11 +135,11 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("special_from_date"),
-                    "value" => Carbon::parse(date("Y-m-d", $start_time)), 
+                    "value" => ($product->type == "simple") ? Carbon::parse(date("Y-m-d", $start_time)) : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("special_to_date"),
-                    "value" => Carbon::parse(date("Y-m-d", $end_time)), 
+                    "value" => ($product->type == "simple") ? Carbon::parse(date("Y-m-d", $end_time)) : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("tax_class_id"),
@@ -306,7 +300,7 @@ trait HasErpValueMapper
         try
         {
             $price_data = $this->getValue($prices)->filter(function ($price_value) {
-                return $price_value["salesCode"] == "WEB" && $price_value["currencyCode"] !== "";
+                return $price_value["salesCode"] == "WEB";
             })->map(function ($price_value) {
 
                 // Condition for invalid date/times
@@ -324,6 +318,11 @@ trait HasErpValueMapper
                         "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"] 
                     ],
                     [
+                        "attribute_id" => $this->getAttributeId("cost"),
+                        "value" => $price_value["unitPrice"],
+                        "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"] 
+                    ],
+                    [
                         "attribute_id" => $this->getAttributeId("special_from_date"),
                         "value" => Carbon::parse(date("Y-m-d", $start_time)),
                         "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"]
@@ -335,12 +334,11 @@ trait HasErpValueMapper
                     ] 
                 ];
             });
-
             foreach ( $price_data as $price )
             {
                 foreach ($price as $attributeData)
                 {
-                    $channel_id  = $this->getChannelId($attributeData["channel_code"])?->id ?? 1;
+                    $channel_id  = $this->getChannel($attributeData["channel_code"])?->id ?? 1;
                     $attribute = Attribute::find($attributeData["attribute_id"]);
                     $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
                     $value = $attribute_type::create(["value" => $attributeData["value"]]);
@@ -367,7 +365,7 @@ trait HasErpValueMapper
         return true;
     }
 
-    private function getChannelId(string $code): ?object
+    private function getChannel(string $code): ?object
     {
         try
         {
@@ -379,8 +377,19 @@ trait HasErpValueMapper
                 "website_id" => 1
             ];
             $match = $data;
-            unset($match["description"], $match["name"]);
+            unset($match["description"], $match["name"], $match["code"]);
             $channel = Channel::updateOrCreate($match, $data);
+            
+            $store_data = [
+                "name" => $code,
+                "code" => $code,
+                "channel_id" => $channel->id,
+                "position" => 1
+            ];
+            $store_match = $store_data;
+            unset($store_match["position"], $store_match["position"], $store_match["name"]);
+            $store = Store::updateOrCreate($store_match, $store_data);
+            $update_channel = $channel->update(["default_store" => $store->id]);
         }
         catch ( Exception $exception )
         {
