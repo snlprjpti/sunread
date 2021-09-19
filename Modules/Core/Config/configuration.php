@@ -365,7 +365,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
-                                "default" => "",
+                                "default" => "142",
                                 "options" => [],
                                 "rules" => "exists:currencies,id",
                                 "multiple" => false,

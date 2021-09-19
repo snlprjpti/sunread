@@ -82,6 +82,9 @@ class CoreServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/website.php'), "website"
         );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/currencies.php'), "currencies"
+        );
     }
 
     /**
