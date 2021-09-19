@@ -389,7 +389,7 @@ trait HasErpValueMapper
             $store_match = $store_data;
             unset($store_match["position"], $store_match["position"], $store_match["name"]);
             $store = Store::updateOrCreate($store_match, $store_data);
-            $update_channel = $channel->update(["default_store" => $store->id]);
+            $update_channel = $channel->update(["default_store_id" => $store->id]);
         }
         catch ( Exception $exception )
         {
