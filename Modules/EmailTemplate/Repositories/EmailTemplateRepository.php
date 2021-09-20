@@ -78,35 +78,33 @@ class EmailTemplateRepository extends BaseRepository
 
     public function getTemplate(string $content): string
     {
-        preg_match_all("#(?<={{)[^}]*(?=}})#", $content, $template);
+//        preg_match_all("#(?<={{)[^}]*(?=}})#", $content, $template);
 //        preg_match_all("#(?<={{)[^}]*(?=}})#", $content, $variables);
-        preg_match_all("#\{\{\s*(.*?)\s*\}\}#", $content, $variables);
+//        preg_match_all("/{+(hc_include_template.*)}/", $content, $templates);
+//dd($template);
 
 
-        if(count($template) > 0)
-        {
-            foreach($template[0] as $match) {
-                $all_groups = collect(config("email_template"))->pluck("code")->toArray();
+        preg_match_all('/{{(.*?)}}/', $content, $data);
+//        preg_match_all("#\{\{\s*(.*?)\s*\}\}#", $content, $variables);
 
-                dd($match);
-                if (in_array($match, $all_groups))
-                {
-                    $data = EmailTemplate::pluck("content")->first();
 
-                    $content = strtr ($content, ["{{{$match}}}" => $data]);
-                }
+
+        if(count($data) > 0) {
+            $temp = preg_grep("#\((.*?)\)#", $data[0]);
+
+            foreach($temp as $t) {
+                preg_match('#\((.*?)\)#', $t, $path);
+
+                $content = str_replace($t, $path[1], $content);
             }
         }
 
-        if(count($variables) > 0)
-        {
-            foreach($variables[1] as $match) {
+        if(count($data) > 0) {
+            foreach($data[1] as $match) {
                 $all_variables = (config("email_variable"));
 
-                foreach ($all_variables as $variable)
-                {
-                    foreach($variable as $value)
-                    {
+                foreach ($all_variables as $variable) {
+                    foreach($variable as $value) {
                         if( in_array($match, array_column($value["variables"], "variable")))
                         {
                             $value = rand(1,100);
