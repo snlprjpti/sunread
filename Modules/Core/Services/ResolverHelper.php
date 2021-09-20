@@ -44,6 +44,15 @@ class ResolverHelper {
 
             $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
             $websiteData["channel"]["default_store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
+            $store_data = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
+                $data = json_decode($store);
+                return [
+                    "id" => $data->id,
+                    "name" => $data->name,
+                    "code" => $data->code,
+                ];
+            });
+            $websiteData["channel"]["stores"] = $store_data;
 
             if($channel->default_store_id) {
                 $d_language = SiteConfig::fetch("store_locale", "store", $channel->default_store_id);
