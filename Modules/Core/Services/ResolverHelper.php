@@ -43,8 +43,7 @@ class ResolverHelper {
             $channel = $this->getChannel($request, $website);
 
             $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
-            $websiteData["channel"]["store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
-            
+
             if ( $channel->default_store_id && $request->header("hc-store") ) {
                 $store = $this->getStore($request, $website, $channel);
                 $websiteData["channel"]["store"] = collect($store)->only(["id","name","code"])->toArray();
@@ -67,13 +66,20 @@ class ResolverHelper {
                 $language = SiteConfig::fetch("store_locale", "store", $store->id);
                 $websiteData["channel"]["store"]["locale"] = $language?->code;
             }
+            else {
+                $websiteData["channel"]["store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
+                $language = SiteConfig::fetch("store_locale", "store", $channel->default_store_id);
+                $websiteData["channel"]["store"]["locale"] = $language?->code;
+            }
 
             $store_data = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
                 $data = json_decode($store);
+                $language = SiteConfig::fetch("store_locale", "store", $store->id);
                 return [
                     "id" => $data->id,
                     "name" => $data->name,
                     "code" => $data->code,
+                    "locale" => $language?->code,
                 ];
             });
             $websiteData["stores"] = $store_data;
