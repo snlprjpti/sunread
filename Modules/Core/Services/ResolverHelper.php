@@ -43,7 +43,31 @@ class ResolverHelper {
             $channel = $this->getChannel($request, $website);
 
             $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
-            $websiteData["channel"]["default_store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
+            $websiteData["channel"]["store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
+            
+            if ( $channel->default_store_id && $request->header("hc-store") ) {
+                $store = $this->getStore($request, $website, $channel);
+                $websiteData["channel"]["store"] = collect($store)->only(["id","name","code"])->toArray();
+                $language = SiteConfig::fetch("store_locale", "store", $store->id);
+                $websiteData["channel"]["store"]["locale"] = $language?->code;
+            }
+            elseif (!$channel->default_store_id && !$request->header("hc-store")) {
+                $store = json_decode(CoreCache::getChannelAllStore($website, $channel)[0]);
+                $websiteData["channel"]["store"] = [
+                    "id" => $store->id,
+                    "name" => $store->name,
+                    "code" => $store->code
+                ];
+                $language = SiteConfig::fetch("store_locale", "store", $store->id);
+                $websiteData["channel"]["store"]["locale"] = $language?->code;
+            }
+            elseif (!$channel->default_store_id && $request->header("hc-store")) {
+                $store = $this->getStore($request, $website, $channel);
+                $websiteData["channel"]["store"] = collect($store)->only(["id","name","code"])->toArray();
+                $language = SiteConfig::fetch("store_locale", "store", $store->id);
+                $websiteData["channel"]["store"]["locale"] = $language?->code;
+            }
+
             $store_data = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
                 $data = json_decode($store);
                 return [
@@ -53,16 +77,6 @@ class ResolverHelper {
                 ];
             });
             $websiteData["channel"]["stores"] = $store_data;
-
-            if($channel->default_store_id) {
-                $d_language = SiteConfig::fetch("store_locale", "store", $channel->default_store_id);
-                $websiteData["channel"]["default_store"]["locale"] = $d_language?->code;
-            }
-
-            $store = $this->getStore($request, $website, $channel);
-            $websiteData["store"] = collect($store)->only(["id","name","code"])->toArray();
-            $language = SiteConfig::fetch("store_locale", "store", $store->id);
-            $websiteData["store"]["locale"] = $language?->code;
 
             $websiteData["pages"] = $this->getPages($website);
 
@@ -85,7 +99,7 @@ class ResolverHelper {
                 $channel = CoreCache::getChannel($website, $channel_code);
             }
             else {
-                $channel= $this->checkCondition("website_default_channel", $website);  
+                $channel = $this->checkCondition("website_default_channel", $website);  
                 if(!$channel) {
                     $cache = CoreCache::getWebsiteAllChannel($website);
                     if(!$cache) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Channel"]));
