@@ -52,6 +52,7 @@ class EmailTemplateController extends BaseController
     {
         try
         {
+            $this->repository->templateGroupValidation($request);
             $data = $this->repository->validateData($request);
             $created = $this->repository->create($data);
         }

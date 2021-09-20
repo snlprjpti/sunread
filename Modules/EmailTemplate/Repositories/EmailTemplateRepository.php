@@ -2,6 +2,7 @@
 
 namespace Modules\EmailTemplate\Repositories;
 
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Exception;
@@ -67,6 +68,12 @@ class EmailTemplateRepository extends BaseRepository
         }
 
         return $data;
+    }
+
+    public function templateGroupValidation(object $reuest): void
+    {
+        $all_groups = collect(config("email_template"))->pluck("code")->toArray();
+        if(! in_array($reuest->email_template_code, $all_groups))  throw ValidationException::withMessages([ "email_template_code" => __("Invalid Template Code") ]);
     }
 
 //    public function sendEmailDemo(): void
