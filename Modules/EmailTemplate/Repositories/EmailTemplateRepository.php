@@ -76,6 +76,76 @@ class EmailTemplateRepository extends BaseRepository
         if(! in_array($reuest->email_template_code, $all_groups))  throw ValidationException::withMessages([ "email_template_code" => __("Invalid Template Code") ]);
     }
 
+    public function getTemplate(string $content): string
+    {
+        preg_match_all("#(?<={{)[^}]*(?=}})#", $content, $template);
+//        preg_match_all("#(?<={{)[^}]*(?=}})#", $content, $variables);
+        preg_match_all("#\{\{\s*(.*?)\s*\}\}#", $content, $variables);
+
+
+        if(count($template) > 0)
+        {
+            foreach($template[0] as $match) {
+                $all_groups = collect(config("email_template"))->pluck("code")->toArray();
+
+                dd($match);
+                if (in_array($match, $all_groups))
+                {
+                    $data = EmailTemplate::pluck("content")->first();
+
+                    $content = strtr ($content, ["{{{$match}}}" => $data]);
+                }
+            }
+        }
+
+        if(count($variables) > 0)
+        {
+            foreach($variables[1] as $match) {
+                $all_variables = (config("email_variable"));
+
+                foreach ($all_variables as $variable)
+                {
+                    foreach($variable as $value)
+                    {
+                        if( in_array($match, array_column($value["variables"], "variable")))
+                        {
+                            $value = rand(1,100);
+                            $content = str_replace("{{{$match}}}", $value, $content);
+                        }
+                    }
+                }
+            }
+        }
+//
+//        $template = str_replace($variables[0],  $temp, $content);
+//
+//
+//        $temp = [];
+//        if(count($variables[1]) > 0)
+//        {
+//            foreach($variables[1] as $match) {
+//
+//                $template = EmailTemplate::whereSlug($slug)->first() ?? $match;
+//                $temp = $template->content ?? $match;
+//
+////                $x[$slug] = strtr ($content, ["{include template={$slug}}" => $temp]);
+//            }
+//        }
+//
+//        $template = str_replace($matches[1],  $temp, $content);
+
+
+        return $content;
+
+
+//        $new  = str_replace($content, preg_match_all("#\{(.*?)\}#", $content, $matches), $temp[""]);
+//
+//        dd($new);
+//
+//        return $temp;
+    }
+
+
 //    public function sendEmailDemo(): void
 //    {
 //        $subject = 'view data';
@@ -112,39 +182,5 @@ class EmailTemplateRepository extends BaseRepository
 //            }
 //        }
 //        dd($format);
-//    }
-//
-//    public function getTemplate(string $content): string
-//    {
-//
-////        $x = preg_replace("/^{include template/", 'x', $content);
-//
-////        dd($x);
-//        preg_match_all("#\{(.*?)\}#", $content, $matches);
-//
-//        if(count($matches[1]) > 0)
-//        {
-//            foreach($matches[1] as $match) {
-//                $slug = preg_replace('/^include template=/', '', $match);
-//
-//                $template = EmailTemplate::whereSlug($slug)->first() ?? $match;
-//                $temp[] = $template->content ?? $match;
-//
-////                $x[$slug] = strtr ($content, ["{include template={$slug}}" => $temp]);
-//            }
-//        }
-//
-//        $template = str_replace($matches[1],  $temp, $content);
-//
-//        $template = str_replace(["{","}"],'',$template);
-//
-//        return $template;
-//
-//
-//        $new  = str_replace($content, preg_match_all("#\{(.*?)\}#", $content, $matches), $temp[""]);
-//
-//        dd($new);
-//
-//        return $temp;
 //    }
 }

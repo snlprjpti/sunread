@@ -69,7 +69,7 @@ class EmailTemplateController extends BaseController
         try
         {
             $fetched = $this->repository->fetch($id);
-//            $fetched->content = $this->repository->getTemplate($fetched->content);
+            $fetched->content = $this->repository->getTemplate($fetched->content);
         }
         catch( Exception $exception )
         {
