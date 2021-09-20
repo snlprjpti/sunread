@@ -3,10 +3,10 @@
 namespace Modules\Core\Services;
 
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Request;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Exceptions\PageNotFoundException;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Page\Entities\Page;
@@ -40,10 +40,11 @@ class ResolverHelper {
             else $website = Website::whereId($fallback_id)->firstOrFail();
 
             $websiteData = collect($website)->only(["id","name","code", "hostname"])->toArray();
-
             $channel = $this->getChannel($request, $website);
+
             $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
             $websiteData["channel"]["default_store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
+
             if($channel->default_store_id) {
                 $d_language = SiteConfig::fetch("store_locale", "store", $channel->default_store_id);
                 $websiteData["channel"]["default_store"]["locale"] = $d_language?->code;
@@ -71,13 +72,14 @@ class ResolverHelper {
         try
         {
             $channel_code = $request->header("hc-channel");
-
-            if($channel_code) $channel = CoreCache::getChannel($website, $channel_code);
+            if($channel_code) { 
+                $channel = CoreCache::getChannel($website, $channel_code);
+            }
             else {
-                $channel= $this->checkCondition("website_default_channel", $website); 
+                $channel= $this->checkCondition("website_default_channel", $website);  
                 if(!$channel) {
                     $cache = CoreCache::getWebsiteAllChannel($website);
-                    if(!$cache) throw new ModelNotFoundException(__("core::app.response.not-found", ["name" => "Channel"]));
+                    if(!$cache) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Channel"]));
                     $channel = json_decode($cache[0]);
                 }
             }    
@@ -95,16 +97,22 @@ class ResolverHelper {
         try
         {
             $store_code = $request->header("hc-store");
+            $channel = $this->getChannel($request, $website);
 
-            if($store_code) $store = CoreCache::getStore($website, $channel, $store_code);
+            if($store_code) {
+                $store = CoreCache::getStore($website, $channel, $store_code);
+                $channel_store_ids = Store::whereChannelId($channel->id)->get()->pluck("id")->toArray();
+                if (!in_array($store->id, $channel_store_ids)) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
+            }
             else {
                 $store = $this->checkCondition("website_default_store", $website);
                 if(!$store) {
-                    $cache = CoreCache::getWebsiteAllStore($website);
-                    if(!$cache) throw new ModelNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
+                    $cache = CoreCache::getChannelAllStore($website, $channel);
+                    if(!$cache) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
                     $store = json_decode($cache[0]);
                 }
             }
+
         }
         catch( Exception $exception )
         {
