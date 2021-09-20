@@ -9,10 +9,15 @@ use Exception;
 
 class EmailTemplateRepository extends BaseRepository
 {
+    protected $config_variable, $config_template;
+
     public function __construct(EmailTemplate $emailTemplate)
     {
         $this->model = $emailTemplate;
         $this->model_key = "email_template";
+        $this->config_variable = config("email_variable");
+        $this->config_template = config("email_template");
+
         $this->rules = [
             "name" => "required",
             "subject" => "required",
@@ -26,7 +31,7 @@ class EmailTemplateRepository extends BaseRepository
     {
         try
         {
-            $config_data = config("email_template");
+            $config_data = $this->config_template;
         }
         catch ( Exception $exception )
         {
@@ -40,7 +45,7 @@ class EmailTemplateRepository extends BaseRepository
     {
         try
         {
-            $config_data = config("email_variable");
+            $config_data = $this->config_variable;
 
             foreach($config_data as $key=>$elements)
             {
@@ -72,7 +77,7 @@ class EmailTemplateRepository extends BaseRepository
 
     public function templateGroupValidation(object $reuest): void
     {
-        $all_groups = collect(config("email_template"))->pluck("code")->toArray();
+        $all_groups = collect($this->config_template)->pluck("code")->toArray();
         if(! in_array($reuest->email_template_code, $all_groups))  throw ValidationException::withMessages([ "email_template_code" => __("Invalid Template Code") ]);
     }
 
@@ -101,7 +106,7 @@ class EmailTemplateRepository extends BaseRepository
 
         if(count($data) > 0) {
             foreach($data[1] as $match) {
-                $all_variables = (config("email_variable"));
+                $all_variables = $this->config_variable;
 
                 foreach ($all_variables as $variable) {
                     foreach($variable as $value) {
