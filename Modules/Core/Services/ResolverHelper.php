@@ -74,7 +74,7 @@ class ResolverHelper {
 
             $store_data = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
                 $data = json_decode($store);
-                $language = SiteConfig::fetch("store_locale", "store", $store->id);
+                $language = SiteConfig::fetch("store_locale", "store", $data->id);
                 return [
                     "id" => $data->id,
                     "name" => $data->name,
