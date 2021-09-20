@@ -192,15 +192,17 @@ class ProductRepository extends BaseRepository
                     "*.type" => "required|array",
                     "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery",
                     "*.file" => "required|mimes:bmp,jpeg,jpg,png",
+                    "*.background_color" => "sometimes|nullable",
+                    "*.position" => "sometimes|nullable|numeric",
                 ],[
                     "*.type.*.in" => "Product Image type must be in base_image,thumbnail_image,section_background_image,small_image,gallery",
                 ]);
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
-               
+                
                 foreach ( $request_images as $image_values )
                 {
-                   
-                    $this->storeImages($product, $image_values["file"], array_unique($image_values["type"]));
+                    // dd($image_values);
+                    $this->storeImages($product, $image_values);
                 }
             }
         }
@@ -267,10 +269,13 @@ class ProductRepository extends BaseRepository
         return $validator->validate();
     }
 
-    public function storeImages(object $product, mixed $image, array $image_types): bool
+    public function storeImages(object $product, array $values): bool
     {
         try
         {
+            
+            $image = $values["file"];
+            $image_types = array_unique($values["type"]);
             if ( isset($image) ) {
                 $key = Str::random(6);
                 $data = [];
@@ -293,6 +298,8 @@ class ProductRepository extends BaseRepository
                     }
                 }
                 $data["product_id"] = $product->id;
+                $data["background_color"] = isset($values["background_color"]) ? $values["background_color"] : null;
+                $data["position"] = isset($values["position"]) ? $values["position"] : 0;
                 $product_image = ProductImage::create($data);
 
                 $image_type_ids = ImageType::whereIn("slug", $image_types)->pluck("id")->toArray();
