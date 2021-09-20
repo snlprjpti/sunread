@@ -76,7 +76,7 @@ class ResolverHelper {
                     "code" => $data->code,
                 ];
             });
-            $websiteData["channel"]["stores"] = $store_data;
+            $websiteData["stores"] = $store_data;
 
             $websiteData["pages"] = $this->getPages($website);
 
