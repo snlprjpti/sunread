@@ -539,11 +539,14 @@ class ProductRepository extends BaseRepository
                 "price_from" => "sometimes|decimal",
                 "price_to" => "sometimes|decimal",
                 "id_from" => "sometimes|numeric",
-                "id_to" => "sometimes|numeric"
+                "id_to" => "sometimes|numeric",
+                "show_variants" => "sometimes|boolean"
             ]);
 
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
-
+           
+            if ( isset($request->show_variants) && (!$request->show_variants) ) $product->where("parent_id", null);
+            
             if (isset($request->product_name))
             {
                 $product_attributes = ProductAttribute::whereAttributeId(1)
