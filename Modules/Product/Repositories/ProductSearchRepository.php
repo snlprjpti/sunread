@@ -219,8 +219,8 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function finalQuery(array $filter, object $request, object $store): ?array
     {
-        try
-        {
+        // try
+        // {
             $page = $request->page ?? 1;
             $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
@@ -239,11 +239,11 @@ class ProductSearchRepository extends ElasticSearchRepository
             ];
 
             $data =  $this->searchIndex($fetched, $store);     
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
+        // }
+        // catch (Exception $exception)
+        // {
+        //     throw $exception;
+        // }
 
         return [
             "products" => $data,
