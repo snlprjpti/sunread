@@ -20,18 +20,19 @@ class ConfigurableIndexing implements ShouldQueue
     public $tries = 10;
     public $timeout = 90000;
 
-    public $parent;
+    public $parent, $store;
 
-    public function __construct(object $parent)
+    public function __construct(object $parent, object $store)
     {
         $this->parent = $parent;
+        $this->store = $store;
     }
 
     public function handle(): void
     {
         try
         {
-            $this->createProduct($this->parent);
+            $this->createProduct($this->parent, $this->store);
         }
         catch (Exception $exception)
         {

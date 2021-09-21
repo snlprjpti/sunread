@@ -13,51 +13,44 @@ trait ConfigurableProductHandler
 {
     use HasIndexing;
 
-    public function createProduct(object $parent): void
+    public function createProduct(object $parent, object $store): void
     {
         try
         {
             $items = [];
-            $stores = Website::find($parent->website_id)->channels->map(function ($channel) {
-                return $channel->stores;
-            })->flatten(1);
-            $this->bulkConfigurableRemoving($parent, $stores);
+            $this->bulkConfigurableRemoving($parent, $store);
 
             $variants = $parent->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
             
-            foreach($stores as $store)
-            {
-                $variant_attribute_options = $variants->map(function($variant) {
-                    return $variant->attribute_options_child_products->pluck("attribute_option_id")->toArray();
-                })->flatten(1)->unique();
+            $variant_attribute_options = $variants->map(function($variant) {
+                return $variant->attribute_options_child_products->pluck("attribute_option_id")->toArray();
+            })->flatten(1)->unique();
 
-                if ($this->checkVisibility($parent, $store)) {
-                    $product_format = $parent->documentDataStructure($store); 
-                    $items[$parent->id][$store->id] = array_merge($product_format, $this->getAttributeData($variant_attribute_options));
-                }
-                foreach($variants as $variant)
-                {
-                    if (!$this->checkVisibility($variant, $store)) continue;
-                    
-                    $product_format = $variant->documentDataStructure($store); 
-
-                    $group_by_attribute = AttributeConfigurableProduct::whereProductId($parent->id)->whereUsedInGrouping(1)->first();
-                    $is_group_attribute = $variant->value([
-                        "scope" => "store",
-                        "scope_id" => $store->id,
-                        "attribute_id" => $group_by_attribute->attribute_id
-                    ]);
-
-                    $related_variants = AttributeOptionsChildProduct::whereIn("product_id", $variants->pluck("id")->toArray())->whereAttributeOptionId($is_group_attribute?->id)->get();
-                    if($related_variants) {
-                        $variant_attribute_options = AttributeOptionsChildProduct::whereIn("product_id", $related_variants->pluck("product_id")->toArray())->where("attribute_option_id", "!=", $is_group_attribute?->id)->get()->pluck("attribute_option_id");
-                    }
-
-                    $items[$variant->id][$store->id] = array_merge($product_format, $this->getAttributeData($variant_attribute_options));              
-                }
+            if ($this->checkVisibility($parent, $store)) {
+                $product_format = $parent->documentDataStructure($store); 
+                $items[$parent->id] = array_merge($product_format, $this->getAttributeData($variant_attribute_options));
             }
+            foreach($variants as $variant)
+            {
+                if (!$this->checkVisibility($variant, $store)) continue;
+                
+                $product_format = $variant->documentDataStructure($store); 
 
-            $this->configurableIndexing($items);
+                $group_by_attribute = AttributeConfigurableProduct::whereProductId($parent->id)->whereUsedInGrouping(1)->first();
+                $is_group_attribute = $variant->value([
+                    "scope" => "store",
+                    "scope_id" => $store->id,
+                    "attribute_id" => $group_by_attribute->attribute_id
+                ]);
+
+                $related_variants = AttributeOptionsChildProduct::whereIn("product_id", $variants->pluck("id")->toArray())->whereAttributeOptionId($is_group_attribute?->id)->get();
+                if($related_variants) {
+                    $variant_attribute_options = AttributeOptionsChildProduct::whereIn("product_id", $related_variants->pluck("product_id")->toArray())->where("attribute_option_id", "!=", $is_group_attribute?->id)->get()->pluck("attribute_option_id");
+                }
+
+                $final_data = array_merge($product_format, $this->getAttributeData($variant_attribute_options));   
+                if(count($final_data) > 0) $this->configurableIndexing($final_data, $store);           
+            }
         }
         catch (Exception $exception)
         {
