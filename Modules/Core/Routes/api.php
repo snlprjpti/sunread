@@ -46,6 +46,6 @@ Route::group(["middleware" => ["api"]], function () {
 });
 
 Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
-    Route::get("resolver/{website?}", [Modules\Core\Http\Controllers\StoreFront\ResolverController::class, "resolve"])->name("resolver.resolve");
+    Route::get("resolver", [Modules\Core\Http\Controllers\StoreFront\ResolverController::class, "resolve"])->name("resolver.resolve");
     Route::get('channels', [\Modules\Core\Http\Controllers\StoreFront\ChannelController::class, "index"])->name("channels.index");
 });
