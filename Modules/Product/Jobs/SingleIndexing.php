@@ -21,8 +21,8 @@ class SingleIndexing implements ShouldQueue
 
     public $product, $store, $method;
     
-    public $tries = 10;
-    public $timeout = 90000;
+    // public $tries = 10;
+    // public $timeout = 90000;
 
     public function __construct(object $product, object $store, ?string $method = null)
     {
