@@ -64,12 +64,14 @@ class EmailTemplateController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(int $id, Request $request): JsonResponse
     {
         try
         {
             $fetched = $this->repository->fetch($id);
-            $fetched->content = $this->repository->getTemplate($fetched->content);
+            if(!$request->scope) $request->scope = "global";
+            if(!$request->scope_id) $request->scope_id = 0;
+            $fetched->content = $this->repository->getTemplate($fetched->content, $request);
         }
         catch( Exception $exception )
         {
@@ -127,6 +129,7 @@ class EmailTemplateController extends BaseController
     {
         try
         {
+            $this->repository->templateGroupValidation($request);
             $fetched = $this->repository->getConfigVariable($request);
         }
         catch( Exception $exception )

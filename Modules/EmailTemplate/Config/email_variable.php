@@ -1,7 +1,7 @@
 <?php
 
 return [
-    "groups" => [
+    "groups" =>
         [
             "label" => "General",
             "code" => "general",
@@ -93,103 +93,101 @@ return [
             ],
         ],
 
-        [
-            "label" => "Customer",
-            "code" => "customer",
-            "variables" => [
-                [
-                    "variable" => "customer_id",
-                    "label" => "Customer ID",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update"],
-                ],
-                [
-                    "variable" => "customer_name",
-                    "label" => "Customer Name",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update", "order_update_guest"],
-                ],
-                [
-                    "variable" => "customer_email_address",
-                    "label" => "Customer Email Address",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "new_guest_order", "order_update", "order_update_guest"],
-                ],
-                [
-                    "variable" => "customer_dashboard_url",
-                    "label" => "Customer Dashboard URL",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update"],
-                ],
-                [
-                    "variable" => "account_confirmation_url",
-                    "label" => "Account Confirmation URL",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_account"],
-                ],
+    [
+        "label" => "Customer",
+        "code" => "customer",
+        "variables" => [
+            [
+                "variable" => "customer_id",
+                "label" => "Customer ID",
+                "type" => "integer",
+                "source" => "Modules\Customer\Entities\Customer",
+                "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update"],
+            ],
+            [
+                "variable" => "customer_name",
+                "label" => "Customer Name",
+                "type" => "string",
+                "source" => "Modules\Customer\Entities\Customer",
+                "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update", "order_update_guest"],
+            ],
+            [
+                "variable" => "customer_email_address",
+                "label" => "Customer Email Address",
+                "type" => "string",
+                "source" => "Modules\Customer\Entities\Customer",
+                "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "new_guest_order", "order_update", "order_update_guest"],
+            ],
+            [
+                "variable" => "customer_dashboard_url",
+                "label" => "Customer Dashboard URL",
+                "type" => "string",
+                "source" => "Modules\Customer\Entities\Customer",
+                "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update"],
+            ],
+            [
+                "variable" => "account_confirmation_url",
+                "label" => "Account Confirmation URL",
+                "type" => "string",
+                "source" => "Modules\Customer\Entities\Customer",
+                "availability" => ["new_account"],
             ],
         ],
+    ],
 
-        [
-
-            "label" => "Password Reset",
-            "code" => "password reset",
-            "variables" => [
-                [
-                    "variable" => "password_reset_url",
-                    "label" => "Password Reset URL",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["forgot_password"],
-                ],
+    [
+        "label" => "Password Reset",
+        "code" => "password reset",
+        "variables" => [
+            [
+                "variable" => "password_reset_url",
+                "label" => "Password Reset URL",
+                "type" => "",
+                "source" => "",
+                "availability" => ["forgot_password"],
             ],
         ],
+    ],
 
-        [
-            "label" => "Order",
-            "code" => "order",
-            "variables" => [
-                [
-                    "variable" => "order_id",
-                    "label" => "Order ID",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
-                ],
-                [
-                    "variable" => "order_items",
-                    "label" => "Order Items (Table)",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
-                ],
-                [
-                    "variable" => "billing_address",
-                    "label" => "Billing Address",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
-                ],
-                [
-                    "variable" => "shipping_address",
-                    "label" => "Shipping Address",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
-                ],
-                [
-                    "variable" => "order",
-                    "label" => "Order",
-                    "type" => "",
-                    "source" => "",
-                    "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
-                ],
-            ]
+    [
+        "label" => "Order",
+        "code" => "order",
+        "variables" => [
+            [
+                "variable" => "order_id",
+                "label" => "Order ID",
+                "type" => "integer",
+                "source" => "",
+                "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
+            ],
+            [
+                "variable" => "order_items",
+                "label" => "Order Items (Table)",
+                "type" => "",
+                "source" => "",
+                "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
+            ],
+            [
+                "variable" => "billing_address",
+                "label" => "Billing Address",
+                "type" => "object",
+                "source" => "",
+                "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
+            ],
+            [
+                "variable" => "shipping_address",
+                "label" => "Shipping Address",
+                "type" => "",
+                "source" => "",
+                "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
+            ],
+            [
+                "variable" => "order",
+                "label" => "Order",
+                "type" => "",
+                "source" => "",
+                "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
+            ],
         ]
     ]
 ];
