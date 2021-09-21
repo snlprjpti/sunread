@@ -3,12 +3,14 @@
 namespace Modules\Core\Services;
 
 use Exception;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Core\Exceptions\PageNotFoundException;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
+use Modules\Core\Transformers\StoreFront\StoreResource;
 use Modules\Page\Entities\Page;
 
 class ResolverHelper {
@@ -38,45 +40,21 @@ class ResolverHelper {
             $fallback_id = config("website.fallback_id");
             if ($request->hasHeader('hc-host')) $website = CoreCache::getWebsite($request->header("hc-host"));
             else $website = Website::whereId($fallback_id)->firstOrFail();
-
             $websiteData = collect($website)->only(["id","name","code", "hostname"])->toArray();
+
             $channel = $this->getChannel($request, $website);
-
             $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
-            $websiteData["channel"]["store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
-            
-            if ( $channel->default_store_id && $request->header("hc-store") ) {
-                $store = $this->getStore($request, $website, $channel);
-                $websiteData["channel"]["store"] = collect($store)->only(["id","name","code"])->toArray();
-                $language = SiteConfig::fetch("store_locale", "store", $store->id);
-                $websiteData["channel"]["store"]["locale"] = $language?->code;
-            }
-            elseif (!$channel->default_store_id && !$request->header("hc-store")) {
-                $store = json_decode(CoreCache::getChannelAllStore($website, $channel)[0]);
-                $websiteData["channel"]["store"] = [
-                    "id" => $store->id,
-                    "name" => $store->name,
-                    "code" => $store->code
-                ];
-                $language = SiteConfig::fetch("store_locale", "store", $store->id);
-                $websiteData["channel"]["store"]["locale"] = $language?->code;
-            }
-            elseif (!$channel->default_store_id && $request->header("hc-store")) {
-                $store = $this->getStore($request, $website, $channel);
-                $websiteData["channel"]["store"] = collect($store)->only(["id","name","code"])->toArray();
-                $language = SiteConfig::fetch("store_locale", "store", $store->id);
-                $websiteData["channel"]["store"]["locale"] = $language?->code;
-            }
 
-            $store_data = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
-                $data = json_decode($store);
-                return [
-                    "id" => $data->id,
-                    "name" => $data->name,
-                    "code" => $data->code,
-                ];
+            $all_stores = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
+                return new StoreResource(json_decode($store));
             });
-            $websiteData["stores"] = $store_data;
+
+            $store = $this->getStore($request, $website, $channel);
+            $storeData = collect($store)->only(["id","name","code"])->toArray();
+            $storeData["local"] = SiteConfig::fetch("store_locale", "store", $store->id)?->code;
+            $websiteData["channel"]["store"] = $storeData;
+
+            $websiteData["stores"] = $all_stores;
 
             $websiteData["pages"] = $this->getPages($website);
 
@@ -120,22 +98,16 @@ class ResolverHelper {
         try
         {
             $store_code = $request->header("hc-store");
-            $channel = $this->getChannel($request, $website);
 
-            if($store_code) {
-                $store = CoreCache::getStore($website, $channel, $store_code);
-                $channel_store_ids = Store::whereChannelId($channel->id)->get()->pluck("id")->toArray();
-                if (!in_array($store->id, $channel_store_ids)) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
-            }
+            if($store_code) $store = CoreCache::getStore($website, $channel, $store_code);
             else {
-                $store = $this->checkCondition("website_default_store", $website);
+                $store = Store::find($channel->default_store_id);
                 if(!$store) {
                     $cache = CoreCache::getChannelAllStore($website, $channel);
                     if(!$cache) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
                     $store = json_decode($cache[0]);
                 }
             }
-
         }
         catch( Exception $exception )
         {
