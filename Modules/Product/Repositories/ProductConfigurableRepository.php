@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -14,11 +15,13 @@ use Modules\Attribute\Entities\Attribute;
 use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Attribute\Entities\AttributeOption;
+use Modules\Core\Entities\Website;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Entities\ProductAttributeString;
 use Modules\Product\Entities\ProductAttributeText;
+use Modules\Product\Jobs\ConfigurableIndexing;
 
 class ProductConfigurableRepository extends BaseRepository
 {
@@ -325,5 +328,22 @@ class ProductConfigurableRepository extends BaseRepository
         } 
 
         return $visibility;
+    }
+
+    public function configurableIndexing(object $data): void
+    {
+        try 
+        { 
+            $stores = Website::find($data->website_id)->channels->map(function ($channel) {
+                return $channel->stores;
+            })->flatten(1);
+            $batch = Bus::batch([])->dispatch();
+
+            foreach( $stores as $store) $batch->add(new ConfigurableIndexing($data, $store));
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
     }
 }
