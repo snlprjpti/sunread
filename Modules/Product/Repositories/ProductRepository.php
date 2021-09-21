@@ -28,6 +28,7 @@ use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Product\Transformers\VariantProductResource;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Product\Entities\AttributeConfigurableProduct;
+use Modules\Product\Transformers\ProductGalleryRescouce;
 
 class ProductRepository extends BaseRepository
 {
@@ -504,19 +505,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $image_arr = $product->images()->get()->map(function ($image) {
-                return [ 
-                    "id" => $image->id,
-                    "type" => $image->types()->pluck("slug")->toArray(),
-                    "delete" => 0,
-                    "background_color" => $image->background_color,
-                    "position" => $image->position, 
-                    "url" => Storage::url($image->path)
-                ];
-            })->toArray();
-
-
-            $images = ["existing" => $image_arr ];   
+            $images = ["existing" => ProductGalleryRescouce::collection($product->images) ];   
         }
         catch( Exception $exception )
         {
