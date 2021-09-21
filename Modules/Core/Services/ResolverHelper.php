@@ -51,7 +51,7 @@ class ResolverHelper {
 
             $store = $this->getStore($request, $website, $channel);
             $storeData = collect($store)->only(["id","name","code"])->toArray();
-            $storeData["local"] = SiteConfig::fetch("store_locale", "store", $store->id)?->code;
+            $storeData["locale"] = SiteConfig::fetch("store_locale", "store", $store->id)?->code;
             $websiteData["channel"]["store"] = $storeData;
 
             $websiteData["stores"] = $all_stores;
