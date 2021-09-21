@@ -190,7 +190,7 @@ class PageAttributeRepository extends BaseRepository
         return [
             "title" => $data["title"],
             "slug" => $data["slug"],
-            "groups" => $this->parent
+            "mainGroups" => $this->parent
         ];        
     }
 
