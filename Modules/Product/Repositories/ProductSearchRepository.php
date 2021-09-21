@@ -105,7 +105,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         $filter = $this->filterAndSort($request, $category_id);
         
         $data = $this->finalQuery($filter, $request, $store);
-        $total = isset($data["products"]["hits"]["total"]) ? $data["products"]["hits"]["total"]["value"] : 0;
+        $total = isset($data["products"]["hits"]["total"]["value"]) ? $data["products"]["hits"]["total"]["value"] : 0;
         $data["products"] = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
         $data["last_page"] = (int) ceil($total/$data["limit"]);
         $data["total"] = $total;
