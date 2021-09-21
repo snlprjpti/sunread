@@ -121,9 +121,9 @@ class ResolverHelper {
     {
         try
         {
-           $pages = Page::whereWebsiteId($website->id)->get();
-           $data = [];
-           foreach ( $pages as $page ) $data = array_merge($data, [ $page->slug => [ "id" => $page->id, "code" => $page->slug ] ]);
+            $pages = Page::whereWebsiteId($website->id)->get();
+            $data = [];
+            foreach ( $pages as $page ) $data[$page->slug] = [ "id" => $page->id, "code" => $page->slug ] ;
         }
         catch( Exception $exception )
         {
