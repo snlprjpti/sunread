@@ -45,8 +45,8 @@ class ProductController extends BaseController
 
     public function index(Request $request, string $category_slug): JsonResponse
     {
-        // try
-        // {
+        try
+        {
             $request->validate([
                 "page" => "numeric|min:1",
                 "color" => "sometimes|array",
@@ -58,11 +58,11 @@ class ProductController extends BaseController
             ]);
 
             $fetched = $this->store_fornt_repository->categoryWiseProduct($request, $category_slug);
-        // }
-        // catch( Exception $exception )
-        // {
-        //     return $this->handleException($exception);
-        // }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
 
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
