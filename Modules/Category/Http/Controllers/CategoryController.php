@@ -182,11 +182,7 @@ class CategoryController extends BaseController
         {
             $category = $this->model->findOrFail($id);
 
-            $this->repository->delete($id, function ($deleted){
-                $deleted->values()->each(function ($value){
-                    $value->delete();
-                });
-            });
+            $this->repository->delete($id);
         }
         catch (Exception $exception)
         {
