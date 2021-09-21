@@ -15,16 +15,19 @@ use Illuminate\Validation\ValidationException;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Tax\Entities\CustomerTaxGroup;
+use Illuminate\Support\Str;
+use Modules\Product\Entities\ProductAttributeString;
 
 class ProductAttributeRepository extends ProductRepository
 {
-    protected $option_fields, $attributeMapperSlug, $functionMapper, $product_repository, $non_option_slug, $non_required_attributes;
+    protected $option_fields, $attributeMapperSlug, $functionMapper, $product_repository, $non_option_slug, $non_required_attributes, $productBuilderRepository;
 
-    public function __construct(ProductAttribute $productAttribute, ProductRepository $product_repository)
+    public function __construct(ProductAttribute $productAttribute, ProductRepository $product_repository, ProductBuilderRepository $productBuilderRepository)
     {
         $this->model = $productAttribute;
         $this->model_key = "catalog.products.attibutes";
         $this->product_repository = $product_repository;
+        $this->productBuilderRepository = $productBuilderRepository;
 
         $this->option_fields = [ "select", "multiselect", "checkbox", "multiimages" ];
 
@@ -34,7 +37,7 @@ class ProductAttributeRepository extends ProductRepository
             "status" => "status",
             "quantity_and_stock_status" => "catalogInventory",
             "category_ids" => "categories",
-            "gallery" => "gallery"
+            "gallery" => "gallery",
         ];
         $this->non_required_attributes = [ "price", "cost", "special_price", "special_from_date", "special_to_date", "quantity_and_stock_status" ];
         $this->non_option_slug = [ "tax_class_id", "category_ids" ];
@@ -74,7 +77,6 @@ class ProductAttributeRepository extends ProductRepository
 
             // get all request attribute id
             $request_attribute_slugs = array_map( function ($request_attribute) {
-
                 if(!isset($request_attribute["attribute_slug"])) throw ValidationException::withMessages(["attribute_slug" => "Invalid attribute format."]);
                 return $request_attribute["attribute_slug"];
                 
@@ -107,6 +109,7 @@ class ProductAttributeRepository extends ProductRepository
                     continue;
                 }
                 $product_attribute["value"] = in_array($attribute->slug, $request_attribute_slugs) ? $single_attribute_collection->pluck("value")->first() : null;
+                if($attribute->slug == "url_key") $product_attribute["value"] = $this->createUniqueSlug($product, $request_attribute_collection, $product_attribute["value"]);
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 
                 $validator = Validator::make($product_attribute, [
@@ -198,6 +201,11 @@ class ProductAttributeRepository extends ProductRepository
                     continue;
                 }
 
+                if($attribute["attribute_slug"] == 'component'){
+                    $this->productBuilderRepository->component($product, $method, $attribute, $scope_arr);
+                    continue;
+                }
+
                 $db_attribute = Attribute::whereSlug($attribute['attribute_slug'])->first();
                 if($this->product_repository->scopeFilter($scope_arr["scope"], $db_attribute->scope)) $scope_arr = $this->product_repository->getParentScope($scope_arr); 
            
@@ -239,5 +247,44 @@ class ProductAttributeRepository extends ProductRepository
         DB::commit();
 
         return true;
+    }
+
+    public function createUniqueSlug(object $product, object $collection, ?string $slug): string
+    {
+        try
+        {
+            $name = $collection->where('attribute_slug', "name")->pluck("value")->first();
+            if(!$slug) $slug = Str::slug($name);
+            $original_slug = $slug;
+    
+            $count = 1;
+    
+            while ($this->checkSlug($product, $slug)) {
+                $slug = "{$original_slug}-{$count}";
+                $count++;
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $slug;
+    }
+
+    public function checkSlug(object $product, ?string $slug): ?object
+    {
+        try
+        {
+            $data = $this->model->where('product_id', '!=', $product->id)->whereAttributeId(18)->whereHasMorph("value", [ProductAttributeString::class], function ($query) use ($slug) {
+                $query->whereValue($slug);
+            })->first();
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 }

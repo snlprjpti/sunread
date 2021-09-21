@@ -3,6 +3,7 @@
 namespace Modules\Core\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Facades\SiteConfig;
 
 class StoreResource extends JsonResource
 {

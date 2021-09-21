@@ -52,6 +52,15 @@ class ElasticSearchRepository
         ];
     }
 
+    public function terms(string $field, ?array $data): array
+    {
+        return [
+            "terms" => [
+                $field => $data
+            ]
+        ];
+    }
+
     public function range(string $field, $value1, $value2): array
     {
         return [
@@ -67,7 +76,7 @@ class ElasticSearchRepository
     public function sort(string $field, ?string $order): array
     {
         return [
-            [$field => ["order" => $order, "mode" => "avg"]]
+            [$field => ["order" => $order]]
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace Modules\Core\Traits;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Configuration as EntitiesConfiguration;
 
 trait Configuration
@@ -23,22 +24,27 @@ trait Configuration
 
     public function has(object $request)
     {
+        if(Redis::exists("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}")) {
+            return (boolean) true;
+        } else{
         return (boolean) $this->checkCondition($request)->count();
+        }
     }
 
     public function checkCondition(object $request): object
-    {
+    {   
         return $this->configuration->where([
             ['scope', $request->scope],
             ['scope_id', $request->scope_id],
             ['path', $request->path]
         ]);  
+        
     }
 
     public function cacheQuery(object $request, array $pluck): array
     {
         $resources = Cache::rememberForever($request->provider, function() use ($request) {
-           return $request->provider::get()->toArray();
+           return $request->provider::orderBy("name", "asc")->get()->toArray();
         });
         $data = [];
         foreach($resources as $resource)

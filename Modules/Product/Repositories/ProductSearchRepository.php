@@ -63,24 +63,21 @@ class ProductSearchRepository extends ElasticSearchRepository
             if($category_id) $filter[]= $this->term("categories.id", $category_id);
     
             if ($request && count($request->all()) > 0) {
+                if ($request->sort_by) $sort = $this->sort($request->sort_by, $request->sort_order ?? "asc");
+                
                 foreach($request->all() as $key => $value) 
                 {
-                    if (str_starts_with($key, 'sort_by_')) $sort = $this->sort(substr($key,8), $value ?? "asc");
                     if(in_array($key, $this->attributeFilterKeys) && $value) {
-                        if($key == "size") {
-                            $size = [$this->term("configurable_size", $value), $this->term($key, $value)];
+                        if($key == "size" || $key == "color") {
+                            $size = [$this->terms("configurable_{$key}", $value), $this->terms($key, $value)];
                             $filter[] = $this->OrwhereQuery($size); 
                         }
-                        if($key == "color") {
-                            $color = [$this->term("configurable_color", $value), $this->term($key, $value)];
-                            $filter[] = $this->OrwhereQuery($color); 
-                        }
-                        else $filter[] = $this->term($key, $value);
+                        else $filter[] = $this->terms($key, $value);
                     } 
                 }
             }
     
-            $query = $this->whereQuery($filter);       
+            $query = $this->whereQuery($filter);   
         }
         catch (Exception $exception)
         {
@@ -108,9 +105,10 @@ class ProductSearchRepository extends ElasticSearchRepository
         $filter = $this->filterAndSort($request, $category_id);
         
         $data = $this->finalQuery($filter, $request, $store);
+        $total = $data["products"]["hits"]["total"]["value"];
         $data["products"] = collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray();
-        $data["last_page"] = (int) ceil(count($data["products"])/$data["limit"]);
-        $data["total"] = count($data["products"]);
+        $data["last_page"] = (int) ceil($total/$data["limit"]);
+        $data["total"] = $total;
         return $data;
     }
 
@@ -221,8 +219,8 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function finalQuery(array $filter, object $request, object $store): ?array
     {
-        try
-        {
+        // try
+        // {
             $page = $request->page ?? 1;
             $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
@@ -241,16 +239,16 @@ class ProductSearchRepository extends ElasticSearchRepository
             ];
 
             $data =  $this->searchIndex($fetched, $store);     
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
+        // }
+        // catch (Exception $exception)
+        // {
+        //     throw $exception;
+        // }
 
         return [
             "products" => $data,
-            "current_page" => $page,
-            "limit" => $limit
+            "current_page" => (int) $page,
+            "limit" => (int) $limit
         ];
     }
 
@@ -260,9 +258,9 @@ class ProductSearchRepository extends ElasticSearchRepository
         {
             $indexed = $this->model->findOrFail($id);
 			if ($callback) $callback($indexed);
-            $stores = Website::find($indexed->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($indexed->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
     
             foreach($stores as $store) SingleIndexing::dispatch($indexed, $store);
         }

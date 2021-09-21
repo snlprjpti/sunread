@@ -13,18 +13,12 @@ use Modules\Product\Entities\ProductImage;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Erp\Entities\ErpImportDetail;
-use Modules\Erp\Jobs\Mapper\ErpDetailStatusUpdate;
-use Modules\Erp\Jobs\Mapper\ErpGenerateVariantProductJob;
-use Modules\Erp\Jobs\Mapper\ErpMigrateAttributeConfigurableProduct;
 use Modules\Inventory\Entities\CatalogInventory;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductImageJob;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductAttributeJob;
-use Modules\Erp\Jobs\Mapper\ErpMigrateProductInventoryJob;
 use Modules\Erp\Jobs\Mapper\ErpMigratorJob;
 use Modules\Inventory\Entities\CatalogInventoryItem;
-use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\ProductAttributeString;
@@ -53,10 +47,8 @@ trait HasErpValueMapper
     {
         try
         {
-            $erp_details = ErpImport::where("type", "listProducts")->first()->erp_import_details;
-
+            $erp_details = ErpImportDetail::whereErpImportId(2)->whereJsonContains("value->webAssortmentWeb_Active", true)->whereJsonContains("value->webAssortmentWeb_Setup", "SR")->get(); 
             $chunked = $erp_details->chunk(100); 
-            $count = 0;
             foreach ( $chunked as $chunk )
             {
                 foreach ( $chunk as $detail )
@@ -64,11 +56,7 @@ trait HasErpValueMapper
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
-
-                    //loop breaked for testing
-                    if ( $count == 10 ) break;
                     ErpMigratorJob::dispatch($detail);
-                    $count++;
                 }
             }
         }
@@ -87,7 +75,9 @@ trait HasErpValueMapper
                 "name" => $erp_product_iteration->value["webAssortmentColor_Description"],
                 "code" => $erp_product_iteration->value["webAssortmentColor_Code"]
             ];
-            if ( !empty($data["name"]) || !empty($data["code"]) ) AttributeOption::updateOrCreate($data);
+            $match = $data;
+            unset($match["name"]);
+            if ( !empty($data["name"]) || !empty($data["code"]) ) AttributeOption::updateOrCreate($match,$data);
         }
         catch ( Exception $exception )
         {
@@ -119,8 +109,8 @@ trait HasErpValueMapper
                 "startingDate" => "",
                 "endingDate" => ""
             ];
-            $this->storeScopeWiseValue($price, $product);
-            $price_value = ($price->count() > 1) ? $this->getValue($price)->where("currencyCode", "USD")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
+            if ($product->type == "simple") $this->storeScopeWiseValue($price, $product);
+            $price_value = ($price->count() > 0) ? $this->getValue($price)->where("currencyCode", "")->where("salesCode", "WEB")->first() ?? $default_price_data : $default_price_data;
 
             // Condition for invalid date/times
             $max_time = strtotime("2030-12-28");
@@ -137,19 +127,19 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("price"),
-                    "value" => ($variants->count() <= 1) ? $price_value["unitPrice"] : "", 
+                    "value" => ($product->type == "simple") ? $price_value["unitPrice"] : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("cost"),
-                    "value" => ($variants->count() <= 1) ? $price_value["unitPrice"] : "", 
+                    "value" => ($product->type == "simple") ? $price_value["unitPrice"] : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("special_from_date"),
-                    "value" => Carbon::parse(date("Y-m-d", $start_time)), 
+                    "value" => ($product->type == "simple") ? Carbon::parse(date("Y-m-d", $start_time)) : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("special_to_date"),
-                    "value" => Carbon::parse(date("Y-m-d", $end_time)), 
+                    "value" => ($product->type == "simple") ? Carbon::parse(date("Y-m-d", $end_time)) : "", 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("tax_class_id"),
@@ -158,6 +148,10 @@ trait HasErpValueMapper
                 [
                     "attribute_id" => $this->getAttributeId("visibility"),
                     "value" => $visibility, 
+                ],
+                [
+                    "attribute_id" => $this->getAttributeId("has_weight"),
+                    "value" => 4, 
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("description"),
@@ -306,7 +300,7 @@ trait HasErpValueMapper
         try
         {
             $price_data = $this->getValue($prices)->filter(function ($price_value) {
-                return $price_value["salesCode"] == "WEB" && $price_value["currencyCode"] !== "USD";
+                return $price_value["salesCode"] == "WEB";
             })->map(function ($price_value) {
 
                 // Condition for invalid date/times
@@ -321,26 +315,30 @@ trait HasErpValueMapper
                     [
                         "attribute_id" => $this->getAttributeId("price"),
                         "value" => $price_value["unitPrice"],
-                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"] 
+                        "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"] 
+                    ],
+                    [
+                        "attribute_id" => $this->getAttributeId("cost"),
+                        "value" => $price_value["unitPrice"],
+                        "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"] 
                     ],
                     [
                         "attribute_id" => $this->getAttributeId("special_from_date"),
                         "value" => Carbon::parse(date("Y-m-d", $start_time)),
-                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
+                        "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"]
                     ],
                     [
                         "attribute_id" => $this->getAttributeId("special_to_date"),
                         "value" => Carbon::parse(date("Y-m-d", $end_time)),
-                        "channel_code" => empty($price_value["currencyCode"]) ? "SEK" : $price_value["currencyCode"]
+                        "channel_code" => empty($price_value["currencyCode"]) ? "international" : $price_value["currencyCode"]
                     ] 
                 ];
             });
-
             foreach ( $price_data as $price )
             {
                 foreach ($price as $attributeData)
                 {
-                    $channel_id  = $this->getChannelId($attributeData["channel_code"])->id ?? 1;
+                    $channel_id  = $this->getChannel($attributeData["channel_code"])?->id ?? 1;
                     $attribute = Attribute::find($attributeData["attribute_id"]);
                     $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
                     $value = $attribute_type::create(["value" => $attributeData["value"]]);
@@ -367,7 +365,7 @@ trait HasErpValueMapper
         return true;
     }
 
-    private function getChannelId(string $code): ?object
+    private function getChannel(string $code): ?object
     {
         try
         {
@@ -379,8 +377,19 @@ trait HasErpValueMapper
                 "website_id" => 1
             ];
             $match = $data;
-            unset($match["description"], $match["name"]);
+            unset($match["description"], $match["name"], $match["code"]);
             $channel = Channel::updateOrCreate($match, $data);
+            
+            $store_data = [
+                "name" => $code,
+                "code" => $code,
+                "channel_id" => $channel->id,
+                "position" => 1
+            ];
+            $store_match = $store_data;
+            unset($store_match["position"], $store_match["position"], $store_match["name"]);
+            $store = Store::updateOrCreate($store_match, $store_data);
+            $update_channel = $channel->update(["default_store_id" => $store->id]);
         }
         catch ( Exception $exception )
         {
@@ -490,8 +499,8 @@ trait HasErpValueMapper
                         $type_ids = 5;
                     }
                     $position++;
-                   $product_image = ProductImage::updateOrCreate($data);
-                   $product_image->types()->sync($type_ids);
+                    $product_image = ProductImage::updateOrCreate($data);
+                    $product_image->types()->sync($type_ids);
                 }
             }
         }
@@ -528,6 +537,7 @@ trait HasErpValueMapper
                     ];
 
                     $variant_product = Product::updateOrCreate($match, $product_data);
+                    $variant_product->categories()->sync(1);
                     $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
 
                     $this->createAttributeValue($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
@@ -550,7 +560,7 @@ trait HasErpValueMapper
                             ]);
                         }
                     }
-                    $this->mapstoreImages($product, $erp_product_iteration, $variant);
+                    $this->mapstoreImages($variant_product, $erp_product_iteration, $variant);
                     $this->createInventory($variant_product, $erp_product_iteration, $variant);
                 }
 

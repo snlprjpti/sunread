@@ -23,7 +23,6 @@ class PageTest extends StoreFrontBaseTestCase
         $this->hasFilters = false;
         $this->hasIndexTest = false;
         
-        $this->hasChannel = false;
         $this->createHeader();
     }
 

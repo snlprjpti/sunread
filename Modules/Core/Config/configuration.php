@@ -206,6 +206,19 @@ return[
                                 "rules" => "numeric",
                                 "scope" => "global",
                                 "is_required" => 1
+                            ],
+                            [
+                                "title" => "Locale",
+                                "path" => "store_locale",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\Locale",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:locales,id",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1
                             ]
                         ]
                     ]
@@ -347,16 +360,16 @@ return[
                                 "is_required" => 1
                             ],
                             [
-                                "title" => "Default Display Currency",
-                                "path" => "default_display_currency",
+                                "title" => "Store Currency",
+                                "path" => "store_currency",
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
-                                "default" => "",
+                                "default" => "142",
                                 "options" => [],
                                 "rules" => "exists:currencies,id",
                                 "multiple" => false,
-                                "scope" => "website",
+                                "scope" => "channel",
                                 "is_required" => 1
                             ],
                         ]

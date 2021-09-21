@@ -69,6 +69,7 @@ class ConfigurationRepository extends BaseRepository
                             $existData = $this->has((object) $checkKey);
                             if($checkKey["scope"] != "global") $element["use_default_value"] = $existData ? 0 : 1;
                             $element["default"] = $existData ? $this->getValues((object) $checkKey) : $this->getDefaultValues((object)$checkKey, $element["default"]);
+                            $element["default"] = is_array($element["default"]) ? array_map('intval', $element["default"]) : (is_numeric($element["default"]) ? json_decode($element["default"]) : $element["default"]);
                             if($element["type"] == "file" && $element["default"]) $element["default"] = Storage::url($element["default"]); 
 
                             if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
@@ -241,7 +242,7 @@ class ConfigurationRepository extends BaseRepository
 
     public function getValues(object $request): mixed
     {
-        return $this->checkCondition($request)->first()->value;
+        return $this->checkCondition($request)->first()?->value;
     }
 
     public function getDefaultValues(object $data, mixed $configValue=null): mixed

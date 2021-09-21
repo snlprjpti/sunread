@@ -43,6 +43,7 @@ class ErpMigratorJob implements ShouldQueue
             ]);
             if ($check_variants) $product_data["parent_id"] = null;
             $product = Product::updateOrCreate($match, $product_data);
+            $product->categories()->sync(1);
             //visibility attribute value
             $visibility = ($check_variants) ? 8 : 5;
             $this->createAttributeValue($product, $this->detail, false, $visibility);
@@ -50,7 +51,7 @@ class ErpMigratorJob implements ShouldQueue
             if (!$check_variants) $this->createVariants($product, $this->detail);
             $this->mapstoreImages($product, $this->detail);
 
-            if ($check_variants) $this->createInventory($product, $this->detail);
+            $this->createInventory($product, $this->detail);
             ErpImportDetail::whereId($this->detail->id)->first()?->update(["status" => 1]);
         }
         catch ( Exception $exception )

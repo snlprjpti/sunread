@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Modules\Core\Console\PartialMigrate;
+use Modules\Core\Console\RedisClear;
 use Modules\Erp\Console\ErpAttributeOptionMigrate;
 use Modules\Erp\Console\ErpImport;
 use Modules\Erp\Console\ErpMigrate;
@@ -24,6 +25,7 @@ class Kernel extends ConsoleKernel
         PartialMigrate::class,
         ElasticSearchImport::class,
         ErpAttributeOptionMigrate::class,
+        RedisClear::class,
     ];
 
     /**
@@ -34,7 +36,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('telescope:clear')->hourly();
+        $schedule->command('telescope:prune')->hourly();
     }
 
     /**

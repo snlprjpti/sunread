@@ -106,7 +106,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["categories", "parent", "brand", "website", "product_attributes", "catalog_inventories", "variants"]);
+            $fetched = $this->repository->fetch($id, ["categories", "parent", "brand", "website", "product_attributes", "productBuilderValues", "catalog_inventories", "variants"]);
         }
         catch( Exception $exception )
         {
@@ -218,4 +218,5 @@ class ProductController extends BaseController
 
         return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
+    
 }
