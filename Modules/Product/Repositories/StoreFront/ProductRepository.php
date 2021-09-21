@@ -248,8 +248,8 @@ class ProductRepository extends BaseRepository
 
     public function categoryWiseProduct(object $request, string $category_slug): ?array
     {
-        // try
-        // {
+        try
+        {
             $fetched = [];
 
             $coreCache = $this->getCoreCache($request);
@@ -267,11 +267,11 @@ class ProductRepository extends BaseRepository
             $categories["categories"] = $this->categoryRepository->getCategories(isset($parent) ? $parent->children : $category->children, $scope);
             $categories["breadcumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null);
             $fetched["category"] = $categories;   
-        // }
-        // catch (Exception $exception)
-        // {
-        //     throw $exception;
-        // }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
         return $fetched;
     }

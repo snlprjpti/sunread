@@ -105,8 +105,8 @@ class ProductSearchRepository extends ElasticSearchRepository
         $filter = $this->filterAndSort($request, $category_id);
         
         $data = $this->finalQuery($filter, $request, $store);
-        $total = $data["products"]["hits"]["total"]["value"];
-        $data["products"] = collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray();
+        $total = isset($data["products"]["hits"]["total"]["value"]) ? $data["products"]["hits"]["total"]["value"] : 0;
+        $data["products"] = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
         $data["last_page"] = (int) ceil($total/$data["limit"]);
         $data["total"] = $total;
         return $data;
@@ -219,8 +219,8 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function finalQuery(array $filter, object $request, object $store): ?array
     {
-        // try
-        // {
+        try
+        {
             $page = $request->page ?? 1;
             $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
@@ -239,11 +239,11 @@ class ProductSearchRepository extends ElasticSearchRepository
             ];
 
             $data =  $this->searchIndex($fetched, $store);     
-        // }
-        // catch (Exception $exception)
-        // {
-        //     throw $exception;
-        // }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
         return [
             "products" => $data,
