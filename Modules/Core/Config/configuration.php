@@ -526,6 +526,47 @@ return[
                 ]
             ]
         ]
+    ],
+    "emails" => [
+        "title" => "Emails",
+        "children" => [
+            [
+                "title" => "Email Configuration",
+                "subChildren" => [
+                    [
+                        "title" => "Email Default Templates",
+                        "elements" => [
+                            [
+                                "title" => "Default Header",
+                                "path" => "header",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name", "id"],
+                                "default" => "1",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "multiple" => false,
+                                "scope" => "website",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Default Footer",
+                                "path" => "footer",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name", "id"],
+                                "default" => "1",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "multiple" => false,
+                                "scope" => "website",
+                                "is_required" => 1
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
     ]
 ];
 ?>

@@ -11,6 +11,8 @@ return [
                     "label" => "Store URL",
                     "type" => "string",
                     "source" => ["Website", "Channel", "Store"],
+                    "column_type" => "",
+                    "column" => "",
                     "availability" => ["all"]
                 ],
                 [
@@ -18,6 +20,8 @@ return [
                     "label" => "Store Name",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                    "column" => "email",
                     "availability" => ["all"],
                 ],
                 [
@@ -25,6 +29,8 @@ return [
                     "label" => "Store Phone Number",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                    "column" => "email",
                     "availability" => ["all"],
                 ],
                 [
@@ -32,6 +38,8 @@ return [
                     "label" => "Store Country",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                    "column" => "email",
                     "availability" => ["all"],
                 ],
                 [
@@ -39,6 +47,8 @@ return [
                     "label" => "Store Region / State",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                    "column" => "email",
                     "availability" => ["all"],
                 ],
                 [
@@ -46,6 +56,8 @@ return [
                     "label" => "Store Postal / Zip Code",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                "column" => "",
                     "availability" => ["all"],
                 ],
                 [
@@ -53,6 +65,8 @@ return [
                     "label" => "Store City",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                "column" => "",
                     "availability" => ["all"],
                 ],
                 [
@@ -60,6 +74,8 @@ return [
                     "label" => "Store Address Line 1",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                "column" => "",
                     "availability" => ["all"],
                 ],
                 [
@@ -67,6 +83,8 @@ return [
                     "label" => "Store Address Line 2",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                "column" => "",
                     "availability" => ["all"],
                 ],
                 [
@@ -74,6 +92,8 @@ return [
                     "label" => "Store VAT number",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                "column" => "",
                     "availability" => ["all"],
                 ],
                 [
@@ -81,6 +101,8 @@ return [
                     "label" => "Store Email Address",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                "column" => "",
                     "availability" => ["all"],
                 ],
                 [
@@ -88,6 +110,8 @@ return [
                     "label" => "Store Email Logo URL",
                     "type" => "string",
                     "source" => "configuration",
+                    "column_type" => "",
+                "column" => "",
                     "availability" => ["all"],
                 ],
             ],
@@ -102,6 +126,8 @@ return [
                 "label" => "Customer ID",
                 "type" => "integer",
                 "source" => "Modules\Customer\Entities\Customer",
+                "column_type" => "",
+                "column" => "id",
                 "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update"],
             ],
             [
@@ -109,6 +135,8 @@ return [
                 "label" => "Customer Name",
                 "type" => "string",
                 "source" => "Modules\Customer\Entities\Customer",
+                "column_type" => "array",
+                "column" => [ "first_name","middle_name", "last_name" ],
                 "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update", "order_update_guest"],
             ],
             [
@@ -116,6 +144,8 @@ return [
                 "label" => "Customer Email Address",
                 "type" => "string",
                 "source" => "Modules\Customer\Entities\Customer",
+                "column_type" => "",
+                "column" => "email",
                 "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "new_guest_order", "order_update", "order_update_guest"],
             ],
             [
@@ -123,6 +153,8 @@ return [
                 "label" => "Customer Dashboard URL",
                 "type" => "string",
                 "source" => "Modules\Customer\Entities\Customer",
+                "column_type" => "",
+                "column" => "",
                 "availability" => ["new_account", "welcome_email", "forgot_password", "reset_password", "new_order", "order_update"],
             ],
             [
@@ -130,6 +162,8 @@ return [
                 "label" => "Account Confirmation URL",
                 "type" => "string",
                 "source" => "Modules\Customer\Entities\Customer",
+                "column_type" => "",
+                "column" => "",
                 "availability" => ["new_account"],
             ],
         ],
@@ -144,6 +178,8 @@ return [
                 "label" => "Password Reset URL",
                 "type" => "",
                 "source" => "",
+                "column_type" => "",
+                "column" => "",
                 "availability" => ["forgot_password"],
             ],
         ],
@@ -157,7 +193,9 @@ return [
                 "variable" => "order_id",
                 "label" => "Order ID",
                 "type" => "integer",
-                "source" => "",
+                "source" => "Modules\Country\Entities\Country",
+                "column_type" => "",
+                "column" => "id",
                 "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
             ],
             [
@@ -165,6 +203,8 @@ return [
                 "label" => "Order Items (Table)",
                 "type" => "",
                 "source" => "",
+                "column_type" => "",
+                "column" => "",
                 "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
             ],
             [
@@ -172,6 +212,8 @@ return [
                 "label" => "Billing Address",
                 "type" => "object",
                 "source" => "",
+                "column_type" => "",
+                "column" => "",
                 "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
             ],
             [
@@ -179,6 +221,8 @@ return [
                 "label" => "Shipping Address",
                 "type" => "",
                 "source" => "",
+                "column_type" => "",
+                "column" => "",
                 "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
             ],
             [
@@ -186,6 +230,8 @@ return [
                 "label" => "Order",
                 "type" => "",
                 "source" => "",
+                "column_type" => "",
+                "column" => "",
                 "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
             ],
         ]

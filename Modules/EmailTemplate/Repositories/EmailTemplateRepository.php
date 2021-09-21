@@ -2,12 +2,14 @@
 
 namespace Modules\EmailTemplate\Repositories;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Repositories\ConfigurationRepository;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Exception;
+use Modules\EmailTemplate\Mail\SampleTemplate;
 
 class EmailTemplateRepository extends BaseRepository
 {
@@ -81,71 +83,21 @@ class EmailTemplateRepository extends BaseRepository
         if(! in_array($request->email_template_code, $all_groups))  throw ValidationException::withMessages([ "email_template_code" => __("Invalid Template Code") ]);
     }
 
-    public function getTemplate(string $content, object $request): string
+    public function getTemplate(string $content, object $request): array
     {
-//        preg_match_all("#(?<={{)[^}]*(?=}})#", $content, $template);
-//        preg_match_all("#(?<={{)[^}]*(?=}})#", $content, $variables);
-//        preg_match_all("/{+(hc_include_template.*)}/", $content, $templates);
-//dd($template);
+        try
+        {
+            preg_match_all('/{{(.*?)}}/', $content, $preg_data);
 
-
-        preg_match_all('/{{(.*?)}}/', $content, $data);
-//        preg_match_all("#\{\{\s*(.*?)\s*\}\}#", $content, $variables);
-
-
-
-
-        if(count($data) > 0) {
-            $temp = preg_grep("#\((.*?)\)#", $data[0]);
-
-            foreach($temp as $t) {
-                preg_match('#\((.*?)\)#', $t, $path);
-
-                $content = str_replace($t, $path[1], $content);
-            }
+            $fetched["templates"] = $this->findTemplateData($preg_data);
+            $fetched["variables"] = $this->findVariableData($preg_data, $request);
         }
-        $elements = collect($this->config_variable)->pluck("variables")->flatten(1);
-
-
-        if(count($data) > 0) {
-            foreach($data[1] as $match) {
-
-                $element = $elements->where("variable", $match)->first();
-                if($element)
-                {
-                    if($element["source"] == "configuration")
-                    {
-                        $request->request->add(['path' => $match]);
-
-                        $value = $this->configurationRepository->getSinglePathValue($request);
-                        $content = str_replace("{{{$match}}}", $value, $content);
-                    }
-                    else
-                    {
-                        $values = 1;
-                        $value = $this->getProviderData($element, $values);
-
-                    }
-
-                }
-//                $all_variables = $this->config_variable;
-//
-//                foreach ($all_variables as $variable) {
-//                    foreach($variable as $value) {
-//
-//                        if( in_array($match, array_column($value["variables"], "variable")))
-//                        {
-//                            $request->request->add(['path' => $match]);
-//
-//                            $value = $this->configurationRepository->getSinglePathValue($request);
-//                            $content = str_replace("{{{$match}}}", $value, $content);
-//                        }
-//                    }
-//                }
-            }
+        catch ( Exception $exception )
+        {
+            throw $exception;
         }
 
-        return $content;
+        return $fetched;
     }
 
     public function getProviderData(array $element, mixed $values): array
@@ -163,27 +115,128 @@ class EmailTemplateRepository extends BaseRepository
         return $fetched->toArray();
     }
 
+    public function findTemplateData(array $preg_data): array|null
+    {
+        try
+        {
+            $fetched = [];
+            if(count($preg_data) > 0) {
+                $temp = preg_grep("#\((.*?)\)#", $preg_data[0]);
+                foreach($temp as $t) {
+                    preg_match('#\("(.*?)"\)#', $t, $path);
 
-//    public function sendEmailDemo(): void
-//    {
-//        $subject = 'view data';
-//        $template = EmailTemplate::findOrFail(2);
-//        preg_match_all("#\{\{(.*?)\}\}#", $template->template_content, $matches);
-//
-//        if(count($matches[1]) > 0)
-//        {
-//            foreach($matches[1] as $match) {
-//
-//                $value = EmailVariable::whereName($match)->pluck("value")->first();
-//                $template->template_content = str_ireplace("{{{$match}}}","{$value}", $template->template_content);
-//            }
-//        }
-//
-//        $htmlBody = $template->template_content;
-//        $fromAddress = 'admin@gmail.com';
-//        Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($subject, $htmlBody, $fromAddress));
-//    }
-//
+                    $template = SiteConfig::fetch($path[1]);
+                    $fetched[$path[1]] = $template->content;
+                }
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function findVariableData(array $preg_data, object $request): array|null
+    {
+        try {
+            $elements = collect($this->config_variable)->pluck("variables")->flatten(1);
+            $fetched = [];
+            if (count($preg_data) > 0) {
+                $model_data = [];
+                foreach ($preg_data[1] as $match) {
+                    $element = $elements->where("variable", $match)->first();
+                    if ($element) {
+                        if ($element["source"] == "configuration") {
+                            $request->request->add(['path' => $match]);
+
+                            $value = $this->configurationRepository->getSinglePathValue($request);
+                            $model_data[$match] = $value;
+                        }
+                        else {
+                            $values = 1;
+                            $a = $this->getProviderData($element, $values);
+                            if ($element["column_type"] == "array") {
+                                $name = "";
+                                for ($i = 0; $i < count($element["column"]); $i++) {
+                                    $name .= $a[$element["column"][$i]] ?? "";
+                                    $name .= " ";
+                                }
+                                $model_data[$match] = $name;
+                            }
+                            else {
+                                $model_data[$match] = $a[$element["column"]] ?? "";
+                            }
+                        }
+                    }
+                }
+                $fetched = $model_data;
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function getHtmlTemplate(string $content, object $request): string
+    {
+        try
+        {
+            preg_match_all('/{{(.*?)}}/', $content, $preg_data);
+
+            $templates = $this->findTemplateData($preg_data);
+            if(count($templates)>0) {
+                $temp = preg_grep("#\((.*?)\)#", $preg_data[0]);
+
+                foreach($temp as $t) {
+                    preg_match('#\("(.*?)"\)#', $t, $path);
+
+                    $content = str_replace($t, $templates[$path[1]], $content);
+                }
+            }
+
+            $variables = $this->findVariableData($preg_data, $request);
+            if(count($variables)>0) {
+
+                $elements = collect($this->config_variable)->pluck("variables")->flatten(1);
+
+                foreach ($preg_data[1] as $match) {
+
+                    $element = $elements->where("variable", $match)->first();
+
+                    if ($element) {
+
+                        $content = str_replace("{{{$match}}}", $variables[$match], $content);
+                    }
+                }
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $content;
+    }
+
+    public function sendEmailDemo(object $request): void
+    {
+        $template = EmailTemplate::findOrFail(3);
+
+        $template->content = $this->getTemplate($template->content, $request);
+        $details = [
+            'style' => "color:red",
+            'subject' => 'Sample Title From Mail',
+            'body' => $template->content
+        ];
+
+        Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($details));
+    }
+
 //    public function validateTemplateContent(array $data)
 //    {
 //        $format = [];
