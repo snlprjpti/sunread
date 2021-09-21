@@ -11,6 +11,7 @@ use Modules\Page\Entities\PageAttribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Exceptions\PageNotFoundException;
 
 class PageAttributeRepository extends BaseRepository
 {
@@ -42,7 +43,16 @@ class PageAttributeRepository extends BaseRepository
             if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
 
 
-            $this->collect_elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("groups")->first();
+            $group_elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("mainGroups")->flatten(1);
+            foreach($group_elements as $group_element)
+            {
+                if($group_element["type"] == "module") {
+                    foreach($group_element["subGroups"] as $module) $this->collect_elements = array_merge($this->collect_elements, $module["groups"]);
+                    continue;
+                }
+                $this->collect_elements = array_merge($this->collect_elements, $group_element["groups"]);
+            }
+
             $this->getRules($component, $this->collect_elements, method:$method);
         }
         catch( Exception $exception )
@@ -169,8 +179,8 @@ class PageAttributeRepository extends BaseRepository
             $this->parent = [];
 
             $data = collect($this->config_fields)->where("slug", $slug)->first();
-            $this->getChildren($data["groups"]);
-
+            if(!$data) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Component"]));
+            $this->getChildren($data["mainGroups"]);
         }
         catch (Exception $exception)
         {
@@ -191,6 +201,18 @@ class PageAttributeRepository extends BaseRepository
             foreach($elements as $i => &$element)
             {
                 $append_key = isset($key) ? "$key.$i" : $i;
+
+                if(isset($element["groups"])) {
+                    setDotToArray($append_key, $this->parent,  $element);
+                    $this->getChildren($element["groups"], "$append_key.groups");
+                    continue;
+                }
+
+                if(isset($element["subGroups"])) {
+                    setDotToArray($append_key, $this->parent,  $element);
+                    $this->getChildren($element["subGroups"], "$append_key.subGroups");
+                    continue;
+                }
 
                 if (isset($element["type"])) {
                     unset($element["rules"]);
@@ -323,7 +345,7 @@ class PageAttributeRepository extends BaseRepository
             $component = [];
             foreach($this->config_fields as $field)
             {
-                unset($field["groups"]);
+                unset($field["mainGroups"]);
                 $component[] = $field;
             }
         }
