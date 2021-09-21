@@ -3,12 +3,14 @@
 namespace Modules\Core\Services;
 
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Exceptions\PageNotFoundException;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
+use Modules\Core\Transformers\StoreFront\StoreResource;
 use Modules\Page\Entities\Page;
 
 class ResolverHelper {
@@ -38,21 +40,21 @@ class ResolverHelper {
             $fallback_id = config("website.fallback_id");
             if ($request->hasHeader('hc-host')) $website = CoreCache::getWebsite($request->header("hc-host"));
             else $website = Website::whereId($fallback_id)->firstOrFail();
-
             $websiteData = collect($website)->only(["id","name","code", "hostname"])->toArray();
 
             $channel = $this->getChannel($request, $website);
             $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
-            $websiteData["channel"]["default_store"] = Store::find($channel->default_store_id)?->only(["id","name","code"]);
-            if($channel->default_store_id) {
-                $d_language = SiteConfig::fetch("store_locale", "store", $channel->default_store_id);
-                $websiteData["channel"]["default_store"]["locale"] = $d_language?->code;
-            }
+
+            $all_stores = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
+                return new StoreResource(json_decode($store));
+            });
 
             $store = $this->getStore($request, $website, $channel);
-            $websiteData["store"] = collect($store)->only(["id","name","code"])->toArray();
-            $language = SiteConfig::fetch("store_locale", "store", $store->id);
-            $websiteData["store"]["locale"] = $language?->code;
+            $storeData = collect($store)->only(["id","name","code"])->toArray();
+            $storeData["local"] = SiteConfig::fetch("store_locale", "store", $store->id)?->code;
+            $websiteData["channel"]["store"] = $storeData;
+
+            $websiteData["stores"] = $all_stores;
 
             $websiteData["pages"] = $this->getPages($website);
 
@@ -71,13 +73,14 @@ class ResolverHelper {
         try
         {
             $channel_code = $request->header("hc-channel");
-
-            if($channel_code) $channel = CoreCache::getChannel($website, $channel_code);
+            if($channel_code) { 
+                $channel = CoreCache::getChannel($website, $channel_code);
+            }
             else {
-                $channel= $this->checkCondition("website_default_channel", $website); 
+                $channel = $this->checkCondition("website_default_channel", $website);  
                 if(!$channel) {
                     $cache = CoreCache::getWebsiteAllChannel($website);
-                    if(!$cache) throw new ModelNotFoundException(__("core::app.response.not-found", ["name" => "Channel"]));
+                    if(!$cache) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Channel"]));
                     $channel = json_decode($cache[0]);
                 }
             }    
@@ -98,10 +101,10 @@ class ResolverHelper {
 
             if($store_code) $store = CoreCache::getStore($website, $channel, $store_code);
             else {
-                $store = $this->checkCondition("website_default_store", $website);
+                $store = Store::find($channel->default_store_id);
                 if(!$store) {
-                    $cache = CoreCache::getWebsiteAllStore($website);
-                    if(!$cache) throw new ModelNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
+                    $cache = CoreCache::getChannelAllStore($website, $channel);
+                    if(!$cache) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
                     $store = json_decode($cache[0]);
                 }
             }

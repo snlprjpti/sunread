@@ -252,7 +252,7 @@ class CoreCacheHelper
         {
             $store = json_decode(Redis::get("sf_s_website_{$website->hostname}_channel_{$channel->code}_store_{$store_code}"));
             if( !$store ) {
-                $store = $this->store->whereCode($store_code)->setEagerLoads([])->firstOrFail();
+                $store = $this->store->whereChannelId($channel->id)->whereCode($store_code)->setEagerLoads([])->firstOrFail();
                 $store["website_id"] = $website->id;
                 unset($store->channel, $store->website);
 
