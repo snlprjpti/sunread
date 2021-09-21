@@ -197,11 +197,9 @@ class ProductRepository extends BaseRepository
                 ],[
                     "*.type.*.in" => "Product Image type must be in base_image,thumbnail_image,section_background_image,small_image,gallery",
                 ]);
-                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
-                
+                if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
                 foreach ( $request_images as $image_values )
                 {
-                    // dd($image_values);
                     $this->storeImages($product, $image_values);
                 }
             }
@@ -253,6 +251,8 @@ class ProductRepository extends BaseRepository
                 "*.delete" => "required|boolean",
                 "*.id" => "required|exists:product_images,id",
                 "*.id" => Rule::in($product->images()->pluck("id")->toArray()),
+                "*.background_color" => "sometimes|nullable",
+                "*.position" => "sometimes|nullable|numeric",
             ], [
                 "*.id.required" => "Product Image id is required",
                 "*.id.in" => "Product Image id does not belongs to current product.",
@@ -505,8 +505,16 @@ class ProductRepository extends BaseRepository
         try
         {
             $image_arr = $product->images()->get()->map(function ($image) {
-                return [ "id" => $image->id, "type" => $image->types()->pluck("slug")->toArray(), "delete" => 0, "url" => Storage::url($image->path) ];
+                return [ 
+                    "id" => $image->id,
+                    "type" => $image->types()->pluck("slug")->toArray(),
+                    "delete" => 0,
+                    "background_color" => $image->background_color,
+                    "position" => $image->position, 
+                    "url" => Storage::url($image->path)
+                ];
             })->toArray();
+
 
             $images = ["existing" => $image_arr ];   
         }
