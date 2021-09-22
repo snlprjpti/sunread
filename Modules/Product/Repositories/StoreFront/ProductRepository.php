@@ -287,7 +287,7 @@ class ProductRepository extends BaseRepository
             $fetched["category"] = $this->getPages($category, $scope);
             if($category->parent_id) $parent = Category::findOrFail($category->parent_id);
             $fetched["navigation"] = $this->categoryRepository->getCategories(isset($parent) ? $parent->children : $category->children, $scope);
-            $fetched["breadcumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null); 
+            $fetched["breadcrumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null); 
         }
         catch (Exception $exception)
         {
