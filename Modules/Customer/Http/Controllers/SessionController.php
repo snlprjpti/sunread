@@ -34,7 +34,7 @@ class SessionController extends BaseController
         try
         {
             $data = $request->validate([
-                "email" => "required|email|exists:customers,email",
+                "email" => "required|email",
                 "password" => "required"
             ]);
 

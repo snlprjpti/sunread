@@ -327,7 +327,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $product = $this->model::findOrFail($id);
+            $product = $this->model::with(["variants.attribute_options_child_products"])->findOrFail($id);
 
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
@@ -357,15 +357,75 @@ class ProductRepository extends BaseRepository
         return $fetched;
     }
 
+    public function getVariants(object $request, int $id): mixed
+    {
+        try
+        {
+            $product = Product::whereId($id)->firstOrFail();
+            $variants = $this->filterVariants($product, $request);          
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+        
+        return $variants;
+
+    }
+
+    public function filterVariants(object $product, object $request): mixed
+    {
+        try
+        {
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)],
+                "website_id" => "required|exists:websites,id",
+                "product_name" => "sometimes|string",
+                "sku" => "sometimes|string",
+                "status" => "sometimes|boolean",
+                "visibility" => "sometimes",
+            ]);
+
+            $this->validateListFiltering($request);
+            
+            $variant = Product::whereParentId($product->id)->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"]);
+
+            if (isset($request->sku)) $variant->whereLike("sku", $request->sku);
+
+            if (isset($request->status)) $variant->where("status",$request->status);
+
+            if (isset($request->product_name))  {
+                $product_attributes = ProductAttribute::whereAttributeId(1)
+                    ->whereScope($request->scope ?? "website")
+                    ->whereScopeId($request->scope_id ?? $request->website_id)
+                    ->get();
+
+                $product_ids = [];
+                foreach ( $product_attributes as $product_attribute )
+                {
+                    $value = $product_attribute->value()->query();
+                    $matched = $value->whereLike("value", $request->product_name)->get();
+                    if(count($matched) > 0) $product_ids[] = $product_attribute->product()->pluck("id");
+                }
+                $variant->whereIn("id", Arr::flatten($product_ids));
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $variant;
+    }
+
     public function getConfigurableData(object $product): array
     {
         try
         {    
             $fetched = [];       
-            $variants = $product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
-            $fetched["variants"] = VariantProductResource::collection($variants);
             
-            $variant_attribute_options = $variants->map(function($variant) {
+            $variant_attribute_options = $product->variants->map(function($variant) {
                 return $variant->attribute_options_child_products->pluck("attribute_option_id")->toArray();
             })->flatten(1)->unique();
 
@@ -540,11 +600,14 @@ class ProductRepository extends BaseRepository
                 "price_from" => "sometimes|decimal",
                 "price_to" => "sometimes|decimal",
                 "id_from" => "sometimes|numeric",
-                "id_to" => "sometimes|numeric"
+                "id_to" => "sometimes|numeric",
+                "show_variants" => "sometimes|boolean"
             ]);
 
             if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
-
+           
+            if ( isset($request->show_variants) && (!$request->show_variants) ) $product->where("parent_id", null);
+            
             if (isset($request->product_name))
             {
                 $product_attributes = ProductAttribute::whereAttributeId(1)

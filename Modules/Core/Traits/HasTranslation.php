@@ -6,15 +6,18 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Modules\Attribute\Entities\AttributeTranslation;
+use Modules\Core\Facades\CoreCache;
 
 trait HasTranslation 
 {
     public function getAttribute($name)
     {
-        $storeID = $this->getStoreId();
-        if($storeID != 0)
+        $store_code = $this->getStoreId();
+
+        if($store_code)
         {
-            $translation = $this->getTranslateData($storeID);
+            $store = CoreCache::getStoreWithCode($store_code);
+            $translation = $this->getTranslateData($store->id);
             if($translation) 
             {
                 array_map(function($attribute) use($translation) {
@@ -26,7 +29,7 @@ trait HasTranslation
         return parent::getAttribute($name);
     }
 
-    public function getTranslateData($storeID)
+    public function getTranslateData(int $storeID): ?object
     {
         $translationModel = new $this->translatedModels[0]();
         $relation = $translationModel::where($this->translatedModels[1], $this->attributes["id"])
@@ -34,12 +37,12 @@ trait HasTranslation
         return $relation; 
     }
     
-    public function getStoreId(): int
+    public function getStoreId(): ?string
     {
-        return array_key_exists("store_id", getallheaders()) ? (int) getallheaders()["store_id"] : 0;
+        return array_key_exists("hc-store", getallheaders()) ? getallheaders()["hc-store"] : null;
 	}
 
-    public function firstTranslation($store_id)
+    public function firstTranslation(int $store_id): ?array
     {
         $translation = $this->translations()->where('store_id', $store_id)->first(); 
         if($translation) 
