@@ -35,7 +35,7 @@ class CustomerAddressRepository extends BaseRepository
             "default_shipping_address" => "sometimes|boolean",
             "region_name" => "sometimes",
             "city_name" => "sometimes",
-            "channel_id" => "sometimes|nullable|exists:channels,id",
+            "channel_id" => "required|nullable|exists:channels,id",
         ];
     }
 
