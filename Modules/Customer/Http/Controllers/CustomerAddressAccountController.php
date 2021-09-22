@@ -5,6 +5,7 @@ namespace Modules\Customer\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Core\Entities\Website;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\CustomerAddress;
 use Modules\Customer\Repositories\StoreFront\AddressRepository;
@@ -22,12 +23,21 @@ class CustomerAddressAccountController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function show(): JsonResponse
+    public function show(Request $request): JsonResponse
     {
         try
         {
-            $fetched["shipping"] = $this->repository->checkShippingAddress($this->customer->id)->first();
-            $fetched["billing"] =$this->repository->checkBillingAddress($this->customer->id)->first();
+            $channel_code = $request->header("hc-channel");
+            $fetched["shipping"] = [];
+            $fetched["billing"] = [];
+            if($channel_code) {
+                $website = Website::findOrFail($this->customer->website_id);
+                $channel_id = ($channel = $website->channels->where("code", $channel_code)->where("website_id", $website->id)->first()) ? $channel->id : null;
+                if($channel_id) {
+                    $fetched["shipping"] = $this->repository->checkShippingAddress($this->customer->id)->first();
+                    $fetched["billing"] =$this->repository->checkBillingAddress($this->customer->id)->first();
+                }
+            }
         }
         catch (Exception $exception)
         {

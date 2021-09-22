@@ -4,9 +4,7 @@ namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
 use Illuminate\Http\Request;
-use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
-use Modules\Core\Facades\CoreCache;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
@@ -85,22 +83,22 @@ class AddressRepository extends BaseRepository
     {
         try
         {
+            $customer = Customer::findOrFail($customer_id);
             $channel_code = $request->header("hc-channel");
             if($channel_code) {
-                $channel = CoreCache::getChannelWithCode($channel_code);
-                $website = Website::findOrFail($channel->website_id);
-                $channel_id = ($channel = $website->channels->where("code", $channel_code)->first()) ? $channel->id : null;
+                $website = Website::findOrFail($customer->website_id);
+                $channel_id = ($channel = $website->channels->where("code", $channel_code)->where("website_id", $website->id)->first()) ? $channel->id : null;
             }
 
             if($request->shipping) {
                 $shipping = new Request($request->shipping);
                 $shipping["channel_id"] = $channel_id ?? null;
-                $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer_id) {
+                $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer) {
                     return [
-                        "customer_id" => Customer::findOrFail($customer_id)->id,
+                        "customer_id" => $customer->id,
                     ];
                 });
-                $shipping = $this->checkShippingAddress($customer_id)->first();
+                $shipping = $this->checkShippingAddress($customer->id)->first();
                 $data = $this->checkRegionAndCity($data, "shipping");
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
@@ -115,12 +113,12 @@ class AddressRepository extends BaseRepository
 
                 $billing = new Request($request->billing);
                 $billing["channel_id"] = $channel_id ?? null;
-                $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer_id) {
+                $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer) {
                     return [
-                        "customer_id" => Customer::findOrFail($customer_id)->id,
+                        "customer_id" => $customer->id,
                     ];
                 });
-                $billing = $this->checkBillingAddress($customer_id)->first();
+                $billing = $this->checkBillingAddress($customer->id)->first();
                 $data = $this->checkRegionAndCity($data, "billing");
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
