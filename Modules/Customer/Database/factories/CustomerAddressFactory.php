@@ -2,6 +2,7 @@
 namespace Modules\Customer\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Core\Entities\Channel;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Country;
 use Modules\Country\Entities\Region;
@@ -13,6 +14,7 @@ class CustomerAddressFactory extends Factory
 
     public function definition(): array
     {
+        $channel = Channel::first();
         $city = City::first();
         $region = $city?->region()->first();
         $country = $region?->country()->first();
@@ -30,7 +32,8 @@ class CustomerAddressFactory extends Factory
             "postcode" => $this->faker->numerify("#####"),
             "phone" => $this->faker->phoneNumber(),
             "default_billing_address" => 1,
-            "default_shipping_address" => 1
+            "default_shipping_address" => 1,
+            "channel_id" => $channel?->id
         ];
     }
 }
