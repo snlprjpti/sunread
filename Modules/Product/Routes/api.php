@@ -33,6 +33,7 @@ Route::group(["middleware" => ["api"]], function() {
 });
 
 Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+    Route::get('catalog/category/{category_slug}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "category"])->name("products.category");
     Route::get('catalog/category/{category_slug}/products', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "index"])->name("products.index");
     Route::get('catalog/category/{category_slug}/navigation/layered', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "filter"])->name("products.filter");
     Route::get('catalog/product/{sku}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "show"])->name("products.show");

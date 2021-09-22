@@ -67,6 +67,20 @@ class ProductController extends BaseController
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
 
+    public function category(Request $request, string $category_slug): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->store_fornt_repository->getCategoryData($request, $category_slug);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
+    }
+
     public function filter(Request $request, string $category_slug): JsonResponse
     {
         try
