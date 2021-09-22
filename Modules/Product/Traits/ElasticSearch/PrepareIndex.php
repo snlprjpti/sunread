@@ -26,9 +26,9 @@ trait PrepareIndex
     {
         try
         {
-            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
             
             foreach($stores as $store) {
                 if(!$method) $this->prepareIndexing($product, $batch, $store);
