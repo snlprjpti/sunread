@@ -5,6 +5,8 @@ namespace Modules\Customer\Repositories\StoreFront;
 use Exception;
 use Illuminate\Http\Request;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Website;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
@@ -83,11 +85,16 @@ class AddressRepository extends BaseRepository
     {
         try
         {
-            if($request->hasHeader('channel_id')) $channel = Channel::findOrFail($request->header("channel_id"));
+            $channel_code = $request->header("hc-channel");
+            if($channel_code) {
+                $channel = CoreCache::getChannelWithCode($channel_code);
+                $website = Website::findOrFail($channel->website_id);
+                $channel_id = ($channel = $website->channels->where("code", $channel_code)->first()) ? $channel->id : null;
+            }
 
             if($request->shipping) {
                 $shipping = new Request($request->shipping);
-                $shipping["channel_id"] = $channel->id ?? null;
+                $shipping["channel_id"] = $channel_id ?? null;
                 $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer_id) {
                     return [
                         "customer_id" => Customer::findOrFail($customer_id)->id,
@@ -107,7 +114,7 @@ class AddressRepository extends BaseRepository
             if($request->billing) {
 
                 $billing = new Request($request->billing);
-                $billing["channel_id"] = $channel->id ?? null;
+                $billing["channel_id"] = $channel_id ?? null;
                 $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer_id) {
                     return [
                         "customer_id" => Customer::findOrFail($customer_id)->id,
