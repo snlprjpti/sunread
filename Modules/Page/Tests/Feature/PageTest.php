@@ -64,7 +64,10 @@ class PageTest extends BaseTestCase
             foreach($group_elements as $group_element)
             {
                 if($group_element["type"] == "module") {
-                    foreach($group_element["subGroups"] as $module) $elements = array_merge($elements, $module["groups"]);
+                    foreach($group_element["subGroups"] as $module)
+                    {
+                        $elements = array_merge($elements, $module["groups"]);
+                    }
                     continue;
                 }
                 $elements = array_merge($elements, $group_element["groups"]);
