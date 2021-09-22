@@ -229,7 +229,7 @@ class ProductRepository extends BaseRepository
                         continue;
                     }
                     $product_image = ProductImage::whereId($item["id"])->first();
-                    $product_image->update(["position" => $item["potision"], "background_color" => $item["background_color"]]);
+                    $product_image->update(["position" => $item["position"], "background_color" => $item["background_color"]]);
                     $product_image->types()->detach($product_image);
                     $image_type_ids = ImageType::whereIn("slug", $item["type"])->pluck("id")->toArray();
                     $product_image->types()->sync($image_type_ids);
