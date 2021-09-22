@@ -218,5 +218,19 @@ class ProductController extends BaseController
 
         return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
+
+    public function variants(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->getVariants($request, $id);
+        }
+        catch ( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
+    }
     
 }

@@ -16,7 +16,7 @@ Route::group(["middleware" => ["api"]], function() {
         Route::put("/products/{product_id}/status", [\Modules\Product\Http\Controllers\ProductController::class, "updateStatus"])->name("products.status");
         Route::resource("products", ProductController::class)->except(["create", "edit"]);
         Route::get("product/attributes/{id}", [\Modules\Product\Http\Controllers\ProductController::class, "product_attributes"])->name("products.attributes.show");
-
+        Route::get("product/configurable/{id}", [\Modules\Product\Http\Controllers\ProductController::class, "variants"])->name("products.configurable.show");
         Route::resource("configurable-products", ProductConfigurableController::class)->except(["create", "edit", "index", "show"]);
 
         // Product Images Routes

@@ -356,6 +356,58 @@ class ProductRepository extends BaseRepository
         return $fetched;
     }
 
+    public function getVariants(object $request, int $id): mixed
+    {
+        try
+        {
+            $product = Product::whereId($id)->firstOrFail();
+            $fetched = $this->filterVariants($request, $product);
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+        
+        return $fetched;
+
+    }
+
+    public function filterVariants(object $product, object $request): mixed
+    {
+        try
+        {
+            $request->validate([
+                "scope" => "sometimes|in:website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)],
+                "website_id" => "required|exists:websites,id"
+            ]);
+
+            $this->validateListFiltering($request);
+            
+            $variant = Product::whereParentId($product->parent_id);
+
+            $validator = Validator::make( $request->all(), [
+                "product_name" => "sometimes|string",
+                "sku" => "sometimes|string",
+                "status" => "sometimes|boolean",
+                "visibility" => "sometimes",
+            ]);
+
+            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
+           
+
+            if ( isset($request->sku) ) {
+                
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
     public function getConfigurableData(object $product): array
     {
         try
