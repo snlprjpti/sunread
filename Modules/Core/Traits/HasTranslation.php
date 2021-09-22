@@ -10,7 +10,7 @@ use Modules\Core\Facades\CoreCache;
 
 trait HasTranslation 
 {
-    public function getAttribute($name)
+    public function getAttribute(string $name): string
     {
         $store_code = $this->getStoreId();
 
@@ -29,7 +29,7 @@ trait HasTranslation
         return parent::getAttribute($name);
     }
 
-    public function getTranslateData(int $storeID)
+    public function getTranslateData(int $storeID): ?object
     {
         $translationModel = new $this->translatedModels[0]();
         $relation = $translationModel::where($this->translatedModels[1], $this->attributes["id"])
@@ -42,7 +42,7 @@ trait HasTranslation
         return array_key_exists("hc-store", getallheaders()) ? getallheaders()["hc-store"] : null;
 	}
 
-    public function firstTranslation($store_id)
+    public function firstTranslation(int $store_id): ?array
     {
         $translation = $this->translations()->where('store_id', $store_id)->first(); 
         if($translation) 
