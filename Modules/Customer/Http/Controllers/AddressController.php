@@ -67,16 +67,15 @@ class AddressController extends BaseController
         try
         {
             $customer = Customer::findOrFail($customer_id);
+            $website = Website::findOrFail($customer->website_id);
+            $channel_id = ($channel = $website->channels->where("id", $request->channel_id)->where("website_id", $website->id)->first()) ? $channel->id : null;
+            $request->request->add(["channel_id" => $channel_id]);
+
             $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer) {
                 return [
                     "customer_id" => $customer->id
                 ];
             });
-
-            $website = Website::findOrFail($customer->website_id);
-            $channel = $website->channels->where("id", $request->channel_id)->where("website_id", $website->id)->first();
-
-            $data["channel_id"] = ($channel) ? $channel->id : null;
 
             $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $created->id);
@@ -111,16 +110,15 @@ class AddressController extends BaseController
         try
         {
             $customer =  Customer::findOrFail($customer_id);
+            $website = Website::findOrFail($customer->website_id);
+            $channel_id = ($channel = $website->channels->where("id", $request->channel_id)->where("website_id", $website->id)->first()) ? $channel->id : null;
+            $request->request->add(["channel_id" => $channel_id]);
+
             $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer) {
                 return [
                     "customer_id" => $customer->id
                 ];
             });
-
-            $website = Website::findOrFail($customer->website_id);
-            $channel = $website->channels->where("id", $request->channel_id)->where("website_id", $website->id)->first();
-
-            $data["channel_id"] = ($channel) ? $channel->id : null;
 
             $updated = $this->repository->update($data, $address_id, function($updated) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $updated->id);
