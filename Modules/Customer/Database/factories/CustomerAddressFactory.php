@@ -31,8 +31,7 @@ class CustomerAddressFactory extends Factory
             "postcode" => $this->faker->numerify("#####"),
             "phone" => $this->faker->phoneNumber(),
             "default_billing_address" => 1,
-            "default_shipping_address" => 1,
-            "customer_type" => Arr::random(["personal", "company"])
+            "default_shipping_address" => 1
         ];
     }
 }
