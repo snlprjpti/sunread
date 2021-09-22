@@ -17,6 +17,7 @@ use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 use Modules\Product\Repositories\ProductAttributeRepository;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
 use Modules\Product\Transformers\List\ProductResource as ListProductResource;
+use Modules\Product\Transformers\VariantProductResource;
 
 class ProductController extends BaseController
 {
@@ -223,14 +224,16 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->getVariants($request, $id);
+            $fetched = $this->repository->fetchAll($request, [], function () use ($request, $id) {
+                return $this->repository->getVariants($request, $id);
+            });
         }
         catch ( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-success'));
+        return $this->successResponse(VariantProductResource::collection($fetched), $this->lang('fetch-success'));
     }
     
 }
