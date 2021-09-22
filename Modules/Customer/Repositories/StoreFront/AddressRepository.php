@@ -4,6 +4,7 @@ namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
 use Illuminate\Http\Request;
+use Modules\Core\Entities\Channel;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
@@ -35,7 +36,8 @@ class AddressRepository extends BaseRepository
             "default_billing_address" => "sometimes|boolean",
             "default_shipping_address" => "sometimes|boolean",
             "region_name" => "sometimes",
-            "city_name" => "sometimes"
+            "city_name" => "sometimes",
+            "channel_id" => "sometimes|nullable|exists:channels,id"
         ];
     }
 
@@ -81,8 +83,11 @@ class AddressRepository extends BaseRepository
     {
         try
         {
+            if($request->hasHeader('channel_id')) $channel = Channel::findOrFail($request->header("channel_id"));
+
             if($request->shipping) {
                 $shipping = new Request($request->shipping);
+                $shipping["channel_id"] = $channel->id ?? null;
                 $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer_id) {
                     return [
                         "customer_id" => Customer::findOrFail($customer_id)->id,
@@ -100,7 +105,9 @@ class AddressRepository extends BaseRepository
             }
 
             if($request->billing) {
+
                 $billing = new Request($request->billing);
+                $billing["channel_id"] = $channel->id ?? null;
                 $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer_id) {
                     return [
                         "customer_id" => Customer::findOrFail($customer_id)->id,
