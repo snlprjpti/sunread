@@ -13,7 +13,7 @@ trait PrepareIndex
     {
         try
         {
-            $batch = Bus::batch([])->dispatch();
+            $batch = Bus::batch([])->onQueue("index")->dispatch();
             foreach($products as $product) $this->preparingSingleData($product, $batch, $method);
         }
         catch(Exception $exception)
