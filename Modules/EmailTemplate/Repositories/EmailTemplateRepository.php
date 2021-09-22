@@ -90,6 +90,7 @@ class EmailTemplateRepository extends BaseRepository
             preg_match_all('/{{(.*?)}}/', $content, $preg_data);
 
             $fetched["templates"] = $this->findTemplateData($preg_data);
+
             $fetched["variables"] = $this->findVariableData($preg_data, $request);
         }
         catch ( Exception $exception )
@@ -125,7 +126,7 @@ class EmailTemplateRepository extends BaseRepository
                 foreach($temp as $t) {
                     preg_match('#\("(.*?)"\)#', $t, $path);
 
-                    $template = SiteConfig::fetch($path[1]);
+                    $template = SiteConfig::fetch($path[1], "website", 1);
                     $fetched[$path[1]] = $template->content;
                 }
             }
@@ -227,11 +228,10 @@ class EmailTemplateRepository extends BaseRepository
     {
         $template = EmailTemplate::findOrFail(3);
 
-        $template->content = $this->getTemplate($template->content, $request);
+        $content = $this->getHtmlTemplate($template->content, $request);
         $details = [
-            'style' => "color:red",
             'subject' => 'Sample Title From Mail',
-            'body' => $template->content
+            'body' => $content
         ];
 
         Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($details));
