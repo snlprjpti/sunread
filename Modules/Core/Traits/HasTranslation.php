@@ -10,7 +10,7 @@ use Modules\Core\Facades\CoreCache;
 
 trait HasTranslation 
 {
-    public function getAttribute(string $name): string
+    public function getAttribute(string $name): ?string
     {
         $store_code = $this->getStoreId();
 
