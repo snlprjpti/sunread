@@ -261,12 +261,33 @@ class ProductRepository extends BaseRepository
             $category = $this->getCategory($scope, $category_slug);
 
             $fetched = $this->search_repository->getFilterProducts($request, $category->id, $coreCache->store);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
-            $categories = $this->getPages($category, $scope);
+        return $fetched;
+    }
+
+    public function getCategoryData(object $request, string $category_slug): ?array
+    {
+        try
+        {
+            $fetched = [];
+
+            $coreCache = $this->getCoreCache($request);
+            $scope = [
+                "scope" => "store",
+                "scope_id" => $coreCache->store->id
+            ]; 
+
+            $category = $this->getCategory($scope, $category_slug);
+
+            $fetched["category"] = $this->getPages($category, $scope);
             if($category->parent_id) $parent = Category::findOrFail($category->parent_id);
-            $categories["categories"] = $this->categoryRepository->getCategories(isset($parent) ? $parent->children : $category->children, $scope);
-            $categories["breadcumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null);
-            $fetched["category"] = $categories;   
+            $fetched["navigation"] = $this->categoryRepository->getCategories(isset($parent) ? $parent->children : $category->children, $scope);
+            $fetched["breadcumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null); 
         }
         catch (Exception $exception)
         {
