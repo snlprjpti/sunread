@@ -48,9 +48,9 @@ trait ConfigurableProductHandler
                     $variant_attribute_options = AttributeOptionsChildProduct::whereIn("product_id", $related_variants->pluck("product_id")->toArray())->where("attribute_option_id", "!=", $is_group_attribute?->id)->get()->pluck("attribute_option_id");
                 }
 
-                $final_data = array_merge($product_format, $this->getAttributeData($variant_attribute_options));   
-                if(count($final_data) > 0) $this->configurableIndexing($final_data, $store);           
+                $items[$variant->id] = array_merge($product_format, $this->getAttributeData($variant_attribute_options));            
             }
+            $this->configurableIndexing($items, $store);
         }
         catch (Exception $exception)
         {

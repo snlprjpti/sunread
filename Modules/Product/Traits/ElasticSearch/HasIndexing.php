@@ -205,18 +205,25 @@ trait HasIndexing
         }
     }
 
-    public function configurableIndexing(array $data, object $store): void
+    public function configurableIndexing(array $products, object $store): void
     {
         try
         {
-            $params["index"]  = $this->setIndexName($store->id);
-            $this->createIndexIfNotExist($params);
+            foreach($products as $product)
+            {
+                $createParams["index"] = $this->setIndexName($store->id);
+                $this->createIndexIfNotExist($createParams);
 
-            $params = array_merge($params, [
-                "id" => $data["id"],
-                "body" => $data
-            ]);
-            $this->client->index($params);
+                $params["body"][] = [
+                    "index" => [
+                        "_index" => $createParams["index"],
+                        "_id" => $product["id"]
+                    ]
+                ];
+            
+                $params["body"][] = $product;
+            }
+            if(count($products) > 0) $this->client->bulk($params);
         }
         catch(Exception $exception)
         {
