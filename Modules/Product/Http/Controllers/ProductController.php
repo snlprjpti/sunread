@@ -224,7 +224,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, [], function () use ($request, $id) {
+            $fetched = $this->repository->fetchAll($request, callback:function () use ($request, $id) {
                 return $this->repository->getVariants($request, $id);
             });
         }
