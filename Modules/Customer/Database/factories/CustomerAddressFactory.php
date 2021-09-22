@@ -1,8 +1,10 @@
 <?php
+
 namespace Modules\Customer\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Website;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Country;
 use Modules\Country\Entities\Region;
@@ -14,13 +16,15 @@ class CustomerAddressFactory extends Factory
 
     public function definition(): array
     {
-        $channel = Channel::first();
+        $customer = Customer::first();
+        $channel = Channel::factory()->create(["website_id" => $customer->website_id]);
+
         $city = City::first();
         $region = $city?->region()->first();
         $country = $region?->country()->first();
 
         return [
-            "customer_id" => Customer::inRandomOrder()->first()->id,
+            "customer_id" => $customer->id,
             "first_name" => $this->faker->firstName(),
             "last_name" => $this->faker->lastName(),
             "address1" => $this->faker->address(),

@@ -11,7 +11,6 @@ class CustomerAddressTest extends BaseTestCase
     public function setUp(): void
     {
         $this->model = CustomerAddress::class;
-
         parent::setUp();
 
         $this->admin = $this->createAdmin();
