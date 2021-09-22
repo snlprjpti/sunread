@@ -27,7 +27,7 @@ class ElasticSearchImport extends Command
 
     public function handle(): void
     {
-        $batch = Bus::batch([])->dispatch();
+        $batch = Bus::batch([])->onQueue("index")->dispatch();
         
         $products = Product::whereType("simple")->whereParentId(null)->get();
         foreach($products as $product)

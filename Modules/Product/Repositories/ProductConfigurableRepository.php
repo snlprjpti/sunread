@@ -337,7 +337,7 @@ class ProductConfigurableRepository extends BaseRepository
             $stores = Website::find($data->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
             })->flatten(1);
-            $batch = Bus::batch([])->dispatch();
+            $batch = Bus::batch([])->onQueue("index")->dispatch();
 
             foreach( $stores as $store) $batch->add(new ConfigurableIndexing($data, $store));
         }

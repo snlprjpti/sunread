@@ -15,7 +15,7 @@ class ProductListener
                 return $channel->stores;
             })->flatten(1);
     
-            $batch = Bus::batch([])->dispatch();
+            $batch = Bus::batch([])->onQueue("index")->dispatch();
             foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
         }
     }
@@ -26,7 +26,7 @@ class ProductListener
             return $channel->stores;
         })->flatten(1);
         
-        $batch = Bus::batch([])->dispatch();
+        $batch = Bus::batch([])->onQueue("index")->dispatch();
         foreach($stores as $store) $batch->add(new SingleIndexing(collect($product), $store, "delete"));
     }
 }
