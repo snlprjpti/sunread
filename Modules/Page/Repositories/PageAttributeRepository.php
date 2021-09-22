@@ -267,9 +267,9 @@ class PageAttributeRepository extends BaseRepository
                 //     $rule = "$rule|in:$option_str";
                 // }
 
-                $append_key = isset($key) ? "{$key}.{$element["slug"]}" : "{$element["slug"]}";
+                $append_key = isset($key) ? "{$key}.{$element['slug']}" : "{$element['slug']}";
 
-                $this->config_rules[$append_key] = "{$rule}|{$element["rules"]}"; 
+                $this->config_rules[$append_key] = "{$rule}|{$element['rules']}"; 
                 $this->config_types[$element["slug"]] = $element["type"];
 
                 if ($method == "update" && isset($component["id"]) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
