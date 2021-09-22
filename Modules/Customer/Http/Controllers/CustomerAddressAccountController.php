@@ -28,14 +28,14 @@ class CustomerAddressAccountController extends BaseController
         try
         {
             $channel_code = $request->header("hc-channel");
-            $fetched["shipping"] = [];
-            $fetched["billing"] = [];
+            $fetched["shipping"] = null;
+            $fetched["billing"] = null;
             if($channel_code) {
                 $website = Website::findOrFail($this->customer->website_id);
                 $channel_id = ($channel = $website->channels->where("code", $channel_code)->where("website_id", $website->id)->first()) ? $channel->id : null;
                 if($channel_id) {
-                    $fetched["shipping"] = $this->repository->checkShippingAddress($this->customer->id)->first();
-                    $fetched["billing"] =$this->repository->checkBillingAddress($this->customer->id)->first();
+                    $fetched["shipping"] = $this->repository->checkShippingAddress($this->customer->id, $channel_id)->first();
+                    $fetched["billing"] =$this->repository->checkBillingAddress($this->customer->id, $channel_id)->first();
                 }
             }
         }

@@ -51,11 +51,11 @@ class AddressRepository extends BaseRepository
         ];
     }
 
-    public function checkShippingAddress(int $customer_id): object
+    public function checkShippingAddress(int $customer_id, int $channel_id): object
     {
         try
         {
-            $address = $this->model->whereCustomerId($customer_id)->whereDefaultShippingAddress(1);
+            $address = $this->model->whereCustomerId($customer_id)->whereDefaultShippingAddress(1)->whereChannelId($channel_id);
         }
         catch (Exception $exception)
         {
@@ -65,11 +65,11 @@ class AddressRepository extends BaseRepository
         return $address;
     }
 
-    public function checkBillingAddress(int $customer_id): object
+    public function checkBillingAddress(int $customer_id, int $channel_id): object
     {
         try
         {
-            $address = $this->model->whereCustomerId($customer_id)->whereDefaultBillingAddress(1);
+            $address = $this->model->whereCustomerId($customer_id)->whereDefaultBillingAddress(1)->whereChannelId($channel_id);
         }
         catch (Exception $exception)
         {
@@ -92,13 +92,13 @@ class AddressRepository extends BaseRepository
 
             if($request->shipping) {
                 $shipping = new Request($request->shipping);
-                $shipping["channel_id"] = $channel_id ?? null;
+                $shipping["channel_id"] = $channel_id;
                 $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer) {
                     return [
                         "customer_id" => $customer->id,
                     ];
                 });
-                $shipping = $this->checkShippingAddress($customer->id)->first();
+                $shipping = $this->checkShippingAddress($customer->id, $channel_id)->first();
                 $data = $this->checkRegionAndCity($data, "shipping");
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
@@ -112,13 +112,13 @@ class AddressRepository extends BaseRepository
             if($request->billing) {
 
                 $billing = new Request($request->billing);
-                $billing["channel_id"] = $channel_id ?? null;
+                $billing["channel_id"] = $channel_id;
                 $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer) {
                     return [
                         "customer_id" => $customer->id,
                     ];
                 });
-                $billing = $this->checkBillingAddress($customer->id)->first();
+                $billing = $this->checkBillingAddress($customer->id, $channel_id)->first();
                 $data = $this->checkRegionAndCity($data, "billing");
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
