@@ -2,6 +2,7 @@
 namespace Modules\Customer\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Country;
 use Modules\Country\Entities\Region;
@@ -30,7 +31,8 @@ class CustomerAddressFactory extends Factory
             "postcode" => $this->faker->numerify("#####"),
             "phone" => $this->faker->phoneNumber(),
             "default_billing_address" => 1,
-            "default_shipping_address" => 1
+            "default_shipping_address" => 1,
+            "customer_type" => Arr::random(["personal", "company"])
         ];
     }
 }
