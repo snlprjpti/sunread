@@ -4,10 +4,7 @@ namespace Modules\Customer\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Website;
 use Modules\Country\Entities\City;
-use Modules\Country\Entities\Country;
-use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
 
 class CustomerAddressFactory extends Factory
