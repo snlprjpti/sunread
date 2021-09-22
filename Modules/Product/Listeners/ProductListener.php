@@ -22,9 +22,9 @@ class ProductListener
 
     public function remove($product)
     {
-        $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+        $stores = Website::find($product->website_id)->channels->map(function ($channel) {
             return $channel->stores;
-        });
+        })->flatten(1);
         
         $batch = Bus::batch([])->dispatch();
         foreach($stores as $store) $batch->add(new SingleIndexing(collect($product), $store, "delete"));
