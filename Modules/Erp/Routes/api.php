@@ -11,3 +11,11 @@
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+use Modules\Erp\Jobs\Mapper\ErpMigrateProductJob;
+use Modules\Erp\Jobs\Mapper\ErpMigrateVariantJob;
+
+Route::get("admin/erp", function () {
+	ErpMigrateProductJob::dispatchSync();
+	dd("asd");
+});

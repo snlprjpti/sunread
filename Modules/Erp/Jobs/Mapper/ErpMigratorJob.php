@@ -46,7 +46,7 @@ class ErpMigratorJob implements ShouldQueue
             $product->categories()->sync(1);
             //visibility attribute value
             $visibility = ($check_variants) ? 8 : 5;
-            $this->createAttributeValue($product, $this->detail, false, $visibility);
+            // $this->createAttributeValue($product, $this->detail, false, $visibility);
             
             if (!$check_variants) $this->createVariants($product, $this->detail);
             $this->mapstoreImages($product, $this->detail);
