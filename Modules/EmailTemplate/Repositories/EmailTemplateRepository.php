@@ -2,6 +2,7 @@
 
 namespace Modules\EmailTemplate\Repositories;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -37,12 +38,9 @@ class EmailTemplateRepository extends BaseRepository
 
     public function getConfigData(object $request): array
     {
-        try
-        {
+        try {
             $config_data = $this->config_template;
-        }
-        catch ( Exception $exception )
-        {
+        } catch (Exception $exception) {
             throw $exception;
         }
 
@@ -51,16 +49,13 @@ class EmailTemplateRepository extends BaseRepository
 
     public function getConfigVariable(object $request): array
     {
-        try
-        {
+        try {
             $elements = collect($this->config_variable);
 
-            foreach($elements as $element)
-            {
+            foreach ($elements as $element) {
                 $parent = [];
-                foreach($element["variables"] as $variable)
-                {
-                    if(in_array( $request->email_template_code, $variable["availability"]) || $variable["availability"] == ["all"]) {
+                foreach ($element["variables"] as $variable) {
+                    if (in_array($request->email_template_code, $variable["availability"]) || $variable["availability"] == ["all"]) {
 
                         unset($variable["availability"], $variable["source"], $variable["type"]);
 
@@ -71,9 +66,7 @@ class EmailTemplateRepository extends BaseRepository
                 }
                 $data["groups"][] = $parent;
             }
-        }
-        catch ( Exception $exception )
-        {
+        } catch (Exception $exception) {
             throw $exception;
         }
 
@@ -83,12 +76,113 @@ class EmailTemplateRepository extends BaseRepository
     public function templateGroupValidation(object $request): void
     {
         $all_groups = collect($this->config_template)->pluck("code")->toArray();
-        if(! in_array($request->email_template_code, $all_groups))  throw ValidationException::withMessages([ "email_template_code" => __("Invalid Template Code") ]);
+        if (!in_array($request->email_template_code, $all_groups)) throw ValidationException::withMessages(["email_template_code" => __("Invalid Template Code")]);
     }
 
-    public function newEvent()
+    public function newEvent(string $event)
     {
-        $customer = Customer::findOrFail(1);
+        /*
+         * get template from configurations
+         * */
+        $email_template_id = 3;
+        $email_template = $this->model::findOrFail($email_template_id);
+
+        /*
+         *  get all variables according to template_codes
+        */
+//        $variables = $this->getEventVariable($email_template->email_template_code);
+
+
+        /*
+         *  get all variable with data
+        */
+        $variable_data = $this->getVariableData($email_template->email_template_code);
+
+
+        $email_template->content = $this->render($email_template->content, $variable_data);
+        $email_template->subject = $this->render($email_template->subject, $variable_data);
+        $this->sendEmail($email_template);
+    }
+
+    public function render(string $content, $data = null): string
+    {
+        /*
+         compile content to render in blade file
+          */
+        $php = Blade::compileString($content);
+        ob_start();
+        extract($data, EXTR_SKIP);
+        try {
+            eval('?' . '>' . $php);
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+        return ob_get_clean();
+    }
+
+    public function sendEmail(object $email_template): void
+    {
+        $details = [
+            'body' => $email_template->content
+        ];
+        Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($details, $email_template->subject));
+    }
+
+    public function getVariableData($template_code): array
+    {
+        $general = $this->getGeneralVariableData();
+        switch ($template_code) {
+            case "forgot_password" :
+                $data = $this->forgotPassword();
+                break;
+
+            case "reset_password" :
+                $data = $this->resetPassword();
+                break;
+
+            case "contact_form" :
+                $data = [];
+                break;
+
+            case "new_account":
+            case "welcome_email":
+                $data = $this->customerData();
+                break;
+
+            case "new_order" :
+            case "order_update" :
+            case "new_guest_order" :
+            case "order_update_guest" :
+
+            $data = $this->orderData();
+                break;
+        }
+
+        return array_merge($data, $general);
+    }
+
+    public function getEventVariable(string $template_code): array
+    {
+        try {
+            $elements = collect($this->config_variable)->pluck("variables")->flatten(1);
+
+            $data = [];
+            foreach ($elements as $element) {
+                if (in_array($template_code, $element["availability"]) || $element["availability"] == ["all"]) {
+
+                    $data[] = $element["variable"];
+                }
+            }
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    public function getCustomerData($customer_id)
+    {
+        $customer = Customer::findOrFail($customer_id);
 
         $store = Store::findOrFail($customer->store_id);
         $channel = $store->channel;
@@ -100,35 +194,79 @@ class EmailTemplateRepository extends BaseRepository
         $customer_dashboard_url = $storefront_url . '/account';
 
         $data = [
-            'customer_id' => $customer->id,
-            'customer_name' => $customer->first_name.' '.$customer->middle_name.' '.$customer->last_name,
-            'customer_email_address' => $customer->email,
-            'customer_dashboard_url' => $customer_dashboard_url,
+            "customer_id" => $customer->id,
+            "customer_name" => $customer->first_name . ' ' . $customer->middle_name . ' ' . $customer->last_name,
+            "customer_email_address" => $customer->email,
+            "customer_dashboard_url" => $customer_dashboard_url,
+            "account_confirmation_url" => $customer_dashboard_url,
+            "password_reset_url" => $customer_dashboard_url,
+            "order_id" => $customer_dashboard_url,
+            "order_items" => $customer_dashboard_url,
+            "billing_address" => $customer_dashboard_url,
+            "shipping_address" => $customer_dashboard_url,
+            "order" => $customer_dashboard_url
         ];
 
-        $email_template_id = 3;
-
-        $email_template = EmailTemplate::findOrFail( $email_template_id );
-
-        $email_template->content = $this->render($email_template->content, $data);
-        $email_template->subject = $this->render($email_template->subject, $data);
-        $this->sendEmail($email_template);
+        return $data;
     }
 
-    public function render(string $content, $data = null): string
+    public function getGeneralVariableData(): array
     {
-        $php = Blade::compileString($content);
-        ob_start();
-        extract($data, EXTR_SKIP);
-        eval('?' . '>' . $php);
-        return ob_get_clean();
-    }
+        /*
+         get general variables data
+         * */
+        $data = [
+            "store_url" => SiteConfig::fetch("storefront_base_urL"),
+            "store_name" => SiteConfig::fetch("store_name"),
+            "store_phone_number" => SiteConfig::fetch("store_phone_number"),
+            "store_country" => SiteConfig::fetch("store_country"),
+            "store_state" => SiteConfig::fetch("store_region"),
+            "store_post_code" => SiteConfig::fetch("store_zip_code"),
+            "store_city" => SiteConfig::fetch("store_city"),
+            "store_address_line_1" => SiteConfig::fetch("store_street_address"),
+            "store_address_line_2" => SiteConfig::fetch("store_address_line2"),
 
-    public function sendEmail(object $email_template): void
-    {
-        $details = [
-            'body' => $email_template->content
+            "store_vat_number" => SiteConfig::fetch("storefront_base_urL"),
+            "store_email_address" => SiteConfig::fetch("storefront_base_urL"),
+            "store_email_logo_url" => SiteConfig::fetch("storefront_base_urL"),
         ];
-        Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($details, $email_template->subject));
+        return $data;
+    }
+
+    private function forgotPassword()
+    {
+        $customer_data = $this->getCustomerData(1);
+        $data = [
+            "password_reset_url" => "password_reset_url_link"
+        ];
+        return array_merge($customer_data, $data);
+    }
+
+    private function resetPassword()
+    {
+        $customer_data = $this->getCustomerData(1);
+        $data = [
+            "password_reset_url" => "password_reset_url_link"
+        ];
+        return array_merge($customer_data, $data);
+    }
+
+    private function customerData()
+    {
+        $customer_data = $this->getCustomerData(1);
+        return $customer_data;
+    }
+
+    private function orderData()
+    {
+        $customer_data = $this->getCustomerData(1);
+        $data = [
+          "order_id" =>  1,
+          "order_items" =>  1,
+          "billing_address" =>  1,
+          "shipping_address" =>  1,
+          "order" =>  1
+        ];
+        return array_merge($customer_data, $data);
     }
 }
