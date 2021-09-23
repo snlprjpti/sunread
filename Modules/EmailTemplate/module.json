@@ -8,6 +8,8 @@
         "Modules\\EmailTemplate\\Providers\\EmailTemplateServiceProvider"
     ],
     "aliases": {},
-    "files": [],
+    "files": [
+        "Helper/helper.php"
+    ],
     "requires": []
 }

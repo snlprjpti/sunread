@@ -2,11 +2,14 @@
 
 namespace Modules\EmailTemplate\Repositories;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Entities\Store;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Repositories\ConfigurationRepository;
+use Modules\Customer\Entities\Customer;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Exception;
 use Modules\EmailTemplate\Mail\SampleTemplate;
@@ -83,174 +86,49 @@ class EmailTemplateRepository extends BaseRepository
         if(! in_array($request->email_template_code, $all_groups))  throw ValidationException::withMessages([ "email_template_code" => __("Invalid Template Code") ]);
     }
 
-    public function getTemplate(string $content, object $request): array
+    public function newEvent()
     {
-        try
-        {
-            preg_match_all('/{{(.*?)}}/', $content, $preg_data);
+        $customer = Customer::findOrFail(1);
 
-            $fetched["templates"] = $this->findTemplateData($preg_data);
+        $store = Store::findOrFail($customer->store_id);
+        $channel = $store->channel;
 
-            $fetched["variables"] = $this->findVariableData($preg_data, $request);
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
+        $store_front_baseurl = SiteConfig::fetch("storefront_base_urL");
 
-        return $fetched;
-    }
+        $storefront_url = $store_front_baseurl . '/' . $channel->code . '/' . $store->code;
 
-    public function getProviderData(array $element, mixed $values): array
-    {
-        try
-        {
-            $model = new $element["source"];
-            $fetched = is_array($values) ? $model->whereIn("id", $values)->get() : $model->find($values);
-        }
-        catch( Exception $exception )
-        {
-            throw $exception;
-        }
+        $customer_dashboard_url = $storefront_url . '/account';
 
-        return $fetched->toArray();
-    }
-
-    public function findTemplateData(array $preg_data): array|null
-    {
-        try
-        {
-            $fetched = [];
-            if(count($preg_data) > 0) {
-                $temp = preg_grep("#\((.*?)\)#", $preg_data[0]);
-                foreach($temp as $t) {
-                    preg_match('#\("(.*?)"\)#', $t, $path);
-                    $template = SiteConfig::fetch($path[1], "website", 1);
-                    $fetched[$path[1]] = $template->content;
-                }
-            }
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return $fetched;
-    }
-
-    public function findVariableData(array $preg_data, object $request): array|null
-    {
-        try {
-            $elements = collect($this->config_variable)->pluck("variables")->flatten(1);
-            $fetched = [];
-            if (count($preg_data) > 0) {
-                $model_data = [];
-                foreach ($preg_data[1] as $match) {
-                    $element = $elements->where("variable", $match)->first();
-                    if ($element) {
-                        if ($element["source"] == "configuration") {
-                            $request->request->add(['path' => $match]);
-
-                            $value = $this->configurationRepository->getSinglePathValue($request);
-                            $model_data[$match] = $value;
-                        }
-                        else {
-                            $values = 1;
-                            $a = $this->getProviderData($element, $values);
-                            if ($element["column_type"] == "array") {
-                                $name = "";
-                                for ($i = 0; $i < count($element["column"]); $i++) {
-                                    $name .= $a[$element["column"][$i]] ?? "";
-                                    $name .= " ";
-                                }
-                                $model_data[$match] = $name;
-                            }
-                            else {
-                                $model_data[$match] = $a[$element["column"]] ?? "";
-                            }
-                        }
-                    }
-                }
-                $fetched = $model_data;
-            }
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return $fetched;
-    }
-
-    public function getHtmlTemplate(string $content, object $request): string
-    {
-        try
-        {
-            preg_match_all('/{{(.*?)}}/', $content, $preg_data);
-
-            $templates = $this->findTemplateData($preg_data);
-            if(count($templates)>0) {
-                $temp = preg_grep("#\((.*?)\)#", $preg_data[0]);
-
-                foreach($temp as $t) {
-                    preg_match('#\("(.*?)"\)#', $t, $path);
-
-                    $content = str_replace($t, $templates[$path[1]], $content);
-                }
-            }
-
-            $variables = $this->findVariableData($preg_data, $request);
-            if(count($variables)>0) {
-
-                $elements = collect($this->config_variable)->pluck("variables")->flatten(1);
-
-                foreach ($preg_data[1] as $match) {
-
-                    $element = $elements->where("variable", $match)->first();
-
-                    if ($element) {
-
-                        $content = str_replace("{{{$match}}}", $variables[$match], $content);
-                    }
-                }
-            }
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return $content;
-    }
-
-    public function sendEmailDemo(object $request): void
-    {
-        $template = EmailTemplate::findOrFail(3);
-
-        $content = $this->getHtmlTemplate($template->content, $request);
-        $details = [
-            'subject' => 'Sample Title From Mail',
-            'body' => $content
+        $data = [
+            'customer_id' => $customer->id,
+            'customer_name' => $customer->first_name.' '.$customer->middle_name.' '.$customer->last_name,
+            'customer_email_address' => $customer->email,
+            'customer_dashboard_url' => $customer_dashboard_url,
         ];
 
-        Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($details));
+        $email_template_id = 3;
+
+        $email_template = EmailTemplate::findOrFail( $email_template_id );
+
+        $email_template->content = $this->render($email_template->content, $data);
+        $email_template->subject = $this->render($email_template->subject, $data);
+        $this->sendEmail($email_template);
     }
 
-//    public function validateTemplateContent(array $data)
-//    {
-//        $format = [];
-//        foreach ($data as $key => $value)
-//        {
-//            dd(is_int($value));
-//            if(is_int($value)) {
-//                dd("dasdasdasdasdasd");
-//                $id["id"] = $value;
-//                dd($id);
-//            }
-//            else {
-//                $content["content"] = $value;
-//            }
-//        }
-//        dd($format);
-//    }
+    public function render(string $content, $data = null): string
+    {
+        $php = Blade::compileString($content);
+        ob_start();
+        extract($data, EXTR_SKIP);
+        eval('?' . '>' . $php);
+        return ob_get_clean();
+    }
+
+    public function sendEmail(object $email_template): void
+    {
+        $details = [
+            'body' => $email_template->content
+        ];
+        Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($details, $email_template->subject));
+    }
 }

@@ -10,11 +10,12 @@ class SampleTemplate extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $details;
+    public $details, $subject;
 
-    public function __construct($details)
+    public function __construct($details, $subject)
     {
         $this->details = $details;
+        $this->subject = $subject;
     }
 
     public function getBody()
@@ -24,9 +25,8 @@ class SampleTemplate extends Mailable
 
     public function build()
     {
+        $this->subject($this->subject);
         return $this->markdown('emailtemplate::mailTemplate');
-//
-//        $this->subject($this->theSubject);
 //        $this->from($this->fromAddress);
 //        $this->html($this->htmlBody);
 //        return $this;

@@ -64,14 +64,12 @@ class EmailTemplateController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    public function show(int $id, Request $request): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try
         {
+            $this->repository->newEvent();
             $fetched = $this->repository->fetch($id);
-            if(!$request->scope) $request->scope = "global";
-            if(!$request->scope_id) $request->scope_id = 0;
-            $fetched->content = $this->repository->getHtmlTemplate($fetched->content, $request);
         }
         catch( Exception $exception )
         {
