@@ -135,4 +135,7 @@ return [
             'last-delete-error' => 'At least one Currency is required.',
         ],
     ],
+    'exception_message' => [
+        'channel-not-found' => "Channel Not Found"
+    ]
 ];

@@ -3,6 +3,7 @@
 namespace Modules\Cart\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Cart\Entities\Cart;
 use Illuminate\Database\Eloquent\Model;
 
 class CartDatabaseSeeder extends Seeder
@@ -15,6 +16,8 @@ class CartDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
+
+        Cart::create(["customer_id" => 1]);
 
         // $this->call("OthersTableSeeder");
     }
