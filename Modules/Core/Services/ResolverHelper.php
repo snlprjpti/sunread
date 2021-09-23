@@ -51,7 +51,7 @@ class ResolverHelper {
 
             $store = $this->getStore($request, $website, $channel);
             $storeData = collect($store)->only(["id","name","code"])->toArray();
-            $storeData["local"] = SiteConfig::fetch("store_locale", "store", $store->id)?->code;
+            $storeData["locale"] = SiteConfig::fetch("store_locale", "store", $store->id)?->code;
             $websiteData["channel"]["store"] = $storeData;
 
             $websiteData["stores"] = $all_stores;
@@ -121,14 +121,16 @@ class ResolverHelper {
     {
         try
         {
-           $pages = Page::whereWebsiteId($website->id)->get();
+            $pages = Page::whereWebsiteId($website->id)->get();
+            $data = [];
+            foreach ( $pages as $page ) $data[$page->slug] = [ "id" => $page->id, "code" => $page->slug ] ;
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $pages ? $pages->toArray() : $pages;
+        return $data;
     }
 
     public function checkCondition(string $slug, object $website): ?object

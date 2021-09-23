@@ -88,7 +88,16 @@ class ProductBuilderRepository extends BaseRepository
             if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
 
 
-            $this->collect_elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("groups")->first();
+            $group_elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("mainGroups")->flatten(1);
+            foreach($group_elements as $group_element)
+            {
+                if($group_element["type"] == "module") {
+                    foreach($group_element["subGroups"] as $module) $this->collect_elements = array_merge($this->collect_elements, $module["groups"]);
+                    continue;
+                }
+                $this->collect_elements = array_merge($this->collect_elements, $group_element["groups"]);
+            }
+
             $this->getRules($component, $this->collect_elements, method:$method);
         }
         catch( Exception $exception )
@@ -106,7 +115,7 @@ class ProductBuilderRepository extends BaseRepository
             $component = [];
             foreach($this->config_fields as $field)
             {
-                unset($field["groups"]);
+                unset($field["mainGroups"]);
                 $component[] = $field;
             }
         }
@@ -298,7 +307,7 @@ class ProductBuilderRepository extends BaseRepository
             $this->parent = [];
 
             $data = collect($this->pageAttributeRepository->config_fields)->where("slug", $component->attribute)->first();
-            $this->getChildren($data["groups"], values:json_decode($component->value, true));
+            $this->getChildren($data["mainGroups"], values:json_decode($component->value, true));
         }
         catch( Exception $exception )
         {
@@ -309,7 +318,7 @@ class ProductBuilderRepository extends BaseRepository
             "id" => $component->id,
             "title" => $data["title"],
             "slug" => $data["slug"],
-            "groups" => $this->parent
+            "mainGroups" => $this->parent
         ];
     }
 
@@ -322,6 +331,18 @@ class ProductBuilderRepository extends BaseRepository
                 $append_key = isset($key) ? "$key.$i" : $i;
                 $append_slug_key = isset($slug_key) ? "$slug_key.{$element["slug"]}" : $element["slug"];
 
+                if(isset($element["groups"])) {
+                    setDotToArray($append_key, $this->parent,  $element);
+                    $this->getChildren($element["groups"], "$append_key.groups", $values);
+                    continue;
+                }
+
+                if(isset($element["subGroups"])) {
+                    setDotToArray($append_key, $this->parent,  $element);
+                    $this->getChildren($element["subGroups"], "$append_key.subGroups", $values);
+                    continue;
+                }
+                
                 if ($element["hasChildren"] == 0) {
                     if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery((object) $element, $element["pluck"]);
                     unset($element["pluck"], $element["provider"], $element["rules"]);

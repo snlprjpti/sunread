@@ -205,28 +205,18 @@ trait HasIndexing
         }
     }
 
-    public function configurableIndexing(array $products): void
+    public function configurableIndexing(array $product, object $store): void
     {
         try
         {
-            foreach($products as $store_products)
-            {
-                foreach($store_products as $store => $store_product)
-                {
-                    $createParams["index"] = $this->setIndexName($store);
-                    $this->createIndexIfNotExist($createParams);
-    
-                    $params["body"][] = [
-                        "index" => [
-                            "_index" => $createParams["index"],
-                            "_id" => $store_product["id"]
-                        ]
-                    ];
-                
-                    $params["body"][] = $store_product;
-                }
-            }
-            if(count($products) > 0) $this->client->bulk($params);
+            $params["index"]  = $this->setIndexName($store->id);
+            $this->createIndexIfNotExist($params);
+
+            $params = array_merge($params, [
+                "id" => $product["id"],
+                "body" => $product
+            ]);
+            $this->client->index($params);
         }
         catch(Exception $exception)
         {
@@ -234,30 +224,26 @@ trait HasIndexing
         }
     }
 
-    public function bulkConfigurableRemoving(object $parent, object $stores): void
+    public function bulkConfigurableRemoving(object $parent, object $store): void
     {
         try
         {
-            foreach($stores as $store)
+            $createParams["index"] = $this->setIndexName($store->id);
+            $this->createIndexIfNotExist($createParams);
+            $params["body"][] = [
+                "delete" => [
+                    "_index" => $createParams["index"],
+                    "_id" => $parent->id
+                ]
+            ];
+            foreach($parent->variants as $variant)
             {
-                $createParams["index"] = $this->setIndexName($store->id);
-                $this->createIndexIfNotExist($createParams);
                 $params["body"][] = [
                     "delete" => [
                         "_index" => $createParams["index"],
-                        "_id" => $parent->id
+                        "_id" => $variant->id
                     ]
                 ];
-
-                foreach($parent->variants as $variant)
-                {
-                    $params["body"][] = [
-                        "delete" => [
-                            "_index" => $createParams["index"],
-                            "_id" => $variant->id
-                        ]
-                    ];
-                }
             }
             if(isset($params)) $this->client->bulk($params);
         }

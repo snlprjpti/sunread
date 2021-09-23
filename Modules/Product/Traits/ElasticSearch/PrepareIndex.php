@@ -13,7 +13,7 @@ trait PrepareIndex
     {
         try
         {
-            $batch = Bus::batch([])->dispatch();
+            $batch = Bus::batch([])->onQueue("index")->dispatch();
             foreach($products as $product) $this->preparingSingleData($product, $batch, $method);
         }
         catch(Exception $exception)
@@ -26,9 +26,9 @@ trait PrepareIndex
     {
         try
         {
-            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
             
             foreach($stores as $store) {
                 if(!$method) $this->prepareIndexing($product, $batch, $store);

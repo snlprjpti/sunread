@@ -30,10 +30,8 @@ class SessionController extends BaseController
         try
         {
             $data = $request->validate([
-                "email" => "required|email|exists:admins,email",
+                "email" => "required|email",
                 "password" => "required"
-            ], [
-                "email.exists" => "Invalid Credentials."
             ]);
 
             $jwtToken = Auth::guard("admin")
