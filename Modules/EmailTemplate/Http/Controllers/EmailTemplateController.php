@@ -71,9 +71,7 @@ class EmailTemplateController extends BaseController
             $fetched = $this->repository->fetch($id);
             if(!$request->scope) $request->scope = "global";
             if(!$request->scope_id) $request->scope_id = 0;
-            $fetched->content = $this->repository->getTemplate($fetched->content, $request);
-//            $this->repository->sendEmailDemo($request);
-//            dd("yes");
+            $fetched->content = $this->repository->getHtmlTemplate($fetched->content, $request);
         }
         catch( Exception $exception )
         {

@@ -80,7 +80,7 @@ class EmailTemplateRepository extends BaseRepository
     public function templateGroupValidation(object $request): void
     {
         $all_groups = collect($this->config_template)->pluck("code")->toArray();
-        if(! in_array($request->template_code, $all_groups))  throw ValidationException::withMessages([ "email_template_code" => __("Invalid Template Code") ]);
+        if(! in_array($request->email_template_code, $all_groups))  throw ValidationException::withMessages([ "email_template_code" => __("Invalid Template Code") ]);
     }
 
     public function getTemplate(string $content, object $request): array
@@ -125,7 +125,6 @@ class EmailTemplateRepository extends BaseRepository
                 $temp = preg_grep("#\((.*?)\)#", $preg_data[0]);
                 foreach($temp as $t) {
                     preg_match('#\("(.*?)"\)#', $t, $path);
-
                     $template = SiteConfig::fetch($path[1], "website", 1);
                     $fetched[$path[1]] = $template->content;
                 }
