@@ -17,6 +17,9 @@ class ErpMigrateVisibilityUpdateJob implements ShouldQueue
 
     protected $product;
 
+    public $tries = 10;
+    public $timeout = 90000;
+
     public function __construct(object $product)
     {
         $this->product = $product;

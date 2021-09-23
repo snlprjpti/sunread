@@ -21,6 +21,9 @@ class ErpMigrateVariantJob implements ShouldQueue
 
     protected $product, $variant, $erp_product_iteration;
 
+    public $tries = 10;
+    public $timeout = 90000;
+
     public function __construct(object $product, mixed $variant, object $erp_product_iteration)
     {
         $this->product = $product;
@@ -28,7 +31,7 @@ class ErpMigrateVariantJob implements ShouldQueue
         $this->erp_product_iteration = $erp_product_iteration;
     }
 
-    public function handle(): string
+    public function handle(): void
     {
         try 
         {
@@ -78,6 +81,5 @@ class ErpMigrateVariantJob implements ShouldQueue
             throw $exception;
         }
 
-        return "asd";
     }
 }
