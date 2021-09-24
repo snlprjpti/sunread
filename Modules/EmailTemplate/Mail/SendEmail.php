@@ -27,8 +27,5 @@ class SendEmail extends Mailable
     {
         $this->subject($this->subject);
         return $this->markdown('emailtemplate::mailTemplate');
-//        $this->from($this->fromAddress);
-//        $this->html($this->htmlBody);
-//        return $this;
     }
 }
