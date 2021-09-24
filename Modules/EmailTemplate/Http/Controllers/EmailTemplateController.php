@@ -69,8 +69,6 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            Event::dispatch("send.email", ["new_order", 1]);
-
             $fetched = $this->repository->fetch($id);
         }
         catch( Exception $exception )
