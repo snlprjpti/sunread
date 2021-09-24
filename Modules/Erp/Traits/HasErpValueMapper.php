@@ -4,6 +4,7 @@ namespace Modules\Erp\Traits;
 
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Bus\Batch;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
@@ -34,17 +35,14 @@ trait HasErpValueMapper
         {
             $erp_details = ErpImportDetail::whereErpImportId(2)->whereJsonContains("value->webAssortmentWeb_Active", true)->whereJsonContains("value->webAssortmentWeb_Setup", "SR")->get(); 
             $chunked = $erp_details->chunk(100);
-            $count = 0;
             foreach ( $chunked as $chunk )
             {
                 foreach ( $chunk as $detail )
                 {
-                    if ( $count == 10 ) break;
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
-                    ErpMigratorJob::dispatchSync($detail)->onQueue("erp");
-                    $count++;
+                    ErpMigratorJob::dispatch($detail)->onQueue("erp");
                 }
             }
         }
@@ -510,8 +508,9 @@ trait HasErpValueMapper
                 foreach ( $this->getValue($variants) as $variant ) {
                     $jobs[] = new ErpMigrateVariantJob($product, $variant, $erp_product_iteration);
                 }
-                $jobs[] = new ErpMigrateVisibilityUpdateJob($product);
-                Bus::chain($jobs)->onQueue('erp')->dispatch();
+                Bus::batch($jobs)->then(function (Batch $batch) use ($product) {
+                    ErpMigrateVisibilityUpdateJob::dispatch($product)->onQueue('erp');
+                })->allowFailures()->onQueue('erp')->dispatch();
             }
         }
         catch ( Exception $exception )
