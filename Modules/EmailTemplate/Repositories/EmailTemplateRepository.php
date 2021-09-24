@@ -9,6 +9,7 @@ use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Repositories\ConfigurationRepository;
 use Modules\Customer\Entities\Customer;
+use Modules\Customer\Entities\CustomerAddress;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Exception;
 use Modules\EmailTemplate\Jobs\SendEmailJob;
@@ -34,7 +35,7 @@ class EmailTemplateRepository extends BaseRepository
         $this->configurationRepository = $configurationRepository;
     }
 
-    public function getConfigData(): array
+    public function getConfigGroup(): array
     {
         try
         {
@@ -83,29 +84,40 @@ class EmailTemplateRepository extends BaseRepository
         if (!in_array($request->email_template_code, $all_groups)) throw ValidationException::withMessages(["email_template_code" => __("Invalid Template Code")]);
     }
 
-    public function newEvent(string $event)
+    public function newEvent(string $event): bool
     {
-        /*
-         * get template from configurations
-         * */
-        $email_template_id = 3;
-        $email_template = $this->model::findOrFail($email_template_id);
+        try
+        {
 
-        /*
-         *  get all variables according to template_codes
-        */
+            $entity_id = 1;
+            $event = "welcome_email";
+
+            /*
+             * get template from configurations according to scope, scope id and event code
+             */
+            $email_template_id = 3;
+            $email_template = $this->model::findOrFail($email_template_id);
+
+            /*
+             *  get all variables according to template_codes
+            */
 //        $variables = $this->getEventVariable($email_template->email_template_code);
 
+            /*
+             *  get all variable with data
+            */
+            $variable_data = $this->getVariableData($email_template->email_template_code, $entity_id);
 
-        /*
-         *  get all variable with data
-        */
-        $variable_data = $this->getVariableData($email_template->email_template_code);
+            $content = $this->render($email_template->content, $variable_data);
+            $subject = $this->render($email_template->subject, $variable_data);
+            $this->sendEmail($content, $subject);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
-
-        $content = $this->render($email_template->content, $variable_data);
-        $subject = $this->render($email_template->subject, $variable_data);
-        $this->sendEmail($content, $subject);
+        return true;
     }
 
     public function render(string $content, $data = null): string
@@ -128,17 +140,12 @@ class EmailTemplateRepository extends BaseRepository
         return ob_get_clean();
     }
 
-    public function sendEmail(string $content, string $subject): void
-    {
-        SendEmailJob::dispatch( $content, $subject );
-    }
-
-    public function getVariableData($template_code): array
+    public function getVariableData(string $event_code, int $entity_id): array
     {
         try
         {
             $general = $this->getGeneralVariableData();
-            switch ($template_code) {
+            switch ($event_code) {
                 case "forgot_password" :
                     $data = $this->forgotPassword();
                     break;
@@ -153,14 +160,14 @@ class EmailTemplateRepository extends BaseRepository
 
                 case "new_account":
                 case "welcome_email":
-                    $data = $this->customerData();
+                    $data = $this->orderData($entity_id);
                     break;
 
                 case "new_order" :
                 case "order_update" :
                 case "new_guest_order" :
                 case "order_update_guest" :
-                    $data = $this->orderData();
+                    $data = $this->orderData($entity_id);
                     break;
             }
         }
@@ -172,38 +179,41 @@ class EmailTemplateRepository extends BaseRepository
         return array_merge($general, $data);
     }
 
-    public function getEventVariable(string $template_code): array
+//    private function getEventVariable(string $template_code): array
+//    {
+//        try
+//        {
+//            $elements = collect($this->config_variable)->pluck("variables")->flatten(1);
+//
+//            $data = [];
+//            foreach ($elements as $element) {
+//                if (in_array($template_code, $element["availability"]) || $element["availability"] == ["all"]) {
+//
+//                    $data[] = $element["variable"];
+//                }
+//            }
+//        }
+//        catch (Exception $exception)
+//        {
+//            throw $exception;
+//        }
+//
+//        return $data;
+//    }
+
+    private function getCustomerData(int $customer_id)
     {
         try
         {
-            $elements = collect($this->config_variable)->pluck("variables")->flatten(1);
-
-            $data = [];
-            foreach ($elements as $element) {
-                if (in_array($template_code, $element["availability"]) || $element["availability"] == ["all"]) {
-
-                    $data[] = $element["variable"];
-                }
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $data;
-    }
-
-    public function getCustomerData($customer_id)
-    {
-        try
-        {
+            /* get customer data by customer id */
             $customer = Customer::findOrFail($customer_id);
-
+            /* get store data by its id */
             $store = Store::findOrFail($customer->store_id);
+            /* get channel by store */
             $channel = $store->channel;
 
-            $store_front_baseurl = SiteConfig::fetch("storefront_base_urL");
+            /* get store url from configuration */
+            $store_front_baseurl = SiteConfig::fetch("storefront_base_urL", "store", $store->id);
 
             $storefront_url = $store_front_baseurl . '/' . $channel->code . '/' . $store->code;
 
@@ -214,13 +224,7 @@ class EmailTemplateRepository extends BaseRepository
                 "customer_name" => $customer->first_name . ' ' . $customer->middle_name . ' ' . $customer->last_name,
                 "customer_email_address" => $customer->email,
                 "customer_dashboard_url" => $customer_dashboard_url,
-                "account_confirmation_url" => $customer_dashboard_url,
-                "password_reset_url" => $customer_dashboard_url,
-                "order_id" => $customer_dashboard_url,
-                "order_items" => $customer_dashboard_url,
-                "billing_address" => $customer_dashboard_url,
-                "shipping_address" => $customer_dashboard_url,
-                "order" => $customer_dashboard_url
+                "account_confirmation_url" => $customer_dashboard_url
             ];
         }
         catch (Exception $exception)
@@ -296,30 +300,18 @@ class EmailTemplateRepository extends BaseRepository
         return array_merge($customer_data, $data);
     }
 
-    private function customerData()
+    private function orderData(int $entity_id)
     {
         try
         {
             $customer_data = $this->getCustomerData(1);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $customer_data;
-    }
-
-    private function orderData()
-    {
-        try
-        {
-            $customer_data = $this->getCustomerData(1);
+            $billing = $this->getBillingAddress(1);
+            $shipping = $this->getShippingAddress(1);
             $data = [
                 "order_id" => 1,
                 "order_items" => 1,
-                "billing_address" => 1,
-                "shipping_address" => 1,
+                "billing_address" => $billing,
+                "shipping_address" => $shipping,
                 "order" => 1
             ];
         }
@@ -329,5 +321,38 @@ class EmailTemplateRepository extends BaseRepository
         }
 
         return array_merge($customer_data, $data);
+    }
+
+    private function getBillingAddress(int $customer_id): object
+    {
+        try
+        {
+            $address = CustomerAddress::whereCustomerId($customer_id)->whereDefaultBillingAddress(1)->first();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $address;
+    }
+
+    private function getShippingAddress(int $customer_id): object
+    {
+        try
+        {
+            $address = CustomerAddress::whereCustomerId($customer_id)->whereDefaultShippingAddress(1)->first();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $address;
+    }
+
+    public function sendEmail(string $content, string $subject): void
+    {
+        SendEmailJob::dispatch( $content, $subject );
     }
 }

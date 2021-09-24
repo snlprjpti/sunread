@@ -68,6 +68,7 @@ class EmailTemplateController extends BaseController
     {
         try
         {
+            $this->repository->newEvent("das");
             $fetched = $this->repository->fetch($id);
         }
         catch( Exception $exception )
@@ -112,7 +113,7 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->getConfigData();
+            $fetched = $this->repository->getConfigGroup();
         }
         catch( Exception $exception )
         {
