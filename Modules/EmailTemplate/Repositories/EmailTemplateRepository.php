@@ -323,7 +323,7 @@ class EmailTemplateRepository extends BaseRepository
         return array_merge($customer_data, $data);
     }
 
-    private function getBillingAddress(int $customer_id): object
+    private function getBillingAddress(int $customer_id): object|null
     {
         try
         {
@@ -337,7 +337,7 @@ class EmailTemplateRepository extends BaseRepository
         return $address;
     }
 
-    private function getShippingAddress(int $customer_id): object
+    private function getShippingAddress(int $customer_id): object|null
     {
         try
         {
