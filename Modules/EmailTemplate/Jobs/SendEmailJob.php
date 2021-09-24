@@ -8,7 +8,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Mail;
-use Modules\EmailTemplate\Mail\SampleTemplate;
+use Modules\EmailTemplate\Mail\SendEmail;
 
 class SendEmailJob implements ShouldQueue
 {
@@ -24,6 +24,6 @@ class SendEmailJob implements ShouldQueue
 
     public function handle(): void
     {
-        Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($this->content, $this->subject));
+        Mail::to("sl.prjpti@gmail.com")->send(new SendEmail($this->content, $this->subject));
     }
 }

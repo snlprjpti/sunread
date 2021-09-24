@@ -2,9 +2,7 @@
 
 namespace Modules\EmailTemplate\Repositories;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Store;
 use Modules\Core\Facades\SiteConfig;
@@ -14,7 +12,6 @@ use Modules\Customer\Entities\Customer;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Exception;
 use Modules\EmailTemplate\Jobs\SendEmailJob;
-use Modules\EmailTemplate\Mail\SampleTemplate;
 
 class EmailTemplateRepository extends BaseRepository
 {
