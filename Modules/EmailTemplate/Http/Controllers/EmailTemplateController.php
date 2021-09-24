@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Event;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Modules\EmailTemplate\Repositories\EmailTemplateRepository;
@@ -68,6 +69,8 @@ class EmailTemplateController extends BaseController
     {
         try
         {
+            Event::dispatch("send.email", ["new_order", 1]);
+
             $fetched = $this->repository->fetch($id);
         }
         catch( Exception $exception )
