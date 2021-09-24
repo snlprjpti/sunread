@@ -229,6 +229,7 @@ class ProductRepository extends BaseRepository
                         continue;
                     }
                     $product_image = ProductImage::whereId($item["id"])->first();
+                    $product_image->update(["position" => $item["position"], "background_color" => $item["background_color"]]);
                     $product_image->types()->detach($product_image);
                     $image_type_ids = ImageType::whereIn("slug", $item["type"])->pluck("id")->toArray();
                     $product_image->types()->sync($image_type_ids);
@@ -513,7 +514,10 @@ class ProductRepository extends BaseRepository
 
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
                         {
-                            $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute); 
+                            if ($attribute->slug == "quantity_and_stock_status") {
+                                $attributesData["options"] = [["value" => 1, "label" => "In Stock"],["value" => 0, "label" => "Out of Stock"]];
+                            }
+                            else $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute);  
                             if($attributesData["value"] && !is_array($attributesData["value"])) $attributesData["value"] = json_decode($attributesData["value"]);
                         } 
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->attribute_set_repository->getInventoryChildren($product->id);

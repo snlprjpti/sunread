@@ -18,8 +18,10 @@ class PageAttributeController extends BaseController
         $this->model = $pageAttribute;
         $this->model_name = "Page Attribute";
         $this->repository = $pageAttributeRepository;
-
-        parent::__construct($this->model, $this->model_name);
+        $exception_statuses = [
+            PageNotFoundException::class => 404
+        ];
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function index(Request $request): JsonResponse

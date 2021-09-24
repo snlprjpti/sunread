@@ -27,9 +27,9 @@ class ElasticSearchImport extends Command
 
     public function handle(): void
     {
+        $batch = Bus::batch([])->onQueue("index")->dispatch();
+        
         $products = Product::whereType("simple")->whereParentId(null)->get();
-
-        $batch = Bus::batch([])->dispatch();
         foreach($products as $product)
         {
             $stores = Website::find($product->website_id)->channels->map(function ($channel) {
@@ -42,7 +42,11 @@ class ElasticSearchImport extends Command
         $variants = Product::whereType("configurable")->get();
         foreach($variants as $variant)
         {
-            $batch->add(new ConfigurableIndexing($variant));
+            $stores = Website::find($variant->website_id)->channels->map(function ($channel) {
+                return $channel->stores;
+            })->flatten(1);
+    
+            foreach( $stores as $store) $batch->add(new ConfigurableIndexing($variant, $store));
         }
         $this->info("All data imported successfully");
     }

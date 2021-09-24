@@ -17,7 +17,7 @@ class StoreListener
         //indexing products in elasticsearch for new store
         $website = $store?->channel?->website;
         $products = Product::whereWebsiteId($website->id)->get();
-        $batch = Bus::batch([])->dispatch();
+        $batch = Bus::batch([])->onQueue("index")->dispatch();
         foreach($products as $product) $batch->add(new SingleIndexing($product, $store));
     }
 

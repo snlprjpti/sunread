@@ -35,7 +35,8 @@ class CustomerRepository extends BaseRepository
             "website_id" => "required|exists:websites,id",
             "store_id" => "nullable|exists:stores,id",
             "subscribed_to_news_letter" => "sometimes|boolean",
-            "password" => "sometimes|nullable|min:6|confirmed"
+            "password" => "sometimes|nullable|min:6|confirmed",
+            "account_type" => "required|in:personal,company"
         ];
     }
 

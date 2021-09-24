@@ -30,6 +30,7 @@ class ProductTest extends BaseTestCase
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
         $this->hasStatusTest = true;
+        $this->hasUpdateTest = false;
          
     }
 
