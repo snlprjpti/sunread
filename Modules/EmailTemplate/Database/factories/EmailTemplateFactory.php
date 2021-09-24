@@ -10,10 +10,11 @@ class EmailTemplateFactory extends Factory
     public function definition(): array
     {
         return [
-            "template_name" => $this->faker->name(),
-            "template_subject" => $this->faker->name(),
-            "template_content" => $this->faker->paragraph(),
-            "template_style" => $this->faker->name()
+            "name" => $this->faker->name(),
+            "subject" => $this->faker->name(),
+            "content" => $this->faker->paragraph(),
+            "style" => $this->faker->name(),
+            "email_template_code" => "welcome_email"
         ];
     }
 }

@@ -21,15 +21,15 @@ class EmailTemplateTest extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "template_name" => null,
-            "template_content"=>null
+            "name" => null,
+            "content"=>null
         ]);
     }
 
     public function getNonMandodtaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "template_style" => null
+            "style" => null
         ]);
     }
 }
