@@ -4,8 +4,10 @@ namespace Modules\Erp\Traits;
 
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Bus\Batch;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
 use Modules\Erp\Entities\ErpImport;
 use Modules\Product\Entities\Product;
 use Modules\Attribute\Entities\Attribute;
@@ -16,6 +18,8 @@ use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Erp\Entities\ErpImportDetail;
+use Modules\Erp\Jobs\Mapper\ErpMigrateVariantJob;
+use Modules\Erp\Jobs\Mapper\ErpMigrateVisibilityUpdateJob;
 use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Erp\Jobs\Mapper\ErpMigratorJob;
 use Modules\Inventory\Entities\CatalogInventoryItem;
@@ -25,30 +29,12 @@ use Modules\Product\Entities\ProductAttributeString;
 
 trait HasErpValueMapper
 {
-    protected array $erp_types = [
-        "webAssortments",
-        "listProducts",
-        "attributeGroups",
-        "salePrices",
-        "eanCodes",
-        "webInventories",
-        "productDescriptions",
-        "productVariants",
-        "productImages"
-    ];
-
-    protected array $erp_attributes = [
-        "Features",
-        "Size and Care",
-        "Ean Code"
-    ];
-
     public function importAll(): void
     {
         try
         {
             $erp_details = ErpImportDetail::whereErpImportId(2)->whereJsonContains("value->webAssortmentWeb_Active", true)->whereJsonContains("value->webAssortmentWeb_Setup", "SR")->get(); 
-            $chunked = $erp_details->chunk(100); 
+            $chunked = $erp_details->chunk(100);
             foreach ( $chunked as $chunk )
             {
                 foreach ( $chunk as $detail )
@@ -56,7 +42,7 @@ trait HasErpValueMapper
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
-                    ErpMigratorJob::dispatch($detail);
+                    ErpMigratorJob::dispatch($detail)->onQueue("erp");
                 }
             }
         }
@@ -517,54 +503,14 @@ trait HasErpValueMapper
         try
         {
             $variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
-
-            if ( $variants->count() > 1 )
-            {		
-                $ean_codes = $this->getDetailCollection("eanCodes", $erp_product_iteration->sku);
-                foreach ( $this->getValue($variants) as $variant )
-                {
-                    $product_data = [
-                        "parent_id" => $product->id,
-                        "attribute_set_id" => 1,
-                        "website_id" => 1,
-                        "sku" => "{$product->sku}_{$variant['pfVerticalComponentCode']}_{$variant['pfHorizontalComponentCode']}",
-                        "type" => "simple",
-                    ];
-
-                    $match = [
-                        "website_id" => 1,
-                        "sku" => "{$product->sku}_{$variant['pfVerticalComponentCode']}_{$variant['pfHorizontalComponentCode']}",
-                    ];
-
-                    $variant_product = Product::updateOrCreate($match, $product_data);
-                    $variant_product->categories()->sync(1);
-                    $ean_code = $this->getValue($ean_codes)->where("variantCode", $variant["code"])->first()["crossReferenceNo"] ?? "" ;
-
-                    $this->createAttributeValue($variant_product, $erp_product_iteration, $ean_code, 8, $variant);
-                    $attribute_options = AttributeOption::get()->filter(function ($attribute_option) use ($variant) {
-                        return $attribute_option->code == $variant["pfVerticalComponentCode"] || $attribute_option->name == $variant["pfHorizontalComponentCode"];
-                    });
-
-                    if ($attribute_options->count() > 1)
-                    {
-                        foreach ( $attribute_options as $attribute_option )
-                        {
-                            $configurable_product_attributes["product_id"] = $product->id;
-                            $configurable_product_attributes["attribute_id"] = $attribute_option?->attribute_id;
-
-                            $configurable_product_attributes["used_in_grouping"] = ($attribute_option?->attribute_id == $this->getAttributeId("color")) ? 1 : 0;
-                            AttributeConfigurableProduct::updateOrCreate($configurable_product_attributes);
-                            AttributeOptionsChildProduct::updateOrCreate([
-                                "attribute_option_id" => $attribute_option?->id,
-                                "product_id" => $variant_product->id 
-                            ]);
-                        }
-                    }
-                    $this->mapstoreImages($variant_product, $erp_product_iteration, $variant);
-                    $this->createInventory($variant_product, $erp_product_iteration, $variant);
+            if ( $variants->count() > 1 ) {		
+                $jobs = [];
+                foreach ( $this->getValue($variants) as $variant ) {
+                    $jobs[] = new ErpMigrateVariantJob($product, $variant, $erp_product_iteration);
                 }
-
-                $this->updateVisibility($product);
+                Bus::batch($jobs)->then(function (Batch $batch) use ($product) {
+                    ErpMigrateVisibilityUpdateJob::dispatch($product)->onQueue('erp');
+                })->allowFailures()->onQueue('erp')->dispatch();
             }
         }
         catch ( Exception $exception )

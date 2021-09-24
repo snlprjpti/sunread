@@ -20,7 +20,7 @@ class ErpAttributeOptionMigrate extends Command
 
     public function handle(): bool
     {
-        ErpMigrateAttributeOptionJob::dispatch();
+        ErpMigrateAttributeOptionJob::dispatch()->onQueue('erp');
         $this->info("All jobs dispatched.");
         return true;
     }
