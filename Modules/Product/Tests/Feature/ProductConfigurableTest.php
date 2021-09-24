@@ -29,6 +29,7 @@ class ProductConfigurableTest extends BaseTestCase
         $this->hasFilters = false;
         $this->hasIndexTest = false;
         $this->hasShowTest = false;
+        $this->hasUpdateTest = false;
         $this->hasDestroyTest = false;
         $this->hasBulkDestroyTest = false;
         $this->hasStatusTest = false;
