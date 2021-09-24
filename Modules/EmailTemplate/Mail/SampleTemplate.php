@@ -12,7 +12,7 @@ class SampleTemplate extends Mailable
 
     public $details, $subject;
 
-    public function __construct($details, $subject)
+    public function __construct(string $details, string $subject)
     {
         $this->details = $details;
         $this->subject = $subject;

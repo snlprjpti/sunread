@@ -1,2 +1,2 @@
 
-{!! $details["body"] !!}
+{!! $details !!}

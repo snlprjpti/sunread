@@ -13,6 +13,7 @@ use Modules\Core\Repositories\ConfigurationRepository;
 use Modules\Customer\Entities\Customer;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Exception;
+use Modules\EmailTemplate\Jobs\SendEmailJob;
 use Modules\EmailTemplate\Mail\SampleTemplate;
 
 class EmailTemplateRepository extends BaseRepository
@@ -105,9 +106,9 @@ class EmailTemplateRepository extends BaseRepository
         $variable_data = $this->getVariableData($email_template->email_template_code);
 
 
-        $email_template->content = $this->render($email_template->content, $variable_data);
-        $email_template->subject = $this->render($email_template->subject, $variable_data);
-        $this->sendEmail($email_template);
+        $content = $this->render($email_template->content, $variable_data);
+        $subject = $this->render($email_template->subject, $variable_data);
+        $this->sendEmail($content, $subject);
     }
 
     public function render(string $content, $data = null): string
@@ -130,12 +131,9 @@ class EmailTemplateRepository extends BaseRepository
         return ob_get_clean();
     }
 
-    public function sendEmail(object $email_template): void
+    public function sendEmail(string $content, string $subject): void
     {
-        $details = [
-            'body' => $email_template->content
-        ];
-        Mail::to("sl.prjpti@gmail.com")->send(new SampleTemplate($details, $email_template->subject));
+        SendEmailJob::dispatch( $content, $subject );
     }
 
     public function getVariableData($template_code): array
