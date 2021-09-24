@@ -108,11 +108,11 @@ class EmailTemplateController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
-    public function templateGroup(Request $request)
+    public function templateGroup(): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->getConfigData($request);
+            $fetched = $this->repository->getConfigData();
         }
         catch( Exception $exception )
         {
@@ -122,7 +122,7 @@ class EmailTemplateController extends BaseController
         return $this->successResponse($fetched, $this->lang('fetch-list-success'));
     }
 
-    public function templateVariable(Request $request)
+    public function templateVariable(Request $request): JsonResponse
     {
         try
         {
