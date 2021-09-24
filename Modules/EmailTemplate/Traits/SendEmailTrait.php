@@ -20,7 +20,7 @@ trait SendEmailTrait
             /*
              * get template from configurations according to scope, scope id and event code
              */
-            $email_template_id = 3;
+            $email_template_id = 1;
             $email_template = EmailTemplate::findOrFail($email_template_id);
 
             /*
