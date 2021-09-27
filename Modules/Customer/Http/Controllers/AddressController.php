@@ -66,14 +66,11 @@ class AddressController extends BaseController
     {
         try
         {
-            $customer = Customer::findOrFail($customer_id);
-            $website = Website::findOrFail($customer->website_id);
-            $channel_id = ($channel = $website->channels->where("id", $request->channel_id)->where("website_id", $website->id)->first()) ? $channel->id : null;
+            $channel_id = $this->repository->checkCustomerChannel($request, $customer_id);
             $request->request->add(["channel_id" => $channel_id]);
-
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer) {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
                 return [
-                    "customer_id" => $customer->id
+                    "customer_id" => $customer_id
                 ];
             });
 
@@ -109,14 +106,12 @@ class AddressController extends BaseController
     {
         try
         {
-            $customer =  Customer::findOrFail($customer_id);
-            $website = Website::findOrFail($customer->website_id);
-            $channel_id = ($channel = $website->channels->where("id", $request->channel_id)->where("website_id", $website->id)->first()) ? $channel->id : null;
+            $channel_id = $this->repository->checkCustomerChannel($request, $customer_id);
             $request->request->add(["channel_id" => $channel_id]);
 
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer) {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
                 return [
-                    "customer_id" => $customer->id
+                    "customer_id" => $customer_id
                 ];
             });
 

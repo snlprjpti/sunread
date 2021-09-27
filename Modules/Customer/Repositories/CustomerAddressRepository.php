@@ -5,6 +5,7 @@ namespace Modules\Customer\Repositories;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Modules\Core\Entities\Website;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
@@ -35,7 +36,7 @@ class CustomerAddressRepository extends BaseRepository
             "default_shipping_address" => "sometimes|boolean",
             "region_name" => "sometimes",
             "city_name" => "sometimes",
-            "channel_id" => "required|nullable|exists:channels,id",
+            "channel_id" => "required|exists:channels,id",
         ];
     }
 
@@ -96,5 +97,21 @@ class CustomerAddressRepository extends BaseRepository
         DB::commit();
 
         return $updated;
+    }
+
+    public function checkCustomerChannel(object $request, int $customer_id): int|null
+    {
+        try
+        {
+            $customer = Customer::findOrFail($customer_id);
+            $website = Website::findOrFail($customer->website_id);
+            $channel_id = $website->channels->where("id", $request->channel_id)->where("website_id", $website->id)->first()?->id;
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $channel_id;
     }
 }
