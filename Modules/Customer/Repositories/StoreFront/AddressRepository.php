@@ -37,7 +37,7 @@ class AddressRepository extends BaseRepository
             "default_shipping_address" => "sometimes|boolean",
             "region_name" => "sometimes",
             "city_name" => "sometimes",
-            "channel_id" => "required|nullable|exists:channels,id"
+            "channel_id" => "required|exists:channels,id"
         ];
     }
 
@@ -156,6 +156,30 @@ class AddressRepository extends BaseRepository
                 $data["city_id"] = null;
                 $region = Region::whereCountryId($data["country_id"])->count();
                 if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "{$name} Region" ]));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    public function getCustomerAddress(object $request, object $customer): array
+    {
+        try
+        {
+            $channel_code = $request->header("hc-channel");
+            $data["shipping"] = null;
+            $data["billing"] = null;
+            if ($channel_code) {
+                $website = Website::findOrFail($customer->website_id);
+                $channel_id = $website->channels->where("code", $channel_code)->where("website_id", $website->id)->first()?->id;
+                if ($channel_id) {
+                    $data["shipping"] = $this->checkShippingAddress($customer->id, $channel_id)->first();
+                    $data["billing"] = $this->checkBillingAddress($customer->id, $channel_id)->first();
+                }
             }
         }
         catch (Exception $exception)
