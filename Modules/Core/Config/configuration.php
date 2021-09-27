@@ -361,8 +361,8 @@ return[
                                 "is_required" => 1
                             ],
                             [
-                                "title" => "Store Currency",
-                                "path" => "store_currency",
+                                "title" => "Default Display Currency",
+                                "path" => "default_display_currency",
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
@@ -370,7 +370,7 @@ return[
                                 "options" => [],
                                 "rules" => "exists:currencies,id",
                                 "multiple" => false,
-                                "scope" => "channel",
+                                "scope" => "website",
                                 "is_required" => 1
                             ],
                         ]
