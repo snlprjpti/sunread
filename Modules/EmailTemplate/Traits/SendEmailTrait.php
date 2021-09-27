@@ -15,11 +15,11 @@ trait SendEmailTrait
     {
         try
         {
-            /*
+            /**
              *  get all variable with its following data
             */
             $variable_data = $this->getVariableData($event, $entity_id);
-            /*
+            /**
              * get template from configurations according to scope, scope id and event code
              */
             $email_template = SiteConfig::fetch($event."_template", "store", $variable_data["store_id"]);
@@ -42,7 +42,7 @@ trait SendEmailTrait
     {
         try
         {
-            /*
+            /**
              compile content to render in blade file
               */
             $php = Blade::compileString($content);
@@ -58,6 +58,9 @@ trait SendEmailTrait
         return ob_get_clean();
     }
 
+    /**
+     * get variables data from event
+     */
     public function getVariableData(string $event_code, int $entity_id): array
     {
         try
@@ -101,14 +104,22 @@ trait SendEmailTrait
     {
         try
         {
-            /* get customer data by customer id */
+            /**
+             * get customer data by customer id
+             */
             $customer = Customer::findOrFail($customer_id);
-            /* get store data by its id */
+            /**
+             * get store data by its id
+             */
             $store = Store::findOrFail($customer->store_id);
-            /* get channel by store */
+            /**
+             * get channel by store
+             */
             $channel = $store->channel;
 
-            /* get store url from configuration */
+            /**
+             * get store url from configuration
+             */
             $store_front_baseurl = SiteConfig::fetch("storefront_base_urL", "store", $store->id);
 
             $storefront_url = $store_front_baseurl . '/' . $channel->code . '/' . $store->code;
@@ -132,7 +143,7 @@ trait SendEmailTrait
         return $data;
     }
 
-    /*
+    /**
         get general variables data
     */
     public function getGeneralVariableData(): array
@@ -163,7 +174,7 @@ trait SendEmailTrait
         return $data;
     }
 
-    /*
+    /**
         get forgot password variables data
     */
     private function forgotPassword(int $customer_id)
@@ -183,7 +194,7 @@ trait SendEmailTrait
         return array_merge($customer_data, $data);
     }
 
-    /*
+    /**
         get reset password variables data
     */
     private function resetPassword(int $customer_id)
@@ -203,17 +214,21 @@ trait SendEmailTrait
         return array_merge($customer_data, $data);
     }
 
-    /*
+    /**
         get order variables data
     */
     private function orderData(int $entity_id)
     {
         try
         {
-            /* get order object by its entity id */
+            /**
+             * get order object by its entity id
+             */
             $order = $entity_id;
 
-            /* get customer detail by order id */
+            /**
+             * get customer detail by order id
+             */
             $customer_id = 1;
 
             $customer_data = $this->getCustomerData($customer_id);
@@ -236,7 +251,7 @@ trait SendEmailTrait
         return array_merge($customer_data, $data);
     }
 
-    /*
+    /**
         get customer billing address data
     */
     private function getBillingAddress(int $customer_id): object|null
@@ -253,7 +268,7 @@ trait SendEmailTrait
         return $address;
     }
 
-    /*
+    /**
         get customer shipping address data
     */
     private function getShippingAddress(int $customer_id): object|null
