@@ -8,6 +8,8 @@
         "Modules\\Notification\\Providers\\NotificationServiceProvider"
     ],
     "aliases": {},
-    "files": [],
+    "files": [
+        "Helper/helper.php"
+    ],
     "requires": []
 }
