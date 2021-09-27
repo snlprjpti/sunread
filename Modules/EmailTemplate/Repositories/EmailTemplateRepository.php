@@ -29,8 +29,8 @@ class EmailTemplateRepository extends BaseRepository
         $this->configurationRepository = $configurationRepository;
     }
 
-    /*
-     * get template group data from config
+    /**
+     * get template group data from configuration file
     */
     public function getConfigGroup(): array
     {
@@ -46,8 +46,8 @@ class EmailTemplateRepository extends BaseRepository
         return $config_data;
     }
 
-    /*
-     * get template variables from config
+    /**
+     * get all template variables by email_template_code from configuration file
     */
     public function getConfigVariable(object $request): array
     {
@@ -78,7 +78,7 @@ class EmailTemplateRepository extends BaseRepository
         return $data;
     }
 
-    /*
+    /**
      *  validate template group
     */
     public function templateGroupValidation(object $request): void
