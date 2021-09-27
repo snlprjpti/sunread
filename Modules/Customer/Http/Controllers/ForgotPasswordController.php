@@ -5,6 +5,7 @@ namespace Modules\Customer\Http\Controllers;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Event;
 use Modules\Customer\Entities\Customer;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -43,6 +44,7 @@ class ForgotPasswordController extends BaseController
         {
             return $this->handleException($exception);
         }
+        Event::dispatch( "storefront.customer.forgot.password", [ "customer_id" => $customer->id] );
 
         return $this->successResponseWithMessage("Reset Link sent to your email {$customer->email}");
     }
