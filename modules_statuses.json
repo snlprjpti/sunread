@@ -15,5 +15,6 @@
     "Inventory": true,
     "Erp": true,
     "Cart": true,
-    "EmailTemplate": true
+    "EmailTemplate": true,
+    "Notification": true
 }
