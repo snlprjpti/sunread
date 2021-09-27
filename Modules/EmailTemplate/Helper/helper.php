@@ -1,11 +1,12 @@
 <?php
 
-use \Modules\EmailTemplate\Entities\EmailTemplate;
+use Modules\Core\Facades\SiteConfig;
 
-if (!function_exists('hc_include_email_template')) {
-    function hc_include_email_template($path, $scope, $scope_id)
+if (!function_exists('hc_include_email_template'))
+{
+    function hc_include_email_template($path)
     {
-        $template = EmailTemplate::findOrFail(1);
+        $template = SiteConfig::fetch($path, "store", config('store'));
         return $template->content;
     }
 }

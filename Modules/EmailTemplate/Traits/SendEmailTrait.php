@@ -7,7 +7,6 @@ use Modules\Core\Entities\Store;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
-use Modules\EmailTemplate\Entities\EmailTemplate;
 use Exception;
 
 trait SendEmailTrait
@@ -16,22 +15,16 @@ trait SendEmailTrait
     {
         try
         {
-            $entity_id = 1;
+            /*
+             *  get all variable with its following data
+            */
+            $variable_data = $this->getVariableData($event, $entity_id);
             /*
              * get template from configurations according to scope, scope id and event code
              */
-            $email_template_id = 1;
-            $email_template = EmailTemplate::findOrFail($email_template_id);
+            $email_template = SiteConfig::fetch($event."_template", "store", $variable_data["store_id"]);
 
-            /*
-             *  get all variables according to template_codes
-            */
-//        $variables = $this->getEventVariable($email_template->email_template_code);
-
-            /*
-             *  get all variable with data
-            */
-            $variable_data = $this->getVariableData($email_template->email_template_code, $entity_id);
+            config(['store' => $variable_data["store_id"]]);
 
             $data["content"] = $this->render($email_template->content, $variable_data);
             $data["subject"] = $this->render($email_template->subject, $variable_data);
@@ -127,7 +120,8 @@ trait SendEmailTrait
                 "customer_name" => $customer->first_name . ' ' . $customer->middle_name . ' ' . $customer->last_name,
                 "customer_email_address" => $customer->email,
                 "customer_dashboard_url" => $customer_dashboard_url,
-                "account_confirmation_url" => $customer_dashboard_url
+                "account_confirmation_url" => $customer_dashboard_url,
+                "store_id" => $customer->store_id
             ];
         }
         catch (Exception $exception)
@@ -218,7 +212,10 @@ trait SendEmailTrait
         {
             /* get order object by its entity id */
             $order = $entity_id;
+
+            /* get customer detail by order id */
             $customer_id = 1;
+
             $customer_data = $this->getCustomerData($customer_id);
             $billing = $this->getBillingAddress($customer_id);
             $shipping = $this->getShippingAddress($customer_id);
@@ -227,7 +224,8 @@ trait SendEmailTrait
                 "order_items" => 1,
                 "billing_address" => $billing,
                 "shipping_address" => $shipping,
-                "order" => 1
+                "order" => 1,
+                "store_id" => 1
             ];
         }
         catch (Exception $exception)
