@@ -157,7 +157,7 @@ return [
                 "variable" => "order_id",
                 "label" => "Order ID",
                 "type" => "integer",
-                "source" => "Modules\Country\Entities\Country",
+                "source" => "",
                 "availability" => ["new_order", "new_guest_order", "order_update", "order_update_guest"],
             ],
             [
