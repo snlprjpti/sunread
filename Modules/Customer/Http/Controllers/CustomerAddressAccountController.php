@@ -20,6 +20,9 @@ class CustomerAddressAccountController extends BaseController
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
         $this->customer = auth()->guard("customer")->user();
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.channel.code');
+        $this->middleware('validate.store.code');
         parent::__construct($this->model, $this->model_name);
     }
 
