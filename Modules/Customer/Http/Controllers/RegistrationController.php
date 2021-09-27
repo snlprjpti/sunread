@@ -5,6 +5,7 @@ namespace Modules\Customer\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Event;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
@@ -36,7 +37,7 @@ class RegistrationController extends BaseController
         {
             $data = $this->repository->registration($request);
             $created = $this->repository->create($data);
-
+            Event::dispatch("send.email", [ "welcome_email", $created->id ]);
         }
         catch (Exception $exception)
         {
