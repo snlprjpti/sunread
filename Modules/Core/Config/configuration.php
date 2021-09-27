@@ -463,6 +463,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "exists:email_templates,id",
+                                "value_rules" => "in:email_template_code,header",
                                 "scope" => "store",
                                 "is_required" => 1
                             ],
@@ -475,6 +476,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "exists:email_templates,id",
+                                "value_rules" => "in:email_template_code,footer",
                                 "scope" => "store",
                                 "is_required" => 1
                             ]
