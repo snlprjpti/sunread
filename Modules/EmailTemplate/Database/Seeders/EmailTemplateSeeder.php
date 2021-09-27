@@ -15,12 +15,14 @@ class EmailTemplateSeeder extends Seeder
             [
                 "name" => "Header",
                 "subject" => "Header",
+                "header" => "header",
                 "content" => '<!DOCTYPE html> <head> </head> <body> <table class="wrapper" width="100%"><tr><td class="wrapper-inner" align="center"><table class="main" align="center"><tr><td class="header"><a class="logo" href="/"></a></td></tr><tr><td class="main-content">',
                 "style" => ""
             ],
             [
                 "name" => "Footer",
                 "subject" => "Footer",
+                "footer" => "Footer",
                 "content" => '</td></tr><tr><td class="footer"><p class="closing">Thank you!</p></td></tr></table></td></tr></table></body></html>',
                 "style" => ""
             ]
@@ -29,7 +31,7 @@ class EmailTemplateSeeder extends Seeder
         $data = array_map(function ($template) {
             return [
                 "name" => $template["name"],
-                "email_template_code" => Arr::random(array_map(function ($i){ return $i["code"]; }, config('email_template'))),
+                "email_template_code" => $template["email_template_code"],
                 "subject" => $template["subject"],
                 "style" => $template["style"],
                 "content" => $template["content"],

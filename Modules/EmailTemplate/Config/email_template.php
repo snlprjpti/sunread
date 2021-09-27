@@ -2,6 +2,14 @@
 
 return [
     [
+        "label" => "Header",
+        "code" => "header"
+    ],
+    [
+        "label" => "Footer",
+        "code" => "footer"
+    ],
+    [
         "label" => "Forgot Password",
         "code" => "forgot_password"
     ],
