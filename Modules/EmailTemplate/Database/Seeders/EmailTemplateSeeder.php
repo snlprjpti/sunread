@@ -15,14 +15,14 @@ class EmailTemplateSeeder extends Seeder
             [
                 "name" => "Header",
                 "subject" => "Header",
-                "header" => "header",
+                "email_template_code" => "header",
                 "content" => '<!DOCTYPE html> <head> </head> <body> <table class="wrapper" width="100%"><tr><td class="wrapper-inner" align="center"><table class="main" align="center"><tr><td class="header"><a class="logo" href="/"></a></td></tr><tr><td class="main-content">',
                 "style" => ""
             ],
             [
                 "name" => "Footer",
                 "subject" => "Footer",
-                "footer" => "Footer",
+                "email_template_code" => "footer",
                 "content" => '</td></tr><tr><td class="footer"><p class="closing">Thank you!</p></td></tr></table></td></tr></table></body></html>',
                 "style" => ""
             ]
