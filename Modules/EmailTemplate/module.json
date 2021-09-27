@@ -5,8 +5,7 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\EmailTemplate\\Providers\\EmailTemplateServiceProvider",
-        "Modules\\EmailTemplate\\Providers\\EventServiceProvider"
+        "Modules\\EmailTemplate\\Providers\\EmailTemplateServiceProvider"
     ],
     "aliases": {},
     "files": [
