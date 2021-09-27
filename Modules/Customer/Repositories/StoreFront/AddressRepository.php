@@ -170,17 +170,9 @@ class AddressRepository extends BaseRepository
     {
         try
         {
-            $channel_code = $request->header("hc-channel");
-            $data["shipping"] = null;
-            $data["billing"] = null;
-            if ($channel_code) {
-                $website = Website::findOrFail($customer->website_id);
-                $channel_id = $website->channels->where("code", $channel_code)->where("website_id", $website->id)->first()?->id;
-                if ($channel_id) {
-                    $data["shipping"] = $this->checkShippingAddress($customer->id, $channel_id)->first();
-                    $data["billing"] = $this->checkBillingAddress($customer->id, $channel_id)->first();
-                }
-            }
+            $coreCache = $this->getCoreCache($request);
+            $data["shipping"] = $this->checkShippingAddress($customer->id, $coreCache->channel->id)->first();
+            $data["billing"] = $this->checkBillingAddress($customer->id, $coreCache->channel->id)->first();
         }
         catch (Exception $exception)
         {
