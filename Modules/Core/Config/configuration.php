@@ -1,3 +1,4 @@
+
 <?php
 return[
     "general" => [
@@ -221,7 +222,8 @@ return[
                                 "is_required" => 1
                             ]
                         ]
-                    ]
+                    ],
+
                 ]
             ],
             [
@@ -416,8 +418,70 @@ return[
                         ]
                     ],
                 ]
+            ],
+            [
+                "title" => "Email",
+                "subChildren" => [
+                    [
+                        "title" => "General",
+                        "elements" => [
+                            [
+                                "title" => "Sender Name",
+                                "path" => "sender_name",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "store",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Sender Email",
+                                "path" => "sender_email",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "store",
+                                "is_required" => 0
+                            ],
+                        ]
+                    ],
+                    [
+                        "title" => "Templates",
+                        "elements" => [
+                            [
+                                "title" => "Header",
+                                "path" => "header",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name","id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Footer",
+                                "path" => "footer",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name","id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "scope" => "store",
+                                "is_required" => 1
+                            ]
+                        ]
+                    ]
+                ]
             ]
-
         ]
     ],
     "catalog" => [
@@ -519,6 +583,100 @@ return[
                                 "rules" => "exists:customer_groups,id",
                                 "multiple" => false,
                                 "scope" => "website",
+                                "is_required" => 1
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Password Options",
+                        "elements" => [
+                            [
+                                "title" => "Recovery Link Expiration Period (hours)",
+                                "path" => "recover_link_expiration_period",
+                                "type" => "integer",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "2",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Minimum Password Length",
+                                "path" => "minimum_password_length",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "8",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Email Templates",
+                        "elements" => [
+                            [
+                                "title" => "Default Welcome Email Template",
+                                "path" => "default_welcome_email_template",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Confirmation Link Email Template",
+                                "path" => "confirmation_link_email_template",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name","id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Welcome Email Template",
+                                "path" => "welcome_email_template",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name","id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Forgot Password Email Template",
+                                "path" => "forgot_password_email_template",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name","id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Reset Password Email Template",
+                                "path" => "reset_password_email_template",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => ["name","id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:email_templates,id",
+                                "scope" => "store",
                                 "is_required" => 1
                             ]
                         ]
