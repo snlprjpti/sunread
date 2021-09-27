@@ -8,21 +8,23 @@ use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 use Exception;
+use Modules\EmailTemplate\Entities\EmailTemplate;
 
 trait EmailNotification
 {
     /**
      *  get email Content and subject data from email template
      */
-    public function getData(string $event, int $entity_id): array
+    public function getData( int $entity_id, string $event ): array
     {
         try
         {
+            /** get all email variables data */
             $variable_data = $this->getVariableData($event, $entity_id);
             /**
              * get template from configurations according to scope, scope id and event code
              */
-            $email_template = SiteConfig::fetch($event."_template", "store", $variable_data["store_id"]);
+            $email_template = SiteConfig::fetch($event, "store", $variable_data["store_id"]);
 
             /**
              * Set store variable with following store_id
@@ -149,18 +151,18 @@ trait EmailNotification
         {
             $data = [
                 "store_url" => SiteConfig::fetch("storefront_base_urL", "store", $store_id),
-                "store_name" => SiteConfig::fetch("store_name", "store", $store_id),
+                "store_name" => SiteConfig::fetch("store_name", "store", $store_id)?->name,
                 "store_phone_number" => SiteConfig::fetch("store_phone_number", "store", $store_id),
-                "store_country" => SiteConfig::fetch("store_country", "store", $store_id),
+                "store_country" => SiteConfig::fetch("store_country", "store", $store_id)?->name,
                 "store_state" => SiteConfig::fetch("store_region", "store", $store_id),
-                "store_post_code" => SiteConfig::fetch("store_zip_code", "store", $store_id),
-                "store_city" => SiteConfig::fetch("store_city", "store", $store_id),
-                "store_address_line_1" => SiteConfig::fetch("store_street_address", "store", $store_id),
-                "store_address_line_2" => SiteConfig::fetch("store_address_line2", "store", $store_id),
-
-                "store_vat_number" => SiteConfig::fetch("store_vat_number", "store", $store_id),
-                "store_email_address" => SiteConfig::fetch("store_email_address", "store", $store_id),
-                "store_email_logo_url" => SiteConfig::fetch("store_email_logo_url", "store", $store_id),
+//                "store_post_code" => SiteConfig::fetch("store_zip_code", "store", $store_id),
+//                "store_city" => SiteConfig::fetch("store_city", "store", $store_id),
+//                "store_address_line_1" => SiteConfig::fetch("store_street_address", "store", $store_id),
+//                "store_address_line_2" => SiteConfig::fetch("store_address_line2", "store", $store_id),
+//
+//                "store_vat_number" => SiteConfig::fetch("store_vat_number", "store", $store_id),
+//                "store_email_address" => SiteConfig::fetch("store_email_address", "store", $store_id),
+//                "store_email_logo_url" => SiteConfig::fetch("store_email_logo_url", "store", $store_id),
             ];
         }
         catch (Exception $exception)

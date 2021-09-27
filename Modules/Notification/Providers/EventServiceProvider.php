@@ -9,6 +9,7 @@ class EventServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        Event::listen('storefront.customer.success.registration', 'Modules\Notification\Listeners\NotificationListener@sendEmail');
+        Event::listen("storefront.customer.success.registration", "Modules\Notification\Listeners\NotificationListener@welcomeEmail");
+        Event::listen("storefront.customer.forgot.password", "Modules\Notification\Listeners\NotificationListener@forgotPassword");
     }
 }

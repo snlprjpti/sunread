@@ -17,15 +17,20 @@ class SendNotification implements ShouldQueue
 
     public $event, $entity_id;
 
-    public function __construct(string $event, string $entity_id)
+    public function __construct( int $entity_id, string $event)
     {
         $this->event = $event;
         $this->entity_id = $entity_id;
     }
 
+    /**
+     * send email through follwing events
+     */
     public function handle(): void
     {
-        $data = $this->getData($this->event, $this->entity_id);
+        /** get data from various content of email templates */
+        $data = $this->getData( $this->entity_id, $this->event);
+        /** Send Email  */
         Mail::to($data["to_email"])->send(new NotificationMail($data["content"], $data["subject"]));
     }
 }
