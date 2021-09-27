@@ -9,6 +9,5 @@ class EventServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        Event::listen('send.email', 'Modules\EmailTemplate\Listeners\SendEmailListener@sendEmail');
     }
 }
