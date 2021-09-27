@@ -2,78 +2,139 @@
 
 namespace Modules\EmailTemplate\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Event;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\EmailTemplate\Entities\EmailTemplate;
+use Modules\EmailTemplate\Repositories\EmailTemplateRepository;
+use Modules\EmailTemplate\Transformers\EmailTemplateResource;
+use Exception;
 
-class EmailTemplateController extends Controller
+class EmailTemplateController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    private $repository;
+
+    public function __construct(EmailTemplate $emailTemplate, EmailTemplateRepository $emailTemplateRepository)
     {
-        return view('emailtemplate::index');
+        $this->model = $emailTemplate;
+        $this->model_name = "Email Template";
+        $this->repository = $emailTemplateRepository;
+        parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function collection(object $data): ResourceCollection
     {
-        return view('emailtemplate::create');
+        return EmailTemplateResource::collection($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
+    public function resource(object $data): JsonResource
     {
-        //
+        return new EmailTemplateResource($data);
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
+    public function index(Request $request): JsonResponse
     {
-        return view('emailtemplate::show');
+        try
+        {
+            $fetched = $this->repository->fetchAll($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
+    public function store(Request $request): JsonResponse
     {
-        return view('emailtemplate::edit');
+        try
+        {
+            $this->repository->templateGroupValidation($request);
+            $data = $this->repository->validateData($request);
+            $created = $this->repository->create($data);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
+    public function show(int $id): JsonResponse
     {
-        //
+        try
+        {
+            $fetched = $this->repository->fetch($id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
+    public function update(Request $request, int $id): JsonResponse
     {
-        //
+        try
+        {
+            $data = $this->repository->validateData($request);
+
+            $updated = $this->repository->update($data, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        try
+        {
+            $this->repository->delete($id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'));
+    }
+
+    public function templateGroup(): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->getConfigGroup();
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+    }
+
+    public function templateVariable(Request $request): JsonResponse
+    {
+        try
+        {
+            $this->repository->templateGroupValidation($request);
+            $fetched = $this->repository->getConfigVariable($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
     }
 }
