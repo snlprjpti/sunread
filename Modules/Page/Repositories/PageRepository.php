@@ -100,7 +100,7 @@ class PageRepository extends BaseRepository
         {
             foreach($elements as $i => &$element)
             {
-                $append_key = isset($key) ? "{$key}{.$i}" : $i;
+                $append_key = isset($key) ? "{$key}.{$i}" : $i;
                 $append_slug_key = isset($slug_key) ? "{$slug_key}.{$element['slug']}" : $element["slug"];
 
                 if(isset($element["groups"])) {
