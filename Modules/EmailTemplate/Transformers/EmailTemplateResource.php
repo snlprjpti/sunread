@@ -15,6 +15,7 @@ class EmailTemplateResource extends JsonResource
             "subject" => $this->subject,
             "content" => $this->content,
             "style" => $this->style,
+            "is_system_defined" => (bool) $this->is_system_defined,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

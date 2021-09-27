@@ -35,7 +35,7 @@ class EmailTemplateSeeder extends Seeder
                 "subject" => $template["subject"],
                 "style" => $template["style"],
                 "content" => $template["content"],
-                "is_system_default" => true,
+                "is_system_defined" => true,
                 "created_at" => now(),
                 "updated_at" => now()
             ];
