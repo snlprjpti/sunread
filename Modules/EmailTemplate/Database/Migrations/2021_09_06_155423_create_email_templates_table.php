@@ -15,7 +15,7 @@ class CreateEmailTemplatesTable extends Migration
             $table->longtext("content");
             $table->text("style")->nullable();
             $table->string("email_template_code");
-            $table->boolean("is_system_default")->default(0);
+            $table->boolean("is_system_defined")->default(0);
             $table->timestamps();
         });
     }
