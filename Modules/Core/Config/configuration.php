@@ -621,7 +621,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Default Welcome Email Template",
-                                "path" => "default_welcome_email_template",
+                                "path" => "default_welcome_email",
                                 "type" => "select",
                                 "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
                                 "pluck" => ["name", "id"],
@@ -633,7 +633,7 @@ return[
                             ],
                             [
                                 "title" => "Confirmation Link Email Template",
-                                "path" => "confirmation_link_email_template",
+                                "path" => "confirmation_link",
                                 "type" => "select",
                                 "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
                                 "pluck" => ["name","id"],
@@ -645,7 +645,7 @@ return[
                             ],
                             [
                                 "title" => "Welcome Email Template",
-                                "path" => "welcome_email_template",
+                                "path" => "welcome_email",
                                 "type" => "select",
                                 "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
                                 "pluck" => ["name","id"],
@@ -657,7 +657,7 @@ return[
                             ],
                             [
                                 "title" => "Forgot Password Email Template",
-                                "path" => "forgot_password_email_template",
+                                "path" => "forgot_password",
                                 "type" => "select",
                                 "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
                                 "pluck" => ["name","id"],
@@ -669,7 +669,7 @@ return[
                             ],
                             [
                                 "title" => "Reset Password Email Template",
-                                "path" => "reset_password_email_template",
+                                "path" => "reset_password",
                                 "type" => "select",
                                 "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
                                 "pluck" => ["name","id"],
