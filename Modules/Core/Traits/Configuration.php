@@ -19,7 +19,7 @@ trait Configuration
     {
         return Cache::remember("configurations.all", 60, function(){
             return config("configuration");
-        }); 
+        });
     }
 
     public function has(object $request)
@@ -32,28 +32,39 @@ trait Configuration
     }
 
     public function checkCondition(object $request): object
-    {   
+    {
         return $this->configuration->where([
             ['scope', $request->scope],
             ['scope_id', $request->scope_id],
             ['path', $request->path]
-        ]);  
-        
+        ]);
+
     }
 
     public function cacheQuery(object $request, array $pluck): array
     {
         $resources = Cache::rememberForever($request->provider, function() use ($request) {
-           return $request->provider::orderBy("name", "asc")->get()->toArray();
+           return  $request->provider::orderBy("name", "asc")->get()->toArray();
         });
         $data = [];
         foreach($resources as $resource)
         {
-            array_push($data, [
-               'value' => $resource[$pluck[1]],
-               'label' => $resource[$pluck[0]]
-            ]);
+            if(isset($request->condition)) {
+                if ($resource[$request->condition[0]] == $request->condition[1]) {
+                    array_push($data, [
+                        'value' => $resource[$pluck[1]],
+                        'label' => $resource[$pluck[0]]
+                    ]);
+                }
+            }
+            else {
+                array_push($data, [
+                    'value' => $resource[$pluck[1]],
+                    'label' => $resource[$pluck[0]]
+                ]);
+            }
         }
+
         return $data;
     }
 }

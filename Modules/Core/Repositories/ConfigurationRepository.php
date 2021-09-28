@@ -41,7 +41,7 @@ class ConfigurationRepository extends BaseRepository
         try
         {
             $this->validateData($request, $this->scopeValidation($request));
-    
+
             $fetched = $this->config_fields;
             $checkKey = [ "scope" => $request->scope ?? "global", "scope_id" => $request->scope_id ?? 0 ];
             if($checkKey["scope"] != "global") $fetched_data['entity'] = $this->getEntityData($checkKey);
@@ -62,19 +62,19 @@ class ConfigurationRepository extends BaseRepository
                         foreach($subchildren["elements"] as $k => &$element)
                         {
                             if($this->scopeFilter($checkKey["scope"], $element["scope"])) continue;
-                            
+
                             $checkKey["path"] = $element["path"];
                             $checkKey["provider"] = $element["provider"];
-
+                            $checkKey["condition"] = $element["condition"] ?? null;
                             $existData = $this->has((object) $checkKey);
                             if($checkKey["scope"] != "global") $element["use_default_value"] = $existData ? 0 : 1;
                             $element["default"] = $existData ? $this->getValues((object) $checkKey) : $this->getDefaultValues((object)$checkKey, $element["default"]);
                             $element["default"] = is_array($element["default"]) ? array_map('intval', $element["default"]) : (is_numeric($element["default"]) ? json_decode($element["default"]) : $element["default"]);
-                            if($element["type"] == "file" && $element["default"]) $element["default"] = Storage::url($element["default"]); 
+                            if($element["type"] == "file" && $element["default"]) $element["default"] = Storage::url($element["default"]);
 
                             if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
-                            
+
                             unset($element["pluck"], $element["provider"], $element["rules"], $element["showIn"]);
                             $subchildren_data["elements"][] = $element;
                         }
@@ -92,7 +92,7 @@ class ConfigurationRepository extends BaseRepository
         {
             throw $exception;
         }
-        
+
         return $fetched_data;
     }
 
@@ -104,7 +104,7 @@ class ConfigurationRepository extends BaseRepository
             case "website":
                 $input["name"] = $this->website_model->findorFail($data["scope_id"])->name;
                 break;
-            
+
             case "channel":
                 $channel = $this->channel_model->findorFail($data["scope_id"]);
                 $input["name"] = $channel->name;
@@ -118,7 +118,7 @@ class ConfigurationRepository extends BaseRepository
                 break;
         }
         return $input;
-        
+
     }
 
     public function scopeFilter(string $scope, string $element_scope): bool
@@ -168,7 +168,7 @@ class ConfigurationRepository extends BaseRepository
                 $return_rules = array_merge($return_rules, [
                     "$value_path.*" => $child_rule
                 ]);
-            } 
+            }
             return ($scope != "global") ? array_merge($return_rules, [
                 $default_path => $default_rule
             ]) : $return_rules
@@ -222,10 +222,10 @@ class ConfigurationRepository extends BaseRepository
             if($configDataArray["path"] != $key) throw ValidationException::withMessages([ "absolute_path" =>  __("core::app.response.wrong_absolute_path", ["name" => $key])]);
 
             if($this->scopeFilter($item['scope'], $configDataArray["scope"])) continue;
-            
+
             $item['path'] = $key;
             $item['value'] = isset($val['value']) ? (($configDataArray["type"] == "file" ) ? $this->storeImage($val['value'], "configuration") : $val['value']) : null;
-            
+
             if($configData = $this->checkCondition((object) $item)->first())
             {
                 if(isset($val['use_default_value'])  && $val['use_default_value'] == 1) $configData->delete();
@@ -237,7 +237,7 @@ class ConfigurationRepository extends BaseRepository
         }
         $created_data['message'] = 'create-success';
         $created_data['code'] = 201;
-        return (object) $created_data; 
+        return (object) $created_data;
     }
 
     public function getValues(object $request): mixed
@@ -256,7 +256,7 @@ class ConfigurationRepository extends BaseRepository
                     $input["scope"] = "channel";
                     $input["scope_id"] = $this->store_model->find($data->scope_id)->channel->id;
                     break;
-                
+
                 case "channel":
                     $input["scope"] = "website";
                     $input["scope_id"] = $this->channel_model->find($data->scope_id)->website->id;
@@ -267,7 +267,7 @@ class ConfigurationRepository extends BaseRepository
                     $input["scope_id"] = 0;
                     break;
             }
-            return ($item = $this->checkCondition((object) $input)->first()) ? $item->value : (( $input["scope"] == "global") ? $configValue : $this->getDefaultValues((object)$input, $configValue));           
+            return ($item = $this->checkCondition((object) $input)->first()) ? $item->value : (( $input["scope"] == "global") ? $configValue : $this->getDefaultValues((object)$input, $configValue));
         }
         return $configValue;
     }
@@ -325,7 +325,7 @@ class ConfigurationRepository extends BaseRepository
             throw $exception;
         }
 
-        return $fetched->toArray();   
+        return $fetched->toArray();
     }
 
 }
