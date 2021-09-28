@@ -17,7 +17,7 @@ class SendNotification implements ShouldQueue
 
     public $event, $entity_id, $append_data;
 
-    public function __construct( int $entity_id, string $event, string $append_data)
+    public function __construct( int $entity_id, string $event, string $append_data = "")
     {
         $this->event = $event;
         $this->entity_id = $entity_id;

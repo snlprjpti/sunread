@@ -15,4 +15,9 @@ class NotificationListener
     {
         SendNotification::dispatch( $entity_id, "forgot_password", $token );
     }
+
+    public function resetPassword(int $entity_id)
+    {
+        SendNotification::dispatch( $entity_id, "reset_password" );
+    }
 }

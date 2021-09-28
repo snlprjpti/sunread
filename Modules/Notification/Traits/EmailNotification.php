@@ -15,7 +15,7 @@ trait EmailNotification
     /**
      *  get email Content and subject data from email template
      */
-    public function getData( int $entity_id, string $event, string $append_data = null): array
+    public function getData( int $entity_id, string $event, string $append_data = ""): array
     {
         try
         {
@@ -76,16 +76,13 @@ trait EmailNotification
                     $data = $this->forgotPassword($entity_id, $append_data);
                     break;
 
-                case "reset_password" :
-                    $data = $this->resetPassword($entity_id);
-                    break;
-
                 case "contact_form" :
                     $data = [];
                     break;
 
                 case "new_account":
                 case "welcome_email":
+                case "reset_password":
                     $data = $this->getCustomerData($entity_id);
                     break;
 
@@ -184,26 +181,6 @@ trait EmailNotification
             $customer_data = $this->getCustomerData($customer_id);
             $data = [
                 "password_reset_url" => route('customers.reset-password.create', $append_data)
-            ];
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return array_merge($customer_data, $data);
-    }
-
-    /**
-        get reset password variables data
-    */
-    private function resetPassword(int $customer_id)
-    {
-        try
-        {
-            $customer_data = $this->getCustomerData($customer_id);
-            $data = [
-                "password_reset_url" => "password_reset_url_link"
             ];
         }
         catch (Exception $exception)
