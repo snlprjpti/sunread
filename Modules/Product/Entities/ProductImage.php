@@ -11,7 +11,7 @@ class ProductImage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["product_id", "position", "path", "main_image", "small_image", "thumbnail", "section_background", "gallery"];
+    protected $fillable = ["product_id", "position", "path", "main_image", "small_image", "thumbnail", "section_background", "gallery", "background_color"];
     protected $appends = [ "small_image_url", "thumbnail_url" ];
 
 

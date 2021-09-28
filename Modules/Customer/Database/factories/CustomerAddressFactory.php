@@ -2,6 +2,7 @@
 namespace Modules\Customer\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Country;
 use Modules\Country\Entities\Region;

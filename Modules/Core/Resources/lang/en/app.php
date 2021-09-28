@@ -97,7 +97,7 @@ return [
             'incorrect-password' => 'The password you entered is incorrect',
             'password-match' => 'Current password does not match.',
             'account-save' => 'Account changes saved successfully.',
-            'login-error' => 'Invalid credentials.',
+            'login-error' => 'Invalid Email Address or Password.',
             'login-success' => 'Logged in successfully.',
             'logout-success' => 'Logged out successfully.',
             'activate-warning' => 'Your account is yet to be activated, please contact administrator.',

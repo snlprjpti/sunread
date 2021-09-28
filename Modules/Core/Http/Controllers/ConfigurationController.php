@@ -56,7 +56,7 @@ class ConfigurationController extends BaseController
             if(!$request->scope_id) $data["scope_id"] = 0;
 
             $created_data = $this->repository->add((object) $data);
-            if(isset($created_data->data)) ConfigurationCache::dispatch($created_data->data);
+            if(isset($created_data->data)) ConfigurationCache::dispatch($created_data->data)->onQueue("high");
         }
         catch( Exception $exception )
         {

@@ -58,7 +58,21 @@ class PageTest extends BaseTestCase
         foreach($components as $component)
         {
             $this->attributes = [];
-            $elements = collect($this->config_fields)->where("slug", $component)->pluck("groups")->first();
+            $elements = [];
+            
+            $group_elements = collect($this->config_fields)->where("slug", $component)->pluck("mainGroups")->flatten(1);
+            foreach($group_elements as $group_element)
+            {
+                if($group_element["type"] == "module") {
+                    foreach($group_element["subGroups"] as $module)
+                    {
+                        $elements = array_merge($elements, $module["groups"]);
+                    }
+                    continue;
+                }
+                $elements = array_merge($elements, $group_element["groups"]);
+            }
+
             $this->getAttributes($elements);
             unset($this->attributes["background-video"]);
             $singleItem[] = [
