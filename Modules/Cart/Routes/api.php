@@ -16,5 +16,7 @@ Route::group(['as' => 'cart.'], function () {
     // CART ROUTES
     Route::post("/public/checkout/cart", [\Modules\Cart\Http\Controllers\CartController::class, "addOrUpdateCart"])->name('add.update');
     Route::delete("/public/checkout/cart", [\Modules\Cart\Http\Controllers\CartController::class, "deleteProductFromCart"])->name('delete.product.from.cart');
+    Route::get("/public/checkout/cart", [\Modules\Cart\Http\Controllers\CartController::class, "getAllProductFromCart"])->name('products.from.cart');
+    Route::post("/public/checkout/cart/merge", [\Modules\Cart\Http\Controllers\CartController::class, "mergeCart"])->name('merge.cart')->middleware('customer');
 
 });

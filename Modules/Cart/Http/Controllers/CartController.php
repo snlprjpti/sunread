@@ -11,6 +11,7 @@ use Modules\Cart\Exceptions\OutOfStockException;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Cart\Exceptions\CartHashIdNotFoundException;
 use Modules\Cart\Exceptions\ChannelDoesNotExistException;
+use Elasticsearch\Common\Exceptions\Forbidden403Exception;
 
 class CartController extends BaseController
 {
@@ -29,7 +30,8 @@ class CartController extends BaseController
         $exception_statuses = [
             OutOfStockException::class => 404,
             ChannelDoesNotExistException::class => 404,
-            CartHashIdNotFoundException::class => 404
+            CartHashIdNotFoundException::class => 404,
+            Forbidden403Exception::class => 403
         ];
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
@@ -38,6 +40,10 @@ class CartController extends BaseController
     {
         try
         {
+            $this->validate($request,[
+                'product_id' => 'required|integer|min:1',
+             ]);
+
             $cartData = $this->cartRepository->addOrUpdateCart($request);
         } 
 
@@ -64,6 +70,34 @@ class CartController extends BaseController
             return $this->handleException($exception);
         }
         return $this->successResponse($response, $this->lang("delete-success"));
+    }
+
+    public function getAllProductFromCart(Request $request): JsonResponse
+    {
+        try
+        {
+            $response = $this->cartRepository->getAllProductFromCart($request);
+        } 
+
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        return $this->successResponse($response, $this->lang("fetch-list-success"));
+    }
+
+    public function mergeCart(Request $request): JsonResponse
+    {
+        try
+        {
+            $response = $this->cartRepository->mergeCart($request);
+        } 
+
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        return $this->successResponse($response, 'merged successfully');
     }
 
 }
