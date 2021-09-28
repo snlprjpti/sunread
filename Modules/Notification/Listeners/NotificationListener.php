@@ -8,6 +8,11 @@ class NotificationListener
 {
     public function welcomeEmail(int $entity_id)
     {
+        SendNotification::dispatch( $entity_id, "default_welcome_email" );
+    }
+
+    public function confirmEmail(int $entity_id)
+    {
         SendNotification::dispatch( $entity_id, "welcome_email" );
     }
 

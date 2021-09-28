@@ -5,6 +5,7 @@ namespace Modules\Customer\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Event;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
@@ -42,6 +43,8 @@ class RegistrationController extends BaseController
         {
             return $this->handleException($exception);
         }
+
+        Event::dispatch( "storefront.customer.registration.success", [ "customer_id" => $created->id ] );
 
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }

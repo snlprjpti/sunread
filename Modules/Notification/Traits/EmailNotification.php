@@ -21,7 +21,6 @@ trait EmailNotification
         {
             /** get all email variables data */
             $variable_data = $this->getVariableData($event, $entity_id, $append_data);
-
             /**
              * get template from configurations according to scope, scope id and event code
              */
@@ -83,6 +82,7 @@ trait EmailNotification
                 case "new_account":
                 case "welcome_email":
                 case "reset_password":
+                case "default_welcome_email":
                     $data = $this->getCustomerData($entity_id);
                     break;
 
