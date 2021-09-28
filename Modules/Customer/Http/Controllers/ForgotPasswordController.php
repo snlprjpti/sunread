@@ -35,10 +35,10 @@ class ForgotPasswordController extends BaseController
             $this->validate($request, ["email" => "required|email"]);
 
             $customer = $this->model::where("email", $request->email)->firstOrFail();
-//            $response = $this->broker()->sendResetLink(["email" => $customer->email]);
-//
-//            if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException(__("core::app.users.token.token-generation-problem"));
-//            if ($response == Password::INVALID_USER) throw new CustomerNotFoundException("Customer not found.");
+            $response = $this->broker()->sendResetLink(["email" => $customer->email]);
+
+            if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException(__("core::app.users.token.token-generation-problem"));
+            if ($response == Password::INVALID_USER) throw new CustomerNotFoundException("Customer not found.");
         }
         catch (Exception $exception)
         {
