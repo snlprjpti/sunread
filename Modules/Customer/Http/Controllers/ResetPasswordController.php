@@ -3,6 +3,7 @@
 namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -55,6 +56,9 @@ class ResetPasswordController extends BaseController
         {
             return $this->handleException($exception);
         }
+
+        $customer = $this->model::whereEmail($data["email"])->firstOrFail();
+        Event::dispatch( "storefront.customer.reset.password", [ "customer_id" => $customer->id ] );
 
         return $this->successResponseWithMessage($this->lang("password-reset-success"));
     }
