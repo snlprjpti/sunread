@@ -31,8 +31,8 @@ trait EmailNotification
              */
             config(['store' => $variable_data["store_id"]]);
 
-            $data["content"] = $this->render($email_template->content, $variable_data);
-            $data["subject"] = $this->render($email_template->subject, $variable_data);
+            $data["content"] = htmlspecialchars_decode($this->render($email_template->content, $variable_data));
+            $data["subject"] = htmlspecialchars_decode($this->render($email_template->subject, $variable_data));
             $data["to_email"] = $variable_data["customer_email_address"];
         }
         catch (Exception $exception)
