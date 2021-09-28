@@ -15,12 +15,13 @@ trait EmailNotification
     /**
      *  get email Content and subject data from email template
      */
-    public function getData( int $entity_id, string $event ): array
+    public function getData( int $entity_id, string $event, string $append_data = null): array
     {
         try
         {
             /** get all email variables data */
-            $variable_data = $this->getVariableData($event, $entity_id);
+            $variable_data = $this->getVariableData($event, $entity_id, $append_data);
+
             /**
              * get template from configurations according to scope, scope id and event code
              */
@@ -66,13 +67,13 @@ trait EmailNotification
     /**
      * get all template variable data according to email template code
      */
-    public function getVariableData(string $event_code, int $entity_id): array
+    public function getVariableData(string $event_code, int $entity_id, string $append_data): array
     {
         try
         {
             switch ($event_code) {
                 case "forgot_password" :
-                    $data = $this->forgotPassword($entity_id);
+                    $data = $this->forgotPassword($entity_id, $append_data);
                     break;
 
                 case "reset_password" :
@@ -176,13 +177,13 @@ trait EmailNotification
     /**
         get forgot password variables data
     */
-    private function forgotPassword(int $customer_id)
+    private function forgotPassword(int $customer_id, string $append_data)
     {
         try
         {
             $customer_data = $this->getCustomerData($customer_id);
             $data = [
-                "password_reset_url" => "password_reset_url_link"
+                "password_reset_url" => route('customers.reset-password.create', $append_data)
             ];
         }
         catch (Exception $exception)

@@ -11,8 +11,8 @@ class NotificationListener
         SendNotification::dispatch( $entity_id, "welcome_email" );
     }
 
-    public function forgotPassword(int $entity_id)
+    public function forgotPassword(int $entity_id, string $token)
     {
-        SendNotification::dispatch( $entity_id, "forgot_password" );
+        SendNotification::dispatch( $entity_id, "forgot_password", $token );
     }
 }

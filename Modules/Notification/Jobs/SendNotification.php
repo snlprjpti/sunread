@@ -15,12 +15,13 @@ class SendNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, EmailNotification;
 
-    public $event, $entity_id;
+    public $event, $entity_id, $append_data;
 
-    public function __construct( int $entity_id, string $event)
+    public function __construct( int $entity_id, string $event, string $append_data)
     {
         $this->event = $event;
         $this->entity_id = $entity_id;
+        $this->append_data = $append_data;
     }
 
     /**
@@ -29,7 +30,7 @@ class SendNotification implements ShouldQueue
     public function handle(): void
     {
         /** get data from various content of email templates */
-        $data = $this->getData( $this->entity_id, $this->event);
+        $data = $this->getData( $this->entity_id, $this->event, $this->append_data);
         /** Send Email  */
         Mail::to($data["to_email"])->send(new NotificationMail($data["content"], $data["subject"]));
     }

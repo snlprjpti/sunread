@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
@@ -63,7 +64,8 @@ class Customer extends Authenticatable implements  JWTSubject
 
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(new CustomerResetPassword($token));
+        Event::dispatch( "storefront.customer.forgot.password", [ "customer_id" => $this->id, "token" => $token ] );
+//        $this->notify(new CustomerResetPassword($token));
     }
 
     public function getDefaultBillingAddressAttribute(): ?object
