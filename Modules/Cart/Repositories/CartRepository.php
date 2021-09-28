@@ -59,6 +59,9 @@ class CartRepository extends BaseRepository
                 // if cart hash id exist in carts table 
                 $cart = $this->model::where('id', $cartHashId)->select('id')->first();
                 if ($cart) {
+
+                    $this->updateHeaderOnCart($cart, $request);
+
                     $cartAndProductCheck = ['cart_id' => $cartHashId, 'product_id' => $productId];
                     // if product id already exist in the cart hash id
                     $checkProductId = $this->cartItem->where($cartAndProductCheck)->select('qty')->first();
@@ -92,6 +95,7 @@ class CartRepository extends BaseRepository
                         return $this->responseData["message"] = $this->responseMsg;
                     }
                 } else {
+
                     $this->checkProductConditions($productId, $request);
                     $this->addProductOnCart($request);
                     $this->responseData['message'] = $this->responseMsg;
@@ -107,6 +111,7 @@ class CartRepository extends BaseRepository
                     $cart = $this->model::where('id', $cartHashId)->select('id')->first();
                     if ($cart) {
 
+                        $this->updateHeaderOnCart($cart, $request);
                         $cartAndProductCheck = ['cart_id' => $cartHashId, 'product_id' => $productId];
                         // if product id already exist in the cart hash id
                         $checkProductId = $this->cartItem->where($cartAndProductCheck)->select('qty')->first();
@@ -251,10 +256,12 @@ class CartRepository extends BaseRepository
 
     public function getAllProductFromCart(object $request)
     {
+        DB::beginTransaction();
         try {
             $products = [];
             if (!array_key_exists('hc-channel', $request->header())) throw ValidationException::withMessages(["channel_code" => "channel code is required"]);
             $checkChannel = $this->channel::where('code', $request->header()['hc-channel'][0])->select('id')->firstOrFail();
+
 
             // if cart hash id is sent
             if (isset($request->header()['hc-cart'])) {
@@ -262,7 +269,10 @@ class CartRepository extends BaseRepository
 
                 // if cart hash id exist in carts table
                 $cart = $this->model::where('id', $cartHashId)->select('id')->first();
+
                 if ($cart) {
+
+                    $this->updateHeaderOnCart($cart, $request);
 
                     $coreCache = $this->getCoreCache($request);
                     $relations = [
@@ -272,89 +282,38 @@ class CartRepository extends BaseRepository
                         "product_attributes",
                         "product_attributes.attribute",
                     ];
-
                     foreach ($cart->cartItems as $item) {
 
                         $getProductWebsiteId = $this->product::where('id', $item->product_id)->whereStatus(1)->with($relations)->firstOrFail();
                         $websiteChannels = $this->channel::where('website_id', $getProductWebsiteId->website_id)->pluck('id')->toArray();
-                        if (!in_array($checkChannel->id, $websiteChannels)) continue;
-                        $this->products[] = $this->getProductDetail($getProductWebsiteId, $request, $coreCache);
+                        if (!in_array($checkChannel->id, $websiteChannels)) {
+                            $item->delete();
+                            //  if there is no cart items on cart_items table then delete that cart hash id row from carts table
+                            $checkCartItemsExitsOnCartHashId = $this->cartItem->where('cart_id', $cartHashId)->select('id')->first();
+                            if (!$checkCartItemsExitsOnCartHashId) {
+                                $this->model->where('id', $cartHashId)->delete();
+                            }
+                            $message = 'product(s) removed due to change in channel';
+                        };
+
+                        $products[] = $this->getProductDetail($getProductWebsiteId, $item, $coreCache);
                     }
                 }
             }
 
             $items = [
-                "items" => $this->products,
-                "count" => count($products)
+                "items" => $products,
+                "count" => count($products),
+                "message" => $message ?? ''
             ];
         } catch (Exception $exception) {
             $this->responseMsg = 'exception on product delete';
+            DB::rollback();
             throw $exception;
         }
 
+        DB::commit();
         return $items;
-    }
-
-    private function getProductDetail($product, $cartItem, $coreCache)
-    {
-        $data = [];
-        $data["id"] = $product->id;
-        $data["sku"] = $product->sku;
-        $store = $coreCache->store;
-
-        $product_details = $product->product_attributes->mapWithKeys( function ($product_attribute) use ($store, $product) {
-            $match = [
-                "scope" => "store",
-                "scope_id" => $store->id,
-                "attribute_id" => $product_attribute->attribute->id
-            ];
-            if ($product_attribute->attribute->slug == "visibility") {
-                if ($product->value($match)?->name == "Not Visible Individually") throw new ProductNotFoundIndividuallyException();
-            }
-            return (!$product_attribute->attribute->is_user_defined) ? [$product_attribute->attribute->slug => ($product_attribute->attribute->type == "select") ? $product->value($match)?->name : $product->value($match)] : [];
-        })->toArray();
-        
-            $data['name'] = $product_details['name'];
-            $data['price'] = $product_details['price'];
-            $data['url_key'] = $product_details['url_key'];
-
-        if ($product->type == "simple") {
-            $data["attribute_options"] = $product->product_attributes->filter( function ($product_attribute) {
-                return ($product_attribute->attribute->slug == "color") || ($product_attribute->attribute->slug == "size");
-            })->map( function ($product_attribute) use ($store, $product) {
-                $match = [
-                    "scope" => "store",
-                    "scope_id" => $store->id,
-                    "attribute_id" => $product_attribute->attribute_id
-                ];
-                $attribute_options = [
-                    "name" => $product_attribute->attribute->name,
-                    "slug" => $product_attribute->attribute->slug,
-                    "value" => $product->value($match),
-                ];
-
-                return $attribute_options;
-            })->toArray();
-        }
-
-
-        // Product Stock
-        $productStock = $product->catalog_inventories->first();
-        $stock_status = true;
-        if ($productStock && $productStock->manage_stock && $productStock->is_in_stock && $cartItem->qty > $productStock->quantity) {
-            $stock_status = false;
-        }
-        $data["stock_status"] = $stock_status;
-
-        // Product Single Image
-        $image = $product->images->filter(fn ($image) => $image->types->where("slug", "base_image")->first())->map(function ($image) {
-            return ["type" => 'base_image', "path" => ($image->path) ? Storage::url($image->path) : ""];
-        })->first();
-
-        $data['image'] = $image;
-
-        return $data;
-
     }
 
     public function mergeCart(object $request)
@@ -376,6 +335,7 @@ class CartRepository extends BaseRepository
                         $checkCartOfUser = $this->model::where('customer_id', $customerId)->first();
                         if ($checkCartOfUser) {
                             $checkCartOfUser->delete();
+                            $this->updateHeaderOnCart($cart, $request);
                             $cart->update(["customer_id" => $customerId]);
                             DB::commit();
                             return true;
@@ -397,12 +357,99 @@ class CartRepository extends BaseRepository
         return true;
     }
 
+    private function getProductDetail($product, $cartItem, $coreCache)
+    {
+        $data = [];
+        $data["id"] = $product->id;
+        $data["sku"] = $product->sku;
+        $store = $coreCache->store;
+
+        $product_details = $product->product_attributes->mapWithKeys(function ($product_attribute) use ($store, $product) {
+            $match = [
+                "scope" => "store",
+                "scope_id" => $store->id,
+                "attribute_id" => $product_attribute->attribute->id
+            ];
+            if ($product_attribute->attribute->slug == "visibility") {
+                if ($product->value($match)?->name == "Not Visible Individually") throw new ProductNotFoundIndividuallyException();
+            }
+            return (!$product_attribute->attribute->is_user_defined) ? [$product_attribute->attribute->slug => ($product_attribute->attribute->type == "select") ? $product->value($match)?->name : $product->value($match)] : [];
+        })->toArray();
+
+        $data['name'] = $product_details['name'];
+
+        /*---------- PRODUCT PRICE------------- */
+        $special_from_date = $product_details['special_from_date'];
+        $special_to_date = $product_details['special_to_date'];
+        $special_price = $product_details['special_price'];
+        $price = $product_details['price'];
+        if (!$special_from_date || !$special_to_date) {
+            $data['price'] = $special_price ?? $price;
+        } else {
+            $currentDate = now()->toDateTimeString();
+            if ($special_from_date <= $currentDate && $currentDate <= $special_to_date) {
+                $data['price'] = $special_price;
+            } else {
+                $data['price'] = $price;
+            }
+        }
+        /*---------- /.PRODUCT PRICE------------- */
+
+        if ($product->type == "simple" && $product->parent_id) {
+            $configurable_attributes = [];
+            $product->product_attributes->filter(function ($product_attribute) {
+                return ($product_attribute->attribute->slug == "color") || ($product_attribute->attribute->slug == "size");
+            })->map(function ($product_attribute) use ($store, $product, &$configurable_attributes) {
+                $match = [
+                    "scope" => "store",
+                    "scope_id" => $store->id,
+                    "attribute_id" => $product_attribute->attribute_id
+                ];
+                $configurable_attributes[] = [
+                    "label" => $product_attribute->attribute->name,
+                    "value" => $product->value($match)?->name,
+                ];
+            })->toArray();
+
+            $data['configurable_attributes'] = $configurable_attributes;
+        }
+
+        $data['product_type'] = $product->parent_id ? 'configurable' : 'simple';
+
+
+        // Product Stock
+        $productStock = $product->catalog_inventories->first();
+        $stock_status = true;
+        if ($productStock && $productStock->manage_stock && $productStock->is_in_stock && $cartItem->qty > $productStock->quantity) {
+            $stock_status = false;
+        }
+        $data["stock_status"] = $stock_status;
+
+        $data['qty'] = $cartItem->qty;
+
+        // Product Single Image
+        $data['image'] = '';
+        foreach($product->images as $image){
+            $imageTypes = $image->types->pluck('slug')->toArray();
+            if(in_array('small_image', $imageTypes) && $image->path){
+                $data['image'] = Storage::url($image->path);
+                break;
+            } else{
+                $data['image'] = in_array('base_image', $imageTypes) ? Storage::url($image->path): '';
+            }
+        }
+
+        return $data;
+    }
+
     private function addProductOnCart(object $request)
     {
         if (isset($request->qty) && $request->qty == 0) throw ValidationException::withMessages(["quantity" => "product quantity must be greater than 0"]);
 
         $checkIfUserHasCartAlready = $this->model::where('customer_id', $request->customer_id)->select('id')->first();
         if (isset($request->customer_id) && $checkIfUserHasCartAlready) {
+
+            $this->updateHeaderOnCart($checkIfUserHasCartAlready, $request);
 
             // if product id already exist in that logged in user id
             $checkProductId = $this->cartItem->where('product_id', $request->product_id)->where('cart_id', $checkIfUserHasCartAlready->id)->select('qty')->first();
@@ -443,9 +490,6 @@ class CartRepository extends BaseRepository
     {
         // check if product exist on product table
         $product = $this->checkProductStatus($productId);
-
-        //   // check product visibility
-        //   $this->productVisibility($product, $request);
 
         // check if product exits on channel
         $this->checkIfProductExistOnChannel($product, $request);
@@ -516,15 +560,14 @@ class CartRepository extends BaseRepository
         }
     }
 
-    // private function productVisibility(object $product, object $request)
-    // {
-    //     $store = $this->store->where('code', $request->header()['hc-store'][0])->select('id')->firstOrFail();
-    //     $is_visibility = $product->value([
-    //         "scope" => "store",
-    //         "scope_id" => $store->id,
-    //         "attribute_slug" => "visibility"
-    //     ]);
-    //     if($is_visibility?->name != "Not Visible Individually") throw new ProductNotFoundIndividuallyException();
-    //     else true;
-    // }
+    private function updateHeaderOnCart(object $cart, object $request): bool
+    {
+        if ($cart->channel_code != $request->header()['hc-channel'][0] || $cart->store_code != $request->header()['hc-store'][0]) {
+            $cart->update([
+                "channel_code" => $request->header()['hc-channel'][0],
+                "store_code" => $request->header()['hc-store'][0]
+            ]);
+        }
+        return true;
+    }
 }
