@@ -4,6 +4,8 @@ namespace Modules\Notification\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Notification\Entities\EmailNotification;
+use Modules\Notification\Services\NotificationLogHelper;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,7 @@ class NotificationServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerActivityLogger();
     }
 
     /**
@@ -72,7 +75,17 @@ class NotificationServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
     }
-
+    /**
+     * Register activity logger.
+     *
+     * @return void
+     */
+    public function registerActivityLogger()
+    {
+        $this->app->singleton('notificationLog', function () {
+            return new NotificationLogHelper(new EmailNotification());
+        });
+    }
     /**
      * Register translations.
      *
