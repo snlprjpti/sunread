@@ -5,6 +5,7 @@ namespace Modules\Customer\Tests\Feature;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class CustomerAddressAccountTest extends TestCase
 {
     use DatabaseTransactions;
 
-    protected object $customer, $fake_customer, $website, $channel;
+    protected object $customer, $fake_customer, $website, $channel, $store;
     protected array $headers;
 
     public $model, $route_prefix, $model_name, $type;
@@ -27,10 +28,17 @@ class CustomerAddressAccountTest extends TestCase
         parent::setUp();
 
         $this->website =  Website::factory()->create();
-        $this->channel =  Channel::factory()->create(["website_id" => $this->website->id]);
+        $this->channel =  Channel::factory()->create([ "website_id" => $this->website->id ]);
+        $this->store =  Store::factory()->create([ "channel_id" => $this->channel->id ]);
+
         $this->customer = $this->createCustomer();
         $this->model_name = "Customer Address";
         $this->route_prefix = "customers.address";
+        $this->headers = [
+            "hc-host" => $this->website->hostname,
+            "hc-channel" => $this->channel->code,
+            "hc-store" => $this->store->code,
+        ];
     }
 
     public function getCreateData(): array
@@ -69,11 +77,10 @@ class CustomerAddressAccountTest extends TestCase
 
     public function testCustomerCanAddOwnAddress()
     {
-        $this->headers["hc-channel"] = $this->channel->code;
-
         $post_data["shipping"] = $this->getCreateData();
         $post_data["billing"] = $this->getCreateData();
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.create"), $post_data);
+
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
@@ -83,8 +90,6 @@ class CustomerAddressAccountTest extends TestCase
 
     public function testCustomerCanFetchOwnAddresses()
     {
-        $this->headers["hc-channel"] = "random-non-existent-channel-code";
-
         $response = $this->withHeaders($this->headers)->get(route("{$this->route_prefix}.show"));
 
         $response->assertStatus(200);
