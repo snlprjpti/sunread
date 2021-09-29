@@ -67,6 +67,164 @@ return[
                         ]
                     ],
                     [
+                        "title" => "State Options",
+                        "elements" => [
+                            [
+                                "title" => "State Country",
+                                "path" => "state_country",
+                                "type" => "select",
+                                "provider" => "Modules\Country\Entities\Country",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:countries,id",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                        ]
+                    ],
+                    [
+                        "title" => "Store Information",
+                        "elements" => [
+                            [
+                                "title" => "Store Name",
+                                "path" => "store_name",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\Store",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:stores,id",
+                                "multiple" => false,
+                                "scope" => "global",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Store Phone Number",
+                                "path" => "store_phone_number",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "channel",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Store Hours of Operation",
+                                "path" => "store_hours_operation",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "website",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Country",
+                                "path" => "store_country",
+                                "type" => "select",
+                                "provider" => "Modules\Country\Entities\Country",
+                                "pluck" => ["name", "id"],
+                                "default" => [],
+                                "options" => [],
+                                "rules" => "array",
+                                "value_rules" => "exists:countries,id",
+                                "multiple" => true,
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Region/State",
+                                "path" => "store_region",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Zip/Postal Code",
+                                "path" => "store_zip_code",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "numeric",
+                                "scope" => "store",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "City",
+                                "path" => "store_city",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Street Address",
+                                "path" => "store_street_address",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "website",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Street Address Line 2",
+                                "path" => "store_address_line2",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "channel",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Store Image",
+                                "path" => "store_image",
+                                "type" => "file",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "scope" => "store",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Pagination Limit",
+                                "path" => "pagination_limit",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "numeric",
+                                "scope" => "global",
+                                "is_required" => 1
+                            ]
+                        ]
+                    ],
+                    [
                         "title" => "Locale Options",
                         "elements" => [
                             [
@@ -246,7 +404,7 @@ return[
                 ]
             ],
             [
-                "title" => "Currency",
+                "title" => "Currency Setup",
                 "subChildren" => [
                     [
                         "title" => "Currency Options",
@@ -345,9 +503,9 @@ return[
                                 "multiple" => false,
                                 "scope" => "channel",
                                 "is_required" => 1
-                            ],
+                            ]
                         ]
-                    ]
+                    ],
                 ]
             ],
             [
@@ -406,7 +564,6 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "",
-                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 0
                             ],
@@ -419,7 +576,6 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "",
-                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 0
                             ]
