@@ -40,7 +40,7 @@ return[
                                 "title" => "Channel Time Zone",
                                 "path" => "channel_time_zone",
                                 "type" => "select",
-                                "provider" => "",
+                                "provider" => "Modules\Core\Entities\TimeZone",
                                 "pluck" => ["name", "id"],
                                 "default" => "",
                                 "options" => [],
@@ -73,7 +73,7 @@ return[
                                 "rules" => "",
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Decimal Seperator",
@@ -107,7 +107,7 @@ return[
                                 "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                         ]
                     ],
@@ -125,7 +125,7 @@ return[
                                 "rules" => "exists:stores,id",
                                 "multiple" => false,
                                 "scope" => "global",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Store Phone Number",
@@ -163,7 +163,7 @@ return[
                                 "value_rules" => "exists:countries,iso_2_code",
                                 "multiple" => true,
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Region/State",
@@ -175,7 +175,7 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "global",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Zip/Postal Code",
@@ -199,7 +199,7 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "global",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Street Address",
@@ -495,8 +495,8 @@ return[
                                 "title" => "State is Optional For",
                                 "path" => "state_is_optional_for",
                                 "type" => "select",
-                                "provider" => "Modules\Country\Entities\iso_2_code",
-                                "pluck" => ["name", "id"],
+                                "provider" => "Modules\Country\Entities\Country",
+                                "pluck" => ["name", "iso_2_code"],
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
@@ -792,7 +792,7 @@ return[
                                 "rules" => "",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Minus Sign Position",
@@ -828,7 +828,7 @@ return[
                                 "rules" => "",
                                 "multiple" => false,
                                 "scope" => "global",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Require Email Confirmation",
