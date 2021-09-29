@@ -28,6 +28,8 @@ class CartServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+
+        include __DIR__ . '/../Helpers/helpers.php';
     }
 
     /**

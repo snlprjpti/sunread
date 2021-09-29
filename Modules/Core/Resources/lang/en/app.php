@@ -141,6 +141,7 @@ return [
     'exception_message' => [
         'channel-not-found' => "Channel Not Found",
         "cart-id-required" => "cart id is required",
-        "product-qty-must-be-above-0" => "product quantity must be greater than 0"
+        "product-qty-must-be-above-0" => "product quantity must be greater than 0",
+        "not-allowed" => "access denied"
     ]
 ];

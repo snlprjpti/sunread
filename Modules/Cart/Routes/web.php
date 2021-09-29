@@ -11,6 +11,3 @@
 |
 */
 
-// Route::prefix('cart')->group(function() {
-//     Route::get('/', 'CartController@index');
-// });
