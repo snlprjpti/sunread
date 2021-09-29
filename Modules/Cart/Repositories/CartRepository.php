@@ -38,6 +38,10 @@ class CartRepository extends BaseRepository
         $this->store = $store;
         $this->website = $website;
         $this->channel = $channel;
+
+        $this->rules = [
+            'product_id' => 'required|integer|min:1|exists:products,product_id'
+        ];
     }
 
     public function addOrUpdateCart(object $request)
@@ -45,6 +49,8 @@ class CartRepository extends BaseRepository
 
         DB::beginTransaction();
         try {
+
+            $this->validateData( $request, $this->rules);
 
             /**
              * check if add/update on cart is by guest or logged in user
@@ -200,6 +206,9 @@ class CartRepository extends BaseRepository
     public function deleteProductFromCart(object $request)
     {
         try {
+
+            $this->validateData( $request, $this->rules);
+
             /**
              * check if user is on guest or logged mode
              **/
