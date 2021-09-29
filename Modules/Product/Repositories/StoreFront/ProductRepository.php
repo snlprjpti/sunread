@@ -341,4 +341,26 @@ class ProductRepository extends BaseRepository
         return $breadcumbs;
     }
 
+    public function searchWiseProduct(object $request): ?array
+    {
+        try
+        {
+            $fetched = [];
+
+            $coreCache = $this->getCoreCache($request);
+            $scope = [
+                "scope" => "store",
+                "scope_id" => $coreCache->store->id
+            ]; 
+
+            $fetched = $this->search_repository->getSearchProducts($request, $coreCache->store);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
 }
