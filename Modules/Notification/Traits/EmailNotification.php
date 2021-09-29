@@ -82,7 +82,6 @@ trait EmailNotification
                 case "new_account":
                 case "welcome_email":
                 case "reset_password":
-                case "default_welcome_email":
                     $data = $this->getCustomerData($entity_id);
                     break;
 

@@ -6,12 +6,12 @@ use Modules\Notification\Jobs\SendNotification;
 
 class NotificationListener
 {
-    public function welcomeEmail(int $entity_id)
+    public function newAccount(int $entity_id)
     {
-        SendNotification::dispatch( $entity_id, "default_welcome_email" );
+        SendNotification::dispatch( $entity_id, "new_account" );
     }
 
-    public function confirmEmail(int $entity_id)
+    public function welcomeEmail(int $entity_id)
     {
         SendNotification::dispatch( $entity_id, "welcome_email" );
     }
