@@ -73,5 +73,12 @@ if (! function_exists('array_permutation')) {
             return (json_last_error() == JSON_ERROR_NONE);
         }
     } 
+
+    if (! function_exists('decodeJsonNumeric')) {
+        function decodeJsonNumeric($val) 
+        {
+            return is_numeric($val) ? json_decode($val) : $val;
+        }
+    } 
 }
 ?>
