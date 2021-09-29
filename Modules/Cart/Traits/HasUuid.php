@@ -4,7 +4,7 @@ namespace Modules\Cart\Traits;
 
 use Illuminate\Support\Str;
 
-trait Uuid
+trait HasUuid
 {
    /**
      * Boot function from Laravel.
