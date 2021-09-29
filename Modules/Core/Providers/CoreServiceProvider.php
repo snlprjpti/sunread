@@ -85,6 +85,9 @@ class CoreServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/currencies.php'), "currencies"
         );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/time_zones.php'), "time_zones"
+        );
     }
 
     /**

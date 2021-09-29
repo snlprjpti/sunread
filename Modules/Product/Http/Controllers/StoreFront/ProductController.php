@@ -31,9 +31,9 @@ class ProductController extends BaseController
         $this->category_repository = $category_repository;
         $this->store_fornt_repository = $store_fornt_repository;
 
-        $this->middleware('validate.website.host')->only(['index', 'filter', 'show', 'category']);
-        $this->middleware('validate.store.code')->only(['index', 'filter', 'show', 'category']);
-        $this->middleware('validate.channel.code')->only(['index', 'filter', 'show', 'category']);
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.store.code');
+        $this->middleware('validate.channel.code');
 
         $exception_statuses = [
             ProductNotFoundIndividuallyException::class => 404,
@@ -100,6 +100,20 @@ class ProductController extends BaseController
         try
         {
             $data = $this->store_fornt_repository->productDetail($request, $identifier);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($data, $this->lang('fetch-success'));
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        try
+        {
+            $data = $this->store_fornt_repository->searchWiseProduct($request);
         }
         catch( Exception $exception )
         {

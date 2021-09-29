@@ -11,18 +11,19 @@ use Modules\Attribute\Entities\AttributeSet;
 use Modules\Product\Entities\ProductBuilder;
 use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
+use Modules\Page\Repositories\PageAttributeRepository;
 
 class ProductBuilderRepository extends BaseRepository
 {
     public $config_fields = [];
-    protected $parent = [], $config_rules = [], $collect_elements = [], $config_types = [], $product;
+    protected $parent = [], $config_rules = [], $collect_elements = [], $config_types = [], $product, $pageAttributeRepository;
     
-    public function __construct(ProductBuilder $productBuilder, Product $product)
+    public function __construct(ProductBuilder $productBuilder, Product $product, PageAttributeRepository $pageAttributeRepository)
     {
         $this->model = $productBuilder;
         $this->product = $product;
         $this->config_fields = config("attributes");
-        
+        $this->pageAttributeRepository = $pageAttributeRepository;
         $this->rules = [
             "component" => "required",
             "attributes" => "required|array",

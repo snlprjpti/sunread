@@ -37,4 +37,5 @@ Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
     Route::get('catalog/category/{category_slug}/products', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "index"])->name("products.index");
     Route::get('catalog/category/{category_slug}/navigation/layered', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "filter"])->name("products.filter");
     Route::get('catalog/product/{sku}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "show"])->name("products.show");
+    Route::get('catalog/search', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "search"])->name("products.search");
 });
