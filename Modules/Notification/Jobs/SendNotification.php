@@ -33,7 +33,13 @@ class SendNotification implements ShouldQueue
         /** get data from various content of email templates */
         $data = $this->getData( $this->entity_id, $this->event, $this->append_data);
         /** Send Email  */
+
         Mail::to($data["to_email"])->send(new NotificationMail($data["content"], $data["subject"]));
-        NotificationLog::log("name", "subject", "html_content", "recipient_email_address", 1, "email_template_code");
+        if( count(Mail::failures()) > 0 ) {
+            NotificationLog::log("name", $data["subject"], $data["content"], $data["to_email"], 1, "email_template_code", false);
+        }
+        else {
+            NotificationLog::log("name", $data["subject"], $data["content"], $data["to_email"], 1, "email_template_code", true);
+        }
     }
 }
