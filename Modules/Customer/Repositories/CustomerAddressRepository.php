@@ -99,7 +99,7 @@ class CustomerAddressRepository extends BaseRepository
         return $updated;
     }
 
-    public function checkCustomerChannel(object $request, int $customer_id): int|null
+    public function checkCustomerChannel(object $request, int $customer_id): ?int
     {
         try
         {
