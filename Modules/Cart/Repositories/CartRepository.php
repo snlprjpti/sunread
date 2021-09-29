@@ -9,19 +9,15 @@ use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Cart\Entities\CartItem;
-
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Repositories\BaseRepository;
-use function GuzzleHttp\Promise\exception_for;
 use Illuminate\Validation\ValidationException;
-use Modules\Product\Entities\ProductAttribute;
 use Modules\Cart\Services\UserAuthCheckService;
 use Modules\Cart\Exceptions\OutOfStockException;
 use Modules\Cart\Exceptions\CartHashIdNotFoundException;
 use Modules\Cart\Exceptions\ChannelDoesNotExistException;
 use Elasticsearch\Common\Exceptions\Forbidden403Exception;
-use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 
 class CartRepository extends BaseRepository
