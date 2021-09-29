@@ -10,13 +10,10 @@ class TaxRuleResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "customer_group" => new CustomerTaxGroupResource($this->whenLoaded("customer_group")),
-            "product_taxable" => new ProductTaxGroupResource($this->whenLoaded("product_taxable")),
+            "customer_tax_groups" => CustomerTaxGroupResource::collection($this->whenLoaded("customer_tax_groups")),
+            "product_tax_groups" => ProductTaxGroupResource::collection($this->whenLoaded("product_tax_groups")),
             "tax_rates" => TaxRateResource::collection($this->whenLoaded("tax_rates")),
             "name" => $this->name,
-            "position" => (int) $this->position,
-            "priority" => (int) $this->priority,
-            "subtotal" => (float) $this->subtotal,
             "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
