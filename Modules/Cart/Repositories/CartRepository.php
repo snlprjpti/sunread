@@ -343,12 +343,13 @@ class CartRepository extends BaseRepository
                         // get customer ID
                         $checkCartOfUser = $this->model::where('customer_id', $customerId)->first();
                         if ($checkCartOfUser) {
-                            $checkCartOfUser->delete();
-                            $this->updateHeaderOnCart($cart, $request);
-                            $cart->update(["customer_id" => $customerId]);
-                            DB::commit();
-                            return true;
+                            $checkCartOfUser->delete();  
                         }
+
+                        $this->updateHeaderOnCart($cart, $request);
+                        $cart->update(["customer_id" => $customerId]);
+                        DB::commit();
+                        return true;
                     }
                 } else {
                     throw new CartHashIdNotFoundException('cart not found');
@@ -527,7 +528,7 @@ class CartRepository extends BaseRepository
     private function checkIfProductExistOnChannel(object $product, object $request)
     {
         $channel = Channel::where('code', $request->header()['hc-channel'][0])->select('id')->first();
-        if (!$channel) throw new ChannelDoesNotExistException('channel not found');
+        if (!$channel) throw new ChannelDoesNotExistException;
         $checkProductOnChannel = DB::table('channel_product')->where('channel_id', $channel->id)
             ->where('product_id', $request->product_id)->select('channel_id')
             ->first();
@@ -541,7 +542,7 @@ class CartRepository extends BaseRepository
         $productStock = $product->catalog_inventories()->first();
         $qty = $request->qty ?? 1;
         if ($productStock && $productStock->manage_stock && $productStock->is_in_stock && $qty > $productStock->quantity) {
-            throw new OutOfStockException('not enough quantity in stock');
+            throw new OutOfStockException;
         }
         return true;
     }
@@ -569,11 +570,11 @@ class CartRepository extends BaseRepository
                 }
             } else {
                 $this->responseMsg = 'cart not found';
-                throw new CartHashIdNotFoundException('cart not found');
+                throw new CartHashIdNotFoundException;
             }
         } else {
             $this->responseMsg = 'cart not found';
-            throw new CartHashIdNotFoundException('cart not found');
+            throw new CartHashIdNotFoundException;
         }
     }
 

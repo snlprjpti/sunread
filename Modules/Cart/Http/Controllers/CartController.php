@@ -75,6 +75,6 @@ class CartController extends BaseController
         } catch (Exception $exception) {
             return $this->handleException($exception);
         }
-        return $this->successResponse($response, 'merged successfully');
+        return $this->successResponse($response, $this->lang("response.cart-merged"));
     }
 }

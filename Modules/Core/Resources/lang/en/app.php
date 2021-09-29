@@ -39,6 +39,8 @@ return [
         'range-required' => ':name range is required',
         'choose-address' => 'Type of address is required.',
         'please-choose' => 'Please choose :name',
+        'cart-merged' => "cart merged successfully",
+        "not-enough-stock-quantity" => "stock quantity is not enough"
     ],
     'users' => [
         'forget-password' => [
@@ -136,6 +138,6 @@ return [
         ],
     ],
     'exception_message' => [
-        'channel-not-found' => "Channel Not Found"
+        'channel-not-found' => "Channel Not Found",
     ]
 ];
