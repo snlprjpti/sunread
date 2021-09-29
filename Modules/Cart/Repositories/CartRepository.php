@@ -393,6 +393,14 @@ class CartRepository extends BaseRepository
                 $data['price'] = $price;
             }
         }
+
+        $data['price_formatted'] = '';
+        $data['tax_amout'] = '';
+        $data['tax_amout_formatted'] = '';
+        $data['total_amount'] = '';
+        $data['total_amount_formatted'] = '';
+        $data['total_tax_amount'] = '';
+        $data['total_tax_amount_formatted'] = '';
         /*---------- /.PRODUCT PRICE------------- */
 
         if ($product->type == "simple" && $product->parent_id) {
@@ -438,7 +446,7 @@ class CartRepository extends BaseRepository
                 $data['image'] = in_array('base_image', $imageTypes) ? Storage::url($image->path): '';
             }
         }
-
+        
         return $data;
     }
 
