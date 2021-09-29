@@ -7,6 +7,7 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('country', CountryController::class)->only(['index', 'show']);
         Route::resource('regions', RegionController::class)->only(['index', 'show']);
         Route::resource('cities', CityController::class)->only(['index', 'show']);
+        Route::get('/country/{country_id}/regions', [Modules\Country\Http\Controllers\RegionController::class, 'countryWiseRegion'])->name('country.regions.show');
     });
 
 //    PUBLIC COUNTRY ROUTES

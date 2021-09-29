@@ -39,6 +39,7 @@ return [
         'range-required' => ':name range is required',
         'choose-address' => 'Type of address is required.',
         'please-choose' => 'Please choose :name',
+        'country-not-found' => 'Region dose not belongs to country.'
     ],
     'users' => [
         'forget-password' => [

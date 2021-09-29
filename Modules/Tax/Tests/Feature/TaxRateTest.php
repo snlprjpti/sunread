@@ -21,7 +21,7 @@ class TaxRateTest extends BaseTestCase
     public function getNonMandotaryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "country_id" => null
+            "zip_code" => null
         ]);
     }
 
