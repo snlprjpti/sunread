@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Mail;
 use Modules\Notification\Emails\NotificationMail;
+use Modules\Notification\Facades\NotificationLog;
 use Modules\Notification\Traits\EmailNotification;
 
 class SendNotification implements ShouldQueue
@@ -33,5 +34,6 @@ class SendNotification implements ShouldQueue
         $data = $this->getData( $this->entity_id, $this->event, $this->append_data);
         /** Send Email  */
         Mail::to($data["to_email"])->send(new NotificationMail($data["content"], $data["subject"]));
+        NotificationLog::log("name", "subject", "html_content", "recipient_email_address", 1, "email_template_code");
     }
 }
