@@ -20,8 +20,12 @@ class RemoveTaxRulesColumnTable extends Migration
 
     public function down(): void
     {
-        Schema::table('', function (Blueprint $table) {
-            
+        Schema::table('tax_rules', function (Blueprint $table) {
+            $table->dropConstrainedForeignId("customer_group_class");
+            $table->dropConstrainedForeignId("product_taxable_class");
+            $table->dropColumn('status');
+            $table->dropColumn('position');
+            $table->dropColumn('subtotal');
         });
     }
 }
