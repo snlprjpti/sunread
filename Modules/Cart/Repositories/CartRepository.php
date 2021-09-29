@@ -36,11 +36,11 @@ class CartRepository extends BaseRepository
         $this->channel = $channel;
 
         $this->rules = [
-            'product_id' => 'required|integer|min:1|exists:products,product_id'
+            'product_id' => 'required|integer|min:1|exists:products,id'
         ];
     }
 
-    public function addOrUpdateCart(object $request)
+    public function addOrUpdateCart(object $request):mixed
     {
 
         DB::beginTransaction();
@@ -199,10 +199,10 @@ class CartRepository extends BaseRepository
         return $this->responseData;
     }
 
-    public function deleteProductFromCart(object $request)
+    public function deleteProductFromCart(object $request):mixed
     {
         try {
-
+           
             $this->validateData( $request, $this->rules);
 
             /**
@@ -259,7 +259,7 @@ class CartRepository extends BaseRepository
         return $this->responseMsg;
     }
 
-    public function getAllProductFromCart(object $request)
+    public function getAllProductFromCart(object $request):array
     {
         DB::beginTransaction();
         try {
@@ -321,7 +321,7 @@ class CartRepository extends BaseRepository
         return $items;
     }
 
-    public function mergeCart(object $request)
+    public function mergeCart(object $request):mixed
     {
         DB::beginTransaction();
         try {
@@ -363,7 +363,7 @@ class CartRepository extends BaseRepository
         return true;
     }
 
-    private function getProductDetail($product, $cartItem, $coreCache)
+    private function getProductDetail($product, $cartItem, $coreCache):array
     {
         $data = [];
         $data["id"] = $product->id;
@@ -456,7 +456,7 @@ class CartRepository extends BaseRepository
         return $data;
     }
 
-    private function addProductOnCart(object $request)
+    private function addProductOnCart(object $request):mixed
     {
         if (isset($request->qty) && $request->qty == 0) throw ValidationException::withMessages(["quantity" => "product quantity must be greater than 0"]);
 
@@ -521,7 +521,7 @@ class CartRepository extends BaseRepository
         return $product;
     }
 
-    private function checkIfProductExistOnChannel(object $product, object $request)
+    private function checkIfProductExistOnChannel(object $product, object $request):bool
     {
         $channel = Channel::where('code', $request->header()['hc-channel'][0])->select('id')->first();
         if (!$channel) throw new ChannelDoesNotExistException;
@@ -533,7 +533,7 @@ class CartRepository extends BaseRepository
         return true;
     }
 
-    private function checkProductStock(object $product, object $request): mixed
+    private function checkProductStock(object $product, object $request): bool
     {
         $productStock = $product->catalog_inventories()->first();
         $qty = $request->qty ?? 1;
@@ -543,7 +543,7 @@ class CartRepository extends BaseRepository
         return true;
     }
 
-    private function deleteProductAsPerCustomerMode(object $request)
+    private function deleteProductAsPerCustomerMode(object $request):mixed
     {
         $customerId = $request->customer_id;
         if ($customerId) {
