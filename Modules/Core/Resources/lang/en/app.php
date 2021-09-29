@@ -40,7 +40,8 @@ return [
         'choose-address' => 'Type of address is required.',
         'please-choose' => 'Please choose :name',
         'cart-merged' => "cart merged successfully",
-        "not-enough-stock-quantity" => "stock quantity is not enough"
+        "not-enough-stock-quantity" => "stock quantity is not enough",
+        "channel-code-required" => "channel code is required"
     ],
     'users' => [
         'forget-password' => [
@@ -139,5 +140,7 @@ return [
     ],
     'exception_message' => [
         'channel-not-found' => "Channel Not Found",
+        "cart-id-required" => "cart id is required",
+        "product-qty-must-be-above-0" => "product quantity must be greater than 0"
     ]
 ];

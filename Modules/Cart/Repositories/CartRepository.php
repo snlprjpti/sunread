@@ -56,7 +56,7 @@ class CartRepository extends BaseRepository
             $productId = $request->product_id;
 
             if ($request->type == 'update') {
-                if (!array_key_exists('hc-cart', $request->header())) throw ValidationException::withMessages(["cart_hash_id" => "cart hash id is required"]);
+                if (!array_key_exists('hc-cart', $request->header())) throw ValidationException::withMessages(["cart_hash_id" => __("core::app.exception_message.cart-id-required")]);
                 $cartHashId = $request->header()['hc-cart'][0];
                 // if cart hash id exist in carts table 
                 $cart = $this->model::where('id', $cartHashId)->select('id')->first();
@@ -149,7 +149,7 @@ class CartRepository extends BaseRepository
                             }
                         }
 
-                        if (isset($request->qty) && $request->qty == 0) throw ValidationException::withMessages(["quantity" => "product quantity must be greater than 0"]);
+                        if (isset($request->qty) && $request->qty == 0) throw ValidationException::withMessages(["quantity" => __("core::app.exception_message.product-qty-must-be-above-0")]);
 
                         // check product exist on product table, product status =1, in stock, same channel
                         $this->checkProductConditions($productId, $request);
@@ -264,7 +264,7 @@ class CartRepository extends BaseRepository
         DB::beginTransaction();
         try {
             $products = [];
-            if (!array_key_exists('hc-channel', $request->header())) throw ValidationException::withMessages(["channel_code" => "channel code is required"]);
+            if (!array_key_exists('hc-channel', $request->header())) throw ValidationException::withMessages(["channel_code" => __("core::app.response.channel-code-required")]);
             $checkChannel = $this->channel::where('code', $request->header()['hc-channel'][0])->select('id')->firstOrFail();
 
 
@@ -458,7 +458,7 @@ class CartRepository extends BaseRepository
 
     private function addProductOnCart(object $request):mixed
     {
-        if (isset($request->qty) && $request->qty == 0) throw ValidationException::withMessages(["quantity" => "product quantity must be greater than 0"]);
+        if (isset($request->qty) && $request->qty == 0) throw ValidationException::withMessages(["quantity" => __("core::app.exception_message.product-qty-must-be-above-0")]);
 
         $checkIfUserHasCartAlready = $this->model::where('customer_id', $request->customer_id)->select('id')->first();
         if (isset($request->customer_id) && $checkIfUserHasCartAlready) {
