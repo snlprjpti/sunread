@@ -145,9 +145,11 @@ class ConfigurationHelper
 
             if ( class_exists($element["provider"]) && $values !== null ) {
                 $model = new $element["provider"];
+                $pluck = $element["pluck"][1];
+
                 $fetched = is_array($values)
-                    ? $model->whereIn("id", $values)->get()
-                    : $model->find($values);
+                    ? $model->whereIn($pluck, $values)->get()
+                    : $model->where($pluck, $values)->first();
                 if ( !$fetched ) throw ValidationException::withMessages(["path" => "Invalid value for configuration."]);
             }
         }

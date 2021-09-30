@@ -22,5 +22,6 @@ class CoreDatabaseSeeder extends Seeder
         $this->call(StoreTableSeeder::class);
         $this->call(ConfigurationTableSeeder::class);
         $this->call(LocalesTableSeeder::class);
+        $this->call(TimeZoneTableSeeder::class);
     }
 }
