@@ -11,6 +11,8 @@ use Modules\Tax\Repositories\TaxRateRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Validation\ValidationException;
+use Modules\Country\Entities\Region;
 
 class TaxRateController extends BaseController
 {
@@ -53,7 +55,11 @@ class TaxRateController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, callback:function () use ($request) {
+                $this->repository->validateRegionCountry($request);
+                return [];
+            }); 
+            
             $created = $this->repository->create($data);
         }
         catch( Exception $exception )
@@ -84,7 +90,10 @@ class TaxRateController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "identifier" => "required|unique:tax_rates,identifier,{$id}"
-            ]);
+            ], function () use ($request) {
+                $this->repository->validateRegionCountry($request);
+                return [];
+            });
             $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )

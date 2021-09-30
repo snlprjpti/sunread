@@ -1,4 +1,3 @@
-
 <?php
 return[
     "general" => [
@@ -15,12 +14,12 @@ return[
                                 "path" => "default_country",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name","id"],
-                                "default" => "",
+                                "pluck" => ["name","iso_2_code"],
+                                "default" => "SE",
                                 "options" => [],
-                                "rules" => "exists:countries,id",
+                                "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
-                                "scope" => "global",
+                                "scope" => "channel",
                                 "is_required" => 1
                             ],
                             [
@@ -28,13 +27,13 @@ return[
                                 "path" => "allow_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "id"],
-                                "default" => [],
+                                "pluck" => ["name", "iso_2_code"],
+                                "default" => ["SE"],
                                 "options" => [],
                                 "rules" => "array",
-                                "value_rules" => "exists:countries,id",
+                                "value_rules" => "exists:countries,iso_2_code",
                                 "multiple" => true,
-                                "scope" => "website",
+                                "scope" => "channel",
                                 "is_required" => 1
                             ],
                             [
@@ -42,12 +41,27 @@ return[
                                 "path" => "optional_zip_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "id"],
-                                "default" => "",
+                                "pluck" => ["name", "iso_2_code"],
+                                "default" => [],
                                 "options" => [],
-                                "rules" => "exists:countries,id",
-                                "multiple" => false,
-                                "scope" => "channel",
+                                "rules" => "array",
+                                "value_rules" => "exists:countries,iso_2_code",
+                                "multiple" => true,
+                                "scope" => "website",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "State is Optional for",
+                                "path" => "general_optional_state",
+                                "type" => "select",
+                                "provider" => "Modules\Country\Entities\Country",
+                                "pluck" => ["name", "iso_2_code"],
+                                "default" => [],
+                                "options" => [],
+                                "rules" => "array",
+                                "value_rules" => "exists:countries,iso_2_code",
+                                "multiple" => true,
+                                "scope" => "website",
                                 "is_required" => 1
                             ]
                         ]
@@ -60,10 +74,10 @@ return[
                                 "path" => "state_country",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "id"],
+                                "pluck" => ["name", "iso_2_code"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:countries,id",
+                                "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
@@ -115,12 +129,11 @@ return[
                                 "path" => "store_country",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "id"],
+                                "pluck" => ["name", "iso_2_code"],
                                 "default" => [],
                                 "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "exists:countries,id",
-                                "multiple" => true,
+                                "rules" => "exists:countries,iso_2_code",
+                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
                             ],
@@ -207,7 +220,12 @@ return[
                                 "rules" => "numeric",
                                 "scope" => "global",
                                 "is_required" => 1
-                            ],
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Locale Options",
+                        "elements" => [
                             [
                                 "title" => "Locale",
                                 "path" => "store_locale",
@@ -220,10 +238,52 @@ return[
                                 "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
-                            ]
-                        ]
-                    ],
+                            ],
+                            [
+                                "title" => "Weight Unit",
+                                "path" => "locale_weight_unit",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "kgs",
+                                "options" => [
+                                    [ "value" => "lbs", "label" => "lbs" ],
+                                    [ "value" => "kgs", "label" => "kgs" ],
+                                ],
+                                "rules" => "in:lbs,kgs",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Global Timezone",
+                                "path" => "global_timezone",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\TimeZone",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:time_zones,id",
+                                "multiple" => false,
+                                "scope" => "website",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Channel Time Zone",
+                                "path" => "channel_time_zone",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\TimeZone",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:time_zones,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
 
+                        ]
+                    ]
                 ]
             ],
             [
@@ -349,21 +409,8 @@ return[
                         "title" => "Currency Options",
                         "elements" => [
                             [
-                                "title" => "Base Currency",
-                                "path" => "base_currency",
-                                "type" => "select",
-                                "provider" => "Modules\Core\Entities\Currency",
-                                "pluck" => ["code","id"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "exists:currencies,id",
-                                "multiple" => false,
-                                "scope" => "global",
-                                "is_required" => 1
-                            ],
-                            [
-                                "title" => "Store Currency",
-                                "path" => "store_currency",
+                                "title" => "Channel Currency",
+                                "path" => "channel_currency",
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
@@ -374,6 +421,88 @@ return[
                                 "scope" => "channel",
                                 "is_required" => 1
                             ],
+                            [
+                                "title" => "Symbol Position",
+                                "path" => "symbol_position",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 4,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Before Value" ],
+                                    [ "value" => 2, "label" => "Before Value With Space" ],
+                                    [ "value" => 3, "label" => "After Value" ],
+                                    [ "value" => 4, "label" => "After Value With Space" ],
+                                ],
+                                "rules" => "in:1,2,3,4",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Minus Sign",
+                                "path" => "minus_sign",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "-",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Minus Sign Position",
+                                "path" => "minus_sign_position",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Before Value" ],
+                                    [ "value" => 2, "label" => "Before Symbol" ],
+                                    [ "value" => 3, "label" => "After Value" ],
+                                    [ "value" => 4, "label" => "After Symbol" ]
+                                ],
+                                "rules" => "in:1,2,3,4",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Group Seperator",
+                                "path" => "group_seperator",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 2,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Comma (,)" ],
+                                    [ "value" => 2, "label" => "Dot (.)" ],
+                                    [ "value" => 3, "label" => "Space()" ],
+                                    [ "value" => 4, "label" => "None" ]
+                                ],
+                                "rules" => "in:1,2,3,4",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Decimal Seperator",
+                                "path" => "decimal_seperator",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Comma (,)" ],
+                                    [ "value" => 2, "label" => "Dot (.)" ]
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ]
                         ]
                     ],
                 ]
@@ -427,7 +556,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Sender Name",
-                                "path" => "sender_name",
+                                "path" => "email_sender_name",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -439,7 +568,24 @@ return[
                             ],
                             [
                                 "title" => "Sender Email",
-                                "path" => "sender_email",
+                                "path" => "email_sender_email",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "store",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Templates",
+                        "elements" => [
+                            [
+                                "title" => "Header",
+                                "path" => "template_header",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -449,45 +595,23 @@ return[
                                 "scope" => "store",
                                 "is_required" => 0
                             ],
-                        ]
-                    ],
-                    [
-                        "title" => "Templates",
-                        "elements" => [
-                            [
-                                "title" => "Header",
-                                "path" => "header",
-                                "type" => "select",
-                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
-                                "pluck" => ["name","id"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "exists:email_templates,id",
-                                "condition" => [
-                                    "email_template_code", "header"
-                                ],
-                                "scope" => "store",
-                                "is_required" => 1
-                            ],
                             [
                                 "title" => "Footer",
-                                "path" => "footer",
-                                "type" => "select",
-                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
-                                "pluck" => ["name","id"],
+                                "path" => "template_footer",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:email_templates,id",
-                                "condition" => [
-                                    "email_template_code", "footer"
-                                ],
+                                "rules" => "",
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 0
                             ]
                         ]
-                    ]
+                    ],
                 ]
             ]
+
         ]
     ],
     "catalog" => [
@@ -558,26 +682,11 @@ return[
         "title" => "Customer",
         "children" => [
             [
-                "title" => "Customer Configuration",
+                "title" => "Customer",
                 "subChildren" => [
                     [
-                        "title" => "Create New Account Options",
+                        "title" => "New Account Options",
                         "elements" => [
-                            [
-                                "title" => "Enable Automatic Assignment to Customer Group",
-                                "path" => "customer_auto_customer_group",
-                                "type" => "radio",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "1",
-                                "options" => [
-                                    [ "value" => 1, "label" => "Yes" ],
-                                    [ "value" => 0, "label" => "No" ]
-                                ],
-                                "rules" => "in:0,1",
-                                "scope" => "global",
-                                "is_required" => 1
-                            ],
                             [
                                 "title" => "Default Customer Group",
                                 "path" => "customer_default_customer_group",
@@ -587,6 +696,22 @@ return[
                                 "default" => "1",
                                 "options" => [],
                                 "rules" => "exists:customer_groups,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Require Email Confirmation",
+                                "path" => "require_email_confirmation",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 2,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Yes" ],
+                                    [ "value" => 2, "label" => "No" ],
+                                ],
+                                "rules" => "",
                                 "multiple" => false,
                                 "scope" => "website",
                                 "is_required" => 1
@@ -598,15 +723,16 @@ return[
                         "elements" => [
                             [
                                 "title" => "Recovery Link Expiration Period (hours)",
-                                "path" => "recover_link_expiration_period",
-                                "type" => "integer",
+                                "path" => "recovery_link_expiration_period",
+                                "type" => "number",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "2",
+                                "default" => 2,
                                 "options" => [],
                                 "rules" => "",
+                                "multiple" => false,
                                 "scope" => "global",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Minimum Password Length",
@@ -614,9 +740,10 @@ return[
                                 "type" => "number",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "8",
+                                "default" => 8,
                                 "options" => [],
                                 "rules" => "",
+                                "multiple" => false,
                                 "scope" => "global",
                                 "is_required" => 1
                             ]
@@ -627,61 +754,67 @@ return[
                         "elements" => [
                             [
                                 "title" => "Default Welcome Email Template",
-                                "path" => "default_welcome_email",
+                                "path" => "default_welcome_email_template",
                                 "type" => "select",
-                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
-                                "pluck" => ["name", "id"],
+                                "provider" => "",
+                                "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:email_templates,id",
+                                "rules" => "",
+                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
                             ],
                             [
                                 "title" => "Confirmation Link Email Template",
-                                "path" => "confirmation_link",
+                                "path" => "confirmation_link_email_template",
                                 "type" => "select",
-                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
-                                "pluck" => ["name","id"],
+                                "provider" => "",
+                                "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:email_templates,id",
+                                "rules" => "",
+                                "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Welcome Email Template",
-                                "path" => "welcome_email",
+                                "path" => "welcome_email_template",
                                 "type" => "select",
-                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
-                                "pluck" => ["name","id"],
+                                "provider" => "",
+                                "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:email_templates,id",
-                                "scope" => "store",
-                                "is_required" => 1
+                                "rules" => "array",
+                                "value_rules" => "",
+                                "multiple" => true,
+                                "scope" => "website",
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Forgot Password Email Template",
-                                "path" => "forgot_password",
+                                "path" => "forgot_password_email_template",
                                 "type" => "select",
-                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
-                                "pluck" => ["name","id"],
+                                "provider" => "",
+                                "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:email_templates,id",
+                                "rules" => "",
+                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
                             ],
                             [
                                 "title" => "Reset Password Email Template",
-                                "path" => "reset_password",
+                                "path" => "reset_password_email_template",
                                 "type" => "select",
-                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
-                                "pluck" => ["name","id"],
+                                "provider" => "",
+                                "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:email_templates,id",
+                                "rules" => "",
+                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
                             ]
@@ -689,6 +822,7 @@ return[
                     ]
                 ]
             ]
+
         ]
     ]
 ];

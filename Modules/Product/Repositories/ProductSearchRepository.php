@@ -9,6 +9,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\PriceFormat;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
@@ -38,7 +39,9 @@ class ProductSearchRepository extends ElasticSearchRepository
     {
         try
         {
+            $this->searchKeys = array_unique(array_merge($this->searchKeys, ["name", "sku", "description"]));
             $search = [];
+
             if(isset($request->q)) {
                 $search[] = $this->queryString($this->searchKeys, $request->q);
                 foreach($this->searchKeys as $key) $search[] = $this->match($key, $request->q);
@@ -50,7 +53,10 @@ class ProductSearchRepository extends ElasticSearchRepository
             throw $exception;
         }
         
-        return $query;
+        return [
+            "query" => $query,
+            "sort" => []
+        ];
     }
 
     public function filterAndSort(?object $request = null, ?int $category_id = null): array
@@ -101,15 +107,51 @@ class ProductSearchRepository extends ElasticSearchRepository
 
     public function getFilterProducts(object $request, int $category_id, object $store): ?array
     {
-        $data = [];
         $filter = $this->filterAndSort($request, $category_id);
-        
-        $data = $this->finalQuery($filter, $request, $store);
-        $total = isset($data["products"]["hits"]["total"]["value"]) ? $data["products"]["hits"]["total"]["value"] : 0;
-        $data["products"] = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
-        $data["last_page"] = (int) ceil($total/$data["limit"]);
-        $data["total"] = $total;
-        return $data;
+        return $this->getProductWithPagination($filter, $request, $store);
+    }
+
+    public function getSearchProducts(object $request, object $store): ?array
+    {
+        $filter = $this->search($request);
+        return $this->getProductWithPagination($filter, $request, $store);
+    }
+
+    public function getProductWithPagination(array $filter, object $request, object $store): ?array
+    {
+        try
+        {
+            $data = [];
+            $data = $this->finalQuery($filter, $request, $store);
+            $total = isset($data["products"]["hits"]["total"]["value"]) ? $data["products"]["hits"]["total"]["value"] : 0;
+            $products = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
+            $data["products"] = $this->productWithPriceFormat($products, $store);
+            $data["last_page"] = (int) ceil($total/$data["limit"]);
+            $data["total"] = $total;    
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data; 
+    }
+
+    public function productWithPriceFormat(array $products, object $store): array
+    {
+        try
+        {
+            foreach($products as &$product)
+            {
+                $product["price"] = isset($product["price"]) ? PriceFormat::get($product["price"], $store->id, "store") : null;
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $products;
     }
 
     public function getProduct(object $request): ?array
