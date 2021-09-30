@@ -461,8 +461,8 @@ return[
                                 "default" => 1,
                                 "options" => [
                                     [ "value" => 1, "label" => "Before Value" ],
-                                    [ "value" => 2, "label" => "After Value" ],
-                                    [ "value" => 3, "label" => "Before Symbol" ],
+                                    [ "value" => 2, "label" => "Before Symbol" ],
+                                    [ "value" => 3, "label" => "After Value" ],
                                     [ "value" => 4, "label" => "After Symbol" ]
                                 ],
                                 "rules" => "in:before_value,before_value_with_space,after_value,after_value_with_space",
@@ -476,7 +476,7 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => 1,
+                                "default" => 2,
                                 "options" => [
                                     [ "value" => 1, "label" => "Comma (,)" ],
                                     [ "value" => 2, "label" => "Dot (.)" ],
@@ -494,7 +494,7 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => 2,
+                                "default" => 1,
                                 "options" => [
                                     [ "value" => 1, "label" => "Comma (,)" ],
                                     [ "value" => 2, "label" => "Dot (.)" ]
