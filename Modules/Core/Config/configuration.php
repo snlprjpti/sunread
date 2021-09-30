@@ -130,7 +130,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name", "iso_2_code"],
-                                "default" => [],
+                                "default" => "",
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
@@ -754,7 +754,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Default Welcome Email Template",
-                                "path" => "default_welcome_email_template",
+                                "path" => "default_welcome_email",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -767,7 +767,7 @@ return[
                             ],
                             [
                                 "title" => "Confirmation Link Email Template",
-                                "path" => "confirmation_link_email_template",
+                                "path" => "confirmation_link_email",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -780,7 +780,7 @@ return[
                             ],
                             [
                                 "title" => "Welcome Email Template",
-                                "path" => "welcome_email_template",
+                                "path" => "welcome_email",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -794,7 +794,7 @@ return[
                             ],
                             [
                                 "title" => "Forgot Password Email Template",
-                                "path" => "forgot_password_email_template",
+                                "path" => "forgot_password",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -807,7 +807,7 @@ return[
                             ],
                             [
                                 "title" => "Reset Password Email Template",
-                                "path" => "reset_password_email_template",
+                                "path" => "reset_password",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
