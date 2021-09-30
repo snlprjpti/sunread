@@ -120,7 +120,7 @@ class CartRepository extends BaseRepository
                     $this->addProductOnCart($request);   
                 }
             }
-            else
+            else  // if type = create
             {
 
                 if (isset($request->header()['hc-cart']))
@@ -130,7 +130,7 @@ class CartRepository extends BaseRepository
                     // if cart hash id exist in carts table 
                     $cart = $this->model::where('id', $cartHashId)->select('id', 'channel_code', 'store_code')->first();
                     if ($cart)
-                    {
+                    { 
 
                         $this->updateHeaderOnCart($cart, $request);
                         $cartAndProductCheck = ['cart_id' => $cartHashId, 'product_id' => $productId];
@@ -158,7 +158,8 @@ class CartRepository extends BaseRepository
                                 // return $this->responseData['message'] = $this->responseMsg;
                                 $this->responseData['message'] = $this->cartStatus['product_removed'];
                                 $this->responseData["cart_id"] = $checkCartItemsExitsOnCartHashId ? $cartHashId : '';
-                            } else
+                            } 
+                            else
                             {
 
                                 // check product exist on product table, product status =1, has visibility and in stock
@@ -169,7 +170,9 @@ class CartRepository extends BaseRepository
                                 $this->responseData['message'] = $this->cartStatus['product_qty_updated'];
                                 $this->responseData["cart_id"] = $cartHashId;
                             }
-                        }
+                        } 
+                        else
+                        {
 
                         if (isset($request->qty) && $request->qty == 0) throw ValidationException::withMessages(["quantity" => __("core::app.exception_message.product-qty-must-be-above-0")]);
 
@@ -188,6 +191,7 @@ class CartRepository extends BaseRepository
                         $this->responseData['message'] = $this->cartStatus['product_added'];
                         $this->responseData["cart_id"] = $cartHashId;
                     }
+                }
                     // if cart hash id sent but not found on cart table
                     else
                     {
