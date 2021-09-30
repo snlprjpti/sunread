@@ -11,12 +11,12 @@
 |
 */
 
-Route::group(['as' => 'cart.'], function () {
+Route::group(['as' => 'cart.', 'prefix' => 'public/checkout/cart'], function () {
     
     // CART ROUTES
-    Route::post("/public/checkout/cart", [\Modules\Cart\Http\Controllers\CartController::class, "addOrUpdateCart"])->name('add.update');
-    Route::delete("/public/checkout/cart", [\Modules\Cart\Http\Controllers\CartController::class, "deleteProductFromCart"])->name('delete.product.from.cart');
-    Route::get("/public/checkout/cart", [\Modules\Cart\Http\Controllers\CartController::class, "getAllProductFromCart"])->name('products.from.cart');
-    Route::post("/public/checkout/cart/merge", [\Modules\Cart\Http\Controllers\CartController::class, "mergeCart"])->name('merge.cart')->middleware('customer');
+    Route::post("/", [\Modules\Cart\Http\Controllers\CartController::class, "addOrUpdateCart"])->name('add.update');
+    Route::delete("/", [\Modules\Cart\Http\Controllers\CartController::class, "deleteProductFromCart"])->name('delete.product.from.cart');
+    Route::get("/", [\Modules\Cart\Http\Controllers\CartController::class, "getAllProductFromCart"])->name('products.from.cart');
+    Route::post("/merge", [\Modules\Cart\Http\Controllers\CartController::class, "mergeCart"])->name('merge.cart')->middleware('customer');
 
 });
