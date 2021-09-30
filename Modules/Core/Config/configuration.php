@@ -132,8 +132,7 @@ return[
                                 "pluck" => ["name", "iso_2_code"],
                                 "default" => [],
                                 "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "exists:countries,iso_2_code",
+                                "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
