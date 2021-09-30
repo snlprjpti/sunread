@@ -5,8 +5,11 @@ namespace Modules\Customer\Tests\Feature;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Modules\Core\Entities\Configuration;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerGroup;
+use Modules\EmailTemplate\Entities\EmailTemplate;
+use PharIo\Manifest\Email;
 use Tests\TestCase;
 
 class SessionTest extends TestCase
@@ -86,6 +89,15 @@ class SessionTest extends TestCase
 
     public function testCustomerCanRequestResetLink()
     {
+        /**
+         * create configuration factory to retrieve email template
+         */
+        Configuration::factory()->make()->create([
+            "scope" => "store",
+            "path" => "forgot_password",
+            "scope_id" => 1,
+            "value" => 3,
+        ]);
         $post_data = ["email" => $this->customer->email];
         $response = $this->post(route("customers.forget-password.store"), $post_data);
 
@@ -98,6 +110,15 @@ class SessionTest extends TestCase
 
     public function testCustomerCanResetPassword()
     {
+        /**
+         * create configuration factory to retrieve email template
+         */
+        Configuration::factory()->make()->create([
+            "scope" => "store",
+            "path" => "forgot_password",
+            "scope_id" => 1,
+            "value" => 4,
+        ]);
         $reset_token = Password::broker('customers')->createToken($this->customer);
         $post_data = [
             "email" => $this->customer->email,
