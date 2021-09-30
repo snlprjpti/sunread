@@ -72,20 +72,16 @@ trait ConfigurableProductHandler
                 
                 $items["configurable_{$attribute->slug}"][] = $variant_option;
                 $items["configurable_{$attribute->slug}_value"][] = $attribute_option->name;
-
-                if($product->parent_id ) {
-                    $catalog = CatalogInventory::whereProductId($key)->first();
-                    $items["configurable"][$attribute->slug][] = [
-                        "label" => $attribute_option->name,
-                        "value" => $variant_option,
-                        "stock_status" => ($catalog?->is_in_stock && $catalog?->quantity > 0) ? 1 : 0
-                    ];
-                    $items["type"] = "configurable";
-                    $items["config_attribute_status"] = 1;
-                }
-                else {
-                    $items["config_attribute_status"] = 0;
-                }
+                
+                $catalog = CatalogInventory::whereProductId($key)->first();
+                $items["configurable_attributes"][$attribute->slug][] = [
+                    "label" => $attribute_option->name,
+                    "value" => $variant_option,
+                    "stock_status" => ($catalog?->is_in_stock && $catalog?->quantity > 0) ? 1 : 0
+                ];
+                
+                $items["type"] = "configurable";
+                    
                 if(isset($items[$attribute->slug]) && isset($items["{$attribute->slug}_value"]))
                 unset($items[$attribute->slug], $items["{$attribute->slug}_value"]);
             }); 
