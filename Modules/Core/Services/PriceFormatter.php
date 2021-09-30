@@ -19,7 +19,8 @@ class PriceFormatter {
             if($price < 0) {
                 $separator_price = substr($separator_price, 1);
                 $formatted_price = $this->minusSignPosition($data->minus, $separator_price, $data->minus_position, $data->currency_symbol, $data->currency_position);
-            } else {
+            }
+            else {
                 $formatted_price = $this->symbolPosition($data->currency_symbol, $separator_price, $data->currency_position);
             }
         }
