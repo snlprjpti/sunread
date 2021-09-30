@@ -166,7 +166,7 @@ class ProductSearchRepository extends ElasticSearchRepository
                 $product["quantity"] = (int) $product["quantity"];
                 $product["color"] = isset($product["color"]) ? $product["color"] : null;
                 $product["color_value"] = isset($product["color_value"]) ? $product["color_value"] : null;
-                unset($product["thumbnail_image"], $product["base_image"]);      
+                //unset($product["thumbnail_image"], $product["base_image"]);      
             }
         }
         catch (Exception $exception)
