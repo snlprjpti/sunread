@@ -150,7 +150,7 @@ trait EmailNotification
                 "store_url" => SiteConfig::fetch("storefront_base_urL", "store", $store_id),
                 "store_name" => SiteConfig::fetch("store_name", "store", $store_id)?->name,
                 "store_phone_number" => SiteConfig::fetch("store_phone_number", "store", $store_id),
-                "store_country" => SiteConfig::fetch("store_country", "store", $store_id)[0]?->name,
+                "store_country" => SiteConfig::fetch("store_country", "store", $store_id)?->name,
                 "store_state" => SiteConfig::fetch("store_region", "store", $store_id),
 //                "store_post_code" => SiteConfig::fetch("store_zip_code", "store", $store_id),
 //                "store_city" => SiteConfig::fetch("store_city", "store", $store_id),
