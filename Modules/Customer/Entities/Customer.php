@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Customer\Notifications\CustomerResetPassword;
+use Modules\Notification\Events\ForgotPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Modules\Core\Traits\HasFactory;
 
@@ -64,7 +65,7 @@ class Customer extends Authenticatable implements  JWTSubject
 
     public function sendPasswordResetNotification($token): void
     {
-        Event::dispatch( "storefront.customer.forgot.password", [ "customer_id" => $this->id, "token" => $token ] );
+        event(new ForgotPassword($this->id, $token));
 //        $this->notify(new CustomerResetPassword($token));
     }
 
