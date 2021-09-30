@@ -8,7 +8,7 @@ use Modules\Notification\Events\ForgotPassword;
 use Modules\Notification\Events\RegistrationSuccess;
 use Modules\Notification\Events\ResetPassword;
 use Modules\Notification\Listeners\SendAccountConfirmation;
-use Modules\Notification\Listeners\SendPasswordChangeEmail;
+use Modules\Notification\Listeners\SendPasswordChangeSuccess;
 use Modules\Notification\Listeners\SendPasswordResetLink;
 use Modules\Notification\Listeners\SendWelcomeEmail;
 
@@ -25,7 +25,7 @@ class EventServiceProvider extends ServiceProvider
             SendPasswordResetLink::class,
         ],
         ResetPassword::class => [
-            SendPasswordChangeEmail::class,
+            SendPasswordChangeSuccess::class,
         ],
     ];
 

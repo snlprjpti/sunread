@@ -5,7 +5,7 @@ namespace Modules\Notification\Listeners;
 use Modules\Notification\Events\ResetPassword;
 use Modules\Notification\Jobs\SendNotification;
 
-class SendPasswordChangeEmail
+class SendPasswordChangeSuccess
 {
     public function __construct()
     {
