@@ -115,7 +115,7 @@ class SessionTest extends TestCase
          */
         Configuration::factory()->make()->create([
             "scope" => "store",
-            "path" => "forgot_password",
+            "path" => "reset_password",
             "scope_id" => 1,
             "value" => 4,
         ]);
