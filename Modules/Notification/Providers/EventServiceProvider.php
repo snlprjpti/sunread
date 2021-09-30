@@ -2,16 +2,19 @@
 
 namespace Modules\Notification\Providers;
 
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Modules\Notification\Events\RegistrationSuccess;
+use Modules\Notification\Listeners\SendWelcomeEmail;
 
 class EventServiceProvider extends ServiceProvider
 {
+    protected $listen = [
+        RegistrationSuccess::class => [
+            SendWelcomeEmail::class,
+        ],
+    ];
+
     public function boot()
     {
-        Event::listen("storefront.customer.registration.success", "Modules\Notification\Listeners\NotificationListener@newAccount");
-        Event::listen("storefront.customer.confirmation.success", "Modules\Notification\Listeners\NotificationListener@welcomeEmail");
-        Event::listen("storefront.customer.forgot.password", "Modules\Notification\Listeners\NotificationListener@forgotPassword");
-        Event::listen("storefront.customer.reset.password", "Modules\Notification\Listeners\NotificationListener@resetPassword");
     }
 }

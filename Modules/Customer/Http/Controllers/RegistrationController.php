@@ -5,13 +5,12 @@ namespace Modules\Customer\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Event;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
 use Modules\Customer\Repositories\StoreFront\CustomerRepository;
 use Exception;
-use Illuminate\Support\Facades\Hash;
+use Modules\Notification\Events\RegistrationSuccess;
 
 class RegistrationController extends BaseController
 {
@@ -44,7 +43,7 @@ class RegistrationController extends BaseController
             return $this->handleException($exception);
         }
 
-        Event::dispatch( "storefront.customer.registration.success", [ "customer_id" => $created->id ] );
+        event(new RegistrationSuccess($created->id));
 
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
