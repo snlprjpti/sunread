@@ -9,6 +9,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\PriceFormat;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
@@ -123,7 +124,8 @@ class ProductSearchRepository extends ElasticSearchRepository
             $data = [];
             $data = $this->finalQuery($filter, $request, $store);
             $total = isset($data["products"]["hits"]["total"]["value"]) ? $data["products"]["hits"]["total"]["value"] : 0;
-            $data["products"] = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
+            $products = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
+            $data["products"] = $this->productWithPriceFormat($products, $store);
             $data["last_page"] = (int) ceil($total/$data["limit"]);
             $data["total"] = $total;    
         }
@@ -133,6 +135,23 @@ class ProductSearchRepository extends ElasticSearchRepository
         }
 
         return $data; 
+    }
+
+    public function productWithPriceFormat(array $products, object $store): array
+    {
+        try
+        {
+            foreach($products as &$product)
+            {
+                $product["price"] = isset($product["price"]) ? PriceFormat::get($product["price"], $store->id, "store") : null;
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $products;
     }
 
     public function getProduct(object $request): ?array
