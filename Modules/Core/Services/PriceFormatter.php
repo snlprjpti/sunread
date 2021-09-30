@@ -2,120 +2,177 @@
 
 namespace Modules\Core\Services;
 
+use Exception;
 use Modules\Core\Facades\SiteConfig;
 
 class PriceFormatter {
 
-    public function get(int $price, int $channel_id, ?string $scope = null)
+    public function get(mixed $price, int $scope_id, ?string $scope = "channel"): ?string
     {
-        $scope =  $scope ?? "channel";
-        $currency = SiteConfig::fetch("channel_currency", $scope, $channel_id);
-        $currency_position = SiteConfig::fetch("symbol_position", $scope, $channel_id);
-        $group_separator = SiteConfig::fetch("group_seperator", $scope, $channel_id);
-        $decimal_separator = SiteConfig::fetch("decimal_seperator", $scope, $channel_id);
+        try
+        {
+            $data = $this->getConfigurationData($scope, $scope_id);
+            $group_separator_value = $this->group_separator($data->group_separator);
+            $decimal_separator_value = $this->decimal_separator($data->decimal_separator);
 
-        $group_separator_value = $this->group_separator($group_separator);
-        $decimal_separator_value = $this->decimal_separator($decimal_separator);
-        $separator_price = number_format($price, 2, $decimal_separator_value, $group_separator_value);
-
-        if($price < 0) {
-            $minus = SiteConfig::fetch("minus_sign", $scope, $channel_id); 
-            $minus_position = SiteConfig::fetch("minus_sign_position", $scope, $channel_id); 
+            $separator_price = number_format($price, 2, $decimal_separator_value, $group_separator_value);
+            if($price < 0) {
+                $separator_price = substr($separator_price, 1);
+                $formatted_price = $this->minusSignPosition($data->minus, $separator_price, $data->minus_position, $data->currency_symbol, $data->currency_position);
+            } else {
+                $formatted_price = $this->symbolPosition($data->currency_symbol, $separator_price, $data->currency_position);
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
         }
         
-        $symbol_price = $this->symbolPosition($currency, $separator_price, $currency_position);
-
+        return $formatted_price;
     }
 
-    public function symbolPosition($symbol, $price, $currency_position)
+    public function getConfigurationData(?string $scope, ?int $scope_id): ?object
+    {
+        try
+        {
+            $currency = SiteConfig::fetch("channel_currency", $scope, $scope_id);
+            $currency_position = SiteConfig::fetch("symbol_position", $scope, $scope_id);
+            $group_separator = SiteConfig::fetch("group_seperator", $scope, $scope_id);
+            $decimal_separator = SiteConfig::fetch("decimal_seperator", $scope, $scope_id);
+            $minus = SiteConfig::fetch("minus_sign", $scope, $scope_id); 
+            $minus_position = SiteConfig::fetch("minus_sign_position", $scope, $scope_id);
+
+            $data = [
+                "currency_symbol" => $currency?->symbol,
+                "currency_position" => $currency_position,
+                "group_separator" => $group_separator,
+                "decimal_separator" => $decimal_separator,
+                "minus" => $minus,
+                "minus_position" => $minus_position
+            ];
+
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+        
+        return (object) $data;
+    }
+
+    public function minusSignPosition(?string $minus_symbol, mixed $price, ?int $minus_position, ?string $currency_symbol, ?int $currency_position): ?string
+    {
+        switch($minus_position)
+        {
+            case ($currency_position == 1  && ($minus_position == 1 || $minus_position == 4) ):
+                $formatted_price = "{$currency_symbol}{$minus_symbol}{$price}";
+                break;
+            case ($currency_position == 1 && $minus_position == 2):
+                $formatted_price = "{$minus_symbol}{$currency_symbol}{$price}";
+                break;
+            case ($currency_position == 1 && $minus_position == 3):
+                $formatted_price = "{$currency_symbol}{$price}{$minus_symbol}";
+                break;       
+            case ($currency_position == 2 && ($minus_position == 1 || $minus_position == 4 )):
+                $formatted_price = "{$currency_symbol}{$minus_symbol} {$price}";
+                break;
+            case ($currency_position == 2 && $minus_position == 2):
+                $formatted_price = "{$minus_symbol}{$currency_symbol} {$price}";
+                break;
+            case ($currency_position == 2 && $minus_position == 3):
+                $formatted_price = "{$currency_symbol} {$price}{$minus_symbol}";
+                break;             
+            case ($currency_position == 3 && $minus_position == 1 ):
+                $formatted_price = "{$minus_symbol}{$price}{$currency_symbol}";
+                break;
+            case ($currency_position == 3 && ($minus_position == 2 || $minus_position == 3)):
+                $formatted_price = "{$price}{$minus_symbol}{$currency_symbol}";
+                break;
+            case ($currency_position == 3 && $minus_position == 4):
+                $formatted_price = "{$price}{$currency_symbol}{$minus_symbol}";
+                break;
+            case ($currency_position == 4 && $minus_position == 1 ):
+                $formatted_price = "{$minus_symbol}{$price} {$currency_symbol}";
+                break;
+            case ($currency_position == 4 && ($minus_position == 2 || $minus_position == 3)):
+                $formatted_price = "{$price}{$minus_symbol} {$currency_symbol}";
+                break;
+            case ($currency_position == 4 && $minus_position == 4):
+                $formatted_price = "{$price} {$currency_symbol}{$minus_symbol}";
+                break;
+        }
+        return $formatted_price;
+    }
+
+    public function symbolPosition(?string $symbol, mixed $price, ?int $currency_position): ?string
     {
         switch($currency_position)
         {
             case 1:
-                return "{$symbol}{$price}";
+                $position = "{$symbol}{$price}";
                 break;
 
             case 2:
-                return "{$symbol} {$price}";
+                $position = "{$symbol} {$price}";
                 break;
 
             case 3:
-                return "{$price}{$symbol}";
+                $position = "{$price}{$symbol}";
                 break;
 
             case 4:
-                return "{$price} {$symbol} ";
+                $position = "{$price} {$symbol} ";
                 break;
 
             default:
-                return null;
+                $position = null;
                 break;
         }
+
+        return $position;
     }
 
-    public function group_separator($group_separator)
+    public function group_separator(?int $group_separator): ?string
     {
         switch($group_separator)
         {
             case 1:
-                return ",";
+                $seperator =  ",";
                 break;
 
             case 2:
-                return ".";
+                $seperator =  ".";
                 break;
 
             case 3:
-                return " ";
+                $seperator =  " ";
                 break;
 
             case 4:
-                return null;
+                $seperator =  null;
                 break;
         }
+
+        return $seperator;
     }
 
-    public function decimal_separator($decimal_separator)
+    public function decimal_separator(?int $decimal_separator): ?string
     {
         switch($decimal_separator)
         {
             case 1:
-                return ",";
+                $seperator = ",";
                 break;
 
             case 2:
-                return ".";
+                $seperator = ".";
                 break;
 
             default:
-                return null;
+                $seperator = null;
                 break;
         }
-    }
 
-    public function minusSignPosition($minus, $minus_position)
-    {
-        switch($minus_position)
-        {
-            case 1:
-                return "{$minus_position}{$minus}";
-                break;
-
-            case 2:
-                return "{$minus_position} {$minus}";
-                break;
-
-            case 3:
-                return "{$minus}{$minus_position}";
-                break;
-
-            case 4:
-                return "{$minus} {$minus_position} ";
-                break;
-
-            default:
-                return null;
-                break;
-        }
+        return $seperator;
     }
 }
