@@ -3,7 +3,7 @@
 namespace Modules\Notification\Listeners;
 
 use Modules\Notification\Events\ResetPassword;
-use Modules\Notification\Jobs\SendNotification;
+use Modules\Notification\Jobs\SendNotificationJob;
 
 class SendPasswordChangeSuccess
 {
@@ -14,6 +14,6 @@ class SendPasswordChangeSuccess
 
     public function handle(ResetPassword $event): void
     {
-        SendNotification::dispatch( $event->user_id, "reset_password" );
+        SendNotificationJob::dispatch( $event->user_id, "reset_password" );
     }
 }

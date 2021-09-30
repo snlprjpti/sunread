@@ -3,7 +3,7 @@
 namespace Modules\Notification\Listeners;
 
 use Modules\Notification\Events\ForgotPassword;
-use Modules\Notification\Jobs\SendNotification;
+use Modules\Notification\Jobs\SendNotificationJob;
 
 class SendPasswordResetLink
 {
@@ -14,6 +14,6 @@ class SendPasswordResetLink
 
     public function handle(ForgotPassword $event): void
     {
-        SendNotification::dispatch( $event->user_id, "forgot_password", $event->token );
+        SendNotificationJob::dispatch( $event->user_id, "forgot_password", $event->token );
     }
 }

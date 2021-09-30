@@ -3,7 +3,7 @@
 namespace Modules\Notification\Listeners;
 
 use Modules\Notification\Events\RegistrationSuccess;
-use Modules\Notification\Jobs\SendNotification;
+use Modules\Notification\Jobs\SendNotificationJob;
 
 class SendWelcomeEmail
 {
@@ -14,6 +14,6 @@ class SendWelcomeEmail
 
     public function handle(RegistrationSuccess $event): void
     {
-        SendNotification::dispatch( $event->user_id, "default_welcome_email" );
+        SendNotificationJob::dispatch( $event->user_id, "default_welcome_email" );
     }
 }

@@ -12,7 +12,7 @@ use Modules\Notification\Emails\NotificationMail;
 use Modules\Notification\Facades\NotificationLog;
 use Modules\Notification\Traits\EmailNotification;
 
-class SendNotification implements ShouldQueue
+class SendNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, EmailNotification;
 

@@ -3,7 +3,7 @@
 namespace Modules\Notification\Listeners;
 
 use Modules\Notification\Events\ConfirmEmail;
-use Modules\Notification\Jobs\SendNotification;
+use Modules\Notification\Jobs\SendNotificationJob;
 
 class SendAccountConfirmation
 {
@@ -14,6 +14,6 @@ class SendAccountConfirmation
 
     public function handle(ConfirmEmail $event): void
     {
-        SendNotification::dispatch( $event->user_id, "welcome_email" );
+        SendNotificationJob::dispatch( $event->user_id, "welcome_email" );
     }
 }
