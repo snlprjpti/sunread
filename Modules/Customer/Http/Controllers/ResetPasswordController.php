@@ -14,6 +14,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Exceptions\TokenGenerationException;
 use Modules\Customer\Exceptions\CustomerNotFoundException;
 use Exception;
+use Modules\Notification\Events\ResetPassword;
 
 class ResetPasswordController extends BaseController
 {
@@ -58,8 +59,8 @@ class ResetPasswordController extends BaseController
         }
 
         $customer = $this->model::whereEmail($data["email"])->firstOrFail();
-        Event::dispatch( "storefront.customer.reset.password", [ "customer_id" => $customer->id ] );
 
+        event(new ResetPassword($customer->id));
         return $this->successResponseWithMessage($this->lang("password-reset-success"));
     }
 
