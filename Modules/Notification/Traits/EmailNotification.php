@@ -26,6 +26,8 @@ trait EmailNotification
              */
             $email_template = SiteConfig::fetch($event, "store", $variable_data["store_id"]);
 
+            if( !$email_template ) throw new Exception("Email Template Not Found");
+
             /**
              * Set store variable with following store_id
              */
