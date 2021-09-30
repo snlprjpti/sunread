@@ -143,5 +143,11 @@ return [
         "cart-id-required" => "cart id is required",
         "product-qty-must-be-above-0" => "product quantity must be greater than 0",
         "not-allowed" => "access denied"
+    ],
+    "cart" => [
+        "product-removed" => "product removed from cart",
+        "product-added" => "product added on cart",
+        "product-qty-updated" => "product quantity updated on cart",
+        "product-remove-due-to-channel-change" => "product removed from cart due to change in channel"
     ]
 ];
