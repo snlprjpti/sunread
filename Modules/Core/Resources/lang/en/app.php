@@ -41,7 +41,8 @@ return [
         'please-choose' => 'Please choose :name',
         'cart-merged' => "cart merged successfully",
         "not-enough-stock-quantity" => "stock quantity is not enough",
-        "channel-code-required" => "channel code is required"
+        "channel-code-required" => "channel code is required",
+        'country-not-found' => 'Region dose not belongs to country.'
     ],
     'users' => [
         'forget-password' => [
