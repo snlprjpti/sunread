@@ -585,7 +585,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Header",
-                                "path" => "template_header",
+                                "path" => "header",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -597,7 +597,7 @@ return[
                             ],
                             [
                                 "title" => "Footer",
-                                "path" => "template_footer",
+                                "path" => "footer",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
