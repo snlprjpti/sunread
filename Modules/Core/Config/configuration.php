@@ -434,7 +434,7 @@ return[
                                     [ "value" => 3, "label" => "After Value" ],
                                     [ "value" => 4, "label" => "After Value With Space" ],
                                 ],
-                                "rules" => "in:before_value,before_value_with_space,after_value,after_value_with_space",
+                                "rules" => "in:1,2,3,4",
                                 "multiple" => false,
                                 "scope" => "channel",
                                 "is_required" => 1
@@ -464,7 +464,7 @@ return[
                                     [ "value" => 3, "label" => "After Value" ],
                                     [ "value" => 4, "label" => "After Symbol" ]
                                 ],
-                                "rules" => "in:before_value,before_value_with_space,after_value,after_value_with_space",
+                                "rules" => "in:1,2,3,4",
                                 "multiple" => false,
                                 "scope" => "channel",
                                 "is_required" => 1
