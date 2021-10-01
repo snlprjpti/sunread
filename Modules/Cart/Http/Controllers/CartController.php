@@ -38,11 +38,12 @@ class CartController extends BaseController
 
     public function addOrUpdateCart(Request $request): JsonResponse
     {
-        try {
-            
+        try
+        {
             $cartData = $this->cartRepository->addOrUpdateCart($request);
-
-        } catch (Exception $exception) {
+        }
+        catch (Exception $exception)
+        {
             return $this->handleException($exception);
         }
         return $this->successResponse($cartData, $this->lang("create-success"));
@@ -50,31 +51,43 @@ class CartController extends BaseController
 
     public function deleteProductFromCart(Request $request): JsonResponse
     {
-        try {
+        try
+        {
             $response = $this->cartRepository->deleteProductFromCart($request);
-        } catch (Exception $exception) {
+        }
+        catch (Exception $exception)
+        {
             return $this->handleException($exception);
         }
+        
         return $this->successResponse($response, $this->lang("delete-success"));
     }
 
     public function getAllProductFromCart(Request $request): JsonResponse
     {
-        try {
+        try
+        {
             $response = $this->cartRepository->getAllProductFromCart($request);
-        } catch (Exception $exception) {
+        }
+        catch (Exception $exception)
+        {
             return $this->handleException($exception);
         }
+        
         return $this->successResponse($response, $this->lang("fetch-list-success"));
     }
 
     public function mergeCart(Request $request): JsonResponse
     {
-        try {
+        try
+        {
             $response = $this->cartRepository->mergeCart($request);
-        } catch (Exception $exception) {
+        }
+        catch (Exception $exception)
+        {
             return $this->handleException($exception);
         }
+        
         return $this->successResponse($response, $this->lang("response.cart-merged"));
     }
 }
