@@ -15,20 +15,6 @@ class CartItemRepository extends BaseRepository
         $this->model_key = "cart_items";
     }
 
-    public function createCartItem(array $data): object
-    {
-        try
-        {
-            $created =  $this->create($data);
-        } 
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $created;
-    }
-
     public function deleteCartItem(array $whereCondition): bool
     {
         try
