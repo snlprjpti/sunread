@@ -484,7 +484,7 @@ class CartRepository extends BaseRepository
     {
         try
         {
-            $product = $this->product::where('id', $productId)->where('status', 1)->select('id')->first();
+            $product = $this->product::where('id', $productId)->where('status', 1)->first();
             if (!$product) throw new ProductNotFoundIndividuallyException();
         }
         catch (Exception $exception)
@@ -502,10 +502,12 @@ class CartRepository extends BaseRepository
             $headerChannel = $this->getCartHashIdFromHeader($request, 'hc-channel');
             $channel = Channel::where('code', $headerChannel)->select('id')->first();
             if (!$channel) throw new ChannelDoesNotExistException;
-            $checkProductOnChannel = DB::table('channel_product')->where('channel_id', $channel->id)
-                ->where('product_id', $request->product_id)->select('channel_id')
-                ->first();
-            if ($checkProductOnChannel) throw new ProductNotFoundIndividuallyException;
+
+            $productWebsiteId = $product->website_id;
+
+            $websiteChannels = $this->channel::where('website_id', $productWebsiteId)->pluck('id')->toArray();
+            
+            if (!in_array($channel->id, $websiteChannels)) throw new ProductNotFoundIndividuallyException;
         }
         catch (Exception $exception)
         {
