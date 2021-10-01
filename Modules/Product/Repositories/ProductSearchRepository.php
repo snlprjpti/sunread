@@ -149,11 +149,16 @@ class ProductSearchRepository extends ElasticSearchRepository
             foreach($products as &$product)
             {
                 $product["price_formatted"] = isset($product["price"]) ? PriceFormat::get($product["price"], $store->id, "store") : null;
+
                 if(isset($product["special_price"])) {
                     if(isset($product["special_from_date"])) $fromDate = date('Y-m-d H:m:s', strtotime($product["special_from_date"]));
                     if(isset($product["special_to_date"])) $toDate = date('Y-m-d H:m:s', strtotime($product["special_to_date"])); 
                     if(!isset($fromDate) && !isset($toDate)) $product["special_price_formatted"] = PriceFormat::get($product["special_price"], $store->id, "store");
                     else $product["special_price_formatted"] = (($currentDate >= $fromDate) && ($currentDate <= $toDate)) ? PriceFormat::get($product["special_price"], $store->id, "store") : null;
+                }
+                else {
+                    $product["special_price"] = null;
+                    $product["special_price_formatted"] = null;
                 }
 
                 if(isset($product["new_from_date"]) && isset($product["new_to_date"])) { 
@@ -166,7 +171,7 @@ class ProductSearchRepository extends ElasticSearchRepository
                 $product["quantity"] = (int) $product["quantity"];
                 $product["color"] = isset($product["color"]) ? $product["color"] : null;
                 $product["color_value"] = isset($product["color_value"]) ? $product["color_value"] : null;
-                //unset($product["thumbnail_image"], $product["base_image"]);      
+                unset($product["thumbnail_image"], $product["base_image"]);      
             }
         }
         catch (Exception $exception)
