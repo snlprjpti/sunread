@@ -246,15 +246,10 @@ class CartRepository extends BaseRepository
                 $cartHashId = $this->getCartHashIdFromHeader($request, "hc-cart");
 
                 // if cart hash id exist in carts table 
-                $cart = $this->model::where("id", $cartHashId)->first();
-                if ($cart)
-                {
-                    if ($cart->customer_id != null)
-                    {
-                        throw new Forbidden403Exception(__("core::app.exception_message.not-allowed"));
-                    } 
-                    else
-                    {
+                $cart = $this->model::where("id", $cartHashId)->firstOrFail();
+               
+                    if ($cart->customer_id != null) throw new Forbidden403Exception(__("core::app.exception_message.not-allowed")); 
+                   
                         // get customer ID
                         $checkCartOfUser = $this->model::where("customer_id", $customerId)->first();
                         if ($checkCartOfUser)
@@ -268,13 +263,8 @@ class CartRepository extends BaseRepository
 
                         $this->responseData["message"] = $this->cartStatus["cart_merged"];
                         $this->responseData["cart_id"] = $cartHashId;
-                    }
-                } 
-                else
-                {
-                    throw new CartHashIdNotFoundException();
                 }
-            }
+               
         } 
         catch (Exception $exception)
         {
