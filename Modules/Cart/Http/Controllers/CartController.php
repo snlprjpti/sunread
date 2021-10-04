@@ -40,7 +40,7 @@ class CartController extends BaseController
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    public function resource(object $data): JsonResource
+    public function resource(?object $data): JsonResource
     {
         return new CartResource($data);
     }
@@ -64,14 +64,13 @@ class CartController extends BaseController
     {
         try
         {
-            $cartData = $this->cartRepository->addOrUpdateCart($request);
+            $response = $this->cartRepository->addOrUpdateCart($request);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
-        //$this->resource($cartData['cart']), this->lang($data))
-        return $this->successResponse($cartData, $this->lang("create-success"));
+        return $this->successResponse($this->resource($response['cart']), $response['message']);
     }
 
     public function deleteProductFromCart(Request $request): JsonResponse
@@ -85,7 +84,8 @@ class CartController extends BaseController
             return $this->handleException($exception);
         }
         
-        return $this->successResponse($response, $this->lang("delete-success"));
+        return $this->successResponse($this->resource($response['cart']), $response['message']);
+
     }
 
     public function getAllProductFromCart(Request $request): JsonResponse
@@ -99,7 +99,8 @@ class CartController extends BaseController
             return $this->handleException($exception);
         }
         
-        return $this->successResponse($response, $this->lang("fetch-list-success"));
+        return $this->successResponse($response, $this->lang('fetch-success'));
+
     }
 
     public function mergeCart(Request $request): JsonResponse
@@ -113,6 +114,7 @@ class CartController extends BaseController
             return $this->handleException($exception);
         }
         
-        return $this->successResponse($response, $this->lang("response.cart-merged"));
+        return $this->successResponse($this->resource($response['cart']), $response['message']);
+
     }
 }

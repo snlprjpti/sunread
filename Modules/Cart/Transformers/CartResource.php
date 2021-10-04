@@ -9,12 +9,13 @@ class CartResource extends JsonResource
 {
     public function toArray($request): array
     {
+        // dd($this);
         return [
             "id" => $this->id,
-            "customer" => $this->whenLoaded(new CustomerResource($this->customer)),
-            "cart_items" => $this->whenLoaded(CartItemResource::collection($this->cart_items)),
-            "item_count" => $this->item_count,
-            "total_quantity" => $this->total_quantity,
+            // "customer" => $this->whenLoaded(new CustomerResource($this->customer)),
+            // "cart_items" => $this->whenLoaded(CartItemResource::collection($this->cartItems)),
+            // "item_count" => $this->item_count,
+            // "total_quantity" => $this->total_quantity,
             "coupon_code" => $this->coupon_code,
             "channel_code" => $this->channel_code,
             "store_code" => $this->store_code,

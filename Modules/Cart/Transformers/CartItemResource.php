@@ -11,8 +11,8 @@ class CartItemResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "product" => $this->whenLoaded(new ProductResource($this->product)),
-            "cart" => $this->whenLoaded(new CartResource($this->cart)),
+            // "product" => $this->whenLoaded(new ProductResource($this->product)),
+            // "cart" => $this->whenLoaded(new CartResource($this->cart)),
             "qty" => $this->qty,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
