@@ -4,6 +4,7 @@ namespace Modules\Tax\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Tax\Services\TaxPrice;
 
 class TaxServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,7 @@ class TaxServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerActivityLogger();
     }
 
     /**
@@ -87,6 +89,13 @@ class TaxServiceProvider extends ServiceProvider
         } else {
             $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
+    }
+
+    public function registerActivityLogger()
+    {
+        $this->app->singleton('TaxPrice', function () {
+            return new TaxPrice();
+        });
     }
 
     /**
