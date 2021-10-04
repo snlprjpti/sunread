@@ -450,7 +450,7 @@ class CartRepository extends BaseRepository
                     "qty" => $request->qty ?? 1
                 ];
 
-                $this->cartItemRepo->createCartItem($cartItemCreateData);
+                $this->cartItemRepo->create($cartItemCreateData);
                 $this->responseData["message"] = $this->cartStatus["product_added"];
                 $this->responseData["cart_id"] = $cart->id;
             }
@@ -546,7 +546,7 @@ class CartRepository extends BaseRepository
                     if (!$cartItem) throw new ProductNotFoundIndividuallyException();
                    
                     $this->updateHeaderOnCart($checkIfUserHasCartAlready, $request);
-                    $this->itemClearFromCart(["id" => $cartItem->id], $$checkIfUserHasCartAlready->id);
+                    $this->itemClearFromCart(["id" => $cartItem->id], $checkIfUserHasCartAlready->id);
 
         } 
         catch (Exception $exception)
@@ -656,7 +656,7 @@ class CartRepository extends BaseRepository
         return true;
     }
 
-    private function quantityValidation(string $qty): bool
+    private function quantityValidation(int $qty): bool
     {
         if (isset($qty) && $qty <= 0) throw ValidationException::withMessages(["quantity" => __("core::app.exception_message.product-qty-must-be-above-0")]);
         return true;
