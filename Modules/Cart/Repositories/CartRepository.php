@@ -187,8 +187,10 @@ class CartRepository extends BaseRepository
 
                 if ($cart)
                 {
-
                     $this->updateHeaderOnCart($cart, $request);
+
+                    $this->mergeGuestCart($request, $cart);
+
 
                     $coreCache = $this->getCoreCache($request);
                     $relations = [
@@ -234,12 +236,44 @@ class CartRepository extends BaseRepository
         return $items;
     }
 
+    private function mergeGuestCart(object $request, object $cart): bool
+    {
+        try
+        {
+
+        $customerId = auth("customer")->user() ? auth("customer")->user()->id : null;
+        if($customerId){
+        if ($cart->customer_id != null) throw new Forbidden403Exception(__("core::app.exception_message.not-allowed")); 
+                   
+        // get customer ID
+        $checkCartOfUser = $this->model::where("customer_id", $customerId)->first();
+        if ($checkCartOfUser)
+        {
+            $checkCartOfUser->delete();
+        }
+
+        $this->updateHeaderOnCart($cart, $request);
+
+        $this->update(["customer_id" => $customerId], $cart->id);
+        $this->responseData["message"] = $this->cartStatus["cart_merged"];
+        $this->responseData["cart_id"] = $cart->id;
+        }
+    }
+
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
+
+    }
+
     public function mergeCart(object $request): mixed
     {
         DB::beginTransaction();
         try
         {
-            $customerId = auth("customer")->user()->id;
             // check if there is cart hash id
             if (isset($request->header()["hc-cart"]))
             {
@@ -247,23 +281,8 @@ class CartRepository extends BaseRepository
 
                 // if cart hash id exist in carts table 
                 $cart = $this->model::where("id", $cartHashId)->firstOrFail();
-               
-                    if ($cart->customer_id != null) throw new Forbidden403Exception(__("core::app.exception_message.not-allowed")); 
-                   
-                        // get customer ID
-                        $checkCartOfUser = $this->model::where("customer_id", $customerId)->first();
-                        if ($checkCartOfUser)
-                        {
-                            $checkCartOfUser->delete();
-                        }
-
-                        $this->updateHeaderOnCart($cart, $request);
-
-                        $this->update(["customer_id" => $customerId], $cart->id);
-
-                        $this->responseData["message"] = $this->cartStatus["cart_merged"];
-                        $this->responseData["cart_id"] = $cartHashId;
-                }
+                $this->mergeGuestCart($request, $cart);
+            }
                
         } 
         catch (Exception $exception)
@@ -273,7 +292,7 @@ class CartRepository extends BaseRepository
         }
 
         DB::commit();
-        return $this->responseData;
+        return count($this->responseData) > 0 ? $this->responseData : null; 
     }
 
     private function getProductDetail($product, $cartItem, $coreCache): mixed
