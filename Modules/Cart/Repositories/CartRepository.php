@@ -2,7 +2,6 @@
 
 namespace Modules\Cart\Repositories;
 
-use DB;
 use Exception;
 use Modules\Cart\Entities\Cart;
 use Modules\Core\Entities\Store;
@@ -19,8 +18,9 @@ use Modules\Cart\Services\UserAuthCheckService;
 use Modules\Cart\Exceptions\OutOfStockException;
 use Modules\Cart\Repositories\CartItemRepository;
 use Modules\Cart\Exceptions\CartHashIdNotFoundException;
-use Modules\Cart\Exceptions\ChannelDoesNotExistException;
 use Elasticsearch\Common\Exceptions\Forbidden403Exception;
+use Illuminate\Support\Facades\DB;
+use Modules\Core\Facades\CoreCache;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 
 class CartRepository extends BaseRepository
@@ -41,7 +41,7 @@ class CartRepository extends BaseRepository
         $this->cartItemRepo = $cartItemRepo;
 
         $this->rules = [
-            "product_id" => "required|integer|exists:products,id",
+            "product_id" => "required|exists:products,id",
             "qty" => "sometimes|numeric|min:0",
             "type" => "sometimes|in:create,update"
         ];
@@ -63,43 +63,31 @@ class CartRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            $this->validateData($request, $this->rules);
-
-            /**
-             * check if add/update on cart is by guest or logged in user
-             **/
+            $this->validateData($request);
+            
+            //check if add/update on cart is by guest or logged in user
             $customer = $this->userAuthCheckService->validateUser($request);
+            
             $request->merge(["customer_id" => $customer->id ?? null, "type" => $request->type ?? "create"]);
-            
-            
-            $productId = $request->product_id;
 
             if (!array_key_exists("hc-cart", $request->header()) && $request->type == "update") throw ValidationException::withMessages(["cart_hash_id" => __("core::app.exception_message.cart-id-required")]);
              
-            elseif (empty($request->header()["hc-cart"]) && $request->type == "create")
-            {
-                $this->checkProductConditions($productId, $request);
+            elseif (empty($request->header()["hc-cart"]) && $request->type == "create") {
+                $this->checkProductConditions($request->product_id, $request);
                 $this->addProductOnCart($request);
             }
-            else
-            {
-            $cartHashId = $this->getCartHashIdFromHeader($request, "hc-cart");
-
-            // if cart hash id exist in carts table 
-            $cart = $this->model::where("id", $cartHashId)->first();
-            if ($cart)
-            {
-                $this->whenCartFoundInTable($cart, $request, $productId);
+            else {
+                $cartHashId = $this->getCartHashIdFromHeader($request, "hc-cart");
+                // if cart hash id exist in carts table 
+                $cart = $this->model::whereId($cartHashId)->first();
+                if ($cart) $this->whenCartFoundInTable($cart, $request, $request->product_id);
+                // if cart hash id sent but not found on cart table
+                else {
+                    // check product exist on product table, product status =1, in stock, same channel
+                    $this->checkProductConditions($request->product_id, $request);
+                    $this->addProductOnCart($request);
+                }
             }
-            // if cart hash id sent but not found on cart table
-            else
-            {
-                // check product exist on product table, product status =1, in stock, same channel
-                $this->checkProductConditions($productId, $request);
-                $this->addProductOnCart($request);
-            }
-            }
-           
         } 
         catch (Exception $exception)
         {
@@ -109,51 +97,45 @@ class CartRepository extends BaseRepository
 
         DB::commit();
         Event::dispatch("{$this->model_key}.add.update.after", $this->responseData);
+        
         return $this->responseData;
     }
 
     public function deleteProductFromCart(object $request): mixed
     {
+
         DB::beginTransaction();
         try
         {
+            $this->validateData($request);
 
-            $this->validateData($request, $this->rules);
-
-            /**
-             * check if user is on guest or logged mode
-             **/
+            //check if user is on guest or logged mode
             $customer = $this->userAuthCheckService->validateUser($request);
             $request->merge(["customer_id" => $customer->id ?? null]);
-            $productId = $request->product_id;
 
-            if (isset($request->header()["hc-cart"]))
-            {
-                $cartHashId = $this->getCartHashIdFromHeader($request, "hc-cart");
+            if (isset($request->header()["hc-cart"])) {
+                $cartId = $this->getCartHashIdFromHeader($request, "hc-cart");
 
                 // if cart hash id exist in carts table
-                $cart = $this->model::where("id", $cartHashId)->select("id", "customer_id", "channel_code", "store_code")->first();
+                $cart = $this->model::whereId($cartId)->firstOrFail();
 
-                if ($cart)
-                {
+                if ($cart) {
                     if ($request->customer_id != $cart->customer_id) throw new Forbidden403Exception(__("core::app.exception_message.not-allowed"));
 
                     $this->updateHeaderOnCart($cart, $request);
 
-                    $cartAndProductCheck = ["cart_id" => $cartHashId, "product_id" => $productId];
+                    $conditions = ["cart_id" => $cartId, "product_id" => $request->product_id];
                     // if product id exist in the cart hash id, delete that product
-                    $this->cartItem->where($cartAndProductCheck)->firstOrFail();
-                    $this->itemClearFromCart($cartAndProductCheck, $cartHashId);
+                    $this->cartItem->where($conditions)->firstOrFail();
+                    $this->itemClearFromCart($conditions, $cartId);
                 }
                 // if cart hash id is sent but not found on cart table case:
-                else
-                {
+                else {
                     $this->deleteProductAsPerCustomerMode($request);
                 }
             }
             // if cart hash id is not sent case:
-            else
-            {
+            else {
                 $this->deleteProductAsPerCustomerMode($request);
             }
         } 
@@ -172,10 +154,8 @@ class CartRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            $products = [];
-            if (!array_key_exists("hc-channel", $request->header())) throw ValidationException::withMessages(["channel_code" => __("core::app.response.channel-code-required")]);
-            $headerChannel = $this->getCartHashIdFromHeader($request, "hc-channel");
-            $checkChannel = $this->channel::where("code", $headerChannel)->select("id")->firstOrFail();
+            $coreCache = $this->getCoreCache($request);
+            $checkChannel = $coreCache?->channel;
 
             // if cart hash id is sent
             if (isset($request->header()["hc-cart"]))
@@ -183,40 +163,39 @@ class CartRepository extends BaseRepository
                 $cartHashId = $this->getCartHashIdFromHeader($request, "hc-cart");
 
                 // if cart hash id exist in carts table
-                $cart = $this->model::where("id", $cartHashId)->first();
+                $cart = $this->model::whereId($cartHashId)->firstOrFail();
 
-                if ($cart)
+                $this->updateHeaderOnCart($cart, $request);
+
+                $this->mergeGuestCart($request, $cart);
+
+
+                $coreCache = $this->getCoreCache($request);
+                $relations = [
+                    "catalog_inventories",
+                    "images",
+                    "images.types",
+                    "product_attributes",
+                    "product_attributes.attribute",
+                    "website.channels"
+                ];
+                $products = [];
+
+                foreach ($cart->cartItems as $item)
                 {
-                    $this->updateHeaderOnCart($cart, $request);
+                    $product = $this->product::whereId($item->product_id)->whereStatus(1)->with($relations)->firstOrFail();
+                    $channel_ids = $product->website->channels->pluck("id")->toArray();
+                    if (!in_array($checkChannel->id, $channel_ids)) {
+                        $item->delete();
+                        //  if there is no cart items on cart_items table then delete that cart hash id row from carts table
+                        $checkCartItemsExitsOnCartHashId = $this->cartItem->where("cart_id", $cartHashId)->first();
+                        if (!$checkCartItemsExitsOnCartHashId) {
+                            $this->delete($cartHashId);
+                        }
+                        $message = $this->cartStatus["product_remove_due_to_channel_change"];
+                    };
 
-                    $this->mergeGuestCart($request, $cart);
-
-
-                    $coreCache = $this->getCoreCache($request);
-                    $relations = [
-                        "catalog_inventories",
-                        "images",
-                        "images.types",
-                        "product_attributes",
-                        "product_attributes.attribute",
-                    ];
-                    //relations cart_items
-                    foreach ($cart->cartItems as $item)
-                    {
-                        $getProductWebsiteId = $this->product::where("id", $item->product_id)->whereStatus(1)->with($relations)->firstOrFail();
-                        $websiteChannels = $this->channel::where("website_id", $getProductWebsiteId->website_id)->pluck("id")->toArray();
-                        if (!in_array($checkChannel->id, $websiteChannels)) {
-                            $item->delete();
-                            //  if there is no cart items on cart_items table then delete that cart hash id row from carts table
-                            $checkCartItemsExitsOnCartHashId = $this->cartItem->where("cart_id", $cartHashId)->first();
-                            if (!$checkCartItemsExitsOnCartHashId) {
-                                $this->delete($cartHashId);
-                            }
-                            $message = $this->cartStatus["product_remove_due_to_channel_change"];
-                        };
-
-                        $products[] = $this->getProductDetail($getProductWebsiteId, $item, $coreCache);
-                    }
+                    $products[] = $this->getProductDetail($product, $item, $coreCache);
                 }
             }
 
@@ -240,25 +219,20 @@ class CartRepository extends BaseRepository
     {
         try
         {
+            $customerId = auth("customer")->id();
+            if ($customerId) {
 
-        $customerId = auth("customer")->user() ? auth("customer")->user()->id : null;
-        if($customerId){
-        if ($cart->customer_id != null) throw new Forbidden403Exception(__("core::app.exception_message.not-allowed")); 
-                   
-        // get customer ID
-        $checkCartOfUser = $this->model::where("customer_id", $customerId)->first();
-        if ($checkCartOfUser)
-        {
-            $checkCartOfUser->delete();
+                if ($cart->customer_id != null) throw new Forbidden403Exception(__("core::app.exception_message.not-allowed")); 
+                $checkCartOfUser = $this->model::whereCustomerId($customerId)->first();
+                if ($checkCartOfUser) $checkCartOfUser->delete();
+
+                $this->updateHeaderOnCart($cart, $request);
+                $this->update(["customer_id" => $customerId], $cart->id);
+
+                $this->responseData["message"] = $this->cartStatus["cart_merged"];
+                $this->responseData["cart_id"] = $cart->id;
+            }
         }
-
-        $this->updateHeaderOnCart($cart, $request);
-
-        $this->update(["customer_id" => $customerId], $cart->id);
-        $this->responseData["message"] = $this->cartStatus["cart_merged"];
-        $this->responseData["cart_id"] = $cart->id;
-        }
-    }
 
         catch (Exception $exception)
         {
@@ -275,10 +249,8 @@ class CartRepository extends BaseRepository
         try
         {
             // check if there is cart hash id
-            if (isset($request->header()["hc-cart"]))
-            {
+            if (isset($request->header()["hc-cart"])) {
                 $cartHashId = $this->getCartHashIdFromHeader($request, "hc-cart");
-
                 // if cart hash id exist in carts table 
                 $cart = $this->model::where("id", $cartHashId)->firstOrFail();
                 $this->mergeGuestCart($request, $cart);
@@ -302,6 +274,8 @@ class CartRepository extends BaseRepository
             $data = [];
             $data["id"] = $product->id;
             $data["sku"] = $product->sku;
+            $data["product_type"] = $product->parent_id ? "configurable" : "simple";
+
             $store = $coreCache->store;
 
             $product_details = $product->product_attributes->mapWithKeys(function ($product_attribute) use ($store, $product) {
@@ -318,27 +292,22 @@ class CartRepository extends BaseRepository
 
             $data["name"] = $product_details["name"];
 
-            /*---------- PRODUCT PRICE------------- */
             $special_from_date = $product_details["special_from_date"] ?? "";
             $special_to_date = $product_details["special_to_date"] ?? "";
             $price = $product_details["price"] ?? 0;
-            if (!$special_from_date || !$special_to_date)
-            {
-                $data["price"] = $product_details["special_price"] ?? $price;
-            } 
-            else 
-            {
-                $currentDate = now()->toDateTimeString();
-                ($special_from_date <= $currentDate && $currentDate <= $special_to_date) ? ($data["price"] = $product_details["special_price"] ?? $price) : $data["price"] = $price;
-            }
+            
+            $currentDate = now()->toDateTimeString();
+            if (!$special_from_date || !$special_to_date) $data["price"] = $product_details["special_price"] ?? $price;
+            else ($special_from_date <= $currentDate && $currentDate <= $special_to_date) ? ($data["price"] = $product_details["special_price"] ?? $price) : $data["price"] = $price;
+
             $data["price_formatted"] = PriceFormat::get($data["price"], $store->id, "store");
+            
             $data["tax_amout"] = "";
             $data["tax_amout_formatted"] = "";
             $data["total_amount"] = "";
             $data["total_amount_formatted"] = "";
             $data["total_tax_amount"] = "";
             $data["total_tax_amount_formatted"] = "";
-            /*---------- /.PRODUCT PRICE------------- */
 
             if ($product->type == "simple" && $product->parent_id) {
                 $configurable_attributes = [];
@@ -359,18 +328,9 @@ class CartRepository extends BaseRepository
                 $data["configurable_attributes"] = $configurable_attributes;
             }
 
-            $data["product_type"] = $product->parent_id ? "configurable" : "simple";
-
-
             // Product Stock
             $productStock = $product->catalog_inventories->first();
-            $stock_status = true;
-            if ($productStock && $productStock->manage_stock && $productStock->is_in_stock && $cartItem->qty > $productStock->quantity)
-            {
-                $stock_status = false;
-            }
-            $data["stock_status"] = $stock_status;
-
+            $data["stock_status"] = ($productStock?->manage_stock && $productStock?->is_in_stock && $cartItem?->qty > $productStock?->quantity) ? false : true;
             $data["qty"] = $cartItem->qty;
 
             // Product Single Image
@@ -378,12 +338,11 @@ class CartRepository extends BaseRepository
             foreach ($product->images as $image)
             {
                 $imageTypes = $image->types->pluck("slug")->toArray();
-                if (in_array("small_image", $imageTypes) && $image->path)
-                {
+                if (in_array("small_image", $imageTypes) && $image->path) {
                     $data["image"] = Storage::url($image->path);
                     break;
-                } else
-                {
+                }
+                else {
                     $data["image"] = in_array("base_image", $imageTypes) ? Storage::url($image->path) : "";
                 }
             }
@@ -401,31 +360,28 @@ class CartRepository extends BaseRepository
         try
         {
             $this->quantityValidation($request->qty);
-
-            $checkIfUserHasCartAlready = $this->model::where("customer_id", $request->customer_id)->first();
-            if (isset($request->customer_id) && $checkIfUserHasCartAlready)
-            {
+            $checkIfUserHasCartAlready = $this->model::whereCustomerId($request->customer_id)->first();
+            
+            if (isset($request->customer_id) && $checkIfUserHasCartAlready) {
 
                 $this->updateHeaderOnCart($checkIfUserHasCartAlready, $request);
 
                 // if product id already exist in that logged in user id
-                $checkProductId = $this->cartItem->where("product_id", $request->product_id)->where("cart_id", $checkIfUserHasCartAlready->id)->first();
-                if ($checkProductId)
-                {
-                    $qty =  ($checkProductId->qty) + $request->qty ?? 1;
-
-                    $whereConditionOfCartAndProduct = [
+                $cartItem = $this->cartItem->whereProductId($request->product_id)->whereCartId($checkIfUserHasCartAlready->id)->first();
+                if ($cartItem) {
+                    $qty =  ($cartItem->qty) + ($request->qty ?? 1);
+                    
+                    $whereConditions = [
                         "product_id" => $request->product_id,
                         "cart_id" => $checkIfUserHasCartAlready->id,
                     ];
 
-                    $this->cartItemRepo->updateItemWithConditions($whereConditionOfCartAndProduct, ["qty" => $qty]);
+                    $this->cartItemRepo->updateItemWithConditions($whereConditions, ["qty" => $qty]);
 
                     $this->responseData["message"] = $this->cartStatus["product_qty_updated"];
-                    $this->responseData["cart_id"] = $$checkIfUserHasCartAlready->id;
+                    $this->responseData["cart_id"] = $checkIfUserHasCartAlready->id;
                 } 
-                else
-                {
+                else {
                     $cartItemCreateData = [
                         "cart_id" => $checkIfUserHasCartAlready->id,
                         "product_id" => $request->product_id,
@@ -433,24 +389,27 @@ class CartRepository extends BaseRepository
                     ];
 
                     $this->cartItemRepo->create($cartItemCreateData);
+
                     $this->responseData['message'] = $this->cartStatus["product_added"];
-                    $this->responseData["cart_id"] = $$checkIfUserHasCartAlready->id;
+                    $this->responseData["cart_id"] = $checkIfUserHasCartAlready->id;
                 }
             } 
-            else
-            {
-                $cart = $this->create([
+            else {
+                $cartData = [
                     "customer_id" => $request->customer_id,
                     "channel_code" => $this->getCartHashIdFromHeader($request, "hc-channel"),
                     "store_code" => $this->getCartHashIdFromHeader($request, "hc-store")
-                ]);
+                ];
+                $cart = $this->create($cartData);
+
                 $cartItemCreateData = [
                     "cart_id" => $cart->id,
                     "product_id" => $request->product_id,
                     "qty" => $request->qty ?? 1
                 ];
+                $this->cartItemRepo->create($cartItemCreateData);
 
-                $this->cartItemRepo->createCartItem($cartItemCreateData);
+
                 $this->responseData["message"] = $this->cartStatus["product_added"];
                 $this->responseData["cart_id"] = $cart->id;
             }
@@ -463,25 +422,21 @@ class CartRepository extends BaseRepository
         return true;
     }
 
-    private function checkProductConditions(string $productId, object $request): bool
+    private function checkProductConditions(string $productId, object $request): void
     {
         // check if product exist on product table
-        $product = $this->checkProductStatus($productId);
-
+        $product = $this->getProduct($productId);
         // check if product exits on channel
         $this->checkIfProductExistOnChannel($product, $request);
-
         // check stock of product
         $this->checkProductStock($product, $request);
-
-        return true;
     }
 
-    private function checkProductStatus(string $productId): object
+    private function getProduct(?int $id): object
     {
         try
         {
-            $product = $this->product::where("id", $productId)->where("status", 1)->firstOrFail();
+            $product = $this->product::whereId($id)->whereStatus(1)->firstOrFail();
         }
         catch (Exception $exception)
         {
@@ -495,14 +450,9 @@ class CartRepository extends BaseRepository
     {
         try
         {
-            $headerChannel = $this->getCartHashIdFromHeader($request, "hc-channel");
-            $channel = Channel::where("code", $headerChannel)->firstOrFail();
-
-            $productWebsiteId = $product->website_id;
-
-            $websiteChannels = $this->channel::where("website_id", $productWebsiteId)->pluck("id")->toArray();
-            
-            if (!in_array($channel->id, $websiteChannels)) throw new ProductNotFoundIndividuallyException();
+            $cacheData = $this->getCoreCache($request);
+            $website_ids = $product->website->channels->pluck("id")->toArray();            
+            if (!in_array($cacheData?->channel?->id, $website_ids)) throw new ProductNotFoundIndividuallyException();
         }
         catch (Exception $exception)
         {
@@ -518,8 +468,7 @@ class CartRepository extends BaseRepository
         {
             $productStock = $product->catalog_inventories()->first();
             $qty = $request->qty ?? 1;
-            if ($productStock && $productStock->manage_stock && $productStock->is_in_stock && $qty > $productStock->quantity)
-            {
+            if ($productStock?->manage_stock && $productStock?->is_in_stock && $qty > $productStock?->quantity) {
                 throw new OutOfStockException();
             }
         }
@@ -535,19 +484,14 @@ class CartRepository extends BaseRepository
     {
         try
         {
-            $customerId = $request->customer_id;
-            if(!$customerId) throw new CartHashIdNotFoundException();
-           
-                $checkIfUserHasCartAlready = $this->model::where("customer_id", $customerId)->first();
-                if (!$checkIfUserHasCartAlready) throw new CartHashIdNotFoundException();
+            if(!$request->customer_id) throw new CartHashIdNotFoundException();
+            $checkIfUserHasCartAlready = $this->model::whereCustomerId($request->customer_id)->firstOrFail();
 
-                    // if product id exist in that logged in user id
-                    $cartItem = $this->cartItem->where("product_id", $request->product_id)->where("cart_id", $checkIfUserHasCartAlready->id)->first();
-                    if (!$cartItem) throw new ProductNotFoundIndividuallyException();
-                   
-                    $this->updateHeaderOnCart($checkIfUserHasCartAlready, $request);
-                    $this->itemClearFromCart(["id" => $cartItem->id], $$checkIfUserHasCartAlready->id);
+            // if product id exist in that logged in user id
+            $cartItem = $this->cartItem->whereProductId($request->product_id)->whereCartId($checkIfUserHasCartAlready->id)->firstOrFail();
 
+            $this->updateHeaderOnCart($checkIfUserHasCartAlready, $request);
+            $this->itemClearFromCart(["id" => $cartItem->id], $checkIfUserHasCartAlready->id);
         } 
         catch (Exception $exception)
         {
@@ -563,14 +507,8 @@ class CartRepository extends BaseRepository
         {
             $headerChannel = $this->getCartHashIdFromHeader($request, "hc-channel");
             $headerStore = $this->getCartHashIdFromHeader($request, "hc-store");
-            if ($cart->channel_code != $headerChannel || $cart->store_code != $headerStore)
-            {
-                $data = [
-                        "channel_code" => $headerChannel,
-                        "store_code" => $headerStore
-                    ];
-                $this->update($data, $cart->id);
-            }
+            $data = [ "channel_code" => $headerChannel, "store_code" => $headerStore ];
+            if ($cart->channel_code != $headerChannel || $cart->store_code != $headerStore) $this->update($data, $cart->id);
         } 
         catch (Exception $exception)
         {
@@ -652,29 +590,29 @@ class CartRepository extends BaseRepository
         $this->responseData["message"] = $this->cartStatus["product_added"];
         $this->responseData["cart_id"] = $cartHashId;
     }
-
         return true;
     }
 
-    private function quantityValidation(string $qty): bool
+    private function quantityValidation(?int $qty): void
     {
         if (isset($qty) && $qty <= 0) throw ValidationException::withMessages(["quantity" => __("core::app.exception_message.product-qty-must-be-above-0")]);
-        return true;
     }
 
-    private function itemClearFromCart(array $cartAndProductCheck, $cartHashId): bool
+    private function itemClearFromCart(array $cartAndProductCheck, string $cartHashId): void
     {
-        $this->cartItemRepo->deleteCartItem($cartAndProductCheck);
-
-        //  if there is no cart items on cart_items table then delete that cart hash id row from carts table
-        $checkCartItemsExitsOnCartHashId = $this->cartItem->where("cart_id", $cartHashId)->select("id")->first();
-        if (!$checkCartItemsExitsOnCartHashId)
+        try
         {
-            $this->model::where("id", $cartHashId)->delete();
+            $this->cartItemRepo->deleteCartItem($cartAndProductCheck);
+            //  if there is no cart items on cart_items table then delete that cart hash id row from carts table
+            $checkCartItemsExitsOnCartHashId = $this->cartItem->whereCartId($cartHashId)->first()?->id;
+            if (!$checkCartItemsExitsOnCartHashId) $this->model::whereId($cartHashId)->delete();
+            
+            $this->responseData["message"] = $this->cartStatus["product_removed"];
+            $this->responseData["cart_id"] = $checkCartItemsExitsOnCartHashId ? $cartHashId : "";
         }
-        $this->responseData["message"] = $this->cartStatus["product_removed"];
-        $this->responseData["cart_id"] = $checkCartItemsExitsOnCartHashId ? $cartHashId : "";
-
-        return true;
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
     }
 }
