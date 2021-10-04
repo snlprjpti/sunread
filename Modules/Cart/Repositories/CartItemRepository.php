@@ -15,11 +15,11 @@ class CartItemRepository extends BaseRepository
         $this->model_key = "cart_items";
     }
 
-    public function deleteCartItem(array $whereCondition): bool
+    public function deleteCartItem(array $conditions): bool
     {
         try
         {
-            $this->model->where($whereCondition)->delete();
+            $this->model->where($conditions)->delete();
         }
         catch (Exception $exception)
         {
@@ -29,17 +29,17 @@ class CartItemRepository extends BaseRepository
         return true;
     }
 
-    public function updateItemWithConditions(array $whereCondition, array $data): bool
+    public function updateItemWithConditions(array $conditions, array $data): bool
     {
         try
         {
-            $this->model::where($whereCondition)->update($data);
+            $this->model::where($conditions)->update($data);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
-        
+
         return true;
     }
 }

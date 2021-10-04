@@ -69,11 +69,24 @@ return [
             "type"=> "long"
         ],
         "base_image" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
@@ -209,39 +222,91 @@ return [
                 ]
             ]
         ],
-        "small_image" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+        "small_image"=> [
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
         "thumbnail_image" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
         "section_background" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
         "gallery" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
