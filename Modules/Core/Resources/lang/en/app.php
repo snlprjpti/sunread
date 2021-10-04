@@ -39,6 +39,9 @@ return [
         'range-required' => ':name range is required',
         'choose-address' => 'Type of address is required.',
         'please-choose' => 'Please choose :name',
+        'cart-merged' => "cart merged successfully",
+        "not-enough-stock-quantity" => "stock quantity is not enough",
+        "channel-code-required" => "channel code is required",
         'country-not-found' => 'Region dose not belongs to country.'
     ],
     'users' => [
@@ -136,4 +139,16 @@ return [
             'last-delete-error' => 'At least one Currency is required.',
         ],
     ],
+    'exception_message' => [
+        'channel-not-found' => "Channel Not Found",
+        "cart-id-required" => "cart id is required",
+        "product-qty-must-be-above-0" => "product quantity must be greater than 0",
+        "not-allowed" => "access denied"
+    ],
+    "cart" => [
+        "product-removed" => "product removed from cart",
+        "product-added" => "product added on cart",
+        "product-qty-updated" => "product quantity updated on cart",
+        "product-remove-due-to-channel-change" => "product removed from cart due to change in channel"
+    ]
 ];

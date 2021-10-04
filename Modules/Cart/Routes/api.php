@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +11,12 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/cart', function (Request $request) {
-    return $request->user();
+Route::group(['as' => 'cart.', 'prefix' => 'public/checkout/cart'], function () {
+    
+    // CART ROUTES
+    Route::post("/", [\Modules\Cart\Http\Controllers\CartController::class, "addOrUpdateCart"])->name('add.update');
+    Route::delete("/", [\Modules\Cart\Http\Controllers\CartController::class, "deleteProductFromCart"])->name('delete.product.from.cart');
+    Route::get("/", [\Modules\Cart\Http\Controllers\CartController::class, "getAllProductFromCart"])->name('products.from.cart');
+    Route::post("/merge", [\Modules\Cart\Http\Controllers\CartController::class, "mergeCart"])->name('merge.cart')->middleware('customer');
+
 });

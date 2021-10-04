@@ -171,7 +171,7 @@ class BaseRepository
         return $created;
     }
 
-    public function update(array $data, int $id, ?callable $callback = null): object
+    public function update(array $data, int|string $id, ?callable $callback = null): object
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.update.before", $id);
@@ -196,7 +196,7 @@ class BaseRepository
         return $updated;
     }
 
-    public function delete(int $id, ?callable $callback = null): object
+    public function delete(int|string $id, ?callable $callback = null): object
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.delete.before", $id);
