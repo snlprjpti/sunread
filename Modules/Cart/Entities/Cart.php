@@ -5,7 +5,9 @@ namespace Modules\Cart\Entities;
 use Modules\Cart\Traits\HasUuid;
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Customer\Entities\Customer;
 
 class Cart extends Model
 {
@@ -16,6 +18,11 @@ class Cart extends Model
     public function cartItems(): HasMany
     {
        return $this->hasMany(CartItem::class);
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
     }
     
 }
