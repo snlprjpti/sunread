@@ -18,13 +18,8 @@ class RedisClear extends Command
 
     public function handle(): bool
     {
-        if(count(Redis::keys("*")) > 0) {
-            Redis::del(Redis::keys("*"));
-            $this->info("Redis cache cleared");
-        }
-        else {
-            $this->info("No cache data found");
-        }
+        Redis::del(Redis::keys("*"));
+        $this->info("Redis cache cleared");
         return true;
     }
 }
