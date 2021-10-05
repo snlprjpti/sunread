@@ -154,23 +154,10 @@ class CartRepository extends BaseRepository
         {
             $coreCache = $this->getCoreCache($request);
             $checkChannel = $coreCache?->channel;
+
             $products = [];
 
-            // if cart hash id is sent
-            if (isset($request->header()["hc-cart"]))
-            {
-                $cartHashId = $this->getCartHashIdFromHeader($request, "hc-cart");
-
-                // if cart hash id exist in carts table
-                $cart = $this->model::whereId($cartHashId)->firstOrFail();
-
-                $this->updateHeaderOnCart($cart, $request);
-
-                $this->mergeGuestCart($request, $cart);
-
-
-                $coreCache = $this->getCoreCache($request);
-                $relations = [
+            $relations = [
                     "catalog_inventories",
                     "images",
                     "images.types",
@@ -179,28 +166,50 @@ class CartRepository extends BaseRepository
                     "website.channels"
                 ];
 
+                $subTotal = 0;
+                $grandTotal = 0;
+                $cartId = null;
+
+            // if cart hash id is sent
+            if (isset($request->header()["hc-cart"]))
+            {
+            
+                $cartHashId = $this->getCartHashIdFromHeader($request, "hc-cart");
+                $cartId = $cartHashId;
+                // if cart hash id exist in carts table
+                $cart = $this->model::whereId($cartHashId)->firstOrFail();
+
+                $this->updateHeaderOnCart($cart, $request);
+
+                $this->mergeGuestCart($request, $cart);
                 foreach ($cart->cartItems as $item)
                 {
-                    $product = $this->product::whereId($item->product_id)->whereStatus(1)->with($relations)->firstOrFail();
-                    $channel_ids = $product->website->channels->pluck("id")->toArray();
-                    if (!in_array($checkChannel->id, $channel_ids)) {
-                        $item->delete();
-                        //  if there is no cart items on cart_items table then delete that cart hash id row from carts table
-                        $checkCartItemsExitsOnCartHashId = $this->cartItem->where("cart_id", $cartHashId)->first();
-                        if (!$checkCartItemsExitsOnCartHashId) {
-                            $this->delete($cartHashId);
-                        }
-                        $message = $this->cartStatus["product_remove_due_to_channel_change"];
-                    };
-
-                    $products[] = $this->getProductDetail($product, $item, $coreCache);
+                   $productData = $this->getCartItemDetail($item, $relations, $checkChannel, $cart, $coreCache);
+                   $products[] = $productData;
+                   $subTotal += $productData['price'];
+                   $grandTotal += $productData['price'];
                 }
+            }
+            elseif (auth("customer")->id() && empty($request->header()["hc-cart"])) {
+                
+                    $cart = $this->model::whereCustomerId(auth("customer")->id())->first();
+                    $cartId = $cart->id;
+                    $item = $cart->cartItems()->latest()->first();
+                   $productData = $this->getCartItemDetail($item, $relations, $checkChannel, $cart, $coreCache);
+                   $products[] = $productData;
+                   $subTotal += $productData['price'];
+                   $grandTotal += $productData['price'];
             }
 
             $items = [
                 "items" => $products,
                 "count" => count($products),
-                "channel_change_msg" => $message ?? ""
+                "sub_total" => $subTotal,
+                "sub_total_formatted" => PriceFormat::get($subTotal, $coreCache->store->id, "store"),
+                "grand_total" => $grandTotal,
+                "grand_total_formatted" => PriceFormat::get($grandTotal, $coreCache->store->id, "store"),
+                "cart_id" => $cartId,
+                "channel_change_msg" => $this->responseData['message'] ?? ""
             ];
         } 
         catch (Exception $exception)
@@ -211,6 +220,22 @@ class CartRepository extends BaseRepository
 
         DB::commit();
         return $items;
+    }
+
+    private function getCartItemDetail(object $item, array $relations, object $checkChannel, object $cart, $coreCache): mixed
+    {
+        $product = $this->product::whereId($item->product_id)->whereStatus(1)->with($relations)->firstOrFail();
+                    $channel_ids = $product->website->channels->pluck("id")->toArray();
+                    if (!in_array($checkChannel->id, $channel_ids)) {
+                        $item->delete();
+                        //  if there is no cart items on cart_items table then delete that cart hash id row from carts table
+                        $checkCartItemsExitsOnCartHashId = $this->cartItem->where("cart_id", $cart->id)->first();
+                        if (!$checkCartItemsExitsOnCartHashId) {
+                            $this->delete($cart->id);
+                        }
+                        $this->responseData['message'] = $this->cartStatus["product_remove_due_to_channel_change"];
+                    };
+        return $this->getProductDetail($product, $item, $coreCache);
     }
 
     private function mergeGuestCart(object $request, object $cart): bool
@@ -300,8 +325,8 @@ class CartRepository extends BaseRepository
 
             $data["price_formatted"] = PriceFormat::get($data["price"], $store->id, "store");
             
-            $data["tax_amout"] = "";
-            $data["tax_amout_formatted"] = "";
+            $data["tax_amount"] = "";
+            $data["tax_amount_formatted"] = "";
             $data["total_amount"] = "";
             $data["total_amount_formatted"] = "";
             $data["total_tax_amount"] = "";
