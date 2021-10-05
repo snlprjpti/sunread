@@ -15,7 +15,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name","iso_2_code"],
-                                "default" => "SE",
+                                "default" => ["SE"],
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
@@ -28,7 +28,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name", "iso_2_code"],
-                                "default" => ["SE"],
+                                "default" => ["SE","DZ"],
                                 "options" => [],
                                 "rules" => "array",
                                 "value_rules" => "exists:countries,iso_2_code",
@@ -822,7 +822,7 @@ return[
                     ]
                 ]
             ]
-            
+
         ]
     ]
 ];

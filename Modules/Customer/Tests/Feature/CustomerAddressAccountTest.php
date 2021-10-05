@@ -4,6 +4,9 @@ namespace Modules\Customer\Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Website;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -64,6 +67,12 @@ class CustomerAddressAccountTest extends TestCase
 
     public function testCustomerCanAddOwnAddress()
     {
+        $website = Website::first();
+        $this->headers["hc-host"] = $website->hostname;
+        $channel = Channel::inRandomOrder()->whereWebsiteId($website->id)->first();
+        $this->headers["hc-channel"] = $channel->code;
+        $this->headers["hc-store"] = Store::inRandomOrder()->whereChannelId($channel->id)->first()->code;
+
         $post_data["shipping"] = $this->getCreateData();
         $post_data["billing"] = $this->getCreateData();
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.create"), $post_data);
