@@ -4,6 +4,7 @@ namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
 use Illuminate\Http\Request;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
@@ -81,14 +82,20 @@ class AddressRepository extends BaseRepository
     {
         try
         {
+            $customer = Customer::findOrFail($customer_id);
+            $countries = $this->getCountry($request);
+
             if($request->shipping) {
                 $shipping = new Request($request->shipping);
-                $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer_id) {
+
+                if (!$countries->contains("id", $shipping->country_id)) throw new Exception(__("core::app.response.invalid-country"));
+
+                $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer, $request) {
                     return [
-                        "customer_id" => Customer::findOrFail($customer_id)->id,
+                        "customer_id" => $customer->id
                     ];
                 });
-                $shipping = $this->checkShippingAddress($customer_id)->first();
+                $shipping = $this->checkShippingAddress($customer->id)->first();
                 $data = $this->checkRegionAndCity($data, "shipping");
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
@@ -101,12 +108,15 @@ class AddressRepository extends BaseRepository
 
             if($request->billing) {
                 $billing = new Request($request->billing);
-                $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer_id) {
+
+                if (!$countries->contains("id", $billing->country_id)) throw new Exception(__("core::app.response.invalid-country"));
+
+                $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer) {
                     return [
-                        "customer_id" => Customer::findOrFail($customer_id)->id,
+                        "customer_id" => $customer->id,
                     ];
                 });
-                $billing = $this->checkBillingAddress($customer_id)->first();
+                $billing = $this->checkBillingAddress($customer->id)->first();
                 $data = $this->checkRegionAndCity($data, "billing");
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
@@ -152,5 +162,25 @@ class AddressRepository extends BaseRepository
         }
 
         return $data;
+    }
+
+    public function getCountry(object $request): object
+    {
+        try
+        {
+            $data = $this->getCoreCache($request);
+
+            if (!$data->channel) throw new Exception(__("core::app.response.not-found", ["name" => "Country"]));
+            $allow = SiteConfig::fetch("allow_countries", "channel", $data->channel->id);
+            $default[] = SiteConfig::fetch("default_country", "channel", $data->channel->id);
+
+            $fetched = $allow->merge($default);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
     }
 }
