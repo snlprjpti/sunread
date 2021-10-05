@@ -48,9 +48,12 @@ class CountryController extends BaseController
     {
         try
         {
+            $data = $this->repository->getCoreCache($request);
+
+            if(!$data->channel) throw new Exception(__("core::app.response.not-found"));
             $request->without_pagination = true;
-            $allow = SiteConfig::fetch("allow_countries");
-            $default[] = SiteConfig::fetch("default_country");
+            $allow = SiteConfig::fetch("allow_countries", "channel", $data->channel->id);
+            $default[] = SiteConfig::fetch("default_country", "channel", $data->channel->id);
 
             $fetched = $allow->merge($default);
         }
