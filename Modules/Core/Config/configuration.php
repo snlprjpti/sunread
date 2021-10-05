@@ -15,7 +15,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name","iso_2_code"],
-                                "default" => ["SE"],
+                                "default" => "DZ",
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,

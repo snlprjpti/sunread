@@ -172,7 +172,7 @@ class AddressRepository extends BaseRepository
 
             if (!$data->channel) throw new Exception(__("core::app.response.not-found", ["name" => "Country"]));
             $allow = SiteConfig::fetch("allow_countries", "channel", $data->channel->id);
-            $default = SiteConfig::fetch("default_country", "channel", $data->channel->id);
+            $default[] = SiteConfig::fetch("default_country", "channel", $data->channel->id);
 
             $fetched = $allow->merge($default);
         }
