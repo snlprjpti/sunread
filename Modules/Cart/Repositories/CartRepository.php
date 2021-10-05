@@ -154,6 +154,7 @@ class CartRepository extends BaseRepository
         {
             $coreCache = $this->getCoreCache($request);
             $checkChannel = $coreCache?->channel;
+            $products = [];
 
             // if cart hash id is sent
             if (isset($request->header()["hc-cart"]))
@@ -177,7 +178,6 @@ class CartRepository extends BaseRepository
                     "product_attributes.attribute",
                     "website.channels"
                 ];
-                $products = [];
 
                 foreach ($cart->cartItems as $item)
                 {
