@@ -2,78 +2,119 @@
 
 namespace Modules\Cart\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Modules\Cart\Entities\Cart;
+use Illuminate\Http\JsonResponse;
+use Modules\Cart\Repositories\CartRepository;
+use Modules\Cart\Exceptions\OutOfStockException;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\Cart\Exceptions\CartHashIdNotFoundException;
+use Modules\Cart\Exceptions\ChannelDoesNotExistException;
+use Elasticsearch\Common\Exceptions\Forbidden403Exception;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Cart\Transformers\CartItemResource;
+use Modules\Cart\Transformers\CartResource;
 
-class CartController extends Controller
+class CartController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    protected $cartRepository;
+
+    public function __construct(CartRepository $cartRepository, Cart $cart)
     {
-        return view('cart::index');
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.channel.code');
+        $this->middleware('validate.store.code');
+
+        $this->model = $cart;
+        $this->model_name = "Cart";
+        $this->cartRepository = $cartRepository;
+
+        $exception_statuses = [
+            OutOfStockException::class => 404,
+            ChannelDoesNotExistException::class => 404,
+            CartHashIdNotFoundException::class => 404,
+            Forbidden403Exception::class => 403
+        ];
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function resource(?object $data): JsonResource
     {
-        return view('cart::create');
+        return new CartResource($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
+    public function collection(object $data): ResourceCollection
     {
-        //
+        return CartResource::collection($data);
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
+    public function cartItemResource(object $data): JsonResource
     {
-        return view('cart::show');
+        return new CartItemResource($data);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
+    public function cartItemCollection(object $data): ResourceCollection
     {
-        return view('cart::edit');
+        return CartItemResource::collection($data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
+    public function addOrUpdateCart(Request $request): JsonResponse
     {
-        //
+        try
+        {
+            $response = $this->cartRepository->addOrUpdateCart($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        return $this->successResponse($this->resource($response['cart']), $response['message']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
+    public function deleteProductFromCart(Request $request): JsonResponse
     {
-        //
+        try
+        {
+            $response = $this->cartRepository->deleteProductFromCart($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        
+        return $this->successResponse($this->resource($response['cart']), $response['message']);
+
+    }
+
+    public function getAllProductFromCart(Request $request): JsonResponse
+    {
+        try
+        {
+            $response = $this->cartRepository->getAllProductFromCart($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        
+        return $this->successResponse($response, $this->lang('fetch-success'));
+
+    }
+
+    public function mergeCart(Request $request): JsonResponse
+    {
+        try
+        {
+            $response = $this->cartRepository->mergeCart($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+        
+        return $this->successResponse($this->resource($response['cart']), $response['message']);
+
     }
 }
