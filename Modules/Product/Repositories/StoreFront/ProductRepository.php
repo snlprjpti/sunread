@@ -118,6 +118,12 @@ class ProductRepository extends BaseRepository
                     continue;
                 }
 
+                if($product->type == "configurable" && ($attribute->slug == "price" ||  $attribute->slug == "special_price")) {
+                    $first_variant = $product->variants->first();
+                    $data[$attribute->slug] = $first_variant->value($match);
+                    continue;
+                }
+
                 if(in_array($attribute->type, [ "select", "multiselect", "checkbox" ]))
                 {
                     if ($values instanceof Collection) $data[$attribute->slug] = $values->pluck("name")->toArray();
@@ -152,7 +158,8 @@ class ProductRepository extends BaseRepository
                 if(isset($fromNewDate) && isset($toNewDate)) $fetched["is_new_product"] = (($currentDate >= $fromNewDate) && ($currentDate <= $toNewDate)) ? 1 : 0;
             }
 
-            if ( $product->type == "configurable") {
+            if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
+                if(isset($product->parent_id)) $product = $product->parent;
                 $variant_ids = $product->variants->pluck("id")->toArray();
                 $elastic_fetched = [
                     "_source" => ["show_configurable_attributes"],
