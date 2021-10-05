@@ -112,7 +112,7 @@ class ProductConfigurableRepository extends BaseRepository
             $this->parentVisibilitySetup($product, $scope);
 
             $productAttributes = collect($request_attributes)->reject(function ($item) {
-                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility"));
+                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility") || ($item["attribute_slug"] == "url_key"));
             })->toArray();
 
             $this->state = [];
@@ -233,7 +233,13 @@ class ProductConfigurableRepository extends BaseRepository
                     "attribute_slug" => "sku",
                     "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
-                ]
+                ],
+                [
+                    //Attribute slug
+                    "attribute_slug" => "url_key",
+                    "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
+                    "value_type" => "Modules\Product\Entities\ProductAttributeString"
+                ],
             ], $productAttributes, $variant_options, [ $visibility ]);
 
             $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store", update_attributes:$update_attributes);
