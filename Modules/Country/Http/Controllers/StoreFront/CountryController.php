@@ -11,17 +11,19 @@ use Modules\Country\Entities\Country;
 use Modules\Country\Repositories\CountryRepository;
 use Modules\Country\Transformers\CountryResource;
 use Exception;
+use Modules\Customer\Repositories\StoreFront\AddressRepository;
 
 class CountryController extends BaseController
 {
-    private $repository;
+    private $repository, $addressRepository;
 
-    public function __construct(Country $country, CountryRepository $countryRepository)
+    public function __construct(Country $country, CountryRepository $countryRepository, AddressRepository $addressRepository)
     {
         $this->model = $country;
         $this->model_name = "Country";
         parent::__construct($this->model, $this->model_name);
         $this->repository = $countryRepository;
+        $this->addressRepository = $addressRepository;
     }
 
     public function collection(object $data): ResourceCollection
@@ -48,14 +50,7 @@ class CountryController extends BaseController
     {
         try
         {
-            $data = $this->repository->getCoreCache($request);
-
-            if(!$data->channel) throw new Exception(__("core::app.response.not-found"));
-            $request->without_pagination = true;
-            $allow = SiteConfig::fetch("allow_countries", "channel", $data->channel->id);
-            $default[] = SiteConfig::fetch("default_country", "channel", $data->channel->id);
-
-            $fetched = $allow->merge($default);
+            $fetched = $this->addressRepository->getCountry($request);
         }
         catch (Exception $exception)
         {
