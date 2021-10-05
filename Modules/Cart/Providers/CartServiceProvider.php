@@ -32,6 +32,7 @@ class CartServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObservers();
 
     }
 
@@ -120,7 +121,7 @@ class CartServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function registerObservers()
+    public function registerObservers(): void
     {
         Cart::observe(CartObserver::class);
         CartItem::observe(CartItemObserver::class);
