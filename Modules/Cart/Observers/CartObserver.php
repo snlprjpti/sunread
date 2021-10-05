@@ -9,16 +9,16 @@ class CartObserver
 {
     public function created(Cart $cart)
     {
-        Audit::log($cart, __FUNCTION__);
+        // Audit::log($cart, __FUNCTION__);
     }
 
     public function updated(Cart $cart)
     {
-        Audit::log($cart, __FUNCTION__);
+        // Audit::log($cart, __FUNCTION__);
     }
 
     public function deleted(Cart $cart)
     {
-        Audit::log($cart, __FUNCTION__);
+        // Audit::log($cart, __FUNCTION__);
     }
 }
