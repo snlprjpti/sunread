@@ -5,6 +5,7 @@ namespace Modules\Country\Http\Controllers\StoreFront;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Country\Entities\Country;
 use Modules\Country\Repositories\CountryRepository;
@@ -34,6 +35,24 @@ class CountryController extends BaseController
         {
             $request->without_pagination = true;
             $fetched = $this->repository->fetchAll($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
+    public function channelCountries(Request $request): JsonResponse
+    {
+        try
+        {
+            $request->without_pagination = true;
+            $allow = SiteConfig::fetch("allow_countries");
+            $default[] = SiteConfig::fetch("default_country");
+
+            $fetched = $allow->merge($default);
         }
         catch (Exception $exception)
         {
