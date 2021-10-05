@@ -3,6 +3,7 @@
 namespace Modules\Product\Traits\ElasticSearch;
 
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Website;
@@ -37,7 +38,7 @@ trait ConfigurableProductHandler
             foreach($variants as $variant)
             {
                 $product_format = $variant->documentDataStructure($store); 
-                $configurable_attributes = $this->getConfigurableAttributes($variant); 
+                $configurable_attributes = $this->getConfigurableAttributes($variant, $store); 
                 $product_format = array_merge($product_format, [ "show_configurable_attributes" => $configurable_attributes ]);
                 
 
@@ -125,20 +126,36 @@ trait ConfigurableProductHandler
         return $bool;
     }
 
-    public function getConfigurableAttributes(object $variant): array
+    public function getConfigurableAttributes(object $variant, object $store): array
     {
         try
         {
-            $configurable_attributes = $variant->attribute_options_child_products->map(function ($variant_option) use($variant) {
+            $configurable_attributes = $variant->attribute_options_child_products->map(function ($variant_option) use($variant, $store) {
                 $attribute_option = AttributeOption::find($variant_option->attribute_option_id);
                 $attribute = $attribute_option->attribute;
+                $catalog = CatalogInventory::whereProductId($variant->id)->first();
+                $store_data = [
+                    "scope" => "store",
+                    "scope_id" => $store->id
+                ];
+
                 return [
                     "id" => $variant_option->attribute_option_id,
                     "attribute_id" => $attribute->id,
                     "attribute_slug" => $attribute->slug,
                     "label" => $attribute_option->name,
                     "code" => $attribute_option->code ?? $attribute_option->name,
-                    "product_id" => $variant->id
+                    "product_id" => $variant->id,
+                    "product_sku" => $variant->sku,
+                    "url_key" => $variant->value(array_merge($store_data, ["attribute_slug" => "url_key"])),
+                    "stock_status" => ($catalog?->is_in_stock && $catalog?->quantity > 0) ? 1 : 0,
+                    "attribute_combination" => $variant->attribute_options_child_products->pluck("attribute_option_id")->mapWithKeys( function($variant_att) {
+                        $f_attribute_option = AttributeOption::find($variant_att);
+                        return [
+                            $f_attribute_option->attribute->slug => $variant_att
+                        ];
+                    }),
+                    "image" => $this->getConfigurableImage($variant)
                 ];
             })->toArray();
         }
@@ -148,5 +165,28 @@ trait ConfigurableProductHandler
         }
 
         return $configurable_attributes;
+    }
+
+    public function getConfigurableImage($product): ?array
+    {
+        try
+        {
+            $image = $product->images()->wherehas("types", function($query) {
+                $query->whereSlug("small_image");
+            })->first();
+            if(!$image) $image = $product->images()->wherehas("types", function($query) {
+                $query->whereSlug("base_image");
+            })->first();;
+            $path = $image ? Storage::url($image->path) : $image;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+         
+        return [
+            "url" => $path,
+            "background_color" => $image?->background_color
+        ];
     }
 }
