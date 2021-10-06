@@ -17,6 +17,11 @@ class Website extends Model
     protected $fillable = [ "code", "hostname", "name", "description", "position", "status", "default_channel_id" ];
     protected $with = [ "channels" ];
 
+    public function default_channel(): BelongsTo
+    {
+        return $this->belongsTo(Channel::class, "default_channel_id");
+    }
+
     public function channels(): HasMany
     {
         return $this->hasMany(Channel::class, 'website_id');
@@ -29,8 +34,4 @@ class Website extends Model
         })->sum();
     }
 
-    public function default_channel(): BelongsTo
-    {
-        return $this->belongsTo(Channel::class, "default_channel_id");
-    }
 }
