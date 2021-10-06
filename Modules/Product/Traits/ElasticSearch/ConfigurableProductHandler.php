@@ -176,7 +176,7 @@ trait ConfigurableProductHandler
         return $configurable_attributes;
     }
 
-    public function getConfigurableImage($product): ?array
+    public function getConfigurableImage(object $product): ?array
     {
         try
         {
