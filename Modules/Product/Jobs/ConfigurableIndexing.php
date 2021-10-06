@@ -17,9 +17,6 @@ class ConfigurableIndexing implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ConfigurableProductHandler;
 
-    // public $tries = 10;
-    // public $timeout = 90000;
-
     public $parent, $store;
 
     public function __construct(object $parent, object $store)

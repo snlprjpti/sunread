@@ -15,9 +15,6 @@ class VariantIndexing implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ConfigurableProductHandler;
 
-    // public $tries = 10;
-    // public $timeout = 90000;
-
     public $parent, $variants, $variant, $store;
 
     public function __construct(object $parent, object $variants, object $variant, object $store)
