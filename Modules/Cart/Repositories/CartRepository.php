@@ -327,8 +327,8 @@ class CartRepository extends BaseRepository
             
             $data["tax_amount"] = "";
             $data["tax_amount_formatted"] = "";
-            $data["total_amount"] = "";
-            $data["total_amount_formatted"] = "";
+            $data["total_amount"] = $data["price"];
+            $data["total_amount_formatted"] = PriceFormat::get($data["price"], $store->id, "store");
             $data["total_tax_amount"] = "";
             $data["total_tax_amount_formatted"] = "";
 
