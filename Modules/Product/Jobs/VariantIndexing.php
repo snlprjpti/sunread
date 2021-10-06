@@ -9,19 +9,19 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Attribute\Entities\Attribute;
-use Modules\Attribute\Entities\AttributeOption;
 use Modules\Product\Traits\ElasticSearch\ConfigurableProductHandler;
 
-class ConfigurableIndexing implements ShouldQueue
+class VariantIndexing implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ConfigurableProductHandler;
 
-    public $parent, $store;
+    public $parent, $variants, $variant, $store;
 
-    public function __construct(object $parent, object $store)
+    public function __construct(object $parent, object $variants, object $variant, object $store)
     {
         $this->parent = $parent;
+        $this->variants = $variants;
+        $this->variant = $variant;
         $this->store = $store;
     }
 
@@ -29,7 +29,7 @@ class ConfigurableIndexing implements ShouldQueue
     {
         try
         {
-            $this->createProduct($this->parent, $this->store);
+            $this->createVariantProduct($this->parent, $this->variants, $this->variant, $this->store);
         }
         catch (Exception $exception)
         {

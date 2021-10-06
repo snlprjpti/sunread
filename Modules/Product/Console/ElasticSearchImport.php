@@ -11,6 +11,7 @@ use Modules\Product\Jobs\BulkIndexing;
 use Modules\Product\Jobs\ConfigurableIndexing;
 use Modules\Product\Jobs\ElasticSearchIndexingJob;
 use Modules\Product\Jobs\SingleIndexing;
+use Modules\Product\Jobs\VariantIndexing;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -39,14 +40,18 @@ class ElasticSearchImport extends Command
             foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
         }
 
-        $variants = Product::whereType("configurable")->get();
-        foreach($variants as $variant)
+        $configurable_products = Product::whereType("configurable")->get();
+        foreach($configurable_products as $configurable_product)
         {
-            $stores = Website::find($variant->website_id)->channels->map(function ($channel) {
+            $stores = Website::find($configurable_product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
             })->flatten(1);
+            $variants = $configurable_product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
     
-            foreach( $stores as $store) $batch->add(new ConfigurableIndexing($variant, $store));
+            foreach( $stores as $store) {
+                $batch->add(new ConfigurableIndexing($configurable_product, $store));
+                foreach($variants as $variant) $batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
+            }
         }
         $this->info("All data imported successfully");
     }
