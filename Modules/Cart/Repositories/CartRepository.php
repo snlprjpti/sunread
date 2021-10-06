@@ -186,8 +186,8 @@ class CartRepository extends BaseRepository
                 {
                    $productData = $this->getCartItemDetail($item, $relations, $checkChannel, $cart, $coreCache);
                    $products[] = $productData;
-                   $subTotal += $productData['price'];
-                   $grandTotal += $productData['price'];
+                   $subTotal += $productData['total_amount'];
+                   $grandTotal += $productData['total_amount'];
                 }
             }
             elseif (auth("customer")->id() && empty($request->header()["hc-cart"])) {
@@ -197,8 +197,8 @@ class CartRepository extends BaseRepository
                     $item = $cart->cartItems()->latest()->first();
                    $productData = $this->getCartItemDetail($item, $relations, $checkChannel, $cart, $coreCache);
                    $products[] = $productData;
-                   $subTotal += $productData['price'];
-                   $grandTotal += $productData['price'];
+                   $subTotal += $productData['total_amount'];
+                   $grandTotal += $productData['total_amount'];
             }
 
             $items = [
@@ -325,13 +325,6 @@ class CartRepository extends BaseRepository
 
             $data["price_formatted"] = PriceFormat::get($data["price"], $store->id, "store");
             
-            $data["tax_amount"] = "";
-            $data["tax_amount_formatted"] = "";
-            $data["total_amount"] = "";
-            $data["total_amount_formatted"] = "";
-            $data["total_tax_amount"] = "";
-            $data["total_tax_amount_formatted"] = "";
-
             if ($product->type == "simple" && $product->parent_id) {
                 $configurable_attributes = [];
                 $product->product_attributes->filter(function ($product_attribute) {
@@ -355,6 +348,13 @@ class CartRepository extends BaseRepository
             $productStock = $product->catalog_inventories->first();
             $data["stock_status"] = ($productStock?->manage_stock && $productStock?->is_in_stock && $cartItem?->qty > $productStock?->quantity) ? false : true;
             $data["qty"] = $cartItem->qty;
+
+            $data["tax_amount"] = "";
+            $data["tax_amount_formatted"] = "";
+            $data["total_amount"] = $data["price"] * $data["qty"];
+            $data["total_amount_formatted"] = PriceFormat::get($data["total_amount"], $store->id, "store");
+            $data["total_tax_amount"] = "";
+            $data["total_tax_amount_formatted"] = "";
 
             // Product Single Image
             $data["image"] = "";
