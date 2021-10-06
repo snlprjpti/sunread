@@ -37,7 +37,7 @@ class ProductRepository extends BaseRepository
         $this->page_groups = ["hero_banner", "usp_banner_1", "usp_banner_2", "usp_banner_3"];
         $this->config_fields = config("category.attributes");
         $this->count = 0;
-        $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description"];
+        $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date"];
         $this->nested_product = [];
         $this->config_products = [];
     }
@@ -157,6 +157,7 @@ class ProductRepository extends BaseRepository
                 if(isset($fetched["new_from_date"])) $fromNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_from_date"]));
                 if(isset($fetched["new_to_date"])) $toNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_to_date"])); 
                 if(isset($fromNewDate) && isset($toNewDate)) $fetched["is_new_product"] = (($currentDate >= $fromNewDate) && ($currentDate <= $toNewDate)) ? 1 : 0;
+                unset($fetched["new_from_date"], $fetched["new_to_date"]);
             }
 
             if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
