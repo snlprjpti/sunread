@@ -67,10 +67,10 @@ class AddressController extends BaseController
         try
         {
             $channel_id = $this->repository->checkCustomerChannel($request, $customer_id);
-            $request->request->add(["channel_id" => $channel_id]);
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id, $channel_id) {
                 return [
-                    "customer_id" => $customer_id
+                    "customer_id" => $customer_id,
+                    "channel_id" => $channel_id
                 ];
             });
 
@@ -107,11 +107,10 @@ class AddressController extends BaseController
         try
         {
             $channel_id = $this->repository->checkCustomerChannel($request, $customer_id);
-            $request->request->add(["channel_id" => $channel_id]);
-
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id, $channel_id) {
                 return [
-                    "customer_id" => $customer_id
+                    "customer_id" => $customer_id,
+                    "channel_id" => $channel_id
                 ];
             });
 
@@ -131,7 +130,7 @@ class AddressController extends BaseController
     {
         try
         {
-            $deleted = $this->repository->delete($address_id, function($deleted) use ($customer_id) {
+            $this->repository->delete($address_id, function($deleted) use ($customer_id) {
                 if ( $deleted->customer_id != $customer_id ) throw new ModelNotFoundException($this->lang("not-found"));
             });
         }
