@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ProductRepository extends BaseRepository
 {
-    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product;
+    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product, $config_products;
 
     public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository)
     {
@@ -37,11 +37,12 @@ class ProductRepository extends BaseRepository
         $this->page_groups = ["hero_banner", "usp_banner_1", "usp_banner_2", "usp_banner_3"];
         $this->config_fields = config("category.attributes");
         $this->count = 0;
-        $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description"];
+        $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date"];
         $this->nested_product = [];
+        $this->config_products = [];
     }
 
-    public function productDetail(object $request, string $identifier): ?array
+    public function productDetail(object $request, string $identifier, ?string $type = null): ?array
     {
         try
         {
@@ -92,7 +93,7 @@ class ProductRepository extends BaseRepository
                 ];
                 $values = $product->value($match);
 
-                if ( $attribute->slug == "visibility" && $values?->name == "Not Visible Individually" ) throw new ProductNotFoundIndividuallyException();
+                if ( !$type && $attribute->slug == "visibility" && $values?->name == "Not Visible Individually" ) throw new ProductNotFoundIndividuallyException();
 
                 if($attribute->slug == "gallery") {
                     $data["image"] = $this->getBaseImage($product);
@@ -156,6 +157,7 @@ class ProductRepository extends BaseRepository
                 if(isset($fetched["new_from_date"])) $fromNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_from_date"]));
                 if(isset($fetched["new_to_date"])) $toNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_to_date"])); 
                 if(isset($fromNewDate) && isset($toNewDate)) $fetched["is_new_product"] = (($currentDate >= $fromNewDate) && ($currentDate <= $toNewDate)) ? 1 : 0;
+                unset($fetched["new_from_date"], $fetched["new_to_date"]);
             }
 
             if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
@@ -173,8 +175,7 @@ class ProductRepository extends BaseRepository
                 ]; 
                 $elastic_data =  $this->search_repository->searchIndex($elastic_fetched, $store); 
                 $elastic_variant_products = isset($elastic_data["hits"]["hits"]) ? collect($elastic_data["hits"]["hits"])->pluck("_source.show_configurable_attributes")->flatten(1)->toArray() : [];
-                
-                $total_variants = count(collect($elastic_variant_products)->where("product_id", $variant_ids[0])->toArray());
+                $this->config_products = $elastic_variant_products;
                 
                 $this->getVariations($elastic_variant_products);  
                 $fetched["configurable_products"] = $this->xyz;          
@@ -199,6 +200,7 @@ class ProductRepository extends BaseRepository
                 
                 $attribute_values = collect($elastic_variant_products)->where("attribute_slug", $attribute_slug)->values()->toArray();
                 $variations = collect($elastic_variant_products)->where("attribute_slug", "!=", $attribute_slug)->values()->toArray();
+                $count = collect($attribute_values)->unique("id")->count(); 
 
                 $j = 0;
                 foreach($attribute_values as $attribute_value)
@@ -209,10 +211,24 @@ class ProductRepository extends BaseRepository
                         $state[$attribute_value["id"]] = true;
                         $abc["value"] = $attribute_value["id"];
                         $abc["label"] = $attribute_value["label"];
-                        if(count($attribute_slugs) == 1)  $abc["product_id"] = $attribute_value["product_id"];
+                        if($attribute_value["attribute_slug"] == "color") {
+                            $abc["url_key"] = $attribute_value["url_key"];
+                            $abc["image"] = $attribute_value["image"];
+                        }
+                        if(count($attribute_slugs) == 1) {
+                            $fake_array = array_merge($this->nested_product, [$attribute_value["attribute_slug"] => $attribute_value["id"]]);
+                            $dot_product = collect($this->config_products)->where("attribute_combination", $fake_array)->first();
+                            $abc["product_id"] = isset($dot_product["product_id"]) ? $dot_product["product_id"] : 0;
+                            $abc["sku"] = isset($dot_product["product_sku"]) ? $dot_product["product_sku"] : 0;
+                            $abc["stock_status"] = isset($dot_product["stock_status"]) ? $dot_product["stock_status"] : 0;
+                            if($count == ($j+1)) $this->nested_product = [];
+                        } 
                         setDotToArray($append_key, $this->xyz,  $abc);
                         $j = $j + 1;
-                        $this->getVariations($variations, "{$append_key}.variations");   
+                        if(count($attribute_slugs) > 1) {
+                            $this->nested_product = [ $attribute_value["attribute_slug"] => $attribute_value["id"] ];
+                            $this->getVariations($variations, "{$append_key}.variations"); 
+                        }  
                     }
                 }
             }     
