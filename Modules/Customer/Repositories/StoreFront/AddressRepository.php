@@ -87,7 +87,7 @@ class AddressRepository extends BaseRepository
             $channel_code = $request->header("hc-channel");
             if($channel_code) {
                 $website = Website::findOrFail($customer->website_id);
-                $channel_id = ($channel = $website->channels->where("code", $channel_code)->where("website_id", $website->id)->first()) ? $channel->id : null;
+                $channel_id = $website->channels()->where("code", $channel_code)->first()?->id;
             }
 
             if($request->shipping) {
