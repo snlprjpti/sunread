@@ -35,34 +35,43 @@ trait ConfigurableProductHandler
                 $final_parent["list_status"] = ($this->checkVisibility($parent, $store)) ? 1 : 0;
                 $this->configurableIndexing($final_parent, $store);   
             }
-            foreach($variants as $variant)
-            {
-                $product_format = $variant->documentDataStructure($store); 
-                $configurable_attributes = $this->getConfigurableAttributes($variant, $store); 
-                $product_format = array_merge($product_format, [ "show_configurable_attributes" => $configurable_attributes ]);
-                
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+    }
 
-                if (!$this->checkVisibility($variant, $store)) {
-                    $product_format["list_status"] = 0;
-                    if(count($product_format) > 0) $this->configurableIndexing($product_format, $store);  
-                    continue;
-                }
+    public function createVariantProduct(object $parent, object $variants, object $variant, object $store): void
+    {
+        try
+        {
+            $product_format = $variant->documentDataStructure($store); 
+            $configurable_attributes = $this->getConfigurableAttributes($variant, $store); 
+            $product_format = array_merge($product_format, [ "show_configurable_attributes" => $configurable_attributes ]);
+            
 
+            if (!$this->checkVisibility($variant, $store)) {
+                $product_format["list_status"] = 0;
+                if(count($product_format) > 0) $this->configurableIndexing($product_format, $store);  
+            }
+
+            else {
                 $group_by_attribute = AttributeConfigurableProduct::whereProductId($parent->id)->whereUsedInGrouping(1)->first();
                 $is_group_attribute = $variant->value([
                     "scope" => "store",
                     "scope_id" => $store->id,
                     "attribute_id" => $group_by_attribute->attribute_id
                 ]);
-
+    
                 $related_variants = AttributeOptionsChildProduct::whereIn("product_id", $variants->pluck("id")->toArray())->whereAttributeOptionId($is_group_attribute?->id)->get();
                 if($related_variants) {
                     $variant_attribute_options = AttributeOptionsChildProduct::whereIn("product_id", $related_variants->pluck("product_id")->toArray())->where("attribute_option_id", "!=", $is_group_attribute?->id)->get()->pluck("attribute_option_id", "product_id");
                 }
-
+    
                 $final_variant = array_merge($product_format, $this->getAttributeData($variant_attribute_options, $variant));  
-                if(count($final_variant) > 0) $this->configurableIndexing($final_variant, $store);          
-            }
+                if(count($final_variant) > 0) $this->configurableIndexing($final_variant, $store); 
+            }   
         }
         catch (Exception $exception)
         {
@@ -174,9 +183,11 @@ trait ConfigurableProductHandler
             $image = $product->images()->wherehas("types", function($query) {
                 $query->whereSlug("small_image");
             })->first();
-            if(!$image) $image = $product->images()->wherehas("types", function($query) {
-                $query->whereSlug("base_image");
-            })->first();;
+            if(!$image) {
+                $image = $product->images()->wherehas("types", function($query) {
+                    $query->whereSlug("base_image");
+                })->first();
+            }
             $path = $image ? Storage::url($image->path) : $image;
         }
         catch (Exception $exception)
