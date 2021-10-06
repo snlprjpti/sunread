@@ -105,7 +105,7 @@ class CustomerAddressRepository extends BaseRepository
         {
             $customer = Customer::findOrFail($customer_id);
             $website = Website::findOrFail($customer->website_id);
-            $channel_id = $website->channels->where("id", $request->channel_id)->where("website_id", $website->id)->first()?->id;
+            $channel_id = $website->channels()->where("id", $request->channel_id)->first()?->id;
         }
         catch(Exception $exception)
         {
