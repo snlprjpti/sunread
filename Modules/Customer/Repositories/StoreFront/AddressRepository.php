@@ -42,20 +42,12 @@ class AddressRepository extends BaseRepository
 
     public function regionAndCityRules(object $request, string $name): array
     {
-//        return [
-//            "region_id" => "required_without:region_name|exists:regions,id,country_id,{$request->country_id}",
-//            "city_id" => "required_without:city_name",
-//            "region_name" => "required_without:region_id",
-//            "city_name" => "required_without:city_id",
-//        ];
-
         return [
             "{$name}.region_id" => "required_without:{$name}.region_name|exists:regions,id,country_id,{$request->{$name}["country_id"]}",
             "{$name}.city_id" => "required_without:{$name}.city_name",
             "{$name}.region_name" => "required_without:{$name}.region_id",
             "{$name}.city_name" => "required_without:{$name}.city_id",
         ];
-
     }
 
     public function checkShippingAddress(int $customer_id): object
