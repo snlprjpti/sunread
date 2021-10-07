@@ -56,7 +56,7 @@ return [
                                 "title" => "Background Color",
                                 "slug" => "section-background-color",
                                 "hasChildren" => 0,
-                                "type" => "Colorpicker",
+                                "type" => "color_picker",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
