@@ -10,7 +10,7 @@ class AddDefaultChannelIdOnWebsites extends Migration
     {
         Schema::table('websites', function (Blueprint $table) {
             $table->unsignedBigInteger("default_channel_id")->nullable();
-            $table->foreign("default_channel_id")->references("id")->on("stores")->onDelete("cascade");
+            $table->foreign("default_channel_id")->references("id")->on("channels")->onDelete("set null");
         });
     }
 

@@ -211,6 +211,7 @@ class ProductRepository extends BaseRepository
                         $state[$attribute_value["id"]] = true;
                         $abc["value"] = $attribute_value["id"];
                         $abc["label"] = $attribute_value["label"];
+                        $abc["code"] = $attribute_value["code"];
                         if($attribute_value["attribute_slug"] == "color") {
                             $abc["url_key"] = $attribute_value["url_key"];
                             $abc["image"] = $attribute_value["image"];

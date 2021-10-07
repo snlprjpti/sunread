@@ -10,6 +10,7 @@ use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
 use Modules\Product\Jobs\ConfigurableIndexing;
 use Modules\Product\Jobs\ElasticSearchIndexingJob;
+use Modules\Product\Jobs\ReIndexer;
 use Modules\Product\Jobs\ReIndexing;
 use Modules\Product\Jobs\SingleIndexing;
 use Modules\Product\Jobs\VariantIndexing;
@@ -30,7 +31,7 @@ class ElasticSearchImport extends Command
     public function handle(): void
     {
         $batch = Bus::batch([])->onQueue("index")->dispatch();
-        $batch->add(new ReIndexing());
+        $batch->add(new ReIndexer());
         $this->info("All data imported successfully");
     }
 }
