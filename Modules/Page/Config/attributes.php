@@ -64,7 +64,7 @@ return [
                                 "description" => "",
                                 "conditions" => [],
                                 "rules" => "",
-                                "is_required" => 1
+                                "is_required" => 0
                             ],
                             [
                                 "title" => "Background Image",
@@ -392,7 +392,7 @@ return [
                                         "description" => "",
                                         "conditions" => [],
                                         "rules" => "",
-                                        "is_required" => 1
+                                        "is_required" => 0
                                     ]
                                 ]
                             ]
@@ -876,7 +876,7 @@ return [
                                         "description" => "",
                                         "conditions" => [],
                                         "rules" => "",
-                                        "is_required" => 1
+                                        "is_required" => 0
                                     ]
                                 ]
                             ]
