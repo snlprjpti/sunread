@@ -85,20 +85,9 @@ class AddressRepository extends BaseRepository
             $customer = Customer::findOrFail($customer_id);
             $countries = $this->getCountry($request);
 
-            $new_rules = $this->rules;
             if($request->shipping) {
 
-                if(!isset($request->shipping["country_id"])) throw new Exception(__("core::app.response.not-found",["name" => "Country"]));
-                if (!$countries->contains("id", $request->shipping["country_id"])) throw new Exception(__("core::app.response.invalid-country"));
-
-                $this->rules = [];
-                foreach($new_rules as $key => $value)
-                {
-                    $this->rules["shipping.".$key] = $value;
-                }
-
-                $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,"shipping")));
-                $data["shipping"] = array_merge($data["shipping"], ["customer_id" => $customer->id]);
+                $data = $this->validateAddress($request, $customer, $countries, "shipping");
 
                 $shipping = $this->checkShippingAddress($customer->id)->first();
                 $data = $this->checkRegionAndCity($data["shipping"], "shipping");
@@ -114,18 +103,7 @@ class AddressRepository extends BaseRepository
 
             if($request->billing) {
 
-                if(!isset($request->billing["country_id"])) throw new Exception(__("core::app.response.not-found",["name" => "Country"]));
-
-                if (!$countries->contains("id", $request->billing["country_id"])) throw new Exception(__("core::app.response.invalid-country"));
-
-                $this->rules = [];
-                foreach($new_rules as $key => $value)
-                {
-                    $this->rules["billing.".$key] = $value;
-                }
-
-                $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,"billing")));
-                $data["billing"] = array_merge($data["billing"], ["customer_id" => $customer->id]);
+                $data = $this->validateAddress($request, $customer, $countries, "billing");
 
                 $billing = $this->checkBillingAddress($customer->id)->first();
                 $data = $this->checkRegionAndCity($data["billing"], "billing");
@@ -193,5 +171,32 @@ class AddressRepository extends BaseRepository
         }
 
         return $fetched;
+    }
+
+    public function validateAddress(object $request, object $customer, object $countries, string $name): array
+    {
+        try
+        {
+            $new_rules = $this->rules;
+
+            if(!isset($request->{$name}["country_id"])) throw new Exception(__("core::app.response.not-found", [ "name" => "Country" ]));
+            if (!$countries->contains("id", $request->shipping["country_id"])) throw new Exception(__("core::app.response.invalid-country", [ "name" => $name]));
+
+            $this->rules = [];
+            foreach($new_rules as $key => $value)
+            {
+                $this->rules[$name.'.'.$key] = $value;
+            }
+
+            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,$name)));
+            $data[$name] = array_merge($data[$name], ["customer_id" => $customer->id]);
+            $this->rules = $new_rules;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 }

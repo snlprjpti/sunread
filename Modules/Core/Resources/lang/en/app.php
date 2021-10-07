@@ -43,7 +43,7 @@ return [
         "not-enough-stock-quantity" => "stock quantity is not enough",
         "channel-code-required" => "channel code is required",
         'country-not-found' => 'Region does not belongs to country.',
-        "invalid-country" => "Invalid Country"
+        "invalid-country" => "Invalid :name Country"
     ],
     'users' => [
         'forget-password' => [
