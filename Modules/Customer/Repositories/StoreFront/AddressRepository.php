@@ -89,7 +89,7 @@ class AddressRepository extends BaseRepository
             if($request->shipping) {
 
                 if(!isset($request->shipping["country_id"])) throw new Exception(__("core::app.response.not-found",["name" => "Country"]));
-                if (!$countries->contains("id", $request->shipping["country_id"])) throw new Exception(__("core::app.response.invalid-country"));
+                if (!$countries->contains("id", $request->shipping["country_id"])) throw new Exception(__("core::app.response.invalid-country", [ "name" => "Shipping"]));
 
                 $this->rules = [];
                 foreach($new_rules as $key => $value)
@@ -114,9 +114,9 @@ class AddressRepository extends BaseRepository
 
             if($request->billing) {
 
-                if(!isset($request->billing["country_id"])) throw new Exception(__("core::app.response.not-found",["name" => "Country"]));
+                if(!isset($request->billing["country_id"])) throw new Exception(__("core::app.response.not-found", [ "name" => "Country" ]));
 
-                if (!$countries->contains("id", $request->billing["country_id"])) throw new Exception(__("core::app.response.invalid-country"));
+                if (!$countries->contains("id", $request->billing["country_id"])) throw new Exception(__("core::app.response.invalid-country", [ "name" => "Billing" ]));
 
                 $this->rules = [];
                 foreach($new_rules as $key => $value)
