@@ -42,7 +42,7 @@ class ProductRepository extends BaseRepository
         $this->config_products = [];
     }
 
-    public function productDetail(object $request, string $identifier, ?string $type = null): ?array
+    public function productDetail(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
     {
         try
         {
@@ -66,13 +66,21 @@ class ProductRepository extends BaseRepository
                 "attribute_options_child_products"
 
             ];
-            $product_attr = ProductAttribute::query()->with(["value"]);
-            $attribute_id = Attribute::whereSlug("url_key")->first()?->id;
-            $product_attr = $product_attr->whereAttributeId($attribute_id)->get()->filter( fn ($attr_product) => $attr_product->value->value == $identifier)->first();
-            $product = Product::whereId($identifier)
-            ->orWhere("id", $product_attr?->product_id)
-            ->whereWebsiteId($coreCache->website->id)
-            ->whereStatus(1)->with($relations)->firstOrFail();
+            if(!$parent_identifier) {
+                $product_attr = ProductAttribute::query()->with(["value"]);
+                $attribute_id = Attribute::whereSlug("url_key")->first()?->id;
+                $product_attr = $product_attr->whereAttributeId($attribute_id)->get()->filter( fn ($attr_product) => $attr_product->value->value == $identifier)->first();
+                $product = Product::whereId($identifier)
+                ->orWhere("id", $product_attr?->product_id)
+                ->whereWebsiteId($coreCache->website->id)
+                ->whereStatus(1)->with($relations)->firstOrFail();
+            }
+            else {
+                $product = Product::whereId($identifier)
+                ->whereParentId($parent_identifier)
+                ->whereWebsiteId($coreCache->website->id)
+                ->whereStatus(1)->with($relations)->firstOrFail();    
+            }
             
             $store = $coreCache->store;
 
@@ -93,7 +101,7 @@ class ProductRepository extends BaseRepository
                 ];
                 $values = $product->value($match);
 
-                if ( !$type && $attribute->slug == "visibility" && $values?->name == "Not Visible Individually" ) throw new ProductNotFoundIndividuallyException();
+                if ( !$parent_identifier && $attribute->slug == "visibility" && $values?->name == "Not Visible Individually" ) throw new ProductNotFoundIndividuallyException();
 
                 if($attribute->slug == "gallery") {
                     $data["image"] = $this->getBaseImage($product);
