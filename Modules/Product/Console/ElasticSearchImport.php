@@ -30,8 +30,9 @@ class ElasticSearchImport extends Command
 
     public function handle(): void
     {
-        $batch = Bus::batch([])->onQueue("index")->dispatch();
-        $batch->add(new ReIndexer());
+        // $batch = Bus::batch([])->onQueue("index")->dispatch();
+        // $batch->add(new ReIndexer());
+        ReIndexer::dispatch()->onQueue("index");
         $this->info("All data imported successfully");
     }
 }
