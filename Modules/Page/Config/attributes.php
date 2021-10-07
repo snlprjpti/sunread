@@ -349,14 +349,14 @@ return [
                                         "title" => "Title",
                                         "slug" => "content-module-title",
                                         "hasChildren" => 0,
-                                        "type" => "number",
+                                        "type" => "text",
                                         "provider" => "",
                                         "pluck" => [],
                                         "default" => "",
                                         "options" => [],
                                         "description" => "Enter top padding in <em>px</em>",
                                         "conditions" => [],
-                                        "rules" => "numeric",
+                                        "rules" => "",
                                         "is_required" => 0
                                     ],
                                     [
@@ -840,14 +840,14 @@ return [
                                         "title" => "Title",
                                         "slug" => "content-module-title",
                                         "hasChildren" => 0,
-                                        "type" => "number",
+                                        "type" => "text",
                                         "provider" => "",
                                         "pluck" => [],
                                         "default" => "",
                                         "options" => [],
                                         "description" => "Enter top padding in <em>px</em>",
                                         "conditions" => [],
-                                        "rules" => "numeric",
+                                        "rules" => "",
                                         "is_required" => 0
                                     ],
                                     [
