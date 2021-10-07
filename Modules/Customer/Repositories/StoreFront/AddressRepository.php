@@ -40,13 +40,13 @@ class AddressRepository extends BaseRepository
         ];
     }
 
-    public function regionAndCityRules(object $request): array
+    public function regionAndCityRules(object $request, string $name): array
     {
         return [
-            "region_id" => "required_without:region_name|exists:regions,id,country_id,{$request->country_id}",
-            "city_id" => "required_without:city_name",
-            "region_name" => "required_without:region_id",
-            "city_name" => "required_without:city_id",
+            "{$name}.region_id" => "required_without:{$name}.region_name|exists:regions,id,country_id,{$request->{$name}["country_id"]}",
+            "{$name}.city_id" => "required_without:{$name}.city_name",
+            "{$name}.region_name" => "required_without:{$name}.region_id",
+            "{$name}.city_name" => "required_without:{$name}.city_id",
         ];
     }
 
@@ -85,18 +85,24 @@ class AddressRepository extends BaseRepository
             $customer = Customer::findOrFail($customer_id);
             $countries = $this->getCountry($request);
 
+            $new_rules = $this->rules;
             if($request->shipping) {
-                $shipping = new Request($request->shipping);
 
-                if (!$countries->contains("id", $shipping->country_id)) throw new Exception(__("core::app.response.invalid-country"));
+                if(!isset($request->shipping["country_id"])) throw new Exception(__("core::app.response.not-found",["name" => "Country"]));
+                if (!$countries->contains("id", $request->shipping["country_id"])) throw new Exception(__("core::app.response.invalid-country"));
 
-                $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer, $request) {
-                    return [
-                        "customer_id" => $customer->id
-                    ];
-                });
+                $this->rules = [];
+                foreach($new_rules as $key => $value)
+                {
+                    $this->rules["shipping.".$key] = $value;
+                }
+
+                $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,"shipping")));
+                $data["shipping"] = array_merge($data["shipping"], ["customer_id" => $customer->id]);
+
                 $shipping = $this->checkShippingAddress($customer->id)->first();
-                $data = $this->checkRegionAndCity($data, "shipping");
+                $data = $this->checkRegionAndCity($data["shipping"], "shipping");
+
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
                 } else {
@@ -107,17 +113,22 @@ class AddressRepository extends BaseRepository
             }
 
             if($request->billing) {
-                $billing = new Request($request->billing);
 
-                if (!$countries->contains("id", $billing->country_id)) throw new Exception(__("core::app.response.invalid-country"));
+                if(!isset($request->billing["country_id"])) throw new Exception(__("core::app.response.not-found",["name" => "Country"]));
 
-                $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer) {
-                    return [
-                        "customer_id" => $customer->id,
-                    ];
-                });
+                if (!$countries->contains("id", $request->billing["country_id"])) throw new Exception(__("core::app.response.invalid-country"));
+
+                $this->rules = [];
+                foreach($new_rules as $key => $value)
+                {
+                    $this->rules["billing.".$key] = $value;
+                }
+
+                $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,"billing")));
+                $data["billing"] = array_merge($data["billing"], ["customer_id" => $customer->id]);
+
                 $billing = $this->checkBillingAddress($customer->id)->first();
-                $data = $this->checkRegionAndCity($data, "billing");
+                $data = $this->checkRegionAndCity($data["billing"], "billing");
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
                 }
