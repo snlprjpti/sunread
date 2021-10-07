@@ -43,7 +43,8 @@ return [
         "not-enough-stock-quantity" => "stock quantity is not enough",
         "channel-code-required" => "channel code is required",
         'country-not-found' => 'Region does not belongs to country.',
-        "invalid-country" => "Invalid :name Country"
+        "invalid-country" => "Invalid :name Country",
+        "product-stock-alert" => "You will be notified via Email once the product is available."
     ],
     'users' => [
         'forget-password' => [
