@@ -4,8 +4,6 @@ namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Validator;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
