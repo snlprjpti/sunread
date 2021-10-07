@@ -13,4 +13,4 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post("catalog/product/alert/stock", [\Modules\ProductStockAlert\Http\Controllers\ProductStockAlertController::class, "createProductStockAlert"])->name('create.product.stock.alert');
+Route::post("public/product/alert/stock", [\Modules\ProductStockAlert\Http\Controllers\ProductStockAlertController::class, "createProductStockAlert"])->name('create.product.stock.alert');
