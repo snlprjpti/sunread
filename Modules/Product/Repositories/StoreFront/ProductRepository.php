@@ -120,7 +120,7 @@ class ProductRepository extends BaseRepository
                     $data["product_builder"] = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get()->map(function($builder) {
                         return [
                             "component" => $builder->attribute,
-                            "attributes" => $builder->value->map,
+                            "attributes" => $builder->value,
                             "position" => $builder->position
                         ];
                     })->toArray();
