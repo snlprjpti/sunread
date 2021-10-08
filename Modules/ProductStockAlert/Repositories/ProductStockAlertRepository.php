@@ -12,13 +12,11 @@ class ProductStockAlertRepository extends BaseRepository
 {
     protected $productAlertStock;
 
-    public function __construct(ProductAlertStock $productAlertStock, Product $product, Store $store)
+    public function __construct(ProductAlertStock $productAlertStock, Product $product)
     {
         $this->model = $productAlertStock;
         $this->model_key = "productAlertStock";
-        $this->product = $product;
-        $this->store = $store;
-       
+        $this->product = $product;       
         $this->rules = [
             "product_id" => "required|exists:products,id",
             "email_address" => "sometimes|email"
@@ -34,11 +32,13 @@ class ProductStockAlertRepository extends BaseRepository
             $this->validateData($request, $merge);
 
             $coreCache = $this->getCoreCache($request);
+
+            $product = $this->product::whereId($request->product_id)->firstOrFail();
             
             $data = [
                 "customer_id" => auth("customer")->id(),
                 "email_address" => auth("customer")->id() ? null : $request->email_address,
-                "product_id" => $request->product_id,
+                "product_id" => $product->parent_id ?? $request->product_id,
                 "store_id" => $coreCache->store->id,
             ];
 
