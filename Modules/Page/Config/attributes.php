@@ -16,7 +16,7 @@ return [
                         "attributes" => [
                             [
                                 "title" => "Admin Title",
-                                "slug" => "admin-title",
+                                "slug" => "admin_title",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -49,12 +49,12 @@ return [
                     ],
                     [
                         "title" => "Background",
-                        "slug" => "section-background",
+                        "slug" => "section_background",
                         "hasChildren" => 1,
                         "attributes" => [
                             [
                                 "title" => "Background Color",
-                                "slug" => "section-background-color",
+                                "slug" => "section_background_color",
                                 "hasChildren" => 0,
                                 "type" => "color_picker",
                                 "provider" => "",
@@ -68,7 +68,7 @@ return [
                             ],
                             [
                                 "title" => "Background Image",
-                                "slug" => "section-background-image",
+                                "slug" => "section_background_image",
                                 "hasChildren" => 0,
                                 "type" => "file",
                                 "provider" => "",
@@ -82,7 +82,7 @@ return [
                             ],
                             [
                                 "title" => "Background Position",
-                                "slug" => "section-background-position",
+                                "slug" => "section_background_position",
                                 "hasChildren" => 0,
                                 "type" => "select",
                                 "provider" => "",
@@ -99,7 +99,7 @@ return [
                             ],
                             [
                                 "title" => "Background Size",
-                                "slug" => "section-background-size",
+                                "slug" => "section_background_size",
                                 "hasChildren" => 0,
                                 "type" => "select",
                                 "provider" => "",
@@ -117,7 +117,7 @@ return [
                             ],
                             [
                                 "title" => "Background Video Link",
-                                "slug" => "section-background-video-link",
+                                "slug" => "section_background_video_link",
                                 "hasChildren" => 0,
                                 "type" => "link",
                                 "provider" => "",
@@ -138,7 +138,7 @@ return [
                         "attributes" => [
                             [
                                 "title" => "Padding Top",
-                                "slug" => "padding-top",
+                                "slug" => "padding_top",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -152,7 +152,7 @@ return [
                             ],
                             [
                                 "title" => "Padding Bottom",
-                                "slug" => "padding-bottom",
+                                "slug" => "padding_bottom",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -166,7 +166,7 @@ return [
                             ],
                             [
                                 "title" => "Padding Left/Right",
-                                "slug" => "padding-left-right",
+                                "slug" => "padding_left_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -182,12 +182,12 @@ return [
                     ],
                     [
                         "title" => "Advanced",
-                        "slug" => "section-advanced",
+                        "slug" => "section_advanced",
                         "hasChildren" => 1,
                         "attributes" => [
                             [
                                 "title" => "Custom Classes",
-                                "slug" => "section-custom-classes",
+                                "slug" => "section_custom_classes",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -201,7 +201,7 @@ return [
                             ],
                             [
                                 "title" => "Custom ID",
-                                "slug" => "section-custom-id",
+                                "slug" => "section_custom_id",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -225,12 +225,12 @@ return [
                 "groups" => [
                     [
                         "title" => "Background",
-                        "slug" => "row-background",
+                        "slug" => "row_background",
                         "hasChildren" => 1,
                         "attributes" => [
                             [
                                 "title" => "Background Color",
-                                "slug" => "row-background-color",
+                                "slug" => "row_background_color",
                                 "hasChildren" => 0,
                                 "type" => "color_picker",
                                 "provider" => "",
@@ -244,7 +244,7 @@ return [
                             ],
                             [
                                 "title" => "Background Image",
-                                "slug" => "row-background-image",
+                                "slug" => "row_background_image",
                                 "hasChildren" => 0,
                                 "type" => "file",
                                 "provider" => "",
@@ -258,7 +258,7 @@ return [
                             ],
                             [
                                 "title" => "Background Position",
-                                "slug" => "row-background-position",
+                                "slug" => "row_background_position",
                                 "hasChildren" => 0,
                                 "type" => "select",
                                 "provider" => "",
@@ -275,7 +275,7 @@ return [
                             ],
                             [
                                 "title" => "Background Size",
-                                "slug" => "row-background-size",
+                                "slug" => "row_background_size",
                                 "hasChildren" => 0,
                                 "type" => "select",
                                 "provider" => "",
@@ -295,12 +295,12 @@ return [
                     ],
                     [
                         "title" => "Advanced",
-                        "slug" => "row-advanced",
+                        "slug" => "row_advanced",
                         "hasChildren" => 1,
                         "attributes" => [
                             [
                                 "title" => "Custom Classes",
-                                "slug" => "row-custom-classes",
+                                "slug" => "row_custom_classes",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -314,7 +314,7 @@ return [
                             ],
                             [
                                 "title" => "Custom ID",
-                                "slug" => "row-custom-id",
+                                "slug" => "row_custom_id",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -342,12 +342,12 @@ return [
                         "groups" => [
                             [
                                 "title" => "Content",
-                                "slug" => "sub-content-module",
+                                "slug" => "sub_content_module",
                                 "hasChildren" => 1,
                                 "attributes" => [
                                     [
                                         "title" => "Title",
-                                        "slug" => "content-module-title",
+                                        "slug" => "content_module_title",
                                         "hasChildren" => 0,
                                         "type" => "text",
                                         "provider" => "",
@@ -361,7 +361,7 @@ return [
                                     ],
                                     [
                                         "title" => "Heading Tag",
-                                        "slug" => "heading-tag",
+                                        "slug" => "heading_tag",
                                         "hasChildren" => 0,
                                         "type" => "select",
                                         "provider" => "",
@@ -382,7 +382,7 @@ return [
                                     ],
                                     [
                                         "title" => "Description",
-                                        "slug" => "content-module-description",
+                                        "slug" => "content_module_description",
                                         "hasChildren" => 0,
                                         "type" => "editor",
                                         "provider" => "",
@@ -410,7 +410,7 @@ return [
                                 "attributes" => [
                                     [
                                         "title" => "Feature",
-                                        "slug" => "feature-repeater",
+                                        "slug" => "feature_repeater",
                                         "hasChildren" => 1,
                                         "type" => "repeater",
                                         "conditions" => [],
@@ -421,7 +421,7 @@ return [
                                             [
                                                 [
                                                     "title" => "Icon",
-                                                    "slug" => "feature-repeater-icon",
+                                                    "slug" => "feature_repeater_icon",
                                                     "hasChildren" => 0,
                                                     "type" => "file",
                                                     "provider" => "",
@@ -435,7 +435,7 @@ return [
                                                 ],
                                                 [
                                                     "title" => "Title",
-                                                    "slug" => "feature-repeater-title",
+                                                    "slug" => "feature_repeater_title",
                                                     "hasChildren" => 0,
                                                     "type" => "text",
                                                     "provider" => "",
@@ -449,7 +449,7 @@ return [
                                                 ],
                                                 [
                                                     "title" => "Description",
-                                                    "slug" => "feature-repeater-description",
+                                                    "slug" => "feature_repeater_description",
                                                     "hasChildren" => 0,
                                                     "type" => "textarea",
                                                     "provider" => "",
@@ -466,7 +466,7 @@ return [
                                     ],
                                     [
                                         "title" => "Items per row",
-                                        "slug" => "feature-items-per-row",
+                                        "slug" => "feature_items_per_row",
                                         "hasChildren" => 0,
                                         "type" => "select",
                                         "provider" => "",
@@ -507,7 +507,7 @@ return [
                         "attributes" => [
                             [
                                 "title" => "Admin Title",
-                                "slug" => "admin-title",
+                                "slug" => "admin_title",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -540,12 +540,12 @@ return [
                     ],
                     [
                         "title" => "Background",
-                        "slug" => "section-background",
+                        "slug" => "section_background",
                         "hasChildren" => 1,
                         "attributes" => [
                             [
                                 "title" => "Background Color",
-                                "slug" => "section-background-color",
+                                "slug" => "section_background_color",
                                 "hasChildren" => 0,
                                 "type" => "color_picker",
                                 "provider" => "",
@@ -559,7 +559,7 @@ return [
                             ],
                             [
                                 "title" => "Background Image",
-                                "slug" => "section-background-image",
+                                "slug" => "section_background_image",
                                 "hasChildren" => 0,
                                 "type" => "file",
                                 "provider" => "",
@@ -573,7 +573,7 @@ return [
                             ],
                             [
                                 "title" => "Background Position",
-                                "slug" => "section-background-position",
+                                "slug" => "section_background_position",
                                 "hasChildren" => 0,
                                 "type" => "select",
                                 "provider" => "",
@@ -590,7 +590,7 @@ return [
                             ],
                             [
                                 "title" => "Background Size",
-                                "slug" => "section-background-size",
+                                "slug" => "section_background_size",
                                 "hasChildren" => 0,
                                 "type" => "select",
                                 "provider" => "",
@@ -608,7 +608,7 @@ return [
                             ],
                             [
                                 "title" => "Background Video Link",
-                                "slug" => "section-background-video-link",
+                                "slug" => "section_background_video_link",
                                 "hasChildren" => 0,
                                 "type" => "link",
                                 "provider" => "",
@@ -629,7 +629,7 @@ return [
                         "attributes" => [
                             [
                                 "title" => "Padding Top",
-                                "slug" => "padding-top",
+                                "slug" => "padding_top",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -643,7 +643,7 @@ return [
                             ],
                             [
                                 "title" => "Padding Bottom",
-                                "slug" => "padding-bottom",
+                                "slug" => "padding_bottom",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -657,7 +657,7 @@ return [
                             ],
                             [
                                 "title" => "Padding Left/Right",
-                                "slug" => "padding-left-right",
+                                "slug" => "padding_left_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -673,12 +673,12 @@ return [
                     ],
                     [
                         "title" => "Advanced",
-                        "slug" => "section-advanced",
+                        "slug" => "section_advanced",
                         "hasChildren" => 1,
                         "attributes" => [
                             [
                                 "title" => "Custom Classes",
-                                "slug" => "section-custom-classes",
+                                "slug" => "section_custom_classes",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -692,7 +692,7 @@ return [
                             ],
                             [
                                 "title" => "Custom ID",
-                                "slug" => "section-custom-id",
+                                "slug" => "section_custom_id",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -716,12 +716,12 @@ return [
                 "groups" => [
                     [
                         "title" => "Background",
-                        "slug" => "row-background",
+                        "slug" => "row_background",
                         "hasChildren" => 1,
                         "attributes" => [
                             [
                                 "title" => "Background Color",
-                                "slug" => "row-background-color",
+                                "slug" => "row_background_color",
                                 "hasChildren" => 0,
                                 "type" => "color_picker",
                                 "provider" => "",
@@ -735,7 +735,7 @@ return [
                             ],
                             [
                                 "title" => "Background Image",
-                                "slug" => "row-background-image",
+                                "slug" => "row_background_image",
                                 "hasChildren" => 0,
                                 "type" => "file",
                                 "provider" => "",
@@ -749,7 +749,7 @@ return [
                             ],
                             [
                                 "title" => "Background Position",
-                                "slug" => "row-background-position",
+                                "slug" => "row_background_position",
                                 "hasChildren" => 0,
                                 "type" => "select",
                                 "provider" => "",
@@ -766,7 +766,7 @@ return [
                             ],
                             [
                                 "title" => "Background Size",
-                                "slug" => "row-background-size",
+                                "slug" => "row_background_size",
                                 "hasChildren" => 0,
                                 "type" => "select",
                                 "provider" => "",
@@ -786,12 +786,12 @@ return [
                     ],
                     [
                         "title" => "Advanced",
-                        "slug" => "row-advanced",
+                        "slug" => "row_advanced",
                         "hasChildren" => 1,
                         "attributes" => [
                             [
                                 "title" => "Custom Classes",
-                                "slug" => "row-custom-classes",
+                                "slug" => "row_custom_classes",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -805,7 +805,7 @@ return [
                             ],
                             [
                                 "title" => "Custom ID",
-                                "slug" => "row-custom-id",
+                                "slug" => "row_custom_id",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -833,12 +833,12 @@ return [
                         "groups" => [
                             [
                                 "title" => "Content",
-                                "slug" => "sub-content-module",
+                                "slug" => "sub_content_module",
                                 "hasChildren" => 1,
                                 "attributes" => [
                                     [
                                         "title" => "Title",
-                                        "slug" => "content-module-title",
+                                        "slug" => "content_module_title",
                                         "hasChildren" => 0,
                                         "type" => "text",
                                         "provider" => "",
@@ -852,7 +852,7 @@ return [
                                     ],
                                     [
                                         "title" => "SubTitle",
-                                        "slug" => "content-module-sub-title",
+                                        "slug" => "content_module_sub_title",
                                         "hasChildren" => 0,
                                         "type" => "text",
                                         "provider" => "",
@@ -866,7 +866,7 @@ return [
                                     ],
                                     [
                                         "title" => "Content",
-                                        "slug" => "content-module-content",
+                                        "slug" => "content_module_content",
                                         "hasChildren" => 0,
                                         "type" => "editor",
                                         "provider" => "",
