@@ -429,7 +429,7 @@ return [
                                                     "default" => "",
                                                     "options" => [],
                                                     "conditions" => [],
-                                                    "description" => "",
+                                                    "description" => "mimes:jpeg,jpg,bmp,png",
                                                     "rules" => "",
                                                     "is_required" => 1
                                                 ],
@@ -444,7 +444,7 @@ return [
                                                     "options" => [],
                                                     "conditions" => [],
                                                     "description" => "",
-                                                    "rules" => "mimes:jpeg,jpg,bmp,png",
+                                                    "rules" => "",
                                                     "is_required" => 1
                                                 ],
                                                 [
