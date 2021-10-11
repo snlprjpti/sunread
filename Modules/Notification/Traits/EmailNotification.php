@@ -28,11 +28,6 @@ trait EmailNotification
 
             if( !$email_template ) throw new Exception("Email Template Not Found");
 
-            /**
-             * Set store variable with following store_id
-             */
-            config(['store' => $variable_data["store_id"]]);
-
             $data["content"] = htmlspecialchars_decode($this->render($email_template->content, $variable_data));
             $data["subject"] = htmlspecialchars_decode($this->render($email_template->subject, $variable_data));
             $data["to_email"] = $variable_data["customer_email_address"];
