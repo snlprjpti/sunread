@@ -429,8 +429,8 @@ return [
                                                     "default" => "",
                                                     "options" => [],
                                                     "conditions" => [],
-                                                    "description" => "mimes:jpeg,jpg,bmp,png",
-                                                    "rules" => "",
+                                                    "description" => "",
+                                                    "rules" => "mimes:jpeg,jpg,bmp,png",
                                                     "is_required" => 1
                                                 ],
                                                 [
