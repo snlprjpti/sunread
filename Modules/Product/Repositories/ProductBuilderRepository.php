@@ -157,7 +157,7 @@ class ProductBuilderRepository extends BaseRepository
                 if ($element["hasChildren"] == 0) continue;
 
                 if ($element["type"] == "repeater") {
-                    $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
+                    $count = isset($component["attributes"][$element["slug"]]) ? count($component["attributes"][$element["slug"]]) : 0;
                     for( $i=0; $i < $count; $i++ )
                     {
                         $this->getRules($component, $element["attributes"][0], "$append_key.$i", $method);
