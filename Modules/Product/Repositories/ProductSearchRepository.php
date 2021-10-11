@@ -229,12 +229,14 @@ class ProductSearchRepository extends ElasticSearchRepository
             $filters = [];
             $data = $this->filterAndSort(category_id:$category_id);
             $aggregate = $this->aggregation();
+
+            $final_l[] = $data["query"];
+            $final_l[] = $this->term("list_status", 1);
+            $final_q = $this->whereQuery($final_l);
     
             $query = [
                 "size"=> 0,
-                "query"=> (count($data["query"]) > 0) ? $data["query"] : [
-                    "match_all"=> (object)[]
-                ],
+                "query"=> $final_q,
                 "aggs"=> $aggregate
             ];
     
@@ -294,13 +296,15 @@ class ProductSearchRepository extends ElasticSearchRepository
             $page = $request->page ?? 1;
             $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
+            $final_l[] = $filter["query"];
+            $final_l[] = $this->term("list_status", 1);
+            $final_q = $this->whereQuery($final_l);
+
             $fetched = [
                 "_source" => $this->listSource,
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
-                "query"=> (count($filter["query"]) > 0) ? $filter["query"] : [
-                    "match_all"=> (object)[]
-                ],
+                "query"=> $final_q,
                 "sort" => (count($filter["sort"]) > 0) ? $filter["sort"] : [
                     ["id" => ["order" => "asc", "mode" => "avg"]]
                 ],

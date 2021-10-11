@@ -22,6 +22,7 @@ use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Entities\ProductAttributeString;
 use Modules\Product\Entities\ProductAttributeText;
 use Modules\Product\Jobs\ConfigurableIndexing;
+use Modules\Product\Jobs\VariantIndexing;
 
 class ProductConfigurableRepository extends BaseRepository
 {
@@ -112,7 +113,7 @@ class ProductConfigurableRepository extends BaseRepository
             $this->parentVisibilitySetup($product, $scope);
 
             $productAttributes = collect($request_attributes)->reject(function ($item) {
-                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility"));
+                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility") || ($item["attribute_slug"] == "url_key"));
             })->toArray();
 
             $this->state = [];
@@ -233,7 +234,13 @@ class ProductConfigurableRepository extends BaseRepository
                     "attribute_slug" => "sku",
                     "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
-                ]
+                ],
+                [
+                    //Attribute slug
+                    "attribute_slug" => "url_key",
+                    "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
+                    "value_type" => "Modules\Product\Entities\ProductAttributeString"
+                ],
             ], $productAttributes, $variant_options, [ $visibility ]);
 
             $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store", update_attributes:$update_attributes);
@@ -330,16 +337,21 @@ class ProductConfigurableRepository extends BaseRepository
         return $visibility;
     }
 
-    public function configurableIndexing(object $data): void
+    public function configurableIndexing(object $configurable_product): void
     {
         try 
         { 
-            $stores = Website::find($data->website_id)->channels->map(function ($channel) {
+            $stores = Website::find($configurable_product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
             })->flatten(1);
+            $variants = $configurable_product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
+
             $batch = Bus::batch([])->onQueue("index")->dispatch();
 
-            foreach( $stores as $store) $batch->add(new ConfigurableIndexing($data, $store));
+            foreach( $stores as $store) {
+                $batch->add(new ConfigurableIndexing($configurable_product, $store));
+                foreach($variants as $variant) $batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
+            }
         }
         catch ( Exception $exception )
         {

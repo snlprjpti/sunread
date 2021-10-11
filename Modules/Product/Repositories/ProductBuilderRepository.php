@@ -5,6 +5,7 @@ namespace Modules\Product\Repositories;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\AttributeSet;
@@ -21,6 +22,7 @@ class ProductBuilderRepository extends BaseRepository
     public function __construct(ProductBuilder $productBuilder, Product $product, PageAttributeRepository $pageAttributeRepository)
     {
         $this->model = $productBuilder;
+        $this->model_key = "product.page.attribute";
         $this->product = $product;
         $this->config_fields = config("attributes");
         $this->pageAttributeRepository = $pageAttributeRepository;
@@ -61,12 +63,13 @@ class ProductBuilderRepository extends BaseRepository
                         "product_id" => $productId,
                         "attribute" => $component["component"],
                         "scope" => $scopeArr["scope"],
-                        "scope_id" => $scopeArr["scope_id"]
+                        "scope_id" => $scopeArr["scope_id"],
+                        "position" => isset($data["position"]) ? $data["position"] : null,
+                        "value" => $all_attributes
                     ];
-
-                    $productBuilderData = array_merge($input, ["value" => json_encode($all_attributes), "position" => $data['position'] ?? 1]);
-                    $this->model->updateOrCreate($input, $productBuilderData);
+                    $product_page_attributes[] = isset($component["id"]) ? $this->update($input, $component["id"]) : $this->create($input);
                 }
+                $product->productBuilderValues()->whereNotIn('id', array_filter(Arr::pluck($product_page_attributes, 'id')))->delete();
         } 
         catch (Exception $exception)
         {

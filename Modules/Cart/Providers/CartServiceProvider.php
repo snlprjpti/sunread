@@ -2,8 +2,12 @@
 
 namespace Modules\Cart\Providers;
 
+use Modules\Cart\Entities\Cart;
 use Illuminate\Support\ServiceProvider;
+use Modules\Cart\Observers\CartObserver;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Cart\Entities\CartItem;
+use Modules\Cart\Observers\CartItemObserver;
 
 class CartServiceProvider extends ServiceProvider
 {
@@ -28,6 +32,8 @@ class CartServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObservers();
+
     }
 
     /**
@@ -108,5 +114,16 @@ class CartServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    /**
+     * Register observers.
+     *
+     * @return void
+     */
+    public function registerObservers(): void
+    {
+        Cart::observe(CartObserver::class);
+        CartItem::observe(CartItemObserver::class);
     }
 }

@@ -19,6 +19,7 @@ class WebsiteResource extends JsonResource
             "name" => $this->name,
             "position" => $this->position,
             "description" => $this->description,
+            "default_channel" => new ChannelResource($this->whenLoaded("default_channel")),
             "channels" => ChannelResource::collection($this->whenLoaded("channels")),
             "channels_count" => $this->when($this->relationLoaded("channels"), $this->channels->count()),
             "stores_count" => $this->when(($stores_count !== false), $stores_count),
