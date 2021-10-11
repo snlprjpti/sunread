@@ -311,7 +311,7 @@ class ProductBuilderRepository extends BaseRepository
             $this->parent = [];
 
             $data = collect($this->pageAttributeRepository->config_fields)->where("slug", $component->attribute)->first();
-            $this->getChildren($data["mainGroups"], values:json_decode($component->value, true));
+            $this->getChildren($data["mainGroups"], values:$component->value);
         }
         catch( Exception $exception )
         {
