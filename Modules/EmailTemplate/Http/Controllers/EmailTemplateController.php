@@ -119,7 +119,7 @@ class EmailTemplateController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Group" ]));
     }
 
     public function templateVariable(Request $request): JsonResponse
@@ -134,6 +134,6 @@ class EmailTemplateController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Variable" ]));
     }
 }
