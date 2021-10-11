@@ -41,7 +41,7 @@ class EmailTemplateTest extends BaseTestCase
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
-            "message" => __("core::app.response.fetch-list-success", [ "name" => $this->model_name ])
+            "message" => __("core::app.response.fetch-list-success", [ "name" => "Template Group" ])
         ]);
     }
 
@@ -56,7 +56,7 @@ class EmailTemplateTest extends BaseTestCase
         $response->assertStatus(200);
         $response->assertJsonFragment([
             "status" => "success",
-            "message" => __("core::app.response.fetch-list-success", [ "name" => $this->model_name ])
+            "message" => __("core::app.response.fetch-list-success", [ "name" => "Template Variable" ])
         ]);
     }
 }
