@@ -4,6 +4,8 @@ namespace Modules\Core\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
+use Modules\Core\Entities\Website;
+use Modules\Core\Facades\CoreCache;
 
 class RedisClear extends Command
 {
@@ -18,8 +20,19 @@ class RedisClear extends Command
 
     public function handle(): bool
     {
-        Redis::del(Redis::keys("*"));
-        $this->info("Redis cache cleared");
+        if(count(Redis::keys("*")) > 0) {
+            Redis::del(Redis::keys("*"));
+        }
+
+        $websites = Website::all();
+        foreach ($websites as $website) {
+            CoreCache::createWebsiteCache($website);
+            CoreCache::getWebsiteAllChannel($website);
+            CoreCache::getWebsiteAllStore($website);
+        }
+
+        $this->info("Redis cache refreshed");
+
         return true;
     }
 }

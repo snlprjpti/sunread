@@ -4,6 +4,7 @@ namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
 use Illuminate\Http\Request;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
@@ -39,13 +40,13 @@ class AddressRepository extends BaseRepository
         ];
     }
 
-    public function regionAndCityRules(object $request): array
+    public function regionAndCityRules(object $request, string $name): array
     {
         return [
-            "region_id" => "required_without:region_name|exists:regions,id,country_id,{$request->country_id}",
-            "city_id" => "required_without:city_name",
-            "region_name" => "required_without:region_id",
-            "city_name" => "required_without:city_id",
+            "{$name}.region_id" => "required_without:{$name}.region_name|exists:regions,id,country_id,{$request->{$name}["country_id"]}",
+            "{$name}.city_id" => "required_without:{$name}.city_name",
+            "{$name}.region_name" => "required_without:{$name}.region_id",
+            "{$name}.city_name" => "required_without:{$name}.city_id",
         ];
     }
 
@@ -81,15 +82,16 @@ class AddressRepository extends BaseRepository
     {
         try
         {
+            $customer = Customer::findOrFail($customer_id);
+            $countries = $this->getCountry($request);
+
             if($request->shipping) {
-                $shipping = new Request($request->shipping);
-                $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer_id) {
-                    return [
-                        "customer_id" => Customer::findOrFail($customer_id)->id,
-                    ];
-                });
-                $shipping = $this->checkShippingAddress($customer_id)->first();
-                $data = $this->checkRegionAndCity($data, "shipping");
+
+                $data = $this->validateAddress($request, $customer, $countries, "shipping");
+
+                $shipping = $this->checkShippingAddress($customer->id)->first();
+                $data = $this->checkRegionAndCity($data["shipping"], "shipping");
+
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
                 } else {
@@ -100,14 +102,11 @@ class AddressRepository extends BaseRepository
             }
 
             if($request->billing) {
-                $billing = new Request($request->billing);
-                $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer_id) {
-                    return [
-                        "customer_id" => Customer::findOrFail($customer_id)->id,
-                    ];
-                });
-                $billing = $this->checkBillingAddress($customer_id)->first();
-                $data = $this->checkRegionAndCity($data, "billing");
+
+                $data = $this->validateAddress($request, $customer, $countries, "billing");
+
+                $billing = $this->checkBillingAddress($customer->id)->first();
+                $data = $this->checkRegionAndCity($data["billing"], "billing");
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
                 }
@@ -145,6 +144,53 @@ class AddressRepository extends BaseRepository
                 $region = Region::whereCountryId($data["country_id"])->count();
                 if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "{$name} Region" ]));
             }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    public function getCountry(object $request): object
+    {
+        try
+        {
+            $data = $this->getCoreCache($request);
+
+            if (!$data->channel) throw new Exception(__("core::app.response.not-found", ["name" => "Country"]));
+            $allow = SiteConfig::fetch("allow_countries", "channel", $data->channel->id);
+            $default[] = SiteConfig::fetch("default_country", "channel", $data->channel->id);
+
+            $fetched = $allow->merge($default);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function validateAddress(object $request, object $customer, object $countries, string $name): array
+    {
+        try
+        {
+            $new_rules = $this->rules;
+
+            if(!isset($request->{$name}["country_id"])) throw new Exception(__("core::app.response.not-found", [ "name" => "Country" ]));
+            if (!$countries->contains("id", $request->shipping["country_id"])) throw new Exception(__("core::app.response.invalid-country", [ "name" => $name]));
+
+            $this->rules = [];
+            foreach($new_rules as $key => $value)
+            {
+                $this->rules[$name.'.'.$key] = $value;
+            }
+
+            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,$name)));
+            $data[$name] = array_merge($data[$name], ["customer_id" => $customer->id]);
+            $this->rules = $new_rules;
         }
         catch (Exception $exception)
         {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\Cart\Database\Seeders;
+namespace Modules\ProductStockAlert\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class CartDatabaseSeeder extends Seeder
+class ProductStockAlertDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.

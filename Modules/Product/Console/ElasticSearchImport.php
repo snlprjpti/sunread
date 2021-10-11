@@ -10,7 +10,10 @@ use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
 use Modules\Product\Jobs\ConfigurableIndexing;
 use Modules\Product\Jobs\ElasticSearchIndexingJob;
+use Modules\Product\Jobs\ReIndexer;
+use Modules\Product\Jobs\ReIndexing;
 use Modules\Product\Jobs\SingleIndexing;
+use Modules\Product\Jobs\VariantIndexing;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -28,26 +31,8 @@ class ElasticSearchImport extends Command
     public function handle(): void
     {
         $batch = Bus::batch([])->onQueue("index")->dispatch();
-        
-        $products = Product::whereType("simple")->whereParentId(null)->get();
-        foreach($products as $product)
-        {
-            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
-                return $channel->stores;
-            })->flatten(1);
-            
-            foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
-        }
-
-        $variants = Product::whereType("configurable")->get();
-        foreach($variants as $variant)
-        {
-            $stores = Website::find($variant->website_id)->channels->map(function ($channel) {
-                return $channel->stores;
-            })->flatten(1);
-    
-            foreach( $stores as $store) $batch->add(new ConfigurableIndexing($variant, $store));
-        }
+        $batch->add(new ReIndexer());
+        // ReIndexer::dispatch()->onQueue("index");
         $this->info("All data imported successfully");
     }
 }

@@ -30,6 +30,8 @@ class PageTest extends BaseTestCase
 
         $this->default_resource_id = $this->model::latest('id')->first()->id;
         $this->hasStatusTest = true;
+        $this->hasStoreTest = false;
+        $this->hasUpdateTest = false;
     }
 
     public function testAdminCanFetchResources()
@@ -51,7 +53,7 @@ class PageTest extends BaseTestCase
 
         for($i = 0; $i < rand(1,2); $i++)
         {
-            $components[] = Arr::random([ "banner" ]);
+            $components[] = Arr::random([ "feature" ]);
         }
 
         $singleItem = [];

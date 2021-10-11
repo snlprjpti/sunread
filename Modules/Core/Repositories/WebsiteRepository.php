@@ -21,7 +21,8 @@ class WebsiteRepository extends BaseRepository
             "name" => "required",
             "description" => "nullable",
             "position" => "sometimes|numeric",
-            "status" => "sometimes|boolean"
+            "status" => "sometimes|boolean",
+            "default_channel_id" => "nullable|exists:channels,id"
         ];
 
         $this->restrict_default_delete = true;

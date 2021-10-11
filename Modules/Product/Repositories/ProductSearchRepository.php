@@ -2,6 +2,7 @@
 
 namespace Modules\Product\Repositories;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
@@ -20,7 +21,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 {
     use HasIndexing;
 
-    protected $model, $mainFilterKeys, $attributeFilterKeys, $searchKeys, $staticFilterKeys, $sortByKeys;
+    protected $model, $mainFilterKeys, $attributeFilterKeys, $searchKeys, $staticFilterKeys, $sortByKeys, $listSource;
 
     public function __construct(Product $product)
     {
@@ -33,6 +34,8 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->sortByKeys = [ "sort_by_id", "sort_by_name", "sort_by_price" ];
 
         $this->staticFilterKeys = ["color", "size", "collection", "configurable_size", "configurable_color"];
+
+        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "color", "color_value"];
     }
 
     public function search(object $request): array
@@ -141,9 +144,34 @@ class ProductSearchRepository extends ElasticSearchRepository
     {
         try
         {
+            $today = date('Y-m-d');
+            $currentDate = date('Y-m-d H:m:s', strtotime($today));
             foreach($products as &$product)
             {
-                $product["price"] = isset($product["price"]) ? PriceFormat::get($product["price"], $store->id, "store") : null;
+                $product["price_formatted"] = isset($product["price"]) ? PriceFormat::get($product["price"], $store->id, "store") : null;
+
+                if(isset($product["special_price"])) {
+                    if(isset($product["special_from_date"])) $fromDate = date('Y-m-d H:m:s', strtotime($product["special_from_date"]));
+                    if(isset($product["special_to_date"])) $toDate = date('Y-m-d H:m:s', strtotime($product["special_to_date"])); 
+                    if(!isset($fromDate) && !isset($toDate)) $product["special_price_formatted"] = PriceFormat::get($product["special_price"], $store->id, "store");
+                    else $product["special_price_formatted"] = (($currentDate >= $fromDate) && ($currentDate <= $toDate)) ? PriceFormat::get($product["special_price"], $store->id, "store") : null;
+                }
+                else {
+                    $product["special_price"] = null;
+                    $product["special_price_formatted"] = null;
+                }
+
+                if(isset($product["new_from_date"]) && isset($product["new_to_date"])) { 
+                    if(isset($product["new_from_date"])) $fromNewDate = date('Y-m-d H:m:s', strtotime($product["new_from_date"]));
+                    if(isset($product["new_to_date"])) $toNewDate = date('Y-m-d H:m:s', strtotime($product["new_to_date"])); 
+                    if(isset($fromNewDate) && isset($toNewDate)) $product["is_new_product"] = (($currentDate >= $fromNewDate) && ($currentDate <= $toNewDate)) ? 1 : 0;
+                }
+                
+                $product["image"] = isset($product["thumbnail_image"]) ? $product["thumbnail_image"] : $product["base_image"];
+                $product["quantity"] = (int) $product["quantity"];
+                $product["color"] = isset($product["color"]) ? $product["color"] : null;
+                $product["color_value"] = isset($product["color_value"]) ? $product["color_value"] : null;
+                unset($product["thumbnail_image"], $product["base_image"]);      
             }
         }
         catch (Exception $exception)
@@ -201,12 +229,14 @@ class ProductSearchRepository extends ElasticSearchRepository
             $filters = [];
             $data = $this->filterAndSort(category_id:$category_id);
             $aggregate = $this->aggregation();
+
+            $final_l[] = $data["query"];
+            $final_l[] = $this->term("list_status", 1);
+            $final_q = $this->whereQuery($final_l);
     
             $query = [
                 "size"=> 0,
-                "query"=> (count($data["query"]) > 0) ? $data["query"] : [
-                    "match_all"=> (object)[]
-                ],
+                "query"=> $final_q,
                 "aggs"=> $aggregate
             ];
     
@@ -266,15 +296,15 @@ class ProductSearchRepository extends ElasticSearchRepository
             $page = $request->page ?? 1;
             $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
+            $final_l[] = $filter["query"];
+            $final_l[] = $this->term("list_status", 1);
+            $final_q = $this->whereQuery($final_l);
+
             $fetched = [
-                "_source"=>[
-                    "exclude"=> "configurable_*",
-                ],
+                "_source" => $this->listSource,
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
-                "query"=> (count($filter["query"]) > 0) ? $filter["query"] : [
-                    "match_all"=> (object)[]
-                ],
+                "query"=> $final_q,
                 "sort" => (count($filter["sort"]) > 0) ? $filter["sort"] : [
                     ["id" => ["order" => "asc", "mode" => "avg"]]
                 ],
