@@ -87,6 +87,7 @@ class ProductBuilderRepository extends BaseRepository
         {
             $this->config_rules = [];
             $this->config_types = [];
+            $this->collect_elements = [];
 
             $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
             if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
