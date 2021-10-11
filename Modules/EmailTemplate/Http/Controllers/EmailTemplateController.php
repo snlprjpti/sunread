@@ -6,7 +6,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Event;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Modules\EmailTemplate\Repositories\EmailTemplateRepository;
@@ -84,7 +83,7 @@ class EmailTemplateController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
-
+            $this->repository->templateGroupValidation($request);
             $updated = $this->repository->update($data, $id);
         }
         catch (Exception $exception)
