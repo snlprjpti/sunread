@@ -39,6 +39,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('telescope:prune')->hourly();
+        $schedule->command('geoip:update')->weekly();
     }
 
     /**
