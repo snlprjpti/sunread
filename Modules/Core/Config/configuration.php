@@ -830,7 +830,7 @@ return[
         "children" => [
             [
                 "title" => "Sales",
-                "subChildern" => [
+                "subChildren" => [
                     [
                         "title" => "Tax Classes",
                         "elements" => [
@@ -840,7 +840,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Tax\Entities\ProductTaxGroup",
                                 "pluck" => ["name", "id"],
-                                "default" => "0",
+                                "default" => "1",
                                 "options" => [],
                                 "rules" => "exists:product_tax_groups,id",
                                 "multiple" => false,
@@ -853,7 +853,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Tax\Entities\CustomerTaxGroup",
                                 "pluck" => ["name", "id"],
-                                "default" => "0",
+                                "default" => "1",
                                 "options" => [],
                                 "rules" => "exists:customer_tax_groups,id",
                                 "multiple" => false,
