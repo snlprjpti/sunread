@@ -51,7 +51,7 @@ class ReIndexer implements ShouldQueue
                 foreach( $stores as $store) {
                     $configurable_batch = Bus::batch([])->then(function (Batch $variant_batch) use ($variants, $configurable_product, $store) {
                         $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
-                        foreach($variants as $variant) $variant_batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
+                        //foreach($variants as $variant) $variant_batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
                     })->allowFailures()->onQueue('index')->dispatch();
                     $configurable_batch->add(new ConfigurableIndexing($configurable_product, $store));
                 }
