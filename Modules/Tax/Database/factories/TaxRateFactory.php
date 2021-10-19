@@ -10,7 +10,7 @@ class TaxRateFactory extends Factory
 
     public function definition(): array
     {
-        $country = Country::inRandomOrder()->first();
+        $country = Country::where("iso_2_code", "SE")->first();
 
         return [
             "country_id" => $country->id,
