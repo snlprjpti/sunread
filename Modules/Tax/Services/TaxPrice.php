@@ -83,8 +83,7 @@ class TaxPrice {
 		$value_added_tax = ($price + $tax_rate_value);
 		$resource = [
 			"net_price" => $price,
-			"tax" => $tax,
-			"tax_rate" => $this->tax_value,
+			"tax_rate_percent" => $this->tax_value,
 			"tax_rate_value" => $tax_rate_value,
 			"multiple_rules" => $this->multiple_rules?->pluck("name", "id")->toArray(),
 			"value_added_tax" => $value_added_tax,
