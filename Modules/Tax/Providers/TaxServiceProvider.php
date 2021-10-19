@@ -5,6 +5,7 @@ namespace Modules\Tax\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Modules\Tax\Services\GeoIp;
+use Modules\Tax\Services\TaxCache;
 use Modules\Tax\Services\TaxPrice;
 
 class TaxServiceProvider extends ServiceProvider
@@ -102,6 +103,9 @@ class TaxServiceProvider extends ServiceProvider
         });
         $this->app->singleton('GeoIp', function () {
             return new GeoIp();
+        });
+        $this->app->singleton('TaxCache', function () {
+            return new TaxCache();
         });
     }
 
