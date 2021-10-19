@@ -32,32 +32,26 @@ class ElasticSearchImport extends Command
     public function handle(): void
     {
         $batch = Bus::batch([])->onQueue("index")->dispatch();
-        
-        $products = Product::whereType("simple")->whereParentId(null)->get();
-        foreach($products as $product)
+
+        $products = Product::whereParentId(null)->get();
+        foreach ($products as $product)
         {
             $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
             })->flatten(1);
+            if ($product->type == "configurable") $variants = $product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
             
-            foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
-        }
-
-        $configurable_products = Product::whereType("configurable")->get();
-        foreach($configurable_products as $configurable_product)
-        {
-            $stores = Website::find($configurable_product->website_id)->channels->map(function ($channel) {
-                return $channel->stores;
-            })->flatten(1);
-            $variants = $configurable_product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
-    
-            foreach( $stores as $store) {
-                $configurable_batch = Bus::batch([])->then(function (Batch $variant_batch) use ($variants, $configurable_product, $store) {
-                    $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
-                    foreach($variants as $variant) $variant_batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
-                })->allowFailures()->onQueue('index')->dispatch();
-                $configurable_batch->add(new ConfigurableIndexing($configurable_product, $store));
-            }
+            foreach ($stores as $store) {
+                if ($product->type == "simple") $batch->add(new SingleIndexing($product, $store));
+                elseif ($product->type == "configurable") {
+                    Bus::batch([
+                        new ConfigurableIndexing($product, $store)
+                    ])->then(function (Batch $variant_batch) use ($variants, $product, $store) {
+                        $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
+                        foreach ($variants as $variant) $variant_batch->add(new VariantIndexing($product, $variants, $variant, $store));
+                    })->allowFailures()->onQueue('index')->dispatch();
+                }
+            } 
         }
         $this->info("All data imported successfully");
     }
