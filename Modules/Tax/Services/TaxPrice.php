@@ -18,192 +18,192 @@ use Modules\Tax\Traits\HasClientIp;
 
 class TaxPrice {
 
-	use HasClientIp;
+    use HasClientIp;
 
-	protected $country_code,
-	$zip_code,
-	$net_price = 0.0,
-	$tax_value = 0,
-	$tax_rate = 0,
-	$priority_tax = [],
-	$company = false,
-	$value = 0,
-	$multiple_rules;
-	
-	public function get(object $request, bool $use_current_location = false, ?string $zip_code = null, ?callable $callback = null): object
-	{
-		try
-		{
-			$data = $this->getGeneralValue($request);
-			$current_geo_location = GeoIp::locate($this->getClientIp());
-			if ($use_current_location) {
-				if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
-				else $country = Country::where("iso_2_code", $current_geo_location?->iso_code)->first();
-				$zip_code = $current_geo_location?->postal_code;
-			}
-			else $country = $data->default_country;
-			$tax_rate_data = TaxRate::whereCountryId($country->id)->get()->filter(function ($tax_rate) use ($zip_code) {
-				if ($zip_code) {
-					if ($tax_rate->use_zip_range) {
-						$zip_code_range = range($tax_rate->postal_code_form, $tax_rate->postal_code_to);
-						return in_array($zip_code, $zip_code_range);
-					}
-					else {
-						if ( Str::contains($tax_rate->zip_code, "*") ) {
-							$pluck_range = explode("*", $tax_rate->zip_code);
-							return ($pluck_range[0] <= $zip_code);
-						}
-						return ($tax_rate->zip_code == "*");
-					}
-				}
-				return true;
-			})->first();
-	
-			$tax_rate_values = [
-				"iso_code" => $country->iso_2_code,
-				"country_name" => $country->name,
-				"tax_identifier" => $tax_rate_data->identifier,
-				"tax_rate" => $tax_rate_data->tax_rate,
-				"client_zip_code" => $current_geo_location?->postal_code,
-				"client_country_name" => $current_geo_location?->country,
-				"client_iso_code" => $current_geo_location?->iso_code,
-			];
-		}
-		catch (Exception $exception)
-		{
-			throw $exception;
-		}
+    protected $country_code,
+    $zip_code,
+    $net_price = 0.0,
+    $tax_value = 0,
+    $tax_rate = 0,
+    $priority_tax = [],
+    $company = false,
+    $value = 0,
+    $multiple_rules;
+    
+    public function get(object $request, bool $use_current_location = false, ?string $zip_code = null, ?callable $callback = null): object
+    {
+        try
+        {
+            $data = $this->getGeneralValue($request);
+            $current_geo_location = GeoIp::locate($this->getClientIp());
+            if ($use_current_location) {
+                if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
+                else $country = Country::where("iso_2_code", $current_geo_location?->iso_code)->first();
+                $zip_code = $current_geo_location?->postal_code;
+            }
+            else $country = $data->default_country;
+            $tax_rate_data = TaxRate::whereCountryId($country->id)->get()->filter(function ($tax_rate) use ($zip_code) {
+                if ($zip_code) {
+                    if ($tax_rate->use_zip_range) {
+                        $zip_code_range = range($tax_rate->postal_code_form, $tax_rate->postal_code_to);
+                        return in_array($zip_code, $zip_code_range);
+                    }
+                    else {
+                        if ( Str::contains($tax_rate->zip_code, "*") ) {
+                            $pluck_range = explode("*", $tax_rate->zip_code);
+                            return ($pluck_range[0] <= $zip_code);
+                        }
+                        return ($tax_rate->zip_code == "*");
+                    }
+                }
+                return true;
+            })->first();
+    
+            $tax_rate_values = [
+                "iso_code" => $country->iso_2_code,
+                "country_name" => $country->name,
+                "tax_identifier" => $tax_rate_data->identifier,
+                "tax_rate" => $tax_rate_data->tax_rate,
+                "client_zip_code" => $current_geo_location?->postal_code,
+                "client_country_name" => $current_geo_location?->country,
+                "client_iso_code" => $current_geo_location?->iso_code,
+            ];
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
-		return (object) $tax_rate_values;
-	}
+        return (object) $tax_rate_values;
+    }
 
-	public function taxResource(mixed $price, mixed $tax, ?object $channel, ?callable $callback = null): array
-	{
-		$tax_rate_value = ($price * $tax);
-		$value_added_tax = ($price + $tax_rate_value);
-		$resource = [
-			"net_price" => $price,
-			"tax_rate_percent" => $this->tax_value,
-			"tax_rate_value" => $tax_rate_value,
-			"multiple_rules" => $this->multiple_rules?->pluck("name", "id")->toArray(),
-			"value_added_tax" => $value_added_tax,
-			"formatted_final_price" => PriceFormat::get($value_added_tax, $channel?->id, "channel")
-		];
-		if ($callback) $resource = array_merge($callback, $resource); 
-		return $resource;
-	}
+    public function taxResource(mixed $price, mixed $tax, ?object $channel, ?callable $callback = null): array
+    {
+        $tax_rate_value = ($price * $tax);
+        $value_added_tax = ($price + $tax_rate_value);
+        $resource = [
+            "net_price" => $price,
+            "tax_rate_percent" => $this->tax_value,
+            "tax_rate_value" => $tax_rate_value,
+            "multiple_rules" => $this->multiple_rules?->pluck("name", "id")->toArray(),
+            "value_added_tax" => $value_added_tax,
+            "formatted_final_price" => PriceFormat::get($value_added_tax, $channel?->id, "channel")
+        ];
+        if ($callback) $resource = array_merge($callback, $resource); 
+        return $resource;
+    }
 
-	public function getGeneralValue(object $request): object
-	{
-		$website = CoreCache::getWebsite($request->header("hc-host"));
-		$channel = CoreCache::getChannel($website, $request->header("hc-channel"));
-		$store = CoreCache::getStore($website, $channel, $request->header("hc-store"));
+    public function getGeneralValue(object $request): object
+    {
+        $website = CoreCache::getWebsite($request->header("hc-host"));
+        $channel = CoreCache::getChannel($website, $request->header("hc-channel"));
+        $store = CoreCache::getStore($website, $channel, $request->header("hc-store"));
 
-		$data = [
-			"website" => $website,
-			"channel" => $channel,
-			"store" => $store,
-			"allow_countries" => SiteConfig::fetch("allow_countries", "channel", $channel?->id),
-			"default_country" => SiteConfig::fetch("default_country", "channel", $channel?->id),
-			"check_tax_catalog_prices" => SiteConfig::fetch("tax_catalog_prices", "channel", $channel?->id)
-		];
+        $data = [
+            "website" => $website,
+            "channel" => $channel,
+            "store" => $store,
+            "allow_countries" => SiteConfig::fetch("allow_countries", "channel", $channel?->id),
+            "default_country" => SiteConfig::fetch("default_country", "channel", $channel?->id),
+            "check_tax_catalog_prices" => SiteConfig::fetch("tax_catalog_prices", "channel", $channel?->id)
+        ];
 
-		return (object) $data;
-	}
+        return (object) $data;
+    }
 
-	public function calculate(object $request, mixed $price, ?int $product_tax_group_id = null, ?int $customer_tax_group_id = null, bool $use_current_location = false, ?string $zip_code = null, ?callable $callback = null)
-	{
-		$data = $this->getGeneralValue($request);
-		
-		if ($data->check_tax_catalog_prices) {
-			$tax = $this->taxRate($request, $product_tax_group_id, $customer_tax_group_id, $use_current_location, $zip_code);
-			if ($callback) $tax = $callback;
-			$over_all_tax_price = $this->taxResource($price, $tax, $data->channel);
-		}
-		else $over_all_tax_price = $this->taxResource($price, 0, $data->channel);
-		
-		return (object) $over_all_tax_price;
-	}
+    public function calculate(object $request, mixed $price, ?int $product_tax_group_id = null, ?int $customer_tax_group_id = null, bool $use_current_location = false, ?string $zip_code = null, ?callable $callback = null)
+    {
+        $data = $this->getGeneralValue($request);
+        
+        if ($data->check_tax_catalog_prices) {
+            $tax = $this->taxRate($request, $product_tax_group_id, $customer_tax_group_id, $use_current_location, $zip_code);
+            if ($callback) $tax = $callback;
+            $over_all_tax_price = $this->taxResource($price, $tax, $data->channel);
+        }
+        else $over_all_tax_price = $this->taxResource($price, 0, $data->channel);
+        
+        return (object) $over_all_tax_price;
+    }
 
-	public function taxRate(object $request, ?int $product_tax_group_id = null, ?int $customer_tax_group_id = null, bool $use_current_location = false, ?string $zip_code = null): mixed
-	{
-		try
-		{	
-			$data = $this->getGeneralValue($request);
+    public function taxRate(object $request, ?int $product_tax_group_id = null, ?int $customer_tax_group_id = null, bool $use_current_location = false, ?string $zip_code = null): mixed
+    {
+        try
+        {	
+            $data = $this->getGeneralValue($request);
 
-			$current_geo_location = GeoIp::locate($this->getClientIp());
-			if ($use_current_location) {
-				if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
-				else $country = Country::where("iso_2_code", $current_geo_location?->iso_code)->first();
-				$zip_code = $current_geo_location?->postal_code; 
-			}
-			else $country = $data->default_country;
-			
-			if ($product_tax_group_id) {
-				$tax_group = ProductTaxGroup::whereId($product_tax_group_id)->with(["tax_rules.tax_rates.country"])->first();
-			}
-			else {
-				$tax_group = CustomerTaxGroup::whereId($customer_tax_group_id)->with(["tax_rules.tax_rates.country"])->first();
-			}
+            $current_geo_location = GeoIp::locate($this->getClientIp());
+            if ($use_current_location) {
+                if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
+                else $country = Country::where("iso_2_code", $current_geo_location?->iso_code)->first();
+                $zip_code = $current_geo_location?->postal_code; 
+            }
+            else $country = $data->default_country;
+            
+            if ($product_tax_group_id) {
+                $tax_group = ProductTaxGroup::whereId($product_tax_group_id)->with(["tax_rules.tax_rates.country"])->first();
+            }
+            else {
+                $tax_group = CustomerTaxGroup::whereId($customer_tax_group_id)->with(["tax_rules.tax_rates.country"])->first();
+            }
 
-			if (!$tax_group) throw ValidationException::withMessages(["tax_group_id" => "Tax group id is required either product or customer"]);
-			$sort_priority_tax_rule = $tax_group->tax_rules->pluck("priority", "id")->toArray();
-			
-			if (!empty(array_not_unique($sort_priority_tax_rule)["duplicate_array"])) {
-				$same_tax_rule_ids = array_keys(array_not_unique($sort_priority_tax_rule)["duplicate_array"]);	
-				$same_priority_tax_rate = $this->getPriorityTaxRate($same_tax_rule_ids, $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
-				$this->tax_value = array_sum($same_priority_tax_rate);
-			}
-			else {
-				$unique_tax_rule_priorities = array_not_unique($sort_priority_tax_rule)["unique_array"];
-				$priority_tax_rate = $this->getPriorityTaxRate(array_flip(array_min($unique_tax_rule_priorities)), $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
-				$this->tax_value += array_sum($priority_tax_rate);
-			}
-			
-		}
-		catch (Exception $exception)
-		{
-			throw $exception;
-		}
-		
-		return $this->tax_rate = ($this->tax_value / 100);
-	}
+            if (!$tax_group) throw ValidationException::withMessages(["tax_group_id" => "Tax group id is required either product or customer"]);
+            $sort_priority_tax_rule = $tax_group->tax_rules->pluck("priority", "id")->toArray();
+            
+            if (!empty(array_not_unique($sort_priority_tax_rule)["duplicate_array"])) {
+                $same_tax_rule_ids = array_keys(array_not_unique($sort_priority_tax_rule)["duplicate_array"]);	
+                $same_priority_tax_rate = $this->getPriorityTaxRate($same_tax_rule_ids, $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
+                $this->tax_value = array_sum($same_priority_tax_rate);
+            }
+            else {
+                $unique_tax_rule_priorities = array_not_unique($sort_priority_tax_rule)["unique_array"];
+                $priority_tax_rate = $this->getPriorityTaxRate(array_flip(array_min($unique_tax_rule_priorities)), $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
+                $this->tax_value += array_sum($priority_tax_rate);
+            }
+            
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $this->tax_rate = ($this->tax_value / 100);
+    }
 
-	private function getPriorityTaxRate(array $tax_rule_ids, object $country, mixed $allow_countries, ?string $zip_code = null): mixed
-	{
-		try
-		{
-			$tax_rules = TaxRule::whereIn("id", $tax_rule_ids)->with(["tax_rates.country"])->get();
-			$this->multiple_rules = $tax_rules;
-			$tax_rules_data = $tax_rules->map(function ($tax_rule) use ($country, $zip_code, $allow_countries) {
-				return $tax_rule->tax_rates
-				->where("country_id", $country->id)
-				->filter(function ($tax_rate) use ($zip_code) {
-					if ($zip_code) {
-						if ($tax_rate->use_zip_range) {
-							$zip_code_range = range($tax_rate->postal_code_form, $tax_rate->postal_code_to);
-							return in_array($zip_code, $zip_code_range);
-						}
-						else {
-							if ($tax_rate->zip_code == "*") return true;
-							if ( Str::contains($tax_rate->zip_code, "*") ) {
-								$pluck_range = explode("*", $tax_rate->zip_code);
-								$str_count = Str::length($pluck_range[0]);
-								$zip_code_prefix = substr($zip_code, 0, $str_count);
-								return ($pluck_range[0] == $zip_code_prefix);
-							}
-						}
-					}
-					return true;
-				})->first();
-			});	
-		}
-		catch (Exception $exception)
-		{
-			throw $exception;
-		}
-		
-		return $tax_rules_data;
-	}
+    private function getPriorityTaxRate(array $tax_rule_ids, object $country, mixed $allow_countries, ?string $zip_code = null): mixed
+    {
+        try
+        {
+            $tax_rules = TaxRule::whereIn("id", $tax_rule_ids)->with(["tax_rates.country"])->get();
+            $this->multiple_rules = $tax_rules;
+            $tax_rules_data = $tax_rules->map(function ($tax_rule) use ($country, $zip_code, $allow_countries) {
+                return $tax_rule->tax_rates
+                ->where("country_id", $country->id)
+                ->filter(function ($tax_rate) use ($zip_code) {
+                    if ($zip_code) {
+                        if ($tax_rate->use_zip_range) {
+                            $zip_code_range = range($tax_rate->postal_code_form, $tax_rate->postal_code_to);
+                            return in_array($zip_code, $zip_code_range);
+                        }
+                        else {
+                            if ($tax_rate->zip_code == "*") return true;
+                            if ( Str::contains($tax_rate->zip_code, "*") ) {
+                                $pluck_range = explode("*", $tax_rate->zip_code);
+                                $str_count = Str::length($pluck_range[0]);
+                                $zip_code_prefix = substr($zip_code, 0, $str_count);
+                                return ($pluck_range[0] == $zip_code_prefix);
+                            }
+                        }
+                    }
+                    return true;
+                })->first();
+            });	
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $tax_rules_data;
+    }
 
 }

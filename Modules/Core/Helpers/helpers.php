@@ -96,7 +96,7 @@ if (! function_exists('array_permutation')) {
 
             }
 
-			return ["unique_array" => $unique_array, "duplicate_array" => $duplicate_array];
+            return ["unique_array" => $unique_array, "duplicate_array" => $duplicate_array];
         }
     }
 
@@ -109,7 +109,7 @@ if (! function_exists('array_permutation')) {
                 if ($min_value == $value) $min_value_with_key[$key] = $value;
             }
 
-			return $min_value_with_key;
+            return $min_value_with_key;
         }
     }
 }
