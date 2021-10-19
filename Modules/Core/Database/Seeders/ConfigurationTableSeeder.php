@@ -20,7 +20,7 @@ class ConfigurationTableSeeder extends Seeder
                 "scope" => "global",
                 "scope_id" => 0,
                 "path" => "default_country",
-                "value" => "1",
+                "value" => json_encode("SE"),
                 "created_at" => now(),
                 "updated_at" => now()
             ]
