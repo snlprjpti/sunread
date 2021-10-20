@@ -11,18 +11,18 @@ class TaxRateObserver
     public function created(TaxRate $TaxRate)
     {
         Audit::log($TaxRate, __FUNCTION__);
-		TaxCache::setTaxRate();
+        TaxCache::setTaxRate();
     }
 
     public function updated(TaxRate $TaxRate)
     {
         Audit::log($TaxRate, __FUNCTION__);
-		TaxCache::setTaxRate();
+        TaxCache::setTaxRate();
     }
 
     public function deleted(TaxRate $TaxRate)
     {
         Audit::log($TaxRate, __FUNCTION__);
-		TaxCache::setTaxRate();
+        TaxCache::setTaxRate();
     }
 }

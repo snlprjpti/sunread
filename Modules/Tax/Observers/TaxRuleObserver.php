@@ -11,18 +11,18 @@ class TaxRuleObserver
     public function created(TaxRule $TaxRule)
     {
         Audit::log($TaxRule, __FUNCTION__);
-		TaxCache::setTaxRule();
+        TaxCache::setTaxRule();
     }
 
     public function updated(TaxRule $TaxRule)
     {
         Audit::log($TaxRule, __FUNCTION__);
-		TaxCache::setTaxRule();
+        TaxCache::setTaxRule();
     }
 
     public function deleted(TaxRule $TaxRule)
     {
         Audit::log($TaxRule, __FUNCTION__);
-		TaxCache::setTaxRule();
+        TaxCache::setTaxRule();
     }
 }

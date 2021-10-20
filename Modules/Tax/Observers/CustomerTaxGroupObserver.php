@@ -11,18 +11,18 @@ class CustomerTaxGroupObserver
     public function created(CustomerTaxGroup $productTaxCustomerTaxGroup)
     {
         Audit::log($productTaxCustomerTaxGroup, __FUNCTION__);
-		TaxCache::setCustomerTaxGroup();
+        TaxCache::setCustomerTaxGroup();
     }
 
     public function updated(CustomerTaxGroup $productTaxCustomerTaxGroup)
     {
         Audit::log($productTaxCustomerTaxGroup, __FUNCTION__);
-		TaxCache::setCustomerTaxGroup();
+        TaxCache::setCustomerTaxGroup();
     }
 
     public function deleted(CustomerTaxGroup $productTaxCustomerTaxGroup)
     {
         Audit::log($productTaxCustomerTaxGroup, __FUNCTION__);
-		TaxCache::setCustomerTaxGroup();
+        TaxCache::setCustomerTaxGroup();
     }
 }

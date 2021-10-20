@@ -11,18 +11,18 @@ class CountryObserver
     public function created(Country $Country)
     {
         Audit::log($Country, __FUNCTION__);
-		TaxCache::setCountry();
+        TaxCache::setCountry();
     }
 
     public function updated(Country $Country)
     {
         Audit::log($Country, __FUNCTION__);
-		TaxCache::setCountry();
+        TaxCache::setCountry();
     }
 
     public function deleted(Country $Country)
     {
         Audit::log($Country, __FUNCTION__);
-		TaxCache::setCountry();
+        TaxCache::setCountry();
     }
 }
