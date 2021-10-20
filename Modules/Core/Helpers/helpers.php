@@ -79,6 +79,38 @@ if (! function_exists('array_permutation')) {
         {
             return is_numeric($val) ? json_decode($val) : $val;
         }
-    } 
+    }
+    
+    if (! function_exists("array_not_unique") ) {
+        function array_not_unique(array $array): array
+        {
+            $duplicate_array = array_diff_key( $array , array_unique( $array ) );
+            $unique_array = [];
+            foreach ($array as $key => $value) {
+                if ( in_array($value, $duplicate_array)) {
+                    $duplicate_array[$key] = $value;
+                }
+                else {
+                    $unique_array[$key] = $value;
+                } 
+
+            }
+
+            return ["unique_array" => $unique_array, "duplicate_array" => $duplicate_array];
+        }
+    }
+
+    if (! function_exists("array_min") ) {
+        function array_min(array $array): array
+        {
+            $min_value = min($array);
+            $min_value_with_key = [];
+            foreach ( $array as $key => $value ) {
+                if ($min_value == $value) $min_value_with_key[$key] = $value;
+            }
+
+            return $min_value_with_key;
+        }
+    }
 }
 ?>

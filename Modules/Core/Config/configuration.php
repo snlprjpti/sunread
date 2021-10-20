@@ -824,6 +824,149 @@ return[
             ]
 
         ]
+    ],
+    "sales" => [
+        "title" => "Sales",
+        "children" => [
+            [
+                "title" => "Sales",
+                "subChildren" => [
+                    [
+                        "title" => "Tax Classes",
+                        "elements" => [
+                            [
+                                "title" => "Default Tax Class for Product",
+                                "path" => "default_tax_class_for_product",
+                                "type" => "select",
+                                "provider" => "Modules\Tax\Entities\ProductTaxGroup",
+                                "pluck" => ["name", "id"],
+                                "default" => "1",
+                                "options" => [],
+                                "rules" => "exists:product_tax_groups,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Default Tax Class for Customer",
+                                "path" => "default_tax_class_for_customer",
+                                "type" => "select",
+                                "provider" => "Modules\Tax\Entities\CustomerTaxGroup",
+                                "pluck" => ["name", "id"],
+                                "default" => "1",
+                                "options" => [],
+                                "rules" => "exists:customer_tax_groups,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                        ]
+                    ],
+                    [
+                        "title" => "Calculation Settings",
+                        "elements" => [
+                            [
+                                "title" => "Tax Calculation Method Based On",
+                                "path" => "tax_calculation_method_based_on",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Total" ],
+                                    [ "value" => 2, "label" => "Raw Total" ],
+                                    [ "value" => 3, "label" => "Unit Price" ],
+                                ],
+                                "rules" => "in:1,2,3",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Tax Calculation Based On",
+                                "path" => "tax_calculation_based_on",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Shipping Address" ],
+                                    [ "value" => 2, "label" => "Billing Address" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Catalog Prices",
+                                "path" => "tax_catalog_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Shipping Prices",
+                                "path" => "tax_shipping_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Apply Customer Tax",
+                                "path" => "apply_customer_tax",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "After Discount" ],
+                                    [ "value" => 2, "label" => "Before Discount" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Apply Discount on Prices",
+                                "path" => "apply_discount_on_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ]
     ]
 ];
 ?>
