@@ -40,11 +40,11 @@ class ReIndexer implements ShouldQueue
                 $configurable_batch = Bus::batch([])->onQueue("index")->dispatch();
                 foreach ($stores as $store) {
                     if ($product->type == "simple") $batch->add(new SingleIndexing($product, $store));
-                    elseif ($product->type == "configurable") {
-                        $configurable_batch->add(new ConfigurableIndexing($product, $store));
-                        // $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
-                        foreach ($variants as $variant) $configurable_batch->add(new VariantIndexing($product, $variants, $variant, $store));
-                    }
+                    // elseif ($product->type == "configurable") {
+                    //     $configurable_batch->add(new ConfigurableIndexing($product, $store));
+                    //     // $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
+                    //     foreach ($variants as $variant) $configurable_batch->add(new VariantIndexing($product, $variants, $variant, $store));
+                    // }
                 } 
             }
         }
