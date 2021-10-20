@@ -119,7 +119,7 @@ class EmailTemplateServiceProvider extends ServiceProvider
         return $paths;
     }
 
-    public function registerObservers()
+    public function registerObservers(): void
     {
         EmailTemplate::observe(EmailTemplateObservers::class);
     }

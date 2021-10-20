@@ -6,7 +6,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\Event;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\EmailTemplate\Entities\EmailTemplate;
 use Modules\EmailTemplate\Repositories\EmailTemplateRepository;
@@ -53,8 +52,10 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $this->repository->templateGroupValidation($request);
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, callback:function ($request) {
+                $this->repository->templateGroupValidation($request);
+                return [];
+            });
             $created = $this->repository->create($data);
         }
         catch (Exception $exception)
@@ -83,8 +84,10 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request);
-
+            $data = $this->repository->validateData($request, callback:function ($request) {
+                $this->repository->templateGroupValidation($request);
+                return [];
+            });
             $updated = $this->repository->update($data, $id);
         }
         catch (Exception $exception)
@@ -120,7 +123,7 @@ class EmailTemplateController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Group" ]));
     }
 
     public function templateVariable(Request $request): JsonResponse
@@ -135,6 +138,6 @@ class EmailTemplateController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Variable" ]));
     }
 }

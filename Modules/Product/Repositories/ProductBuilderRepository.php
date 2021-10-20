@@ -87,6 +87,7 @@ class ProductBuilderRepository extends BaseRepository
         {
             $this->config_rules = [];
             $this->config_types = [];
+            $this->collect_elements = [];
 
             $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
             if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
@@ -157,7 +158,7 @@ class ProductBuilderRepository extends BaseRepository
                 if ($element["hasChildren"] == 0) continue;
 
                 if ($element["type"] == "repeater") {
-                    $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
+                    $count = isset($component["attributes"][$element["slug"]]) ? count($component["attributes"][$element["slug"]]) : 0;
                     for( $i=0; $i < $count; $i++ )
                     {
                         $this->getRules($component, $element["attributes"][0], "$append_key.$i", $method);
@@ -311,7 +312,7 @@ class ProductBuilderRepository extends BaseRepository
             $this->parent = [];
 
             $data = collect($this->pageAttributeRepository->config_fields)->where("slug", $component->attribute)->first();
-            $this->getChildren($data["mainGroups"], values:json_decode($component->value, true));
+            $this->getChildren($data["mainGroups"], values:$component->value);
         }
         catch( Exception $exception )
         {
