@@ -32,6 +32,7 @@ class ReIndexer implements ShouldQueue
     {
         try
         {
+            $count = 0;
             $this->connectElasticSearch(); 
   
             $batch = Bus::batch([])->onQueue("index")->dispatch();
@@ -39,6 +40,7 @@ class ReIndexer implements ShouldQueue
             $products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->whereParentId(null)->get();
             foreach ($products as $product)
             {
+                if($count == 3) break;
                 $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                     return $channel->stores;
                 })->flatten(1);
@@ -60,6 +62,7 @@ class ReIndexer implements ShouldQueue
                         }
                     }
                 } 
+                $count++;
             }
         }
         catch (Exception $exception)
