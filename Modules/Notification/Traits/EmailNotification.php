@@ -48,7 +48,7 @@ trait EmailNotification
     /**
      * compile php variable and content to render in blade template
      */
-    public function render(string $content, $data = null): string
+    public function render(string $content, array $data = null): string
     {
         try
         {
