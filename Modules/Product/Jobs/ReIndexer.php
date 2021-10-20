@@ -4,6 +4,7 @@ namespace Modules\Product\Jobs;
 
 use Elasticsearch\ClientBuilder;
 use Exception;
+use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -48,8 +49,11 @@ class ReIndexer implements ShouldQueue
                 $variants = $configurable_product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
         
                 foreach( $stores as $store) {
-                    $batch->add(new ConfigurableIndexing($configurable_product, $store));
-                    foreach($variants as $variant) $batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
+                    $configurable_batch = Bus::batch([])->then(function (Batch $variant_batch) use ($variants, $configurable_product, $store) {
+                        $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
+                        foreach($variants as $variant) $variant_batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
+                    })->allowFailures()->onQueue('index')->dispatch();
+                    $configurable_batch->add(new ConfigurableIndexing($configurable_product, $store));
                 }
             }
         }

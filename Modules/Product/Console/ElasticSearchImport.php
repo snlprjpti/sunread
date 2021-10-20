@@ -16,6 +16,7 @@ use Modules\Product\Jobs\SingleIndexing;
 use Modules\Product\Jobs\VariantIndexing;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Bus\Batch;
 
 class ElasticSearchImport extends Command
 {
@@ -31,8 +32,25 @@ class ElasticSearchImport extends Command
     public function handle(): void
     {
         $batch = Bus::batch([])->onQueue("index")->dispatch();
-        $batch->add(new ReIndexer());
-        // ReIndexer::dispatch()->onQueue("index");
+
+        $products = Product::whereParentId(null)->get();
+        foreach ($products as $product)
+        {
+            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
+                return $channel->stores;
+            })->flatten(1);
+            if ($product->type == "configurable") $variants = $product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
+            $configurable_batch = Bus::batch([])->onQueue("index")->dispatch();
+            foreach ($stores as $store) {
+                if ($product->type == "simple") $batch->add(new SingleIndexing($product, $store));
+                elseif ($product->type == "configurable") {
+                    $configurable_batch->add(new ConfigurableIndexing($product, $store));
+                    // $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
+                    foreach ($variants as $variant) $configurable_batch->add(new VariantIndexing($product, $variants, $variant, $store));
+                }
+            } 
+        }
+        
         $this->info("All data imported successfully");
     }
 }

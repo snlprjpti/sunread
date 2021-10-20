@@ -5,6 +5,7 @@ namespace Modules\Product\Repositories;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\AttributeSet;
@@ -21,6 +22,7 @@ class ProductBuilderRepository extends BaseRepository
     public function __construct(ProductBuilder $productBuilder, Product $product, PageAttributeRepository $pageAttributeRepository)
     {
         $this->model = $productBuilder;
+        $this->model_key = "product.page.attribute";
         $this->product = $product;
         $this->config_fields = config("attributes");
         $this->pageAttributeRepository = $pageAttributeRepository;
@@ -61,12 +63,13 @@ class ProductBuilderRepository extends BaseRepository
                         "product_id" => $productId,
                         "attribute" => $component["component"],
                         "scope" => $scopeArr["scope"],
-                        "scope_id" => $scopeArr["scope_id"]
+                        "scope_id" => $scopeArr["scope_id"],
+                        "position" => isset($data["position"]) ? $data["position"] : null,
+                        "value" => $all_attributes
                     ];
-
-                    $productBuilderData = array_merge($input, ["value" => json_encode($all_attributes), "position" => $data['position'] ?? 1]);
-                    $this->model->updateOrCreate($input, $productBuilderData);
+                    $product_page_attributes[] = isset($component["id"]) ? $this->update($input, $component["id"]) : $this->create($input);
                 }
+                $product->productBuilderValues()->whereNotIn('id', array_filter(Arr::pluck($product_page_attributes, 'id')))->delete();
         } 
         catch (Exception $exception)
         {
@@ -84,6 +87,7 @@ class ProductBuilderRepository extends BaseRepository
         {
             $this->config_rules = [];
             $this->config_types = [];
+            $this->collect_elements = [];
 
             $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
             if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
@@ -154,7 +158,7 @@ class ProductBuilderRepository extends BaseRepository
                 if ($element["hasChildren"] == 0) continue;
 
                 if ($element["type"] == "repeater") {
-                    $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
+                    $count = isset($component["attributes"][$element["slug"]]) ? count($component["attributes"][$element["slug"]]) : 0;
                     for( $i=0; $i < $count; $i++ )
                     {
                         $this->getRules($component, $element["attributes"][0], "$append_key.$i", $method);
@@ -308,7 +312,7 @@ class ProductBuilderRepository extends BaseRepository
             $this->parent = [];
 
             $data = collect($this->pageAttributeRepository->config_fields)->where("slug", $component->attribute)->first();
-            $this->getChildren($data["mainGroups"], values:json_decode($component->value, true));
+            $this->getChildren($data["mainGroups"], values:$component->value);
         }
         catch( Exception $exception )
         {
