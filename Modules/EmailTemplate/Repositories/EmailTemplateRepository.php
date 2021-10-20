@@ -53,7 +53,7 @@ class EmailTemplateRepository extends BaseRepository
     {
         try
         {
-            $elements = collect($this->config_variable);
+            $elements = $this->config_variable;
 
             foreach ($elements as $element) {
                 $parent = [];
