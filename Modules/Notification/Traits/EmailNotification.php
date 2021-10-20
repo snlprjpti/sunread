@@ -158,10 +158,9 @@ trait EmailNotification
                 "store_city" => SiteConfig::fetch("store_city", "store", $store_id),
                 "store_address_line_1" => SiteConfig::fetch("store_street_address", "store", $store_id),
                 "store_address_line_2" => SiteConfig::fetch("store_address_line2", "store", $store_id),
-//
-//                "store_vat_number" => SiteConfig::fetch("store_vat_number", "store", $store_id),
-//                "store_email_address" => SiteConfig::fetch("store_email_address", "store", $store_id),
-//                "store_email_logo_url" => SiteConfig::fetch("store_email_logo_url", "store", $store_id),
+                "store_vat_number" => SiteConfig::fetch("store_vat_number", "store", $store_id),
+                "store_email_address" => SiteConfig::fetch("store_email_address", "store", $store_id),
+                "store_email_logo_url" => SiteConfig::fetch("store_email_logo_url", "store", $store_id),
             ];
         }
         catch (Exception $exception)

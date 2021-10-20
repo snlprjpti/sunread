@@ -220,6 +220,42 @@ return[
                                 "rules" => "numeric",
                                 "scope" => "global",
                                 "is_required" => 1
+                            ],
+                            [
+                                "title" => "Store Vat Number",
+                                "path" => "store_vat_number",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Store Email Address",
+                                "path" => "store_email_address",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Store Email Logo Url",
+                                "path" => "store_email_logo_url",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1
                             ]
                         ]
                     ],
