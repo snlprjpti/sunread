@@ -33,7 +33,7 @@ trait ConfigurableProductHandler
 
             if(count($final_parent) > 0) {
                 $final_parent["list_status"] = ($this->checkVisibility($parent, $store)) ? 1 : 0;
-                $this->configurableIndexing($final_parent, $store);   
+                //$this->configurableIndexing($final_parent, $store);   
             }
         }
         catch (Exception $exception)
@@ -53,7 +53,7 @@ trait ConfigurableProductHandler
 
             if (!$this->checkVisibility($variant, $store)) {
                 $product_format["list_status"] = 0;
-                if(count($product_format) > 0) $this->configurableIndexing($product_format, $store);  
+                //if(count($product_format) > 0) $this->configurableIndexing($product_format, $store);  
             }
 
             else {
@@ -70,7 +70,7 @@ trait ConfigurableProductHandler
                 }
     
                 $final_variant = array_merge($product_format, $this->getAttributeData($variant_attribute_options, $variant));  
-                if(count($final_variant) > 0) $this->configurableIndexing($final_variant, $store); 
+                //if(count($final_variant) > 0) $this->configurableIndexing($final_variant, $store); 
             }   
         }
         catch (Exception $exception)
