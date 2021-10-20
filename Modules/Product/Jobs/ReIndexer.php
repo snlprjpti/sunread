@@ -14,78 +14,43 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
 use Modules\Core\Entities\Website;
 use Modules\Product\Entities\Product;
-use Modules\Product\Traits\ElasticSearch\ConfigurableProductHandler;
 use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
 class ReIndexer implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing, ConfigurableProductHandler;
-
-    public $product, $store, $method;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 
     public function __construct()
     {
-        
     }
 
     public function handle(): void
     {
         try
         {
-            $count = 0;
-            $this->connectElasticSearch(); 
-  
-            $batch = Bus::batch([])->onQueue("index")->dispatch();
+            $simple_batch = Bus::batch([])->onQueue("index")->dispatch();
+            $configurable_batch = Bus::batch([])->onQueue("index")->dispatch();
+            $variant_batch = Bus::batch([])->onQueue("index")->dispatch();
 
-            $products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->whereParentId(null)->get();
+            $products = Product::whereParentId(null)->get();
             foreach ($products as $product)
             {
-                if($count == 3) break;
                 $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                     return $channel->stores;
                 })->flatten(1);
-                if ($product->type == "configurable") $variants = $product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
-                $store_batch = Bus::batch([])->onQueue("index")->dispatch();
-                foreach ($stores as $store) {
-                    
-                    // if ($product->type == "simple") $batch->add(new SingleIndexing($product, $store));
-                    if ($product->type == "simple") $this->singleIndexing($product, $store);
-                    
-                    elseif ($product->type == "configurable") {
-                        $this->createProduct($product, $store, $variants);
-                        // $configurable_batch->add(new ConfigurableIndexing($product, $store));
 
+                if ($product->type == "configurable") $variants = $product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
+
+                foreach ($stores as $store) {
+                    if ($product->type == "simple") $simple_batch->add(new SingleIndexing($product, $store));
+
+                    elseif ($product->type == "configurable") {
+                        $configurable_batch->add(new ConfigurableIndexing($product, $store));
                         // $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
-                        foreach ($variants as $variant) {
-                            $this->createVariantProduct($product, $variants, $variant, $store);
-                            // $configurable_batch->add(new VariantIndexing($product, $variants, $variant, $store));
-                        }
+                        foreach ($variants as $variant) $variant_batch->add(new VariantIndexing($product, $variants, $variant, $store));
                     }
                 } 
-                $count++;
             }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-    }
-
-    public function singleIndexing($product, $store)
-    {
-        try
-        {
-            if(!null) {
-                $is_visibility = $product->value([
-                    "scope" => "store",
-                    "scope_id" => $store->id,
-                    "attribute_slug" => "visibility"
-                ]);
-                
-                if($is_visibility?->name != "Not Visible Individually") $this->singleIndexing($product, $store);
-                else $this->removeIndex(collect($product), $store);
-            }
-            else $this->removeIndex($product, $store);
         }
         catch (Exception $exception)
         {
