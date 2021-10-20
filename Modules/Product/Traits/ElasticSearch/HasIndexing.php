@@ -27,7 +27,7 @@ trait HasIndexing
     {
         try
         {
-            $this->connectElasticSearch();
+            // $this->connectElasticSearch();
 
             $exists = $this->client->indices()->exists($params);
         }
@@ -43,7 +43,7 @@ trait HasIndexing
     {
         try
         {
-            $this->connectElasticSearch();
+            // $this->connectElasticSearch();
 
             $exists = $this->client->exists($params);
         }
