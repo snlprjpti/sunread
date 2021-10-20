@@ -10,5 +10,6 @@ class ProductBuilder extends Model
     use HasFactory;
 
     protected $fillable = [ "product_id", "attribute", "value", "scope", "scope_id", "position"];
+    protected $casts = [ "value" => "array" ];
     
 }

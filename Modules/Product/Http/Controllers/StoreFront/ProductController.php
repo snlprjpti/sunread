@@ -109,6 +109,20 @@ class ProductController extends BaseController
         return $this->successResponse($data, $this->lang('fetch-success'));
     }
 
+    public function variantShow(Request $request, int $parent_identifier, int $identifier): JsonResponse
+    {
+        try
+        {
+            $data = $this->store_fornt_repository->productDetail($request, $identifier, $parent_identifier);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($data, $this->lang('fetch-success'));
+    }
+
     public function search(Request $request): JsonResponse
     {
         try

@@ -53,6 +53,9 @@ return [
         "parent_id" =>  [
             "type" => "long"
         ],
+        "list_status" =>  [
+            "type" => "long"
+        ],
         "visibility" =>  [
             "type" => "long"
         ],

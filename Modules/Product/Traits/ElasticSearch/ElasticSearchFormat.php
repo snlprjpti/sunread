@@ -27,6 +27,7 @@ trait ElasticSearchFormat
     
             $array['categories'] = $this->getCategoryData($store);
             $images = $this->getImages();
+            if($this->type == "simple" && !$this->parent_id) $array["list_status"] = 1;
         }
         catch (Exception $exception)
         {

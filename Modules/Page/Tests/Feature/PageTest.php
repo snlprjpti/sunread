@@ -51,7 +51,7 @@ class PageTest extends BaseTestCase
 
         for($i = 0; $i < rand(1,2); $i++)
         {
-            $components[] = Arr::random([ "banner" ]);
+            $components[] = Arr::random([ "feature" ]);
         }
 
         $singleItem = [];
