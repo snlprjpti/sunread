@@ -46,7 +46,7 @@ class ElasticSearchImport extends Command
                 elseif ($product->type == "configurable") {
                     $configurable_batch->add(new ConfigurableIndexing($product, $store));
                     // $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
-                    foreach ($variants as $variant) $configurable_batch->add(new VariantIndexing($product, $variants, $variant, $store));
+                    //foreach ($variants as $variant) $configurable_batch->add(new VariantIndexing($product, $variants, $variant, $store));
                 }
             } 
         }
