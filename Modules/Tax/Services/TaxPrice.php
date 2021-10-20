@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Modules\Tax\Entities\TaxRate;
 use Modules\Tax\Facades\GeoIp;
+use Modules\Tax\Facades\TaxCache;
 use Modules\Tax\Traits\HasClientIp;
 
 class TaxPrice {
@@ -38,22 +39,25 @@ class TaxPrice {
             $current_geo_location = GeoIp::locate($this->getClientIp());
             if ($use_current_location) {
                 if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
-                else $country = Country::where("iso_2_code", $current_geo_location?->iso_code)->first();
+                else $country = TaxCache::country()->where("iso_2_code", $current_geo_location?->iso_code)->first();
                 $zip_code = $current_geo_location?->postal_code;
             }
             else $country = $data->default_country;
-            $tax_rate_data = TaxRate::whereCountryId($country->id)->get()->filter(function ($tax_rate) use ($zip_code) {
+
+            $tax_rate_data = TaxCache::taxRate()->where("country_id",$country->id)->filter(function ($tax_rate) use ($zip_code) {
                 if ($zip_code) {
                     if ($tax_rate->use_zip_range) {
                         $zip_code_range = range($tax_rate->postal_code_form, $tax_rate->postal_code_to);
                         return in_array($zip_code, $zip_code_range);
                     }
                     else {
+                        if ($tax_rate->zip_code == "*") return true;
                         if ( Str::contains($tax_rate->zip_code, "*") ) {
                             $pluck_range = explode("*", $tax_rate->zip_code);
-                            return ($pluck_range[0] <= $zip_code);
+                            $str_count = Str::length($pluck_range[0]);
+                            $zip_code_prefix = substr($zip_code, 0, $str_count);
+                            return ($pluck_range[0] == $zip_code_prefix);
                         }
-                        return ($tax_rate->zip_code == "*");
                     }
                 }
                 return true;
@@ -134,16 +138,15 @@ class TaxPrice {
             $current_geo_location = GeoIp::locate($this->getClientIp());
             if ($use_current_location) {
                 if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
-                else $country = Country::where("iso_2_code", $current_geo_location?->iso_code)->first();
+                else $country = TaxCache::country()->where("iso_2_code", $current_geo_location?->iso_code)->first();
                 $zip_code = $current_geo_location?->postal_code; 
             }
             else $country = $data->default_country;
-            
             if ($product_tax_group_id) {
-                $tax_group = ProductTaxGroup::whereId($product_tax_group_id)->with(["tax_rules.tax_rates.country"])->first();
+                $tax_group = TaxCache::productTaxGroup()->where("id", $product_tax_group_id)->first();
             }
             else {
-                $tax_group = CustomerTaxGroup::whereId($customer_tax_group_id)->with(["tax_rules.tax_rates.country"])->first();
+                $tax_group = TaxCache::customerTaxGroup()->where("id", $customer_tax_group_id)->first();
             }
 
             if (!$tax_group) throw ValidationException::withMessages(["tax_group_id" => "Tax group id is required either product or customer"]);
@@ -173,7 +176,7 @@ class TaxPrice {
     {
         try
         {
-            $tax_rules = TaxRule::whereIn("id", $tax_rule_ids)->with(["tax_rates.country"])->get();
+            $tax_rules = TaxCache::taxRule()->whereIn("id", $tax_rule_ids);
             $this->multiple_rules = $tax_rules;
             $tax_rules_data = $tax_rules->map(function ($tax_rule) use ($country, $zip_code, $allow_countries) {
                 return $tax_rule->tax_rates
