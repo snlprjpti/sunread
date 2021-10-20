@@ -40,13 +40,8 @@ trait ElasticSearchFormat
     public function getProductAttributes(object $store): array
     {
         try
-        {
-            $data = [];
-
-            $selected_attr = [ "id", "sku", "status", "website_id", "parent_id", "type" ];
-            $data = collect($this)->filter(function ($product, $key) use($selected_attr) {
-                if(in_array($key, $selected_attr)) return $product;
-            })->toArray();
+        {   
+            $data = $this->select("id", "sku", "status", "website_id", "parent_id", "type")->first()->toArray();
             
             $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
             
