@@ -175,7 +175,7 @@ class ConfigurationRepository extends BaseRepository
                 $child_rule = "$child_rule|{$item["value_rules"]}";
 
                 $return_rules = array_merge($return_rules, [
-                    "$value_path.*" => $child_rule
+                    "{$value_path}.*" => $child_rule
                 ]);
             }
             return ($scope != "global") ? array_merge($return_rules, [
