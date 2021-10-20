@@ -20,12 +20,12 @@ class NotificationMail extends Mailable
         $this->subject = $subject;
     }
 
-    public function getBody()
+    public function getBody(): string
     {
         return $this->details;
     }
 
-    public function build()
+    public function build(): NotificationMail
     {
         $this->subject($this->subject);
         return $this->markdown('notification::emailNotification');
