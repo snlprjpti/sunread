@@ -52,7 +52,7 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, callback:function ($request){
+            $data = $this->repository->validateData($request, callback:function ($request) {
                 $this->repository->templateGroupValidation($request);
                 return [];
             });
@@ -84,7 +84,7 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, callback:function ($request){
+            $data = $this->repository->validateData($request, callback:function ($request) {
                 $this->repository->templateGroupValidation($request);
                 return [];
             });
