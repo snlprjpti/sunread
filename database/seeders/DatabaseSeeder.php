@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Modules\Tax\Database\Seeders\TaxDatabaseSeeder::class);
         $this->call(\Modules\Inventory\Database\Seeders\InventoryDatabaseSeeder::class);
         $this->call(\Modules\Erp\Database\Seeders\ErpDatabaseSeeder::class);
+        $this->call(\Modules\EmailTemplate\Database\Seeders\EmailTemplateDatabaseSeeder::class);
     }
 }
