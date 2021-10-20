@@ -591,7 +591,7 @@ return[
                                 "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "scope" => "store",
                                 "is_required" => 0
                             ],
@@ -603,7 +603,7 @@ return[
                                 "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "scope" => "store",
                                 "is_required" => 0
                             ]
@@ -760,7 +760,7 @@ return[
                                 "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
@@ -773,7 +773,7 @@ return[
                                 "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 0
@@ -787,7 +787,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "array",
-                                "value_rules" => "",
+                                "value_rules" => "exists:email_templates,id",
                                 "multiple" => true,
                                 "scope" => "website",
                                 "is_required" => 0
@@ -800,7 +800,7 @@ return[
                                 "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
@@ -813,7 +813,7 @@ return[
                                 "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
