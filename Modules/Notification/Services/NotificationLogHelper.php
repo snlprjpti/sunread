@@ -14,7 +14,7 @@ class NotificationLogHelper
         $this->emailNotification = $emailNotification;
     }
 
-    public function log($name, $subject, $html_content, $recipient_email_address, $email_template_id, $email_template_code, $is_sent)
+    public function log(string $name, string $subject, string $html_content, string $recipient_email_address, int $email_template_id, string $email_template_code, bool $is_sent): void
     {
         try
         {
