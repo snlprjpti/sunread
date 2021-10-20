@@ -20,7 +20,7 @@ trait ConfigurableProductHandler
     {
         try
         {
-            $this->bulkConfigurableRemoving($parent, $store);
+            //$this->bulkConfigurableRemoving($parent, $store);
 
             $variants = $parent->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
             
