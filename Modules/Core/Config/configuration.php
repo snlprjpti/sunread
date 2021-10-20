@@ -593,7 +593,7 @@ return[
                                 "options" => [],
                                 "rules" => "exists:email_templates,id",
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Footer",
@@ -605,7 +605,7 @@ return[
                                 "options" => [],
                                 "rules" => "exists:email_templates,id",
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1
                             ]
                         ]
                     ],
@@ -776,7 +776,7 @@ return[
                                 "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Welcome Email Template",
@@ -786,11 +786,10 @@ return[
                                 "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "exists:email_templates,id",
-                                "multiple" => true,
-                                "scope" => "website",
-                                "is_required" => 0
+                                "rules" => "exists:email_templates,id",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1
                             ],
                             [
                                 "title" => "Forgot Password Email Template",
