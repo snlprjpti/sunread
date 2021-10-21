@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Bus\Batch;
 use Modules\Product\Jobs\ReindexMigrator;
+use Modules\Product\Jobs\Tester;
 
 class ElasticSearchImport extends Command
 {
@@ -43,7 +44,7 @@ class ElasticSearchImport extends Command
                 
                 foreach ($stores as $store)
                 {
-                    if ($product->type == "simple") SingleIndexing::dispatch($product, $store)->onQueue("index");
+                    if ($product->type == "simple") Tester::dispatch($product, $store)->onQueue("index");
                 }
             }
         }
