@@ -25,6 +25,7 @@ class VerificationController extends BaseController
 
                 if(!$customer->is_email_verified) {
                     $customer->is_email_verified = 1;
+                    $customer->verification_token = null;
                     $customer->save();
                     $message = $this->lang('verification-success');
                 } else {
