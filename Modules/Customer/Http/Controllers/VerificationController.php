@@ -2,6 +2,7 @@
 
 namespace Modules\Customer\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
 use Exception;
@@ -15,22 +16,20 @@ class VerificationController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function verifyAccount($token)
+    public function verifyAccount($token): JsonResponse
     {
         try
         {
             $customer = $this->model::where('verification_token', $token)->firstOrFail();
 
-            if($customer) {
-
-                if(!$customer->is_email_verified) {
-                    $customer->is_email_verified = 1;
-                    $customer->verification_token = null;
-                    $customer->save();
-                    $message = $this->lang('verification-success');
-                } else {
-                    $message = $this->lang('already-verified');
-                }
+            if(!$customer->is_email_verified) {
+                $customer->is_email_verified = 1;
+                $customer->verification_token = null;
+                $customer->save();
+                $message = $this->lang('verification-success');
+            }
+            else {
+                $message = $this->lang('already-verified');
             }
         }
         catch( Exception $exception )
