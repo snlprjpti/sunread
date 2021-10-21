@@ -37,7 +37,7 @@ class ReIndexer implements ShouldQueue
                 {
                     // if ($count == 3) break;
 
-                    $product_batch = Bus::batch([])->onQueue("index")->dispatch();
+                    //$product_batch = Bus::batch([])->onQueue("index")->dispatch();
                     $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                         return $channel->stores;
                     })->flatten(1);
@@ -49,7 +49,8 @@ class ReIndexer implements ShouldQueue
         
                     foreach ($stores as $store)
                     {
-                        if ($product->type == "simple") $product_batch->add(new SingleIndexing($product, $store));
+                        //if ($product->type == "simple") $product_batch->add(new SingleIndexing($product, $store));
+                        if ($product->type == "simple") SingleIndexing::dispatch($product, $store);
                         // elseif ($product->type == "configurable") {
                         //     $product_batch->add(new ConfigurableIndexing($product, $store));
                         //     // foreach ( $chunk_variants as $variants )
