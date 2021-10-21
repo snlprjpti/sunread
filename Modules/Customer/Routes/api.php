@@ -6,6 +6,7 @@ use Modules\Customer\Http\Controllers\SessionController;
 use Modules\Customer\Http\Controllers\RegistrationController;
 use Modules\Customer\Http\Controllers\ResetPasswordController;
 use Modules\Customer\Http\Controllers\ForgotPasswordController;
+use Modules\Customer\Http\Controllers\VerificationController;
 
 Route::group(["middleware" => ["api"]], function () {
     // CUSTOMER ROUTES
@@ -17,6 +18,7 @@ Route::group(["middleware" => ["api"]], function () {
         Route::post("/forget-password", [ForgotPasswordController::class, "store"])->name("forget-password.store");
         Route::post("/reset-password", [ResetPasswordController::class, "store"])->name("reset-password.store");
         Route::get("/reset-password/{token}", [ResetPasswordController::class, "create"])->name("reset-password.create");
+        Route::get("/verify-account/{token}", [VerificationController::class, "verifyAccount"])->middleware("jwt.verify")->name("account.verify");
     });
 
     Route::group(["middleware" => ["customer"], "prefix" => "customers", "as" => "customers."], function () {
