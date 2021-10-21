@@ -44,7 +44,7 @@ class ElasticSearchImport extends Command
                 
                 foreach ($stores as $store)
                 {
-                    if ($product->type == "simple") Tester::dispatch()->onQueue("index");
+                    if ($product->type == "simple") Tester::dispatch($product, $store)->onQueue("index");
                 }
             }
         }
