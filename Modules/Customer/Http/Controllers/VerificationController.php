@@ -4,8 +4,7 @@ namespace Modules\Customer\Http\Controllers;
 
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
-use Modules\Customer\Exceptions\CustomerNotFoundException;
-use Modules\Customer\Exceptions\TokenGenerationException;
+use Exception;
 
 class VerificationController extends BaseController
 {
@@ -13,15 +12,31 @@ class VerificationController extends BaseController
     {
         $this->model = $customer;
         $this->model_name = "Customer";
-        $exception_statuses = [
-            TokenGenerationException::class => 401,
-            CustomerNotFoundException::class => 404
-        ];
-        parent::__construct($this->model, $this->model_name,$exception_statuses);
+        parent::__construct($this->model, $this->model_name);
     }
 
     public function verifyAccount($token)
     {
+        try
+        {
+            $customer = $this->model::where('verification_token', $token)->firstOrFail();
 
+            if(!is_null($customer)) {
+
+                if(!$customer->is_email_verified) {
+                    $customer->is_email_verified = 1;
+                    $customer->save();
+                    $message = $this->lang('verification-success');
+                } else {
+                    $message = $this->lang('already-verified');
+                }
+            }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($message, 201);
     }
 }
