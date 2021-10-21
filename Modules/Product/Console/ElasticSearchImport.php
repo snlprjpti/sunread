@@ -32,7 +32,21 @@ class ElasticSearchImport extends Command
 
     public function handle(): void
     {
-        ReIndexer::dispatch()->onQueue("index");   
+        $chunk_products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->whereParentId(null)->get()->chunk(100);
+        foreach ($chunk_products as $products)
+        {
+            foreach ($products as $product)
+            {
+                $stores = Website::find($product->website_id)->channels->map(function ($channel) {
+                    return $channel->stores;
+                })->flatten(1);
+                
+                foreach ($stores as $store)
+                {
+                    if ($product->type == "simple") SingleIndexing::dispatch($product, $store)->onQueue("index");
+                }
+            }
+        }
         $this->info("All data imported successfully");
     }
 }
