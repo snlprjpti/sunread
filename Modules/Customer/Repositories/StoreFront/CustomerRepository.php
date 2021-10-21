@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 
@@ -50,13 +51,16 @@ class CustomerRepository extends BaseRepository
             });
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
             $data["password"] = Hash::make($request->password);
+            if(SiteConfig::fetch("require_email_confirmation", "website", $request->website_id) == 1) {
+                $data["verification_token"] = Str::random(30);
+            }
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return $data; 
+        return $data;
     }
     public function updateAccount(object $request, object $customer): array
     {
@@ -105,7 +109,7 @@ class CustomerRepository extends BaseRepository
         if (!Hash::check($request->current_password, auth()->guard('customer')->user()->password)) {
             throw new Exception("Password is incorrect.");
         }
-        return Hash::make($request->password);        
+        return Hash::make($request->password);
     }
 
     public function uploadProfileImage(object $request, int $id): object
@@ -171,7 +175,7 @@ class CustomerRepository extends BaseRepository
 
             $path_array = explode("/", $updated->profile_image);
             unset($path_array[count($path_array) - 1]);
-    
+
             $delete_folder = implode("/", $path_array);
             Storage::disk("public")->deleteDirectory($delete_folder);
 
