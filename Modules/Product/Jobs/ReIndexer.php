@@ -50,7 +50,7 @@ class ReIndexer implements ShouldQueue
                     foreach ($stores as $store)
                     {
                         //if ($product->type == "simple") $product_batch->add(new SingleIndexing($product, $store));
-                        if ($product->type == "simple") SingleIndexing::dispatch($product, $store);
+                        if ($product->type == "simple") SingleIndexing::dispatch($product, $store)->onQueue("index");
                         // elseif ($product->type == "configurable") {
                         //     $product_batch->add(new ConfigurableIndexing($product, $store));
                         //     // foreach ( $chunk_variants as $variants )
