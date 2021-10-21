@@ -19,7 +19,6 @@ class AddEmailVerificationOnCustomers extends Migration
     {
         Schema::table('customers', function (Blueprint $table) {
             $table->dropColumn(['verification_token', 'is_email_verified']);
-            $table->dropColumn(['is_email_verified']);
         });
     }
 }
