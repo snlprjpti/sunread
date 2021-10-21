@@ -16,7 +16,7 @@ class VerificationController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function verifyAccount($token): JsonResponse
+    public function verifyAccount(string $token): JsonResponse
     {
         try
         {
