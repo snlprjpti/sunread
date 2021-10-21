@@ -33,10 +33,10 @@ class ReIndexer implements ShouldQueue
             $chunk_products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->whereParentId(null)->get()->chunk(100);
             foreach ($chunk_products as $products)
             {
-                foreach ($products as $key => $product)
+                foreach ($products as $product)
                 {
-                    $product_name = $product->name;
-                    $product_name.$key = Bus::batch([])->onQueue("index")->dispatch();
+                    $product_sku = $product->sku;
+                    $product_sku = Bus::batch([])->onQueue("index")->dispatch();
 
                     $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                         return $channel->stores;
@@ -46,15 +46,15 @@ class ReIndexer implements ShouldQueue
                     
                     foreach ($stores as $store)
                     {
-                        if ($product->type == "simple") $product_name.$key->add(new SingleIndexing($product, $store));
+                        if ($product->type == "simple") $product_sku->add(new SingleIndexing($product, $store));
                         elseif ($product->type == "configurable") {
-                            $product_name.$key->add(new ConfigurableIndexing($product, $store));
+                            $product_sku->add(new ConfigurableIndexing($product, $store));
 
                             foreach ( $chunk_variants as $chunk_variant_key => $variants )
                             {
-                                $key.$product_name.$chunk_variant_key = Bus::batch([])->onQueue("index")->dispatch();
+                                $chunk_variant_key = Bus::batch([])->onQueue("index")->dispatch();
                                 foreach ($variants as $variant) {
-                                    $key.$product_name.$chunk_variant_key->add(new VariantIndexing($product, $variants, $variant, $store));
+                                   $chunk_variant_key->add(new VariantIndexing($product, $variants, $variant, $store));
                                 }
                             }
                         }
