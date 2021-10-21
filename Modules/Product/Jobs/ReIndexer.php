@@ -14,12 +14,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Bus;
 use Modules\Core\Entities\Website;
 use Modules\Product\Entities\Product;
-use Modules\Product\Traits\ElasticSearch\ConfigurableProductHandler;
 use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
 class ReIndexer implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing, ConfigurableProductHandler;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 
     protected $product;
 
@@ -32,26 +31,24 @@ class ReIndexer implements ShouldQueue
     {
         try
         {
-            $product_name = $product->name;
-            $product_name.$key = Bus::batch([])->onQueue("index")->dispatch();
-
-            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
+            $product_sku = $this->product->sku;
+            $product_sku = Bus::batch([])->onQueue("index")->dispatch();
+            $stores = Website::find($this->product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
             })->flatten(1);
-            
-            if ($product->type == "configurable") $chunk_variants = $product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get()->chunk(100);
-            
+
+            if ($this->product->type == "configurable") $chunk_variants = $this->product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get()->chunk(100);
+
             foreach ($stores as $store)
             {
-                if ($product->type == "simple") $product_name.$key->add(new SingleIndexing($product, $store));
-                elseif ($product->type == "configurable") {
-                    $product_name.$key->add(new ConfigurableIndexing($product, $store));
-
+                if ($this->product->type == "simple") $product_sku->add(new SingleIndexing($this->product, $store));
+                elseif ($this->product->type == "configurable") {
+                    $product_sku->add(new ConfigurableIndexing($this->product, $store));
                     foreach ( $chunk_variants as $chunk_variant_key => $variants )
                     {
-                        $key.$product_name.$chunk_variant_key = Bus::batch([])->onQueue("index")->dispatch();
+                        $chunk_variant_key = Bus::batch([])->onQueue("index")->dispatch();
                         foreach ($variants as $variant) {
-                            $key.$product_name.$chunk_variant_key->add(new VariantIndexing($product, $variants, $variant, $store));
+                            $chunk_variant_key->add(new VariantIndexing($this->product, $variants, $variant, $store));
                         }
                     }
                 }
