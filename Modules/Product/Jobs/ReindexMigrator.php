@@ -16,6 +16,8 @@ class ReindexMigrator implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $timeout = 1200;
+
     public function __construct()
     {
         //
@@ -29,8 +31,7 @@ class ReindexMigrator implements ShouldQueue
         {
             foreach ($products as $product)
             {
-                $product_sku = $product->sku;
-                $product_sku = Bus::batch([])->onQueue("index")->dispatch();
+                $product_batch = Bus::batch([])->onQueue("index")->dispatch();
                 $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                     return $channel->stores;
                 })->flatten(1);
@@ -39,14 +40,14 @@ class ReindexMigrator implements ShouldQueue
     
                 foreach ($stores as $store)
                 {
-                    if ($product->type == "simple") $product_sku->add(new SingleIndexing($product, $store));
+                    if ($product->type == "simple") $product_batch->add(new SingleIndexing($product, $store));
                     elseif ($product->type == "configurable") {
-                        $product_sku->add(new ConfigurableIndexing($product, $store));
+                        $product_batch->add(new ConfigurableIndexing($product, $store));
                         foreach ( $chunk_variants as $chunk_variant_key => $variants )
                         {
-                            $chunk_variant_key = Bus::batch([])->onQueue("index")->dispatch();
+                            $variant_batch = Bus::batch([])->onQueue("index")->dispatch();
                             foreach ($variants as $variant) {
-                                $chunk_variant_key->add(new VariantIndexing($product, $variants, $variant, $store));
+                                $variant_batch->add(new VariantIndexing($product, $variants, $variant, $store));
                             }
                         }
                     }
