@@ -25,7 +25,7 @@ class ReindexMigrator implements ShouldQueue
 
     public function handle(): void
     {
-        $chunk_products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->whereParentId(null)->get()->chunk(100);
+        $chunk_products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->whereParentId(null)->get()->chunk(50);
         
         foreach ($chunk_products as $products)
         {
