@@ -28,32 +28,41 @@ class ReIndexer implements ShouldQueue
     {
         try
         {
-            $batch = Bus::batch([])->onQueue("index")->dispatch();
-        
-            $products = Product::whereType("simple")->whereParentId(null)->get();
-            foreach($products as $product)
+            $count = 0;
+            $chunk_products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->whereParentId(null)->get()->chunk(100);
+            
+            foreach ($chunk_products as $products)
             {
-                $stores = Website::find($product->website_id)->channels->map(function ($channel) {
-                    return $channel->stores;
-                })->flatten(1);
-                
-                foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
-            }
+                foreach ($products as $product)
+                {
+                    if ($count == 3) break;
+
+                    $product_batch = Bus::batch([])->onQueue("index")->dispatch();
+                    $stores = Website::find($product->website_id)->channels->map(function ($channel) {
+                        return $channel->stores;
+                    })->flatten(1);
+        
+                    if ($product->type == "configurable") {
+                        $all_variants = $product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
+                        $chunk_variants = $all_variants->chunk(100);
+                    }
+        
+                    foreach ($stores as $store)
+                    {
+                        if ($product->type == "simple") $product_batch->add(new SingleIndexing($product, $store));
+                        elseif ($product->type == "configurable") {
+                            $product_batch->add(new ConfigurableIndexing($product, $store));
+                            foreach ( $chunk_variants as $variants )
+                            {
+                                $variant_batch = Bus::batch([])->onQueue("index")->dispatch();
+                                foreach ($variants as $variant) {
+                                    $variant_batch->add(new VariantIndexing($product, $all_variants, $variant, $store));
+                                }
+                            }
+                        }
+                    }
     
-            $configurable_products = Product::whereType("configurable")->get();
-            foreach($configurable_products as $configurable_product)
-            {
-                $stores = Website::find($configurable_product->website_id)->channels->map(function ($channel) {
-                    return $channel->stores;
-                })->flatten(1);
-                $variants = $configurable_product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
-        
-                foreach( $stores as $store) {
-                    $configurable_batch = Bus::batch([])->then(function (Batch $variant_batch) use ($variants, $configurable_product, $store) {
-                        $variant_batch = Bus::batch([])->allowFailures()->onQueue('index')->dispatch();
-                        foreach($variants as $variant) $variant_batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
-                    })->allowFailures()->onQueue('index')->dispatch();
-                    $configurable_batch->add(new ConfigurableIndexing($configurable_product, $store));
+                    $count++;
                 }
             }
         }

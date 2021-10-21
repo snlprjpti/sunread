@@ -7,6 +7,7 @@ use Modules\Country\Entities\Region;
 use Modules\Country\Entities\Country;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class TaxRate extends Model
 {
@@ -23,5 +24,10 @@ class TaxRate extends Model
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class);
+    }
+
+    public function tax_rules(): BelongsToMany
+    {
+        return $this->belongsToMany(TaxRule::class);
     }
 }

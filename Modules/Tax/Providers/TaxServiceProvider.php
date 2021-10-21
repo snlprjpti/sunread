@@ -4,6 +4,17 @@ namespace Modules\Tax\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Tax\Entities\CustomerTaxGroup;
+use Modules\Tax\Entities\ProductTaxGroup;
+use Modules\Tax\Entities\TaxRate;
+use Modules\Tax\Entities\TaxRule;
+use Modules\Tax\Observers\CustomerTaxGroupObserver;
+use Modules\Tax\Observers\ProductTaxGroupObserver;
+use Modules\Tax\Observers\TaxRateObserver;
+use Modules\Tax\Observers\TaxRuleObserver;
+use Modules\Tax\Services\GeoIp;
+use Modules\Tax\Services\TaxCache;
+use Modules\Tax\Services\TaxPrice;
 
 class TaxServiceProvider extends ServiceProvider
 {
@@ -28,6 +39,8 @@ class TaxServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerActivityLogger();
+        $this->registerObserver();
     }
 
     /**
@@ -52,6 +65,9 @@ class TaxServiceProvider extends ServiceProvider
         ], 'config');
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
+        );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/geoip.php'), "geoip"
         );
     }
 
@@ -89,6 +105,19 @@ class TaxServiceProvider extends ServiceProvider
         }
     }
 
+    public function registerActivityLogger()
+    {
+        $this->app->singleton('TaxPrice', function () {
+            return new TaxPrice();
+        });
+        $this->app->singleton('GeoIp', function () {
+            return new GeoIp();
+        });
+        $this->app->singleton('TaxCache', function () {
+            return new TaxCache();
+        });
+    }
+
     /**
      * Get the services provided by the provider.
      *
@@ -108,5 +137,13 @@ class TaxServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    public function registerObserver(): void
+    {
+        ProductTaxGroup::observe(ProductTaxGroupObserver::class);
+        CustomerTaxGroup::observe(CustomerTaxGroupObserver::class);
+        TaxRule::observe(TaxRuleObserver::class);
+        TaxRate::observe(TaxRateObserver::class);
     }
 }
