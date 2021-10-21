@@ -52,13 +52,13 @@ class ReIndexer implements ShouldQueue
                         if ($product->type == "simple") $product_batch->add(new SingleIndexing($product, $store));
                         elseif ($product->type == "configurable") {
                             $product_batch->add(new ConfigurableIndexing($product, $store));
-                            foreach ( $chunk_variants as $variants )
-                            {
-                                $variant_batch = Bus::batch([])->onQueue("index")->dispatch();
-                                foreach ($variants as $variant) {
-                                    $variant_batch->add(new VariantIndexing($product, $all_variants, $variant, $store));
-                                }
-                            }
+                            // foreach ( $chunk_variants as $variants )
+                            // {
+                            //     $variant_batch = Bus::batch([])->onQueue("index")->dispatch();
+                            //     foreach ($variants as $variant) {
+                            //         $variant_batch->add(new VariantIndexing($product, $all_variants, $variant, $store));
+                            //     }
+                            // }
                         }
                     }
     
