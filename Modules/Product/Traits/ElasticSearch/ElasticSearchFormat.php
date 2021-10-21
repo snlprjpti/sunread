@@ -19,22 +19,25 @@ trait ElasticSearchFormat
     {
         try
         {
-            $array = $this->getProductAttributes($store);
+            $array = [
+                "name" => "test"
+            ];
+            // $array = $this->getProductAttributes($store);
 
-            $inventory = $this->getInventoryData();
-            if ($inventory) $array = array_merge($array, $inventory); 
-            $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
+            // $inventory = $this->getInventoryData();
+            // if ($inventory) $array = array_merge($array, $inventory); 
+            // $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
     
-            $array['categories'] = $this->getCategoryData($store);
-            $images = $this->getImages();
-            if($this->type == "simple" && !$this->parent_id) $array["list_status"] = 1;
+            // $array['categories'] = $this->getCategoryData($store);
+            // $images = $this->getImages();
+            // if($this->type == "simple" && !$this->parent_id) $array["list_status"] = 1;
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
-        
-        return array_merge($array, $images);
+        return $array;
+        // return array_merge($array, $images);
     }
 
     public function getProductAttributes(object $store): array

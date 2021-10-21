@@ -32,17 +32,18 @@ class SingleIndexing implements ShouldQueue
     {
         try
         {
-            if(!$this->method) {
-                $is_visibility = $this->product->value([
-                    "scope" => "store",
-                    "scope_id" => $this->store->id,
-                    "attribute_slug" => "visibility"
-                ]);
+            $this->singleIndexing($this->product, $this->store);
+            // if(!$this->method) {
+            //     $is_visibility = $this->product->value([
+            //         "scope" => "store",
+            //         "scope_id" => $this->store->id,
+            //         "attribute_slug" => "visibility"
+            //     ]);
                 
-                if($is_visibility?->name != "Not Visible Individually") $this->singleIndexing($this->product, $this->store);
-                else $this->removeIndex(collect($this->product), $this->store);
-            }
-            else $this->removeIndex($this->product, $this->store);
+            //     if($is_visibility?->name != "Not Visible Individually") $this->singleIndexing($this->product, $this->store);
+            //     else $this->removeIndex(collect($this->product), $this->store);
+            // }
+            // else $this->removeIndex($this->product, $this->store);
         }
         catch (Exception $exception)
         {
