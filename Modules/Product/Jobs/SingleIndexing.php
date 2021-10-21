@@ -32,7 +32,7 @@ class SingleIndexing implements ShouldQueue
     {
         try
         {
-            $this->singleIndexing($this->product, $this->store);
+            // $this->singleIndexing($this->product, $this->store);
             // if(!$this->method) {
             //     $is_visibility = $this->product->value([
             //         "scope" => "store",
