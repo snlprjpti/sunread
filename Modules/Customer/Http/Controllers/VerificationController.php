@@ -21,7 +21,7 @@ class VerificationController extends BaseController
         {
             $customer = $this->model::where('verification_token', $token)->firstOrFail();
 
-            if(!is_null($customer)) {
+            if($customer) {
 
                 if(!$customer->is_email_verified) {
                     $customer->is_email_verified = 1;
