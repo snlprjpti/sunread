@@ -16,7 +16,7 @@ class ReindexMigrator implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 1200;
+    public $timeout = 90000;
 
     public function __construct()
     {
