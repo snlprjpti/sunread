@@ -42,7 +42,7 @@ trait ConfigurableProductHandler
         }
     }
 
-    public function createVariantProduct(object $parent, object $variants, object $variant, object $store): void
+    public function createVariantProduct(object $parent, mixed $variants, object $variant, object $store): void
     {
         try
         {
