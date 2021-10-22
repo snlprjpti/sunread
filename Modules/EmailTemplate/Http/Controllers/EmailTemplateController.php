@@ -112,11 +112,25 @@ class EmailTemplateController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
-    public function templateGroup(): JsonResponse
+    public function templateGroup(Request $request): JsonResponse
     {
         try
         {
             $fetched = $this->repository->getConfigGroup();
+
+            $templates = $this->repository->fetchAll($request);
+
+            $merged = collect($fetched)->map(function ($value) use ($templates)  {
+
+                foreach($templates as $array){
+                    if($value["code"] = $array["email_template_code"]){
+                        $value["templates"] = $array;
+                    }
+                }
+                return $value;
+            });
+
+            $fetched=  $merged->toArray();
         }
         catch( Exception $exception )
         {
