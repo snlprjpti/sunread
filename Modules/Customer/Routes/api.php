@@ -18,6 +18,8 @@ Route::group(["middleware" => ["api"]], function () {
         Route::post("/forget-password", [ForgotPasswordController::class, "store"])->name("forget-password.store");
         Route::post("/reset-password", [ResetPasswordController::class, "store"])->name("reset-password.store");
         Route::get("/reset-password/{token}", [ResetPasswordController::class, "create"])->name("reset-password.create");
+
+        Route::post("/send-confirmation/", [VerificationController::class, "sendConfirmation"])->middleware("jwt.verify")->name("account-confirmation.store");
         Route::get("/verify-account/{token}", [VerificationController::class, "verifyAccount"])->name("account-verify");
     });
 
