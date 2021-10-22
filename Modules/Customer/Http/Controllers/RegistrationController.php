@@ -10,6 +10,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
 use Modules\Customer\Repositories\StoreFront\CustomerRepository;
 use Exception;
+use Modules\Notification\Events\NewAccount;
 use Modules\Notification\Events\RegistrationSuccess;
 
 class RegistrationController extends BaseController
@@ -44,6 +45,7 @@ class RegistrationController extends BaseController
         }
 
         event(new RegistrationSuccess($created->id));
+        event(new NewAccount($created->id));
 
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
