@@ -20,6 +20,9 @@ class VerificationController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
+    /**
+     * customer send confirmation link to their email
+    */
     public function sendConfirmation(): JsonResponse
     {
         try
@@ -47,6 +50,9 @@ class VerificationController extends BaseController
         return $this->successResponseWithMessage($this->lang($message), 201);
     }
 
+    /**
+     * Customer verify their account
+    */
     public function verifyAccount(string $token): JsonResponse
     {
         try
