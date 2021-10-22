@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
 use Exception;
+use Modules\Notification\Events\ConfirmEmail;
 
 class VerificationController extends BaseController
 {
@@ -27,6 +28,8 @@ class VerificationController extends BaseController
                 $customer->verification_token = null;
                 $customer->save();
                 $message = $this->lang('verification-success');
+
+                event(new ConfirmEmail($customer->id));
             }
             else {
                 $message = $this->lang('already-verified');
