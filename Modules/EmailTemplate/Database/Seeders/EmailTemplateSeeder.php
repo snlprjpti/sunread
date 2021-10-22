@@ -366,7 +366,7 @@ class EmailTemplateSeeder extends Seeder
                                                     <tr style="padding: 0; text-align: left; vertical-align: top;">
                                                       <th style="Margin: 0; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0; padding: 0; text-align: left;">
                                                       <center data-parsed="" style="min-width: 532px; width: 100%;">
-                                                        <img src="{{$store_email_logo_url}}" style="-ms-interpolation-mode: bicubic; clear: both; display: block; margin: 0 auto; max-width: 100%; outline: none; text-decoration: none; width: 180px;max-width: 180px;">
+                                                        <img src="https://i.ibb.co/K70zzBS/logo.png" style="-ms-interpolation-mode: bicubic; clear: both; display: block; margin: 0 auto; max-width: 100%; outline: none; text-decoration: none; width: 180px;max-width: 180px;">
                                                       </center>
                                                         </th>
                                                     </tr>
