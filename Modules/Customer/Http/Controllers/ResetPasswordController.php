@@ -60,7 +60,6 @@ class ResetPasswordController extends BaseController
 
         $customer = $this->model::whereEmail($data["email"])->firstOrFail();
 
-        event(new ResetPassword($customer->id));
         return $this->successResponseWithMessage($this->lang("password-reset-success"));
     }
 
