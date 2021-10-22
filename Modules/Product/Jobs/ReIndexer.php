@@ -18,7 +18,7 @@ use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
 class ReIndexer implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct()
     {
