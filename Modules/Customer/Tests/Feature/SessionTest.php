@@ -118,7 +118,7 @@ class SessionTest extends TestCase
             "scope" => "store",
             "path" => "reset_password",
             "scope_id" => 1,
-            "value" => 4,
+            "value" => 7,
         ]);
         $reset_token = Password::broker('customers')->createToken($this->customer);
         $post_data = [
