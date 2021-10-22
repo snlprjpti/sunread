@@ -480,7 +480,7 @@ class EmailTemplateSeeder extends Seeder
                               <tbody>
                                 <tr style="padding: 0; text-align: left; vertical-align: top;">
                                   <th style="Margin: 0; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0; padding: 0; text-align: left;">
-                                    <h1 class="text-center" style="Margin: 0; Margin-bottom: 10px; color: inherit; font-family: Helvetica, Arial, sans-serif; font-size: 45px; font-weight: bold; line-height: 1.3; margin: 0; margin-bottom: 10px; padding: 0 20px; text-align: center; text-transform: uppercase; word-wrap: normal;">Your <br>Account</h1>
+                                    <h1 class="text-center" style="Margin: 0; Margin-bottom: 10px; color: inherit; font-family: Helvetica, Arial, sans-serif; font-size: 45px; font-weight: bold; line-height: 1.3; margin: 0; margin-bottom: 10px; padding: 0 20px; text-align: center; text-transform: uppercase; word-wrap: normal;">Welcome <br>Account</h1>
                                     <table class="spacer" style="border-collapse: collapse; border-spacing: 0; padding: 0; text-align: left; vertical-align: top; width: 100%;">
                                       <tbody>
                                         <tr style="padding: 0; text-align: left; vertical-align: top;">
@@ -546,7 +546,7 @@ class EmailTemplateSeeder extends Seeder
                               <tbody>
                                 <tr style="padding: 0; text-align: left; vertical-align: top;">
                                   <th style="Margin: 0; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0; padding: 0; text-align: left;">
-                                    <h1 class="text-center" style="Margin: 0; Margin-bottom: 10px; color: inherit; font-family: Helvetica, Arial, sans-serif; font-size: 45px; font-weight: bold; line-height: 1.3; margin: 0; margin-bottom: 10px; padding: 0 20px; text-align: center; text-transform: uppercase; word-wrap: normal;">Your <br>Account</h1>
+                                    <h1 class="text-center" style="Margin: 0; Margin-bottom: 10px; color: inherit; font-family: Helvetica, Arial, sans-serif; font-size: 45px; font-weight: bold; line-height: 1.3; margin: 0; margin-bottom: 10px; padding: 0 20px; text-align: center; text-transform: uppercase; word-wrap: normal;">New <br>Account</h1>
                                     <table class="spacer" style="border-collapse: collapse; border-spacing: 0; padding: 0; text-align: left; vertical-align: top; width: 100%;">
                                       <tbody>
                                         <tr style="padding: 0; text-align: left; vertical-align: top;">
