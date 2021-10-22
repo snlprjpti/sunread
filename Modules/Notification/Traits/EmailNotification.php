@@ -107,7 +107,7 @@ trait EmailNotification
     /**
      * get customer data by customer id
     */
-    private function getCustomerData(int $customer_id)
+    private function getCustomerData(int $customer_id, string $append_data = null)
     {
         try
         {
@@ -129,7 +129,7 @@ trait EmailNotification
                 "customer_name" => $customer->first_name . ' ' . $customer->middle_name . ' ' . $customer->last_name,
                 "customer_email_address" => $customer->email,
                 "customer_dashboard_url" => $customer_dashboard_url,
-                "account_confirmation_url" => $customer_dashboard_url,
+                "account_confirmation_url" => route('customers.verify-account', $append_data),
                 "store_id" => $customer->store_id
             ];
         }
