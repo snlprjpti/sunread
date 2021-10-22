@@ -111,6 +111,15 @@ class SessionTest extends TestCase
 
     public function testCustomerCanResetPassword()
     {
+        /**
+         * create configuration factory to retrieve email template
+         */
+        Configuration::factory()->make()->create([
+            "scope" => "store",
+            "path" => "reset_password",
+            "scope_id" => 1,
+            "value" => 7,
+        ]);
         $reset_token = Password::broker('customers')->createToken($this->customer);
         $post_data = [
             "email" => $this->customer->email,
