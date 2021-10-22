@@ -496,7 +496,7 @@ class EmailTemplateSeeder extends Seeder
                                             <br style="color: #000;">
                                             <h2 style="Margin: 0; Margin-bottom: 10px; color: #000; font-family: Helvetica, Arial, sans-serif; font-size: 30px; font-weight: normal; line-height: 1.3; margin: 0; margin-bottom: 0; padding: 0; text-align: left; word-wrap: normal;">We are happy to welcome you to Sailracing community.</h2>
                                             <br style="color: #000;">
-                                            <p style="Margin: 0; Margin-bottom: 10px; color: #000; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0; margin-bottom: 10px; padding: 0; text-align: left;">Your account has been created with the provided email. Please click on the link below to activate your account and set a new password</p>
+                                            <p style="Margin: 0; Margin-bottom: 10px; color: #000; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0; margin-bottom: 10px; padding: 0; text-align: left;">Your account has been created with the provided email.</p>
 
                                             <table class="spacer" style="border-collapse: collapse; border-spacing: 0; padding: 0; text-align: left; vertical-align: top; width: 100%;">
                                       <tbody>
