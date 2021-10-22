@@ -8,11 +8,12 @@ class NewAccount
 {
     use SerializesModels;
 
-    public $user_id;
+    public $user_id, $verification_token;
 
-    public function __construct($user_id)
+    public function __construct($user_id, $verification_token)
     {
         $this->user_id = $user_id;
+        $this->verification_token = $verification_token;
     }
 
     public function broadcastOn(): array

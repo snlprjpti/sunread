@@ -5,6 +5,7 @@ namespace Modules\Customer\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
@@ -45,7 +46,9 @@ class RegistrationController extends BaseController
         }
 
         event(new RegistrationSuccess($created->id));
-        event(new NewAccount($created->id));
+        if(SiteConfig::fetch("require_email_confirmation", "website", $request->website_id) == 1) {
+            event(new NewAccount($created->id, $created->verification_token));
+        }
 
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
