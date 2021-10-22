@@ -67,7 +67,7 @@ class ConfigurationTableSeeder extends Seeder
             [
                 "scope" => "store",
                 "scope_id" => 1,
-                "path" => "reset_password",
+                "path" => "confirm_email",
                 "value" => "5",
                 "created_at" => now(),
                 "updated_at" => now()
@@ -75,8 +75,24 @@ class ConfigurationTableSeeder extends Seeder
             [
                 "scope" => "store",
                 "scope_id" => 1,
-                "path" => "contact_form",
+                "path" => "forgot_password",
                 "value" => "6",
+                "created_at" => now(),
+                "updated_at" => now()
+            ],
+            [
+                "scope" => "store",
+                "scope_id" => 1,
+                "path" => "reset_password",
+                "value" => "7",
+                "created_at" => now(),
+                "updated_at" => now()
+            ],
+            [
+                "scope" => "store",
+                "scope_id" => 1,
+                "path" => "contact_form",
+                "value" => "8",
                 "created_at" => now(),
                 "updated_at" => now()
             ]
