@@ -77,11 +77,14 @@ trait EmailNotification
                     $data = $this->forgotPassword($entity_id, $append_data);
                     break;
 
+                case "new_account" :
+                    $data = $this->newAccount($entity_id, $append_data);
+                    break;
+
                 case "contact_form" :
                     $data = [];
                     break;
 
-                case "new_account":
                 case "welcome_email":
                 case "reset_password":
                     $data = $this->getCustomerData($entity_id);
@@ -107,7 +110,7 @@ trait EmailNotification
     /**
      * get customer data by customer id
     */
-    private function getCustomerData(int $customer_id, string $append_data = null)
+    private function getCustomerData(int $customer_id)
     {
         try
         {
@@ -129,7 +132,6 @@ trait EmailNotification
                 "customer_name" => $customer->first_name . ' ' . $customer->middle_name . ' ' . $customer->last_name,
                 "customer_email_address" => $customer->email,
                 "customer_dashboard_url" => $customer_dashboard_url,
-                "account_confirmation_url" => route('customers.verify-account', $append_data),
                 "store_id" => $customer->store_id
             ];
         }
@@ -181,6 +183,26 @@ trait EmailNotification
             $customer_data = $this->getCustomerData($customer_id);
             $data = [
                 "password_reset_url" => route('customers.reset-password.create', $append_data)
+            ];
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return array_merge($customer_data, $data);
+    }
+
+    /**
+        get new account variables data
+    */
+    private function newAccount(int $customer_id, string $append_data)
+    {
+        try
+        {
+            $customer_data = $this->getCustomerData($customer_id);
+            $data = [
+                "account_confirmation_url" => route('customers.account-verify', $append_data),
             ];
         }
         catch (Exception $exception)
