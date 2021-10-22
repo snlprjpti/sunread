@@ -505,22 +505,6 @@ class EmailTemplateSeeder extends Seeder
                                         </tr>
                                       </tbody>
                                     </table>
-
-                                            <table class="button large secondary" style="Margin: 30px 0 0; border-collapse: collapse; border-spacing: 0; color: #000; margin: 0; padding: 0; text-align: left; vertical-align: top; width: auto;">
-                                              <tbody>
-                                                <tr style="color: #000; padding: 0; text-align: left; vertical-align: top;">
-                                                  <td style="-moz-hyphens: auto; -webkit-hyphens: auto; Margin: 0; border-collapse: collapse !important; color: #000; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 1.3; margin: 0; padding: 0; text-align: left; vertical-align: top; word-wrap: break-word;">
-                                                    <table style="border-collapse: collapse; border-spacing: 0; color: #000; padding: 0; text-align: left; vertical-align: top; width: 100%;">
-                                                      <tbody>
-                                                        <tr style="color: #000; padding: 0; text-align: left; vertical-align: top;">
-                                                          <td style="-moz-hyphens: auto; -webkit-hyphens: auto; Margin: 0; background: #121212; border: 0px solid #121212; border-collapse: collapse !important; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 1.3; margin: 0; padding: 0 30px; text-align: left; vertical-align: top; word-wrap: break-word;"><a href="#" style="Margin: 0; border: 0 solid #121212; border-radius: 3px; color: #fff; display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 20px; font-weight: normal; line-height: 1.3; margin: 0; padding: 10px 0px 10px 0px; text-align: left; text-decoration: none;">Activate account</a></td>
-                                                        </tr>
-                                                      </tbody>
-                                                    </table>
-                                                  </td>
-                                                </tr>
-                                              </tbody>
-                                            </table>
                                           </th>
                                           <th class="expander" style="Margin: 0; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0; padding: 0 !important; text-align: left; visibility: hidden; width: 0;"></th>
                                         </tr>
@@ -595,7 +579,7 @@ class EmailTemplateSeeder extends Seeder
                                                     <table style="border-collapse: collapse; border-spacing: 0; color: #000; padding: 0; text-align: left; vertical-align: top; width: 100%;">
                                                       <tbody>
                                                         <tr style="color: #000; padding: 0; text-align: left; vertical-align: top;">
-                                                          <td style="-moz-hyphens: auto; -webkit-hyphens: auto; Margin: 0; background: #121212; border: 0px solid #121212; border-collapse: collapse !important; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 1.3; margin: 0; padding: 0 30px; text-align: left; vertical-align: top; word-wrap: break-word;"><a href="#" style="Margin: 0; border: 0 solid #121212; border-radius: 3px; color: #fff; display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 20px; font-weight: normal; line-height: 1.3; margin: 0; padding: 10px 0px 10px 0px; text-align: left; text-decoration: none;">Activate account</a></td>
+                                                          <td style="-moz-hyphens: auto; -webkit-hyphens: auto; Margin: 0; background: #121212; border: 0px solid #121212; border-collapse: collapse !important; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; hyphens: auto; line-height: 1.3; margin: 0; padding: 0 30px; text-align: left; vertical-align: top; word-wrap: break-word;"><a href="{{$account_confirmation_url}}" style="Margin: 0; border: 0 solid #121212; border-radius: 3px; color: #fff; display: inline-block; font-family: Helvetica, Arial, sans-serif; font-size: 20px; font-weight: normal; line-height: 1.3; margin: 0; padding: 10px 0px 10px 0px; text-align: left; text-decoration: none;">Activate account</a></td>
                                                         </tr>
                                                       </tbody>
                                                     </table>
