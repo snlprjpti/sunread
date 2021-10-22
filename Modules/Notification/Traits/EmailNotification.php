@@ -111,7 +111,7 @@ trait EmailNotification
     /**
      * get customer data by customer id
     */
-    private function getCustomerData(int $customer_id)
+    private function getCustomerData(int $customer_id): array
     {
         try
         {
@@ -177,7 +177,7 @@ trait EmailNotification
     /**
         get forgot password variables data
     */
-    private function forgotPassword(int $customer_id, string $append_data)
+    private function forgotPassword(int $customer_id, string $append_data): array
     {
         try
         {
@@ -197,7 +197,7 @@ trait EmailNotification
     /**
         get new account variables data
     */
-    private function newAccount(int $customer_id, string $append_data)
+    private function newAccount(int $customer_id, string $append_data): array
     {
         try
         {
@@ -217,7 +217,7 @@ trait EmailNotification
     /**
        * get order variables data
     */
-    private function orderData(int $entity_id)
+    private function orderData(int $entity_id): array
     {
         try
         {
