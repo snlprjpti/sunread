@@ -86,6 +86,7 @@ trait EmailNotification
                     break;
 
                 case "welcome_email":
+                case "confirm_email":
                 case "reset_password":
                     $data = $this->getCustomerData($entity_id);
                     break;
