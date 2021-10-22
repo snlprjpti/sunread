@@ -29,5 +29,6 @@ class Tester implements ShouldQueue
      */
     public function handle()
     {
+        $a = 1 + 1;
     }
 }

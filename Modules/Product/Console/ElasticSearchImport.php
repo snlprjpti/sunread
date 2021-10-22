@@ -33,7 +33,7 @@ class ElasticSearchImport extends Command
 
     public function handle(): void
     {
-        ReIndexer::dispatch()->onQueue("index");
+        Tester::dispatch()->onQueue("index");
         $this->info("All data imported successfully");
     }
 }
