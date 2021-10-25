@@ -40,17 +40,17 @@ class SendNotificationJob implements ShouldQueue
         $logs = [
             "name" => $this->event,
             "subject" => $data["subject"],
-            "content" => $data["content"],
-            "to_email" => $data["to_email"],
+            "html_content" => $data["content"],
+            "recipient_email_address" => $data["to_email"],
             "email_template_id" => $data["template_id"],
             "email_template_code" => $this->event,
         ];
 
         if( count(Mail::failures()) > 0 ) {
-            NotificationLog::log("name", $data["subject"], $data["content"], $data["to_email"], 1, "email_template_code", false);
+            NotificationLog::log($logs, false);
         }
         else {
-            NotificationLog::log("name", $data["subject"], $data["content"], $data["to_email"], 1, "email_template_code", true);
+            NotificationLog::log($logs, true);
         }
     }
 }

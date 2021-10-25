@@ -14,24 +14,18 @@ class NotificationLogHelper
         $this->emailNotification = $emailNotification;
     }
 
-    public function log(string $name, string $subject, string $html_content, string $recipient_email_address, int $email_template_id, string $email_template_code, bool $is_sent): void
+    public function log(array $logs, bool $is_sent): void
     {
         try
         {
             $recipient_detail = $this->getRecipientUser();
 
-            $data = [
-                "name" => $name,
-                "subject" => $subject,
-                "html_content" => $html_content,
-                "recipient_email_address" => $recipient_email_address,
-                "email_template_id" => $email_template_id,
-                "email_template_code" => $email_template_code,
+            array_push($logs,[
                 "is_sent" => $is_sent,
                 "created_at" => now(),
-            ];
+            ]);
 
-            $this->emailNotification->create(array_merge($data, $recipient_detail));
+            $this->emailNotification->create(array_merge($logs, $recipient_detail));
         }
         catch (Exception $exception)
         {
