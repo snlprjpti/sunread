@@ -23,12 +23,13 @@ use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Page\Repositories\StoreFront\PageRepository;
 
 class ProductRepository extends BaseRepository
 {
-    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product, $config_products;
+    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product, $config_products, $pageRepository;
 
-    public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository)
+    public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository, PageRepository $pageRepository)
     {
         $this->model = $product;
         $this->search_repository = $search_repository;
@@ -36,6 +37,7 @@ class ProductRepository extends BaseRepository
         $this->model_name = "Product";
         $this->page_groups = ["hero_banner", "usp_banner_1", "usp_banner_2", "usp_banner_3"];
         $this->config_fields = config("category.attributes");
+        $this->pageRepository = $pageRepository;
         $this->count = 0;
         $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date"];
         $this->nested_product = [];
@@ -117,13 +119,9 @@ class ProductRepository extends BaseRepository
                 }
 
                 if($attribute->slug == "component") {
-                    $data["product_builder"] = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get()->map(function($builder) {
-                        return [
-                            "component" => $builder->attribute,
-                            "attributes" => $builder->value,
-                            "position" => $builder->position
-                        ];
-                    })->toArray();
+                    $product_builders = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
+                    if($product_builders->isEmpty()) $product_builders = $product->getBuilderParentValues($match);
+                    $data["product_builder"] = $product_builders ? $this->pageRepository->getComponent($product_builders) : [];
                     continue;
                 }
 
