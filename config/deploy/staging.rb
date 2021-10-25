@@ -33,8 +33,6 @@ end
 
 task :install_composer do
   invoke "composer:run", :install, "--prefer-dist --ignore-platform-reqs"
-  invoke "curl -sS https://getcomposer.org/installer | php"
-  invoke "php composer.phar require geoip2/geoip2:~2.0 --ignore-platform-reqs"
 end
 
 task :get_geoip_files do
