@@ -37,6 +37,15 @@ class SendNotificationJob implements ShouldQueue
         Mail::to($data["to_email"])->send(new NotificationMail($data["content"], $data["subject"]));
 
         /** save email notification logs */
+        $logs = [
+            "name" => $this->event,
+            "subject" => $data["subject"],
+            "content" => $data["content"],
+            "to_email" => $data["to_email"],
+            "email_template_id" => $data["template_id"],
+            "email_template_code" => $this->event,
+        ];
+
         if( count(Mail::failures()) > 0 ) {
             NotificationLog::log("name", $data["subject"], $data["content"], $data["to_email"], 1, "email_template_code", false);
         }

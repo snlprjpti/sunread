@@ -35,6 +35,7 @@ trait EmailNotification
 
             $data["content"] = htmlspecialchars_decode($this->render($email_template->content, $variable_data));
             $data["subject"] = htmlspecialchars_decode($this->render($email_template->subject, $variable_data));
+            $data["template_id"] = $email_template->id;
             $data["to_email"] = $variable_data["customer_email_address"];
         }
         catch (Exception $exception)
