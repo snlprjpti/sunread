@@ -42,9 +42,9 @@ class EmailTemplateRepository extends BaseRepository
                 return $this->model->select("id","name","email_template_code");
             });
 
-            $merged = collect($config_data)->map(function ($value) use ($templates)  {
+            $merged = collect($config_data)->map(function ($value) use ($templates) {
                 foreach($templates as $array) {
-                    if($value["code"] == $array["email_template_code"]){
+                    if($value["code"] == $array["email_template_code"]) {
                         $value["templates"][] = $array;
                     }
                 }
