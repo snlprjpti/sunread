@@ -66,8 +66,8 @@ task :link_storage do
 end
 
 after "deploy:published", "install_composer"
-after "deploy:published", "get_geoip_files"
 after "deploy:published", "reload_supervisor"
+after "deploy:published", "get_geoip_files"
 after "deploy:published", "link_storage"
 
 
