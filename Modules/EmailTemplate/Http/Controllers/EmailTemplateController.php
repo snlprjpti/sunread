@@ -119,22 +119,7 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->getConfigGroup();
-
-            $templates = $this->repository->fetchAll($request, callback:function () {
-                return $this->model->select("id","name","email_template_code");
-            });
-
-            $merged = collect($fetched)->map(function ($value) use ($templates)  {
-                foreach($templates as $array) {
-                    if($value["code"] == $array["email_template_code"]){
-                        $value["templates"][] = $array;
-                    }
-                }
-                return $value;
-            });
-
-            $fetched = $merged->toArray();
+            $fetched = $this->repository->getConfigGroup($request);
         }
         catch( Exception $exception )
         {

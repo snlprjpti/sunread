@@ -32,18 +32,33 @@ class EmailTemplateRepository extends BaseRepository
     /**
      * get template group data from configuration file
     */
-    public function getConfigGroup(): array
+    public function getConfigGroup(object $request): array
     {
         try
         {
             $config_data = $this->config_template;
+
+            $templates = $this->fetchAll($request, callback:function () {
+                return $this->model->select("id","name","email_template_code");
+            });
+
+            $merged = collect($config_data)->map(function ($value) use ($templates)  {
+                foreach($templates as $array) {
+                    if($value["code"] == $array["email_template_code"]){
+                        $value["templates"][] = $array;
+                    }
+                }
+                return $value;
+            });
+
+            $fetched = $merged->toArray();
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return $config_data;
+        return $fetched;
     }
 
     /**
