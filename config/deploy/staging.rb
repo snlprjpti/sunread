@@ -37,6 +37,15 @@ task :install_composer do
   invoke "php composer.phar require geoip2/geoip2:~2.0 --ignore-platform-reqs"
 end
 
+task :get_geoip_files do
+    puts "==================Get Composer and Maxmind file======================"
+    on roles(:all) do
+        execute "curl -sS https://getcomposer.org/installer | php"
+        execute "php composer.phar require geoip2/geoip2:~2.0 --ignore-platform-reqs"
+        execute "composer dump-autoload"
+    end
+end
+
 task :reload_supervisor do
     puts "==================restart supervisor======================"
     on roles(:all) do
@@ -59,6 +68,7 @@ task :link_storage do
 end
 
 after "deploy:published", "install_composer"
+after "deploy:published", "get_geoip_files"
 after "deploy:published", "reload_supervisor"
 after "deploy:published", "link_storage"
 
