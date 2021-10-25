@@ -112,25 +112,29 @@ class EmailTemplateController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
+    /**
+     * fetch email template groupwise
+    */
     public function templateGroup(Request $request): JsonResponse
     {
         try
         {
             $fetched = $this->repository->getConfigGroup();
 
-            $templates = $this->repository->fetchAll($request);
+            $templates = $this->repository->fetchAll($request, callback:function () {
+                return $this->model->select("id","name","email_template_code");
+            });
 
             $merged = collect($fetched)->map(function ($value) use ($templates)  {
-
-                foreach($templates as $array){
-                    if($value["code"] = $array["email_template_code"]){
-                        $value["templates"] = $array;
+                foreach($templates as $array) {
+                    if($value["code"] == $array["email_template_code"]){
+                        $value["templates"][] = $array;
                     }
                 }
                 return $value;
             });
 
-            $fetched=  $merged->toArray();
+            $fetched = $merged->toArray();
         }
         catch( Exception $exception )
         {
@@ -140,6 +144,9 @@ class EmailTemplateController extends BaseController
         return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Group" ]));
     }
 
+    /**
+     * Fetch email template variables
+    */
     public function templateVariable(Request $request): JsonResponse
     {
         try
@@ -153,5 +160,23 @@ class EmailTemplateController extends BaseController
         }
 
         return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Variable" ]));
+    }
+
+    /**
+     * Fetch template content only
+     */
+    public function getTemplateContent(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->fetch($id);
+            $fetched = $fetched->content;
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }
