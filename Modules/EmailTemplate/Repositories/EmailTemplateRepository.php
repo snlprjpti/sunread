@@ -49,16 +49,14 @@ class EmailTemplateRepository extends BaseRepository
                     }
                 }
                 return $value;
-            });
-
-            $fetched = $merged->toArray();
+            })->toArray();
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return $fetched;
+        return $merged;
     }
 
     /**
