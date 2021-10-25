@@ -20,7 +20,7 @@ Route::get('/', function () {
 
 Route::get('/check', function (\Illuminate\Http\Request $request) {
     $ip = Modules\Tax\Facades\GeoIp::getGeoLocation();
-    retrun response()->jspn([
+    return response()->jspn([
         "ip" => $ip
     ]);
     //return view('check');
