@@ -4,7 +4,7 @@ namespace Modules\Tax\Traits;
 
 trait HasClientIp {
 
-	private function getClientIp(): ?string
+	public function getClientIp(): ?string
     {
 		if (isset($_SERVER['HTTP_CLIENT_IP'])) {
 			$clientIP = $_SERVER['HTTP_CLIENT_IP'];
