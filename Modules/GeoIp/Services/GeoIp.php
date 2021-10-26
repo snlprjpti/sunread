@@ -20,12 +20,13 @@ class GeoIp {
         $this->geoip_db_path = config("geoip.services.maxmind_database.database_path");
         $this->dbupdate_url = config("geoip.services.maxmind_database.update_url");
         $this->default_locale = config("geoip.services.maxmind_database.locales");
-        $this->reader = $this->connect();
+     //   $this->reader = $this->connect();
     }
 
     public function connect(): mixed
     {
-        return new Reader($this->geoip_db_path, ["en"]);		
+       // return new Reader($this->geoip_db_path, ["en"]);		
+        return null;
     }
 
     public function hydrate(array $attributes = []): mixed

@@ -80,7 +80,7 @@ class EmailTemplateRepository extends BaseRepository
                         $parent["variables"][] = $variable;
                     }
                 }
-                $data["groups"][] = $parent;
+                if(!empty($parent)) $data["groups"][] = $parent;
             }
         }
         catch (Exception $exception)
@@ -88,7 +88,7 @@ class EmailTemplateRepository extends BaseRepository
             throw $exception;
         }
 
-        return $data;
+        return array_filter($data);
     }
 
     /**
