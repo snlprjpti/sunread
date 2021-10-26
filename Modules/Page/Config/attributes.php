@@ -1345,13 +1345,13 @@ return [
                                                     "slug" => "products_repeater_sku",
                                                     "hasChildren" => 0,
                                                     "type" => "text",
-                                                    "provider" => "",
-                                                    "pluck" => [],
+                                                    "provider" => "Modules\Product\Entities\Product",
+                                                    "pluck" => ["name", "sku"],
                                                     "default" => "",
                                                     "options" => [],
                                                     "conditions" => [],
                                                     "description" => "",
-                                                    "rules" => "",
+                                                    "rules" => "exists:products,sku",
                                                     "is_required" => 1
                                                 ],
                                                 [
