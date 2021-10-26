@@ -183,7 +183,7 @@ class PageRepository extends BaseRepository
                 $array_url[1] = $coreCache->store->code;
                 $default_url = implode("/", $array_url);
             }
-            $final_url = Storage::url($default_url);
+            $final_url = url($default_url);
             
         }
         catch( Exception $exception )
