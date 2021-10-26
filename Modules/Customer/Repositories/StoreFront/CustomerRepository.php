@@ -32,7 +32,7 @@ class CustomerRepository extends BaseRepository
             "gender" => "required|in:male,female,other",
             "date_of_birth" => "date|before:today",
             "subscribed_to_news_letter" => "sometimes|boolean",
-            "phone" => "sometimes|nullable"
+            "phone" => "nullable"
         ];
     }
 

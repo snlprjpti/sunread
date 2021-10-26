@@ -37,7 +37,7 @@ class CustomerRepository extends BaseRepository
             "subscribed_to_news_letter" => "sometimes|boolean",
             "password" => "sometimes|nullable|min:6|confirmed",
             "account_type" => "required|in:personal,company",
-            "phone" => "sometimes|nullable"
+            "phone" => "nullable"
         ];
     }
 
