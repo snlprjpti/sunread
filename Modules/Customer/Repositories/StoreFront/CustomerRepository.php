@@ -31,7 +31,8 @@ class CustomerRepository extends BaseRepository
             "email" => "required|email|unique:customers,email",
             "gender" => "required|in:male,female,other",
             "date_of_birth" => "date|before:today",
-            "subscribed_to_news_letter" => "sometimes|boolean"
+            "subscribed_to_news_letter" => "sometimes|boolean",
+            "phone" => "nullable"
         ];
     }
 

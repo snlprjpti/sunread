@@ -20,6 +20,7 @@ class CustomerAccountResource extends JsonResource
             "addresses" => CustomerAddressResource::collection($this->whenLoaded("addresses")),
             "profile_image" => $this->profile_image_url,
             "subscribed_to_news_letter" => $this->subscribed_to_news_letter,
+            "phone" => $this->phone,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
