@@ -8,6 +8,8 @@ use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\CoreCache;
+use Modules\Product\Transformers\StoreFront\ProductResource;
 
 class PageRepository extends BaseRepository
 {
@@ -33,7 +35,7 @@ class PageRepository extends BaseRepository
             $all_scope = (clone $page_scope)->whereScopeId(0)->first();
             if (!$all_scope) $page_scope->whereScopeId($coreCache->store->id)->firstOrFail();
             $fetched = $page->toArray();
-            $fetched["components"] = $this->getComponent($page->page_attributes);
+            $fetched["components"] = $this->getComponent($request, $page->page_attributes);
             unset($fetched["page_attributes"], $fetched["created_at"], $fetched["updated_at"]);
         }
         catch( Exception $exception )
@@ -44,7 +46,7 @@ class PageRepository extends BaseRepository
         return $fetched;
     }
 
-    public function getComponent(object $components): array
+    public function getComponent(object $request, object $components): array
     {
         try
         {
@@ -53,7 +55,7 @@ class PageRepository extends BaseRepository
             foreach($components as $component)
             {
                 $data["component"] = $component->attribute;
-                $data["attributes"] = $this->getElements($component->attribute, $component->value);
+                $data["attributes"] = $this->getElements($request, $component->attribute, $component->value);
                 $comp[] = $data;
             }
         }
@@ -65,7 +67,7 @@ class PageRepository extends BaseRepository
         return $comp;
     }
 
-    public function getElements(string $component, array $attributes): array
+    public function getElements(object $request, string $component, array $attributes): array
     {
         try
         {
@@ -87,10 +89,10 @@ class PageRepository extends BaseRepository
             foreach($attributes as $field => $attribute)
             {
                 $selected_element = $collect_elements->where("slug", $field)->first();
-                if (isset($selected_element["provider"]) && $selected_element["provider"] != "") $attributes[$field] = $this->getProviderData($selected_element, $attribute);
+                if (isset($selected_element["provider"]) && $selected_element["provider"] != "") $attributes[$field] = $this->getProviderData($request, $selected_element, $attribute);
                 if ($selected_element["type"] == "file") $attributes[$field] = Storage::url($attribute);
-                if ($selected_element["type"] == "repeater") $attributes[$field] = $this->getRepeatorType($selected_element, $attribute);
-                if ($selected_element["type"] == "normal") $attributes[$field] = $this->getNormalType($selected_element, $attribute);
+                if ($selected_element["type"] == "repeater") $attributes[$field] = $this->getRepeatorType($request, $selected_element, $attribute);
+                if ($selected_element["type"] == "normal") $attributes[$field] = $this->getNormalType($request, $selected_element, $attribute);
 
                 if ($selected_element["slug"] == "dynamic_link" && $attribute == "0") $attributes["view_more_link"] = "";
             }
@@ -103,7 +105,7 @@ class PageRepository extends BaseRepository
         return $attributes;
     }
 
-    private function getRepeatorType(array $repeators, array $attributes)
+    private function getRepeatorType(object $request, array $repeators, array $attributes)
     {
         try
         {
@@ -113,7 +115,7 @@ class PageRepository extends BaseRepository
                 foreach($attribute as $field => $att)
                 {
                     $selected_element = $repeator_elements->where("slug", $field)->first();
-                    if ($selected_element["provider"] != "") $attributes[$key][$field] = $this->getProviderData($selected_element, $attribute);
+                    if ($selected_element["provider"] != "") $attributes[$key][$field] = $this->getProviderData($request, $selected_element, $attribute);
                     if ($selected_element["type"] == "file") $attributes[$key][$field] = Storage::url($att); 
                 }
             }
@@ -126,7 +128,7 @@ class PageRepository extends BaseRepository
         return $attributes;
     }
 
-    private function getNormalType(array $normals, array $attributes)
+    private function getNormalType(object $request, array $normals, array $attributes)
     {
         try
         {
@@ -134,7 +136,7 @@ class PageRepository extends BaseRepository
             foreach($attributes as $field => $attribute)
             {
                 $selected_element = $normal_elements->where("slug", $field)->first();
-                if ($selected_element["provider"] != "") $attributes[$field] = $this->getProviderData($selected_element, $attribute);
+                if ($selected_element["provider"] != "") $attributes[$field] = $this->getProviderData($request, $selected_element, $attribute);
                 if ($selected_element["type"] == "file") $attributes[$field] = Storage::url($attribute); 
             }
         }
@@ -146,13 +148,24 @@ class PageRepository extends BaseRepository
         return $attributes;
     }
 
-    public function getProviderData(array $element, mixed $values): mixed
+    public function getProviderData(object $request, array $element, mixed $values): mixed
     {
         try
         {
             $model = new $element["provider"];
             $pluck = $element["pluck"][1];
             $fetched = $model->where($pluck, $values)->first();
+
+            if($element["slug"] == "products_repeater_sku") {
+                $store = CoreCache::getStoreWithCode($request->header("hc-store"));
+                $is_visibility = $fetched->value([
+                    "scope" => "store",
+                    "scope_id" => $store->id,
+                    "attribute_slug" => "visibility"
+                ]);
+                
+                $fetched = ($is_visibility?->name != "Not Visible Individually") ? new ProductResource($fetched) : [];
+            } 
         }
         catch( Exception $exception )
         {
