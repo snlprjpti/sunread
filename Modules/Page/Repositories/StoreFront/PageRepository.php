@@ -50,13 +50,12 @@ class PageRepository extends BaseRepository
     {
         try
         {
-            $data = [];
-            $comp = [];
+            $all_components = [];
             foreach($components as $component)
             {
                 $data["component"] = $component->attribute;
                 $data["attributes"] = $this->getElements($store, $component->attribute, $component->value);
-                $comp[] = $data;
+                $all_components[] = $data;
             }
         }
         catch( Exception $exception )
@@ -64,7 +63,7 @@ class PageRepository extends BaseRepository
             throw $exception;
         }
 
-        return $comp;
+        return $all_components;
     }
 
     public function getElements(object $store, string $component, array $attributes): array
