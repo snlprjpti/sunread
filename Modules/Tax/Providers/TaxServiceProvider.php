@@ -3,7 +3,6 @@
 namespace Modules\Tax\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 use Modules\Tax\Entities\CustomerTaxGroup;
 use Modules\Tax\Entities\ProductTaxGroup;
 use Modules\Tax\Entities\TaxRate;
@@ -12,7 +11,6 @@ use Modules\Tax\Observers\CustomerTaxGroupObserver;
 use Modules\Tax\Observers\ProductTaxGroupObserver;
 use Modules\Tax\Observers\TaxRateObserver;
 use Modules\Tax\Observers\TaxRuleObserver;
-use Modules\Tax\Services\GeoIp;
 use Modules\Tax\Services\TaxCache;
 use Modules\Tax\Services\TaxPrice;
 
@@ -66,9 +64,6 @@ class TaxServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
-        $this->mergeConfigFrom(
-            module_path($this->moduleName, 'Config/geoip.php'), "geoip"
-        );
     }
 
     /**
@@ -109,9 +104,6 @@ class TaxServiceProvider extends ServiceProvider
     {
         $this->app->singleton('TaxPrice', function () {
             return new TaxPrice();
-        });
-        $this->app->singleton('GeoIp', function () {
-            return new GeoIp();
         });
         $this->app->singleton('TaxCache', function () {
             return new TaxCache();

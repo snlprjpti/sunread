@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Tax\Services\GeoServices;
+namespace Modules\GeoIp\Services;
 
 use ArrayAccess;
 use Illuminate\Support\Str;

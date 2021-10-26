@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Bus\Batch;
 use Modules\Product\Jobs\ReindexMigrator;
+use Modules\Product\Jobs\Tester;
 
 class ElasticSearchImport extends Command
 {
@@ -32,7 +33,7 @@ class ElasticSearchImport extends Command
 
     public function handle(): void
     {
-        ReIndexer::dispatch()->onQueue("index");   
+        ReindexMigrator::dispatch()->onQueue("index");
         $this->info("All data imported successfully");
     }
 }

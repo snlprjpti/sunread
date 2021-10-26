@@ -112,11 +112,14 @@ class EmailTemplateController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
-    public function templateGroup(): JsonResponse
+    /**
+     * fetch email template groupwise
+    */
+    public function templateGroup(Request $request): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->getConfigGroup();
+            $fetched = $this->repository->getConfigGroup($request);
         }
         catch( Exception $exception )
         {
@@ -126,6 +129,9 @@ class EmailTemplateController extends BaseController
         return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Group" ]));
     }
 
+    /**
+     * Fetch email template variables
+    */
     public function templateVariable(Request $request): JsonResponse
     {
         try
@@ -139,5 +145,23 @@ class EmailTemplateController extends BaseController
         }
 
         return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Variable" ]));
+    }
+
+    /**
+     * Fetch template content only
+     */
+    public function getTemplateContent(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->fetch($id);
+            $fetched = $fetched->content;
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }

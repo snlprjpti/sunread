@@ -32,7 +32,16 @@ task :update_composer do
 end
 
 task :install_composer do
-  invoke "composer:run", :install, "--prefer-dist --ignore-platform-reqs"
+    invoke "composer:run", :install, "--prefer-dist --ignore-platform-reqs"
+end
+
+task :get_geoip_files do
+    puts "==================Get Composer and Maxmind file======================"
+    on roles(:all) do
+        execute "cd ~/api/current && curl -sS https://getcomposer.org/installer | php"
+        execute "cd ~/api/current && php composer.phar require geoip2/geoip2:~2.0 --ignore-platform-reqs"
+        execute "cd ~/api/current && composer dump-autoload"
+    end
 end
 
 task :reload_supervisor do
@@ -40,6 +49,9 @@ task :reload_supervisor do
     on roles(:all) do
         execute :sudo, :supervisorctl, "restart php_serve"
         execute :sudo, :supervisorctl, "restart php_queue:*"
+        execute :sudo, :supervisorctl, "restart php_queue_index:*"
+        execute :sudo, :supervisorctl, "restart php_queue_erp:*"
+        execute :sudo, :supervisorctl, "restart php_queue_high:*"
         execute :sudo, :supervisorctl, "restart php_schedule"
         execute :sudo, :supervisorctl, "reread"
         execute :sudo, :supervisorctl, "update"
@@ -55,6 +67,7 @@ end
 
 after "deploy:published", "install_composer"
 after "deploy:published", "reload_supervisor"
+after "deploy:published", "get_geoip_files"
 after "deploy:published", "link_storage"
 
 

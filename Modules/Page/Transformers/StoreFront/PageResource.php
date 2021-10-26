@@ -17,7 +17,7 @@ class PageResource extends JsonResource
             "meta_title" => $this->meta_title,
             "meta_description" => $this->meta_description,
             "meta_keywords" => $this->meta_keywords,
-            "components" => PageAttributeResource::collection($this->whenLoaded("page_attributes"))
+            // "components" => PageAttributeResource::collection($this->whenLoaded("page_attributes"))
         ];
     }
 }

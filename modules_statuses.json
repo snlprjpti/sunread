@@ -18,5 +18,6 @@
     "EmailTemplate": true,
     "Notification": true,
     "ProductStockAlert": true,
-    "ProductStockAlertResource": true
+    "ProductStockAlertResource": true,
+    "GeoIp": true
 }

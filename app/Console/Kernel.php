@@ -10,7 +10,7 @@ use Modules\Erp\Console\ErpAttributeOptionMigrate;
 use Modules\Erp\Console\ErpImport;
 use Modules\Erp\Console\ErpMigrate;
 use Modules\Product\Console\ElasticSearchImport;
-use Modules\Tax\Console\GeoIpDbUpdator;
+use Modules\GeoIp\Console\GeoIpDbUpdator;
 
 class Kernel extends ConsoleKernel
 {

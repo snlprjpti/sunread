@@ -18,6 +18,3 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/check', function (\Illuminate\Http\Request $request) {
-    return view('check');
-});

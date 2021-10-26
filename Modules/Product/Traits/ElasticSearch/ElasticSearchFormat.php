@@ -41,7 +41,7 @@ trait ElasticSearchFormat
     {
         try
         {   
-            $data = $this->select("id", "sku", "status", "website_id", "parent_id", "type")->first()->toArray();
+            $data = $this->select("id", "sku", "status", "website_id", "parent_id", "type")->where("id", $this->id)->first()->toArray();
             
             $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
             

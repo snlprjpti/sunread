@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\Tax\Console;
+namespace Modules\GeoIp\Console;
 
 use Illuminate\Console\Command;
-use Modules\Tax\Facades\GeoIp;
+use Modules\GeoIp\Facades\GeoIp;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
