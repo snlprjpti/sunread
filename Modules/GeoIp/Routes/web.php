@@ -11,10 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return response()->json([
-        'status' => 'success',
-        'message' => 'App is running!!',
-    ]);
+Route::prefix('geoip')->group(function() {
+    Route::get('/', 'GeoIpController@index');
 });
-

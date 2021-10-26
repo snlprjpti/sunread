@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\Tax\Services;
+namespace Modules\GeoIp\Services;
 
 use Exception;
 use GeoIp2\Database\Reader;
-use Modules\Tax\Services\GeoServices\Location;
-use Modules\Tax\Traits\HasClientIp;
+use Modules\GeoIp\Services\Location;
+use Modules\GeoIp\Traits\HasClientIp;
 use PharData;
 use GeoIp2\Exception\AddressNotFoundException;
 

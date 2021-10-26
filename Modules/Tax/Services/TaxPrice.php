@@ -6,14 +6,9 @@ use Exception;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\PriceFormat;
 use Modules\Core\Facades\SiteConfig;
-use Modules\Country\Entities\Country;
-use Modules\Tax\Entities\CustomerTaxGroup;
-use Modules\Tax\Entities\ProductTaxGroup;
-use Modules\Tax\Entities\TaxRule;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Modules\Tax\Entities\TaxRate;
-use Modules\Tax\Facades\GeoIp;
+use Modules\GeoIp\Facades\GeoIp;
 use Modules\Tax\Facades\TaxCache;
 use Modules\Tax\Traits\HasClientIp;
 

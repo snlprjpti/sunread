@@ -15,4 +15,12 @@ Route::group(["middleware" => ["api"]], function () {
         Route::put("/rules/{tax_rule_id}/status", [\Modules\Tax\Http\Controllers\TaxRuleController::class, "updateStatus"])->name("rules.status");
         Route::resource('rules', TaxRuleController::class)->except(['create', 'edit']);
     });
+
+    Route::get('/ip', function (\Illuminate\Http\Request $request) {
+        $ip = \Modules\Tax\Facades\GeoIp::clientIp();
+        return response()->json([
+            "ip" => $ip
+        ]);
+        //return view('check');
+    });
 });

@@ -1,6 +1,7 @@
 <?php
 
-namespace Modules\Tax\Facades;
+namespace Modules\GeoIp\Facades;
+
 use Illuminate\Support\Facades\Facade;
 
 class GeoIp extends Facade
