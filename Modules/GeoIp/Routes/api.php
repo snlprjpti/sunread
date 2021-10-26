@@ -16,7 +16,8 @@ use Modules\GeoIp\Facades\GeoIp;
 
 Route::get("test-ip", function () {
     return response()->json([
-        "client_ip" => GeoIp::requestIp(),
-        "location" => GeoIp::getGeoLocation(),
+        "ip" => request()->ip(),
+        //"client_ip" => GeoIp::requestIp(),
+        //"location" => GeoIp::getGeoLocation(),
     ]);
 })->middleware("proxies");
