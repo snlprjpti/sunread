@@ -26,7 +26,7 @@ class CategoryRepository extends BaseRepository
         $this->model = $category;
         $this->value_model = $categoryValue;
         $this->model_key = "catalog.categories";
-        
+
         $this->rules = [
             // category validation
             "position" => "sometimes|nullable|numeric",
@@ -45,13 +45,13 @@ class CategoryRepository extends BaseRepository
     public function getConfigData(array $data): array
     {
         $fetched = $this->config_fields;
-       
+
         foreach($fetched as $key => $children){
             if(!isset($children["elements"])) continue;
 
             $children_data["title"] = $children["title"];
             $children_data["elements"] = [];
-            
+
             foreach($children["elements"] as &$element){
                 if($this->scopeFilter($data["scope"], $element["scope"])) continue;
 
@@ -59,7 +59,7 @@ class CategoryRepository extends BaseRepository
                     $data["attribute"] = $element["slug"];
 
                     $existData = $this->has($data);
-                    
+
                     if($data["scope"] != "website") $element["use_default_value"] = $existData ? 0 : 1;
                     $elementValue = $existData ? $this->getValues($data) : $this->getDefaultValues($data);
                     $element["value"] = $elementValue?->value ?? null;
@@ -89,7 +89,7 @@ class CategoryRepository extends BaseRepository
     }
 
     public function updatePosition(array $data, int $id): object
-    {        
+    {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.update.before");
 
@@ -97,8 +97,8 @@ class CategoryRepository extends BaseRepository
         {
             $category = $this->model->findOrFail($id);
             $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : null;
-            
-            if($parent_id) 
+
+            if($parent_id)
             {
                 $parent = $this->model->findOrFail($parent_id);
                 if(($id == $parent_id) || ($parent->parent_id == $id)) throw ValidationException::withMessages([ "parent_id" => "Node must not be a descendant." ]);
@@ -108,11 +108,11 @@ class CategoryRepository extends BaseRepository
 
             $all_category = $parent_id ? $parent->children : $this->model->whereParentId(null)->get();
             if($data["position"] > count($all_category)) $data["position"] = count($all_category);
-            
+
             $allnodes = $all_category->sortBy('_lft')->values();
             $position_category = $allnodes->get(($data["position"]-1));
             $key = key(collect($allnodes)->where('id', $id)->toArray()) + 1;
-            
+
             ($position_category->_lft < $category->_lft) ? $category->up($key-$data["position"]) : $category->down($data["position"]-$key);
 
         }

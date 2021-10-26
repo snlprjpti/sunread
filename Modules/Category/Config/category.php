@@ -1,4 +1,4 @@
-<?php 
+<?php
 return [
     "attributes" => [
         "general" => [
@@ -23,7 +23,7 @@ return [
                     "options" => [],
                     "rules" => "string",
                     "is_required" => 0
-                    
+
                 ],
                 [
                     "title" => "Status",
@@ -31,7 +31,7 @@ return [
                     "type" => "select",
                     "value" => "",
                     "scope" => "store",
-                    "options" => [ 
+                    "options" => [
                         [ "value" => "1", "label" => "Enabled" ],
                         [ "value" => "0", "label" => "Disabled" ]
                     ],
@@ -44,13 +44,13 @@ return [
                     "type" => "select",
                     "value" => "",
                     "scope" => "store",
-                    "options" => [ 
+                    "options" => [
                         [ "value" => "1", "label" => "Yes" ],
                         [ "value" => "0", "label" => "No" ]
                     ],
                     "rules" => "nullable|in:0,1",
                     "is_required" => 0
-                    
+
                 ]
             ]
         ],
@@ -65,7 +65,7 @@ return [
                     "scope" => "store",
                     "options" => [],
                     "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
-                    "is_required" => 0            
+                    "is_required" => 0
                 ],
                 [
                     "title" => "Description",
@@ -76,7 +76,7 @@ return [
                     "options" => [],
                     "rules" => "nullable|string",
                     "is_required" => 0
-                    
+
                 ]
             ]
         ],
@@ -89,7 +89,7 @@ return [
                     "type" => "select",
                     "value" => "",
                     "scope" => "store",
-                    "options" => [ 
+                    "options" => [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
                     ],
@@ -306,10 +306,10 @@ return [
                     "options" => [],
                     "rules" => "nullable",
                     "is_required" => 0
-                    
+
                 ],
                 [
-                    "title" => "Meta KeyWords", 
+                    "title" => "Meta KeyWords",
                     "slug" => "meta_keywords",
                     "type" => "text",
                     "value" => "",
@@ -317,7 +317,7 @@ return [
                     "options" => [],
                     "rules" => "nullable",
                     "is_required" => 0
-                    
+
                 ],
                 [
                     "title" => "Meta Description",
@@ -328,7 +328,7 @@ return [
                     "options" => [],
                     "rules" => "nullable",
                     "is_required" => 0
-                    
+
                 ]
             ]
         ],
@@ -358,7 +358,7 @@ return [
         "usp_banner_3_first_image" => "usp_banner_3.elements.0",
         "usp_banner_3_second_image" => "usp_banner_3.elements.1",
         "usp_banner_3_third_image" => "usp_banner_3.elements.2",
-        "usp_banner_3_placement" => "usp_banner_3.elements.3",      
+        "usp_banner_3_placement" => "usp_banner_3.elements.3",
         "meta_title" => "search_engine_optimization.elements.0",
         "meta_keywords" => "search_engine_optimization.elements.1",
         "meta_description" => "search_engine_optimization.elements.2"

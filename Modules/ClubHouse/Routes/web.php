@@ -11,6 +11,6 @@
 |
 */
 
-Route::prefix('erp')->group(function() {
-    // Route::get('/', 'ErpController@index');
+Route::prefix('clubhouse')->group(function() {
+    Route::get('/', 'ClubHouseController@index');
 });

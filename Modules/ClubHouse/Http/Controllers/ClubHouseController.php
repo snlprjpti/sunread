@@ -1,55 +1,45 @@
 <?php
 
-namespace Modules\Category\Http\Controllers;
+namespace Modules\ClubHouse\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\Category\Entities\Category;
-use Modules\Core\Http\Controllers\BaseController;
-use Modules\Category\Transformers\CategoryResource;
-use Modules\Category\Repositories\CategoryRepository;
-use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
-use Modules\Category\Transformers\List\CategoryResource as ListCategoryResource;
-use Modules\Category\Repositories\CategoryValueRepository;
-use Modules\Category\Rules\CategoryScopeRule;
-use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Core\Rules\ScopeRule;
-use Modules\Product\Entities\Product;
+use Illuminate\Routing\Controller;
+use Modules\ClubHouse\Entities\ClubHouse;
+use Modules\ClubHouse\Rules\SlugUniqueRule;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Validation\ValidationException;
+use Modules\Clubhouse\Rules\ClubhouseScopeRule;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\ClubHouse\Transformers\ClubHouseResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Clubhouse\Repositories\ClubHouseRepository;
 
-class CategoryController extends BaseController
+class ClubHouseController extends Controller
 {
-    protected $repository, $categoryValueRepository, $is_super_admin, $main_root_id, $product_model;
+    protected $repository, $clubHouseValueRepository;
 
-    public function __construct(CategoryRepository $categoryRepository, Category $category, CategoryValueRepository $categoryValueRepository, Product $product_model)
+    public function __construct(ClubHouseRepository $clubHouseRepository, ClubHouse $clubHouse, ClubHouseRepository $clubHouseValueRepository)
     {
-        $this->repository = $categoryRepository;
-        $this->categoryValueRepository = $categoryValueRepository;
+        $this->repository = $clubHouseRepository;
+        $this->clubHouseValueRepository = $clubHouseValueRepository;
 
-        $this->model = $category;
-        $this->model_name = "Category";
-
-        $this->product_model = $product_model;
+        $this->model = $clubHouse;
+        $this->model_name = "ClubHouse";
 
         parent::__construct($this->model, $this->model_name);
     }
 
     public function collection(object $data): ResourceCollection
     {
-        return CategoryResource::collection($data);
-    }
-
-    public function listCollection(object $data): ResourceCollection
-    {
-        return ListCategoryResource::collection($data);
+        return ClubHouseResource::collection($data);
     }
 
     public function resource(object $data): JsonResource
     {
-        return new CategoryResource($data);
+        return new ClubHouseResource($data);
     }
 
     public function index(Request $request): JsonResponse
@@ -58,7 +48,7 @@ class CategoryController extends BaseController
         {
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request)],
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubhouseScopeRule($request)],
                 "website_id" => "required|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll(request: $request, callback: function () use ($request) {
@@ -112,7 +102,7 @@ class CategoryController extends BaseController
         {
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubhouseScopeRule($request, $id)]
             ]);
 
             $category = $this->model->findOrFail($id);
@@ -151,7 +141,7 @@ class CategoryController extends BaseController
             $data = $this->repository->validateData($request, array_merge($this->categoryValueRepository->getValidationRules($request, $id, "update"), [
                 "items.slug.value" => new SlugUniqueRule($request, $category),
                 "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new ClubhouseScopeRule($request, $id)]
             ]), function () use ($category) {
                 return [
                     "parent_id" => $category->parent_id,
@@ -226,22 +216,4 @@ class CategoryController extends BaseController
         return $this->successResponse($fetched, $this->lang("fetch-success"));
     }
 
-    public function updatePosition(Request $request, int $id): JsonResponse
-    {
-        try
-        {
-            $data = $request->validate([
-                "parent_id" => "nullable|numeric|exists:categories,id",
-                "position" => "required|numeric"
-            ]);
-
-            $category = $this->repository->updatePosition($data, $id);
-        }
-        catch (Exception $exception)
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse($this->resource($category), $this->lang("update-success"));
-    }
 }

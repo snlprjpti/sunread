@@ -17,5 +17,6 @@
     "Cart": true,
     "EmailTemplate": true,
     "ProductStockAlert": true,
-    "ProductStockAlertResource": true
+    "ProductStockAlertResource": true,
+    "ClubHouse": true
 }

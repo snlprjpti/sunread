@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Category\Traits;
+namespace Modules\Clubhouse\Traits;
 
 use Illuminate\Support\Facades\Storage;
 use Modules\Category\Entities\Category;
