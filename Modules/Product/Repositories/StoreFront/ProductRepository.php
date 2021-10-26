@@ -171,6 +171,7 @@ class ProductRepository extends BaseRepository
                 $variant_ids = $product->variants->pluck("id")->toArray();
                 $elastic_fetched = [
                     "_source" => ["show_configurable_attributes"],
+                    "size" => 1000,
                     "query"=> [
                         "bool" => [
                             "must" => [
