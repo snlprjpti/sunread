@@ -1326,7 +1326,7 @@ return [
                         "groups" => [
                             [
                                 "title" => "Products",
-                                "slug" => "products_module",
+                                "slug" => "sub_products_module",
                                 "hasChildren" => 1,
                                 "attributes" => [
                                     [
@@ -1342,7 +1342,7 @@ return [
                                             [
                                                 [
                                                     "title" => "SKU",
-                                                    "slug" => "products_repeater_sku",
+                                                    "slug" => "sku",
                                                     "hasChildren" => 0,
                                                     "type" => "text",
                                                     "provider" => "Modules\Product\Entities\Product",
@@ -1356,7 +1356,7 @@ return [
                                                 ],
                                                 [
                                                     "title" => "Image",
-                                                    "slug" => "products_repeater_image",
+                                                    "slug" => "image",
                                                     "hasChildren" => 0,
                                                     "type" => "file",
                                                     "provider" => "",
@@ -1448,7 +1448,7 @@ return [
                                         "options" => [],
                                         "conditions" => [],
                                         "description" => "",
-                                        "rules" => "",
+                                        "rules" => "url",
                                         "is_required" => 1
                                     ],
                                     [
@@ -1460,8 +1460,8 @@ return [
                                         "pluck" => [],
                                         "default" => "",
                                         "options" => [
-                                            [ "value" => 0, "label" => "Yes" ],
-                                            [ "value" => 1, "label" => "No" ]
+                                            [ "value" => 1, "label" => "Yes" ],
+                                            [ "value" => 0, "label" => "No" ]
                                         ],
                                         "conditions" => [],
                                         "description" => "",
