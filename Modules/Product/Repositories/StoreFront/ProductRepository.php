@@ -121,7 +121,7 @@ class ProductRepository extends BaseRepository
                 if($attribute->slug == "component") {
                     $product_builders = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
                     if($product_builders->isEmpty()) $product_builders = $product->getBuilderParentValues($match);
-                    $data["product_builder"] = $product_builders ? $this->pageRepository->getComponent($product_builders) : [];
+                    $data["product_builder"] = $product_builders ? $this->pageRepository->getComponent($store, $product_builders) : [];
                     continue;
                 }
 
