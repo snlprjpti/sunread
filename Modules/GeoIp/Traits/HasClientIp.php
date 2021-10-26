@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Tax\Traits;
+namespace Modules\GeoIp\Traits;
 
 trait HasClientIp {
 
@@ -61,6 +61,11 @@ trait HasClientIp {
             $ipAddress = $_SERVER['REMOTE_ADDR'];
         }
         return $ipAddress;
+    }
+
+    public function requestIp(): ?string
+    {
+        return request()->ip();
     }
 
 }

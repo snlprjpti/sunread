@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\Tax\Services;
+namespace Modules\GeoIp\Services;
 
 use Exception;
 use GeoIp2\Database\Reader;
-use Modules\Tax\Services\GeoServices\Location;
-use Modules\Tax\Traits\HasClientIp;
+use Modules\GeoIp\Services\Location;
+use Modules\GeoIp\Traits\HasClientIp;
 use PharData;
 use GeoIp2\Exception\AddressNotFoundException;
 
@@ -20,13 +20,12 @@ class GeoIp {
         $this->geoip_db_path = config("geoip.services.maxmind_database.database_path");
         $this->dbupdate_url = config("geoip.services.maxmind_database.update_url");
         $this->default_locale = config("geoip.services.maxmind_database.locales");
-     //   $this->reader = $this->connect();
+        $this->reader = $this->connect();
     }
 
     public function connect(): mixed
     {
-       // return new Reader($this->geoip_db_path, ["en"]);		
-        return null;
+        return new Reader($this->geoip_db_path, ["en"]);
     }
 
     public function hydrate(array $attributes = []): mixed
@@ -36,7 +35,7 @@ class GeoIp {
 
     public function getGeoLocation(): mixed
     {
-        return $this->locate($this->getClientIp());
+        return $this->locate($this->clientIp());
     }
 
     public function locate(string $ip): mixed
