@@ -120,7 +120,7 @@ class PageRepository extends BaseRepository
                     unset($element["pluck"], $element["provider"], $element["rules"]);
 
                     if (count($values) > 0) {
-                        $default = getDotToArray($append_slug_key, $values);
+                        $default = decodeJsonNumeric(getDotToArray($append_slug_key, $values));
                         if($default) $element["default"] = ($element["type"] == "file") ? Storage::url($default) : $default;
                     }
 
