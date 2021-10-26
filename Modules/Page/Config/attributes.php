@@ -1331,7 +1331,7 @@ return [
                                 "attributes" => [
                                     [
                                         "title" => "Products",
-                                        "slug" => "products_repeater",
+                                        "slug" => "products",
                                         "hasChildren" => 1,
                                         "type" => "repeater",
                                         "conditions" => [],
@@ -1341,8 +1341,8 @@ return [
                                         "attributes" => [
                                             [
                                                 [
-                                                    "title" => "SKU",
-                                                    "slug" => "sku",
+                                                    "title" => "Product",
+                                                    "slug" => "product",
                                                     "hasChildren" => 0,
                                                     "type" => "text",
                                                     "provider" => "Modules\Product\Entities\Product",

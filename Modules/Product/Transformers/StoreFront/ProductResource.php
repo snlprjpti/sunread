@@ -21,7 +21,8 @@ class ProductResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->value(array_merge($scope, [ "attribute_slug" => "name" ])),
-            "price" => PriceFormat::get($price, $store->id, "store"),
+            "price" => $price,
+            "price_formatted" => PriceFormat::get($price, $store->id, "store"),
             "url_key" => $this->value(array_merge($scope, [ "attribute_slug" => "url_key" ])),
             "type" => $this->type,
             "sku" => $this->sku,           
