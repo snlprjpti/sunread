@@ -28,4 +28,4 @@ Route::get('/ip', function (\Illuminate\Http\Request $request) {
         "ip" => $ip
     ]);
     //return view('check');
-});
+})->middleware("proxies");
