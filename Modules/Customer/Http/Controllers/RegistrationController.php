@@ -46,7 +46,8 @@ class RegistrationController extends BaseController
         }
 
         event(new RegistrationSuccess($created->id));
-        if(SiteConfig::fetch("require_email_confirmation", "website", $request->website_id) == 1) {
+        $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $request->website_id);
+        if($required_email_confirm == 1) {
             event(new NewAccount($created->id, $created->verification_token));
         }
 

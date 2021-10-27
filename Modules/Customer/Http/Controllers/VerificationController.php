@@ -30,7 +30,8 @@ class VerificationController extends BaseController
             $customer = auth()->guard('customer')->user();
 
             if(!$customer->is_email_verified) {
-                if(SiteConfig::fetch("require_email_confirmation", "website", $customer->website_id) == 1) {
+                $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $customer->website_id);
+                if($required_email_confirm == 1) {
                     $customer["verification_token"] = Str::random(30);
                     $customer->save();
                     $message = "response.send-confirmation-link";
