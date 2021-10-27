@@ -37,7 +37,10 @@ class ReIndexer implements ShouldQueue
                 return $channel->stores;
             })->flatten(1);
 
-            if ($this->product->type == "configurable") $chunk_variants = $this->product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get()->chunk(100);
+            if ($this->product->type == "configurable") {
+                $all_variants = $this->product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
+                $chunk_variants = $all_variants->chunk(100);
+            } 
 
             foreach ($stores as $store)
             {
@@ -48,7 +51,7 @@ class ReIndexer implements ShouldQueue
                     {
                         $chunk_variant_key = Bus::batch([])->onQueue("index")->dispatch();
                         foreach ($variants as $variant) {
-                            $chunk_variant_key->add(new VariantIndexing($this->product, $variants, $variant, $store));
+                            $chunk_variant_key->add(new VariantIndexing($this->product, $all_variants, $variant, $store));
                         }
                     }
                 }
