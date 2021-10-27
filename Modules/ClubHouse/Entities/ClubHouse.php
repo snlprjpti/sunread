@@ -18,10 +18,10 @@ class ClubHouse extends Model
      */
     protected $fillable = ["position", "website_id", "type", "status"];
     protected $with = [ "values" ];
+    public static $SEARCHABLE = [];
+
 
     protected $casts = [];
-
-
 
     public function __construct(?array $attributes = [])
     {

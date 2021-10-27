@@ -15,7 +15,7 @@ class ClubHouseTest extends BaseTestCase
         $this->admin = $this->createAdmin();
 
         $this->model_name = "Club House";
-        $this->route_prefix = "admin.";
+        $this->route_prefix = "admin.clubhouses";
     }
 
     public function testAdminCanFetchResources()

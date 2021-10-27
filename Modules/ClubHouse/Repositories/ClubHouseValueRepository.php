@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Modules\Category\Repositories;
+namespace Modules\ClubHouse\Repositories;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -9,21 +9,21 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Modules\Category\Entities\Category;
-use Modules\Category\Entities\CategoryValue;
-use Modules\Category\Traits\HasScope;
+use Modules\ClubHouse\Entities\ClubHouse;
+use Modules\ClubHouse\Entities\ClubHouseValue;
+use Modules\ClubHouse\Traits\HasScope;
 
-class CategoryValueRepository
+class ClubHouseValueRepository
 {
     use HasScope;
     protected $model, $model_key, $repository, $model_name, $global_file = [];
 
-    public function __construct(CategoryValue $category_value, CategoryRepository $category_repository)
+    public function __construct(ClubHouseValue $club_house_value, ClubHouseRepository $club_house_repository)
     {
-        $this->model = $category_value;
-        $this->model_key = "catalog.category.values";
-        $this->repository = $category_repository;
-        $this->model_name = "Category";
+        $this->model = $club_house_value;
+        $this->model_key = "clubhouse.values";
+        $this->repository = $club_house_repository;
+        $this->model_name = "ClubHouse";
 
         $this->createModel();
     }
@@ -33,7 +33,7 @@ class CategoryValueRepository
         try
         {
             $scope = $request->scope ?? "website";
-            $all_rules = collect(config("category.attributes"))->pluck("elements")->flatten(1)->map(function($data) {
+            $all_rules = collect(config("clubhouse.attributes"))->pluck("elements")->flatten(1)->map(function($data) {
                 return $data;
             })->reject(function ($data) use ($scope) {
                 return $this->scopeFilter($scope, $data["scope"]);
@@ -59,7 +59,7 @@ class CategoryValueRepository
         {
             throw $exception;
         }
-        
+
         return $all_rules;
     }
 
@@ -67,12 +67,12 @@ class CategoryValueRepository
     {
         try
         {
-            $exist_category = Category::findOrFail($id); 
+            $exist_club_house = ClubHouse::findOrFail($id);
 
             if (isset($request->items[$item["slug"]])) {
                 $request_slug = $request->items[$item["slug"]];
                 if (isset($request_slug["value"]) && !is_file($request_slug["value"])  && !isset($request_slug["use_default_value"])) {
-                $exist_file = $exist_category->values()->whereAttribute($item["slug"])->whereScope($request->scope ?? "website")->whereScopeId($request->scope_id ?? $exist_category->website_id)->first();
+                $exist_file = $exist_club_house->values()->whereAttribute($item["slug"])->whereScope($request->scope ?? "website")->whereScopeId($request->scope_id ?? $exist_club_house->website_id)->first();
                     if ($exist_file?->value && (Storage::url($exist_file?->value) == $request_slug["value"])) {
                         $this->global_file[] = $item["slug"];
                         return "";
@@ -93,12 +93,11 @@ class CategoryValueRepository
 
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.create.before");
-
         try
         {
             $created_data = [];
             $match = [
-                "category_id" => $parent->id,
+                "club_house_id" => $parent->id,
                 "scope" => $data["scope"],
                 "scope_id" => $data["scope_id"]
             ];
@@ -108,18 +107,18 @@ class CategoryValueRepository
                 if(in_array($key, $this->global_file)) continue;
 
                 if(isset($val["use_default_value"]) && $val["use_default_value"] != 1) throw ValidationException::withMessages([ "use_default_value" => __("core::app.response.use_default_value") ]);
-    
+
                 if(!isset($val["use_default_value"]) && !array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
 
-                $absolute_path = config("category.absolute_path.{$key}");
-                $configDataArray = config("category.attributes.{$absolute_path}");
+                $absolute_path = config("clubhouse.absolute_path.{$key}");
+                $configDataArray = config("clubhouse.attributes.{$absolute_path}");
 
                 if($this->scopeFilter($match["scope"], $configDataArray["scope"])) continue;
-                
+
                 $match["attribute"] = $key;
-                
+
                 $value = $val["value"] ?? null;
-                $match["value"] = ($configDataArray["type"] == "file" && $value) ? $this->repository->storeScopeImage($value, "category") : $value;
+                $match["value"] = ($configDataArray["type"] == "file" && $value) ? $this->repository->storeScopeImage($value, "club_house") : $value;
 
                 if($configData = $this->checkCondition($match)->first())
                 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\Clubhouse\Traits;
+namespace Modules\ClubHouse\Traits;
 
-use Illuminate\Support\Facades\Storage;
-use Modules\Category\Entities\Category;
-use Modules\Category\Entities\CategoryValue;
-use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Channel;
+use Illuminate\Support\Facades\Storage;
+use Modules\ClubHouse\Entities\ClubHouse;
+use Modules\ClubHouse\Entities\ClubHouseValue;
 
 trait HasScope
 {
@@ -16,7 +16,7 @@ trait HasScope
     {
         $this->channel_model = new Channel();
         $this->store_model = new Store();
-        $this->value_model = new CategoryValue();
+        $this->value_model = new ClubHouseValue();
     }
 
     public function getDefaultValues(array $data): ?object
@@ -59,16 +59,15 @@ trait HasScope
 
     public function checkCondition(array $data): object
     {
-        return $this->value_model->whereCategoryId($data["category_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);
+        return $this->value_model->whereClubHouseId($data["club_house_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);
     }
 
-    public function checkSlug(array $data, ?string $slug, ?object $category = null): ?object
+    public function checkSlug(array $data, ?string $slug, ?object $club_house = null): ?object
     {
-        $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : $category?->parent_id;
-        $website_id = isset($data["website_id"]) ? $data["website_id"] : $category?->website_id;
+        $website_id = isset($data["website_id"]) ? $data["website_id"] : $club_house?->website_id;
 
-        return Category::whereParentId($parent_id)->whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $category) {
-            if($category) $query = $query->where('category_id', '!=', $category->id);
+        return ClubHouse::whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $club_house) {
+            if($club_house) $query = $query->where('club_house_id', '!=', $club_house->id);
             $query->whereAttribute("slug")->whereValue($slug);
         })->first();
     }
@@ -76,9 +75,9 @@ trait HasScope
     public function value(array $data, string $attribute): mixed
     {
         $this->createModel();
-        $elements = collect(config("category.attributes"))->pluck("elements")->flatten(1);
+        $elements = collect(config("cluhbouse.attributes"))->pluck("elements")->flatten(1);
         $attribute_data = $elements->where("slug", $attribute)->first();
-        $data = array_merge($data, [ "attribute" => $attribute], ["category_id" => $this->id]);
+        $data = array_merge($data, [ "attribute" => $attribute], ["club_house_id" => $this->id]);
         $default = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
         return ($attribute_data["type"] == "file" && $default?->value) ? Storage::url($default?->value) : $default?->value;
     }

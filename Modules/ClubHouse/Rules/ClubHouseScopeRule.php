@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\Clubhouse\Rules;
+namespace Modules\ClubHouse\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use Modules\Clubhouse\Entities\Clubhouse;
+use Modules\ClubHouse\Entities\ClubHouse;
 use Modules\Core\Entities\Website;
 
-class ClubhouseScopeRule implements Rule
+class ClubHouseScopeRule implements Rule
 {
     /**
      * Create a new rule instance.
@@ -31,7 +31,7 @@ class ClubhouseScopeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($this->id) $website_id = Clubhouse::findOrFail($this->id)->website_id ;
+        if($this->id) $website_id = ClubHouse::findOrFail($this->id)->website_id ;
 
         if(!isset($website_id) && $this->data->website_id) $website_id = $this->data->website_id;
 

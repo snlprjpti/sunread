@@ -12,5 +12,5 @@
 */
 
 Route::prefix('clubhouse')->group(function() {
-    Route::get('/', 'ClubHouseController@index');
+    // Route::get('/', 'ClubHouseController@index');
 });

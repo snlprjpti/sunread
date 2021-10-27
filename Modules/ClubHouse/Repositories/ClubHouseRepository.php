@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Clubhouse\Repositories;
+namespace Modules\ClubHouse\Repositories;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -13,22 +13,24 @@ use Modules\ClubHouse\Entities\ClubHouseValue;
 use Modules\ClubHouse\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
 
-class ClubhouseRepository extends BaseRepository
+class ClubHouseRepository extends BaseRepository
 {
     use HasScope;
 
     protected $repository, $config_fields;
     protected bool $without_pagination = true;
 
-    public function __construct(ClubHouse $clubHouse, ClubHouseValue $clubHouseValue)
+    public function __construct(ClubHouse $club_house, ClubHouseValue $club_house_value)
     {
-        $this->model = $clubHouse;
-        $this->value_model = $clubHouseValue;
+        $this->model = $club_house;
+        $this->value_model = $club_house_value;
         $this->model_key = "clubhouse";
 
         $this->rules = [
             // ClubHouse validation
-            "position" => "sometimes|nullable|numeric",
+            "position" => "sometimes|nullable|integer",
+            "website_id" => "required|exists:websites,id",
+            "type" => "required|string|in:clubhouse,resort"
         ];
 
         $this->config_fields = config("clubhouse.attributes");
@@ -48,17 +50,6 @@ class ClubhouseRepository extends BaseRepository
 
             foreach($children["elements"] as &$element){
                 if($this->scopeFilter($data["scope"], $element["scope"])) continue;
-
-                if(isset($data["category_id"])){
-                    $data["attribute"] = $element["slug"];
-
-                    $existData = $this->has($data);
-
-                    if($data["scope"] != "website") $element["use_default_value"] = $existData ? 0 : 1;
-                    $elementValue = $existData ? $this->getValues($data) : $this->getDefaultValues($data);
-                    $element["value"] = $elementValue?->value ?? null;
-                    if ($element["type"] == "file" && $element["value"]) $element["value"] = Storage::url($element["value"]);
-                }
                 unset($element["rules"]);
 
                 $children_data["elements"][] = $element;
@@ -68,14 +59,14 @@ class ClubhouseRepository extends BaseRepository
         return $fetched;
     }
 
-    public function createUniqueSlug(array $data, ?object $clubHouse = null)
+    public function createUniqueSlug(array $data, ?object $club_house = null)
     {
-        $slug = isset($data["items"]["name"]["value"]) ? Str::slug($data["items"]["name"]["value"]) : $clubHouse->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug");
+        $slug = isset($data["items"]["name"]["value"]) ? Str::slug($data["items"]["name"]["value"]) : $club_house->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug");
         $original_slug = $slug;
 
         $count = 1;
 
-        while ($this->checkSlug($data, $slug, $clubHouse)) {
+        while ($this->checkSlug($data, $slug, $club_house)) {
             $slug = "{$original_slug}-{$count}";
             $count++;
         }

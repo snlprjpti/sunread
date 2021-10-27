@@ -6,22 +6,22 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Modules\Core\Rules\ScopeRule;
-use Illuminate\Routing\Controller;
 use Modules\ClubHouse\Entities\ClubHouse;
 use Modules\ClubHouse\Rules\SlugUniqueRule;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Validation\ValidationException;
-use Modules\Clubhouse\Rules\ClubhouseScopeRule;
+use Modules\ClubHouse\Rules\ClubHouseScopeRule;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Http\Controllers\BaseController;
 use Modules\ClubHouse\Transformers\ClubHouseResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\Clubhouse\Repositories\ClubHouseRepository;
+use Modules\ClubHouse\Repositories\ClubHouseRepository;
+use Modules\ClubHouse\Repositories\ClubHouseValueRepository;
 
-class ClubHouseController extends Controller
+class ClubHouseController extends BaseController
 {
     protected $repository, $clubHouseValueRepository;
 
-    public function __construct(ClubHouseRepository $clubHouseRepository, ClubHouse $clubHouse, ClubHouseRepository $clubHouseValueRepository)
+    public function __construct(ClubHouseRepository $clubHouseRepository, ClubHouse $clubHouse, ClubHouseValueRepository $clubHouseValueRepository)
     {
         $this->repository = $clubHouseRepository;
         $this->clubHouseValueRepository = $clubHouseValueRepository;
@@ -48,26 +48,24 @@ class ClubHouseController extends Controller
         {
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubhouseScopeRule($request)],
-                "website_id" => "required|exists:websites,id"
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request)],
+                "website_id" => "sometimes|exists:websites,id"
             ]);
-            $fetched = $this->repository->fetchAll(request: $request, callback: function () use ($request) {
-                return $this->model->whereWebsiteId($request->website_id)->orderBy("_lft", "asc");
-            })->toTree();
+            $fetched = $this->repository->fetchAll($request);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->listCollection($fetched), $this->lang("fetch-list-success"));
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
     public function store(Request $request): JsonResponse
     {
         try
         {
-            $data = $this->repository->validateData($request, array_merge($this->categoryValueRepository->getValidationRules($request), [
+            $data = $this->repository->validateData($request, array_merge($this->clubHouseValueRepository->getValidationRules($request), [
                 "items.slug.value" => new SlugUniqueRule($request),
                 "website_id" => "required|exists:websites,id"
             ]), function () use ($request) {
@@ -77,13 +75,15 @@ class ClubHouseController extends Controller
                 ];
             });
 
+            dd($data);
+
             if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data);
 
             if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
             throw ValidationException::withMessages(["website_id" => $this->lang("response.no_parent_belong_to_website")]);
 
             $created = $this->repository->create($data, function ($created) use ($data) {
-                $this->categoryValueRepository->createOrUpdate($data, $created);
+                $this->clubHouseValueRepository->createOrUpdate($data, $created);
                 if(isset($data["channels"])) $created->channels()->sync($data["channels"]);
                 if(isset($data["products"])) $created->products()->sync($data["products"]);
             });
@@ -102,26 +102,25 @@ class ClubHouseController extends Controller
         {
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
-                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubhouseScopeRule($request, $id)]
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $id)]
             ]);
 
-            $category = $this->model->findOrFail($id);
+            $club_house = $this->model->findOrFail($id);
             $data = [
                 "scope" => $request->scope ?? "website",
-                "scope_id" => $request->scope_id ?? $category->website_id,
+                "scope_id" => $request->scope_id ?? $club_house->website_id,
                 "category_id" => $id
             ];
 
             $name_data = array_merge($data, ["attribute" => "name"]);
-            $category->createModel();
-            $nameValue = $category->has($name_data) ? $category->getValues($name_data) : $category->getDefaultValues($name_data);
+            $club_house->createModel();
+            $nameValue = $club_house->has($name_data) ? $club_house->getValues($name_data) : $club_house->getDefaultValues($name_data);
 
             $fetched = [];
             $fetched = [
                 "id" => $id,
-                "parent_id" => $category->parent_id,
-                "website_id" => $category->website_id,
-                "name" => $nameValue?->value
+                "website_id" => $club_house->website_id,
+                "name" => $nameValue->value
             ];
             $fetched["attributes"] = $this->repository->getConfigData($data);
         }
@@ -137,22 +136,21 @@ class ClubHouseController extends Controller
     {
         try
         {
-            $category = $this->model->findOrFail($id);
-            $data = $this->repository->validateData($request, array_merge($this->categoryValueRepository->getValidationRules($request, $id, "update"), [
-                "items.slug.value" => new SlugUniqueRule($request, $category),
+            $club_house = $this->model->findOrFail($id);
+            $data = $this->repository->validateData($request, array_merge($this->clubHouseValueRepository->getValidationRules($request, $id, "update"), [
+                "items.slug.value" => new SlugUniqueRule($request, $club_house),
                 "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new ClubhouseScopeRule($request, $id)]
-            ]), function () use ($category) {
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $id)]
+            ]), function () use ($club_house) {
                 return [
-                    "parent_id" => $category->parent_id,
-                    "website_id" => $category->website_id
+                    "website_id" => $club_house->website_id
                 ];
             });
 
             if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data, $category);
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
-                $this->categoryValueRepository->createOrUpdate($data, $updated);
+                $this->clubHouseValueRepository->createOrUpdate($data, $updated);
                 if(isset($data["channels"])) $updated->channels()->sync($data["channels"]);
                 if(isset($data["products"])) $updated->products()->sync($data["products"]);
                 $updated->load("values");

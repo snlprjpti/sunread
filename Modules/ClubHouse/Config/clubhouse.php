@@ -37,19 +37,6 @@ return [
                     "rules" => "nullable|in:0,1",
                     "is_required" => 0
                 ],
-                [
-                    "title" => "Type",
-                    "slug" => "type",
-                    "type" => "select",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [
-                        [ "value" => "club-house", "label" => "Club House" ],
-                        [ "value" => "resort", "label" => "Resort" ]
-                    ],
-                    "rules" => "required|in:0,1",
-                    "is_required" => 1
-                ],
             ]
         ],
         "content" => [
@@ -161,6 +148,43 @@ return [
                 ],
             ]
         ],
+        "search_engine_optimization" => [
+            "title" => "Search Engine Optimization",
+            "elements" => [
+                [
+                    "title" => "Meta Title",
+                    "slug" => "meta_title",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "nullable",
+                    "is_required" => 0
+
+                ],
+                [
+                    "title" => "Meta KeyWords",
+                    "slug" => "meta_keywords",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "nullable",
+                    "is_required" => 0
+
+                ],
+                [
+                    "title" => "Meta Description",
+                    "slug" => "meta_description",
+                    "type" => "textarea",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "nullable",
+                    "is_required" => 0
+                ]
+            ]
+        ],
     ],
     "absolute_path" => [
         "title" => "general.elements.0",
@@ -174,6 +198,9 @@ return [
         "latitude" => "location.elements.0",
         "longitude" => "location.elements.1",
         "background_type" => "hero_banner.elements.0",
-        "background_image" => "hero_banner.elements.1"
+        "background_image" => "hero_banner.elements.1",
+        "meta_title" => "search_engine_optimization.elements.0",
+        "meta_keywords" => "search_engine_optimization.elements.1",
+        "meta_description" => "search_engine_optimization.elements.2"
     ]
 ];
