@@ -12,7 +12,7 @@ class ForgotPassword
 
     public $user_id, $token;
 
-    public function __construct($user_id, $token)
+    public function __construct(int $user_id, string $token)
     {
         $this->user_id = $user_id;
         $this->token = $token;

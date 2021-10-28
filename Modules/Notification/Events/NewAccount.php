@@ -10,7 +10,7 @@ class NewAccount
 
     public $user_id, $verification_token;
 
-    public function __construct($user_id, $verification_token)
+    public function __construct(int $user_id, string $verification_token)
     {
         $this->user_id = $user_id;
         $this->verification_token = $verification_token;
