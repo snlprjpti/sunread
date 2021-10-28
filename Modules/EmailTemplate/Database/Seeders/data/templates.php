@@ -501,7 +501,7 @@ function welcomeTemplate(): string
 
 function newAccountTemplate(): string
 {
-    '{{hc_include_email_template("header")}}
+    return '{{hc_include_email_template("header")}}
                  <table class="spacer" style="border-collapse: collapse; border-spacing: 0; padding: 0; text-align: left; vertical-align: top; width: 100%;">
                       <tbody>
                         <tr style="padding: 0; text-align: left; vertical-align: top;">
