@@ -16,8 +16,16 @@ use Modules\ClubHouse\Traits\HasScope;
 class ClubHouseValueRepository
 {
     use HasScope;
+
+    // Properties for ClubHouseValueRepositor
     protected $model, $model_key, $repository, $model_name, $parent_model, $global_file = [];
 
+    /**
+     * ClubHouseValueRepositor Constructor
+     * @param ClubHouseValue $club_house_value
+     * @param ClubHouseRepository $club_house_repository
+     * @param ClubHouse $club_house
+     */
     public function __construct(ClubHouseValue $club_house_value, ClubHouseRepository $club_house_repository, ClubHouse $club_house)
     {
         $this->model = $club_house_value;
@@ -29,6 +37,13 @@ class ClubHouseValueRepository
         $this->createModel();
     }
 
+    /**
+     * Fetch Validation Rules from Config File and Return it
+     * @param object $request
+     * @param int|null $id
+     * @param string|null $method
+     * @return array
+     */
     public function getValidationRules(object $request, ?int $id = null, ?string $method = null): array
     {
         try
@@ -63,6 +78,13 @@ class ClubHouseValueRepository
         return $all_rules;
     }
 
+    /**
+     * Handle and Store File from the Request
+     * @param int $id
+     * @param object $request
+     * @param array $item
+     * @param string|null $value
+     */
     public function handleFileIssue(int $id, object $request, array $item, ?string $value_rule): ?string
     {
         try
@@ -87,11 +109,16 @@ class ClubHouseValueRepository
         return $value_rule;
     }
 
+    /**
+     * Create or Update ClubHouseValue [Update if it exists, if not create the model]
+     * @param array $data
+     * @param Model $parent
+     * @return void
+     */
     public function createOrUpdate(array $data, Model $parent): void
     {
         if ( !is_array($data) || $data == [] ) return;
         DB::beginTransaction();
-        Event::dispatch("{$this->model_key}.create.before");
         try
         {
             $created_data = [];
@@ -137,7 +164,6 @@ class ClubHouseValueRepository
             throw $exception;
         }
 
-        Event::dispatch("{$this->model_key}.create.after", $created_data);
         DB::commit();
     }
 }

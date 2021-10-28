@@ -8,7 +8,6 @@ use Illuminate\Http\JsonResponse;
 use Modules\Core\Rules\ScopeRule;
 use Modules\ClubHouse\Entities\ClubHouse;
 use Modules\ClubHouse\Rules\SlugUniqueRule;
-use Illuminate\Validation\ValidationException;
 use Modules\ClubHouse\Rules\ClubHouseScopeRule;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
@@ -19,8 +18,15 @@ use Modules\ClubHouse\Repositories\ClubHouseValueRepository;
 
 class ClubHouseController extends BaseController
 {
+    // Protected properties
     protected $repository, $clubHouseValueRepository;
 
+    /**
+     * ClubHouseController Class constructor
+     * @param ClubHouseRepository $clubHouseRepository
+     * @param ClubHouse $clubHouse
+     * @param ClubHouseValueRepository $clubHouseValueRepository
+     */
     public function __construct(ClubHouseRepository $clubHouseRepository, ClubHouse $clubHouse, ClubHouseValueRepository $clubHouseValueRepository)
     {
         $this->repository = $clubHouseRepository;
@@ -29,19 +35,35 @@ class ClubHouseController extends BaseController
         $this->model = $clubHouse;
         $this->model_name = "ClubHouse";
 
+        // Calling Parent Constructor of BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
+    /**
+     * Returns ClubHouseResource in Collection
+     * @param object $data
+     * @return ResourceCollection
+     */
     public function collection(object $data): ResourceCollection
     {
         return ClubHouseResource::collection($data);
     }
 
+    /**
+     * Returns ClubHouseResource
+     * @param object $data
+     * @return JsonResource
+     */
     public function resource(object $data): JsonResource
     {
         return new ClubHouseResource($data);
     }
 
+    /**
+     * Fetches and returns the list of ClubHouse
+     * @param Request $request
+     * @return JsonResposne
+     */
     public function index(Request $request): JsonResponse
     {
         try
@@ -61,6 +83,11 @@ class ClubHouseController extends BaseController
         return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
+    /**
+     * Validates and Creates Clubhouse with Clubhouse values
+     * @param Request $request
+     * @return JsonResposne
+     */
     public function store(Request $request): JsonResponse
     {
         try
@@ -89,6 +116,12 @@ class ClubHouseController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang("create-success"), 201);
     }
 
+    /**
+     * Fetches and returns the ClubHouse by Id
+     * @param Request $request
+     * @param int $id
+     * @return JsonResposne
+     */
     public function show(Request $request, int $id): JsonResponse
     {
         try
@@ -105,7 +138,8 @@ class ClubHouseController extends BaseController
                 "club_house_id" => $id
             ];
 
-            $title_data = array_merge($data, ["attribute" => "title"]);
+            // Accessing Clubhouse title through values
+            // $title_data = array_merge($data, ["attribute" => "title"]);
             // $club_house->createModel();
             // $title_value = $club_house->has($title_data) ? $club_house->getValues($title_data) : $club_house->getDefaultValues($title_data);
 
@@ -125,6 +159,12 @@ class ClubHouseController extends BaseController
         return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
+    /**
+     * Validates and Updates Clubhouse with Clubhouse values
+     * @param Request $request
+     * @param int $id
+     * @return JsonResposne
+     */
     public function update(Request $request, int $id): JsonResponse
     {
         try
@@ -156,6 +196,12 @@ class ClubHouseController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }
 
+    /**
+     * Finds and Deletes Clubhouse
+     * @param Request $request
+     * @param int $id
+     * @return JsonResposne
+     */
     public function destroy(int $id): JsonResponse
     {
         try
@@ -172,6 +218,12 @@ class ClubHouseController extends BaseController
         return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
+    /**
+     * Updates the Status of Clubhouse with given Id
+     * @param Request $request
+     * @param int $id
+     * @return JsonResposne
+     */
     public function updateStatus(Request $request, int $id): JsonResponse
     {
         try
@@ -186,6 +238,11 @@ class ClubHouseController extends BaseController
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
     }
 
+    /**
+     * Fetches and returns Attributes for ClubHouse Values
+     * @param Request $request
+     * @return JsonResposne
+     */
     public function attributes(Request $request): JsonResponse
     {
         try

@@ -54,6 +54,7 @@ class ClubHouseServiceProvider extends ServiceProvider
             module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
         );
 
+        // Register the `clubhouse` config created to fetch Attributes for ClubHouseValues
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/clubhouse.php'), "clubhouse"
         );

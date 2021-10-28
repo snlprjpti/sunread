@@ -9,6 +9,19 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class ClubHouse.
+ *
+ * @package Modules\ClubHouse\Entities
+ *
+ * @property integer id
+ * @property integer position
+ * @property integer website_id
+ * @property string type
+ * @property integer status
+ * @property Carbon created_at
+ * @property Carbon updated_at
+ */
 class ClubHouse extends Model
 {
     use HasFactory;
@@ -17,9 +30,12 @@ class ClubHouse extends Model
      * Arrays that are Mass Assignable
      */
     protected $fillable = ["position", "website_id", "type", "status"];
-    protected $with = [ "values" ];
-    public static $SEARCHABLE = [];
 
+    // Append data with Values [ClubHouseValue]
+    protected $with = [ "values" ];
+
+    // Searchable
+    public static $SEARCHABLE = [];
 
     protected $casts = [];
 

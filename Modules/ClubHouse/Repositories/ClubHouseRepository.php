@@ -13,9 +13,15 @@ class ClubHouseRepository extends BaseRepository
 {
     use HasScope;
 
+    // Properties for ClubHouseRepostiory
     protected $repository, $config_fields;
     protected bool $without_pagination = true;
 
+    /**
+     * ClubHouseRepository Class Constructor
+     * @param ClubHouse $club_house
+     * @param ClubHouseValue $club_house_value
+     */
     public function __construct(ClubHouse $club_house, ClubHouseValue $club_house_value)
     {
         $this->model = $club_house;
@@ -34,6 +40,11 @@ class ClubHouseRepository extends BaseRepository
         $this->createModel();
     }
 
+    /**
+     * Get Attributes value from Config Data
+     * @param array $data
+     * @return array
+     */
     public function getConfigData(array $data): array
     {
         $fetched = $this->config_fields;
@@ -55,6 +66,12 @@ class ClubHouseRepository extends BaseRepository
         return $fetched;
     }
 
+    /**
+     * Creates a Unique Slug for ClubHouse
+     * @param array $data
+     * @param object|null $club_house
+     * @return string
+     */
     public function createUniqueSlug(array $data, ?object $club_house = null)
     {
         $slug = isset($data["items"]["name"]["value"]) ? Str::slug($data["items"]["name"]["value"]) : $club_house->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug");
