@@ -57,13 +57,14 @@ trait EmailNotification
             ob_start();
             extract((array)$data, EXTR_SKIP);
             eval('?' . '>' . $php);
+            $content = ob_get_clean();
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return ob_get_clean();
+        return $content;
     }
 
     /**
