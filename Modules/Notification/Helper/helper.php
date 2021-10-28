@@ -7,7 +7,7 @@ use Modules\Core\Facades\SiteConfig;
  */
 if (!function_exists('hc_include_email_template'))
 {
-    function hc_include_email_template($path)
+    function hc_include_email_template($path): ?string
     {
         $template = SiteConfig::fetch($path, "store", config('store'));
         return ($template) ? $template->content : null;
