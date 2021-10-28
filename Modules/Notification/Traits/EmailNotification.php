@@ -127,13 +127,13 @@ trait EmailNotification
             /** get store url from configuration */
             $store_front_baseurl = SiteConfig::fetch("storefront_base_urL", "store", $store->id);
 
-            $storefront_url = $store_front_baseurl . '/' . $channel->code . '/' . $store->code;
+            $storefront_url = "{$store_front_baseurl}/{$channel->code}/{$store->code}";
 
-            $customer_dashboard_url = $storefront_url . '/account';
+            $customer_dashboard_url = "{$storefront_url}/account";
 
             $customer_data = [
                 "customer_id" => $customer->id,
-                "customer_name" => $customer->first_name . ' ' . $customer->middle_name . ' ' . $customer->last_name,
+                "customer_name" => "{$customer->first_name} {$customer->middle_name} {$customer->last_name}",
                 "customer_email_address" => $customer->email,
                 "customer_dashboard_url" => $customer_dashboard_url,
                 "store_id" => $customer->store_id
