@@ -35,23 +35,28 @@ class NotificationLogHelper
 
     public function getRecipientUser(): array
     {
-        if(auth()->user()) {
-            $user_id = auth()->user()->id;
-            $type = "admin";
-        }
-        elseif (auth()->guard('customer')->user()) {
-            $user_id = auth()->guard('customer')->user()->id;
-            $type = "customer";
-        }
-        else {
-            $user_id = null;
-            $type = "guest";
-        }
+        try
+        {
+            if (auth()->user()) {
+                $user_id = auth()->user()->id;
+                $type = "admin";
+            } elseif (auth()->guard('customer')->user()) {
+                $user_id = auth()->guard('customer')->user()->id;
+                $type = "customer";
+            } else {
+                $user_id = null;
+                $type = "guest";
+            }
 
-        $data = [
-            "recipient_user_type" => $type,
-            "recipient_user_id" => $user_id,
-        ];
+            $data = [
+                "recipient_user_type" => $type,
+                "recipient_user_id" => $user_id,
+            ];
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
         return $data;
     }
