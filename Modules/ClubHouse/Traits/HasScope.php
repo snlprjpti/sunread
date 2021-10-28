@@ -59,17 +59,20 @@ trait HasScope
 
     public function checkCondition(array $data): object
     {
-        return $this->value_model->whereClubHouseId($data["club_house_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);
+        return $this->value_model->where('club_house_id', $data["club_house_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);
     }
 
     public function checkSlug(array $data, ?string $slug, ?object $club_house = null): ?object
     {
         $website_id = isset($data["website_id"]) ? $data["website_id"] : $club_house?->website_id;
+        // dd($club_house->id);
 
-        return ClubHouse::whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $club_house) {
+        $club_house = ClubHouse::whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $club_house) {
             if($club_house) $query = $query->where('club_house_id', '!=', $club_house->id);
             $query->whereAttribute("slug")->whereValue($slug);
         })->first();
+        return $club_house;
+        // dd($club_house);
     }
 
     public function value(array $data, string $attribute): mixed

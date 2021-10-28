@@ -75,17 +75,10 @@ class ClubHouseController extends BaseController
                 ];
             });
 
-            dd($data);
-
             if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data);
-
-            if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
-            throw ValidationException::withMessages(["website_id" => $this->lang("response.no_parent_belong_to_website")]);
 
             $created = $this->repository->create($data, function ($created) use ($data) {
                 $this->clubHouseValueRepository->createOrUpdate($data, $created);
-                if(isset($data["channels"])) $created->channels()->sync($data["channels"]);
-                if(isset($data["products"])) $created->products()->sync($data["products"]);
             });
         }
         catch (Exception $exception)
@@ -109,18 +102,18 @@ class ClubHouseController extends BaseController
             $data = [
                 "scope" => $request->scope ?? "website",
                 "scope_id" => $request->scope_id ?? $club_house->website_id,
-                "category_id" => $id
+                "club_house_id" => $id
             ];
 
-            $name_data = array_merge($data, ["attribute" => "name"]);
-            $club_house->createModel();
-            $nameValue = $club_house->has($name_data) ? $club_house->getValues($name_data) : $club_house->getDefaultValues($name_data);
+            $title_data = array_merge($data, ["attribute" => "title"]);
+            // $club_house->createModel();
+            // $title_value = $club_house->has($title_data) ? $club_house->getValues($title_data) : $club_house->getDefaultValues($title_data);
 
             $fetched = [];
             $fetched = [
                 "id" => $id,
                 "website_id" => $club_house->website_id,
-                "name" => $nameValue->value
+                // "name" => $title_value->value
             ];
             $fetched["attributes"] = $this->repository->getConfigData($data);
         }
@@ -136,6 +129,7 @@ class ClubHouseController extends BaseController
     {
         try
         {
+            // dd($request->all());
             $club_house = $this->model->findOrFail($id);
             $data = $this->repository->validateData($request, array_merge($this->clubHouseValueRepository->getValidationRules($request, $id, "update"), [
                 "items.slug.value" => new SlugUniqueRule($request, $club_house),
@@ -147,12 +141,10 @@ class ClubHouseController extends BaseController
                 ];
             });
 
-            if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data, $category);
+            if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data, $club_house);
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->clubHouseValueRepository->createOrUpdate($data, $updated);
-                if(isset($data["channels"])) $updated->channels()->sync($data["channels"]);
-                if(isset($data["products"])) $updated->products()->sync($data["products"]);
                 $updated->load("values");
             });
         }
@@ -168,7 +160,7 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $category = $this->model->findOrFail($id);
+            $club_house = $this->model->findOrFail($id);
 
             $this->repository->delete($id);
         }

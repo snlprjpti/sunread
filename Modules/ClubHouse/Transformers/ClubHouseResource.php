@@ -9,23 +9,11 @@ class ClubHouseResource extends JsonResource
 {
     public function toArray($request): array
     {
-        $this->createModel();
-        $data = [
-            "scope" => $request->scope ?? "website",
-            "scope_id" => $request->scope_id ?? $request->website_id,
-            "clubhouse_id" => $this->id,
-            "attribute" => "name"
-        ];
-        $name = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
-
         return [
             "id" => $this->id,
             "website_id" => $this->website_id,
-            "parent_id" => $this->parent_id,
-            "name" => $name?->value,
-
+            "position" => $this->position,
             "values" => $this->values,
-            "channels" => ChannelResource::collection($this->whenLoaded("channels")),
 
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];

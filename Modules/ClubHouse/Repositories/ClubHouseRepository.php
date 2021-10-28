@@ -3,11 +3,7 @@
 namespace Modules\ClubHouse\Repositories;
 
 use Exception;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Modules\ClubHouse\Entities\ClubHouse;
 use Modules\ClubHouse\Entities\ClubHouseValue;
 use Modules\ClubHouse\Traits\HasScope;

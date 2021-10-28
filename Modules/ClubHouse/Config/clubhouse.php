@@ -6,7 +6,7 @@ return [
             "elements" => [
                 [
                     "title" => "Title",
-                    "slug" => "name",
+                    "slug" => "title",
                     "type" => "text",
                     "value" => "",
                     "scope" => "store",
@@ -69,7 +69,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "nullable|in:0,1",
+                    "rules" => "required|string",
                     "is_required" => 1
                 ],
                 [
@@ -79,7 +79,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "nullable|in:0,1",
+                    "rules" => "required|string",
                     "is_required" => 1
                 ],
                 [
@@ -89,7 +89,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "nullable|in:0,1",
+                    "rules" => "required|string",
                     "is_required" => 1
                 ],
             ]
@@ -112,9 +112,9 @@ return [
                     "slug" => "longitude",
                     "type" => "text",
                     "value" => "",
-                    "scope" => "store",
+                    "scope" => "website",
                     "options" => [],
-                    "rules" => "website",
+                    "rules" => "string",
                     "is_required" => 0
                 ],
             ]
@@ -188,8 +188,8 @@ return [
     ],
     "absolute_path" => [
         "title" => "general.elements.0",
-        "status" => "general.elements.1",
-        "type" => "general.elements.2",
+        "slug" => "general.elements.1",
+        "status" => "general.elements.2",
         "thumbnail" => "content.elements.0",
         "header_content" => "content.elements.1",
         "opening_hours" => "content.elements.2",

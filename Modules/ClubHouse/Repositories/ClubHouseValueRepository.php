@@ -16,14 +16,15 @@ use Modules\ClubHouse\Traits\HasScope;
 class ClubHouseValueRepository
 {
     use HasScope;
-    protected $model, $model_key, $repository, $model_name, $global_file = [];
+    protected $model, $model_key, $repository, $model_name, $parent_model, $global_file = [];
 
-    public function __construct(ClubHouseValue $club_house_value, ClubHouseRepository $club_house_repository)
+    public function __construct(ClubHouseValue $club_house_value, ClubHouseRepository $club_house_repository, ClubHouse $club_house)
     {
         $this->model = $club_house_value;
         $this->model_key = "clubhouse.values";
         $this->repository = $club_house_repository;
         $this->model_name = "ClubHouse";
+        $this->parent_model = $club_house;
 
         $this->createModel();
     }
@@ -38,7 +39,6 @@ class ClubHouseValueRepository
             })->reject(function ($data) use ($scope) {
                 return $this->scopeFilter($scope, $data["scope"]);
             })->mapWithKeys(function ($item) use ($scope, $id, $method, $request) {
-
                 $prefix = "items.{$item["slug"]}";
                 $value_path = "{$prefix}.value";
                 $default_path = "{$prefix}.use_default_value";
@@ -67,7 +67,7 @@ class ClubHouseValueRepository
     {
         try
         {
-            $exist_club_house = ClubHouse::findOrFail($id);
+            $exist_club_house = $this->parent_model->findOrFail($id);
 
             if (isset($request->items[$item["slug"]])) {
                 $request_slug = $request->items[$item["slug"]];
@@ -90,7 +90,6 @@ class ClubHouseValueRepository
     public function createOrUpdate(array $data, Model $parent): void
     {
         if ( !is_array($data) || $data == [] ) return;
-
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.create.before");
         try
@@ -101,7 +100,6 @@ class ClubHouseValueRepository
                 "scope" => $data["scope"],
                 "scope_id" => $data["scope_id"]
             ];
-
             foreach($data["items"] as $key => $val)
             {
                 if(in_array($key, $this->global_file)) continue;
@@ -120,13 +118,16 @@ class ClubHouseValueRepository
                 $value = $val["value"] ?? null;
                 $match["value"] = ($configDataArray["type"] == "file" && $value) ? $this->repository->storeScopeImage($value, "club_house") : $value;
 
+
                 if($configData = $this->checkCondition($match)->first())
                 {
                     if(isset($val["use_default_value"])  && $val["use_default_value"] == 1) $configData->delete();
                     else $created_data["data"][] = $configData->update($match);
                     continue;
                 }
+
                 if(isset($val["use_default_value"])  && $val["use_default_value"] == 1) continue;
+
                 $created_data["data"][] = $this->model->create($match);
             }
         }

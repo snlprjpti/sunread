@@ -83,7 +83,7 @@ class CartController extends BaseController
         {
             return $this->handleException($exception);
         }
-        
+
         return $this->successResponse($this->resource($response['cart']), $response['message']);
 
     }
@@ -98,7 +98,7 @@ class CartController extends BaseController
         {
             return $this->handleException($exception);
         }
-        
+
         return $this->successResponse($response, $this->lang('fetch-success'));
 
     }
@@ -113,7 +113,7 @@ class CartController extends BaseController
         {
             return $this->handleException($exception);
         }
-        
+
         return $this->successResponse($this->resource($response['cart']), $response['message']);
 
     }
