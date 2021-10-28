@@ -34,15 +34,15 @@ class SendNotificationJob implements ShouldQueue
         $data = $this->getData( $this->entity_id, $this->event, $this->append_data);
 
         /** Send Email  */
-        Mail::to($data["to_email"])->send(new NotificationMail($data["content"], $data["subject"]));
+        Mail::to($data->to_email)->send(new NotificationMail($data->content, $data->subject));
 
         /** save email notification logs */
         $logs = [
             "name" => $this->event,
-            "subject" => $data["subject"],
-            "html_content" => $data["content"],
-            "recipient_email_address" => $data["to_email"],
-            "email_template_id" => $data["template_id"],
+            "subject" => $data->subject,
+            "html_content" => $data->content,
+            "recipient_email_address" => $data->to_email,
+            "email_template_id" => $data->template_id,
             "email_template_code" => $this->event,
         ];
 

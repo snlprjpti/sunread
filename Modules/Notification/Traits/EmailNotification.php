@@ -8,14 +8,13 @@ use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 use Exception;
-use Modules\EmailTemplate\Entities\EmailTemplate;
 
 trait EmailNotification
 {
     /**
      *  get email Content and subject data from email template
      */
-    public function getData( int $entity_id, string $event, string $append_data = ""): array
+    public function getData( int $entity_id, string $event, string $append_data = ""): object
     {
         try
         {
@@ -24,19 +23,20 @@ trait EmailNotification
             /**
              * get template from configurations according to scope, scope id and event code
              */
-            $email_template = SiteConfig::fetch($event, "store", $variable_data["store_id"]);
+            $email_template = SiteConfig::fetch($event, "store", $variable_data->store_id);
 
             if( !$email_template ) throw new Exception(__("core::app.response.not-found", [ "name" => "Email Template"]));
 
             /**
              * Set store_id as store to get content from configuration
              */
-            config(['store' => $variable_data["store_id"]]);
+            config(['store' => $variable_data->store_id]);
 
-            $data["content"] = htmlspecialchars_decode($this->render($email_template->content, $variable_data));
-            $data["subject"] = htmlspecialchars_decode($this->render($email_template->subject, $variable_data));
-            $data["template_id"] = $email_template->id;
-            $data["to_email"] = $variable_data["customer_email_address"];
+            $data = new \stdClass();
+            $data->content = htmlspecialchars_decode($this->render($email_template->content, $variable_data));
+            $data->subject = htmlspecialchars_decode($this->render($email_template->subject, $variable_data));
+            $data->template_id = $email_template->id;
+            $data->to_email = $variable_data->customer_email_address;
         }
         catch (Exception $exception)
         {
@@ -49,13 +49,13 @@ trait EmailNotification
     /**
      * compile php variable and content to render in blade template
      */
-    public function render(string $content, array $data = null): string
+    public function render(string $content, object $data = null): string
     {
         try
         {
             $php = Blade::compileString($content);
             ob_start();
-            extract($data, EXTR_SKIP);
+            extract((array)$data, EXTR_SKIP);
             eval('?' . '>' . $php);
         }
         catch (Exception $exception)
@@ -69,7 +69,7 @@ trait EmailNotification
     /**
      * get all template variable data according to email template code
      */
-    public function getVariableData(string $event_code, int $entity_id, string $append_data): array
+    public function getVariableData(string $event_code, int $entity_id, string $append_data): object
     {
         try
         {
@@ -99,20 +99,21 @@ trait EmailNotification
                     $data = $this->orderData($entity_id);
                     break;
             }
-            $general = $this->getGeneralVariableData($data["store_id"]);
+            $general = $this->getGeneralVariableData($data->store_id);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return array_merge($general, $data);
+        $result = array_merge((array)$general, (array)$data);
+        return (object) $result;
     }
 
     /**
      * get customer data by customer id
     */
-    private function getCustomerData(int $customer_id): array
+    private function getCustomerData(int $customer_id): object
     {
         try
         {
@@ -129,7 +130,7 @@ trait EmailNotification
 
             $customer_dashboard_url = $storefront_url . '/account';
 
-            $data = [
+            $customer_data = [
                 "customer_id" => $customer->id,
                 "customer_name" => $customer->first_name . ' ' . $customer->middle_name . ' ' . $customer->last_name,
                 "customer_email_address" => $customer->email,
@@ -142,13 +143,13 @@ trait EmailNotification
             throw $exception;
         }
 
-        return $data;
+        return (object)$customer_data;
     }
 
     /**
       * get all general variables data
     */
-    public function getGeneralVariableData(int $store_id = 0): array
+    private function getGeneralVariableData(int $store_id = 0): object
     {
         try
         {
@@ -172,47 +173,43 @@ trait EmailNotification
             throw $exception;
         }
 
-        return $data;
+        return (object) $data;
     }
 
     /**
         get forgot password variables data
     */
-    private function forgotPassword(int $customer_id, string $append_data): array
+    private function forgotPassword(int $customer_id, string $append_data): object
     {
         try
         {
-            $customer_data = $this->getCustomerData($customer_id);
-            $data = [
-                "password_reset_url" => route('customers.reset-password.create', $append_data)
-            ];
+            $data = $this->getCustomerData($customer_id);
+            $data->password_reset_url =  route('customers.reset-password.create', $append_data);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return array_merge($customer_data, $data);
+        return $data;
     }
 
     /**
         get new account variables data
     */
-    private function newAccount(int $customer_id, string $append_data): array
+    private function newAccount(int $customer_id, string $append_data): object
     {
         try
         {
             $customer_data = $this->getCustomerData($customer_id);
-            $data = [
-                "account_confirmation_url" => route('customers.account-verify', $append_data),
-            ];
+            $customer_data->account_confirmation_url = route('customers.account-verify', $append_data);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return array_merge($customer_data, $data);
+        return $customer_data;
     }
 
     /**
@@ -251,7 +248,7 @@ trait EmailNotification
     /**
     * get customer billing address data
     */
-    private function getBillingAddress(int $customer_id): object|null
+    private function getBillingAddress(int $customer_id): ?object
     {
         try
         {
@@ -268,7 +265,7 @@ trait EmailNotification
     /**
     * get customer shipping address data
     */
-    private function getShippingAddress(int $customer_id): object|null
+    private function getShippingAddress(int $customer_id): ?object
     {
         try
         {
