@@ -1240,7 +1240,7 @@ return [
                                         "pluck" => [],
                                         "default" => "",
                                         "options" => [],
-                                        "description" => "Enter top padding in <em>px</em>",
+                                        "description" => "",
                                         "conditions" => [],
                                         "rules" => "",
                                         "is_required" => 0
@@ -1261,7 +1261,7 @@ return [
                                             [ "value" => "h5", "label" => "H5" ],
                                             [ "value" => "h6", "label" => "H6" ],
                                         ],
-                                        "description" => "Enter bottom padding in <em>px</em>",
+                                        "description" => "",
                                         "conditions" => [],
                                         "rules" => "in:h1,h2,h3,h4,h5,h6",
                                         "is_required" => 0
@@ -1275,7 +1275,7 @@ return [
                                         "pluck" => [],
                                         "default" => "",
                                         "options" => [],
-                                        "description" => "Enter top padding in <em>px</em>",
+                                        "description" => "",
                                         "conditions" => [],
                                         "rules" => "",
                                         "is_required" => 0
@@ -1296,7 +1296,7 @@ return [
                                             [ "value" => "h5", "label" => "H5" ],
                                             [ "value" => "h6", "label" => "H6" ],
                                         ],
-                                        "description" => "Enter bottom padding in <em>px</em>",
+                                        "description" => "",
                                         "conditions" => [],
                                         "rules" => "in:h1,h2,h3,h4,h5,h6",
                                         "is_required" => 0
@@ -1404,7 +1404,7 @@ return [
                                         "conditions" => [],
                                         "description" => "",
                                         "rules" => "in:0,1",
-                                        "is_required" => 1
+                                        "is_required" => 0
                                     ],
                                     [
                                         "title" => "View More Button",
@@ -1421,7 +1421,7 @@ return [
                                         "conditions" => [],
                                         "description" => "",
                                         "rules" => "in:0,1",
-                                        "is_required" => 1
+                                        "is_required" => 0
                                     ],
                                     [
                                         "title" => "View More Button Label",
@@ -1435,7 +1435,7 @@ return [
                                         "conditions" => [],
                                         "description" => "",
                                         "rules" => "",
-                                        "is_required" => 1
+                                        "is_required" => 0
                                     ],
                                     [
                                         "title" => "View More Link",
@@ -1449,7 +1449,7 @@ return [
                                         "conditions" => [],
                                         "description" => "",
                                         "rules" => "url",
-                                        "is_required" => 1
+                                        "is_required" => 0
                                     ],
                                     [
                                         "title" => "Dynamic Link",
@@ -1466,7 +1466,7 @@ return [
                                         "conditions" => [],
                                         "description" => "",
                                         "rules" => "in:0,1",
-                                        "is_required" => 1
+                                        "is_required" => 0
                                     ]
                                 ]
                             ]
