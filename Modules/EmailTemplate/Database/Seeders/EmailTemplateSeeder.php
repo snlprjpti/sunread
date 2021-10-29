@@ -9,6 +9,7 @@ class EmailTemplateSeeder extends Seeder
 {
     public function run(): void
     {
+        include("data/templates.php");
         $templates = [
             [
                 "name" => "Header",
