@@ -1910,6 +1910,518 @@ return [
         ]
     ],
     [
+        "title" => "Content with Image #2",
+        "slug" => "content_with_image_two",
+        "mainGroups" => [
+            [
+                "title" => "Section Settings",
+                "slug" => "section_settings",
+                "type" => "section",
+                "groups" => [
+                    [
+                        "title" => "General",
+                        "slug" => "general",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Admin Title",
+                                "slug" => "admin_title",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Status",
+                                "slug" => "status",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => 1, "label" => "Enabled" ],
+                                    [ "value" => 2, "label" => "Disabled" ],
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "in:1,2",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Background",
+                        "slug" => "section_background",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Background Color",
+                                "slug" => "section_background_color",
+                                "hasChildren" => 0,
+                                "type" => "color_picker",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Image",
+                                "slug" => "section_background_image",
+                                "hasChildren" => 0,
+                                "type" => "file",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Position",
+                                "slug" => "section_background_position",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => "no-repeat;left top;;", "label" => "Left Top | no-repeat" ],
+                                    [ "value" => "repeat;left top;;", "label" => "Left Top | repeat" ],
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Size",
+                                "slug" => "section_background_size",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => "auto", "label" => "Auto" ],
+                                    [ "value" => "contain", "label" => "Contain" ],
+                                    [ "value" => "cover", "label" => "Cover" ]
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Video Link",
+                                "slug" => "section_background_video_link",
+                                "hasChildren" => 0,
+                                "type" => "link",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Layout",
+                        "slug" => "layout",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Padding Top",
+                                "slug" => "padding_top",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Bottom",
+                                "slug" => "padding_bottom",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Left/Right",
+                                "slug" => "padding_left_right",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                        ]
+                    ],
+                    [
+                        "title" => "Advanced",
+                        "slug" => "section_advanced",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Custom Classes",
+                                "slug" => "section_custom_classes",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Custom ID",
+                                "slug" => "section_custom_id",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                        ]
+                    ],
+
+                ]
+            ],
+            [
+                "title" => "Row Settings",
+                "slug" => "row_settings",
+                "type" => "row",
+                "groups" => [
+                    [
+                        "title" => "Background",
+                        "slug" => "row_background",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Background Color",
+                                "slug" => "row_background_color",
+                                "hasChildren" => 0,
+                                "type" => "color_picker",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Image",
+                                "slug" => "row_background_image",
+                                "hasChildren" => 0,
+                                "type" => "file",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Position",
+                                "slug" => "row_background_position",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => "no-repeat;left top;;", "label" => "Left Top | no-repeat" ],
+                                    [ "value" => "repeat;left top;;", "label" => "Left Top | repeat" ],
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Size",
+                                "slug" => "row_background_size",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => "auto", "label" => "Auto" ],
+                                    [ "value" => "contain", "label" => "Contain" ],
+                                    [ "value" => "cover", "label" => "Cover" ]
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Advanced",
+                        "slug" => "row_advanced",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Custom Classes",
+                                "slug" => "row_custom_classes",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Custom ID",
+                                "slug" => "row_custom_id",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+            [
+                "title" => "Module",
+                "slug" => "module",
+                "type" => "module",
+                "subGroups" => [
+                    [
+                        "title" => "Image",
+                        "slug" => "image_module",
+                        "column" => "6",
+                        "groups" => [
+                            [
+                                "title" => "Image",
+                                "slug" => "image_module_section",
+                                "hasChildren" => 1,
+                                "attributes" => [
+
+                                    [
+                                        "title" => "Image",
+                                        "slug" => "image_module_image",
+                                        "hasChildren" => 0,
+                                        "type" => "file",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "mimes:jpeg,jpg,bmp,png",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Position",
+                                        "slug" => "image_position",
+                                        "hasChildren" => 0,
+                                        "type" => "select",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "1",
+                                        "options" => [
+                                            [ "value" => "left", "label" => "Left" ],
+                                            [ "value" => "right", "label" => "Right" ]
+                                        ],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "in:left,right",
+                                        "is_required" => 1
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Content",
+                        "slug" => "content_module",
+                        "column" => "6",
+                        "groups" => [
+                            [
+                                "title" => "Content",
+                                "slug" => "sub_content_module",
+                                "hasChildren" => 1,
+                                "attributes" => [
+
+                                    [
+                                        "title" => "Title",
+                                        "slug" => "content_module_title",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Title Heading Tag",
+                                        "slug" => "title_heading_tag",
+                                        "hasChildren" => 0,
+                                        "type" => "select",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [
+                                            [ "value" => "h1", "label" => "H1" ],
+                                            [ "value" => "h2", "label" => "H2" ],
+                                            [ "value" => "h3", "label" => "H3" ],
+                                            [ "value" => "h4", "label" => "H4" ],
+                                            [ "value" => "h5", "label" => "H5" ],
+                                            [ "value" => "h6", "label" => "H6" ],
+                                        ],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "in:h1,h2,h3,h4,h5,h6",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Content",
+                                        "slug" => "content_module_content",
+                                        "hasChildren" => 0,
+                                        "type" => "editor",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Has Button",
+                                        "slug" => "has_button",
+                                        "hasChildren" => 0,
+                                        "type" => "select",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "0",
+                                        "options" => [
+                                            [ "value" => 0, "label" => "No" ],
+                                            [ "value" => 1, "label" => "Yes" ]
+                                        ],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "in:0,1",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Button Label",
+                                        "slug" => "button_label",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Button Link",
+                                        "slug" => "button_link",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "url",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Dynamic Link",
+                                        "slug" => "dynamic_link",
+                                        "hasChildren" => 0,
+                                        "type" => "select",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "1",
+                                        "options" => [
+                                            [ "value" => 1, "label" => "Yes" ],
+                                            [ "value" => 0, "label" => "No" ]
+                                        ],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "in:0,1",
+                                        "is_required" => 0
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+
+                ]
+            ]
+        ]
+    ],
+    [
         "title" => "Carousel Featured Buy",
         "slug" => "carousel_featured_buy",
         "mainGroups" => [
@@ -3383,4 +3895,6 @@ return [
             ]
         ]
     ],
+
+
 ];
