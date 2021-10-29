@@ -42,12 +42,6 @@ class ClubHouse extends Model
 
     protected $casts = [];
 
-    // ClubHouse Model Constructor
-    public function __construct(?array $attributes = [])
-    {
-        parent::__construct($attributes);
-    }
-
     /**
      * Get Image URL
      */
