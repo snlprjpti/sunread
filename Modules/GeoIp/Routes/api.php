@@ -18,6 +18,6 @@ Route::get("test-ip", function () {
     return response()->json([
         "ip" => request()->ip(),
         "client_ip" => GeoIp::requestIp(),
-        "location" => GeoIp::getGeoLocation(),
+        "location" => GeoIp::locate(request()->ip())?->toArray(),
     ]);
 })->middleware("proxies");
