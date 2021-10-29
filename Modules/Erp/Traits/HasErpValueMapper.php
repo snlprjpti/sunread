@@ -33,7 +33,7 @@ trait HasErpValueMapper
     {
         try
         {
-            $erp_details = ErpImportDetail::whereErpImportId(2)->whereJsonContains("value->webAssortmentWeb_Active", true)->whereJsonContains("value->webAssortmentWeb_Setup", "SR")->get();
+            $erp_details = ErpImportDetail::whereErpImportId(2)->whereJsonContains("value->webAssortmentWeb_Active", true)->whereJsonContains("value->webAssortmentWeb_Setup", "SR")->limit(50)->get();
             $chunked = $erp_details->chunk(50);
 
             $count = 0;
@@ -49,11 +49,9 @@ trait HasErpValueMapper
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
                     ErpMigratorJob::dispatch($detail)->onQueue("erp");
-
                     $count++;
 
                 }
-
                 //@TODO: Remove break later
                 break;
             }
