@@ -3896,5 +3896,625 @@ return [
         ]
     ],
 
+    [
+        "title" => "Three Column Blocks",
+        "slug" => "three_column_blocks",
+        "mainGroups" => [
+            [
+                "title" => "Section Settings",
+                "slug" => "section_settings",
+                "type" => "section",
+                "groups" => [
+                    [
+                        "title" => "General",
+                        "slug" => "general",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Admin Title",
+                                "slug" => "admin_title",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Status",
+                                "slug" => "status",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => 1, "label" => "Enabled" ],
+                                    [ "value" => 2, "label" => "Disabled" ],
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "in:1,2",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Background",
+                        "slug" => "section_background",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Background Color",
+                                "slug" => "section_background_color",
+                                "hasChildren" => 0,
+                                "type" => "color_picker",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Image",
+                                "slug" => "section_background_image",
+                                "hasChildren" => 0,
+                                "type" => "file",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Position",
+                                "slug" => "section_background_position",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => "no-repeat;left top;;", "label" => "Left Top | no-repeat" ],
+                                    [ "value" => "repeat;left top;;", "label" => "Left Top | repeat" ],
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Size",
+                                "slug" => "section_background_size",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => "auto", "label" => "Auto" ],
+                                    [ "value" => "contain", "label" => "Contain" ],
+                                    [ "value" => "cover", "label" => "Cover" ]
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Video Link",
+                                "slug" => "section_background_video_link",
+                                "hasChildren" => 0,
+                                "type" => "link",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Layout",
+                        "slug" => "layout",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Padding Top",
+                                "slug" => "padding_top",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Bottom",
+                                "slug" => "padding_bottom",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Left/Right",
+                                "slug" => "padding_left_right",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                        ]
+                    ],
+                    [
+                        "title" => "Advanced",
+                        "slug" => "section_advanced",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Custom Classes",
+                                "slug" => "section_custom_classes",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Custom ID",
+                                "slug" => "section_custom_id",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                        ]
+                    ],
+
+                ]
+            ],
+            [
+                "title" => "Row Settings",
+                "slug" => "row_settings",
+                "type" => "row",
+                "groups" => [
+                    [
+                        "title" => "Background",
+                        "slug" => "row_background",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Background Color",
+                                "slug" => "row_background_color",
+                                "hasChildren" => 0,
+                                "type" => "color_picker",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Image",
+                                "slug" => "row_background_image",
+                                "hasChildren" => 0,
+                                "type" => "file",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Position",
+                                "slug" => "row_background_position",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => "no-repeat;left top;;", "label" => "Left Top | no-repeat" ],
+                                    [ "value" => "repeat;left top;;", "label" => "Left Top | repeat" ],
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Background Size",
+                                "slug" => "row_background_size",
+                                "hasChildren" => 0,
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [
+                                    [ "value" => "auto", "label" => "Auto" ],
+                                    [ "value" => "contain", "label" => "Contain" ],
+                                    [ "value" => "cover", "label" => "Cover" ]
+                                ],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Advanced",
+                        "slug" => "row_advanced",
+                        "hasChildren" => 1,
+                        "attributes" => [
+                            [
+                                "title" => "Custom Classes",
+                                "slug" => "row_custom_classes",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Custom ID",
+                                "slug" => "row_custom_id",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+            [
+                "title" => "Module",
+                "slug" => "module",
+                "type" => "module",
+                "subGroups" => [
+                    [
+                        "title" => "Content",
+                        "slug" => "content_col_one",
+                        "column" => "4",
+                        "groups" => [
+                            [
+                                "title" => "Content",
+                                "slug" => "content_col_one_section",
+                                "hasChildren" => 1,
+                                "attributes" => [
+
+                                    [
+                                        "title" => "Hover Title",
+                                        "slug" => "content_col_one_title",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Image",
+                                        "slug" => "content_col_one_image",
+                                        "hasChildren" => 0,
+                                        "type" => "file",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "mimes:jpeg,jpg,bmp,png",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Hover Video Link",
+                                        "slug" => "content_col_one_video_link",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Column Link",
+                                        "slug" => "content_col_one_col_link",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "url",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Dynamic Link",
+                                        "slug" => "content_col_one_dynamic_link",
+                                        "hasChildren" => 0,
+                                        "type" => "select",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "1",
+                                        "options" => [
+                                            [ "value" => 1, "label" => "Yes" ],
+                                            [ "value" => 0, "label" => "No" ]
+                                        ],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "in:0,1",
+                                        "is_required" => 0
+                                    ]
+
+                                ]
+                            ]
+                        ]
+                    ],
+
+                    [
+                        "title" => "Content",
+                        "slug" => "content_col_two",
+                        "column" => "4",
+                        "groups" => [
+                            [
+                                "title" => "Content",
+                                "slug" => "content_col_two_section",
+                                "hasChildren" => 1,
+                                "attributes" => [
+
+                                    [
+                                        "title" => "Hover Title",
+                                        "slug" => "content_col_two_title",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Image",
+                                        "slug" => "content_col_two_image",
+                                        "hasChildren" => 0,
+                                        "type" => "file",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "mimes:jpeg,jpg,bmp,png",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Hover Video Link",
+                                        "slug" => "content_col_two_video_link",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Column Link",
+                                        "slug" => "content_col_two_col_link",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "url",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Dynamic Link",
+                                        "slug" => "content_col_two_dynamic_link",
+                                        "hasChildren" => 0,
+                                        "type" => "select",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "1",
+                                        "options" => [
+                                            [ "value" => 1, "label" => "Yes" ],
+                                            [ "value" => 0, "label" => "No" ]
+                                        ],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "in:0,1",
+                                        "is_required" => 0
+                                    ]
+
+                                ]
+                            ]
+                        ]
+                    ],
+
+                    [
+                        "title" => "Content",
+                        "slug" => "content_col_three",
+                        "column" => "4",
+                        "groups" => [
+                            [
+                                "title" => "Content",
+                                "slug" => "content_col_three_section",
+                                "hasChildren" => 1,
+                                "attributes" => [
+
+                                    [
+                                        "title" => "Hover Title",
+                                        "slug" => "content_col_three_title",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Image",
+                                        "slug" => "content_col_three_image",
+                                        "hasChildren" => 0,
+                                        "type" => "file",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "mimes:jpeg,jpg,bmp,png",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Hover Video Link",
+                                        "slug" => "content_col_three_video_link",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "description" => "",
+                                        "conditions" => [],
+                                        "rules" => "",
+                                        "is_required" => 0
+                                    ],
+
+                                    [
+                                        "title" => "Column Link",
+                                        "slug" => "content_col_three_col_link",
+                                        "hasChildren" => 0,
+                                        "type" => "text",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "",
+                                        "options" => [],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "url",
+                                        "is_required" => 0
+                                    ],
+                                    [
+                                        "title" => "Dynamic Link",
+                                        "slug" => "content_col_three_dynamic_link",
+                                        "hasChildren" => 0,
+                                        "type" => "select",
+                                        "provider" => "",
+                                        "pluck" => [],
+                                        "default" => "1",
+                                        "options" => [
+                                            [ "value" => 1, "label" => "Yes" ],
+                                            [ "value" => 0, "label" => "No" ]
+                                        ],
+                                        "conditions" => [],
+                                        "description" => "",
+                                        "rules" => "in:0,1",
+                                        "is_required" => 0
+                                    ]
+
+                                ]
+                            ]
+                        ]
+                    ],
+
+
+                ]
+            ]
+        ]
+    ],
+
 
 ];
