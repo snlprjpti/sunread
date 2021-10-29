@@ -33,7 +33,7 @@ class ProductUrlGeneratorJob implements ShouldQueue
            {
                 $product_name = $product->value([
                     "scope" => "website",
-                    "scope_id" => $product->id,
+                    "scope_id" => $product->website_id,
                     "attribute_slug" => "name"
                 ]);
                 $product_attribute = ProductAttribute::whereProductId($product->id)
