@@ -361,6 +361,10 @@ trait HasErpValueMapper
     {
         try
         {
+            $_channel = Channel::where('code', $code )->first();
+
+            if( $_channel ) return $_channel;
+
             $data = [
                 "name" => $code,
                 "code" => $code,
