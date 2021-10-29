@@ -18,7 +18,7 @@ trait EmailNotification
     {
         try
         {
-            /** get all email variables data */
+            /** get all email variables data by specific events */
             $variable_data = $this->getVariableData($event, $entity_id, $append_data);
             /**
              * get template from configurations according to scope, scope id and event code
@@ -28,7 +28,7 @@ trait EmailNotification
             if( !$email_template ) throw new Exception(__("core::app.response.not-found", [ "name" => "Email Template"]));
 
             /**
-             * Set store_id as store to get content from configuration
+             * Set store_id as store (global variable) to get content from configuration
              */
             config(['store' => $variable_data->store_id]);
 
