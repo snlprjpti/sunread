@@ -69,7 +69,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "required|string",
+                    "rules" => "string",
                     "is_required" => 1
                 ],
                 [
@@ -79,7 +79,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "required|string",
+                    "rules" => "string",
                     "is_required" => 1
                 ],
                 [
@@ -89,7 +89,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "required|string",
+                    "rules" => "string",
                     "is_required" => 1
                 ],
             ]
