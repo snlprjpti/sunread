@@ -33,7 +33,7 @@ class ProductUrlGenerator extends Command
         parent::__construct();
     }
 
-    public function handle(): mixed
+    public function handle(): void
     {
         ProductUrlGeneratorJob::dispatch()->onQueue("high");
         $this->info("Product url key regenerate job dispatched.");
