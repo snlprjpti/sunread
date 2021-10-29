@@ -34,16 +34,28 @@ trait HasErpValueMapper
         try
         {
             $erp_details = ErpImportDetail::whereErpImportId(2)->whereJsonContains("value->webAssortmentWeb_Active", true)->whereJsonContains("value->webAssortmentWeb_Setup", "SR")->get();
-            $chunked = $erp_details->chunk(100);
+            $chunked = $erp_details->chunk(50);
+
+            $count = 0;
             foreach ( $chunked as $chunk )
             {
+                if( $count == 50 ) break;
+
                 foreach ( $chunk as $detail )
                 {
+                    if( $count >50 ) continue;
+                    if( $count == 50 ) break;
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
                     ErpMigratorJob::dispatch($detail)->onQueue("erp");
+
+                    $count++;
+
                 }
+
+                //@TODO: Remove break later
+                break;
             }
         }
         catch ( Exception $exception )
