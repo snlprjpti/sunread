@@ -161,7 +161,7 @@ class PageRepository extends BaseRepository
                     "attribute_slug" => "visibility"
                 ]);
                 
-                $fetched = ($is_visibility?->name != "Not Visible Individually") ? new ProductResource($fetched) : [];
+                $fetched = ($is_visibility?->name != "Not Visible Individually") ? new ProductResource($fetched) : null;
             } 
         }
         catch( Exception $exception )
