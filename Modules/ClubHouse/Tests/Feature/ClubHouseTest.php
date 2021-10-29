@@ -117,6 +117,13 @@ class ClubHouseTest extends BaseTestCase
         ]);
     }
 
+    public function getNonMandatoryUpdateData(): array
+    {
+        return array_merge($this->getUpdateData(), [
+            "latitude" => null
+        ]);
+    }
+
     public function testAdminCanFetchResourceAttribute()
     {
         $this->filter = [

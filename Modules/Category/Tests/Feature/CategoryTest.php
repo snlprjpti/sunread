@@ -99,7 +99,7 @@ class CategoryTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandotaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "parent_id" => null
@@ -113,7 +113,7 @@ class CategoryTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandodtaryUpdateData(): array
+    public function getNonMandatoryUpdateData(): array
     {
         return array_merge($this->getUpdateData(),[
             "parent_id" => null
