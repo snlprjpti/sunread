@@ -14,7 +14,7 @@ class TaxRuleResource extends JsonResource
             "product_tax_groups" => ProductTaxGroupResource::collection($this->whenLoaded("product_tax_groups")),
             "tax_rates" => TaxRateResource::collection($this->whenLoaded("tax_rates")),
             "name" => $this->name,
-            "status" => (bool) $this->status,
+            "priority" => $this->priority,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }
