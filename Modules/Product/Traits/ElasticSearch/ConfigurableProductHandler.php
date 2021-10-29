@@ -148,6 +148,7 @@ trait ConfigurableProductHandler
                     "scope_id" => $store->id
                 ];
 
+                $visibility_data_val = $variant->value(array_merge($store_data, ["attribute_slug" => "visibility"]));
                 return [
                     "id" => $variant_option->attribute_option_id,
                     "attribute_id" => $attribute->id,
@@ -157,6 +158,7 @@ trait ConfigurableProductHandler
                     "product_id" => $variant->id,
                     "product_sku" => $variant->sku,
                     "url_key" => $variant->value(array_merge($store_data, ["attribute_slug" => "url_key"])),
+                    "visibility" => $visibility_data_val->id,
                     "stock_status" => ($catalog?->is_in_stock && $catalog?->quantity > 0) ? 1 : 0,
                     "attribute_combination" => $variant->attribute_options_child_products->pluck("attribute_option_id")->mapWithKeys( function($variant_att) {
                         $f_attribute_option = AttributeOption::find($variant_att);

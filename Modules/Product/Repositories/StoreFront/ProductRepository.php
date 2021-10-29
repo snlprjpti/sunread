@@ -220,8 +220,9 @@ class ProductRepository extends BaseRepository
                         $abc["label"] = $attribute_value["label"];
                         $abc["code"] = $attribute_value["code"];
                         if($attribute_value["attribute_slug"] == "color") {
-                            $abc["url_key"] = $attribute_value["url_key"];
-                            $abc["image"] = $attribute_value["image"];
+                            $visibility_item = collect($attribute_values)->where("visibility", 8)->where("id", $attribute_value["id"])->first();
+                            $abc["url_key"] = isset($visibility_item["url_key"]) ? $visibility_item["url_key"] : $attribute_value["url_key"];
+                            $abc["image"] = isset($visibility_item["image"]) ? $visibility_item["image"] : $attribute_value["image"];
                         }
                         if(count($attribute_slugs) == 1) {
                             $fake_array = array_merge($this->nested_product, [$attribute_value["attribute_slug"] => $attribute_value["id"]]);
