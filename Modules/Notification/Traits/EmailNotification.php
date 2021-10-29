@@ -55,8 +55,13 @@ trait EmailNotification
         {
             $php = Blade::compileString($content);
             ob_start();
+
+            /** Extract template variables */
             extract((array)$data, EXTR_SKIP);
-            eval('?' . '>' . $php);
+
+            /** replace template variables with defined variable data  */
+            eval("?>" . $php);
+
             $content = ob_get_contents();
             ob_end_clean();
         }
