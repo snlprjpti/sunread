@@ -19,7 +19,7 @@ return [
                     "slug" => "slug",
                     "type" => "text",
                     "value" => "",
-                    "scope" => "store",
+                    "scope" => "website",
                     "options" => [],
                     "rules" => "string",
                     "is_required" => 0
@@ -69,7 +69,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "required|string",
+                    "rules" => "string",
                     "is_required" => 1
                 ],
                 [
@@ -79,7 +79,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "required|string",
+                    "rules" => "string",
                     "is_required" => 1
                 ],
                 [
@@ -89,7 +89,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "required|string",
+                    "rules" => "string",
                     "is_required" => 1
                 ],
             ]
@@ -127,7 +127,7 @@ return [
                     "slug" => "background_type",
                     "type" => "select",
                     "value" => "",
-                    "scope" => "store",
+                    "scope" => "website",
                     "options" => [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
@@ -141,7 +141,7 @@ return [
                     "slug" => "background_image",
                     "type" => "file",
                     "value" => "",
-                    "scope" => "store",
+                    "scope" => "website",
                     "options" => [],
                     "rules" => "mimes:jpeg,jpg,bmp,png",
                     "is_required" => 0

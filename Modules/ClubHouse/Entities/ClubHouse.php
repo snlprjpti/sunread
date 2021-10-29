@@ -2,8 +2,11 @@
 
 namespace Modules\ClubHouse\Entities;
 
+use Kalnoy\Nestedset\NodeTrait;
 use Modules\Core\Entities\Website;
+use Modules\Core\Traits\Sluggable;
 use Modules\Core\Traits\HasFactory;
+use Modules\ClubHouse\Traits\HasScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,7 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ClubHouse extends Model
 {
-    use HasFactory;
+    use HasFactory, Sluggable, HasScope, NodeTrait;
 
     /**
      * Arrays that are Mass Assignable
@@ -64,7 +67,6 @@ class ClubHouse extends Model
 
     /**
      * Many to One Relation Between ClubHouse and Website
-     * @return BelongsTo
      */
     public function website(): BelongsTo
     {
@@ -73,7 +75,6 @@ class ClubHouse extends Model
 
     /**
      * One to Many Relation Between ClubHouse and ClubHouseValue
-     * @return BelongsTo
      */
     public function values(): HasMany
     {

@@ -19,8 +19,6 @@ class ClubHouseRepository extends BaseRepository
 
     /**
      * ClubHouseRepository Class Constructor
-     * @param ClubHouse $club_house
-     * @param ClubHouseValue $club_house_value
      */
     public function __construct(ClubHouse $club_house, ClubHouseValue $club_house_value)
     {
@@ -42,8 +40,6 @@ class ClubHouseRepository extends BaseRepository
 
     /**
      * Get Attributes value from Config Data
-     * @param array $data
-     * @return array
      */
     public function getConfigData(array $data): array
     {
@@ -68,9 +64,6 @@ class ClubHouseRepository extends BaseRepository
 
     /**
      * Creates a Unique Slug for ClubHouse
-     * @param array $data
-     * @param object|null $club_house
-     * @return string
      */
     public function createUniqueSlug(array $data, ?object $club_house = null)
     {

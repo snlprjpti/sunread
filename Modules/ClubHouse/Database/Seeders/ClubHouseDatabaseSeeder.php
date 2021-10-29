@@ -15,7 +15,7 @@ class ClubHouseDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-
-        // $this->call("OthersTableSeeder");
+        $this->call(ClubHouseTableSeeder::class);
+        $this->call(ClubHouseValueTableSeeder::class);
     }
 }

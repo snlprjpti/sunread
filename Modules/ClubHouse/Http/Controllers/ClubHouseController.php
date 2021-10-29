@@ -23,9 +23,6 @@ class ClubHouseController extends BaseController
 
     /**
      * ClubHouseController Class constructor
-     * @param ClubHouseRepository $clubHouseRepository
-     * @param ClubHouse $clubHouse
-     * @param ClubHouseValueRepository $clubHouseValueRepository
      */
     public function __construct(ClubHouseRepository $clubHouseRepository, ClubHouse $clubHouse, ClubHouseValueRepository $clubHouseValueRepository)
     {
@@ -41,8 +38,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Returns ClubHouseResource in Collection
-     * @param object $data
-     * @return ResourceCollection
      */
     public function collection(object $data): ResourceCollection
     {
@@ -51,8 +46,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Returns ClubHouseResource
-     * @param object $data
-     * @return JsonResource
      */
     public function resource(object $data): JsonResource
     {
@@ -61,8 +54,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Fetches and returns the list of ClubHouse
-     * @param Request $request
-     * @return JsonResposne
      */
     public function index(Request $request): JsonResponse
     {
@@ -85,8 +76,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Validates and Creates Clubhouse with Clubhouse values
-     * @param Request $request
-     * @return JsonResposne
      */
     public function store(Request $request): JsonResponse
     {
@@ -118,9 +107,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Fetches and returns the ClubHouse by Id
-     * @param Request $request
-     * @param int $id
-     * @return JsonResposne
      */
     public function show(Request $request, int $id): JsonResponse
     {
@@ -139,15 +125,15 @@ class ClubHouseController extends BaseController
             ];
 
             // Accessing Clubhouse title through values
-            // $title_data = array_merge($data, ["attribute" => "title"]);
-            // $club_house->createModel();
-            // $title_value = $club_house->has($title_data) ? $club_house->getValues($title_data) : $club_house->getDefaultValues($title_data);
+            $title_data = array_merge($data, ["attribute" => "title"]);
+            $club_house->createModel();
+            $title_value = $club_house->has($title_data) ? $club_house->getValues($title_data) : $club_house->getDefaultValues($title_data);
 
             $fetched = [];
             $fetched = [
                 "id" => $id,
                 "website_id" => $club_house->website_id,
-                // "name" => $title_value->value
+                "title" => $title_value->value
             ];
             $fetched["attributes"] = $this->repository->getConfigData($data);
         }
@@ -161,9 +147,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Validates and Updates Clubhouse with Clubhouse values
-     * @param Request $request
-     * @param int $id
-     * @return JsonResposne
      */
     public function update(Request $request, int $id): JsonResponse
     {
@@ -198,9 +181,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Finds and Deletes Clubhouse
-     * @param Request $request
-     * @param int $id
-     * @return JsonResposne
      */
     public function destroy(int $id): JsonResponse
     {
@@ -220,9 +200,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Updates the Status of Clubhouse with given Id
-     * @param Request $request
-     * @param int $id
-     * @return JsonResposne
      */
     public function updateStatus(Request $request, int $id): JsonResponse
     {
@@ -240,8 +217,6 @@ class ClubHouseController extends BaseController
 
     /**
      * Fetches and returns Attributes for ClubHouse Values
-     * @param Request $request
-     * @return JsonResposne
      */
     public function attributes(Request $request): JsonResponse
     {

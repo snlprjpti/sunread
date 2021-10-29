@@ -22,9 +22,6 @@ class ClubHouseValueRepository
 
     /**
      * ClubHouseValueRepositor Constructor
-     * @param ClubHouseValue $club_house_value
-     * @param ClubHouseRepository $club_house_repository
-     * @param ClubHouse $club_house
      */
     public function __construct(ClubHouseValue $club_house_value, ClubHouseRepository $club_house_repository, ClubHouse $club_house)
     {
@@ -39,10 +36,6 @@ class ClubHouseValueRepository
 
     /**
      * Fetch Validation Rules from Config File and Return it
-     * @param object $request
-     * @param int|null $id
-     * @param string|null $method
-     * @return array
      */
     public function getValidationRules(object $request, ?int $id = null, ?string $method = null): array
     {
@@ -80,10 +73,6 @@ class ClubHouseValueRepository
 
     /**
      * Handle and Store File from the Request
-     * @param int $id
-     * @param object $request
-     * @param array $item
-     * @param string|null $value
      */
     public function handleFileIssue(int $id, object $request, array $item, ?string $value_rule): ?string
     {
@@ -111,9 +100,6 @@ class ClubHouseValueRepository
 
     /**
      * Create or Update ClubHouseValue [Update if it exists, if not create the model]
-     * @param array $data
-     * @param Model $parent
-     * @return void
      */
     public function createOrUpdate(array $data, Model $parent): void
     {
