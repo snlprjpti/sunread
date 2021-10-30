@@ -27,7 +27,7 @@ use Modules\Page\Repositories\StoreFront\PageRepository;
 
 class ProductRepository extends BaseRepository
 {
-    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product, $config_products, $pageRepository, $final_product_val;
+    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product = [], $config_products = [], $pageRepository, $final_product_val = [];
 
     public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository, PageRepository $pageRepository)
     {
@@ -40,9 +40,9 @@ class ProductRepository extends BaseRepository
         $this->pageRepository = $pageRepository;
         $this->count = 0;
         $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date"];
-        $this->nested_product = [];
-        $this->config_products = [];
-        $this->final_product_val = [];
+        // $this->nested_product = [];
+        // $this->config_products = [];
+        // $this->final_product_val = [];
     }
 
     public function productDetail(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
@@ -172,7 +172,7 @@ class ProductRepository extends BaseRepository
                 $variant_ids = $product->variants->pluck("id")->toArray();
                 $elastic_fetched = [
                     "_source" => ["show_configurable_attributes"],
-                    "size" => 1000,
+                    "size" => count($variant_ids),
                     "query"=> [
                         "bool" => [
                             "must" => [
