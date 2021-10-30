@@ -40,9 +40,6 @@ class ProductRepository extends BaseRepository
         $this->pageRepository = $pageRepository;
         $this->count = 0;
         $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date"];
-        // $this->nested_product = [];
-        // $this->config_products = [];
-        // $this->final_product_val = [];
     }
 
     public function productDetail(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
@@ -167,6 +164,9 @@ class ProductRepository extends BaseRepository
                 unset($fetched["new_from_date"], $fetched["new_to_date"]);
             }
 
+            $this->nested_product = [];
+            $this->config_products = [];
+            $this->final_product_val = [];
             if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
                 if(isset($product->parent_id)) $product = $product->parent;
                 $variant_ids = $product->variants->pluck("id")->toArray();
