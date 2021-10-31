@@ -46,7 +46,7 @@ trait Sluggable
 
     /**
      * Get related slugs
-     * 
+     *
      * @param String $slug
      * @param Int $id
      * @return Collection
@@ -60,7 +60,7 @@ trait Sluggable
 
     /**
      * Check if slug exists
-     * 
+     *
      * @param String $slug
      * @param Int $id
      * @return Boolean

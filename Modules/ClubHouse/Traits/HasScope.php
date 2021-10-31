@@ -25,8 +25,6 @@ trait HasScope
 
     /**
      * Returns Default Values for given Attributes
-     * @param array $data
-     * @return object
      */
     public function getDefaultValues(array $data): ?object
     {
@@ -52,8 +50,6 @@ trait HasScope
 
     /**
      * Get the Values for the Attribtues
-     * @param array $data
-     * @return object
      */
     public function getValues(array $data): object
     {
@@ -87,9 +83,6 @@ trait HasScope
 
     /**
      * Check if Slug Exists Or Not
-     * @param array $data
-     * @param string $slug
-     * @param object|null $club_house
      */
     public function checkSlug(array $data, ?string $slug, ?object $club_house = null): ?object
     {
@@ -106,9 +99,6 @@ trait HasScope
 
     /**
      * Return Value of the Given Data
-     * @param array $data
-     * @param string $attribute
-     * @return mixed
      */
     public function value(array $data, string $attribute): mixed
     {

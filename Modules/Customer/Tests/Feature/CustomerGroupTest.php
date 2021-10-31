@@ -18,7 +18,7 @@ class CustomerGroupTest extends BaseTestCase
         $this->route_prefix = "admin.groups";
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "is_user_defined" => null
