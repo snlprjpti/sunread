@@ -16,6 +16,7 @@
     "Erp": true,
     "Cart": true,
     "EmailTemplate": true,
+    "Notification": true,
     "ProductStockAlert": true,
     "ProductStockAlertResource": true,
     "GeoIp": true
