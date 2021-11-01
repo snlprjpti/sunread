@@ -26,6 +26,10 @@ return [
         "code" => "new_account"
     ],
     [
+        "label" => "Confirm Account",
+        "code" => "confirm_account"
+    ],
+    [
         "label" => "Welcome Email",
         "code" => "welcome_email"
     ],
@@ -41,7 +45,6 @@ return [
         "label" => "New Guest Order",
         "code" => "new_guest_order"
     ],
-
     [
         "label" => "Guest Order Update",
         "code" => "order_update_guest"
