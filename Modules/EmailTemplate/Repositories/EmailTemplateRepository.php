@@ -99,6 +99,9 @@ class EmailTemplateRepository extends BaseRepository
      */
     public function templateVariableValidation(object $request): void
     {
+        $check_braces = $this->checkBraces($request->content);
+        if(!$check_braces)  throw ValidationException::withMessages(["content" => __("Invalid template content")]);
+
         $variables = $this->getConfigVariable($request);
 
         /**
@@ -110,10 +113,9 @@ class EmailTemplateRepository extends BaseRepository
         $config_variables = call_user_func_array("array_merge", $config_variables);
 
         /**
-         * get variables used in template content with prefix of "{{$variable_name}}.
+         * get variables used in template content with prefix of "{{$variables_name}}.
         */
-        preg_match_all("/{{(.*)\}}/U", $request->content, $matches);
-
+        preg_match_all("/{{(.*?)\}}/U", $request->content, $matches);
         foreach ($matches[1] as $v) {
             if (str_contains($v, "\$")) {
 
@@ -122,8 +124,38 @@ class EmailTemplateRepository extends BaseRepository
                 */
                 $variable = substr($v, 1);
 
-                if (!collect($config_variables)->contains("variable", $variable)) throw ValidationException::withMessages(["content" => __("Invalid Template Content")]);
+                if (!collect($config_variables)->contains("variable", $variable)) throw ValidationException::withMessages(["content" => __("Undefined variables found!")]);
             }
         }
+    }
+
+    /**
+     * check opening braces and closing braces from template content
+    */
+    public function checkBraces(string $str): bool
+    {
+        $strlen = strlen($str); // cache string length for performance
+        $openbraces = 0;
+
+        for ($i = 0; $i < $strlen; $i++)
+        {
+            $c = $str[$i];
+            if ($c == '{') {
+                // count opening bracket
+                $openbraces++;
+            }
+
+            if ($c == '}') {
+                // count closing bracket
+                $openbraces--;
+            }
+            if ($openbraces < 0)
+            {
+                // check for unopened closing brackets
+                return false;
+            }
+        }
+
+        return $openbraces == 0; // check for unclosed open brackets
     }
 }
