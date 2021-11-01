@@ -3,6 +3,7 @@
 namespace Modules\Tax\Services;
 
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\PriceFormat;
 use Modules\Core\Facades\SiteConfig;
@@ -24,7 +25,8 @@ class TaxPrice {
     $priority_tax = [],
     $company = false,
     $value = 0,
-    $multiple_rules;
+    $multiple_rules,
+    $country_id;
     
     public function get(object $request, bool $use_current_location = false, ?string $zip_code = null, ?callable $callback = null): object
     {
@@ -79,17 +81,58 @@ class TaxPrice {
     public function taxResource(mixed $price, mixed $tax, ?object $channel, ?callable $callback = null): array
     {
         $tax_rate_value = ($price * $tax);
-        $value_added_tax = ($price + $tax_rate_value);
         $resource = [
-            "net_price" => $price,
+            "price" => $price,
             "tax_rate_percent" => $this->tax_value,
             "tax_rate_value" => $tax_rate_value,
-            "multiple_rules" => $this->multiple_rules?->pluck("name", "id")->toArray(),
-            "value_added_tax" => $value_added_tax,
-            "formatted_final_price" => PriceFormat::get($value_added_tax, $channel?->id, "channel")
+            "rules" => $this->getMultipleRules(),
         ];
         if ($callback) $resource = array_merge($callback, $resource); 
         return $resource;
+    }
+
+    public function getMultipleRules(): ?object
+    {
+        try
+        {
+            $data = $this->multiple_rules?->map(function ($rule) {
+                return (object) [
+                    "id" => $rule->id,
+                    "name" => $rule->name,
+                    "rates" => $rule->tax_rates?->where("country_id", $this->country_id)
+                    ->filter(function ($tax_rate) {
+                        if ($this->zip_code) {
+                            if ($tax_rate->use_zip_range) {
+                                $zip_code_range = range($tax_rate->postal_code_form, $tax_rate->postal_code_to);
+                                return in_array($this->zip_code, $zip_code_range);
+                            }
+                            else {
+                                if ($tax_rate->zip_code == "*") return true;
+                                if ( Str::contains($tax_rate->zip_code, "*") ) {
+                                    $pluck_range = explode("*", $tax_rate->zip_code);
+                                    $str_count = Str::length($pluck_range[0]);
+                                    $zip_code_prefix = substr($this->zip_code, 0, $str_count);
+                                    return ($pluck_range[0] == $zip_code_prefix);
+                                }
+                            }
+                        }
+                        return true;
+                    })->map(function ($rate) {
+                        return (object) [
+                            "id" => $rate->id,
+                            "identifier" => $rate->identifier,
+                            "tax_rate" => $rate->tax_rate
+                        ];
+                    })->toArray()
+                ];
+            })->values();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return (object) $data;
     }
 
     public function getGeneralValue(object $request): object
@@ -129,7 +172,6 @@ class TaxPrice {
         try
         {	
             $data = $this->getGeneralValue($request);
-
             $current_geo_location = GeoIp::locate($this->getClientIp());
             if ($use_current_location) {
                 if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
@@ -143,7 +185,6 @@ class TaxPrice {
             else {
                 $tax_group = TaxCache::customerTaxGroup()->where("id", $customer_tax_group_id)->first();
             }
-
             if (!$tax_group) throw ValidationException::withMessages(["tax_group_id" => "Tax group id is required either product or customer"]);
             $sort_priority_tax_rule = $tax_group->tax_rules->pluck("priority", "id")->toArray();
             
@@ -173,6 +214,8 @@ class TaxPrice {
         {
             $tax_rules = TaxCache::taxRule()->whereIn("id", $tax_rule_ids);
             $this->multiple_rules = $tax_rules;
+            $this->country_id = $country->id;
+            $this->zip_code = $zip_code;
             $tax_rules_data = $tax_rules->map(function ($tax_rule) use ($country, $zip_code, $allow_countries) {
                 return $tax_rule->tax_rates
                 ->where("country_id", $country->id)
