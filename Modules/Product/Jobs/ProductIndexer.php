@@ -14,7 +14,7 @@ use Modules\Core\Entities\Website;
 use Modules\Product\Entities\Product;
 use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
-class ReIndexer implements ShouldQueue
+class ProductIndexer implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 

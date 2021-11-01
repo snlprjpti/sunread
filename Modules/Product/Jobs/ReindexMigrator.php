@@ -29,7 +29,7 @@ class ReindexMigrator implements ShouldQueue
             $batch = Bus::batch([])->onQueue("index")->dispatch();
             foreach ($products as $product)
             {
-                $batch->add(new ReIndexer($product));
+                $batch->add(new ProductIndexer($product));
             }
         }
     }
