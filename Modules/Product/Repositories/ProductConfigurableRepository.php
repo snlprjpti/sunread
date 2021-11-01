@@ -169,8 +169,11 @@ class ProductConfigurableRepository extends BaseRepository
             // create variant simple product
             if(isset($child_variant))
             {
-                $product_variant = $this->update($data, $child_variant->id, function ($variant) use ($product, $permutation_modify, $request, &$product_attributes, $productAttributes, $scope, $variant_options) {
-                    $this->syncConfigurableAttributes($product, $permutation_modify, $request, $product_attributes, $productAttributes, $scope, $variant_options, $variant, $request->update_attributes);
+                $product_variant = $this->update($data, $child_variant->id, function ($variant) use ($request, $productAttributes, $scope) {
+                    if(in_array($variant->id, $request->update_variants)) {
+                        $update_productAttributes = collect($productAttributes)->whereIn("attribute_slug", $request->update_attributes)->toArray();
+                        $this->product_attribute_repository->syncAttributes($update_productAttributes, $variant, $scope, $request, "store");
+                    }
                 });
             }
             else
@@ -217,7 +220,7 @@ class ProductConfigurableRepository extends BaseRepository
         return $data ?? null;
     }
 
-    private function syncConfigurableAttributes(object $product, array $permutation_modify, object $request, array &$product_attributes, array $productAttributes, array $scope, array $variant_options, object $variant, ?array $update_attributes = null): void
+    private function syncConfigurableAttributes(object $product, array $permutation_modify, object $request, array &$product_attributes, array $productAttributes, array $scope, array $variant_options, object $variant): void
     {
         try 
         {
@@ -225,12 +228,6 @@ class ProductConfigurableRepository extends BaseRepository
             $name = collect($productAttributes)->where("attribute_slug", "name")->first();
 
             $product_attributes = array_merge([
-                // [
-                //     // Attrubute name
-                //     "attribute_slug" => "name",
-                //     "value" => $product->sku."_".implode("_", $permutation_modify),
-                //     "value_type" => "Modules\Product\Entities\ProductAttributeString"
-                // ],
                 [
                     //Attribute slug
                     "attribute_slug" => "sku",
@@ -238,14 +235,14 @@ class ProductConfigurableRepository extends BaseRepository
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ],
                 [
-                    //Attribute slug
+                    //Attribute Url Key
                     "attribute_slug" => "url_key",
                     "value" => $this->createSlug(Str::slug($name["value"])),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ],
             ], $productAttributes, $variant_options, [ $visibility ]);
 
-            $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store", update_attributes:$update_attributes);
+            $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
 
             array_map(function($child_attribute_option) use($variant) {
                 AttributeOptionsChildProduct::updateOrCreate([
