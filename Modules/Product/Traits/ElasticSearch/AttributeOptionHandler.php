@@ -21,16 +21,16 @@ trait AttributeOptionHandler
                     "attribute_id" => $attribute->id
                 ];
                 $value = $product->value($match);
-                
-                ($method == "update") 
-                ? $this->handleUpdate($value, $attribute_option, $attribute, $product, $store) 
+
+                ($method == "update")
+                ? $this->handleUpdate($value, $attribute_option, $attribute, $product, $store)
                 : $this->handleDelete($value, $attribute_option, $attribute, $product, $store);
             }
         }
         catch(Exception $exception)
         {
             throw $exception;
-        } 
+        }
     }
 
     public function handleUpdate(mixed $value, object $attribute_option, object $attribute, object $product, object $store): void
@@ -43,16 +43,16 @@ trait AttributeOptionHandler
                 if(in_array($attribute_option->id, $value)) {
                     $key = array_keys($value, $attribute_option->id);
                     $slug_values["{$attribute->slug}_{$key[0]}_value"] = $attribute_option->name;
-                } 
+                }
             }
             else $slug_values["{$attribute->slug}_value"] = $attribute_option->name;
-    
-            if(count($slug_values) > 0) $this->partialIndexing($product, $store, $slug_values); 
+
+            if(count($slug_values) > 0) $this->partialIndexing($product, $store, $slug_values);
         }
         catch(Exception $exception)
         {
             throw $exception;
-        } 
+        }
     }
 
     public function handleDelete(mixed $value, object $attribute_option, object $attribute, object $product, object $store): void
@@ -63,11 +63,11 @@ trait AttributeOptionHandler
         //     $field_values = [];
         //     $r_ctx = "ctx._source.remove";
         //     $a_ctx = "ctx._source.tags.add(params";
-    
+
         //     if (is_array($value)) {
         //         $j = 0;
         //         foreach($value as $i => $val)
-        //         { 
+        //         {
         //             if($attribute_option["id"] != $val)
         //             {
         //                 $add_values[] = "$a_ctx.{$attribute->slug}_{$j}_value)";
@@ -82,12 +82,12 @@ trait AttributeOptionHandler
         //         $params["params"][] = [ $attribute->slug => $final_value ];
         //     }
         //     else $field_values = [ "$r_ctx('{$attribute->slug}_value')", "$r_ctx('{$attribute->slug}')" ];
-    
+
         //     $this->partialRemoving($product, $store, $slug_values, $field_values);
         // }
-        // catch(Exception $exception)
+        // catch(Exceptions $exception)
         // {
         //     throw $exception;
-        // } 
+        // }
     }
 }

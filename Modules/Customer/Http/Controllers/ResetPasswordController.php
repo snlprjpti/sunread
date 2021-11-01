@@ -3,6 +3,7 @@
 namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -13,6 +14,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Exceptions\TokenGenerationException;
 use Modules\Customer\Exceptions\CustomerNotFoundException;
 use Exception;
+use Modules\Notification\Events\ResetPassword;
 
 class ResetPasswordController extends BaseController
 {
@@ -49,6 +51,10 @@ class ResetPasswordController extends BaseController
 
             if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException($this->lang("token-generation-problem", []));
             if ($response == Password::INVALID_USER) throw new CustomerNotFoundException("Customer not found exception");
+
+            $customer = $this->model::whereEmail($data["email"])->firstOrFail();
+
+            event(new ResetPassword($customer->id));
         }
 
         catch (Exception $exception)

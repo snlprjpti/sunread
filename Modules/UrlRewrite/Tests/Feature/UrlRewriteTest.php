@@ -38,7 +38,7 @@ class UrlRewriteTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "store_id" => null

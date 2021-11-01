@@ -11,7 +11,7 @@
 |
 */
 
-Route::group(['as' => 'cart.', 'prefix' => 'public/checkout/cart', 'middleware' => ['api']], function () {
+Route::group(['as' => 'cart.', 'prefix' => 'public/checkout/cart', 'middleware' => ['api','proxies']], function () {
     
     // CART ROUTES
     Route::post("/", [\Modules\Cart\Http\Controllers\CartController::class, "addOrUpdateCart"])->name('add.update');

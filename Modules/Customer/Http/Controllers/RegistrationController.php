@@ -10,7 +10,6 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
 use Modules\Customer\Repositories\StoreFront\CustomerRepository;
 use Exception;
-use Illuminate\Support\Facades\Hash;
 
 class RegistrationController extends BaseController
 {
@@ -37,6 +36,7 @@ class RegistrationController extends BaseController
             $data = $this->repository->registration($request);
             $created = $this->repository->create($data);
 
+            $this->repository->sendRegistrationEmail($created, $request);
         }
         catch (Exception $exception)
         {

@@ -31,13 +31,13 @@ class ProductTest extends BaseTestCase
         $this->default_resource_id = $this->default_resource->id;
         $this->hasStatusTest = true;
         $this->hasUpdateTest = false;
-         
+
     }
 
     public function getCreateData(): array
     {
         $product = $this->model::factory()->make();
-        $merge_product = $product->toArray(); 
+        $merge_product = $product->toArray();
 
         $attributes = [];
 
@@ -60,18 +60,18 @@ class ProductTest extends BaseTestCase
     {
         $websiteId = $this->default_resource->website_id;
         $updateData = $this->getCreateData();
-        return array_merge($updateData, $this->getScope($websiteId)); 
+        return array_merge($updateData, $this->getScope($websiteId));
     }
 
     public function value(object $attribute): mixed
     {
         switch($attribute->type)
         {
-            case "price" : 
+            case "price" :
                 $value = 1000.1;
                 break;
 
-            case "boolean" : 
+            case "boolean" :
                 $value = true;
                 break;
 
@@ -83,7 +83,7 @@ class ProductTest extends BaseTestCase
                 $value = rand(1,1000);
                 break;
 
-            case "select" : 
+            case "select" :
                 $attribute_option = ($attribute->slug == "tax_class_id") ? CustomerTaxGroup::inRandomOrder()->first() : AttributeOption::create([
                     "attribute_id" => $attribute->id,
                     "name" => Str::random(10),
@@ -103,7 +103,7 @@ class ProductTest extends BaseTestCase
             case "image":
                 $value = UploadedFile::fake()->image('image.jpeg');
                 break;
-            
+
             case "multiimage":
                 $value[] = UploadedFile::fake()->image('image.jpeg');
                 break;
@@ -115,7 +115,7 @@ class ProductTest extends BaseTestCase
         return $value;
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "parent_id" => null,
@@ -227,12 +227,12 @@ class ProductTest extends BaseTestCase
             {
                 case "website":
                     $scope_id = $websiteId;
-                    break; 
-    
+                    break;
+
                 case "channel":
                     $scope_id = $channels->first()->id;
                     break;
-    
+
                 case "store":
                     $stores = $channels->first()->stores;
                     $scope_id = (count($stores) > 0) ? $stores->first()->id : $this->getScope("channel", $websiteId);

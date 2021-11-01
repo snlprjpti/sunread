@@ -167,7 +167,7 @@ class ProductConfigurableRepository extends BaseRepository
             if(isset($child_variant))
             {
                 $product_variant = $this->update($data, $child_variant->id, function ($variant) use ($request, $productAttributes, $scope) {
-                    if(in_array($variant->id, $request->update_variants)) {
+                    if($request->update_variants && in_array($variant->id, $request->update_variants)) {
                         $update_productAttributes = collect($productAttributes)->whereIn("attribute_slug", $request->update_attributes)->toArray();
                         $this->product_attribute_repository->syncAttributes($update_productAttributes, $variant, $scope, $request, "store");
                     }
