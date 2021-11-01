@@ -14,6 +14,7 @@ use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Notification\Events\ConfirmEmail;
 use Modules\Notification\Events\NewAccount;
+use Modules\Notification\Events\RegistrationSuccess;
 
 class CustomerRepository extends BaseRepository
 {
@@ -195,6 +196,24 @@ class CustomerRepository extends BaseRepository
         DB::commit();
 
         return $updated;
+    }
+
+    public function sendRegistrationEmail(object $customer, object $request): bool
+    {
+        try
+        {
+            event(new RegistrationSuccess($customer->id));
+            $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $request->website_id);
+            if($required_email_confirm == 1) {
+                event(new NewAccount($customer->id, $customer->verification_token));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
     }
 
     public function sendVerificationLink(object $customer): bool
