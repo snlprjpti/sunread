@@ -196,7 +196,6 @@ class TaxPrice {
             }
             if (!$tax_group) throw ValidationException::withMessages(["tax_group_id" => "Tax group id is required either product or customer"]);
             $sort_priority_tax_rule = $tax_group->tax_rules->pluck("priority", "id")->toArray();
-            
             if (!empty(array_not_unique($sort_priority_tax_rule)["duplicate_array"])) {
                 $same_tax_rule_ids = array_keys(array_not_unique($sort_priority_tax_rule)["duplicate_array"]);	
                 $same_priority_tax_rate = $this->getPriorityTaxRate($same_tax_rule_ids, $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
