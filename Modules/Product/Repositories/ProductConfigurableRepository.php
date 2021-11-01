@@ -15,15 +15,12 @@ use Modules\Attribute\Entities\Attribute;
 use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Attribute\Entities\AttributeOption;
-use Modules\Core\Entities\Website;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Entities\ProductAttributeString;
-use Modules\Product\Entities\ProductAttributeText;
-use Modules\Product\Jobs\ConfigurableIndexing;
-use Modules\Product\Jobs\VariantIndexing;
+use Modules\Product\Jobs\ProductIndexer;
 
 class ProductConfigurableRepository extends BaseRepository
 {
@@ -339,18 +336,9 @@ class ProductConfigurableRepository extends BaseRepository
     public function configurableIndexing(object $configurable_product): void
     {
         try 
-        { 
-            $stores = Website::find($configurable_product->website_id)->channels->map(function ($channel) {
-                return $channel->stores;
-            })->flatten(1);
-            $variants = $configurable_product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
-
+        {
             $batch = Bus::batch([])->onQueue("index")->dispatch();
-
-            foreach( $stores as $store) {
-                $batch->add(new ConfigurableIndexing($configurable_product, $store));
-                foreach($variants as $variant) $batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
-            }
+            $batch->add(new ProductIndexer($configurable_product)); 
         }
         catch ( Exception $exception )
         {
