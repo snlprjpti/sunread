@@ -51,6 +51,10 @@ class ResetPasswordController extends BaseController
 
             if ($response == Password::INVALID_TOKEN) throw new TokenGenerationException($this->lang("token-generation-problem", []));
             if ($response == Password::INVALID_USER) throw new CustomerNotFoundException("Customer not found exception");
+
+            $customer = $this->model::whereEmail($data["email"])->firstOrFail();
+
+            event(new ResetPassword($customer->id));
         }
 
         catch (Exception $exception)
@@ -58,9 +62,6 @@ class ResetPasswordController extends BaseController
             return $this->handleException($exception);
         }
 
-        $customer = $this->model::whereEmail($data["email"])->firstOrFail();
-
-        event(new ResetPassword($customer->id));
         return $this->successResponseWithMessage($this->lang("password-reset-success"));
     }
 
