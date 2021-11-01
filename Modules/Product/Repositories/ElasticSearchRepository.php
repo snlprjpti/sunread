@@ -89,11 +89,11 @@ class ElasticSearchRepository
         ];
     }
 
-    public function wildcard(string $field): array
+    public function wildcard(string $field, ?string $data): array
     {
         return [ 
             "wildcard" => [
-                "text" => "*{$field}*"
+                $field => "{$data}*"
             ]
         ];
     }
