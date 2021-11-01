@@ -31,28 +31,25 @@ class EmailTemplateRepository extends BaseRepository
 
     /**
      * get template group data from configuration file
-    */
+     */
     public function getConfigGroup(object $request): array
     {
-        try
-        {
+        try {
             $config_data = $this->config_template;
 
-            $templates = $this->fetchAll($request, callback:function () {
-                return $this->model->select("id","name","email_template_code");
+            $templates = $this->fetchAll($request, callback: function () {
+                return $this->model->select("id", "name", "email_template_code");
             });
 
             $merged = collect($config_data)->map(function ($value) use ($templates) {
-                foreach($templates as $array) {
-                    if($value["code"] == $array["email_template_code"]) {
+                foreach ($templates as $array) {
+                    if ($value["code"] == $array["email_template_code"]) {
                         $value["templates"][] = $array;
                     }
                 }
                 return $value;
             })->toArray();
-        }
-        catch (Exception $exception)
-        {
+        } catch (Exception $exception) {
             throw $exception;
         }
 
@@ -61,11 +58,10 @@ class EmailTemplateRepository extends BaseRepository
 
     /**
      * get all template variables by email_template_code from configuration file
-    */
+     */
     public function getConfigVariable(object $request): array
     {
-        try
-        {
+        try {
             $elements = $this->config_variable;
 
             foreach ($elements as $element) {
@@ -80,11 +76,9 @@ class EmailTemplateRepository extends BaseRepository
                         $parent["variables"][] = $variable;
                     }
                 }
-                if(!empty($parent)) $data["groups"][] = $parent;
+                if (!empty($parent)) $data["groups"][] = $parent;
             }
-        }
-        catch (Exception $exception)
-        {
+        } catch (Exception $exception) {
             throw $exception;
         }
 
@@ -93,10 +87,43 @@ class EmailTemplateRepository extends BaseRepository
 
     /**
      *  validate template group
-    */
+     */
     public function templateGroupValidation(object $request): void
     {
         $all_groups = collect($this->config_template)->pluck("code")->toArray();
         if (!in_array($request->email_template_code, $all_groups)) throw ValidationException::withMessages(["email_template_code" => __("Invalid Template Code")]);
+    }
+
+    /**
+     *  validate template group
+     */
+    public function templateVariableValidation(object $request): void
+    {
+        $variables = $this->getConfigVariable($request);
+
+        /**
+         * get config variable and make it in array.
+        */
+        $config_variables = collect($variables)->flatten(1)->map(function ($data) {
+            return $data["variables"];
+        })->toArray();
+        $config_variables = call_user_func_array("array_merge", $config_variables);
+
+        /**
+         * get variables used in template content with prefix of "{{$variable_name}}.
+        */
+        preg_match_all("/{{(.*)\}}/U", $request->content, $matches);
+
+        foreach ($matches[1] as $v) {
+            if (str_contains($v, "\$")) {
+
+                /**
+                 * remove 1st character. eg: remove "$" sign from variable.
+                */
+                $variable = substr($v, 1);
+
+                if (!collect($config_variables)->contains("variable", $variable)) throw ValidationException::withMessages(["content" => __("Invalid Template Content")]);
+            }
+        }
     }
 }
