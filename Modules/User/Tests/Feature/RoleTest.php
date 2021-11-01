@@ -18,7 +18,7 @@ class RoleTest extends BaseTestCase
         $this->route_prefix = "admin.roles";
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "description" => null

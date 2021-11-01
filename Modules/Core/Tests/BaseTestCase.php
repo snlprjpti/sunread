@@ -49,11 +49,11 @@ class BaseTestCase extends TestCase
      * Factory methods
      */
     public function getCreateData(): array { return $this->model::factory()->make()->toArray(); }
-    public function getNonMandodtaryCreateData(): array { return $this->getCreateData(); }
+    public function getNonMandatoryCreateData(): array { return $this->getCreateData(); }
     public function getInvalidCreateData(): array { return $this->getCreateData(); }
 
     public function getUpdateData(): array { return $this->getCreateData(); }
-    public function getNonMandodtaryUpdateData(): array { return $this->getNonMandodtaryCreateData(); }
+    public function getNonMandatoryUpdateData(): array { return $this->getNonMandatoryCreateData(); }
     public function getInvalidUpdateData(): array { return $this->getInvalidCreateData(); }
 
     /**
@@ -195,7 +195,7 @@ class BaseTestCase extends TestCase
     {
         if ( !$this->hasStoreTest ) $this->markTestSkipped("Store method not available.");
 
-        $post_data = $this->getNonMandodtaryCreateData();
+        $post_data = $this->getNonMandatoryCreateData();
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
         $response->assertCreated();
@@ -245,7 +245,7 @@ class BaseTestCase extends TestCase
     {
         if ( !$this->hasUpdateTest ) $this->markTestSkipped("Update method not available.");
 
-        $post_data = $this->getNonMandodtaryUpdateData();
+        $post_data = $this->getNonMandatoryUpdateData();
         $response = $this->withHeaders($this->headers)->put($this->getRoute("update", [$this->default_resource_id]), $post_data);
 
         $response->assertOk();

@@ -20,7 +20,7 @@ class CustomerAddressTest extends BaseTestCase
         $this->append_to_route = Customer::latest("id")->first()->id;
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "address2" => null
