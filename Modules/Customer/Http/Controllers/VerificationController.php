@@ -3,14 +3,10 @@
 namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Str;
-use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
 use Exception;
 use Modules\Customer\Repositories\StoreFront\CustomerRepository;
-use Modules\Notification\Events\ConfirmEmail;
-use Modules\Notification\Events\NewAccount;
 
 class VerificationController extends BaseController
 {
