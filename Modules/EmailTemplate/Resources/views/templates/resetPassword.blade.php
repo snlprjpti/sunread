@@ -31,14 +31,11 @@
                             </tr>
                             </tbody>
                         </table>
-
                     </th>
                     <th class="expander" style="Margin: 0; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0; padding: 0 !important; text-align: left; visibility: hidden; width: 0;"></th>
                 </tr>
                 </tbody>
             </table>
-
-
         </th>
         <th class="expander" style="Margin: 0; color: #fff; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: normal; line-height: 1.3; margin: 0; padding: 0 !important; text-align: left; visibility: hidden; width: 0;"></th>
     </tr>

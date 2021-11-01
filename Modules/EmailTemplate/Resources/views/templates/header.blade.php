@@ -13,7 +13,6 @@
             background: #121212;
         }
     }
-
     @media only screen and (max-width: 596px) {
         .small-float-center {
             margin: 0 auto !important;
@@ -30,7 +29,6 @@
             text-align: right !important;
         }
     }
-
     @media only screen and (max-width: 596px) {
         .hide-for-large {
             display: block !important;
@@ -41,7 +39,6 @@
             line-height: inherit !important;
         }
     }
-
     @media only screen and (max-width: 596px) {
         table.body table.container .hide-for-large,
         table.body table.container .row.hide-for-large {
@@ -49,7 +46,6 @@
             width: 100% !important;
         }
     }
-
     @media only screen and (max-width: 596px) {
         table.body table.container .callout-inner.hide-for-large {
             display: table-cell !important;
