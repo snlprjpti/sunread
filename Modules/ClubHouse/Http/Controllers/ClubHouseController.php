@@ -30,7 +30,7 @@ class ClubHouseController extends BaseController
         $this->clubHouseValueRepository = $clubHouseValueRepository;
 
         $this->model = $clubHouse;
-        $this->model_name = "ClubHouse";
+        $this->model_name = "Club House";
 
         // Calling Parent Constructor of BaseController
         parent::__construct($this->model, $this->model_name);
@@ -133,7 +133,7 @@ class ClubHouseController extends BaseController
             $fetched = [
                 "id" => $id,
                 "website_id" => $club_house->website_id,
-                "title" => $title_value->value
+                "title" => $title_value?->value
             ];
             $fetched["attributes"] = $this->repository->getConfigData($data);
         }

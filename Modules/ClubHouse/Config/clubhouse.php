@@ -104,7 +104,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "string",
+                    "rules" => "",
                     "is_required" => 0
                 ],
                 [
@@ -114,7 +114,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "string",
+                    "rules" => "",
                     "is_required" => 0
                 ],
             ]

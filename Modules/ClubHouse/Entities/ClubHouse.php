@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ClubHouse extends Model
 {
-    use HasFactory, Sluggable, HasScope, NodeTrait;
+    use HasFactory, Sluggable, HasScope;
 
     /**
      * Arrays that are Mass Assignable

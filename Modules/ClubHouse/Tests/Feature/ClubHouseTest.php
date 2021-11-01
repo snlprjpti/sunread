@@ -21,7 +21,7 @@ class ClubHouseTest extends BaseTestCase
         parent::setUp();
         $this->admin = $this->createAdmin();
 
-        $this->model_name = "ClubHouse";
+        $this->model_name = "Club House";
         $this->route_prefix = "admin.clubhouses";
 
         $this->model::factory(10)->create();
@@ -88,7 +88,7 @@ class ClubHouseTest extends BaseTestCase
     {
         $websiteId = $this->default_resource->website_id;
         $updateData = $this->getCreateData();
-        unset($updateData["website_id"]);
+        //unset($updateData["website_id"]);
         return array_merge($updateData, $this->getScope($websiteId));
     }
 
@@ -138,21 +138,6 @@ class ClubHouseTest extends BaseTestCase
             "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
         ]);
     }
-
-    public function testAdminCanUpdateResourceWithPosition()
-    {
-        $post_data = [
-            "position" => rand(1,10)
-        ];
-        $response = $this->withHeaders($this->headers)->put($this->getRoute("position", [$this->default_resource_id]), $post_data);
-
-        $response->assertOk();
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
-        ]);
-    }
-
     public function getScope($websiteId)
     {
         $scope = Arr::random(["website", "channel", "store"]);
