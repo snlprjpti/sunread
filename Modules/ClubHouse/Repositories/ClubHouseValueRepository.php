@@ -4,21 +4,23 @@
 namespace Modules\ClubHouse\Repositories;
 
 use Exception;
+use Modules\Core\Rules\ScopeRule;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
+use Modules\ClubHouse\Traits\HasScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 use Modules\ClubHouse\Entities\ClubHouse;
+use Modules\ClubHouse\Rules\SlugUniqueRule;
+use Illuminate\Validation\ValidationException;
 use Modules\ClubHouse\Entities\ClubHouseValue;
-use Modules\ClubHouse\Traits\HasScope;
+use Modules\ClubHouse\Rules\ClubHouseScopeRule;
 
 class ClubHouseValueRepository
 {
     use HasScope;
 
     // Properties for ClubHouseValueRepositor
-    protected $model, $model_key, $repository, $model_name, $parent_model, $global_file = [];
+    protected $model, $model_key, $club_house_repository, $model_name, $parent_model, $global_file = [];
 
     /**
      * ClubHouseValueRepositor Constructor
@@ -27,7 +29,7 @@ class ClubHouseValueRepository
     {
         $this->model = $club_house_value;
         $this->model_key = "clubhouse.values";
-        $this->repository = $club_house_repository;
+        $this->club_house_repository = $club_house_repository;
         $this->model_name = "ClubHouse";
         $this->parent_model = $club_house;
 
@@ -71,6 +73,7 @@ class ClubHouseValueRepository
         return $all_rules;
     }
 
+
     /**
      * Handle and Store File from the Request
      */
@@ -96,6 +99,50 @@ class ClubHouseValueRepository
             throw $exception;
         }
         return $value_rule;
+    }
+
+     /**
+     * Validate the Request with Unique Slug and Create it
+     */
+    public function validateWithValues(object $request, ?object $club_house = null , ?string $method = null): array
+    {
+        try
+        {
+            if($method == "update") {
+                $call_back = function () use ($club_house) {
+                    return [
+                        "website_id" => $club_house->website_id
+                    ];
+                };
+
+                $validation_items = [
+                    "items.slug.value" => new SlugUniqueRule($request, $club_house),
+                    "scope" => "required|in:website,channel,store",
+                    "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $club_house?->id)]
+                ];
+            } else {
+                $call_back = function () use ($request) {
+                    return [
+                        "scope" => "website",
+                        "scope_id" => $request->website_id
+                    ];
+                };
+
+                $validation_items = [
+                    "items.slug.value" => new SlugUniqueRule($request),
+                    "website_id" => "required|exists:websites,id"
+                ];
+            }
+            $data = $this->club_house_repository->validateData($request, array_merge($this->getValidationRules($request, $club_house?->id, $method), $validation_items), $call_back);
+
+            if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->club_house_repository->createUniqueSlug($data, $club_house);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 
     /**
@@ -129,7 +176,7 @@ class ClubHouseValueRepository
                 $match["attribute"] = $key;
 
                 $value = $val["value"] ?? null;
-                $match["value"] = ($configDataArray["type"] == "file" && $value) ? $this->repository->storeScopeImage($value, "club_house") : $value;
+                $match["value"] = ($configDataArray["type"] == "file" && $value) ? $this->club_house_repository->storeScopeImage($value, "club_house") : $value;
 
 
                 if($configData = $this->checkCondition($match)->first())

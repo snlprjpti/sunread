@@ -81,17 +81,7 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, array_merge($this->clubHouseValueRepository->getValidationRules($request), [
-                "items.slug.value" => new SlugUniqueRule($request),
-                "website_id" => "required|exists:websites,id"
-            ]), function () use ($request) {
-                return [
-                    "scope" => "website",
-                    "scope_id" => $request->website_id
-                ];
-            });
-
-            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data);
+            $data = $this->clubHouseValueRepository->validateWithValues($request, null, "create");
 
             $created = $this->repository->create($data, function ($created) use ($data) {
                 $this->clubHouseValueRepository->createOrUpdate($data, $created);
@@ -116,26 +106,9 @@ class ClubHouseController extends BaseController
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $id)]
             ]);
-
             $club_house = $this->model->findOrFail($id);
-            $data = [
-                "scope" => $request->scope ?? "website",
-                "scope_id" => $request->scope_id ?? $club_house->website_id,
-                "club_house_id" => $id
-            ];
 
-            // Accessing Clubhouse title through values
-            $title_data = array_merge($data, ["attribute" => "title"]);
-            $club_house->createModel();
-            $title_value = $club_house->has($title_data) ? $club_house->getValues($title_data) : $club_house->getDefaultValues($title_data);
-
-            $fetched = [];
-            $fetched = [
-                "id" => $id,
-                "website_id" => $club_house->website_id,
-                "title" => $title_value?->value
-            ];
-            $fetched["attributes"] = $this->repository->getConfigData($data);
+            $fetched = $this->repository->fetchWithAttributes($request, $club_house);
         }
         catch (Exception $exception)
         {
@@ -152,19 +125,9 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            // dd($request->all());
             $club_house = $this->model->findOrFail($id);
-            $data = $this->repository->validateData($request, array_merge($this->clubHouseValueRepository->getValidationRules($request, $id, "update"), [
-                "items.slug.value" => new SlugUniqueRule($request, $club_house),
-                "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $id)]
-            ]), function () use ($club_house) {
-                return [
-                    "website_id" => $club_house->website_id
-                ];
-            });
 
-            if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data, $club_house);
+            $data = $this->clubHouseValueRepository->validateWithValues($request, $club_house, "update");
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->clubHouseValueRepository->createOrUpdate($data, $updated);
@@ -186,7 +149,7 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $club_house = $this->model->findOrFail($id);
+            $this->model->findOrFail($id);
 
             $this->repository->delete($id);
         }

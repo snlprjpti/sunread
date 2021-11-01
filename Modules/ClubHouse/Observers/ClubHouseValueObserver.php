@@ -21,7 +21,7 @@ class ClubHouseValueObserver
 
     }
 
-    public function deleted(ClubHouseValue $category_value)
+    public function deleted(ClubHouseValue $clubhouse_value)
     {
     }
 }

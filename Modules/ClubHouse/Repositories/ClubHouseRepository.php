@@ -4,10 +4,12 @@ namespace Modules\ClubHouse\Repositories;
 
 use Exception;
 use Illuminate\Support\Str;
-use Modules\ClubHouse\Entities\ClubHouse;
-use Modules\ClubHouse\Entities\ClubHouseValue;
 use Modules\ClubHouse\Traits\HasScope;
+use Illuminate\Support\Facades\Storage;
+use Modules\ClubHouse\Entities\ClubHouse;
+use Modules\ClubHouse\Rules\SlugUniqueRule;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\ClubHouse\Entities\ClubHouseValue;
 
 class ClubHouseRepository extends BaseRepository
 {
@@ -53,6 +55,17 @@ class ClubHouseRepository extends BaseRepository
 
             foreach($children["elements"] as &$element){
                 if($this->scopeFilter($data["scope"], $element["scope"])) continue;
+
+                if(isset($data["club_house_id"])){
+                    $data["attribute"] = $element["slug"];
+
+                    $existData = $this->has($data);
+
+                    if($data["scope"] != "website") $element["use_default_value"] = $existData ? 0 : 1;
+                    $elementValue = $existData ? $this->getValues($data) : $this->getDefaultValues($data);
+                    $element["value"] = $elementValue?->value ?? null;
+                    if ($element["type"] == "file" && $element["value"]) $element["value"] = Storage::url($element["value"]);
+                }
                 unset($element["rules"]);
 
                 $children_data["elements"][] = $element;
@@ -61,6 +74,34 @@ class ClubHouseRepository extends BaseRepository
         }
         return $fetched;
     }
+
+
+    /**
+     * Get ClubHouse with it's Attributes and Values
+     */
+    public function fetchWithAttributes(object $request, ClubHouse $club_house)
+    {
+        $data = [
+            "scope" => $request->scope ?? "website",
+            "scope_id" => $request->scope_id ?? $club_house->website_id,
+            "club_house_id" => $club_house->id
+        ];
+
+        // Accessing Clubhouse title through values
+        $title_data = array_merge($data, ["attribute" => "title"]);
+        $club_house->createModel();
+        $title_value = $club_house->has($title_data) ? $club_house->getValues($title_data) : $club_house->getDefaultValues($title_data);
+
+        $fetched = [
+            "id" => $club_house->id,
+            "website_id" => $club_house->website_id,
+            "title" => $title_value?->value
+        ];
+
+        $fetched["attributes"] = $this->getConfigData($data);
+        return $fetched;
+    }
+
 
     /**
      * Creates a Unique Slug for ClubHouse
