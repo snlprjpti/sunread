@@ -10,9 +10,15 @@ use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
 use Modules\Product\Jobs\ConfigurableIndexing;
 use Modules\Product\Jobs\ElasticSearchIndexingJob;
+use Modules\Product\Jobs\ReIndexer;
+use Modules\Product\Jobs\ReIndexing;
 use Modules\Product\Jobs\SingleIndexing;
+use Modules\Product\Jobs\VariantIndexing;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Bus\Batch;
+use Modules\Product\Jobs\ReindexMigrator;
+use Modules\Product\Jobs\Tester;
 
 class ElasticSearchImport extends Command
 {
@@ -27,23 +33,7 @@ class ElasticSearchImport extends Command
 
     public function handle(): void
     {
-        $products = Product::whereType("simple")->whereParentId(null)->get();
-
-        $batch = Bus::batch([])->dispatch();
-        foreach($products as $product)
-        {
-            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
-                return $channel->stores;
-            });
-            
-            foreach($stores as $store) $batch->add(new SingleIndexing($product, $store));
-        }
-
-        $variants = Product::whereType("configurable")->get();
-        foreach($variants as $variant)
-        {
-            $batch->add(new ConfigurableIndexing($variant));
-        }
+        ReindexMigrator::dispatch()->onQueue("index");
         $this->info("All data imported successfully");
     }
 }

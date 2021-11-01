@@ -32,9 +32,9 @@ class PageScopeRepository extends BaseRepository
             foreach($stores as $k => $store)
             {  
                 if ($parent->website_id) {
-                    $website_stores = Website::find($parent->website_id)->channels->mapWithKeys(function ($channel) {
+                    $website_stores = Website::find($parent->website_id)->channels->map(function ($channel) {
                         return $channel->stores->pluck('id');
-                    })->toArray();
+                    })->flatten(1)->toArray();
     
                     if (!in_array($store, $website_stores) && $store != 0) throw ValidationException::withMessages(["stores.$k" => "Store does not belong to this website"]);
                 }
@@ -51,6 +51,7 @@ class PageScopeRepository extends BaseRepository
                 }
                 $page_scopes[] = $this->create($data);
             }
+
             $parent->page_scopes()->whereNotIn('id', array_filter(Arr::pluck($page_scopes, 'id')))->delete();
         }
         catch (Exception $exception)

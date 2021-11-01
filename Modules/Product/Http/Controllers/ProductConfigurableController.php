@@ -12,9 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 use Exception;
-use Illuminate\Support\Facades\Bus;
 use Modules\Core\Rules\ScopeRule;
-use Modules\Product\Jobs\ConfigurableIndexing;
 use Modules\Product\Repositories\ProductAttributeRepository;
 use Modules\Product\Repositories\ProductRepository;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
@@ -75,8 +73,8 @@ class ProductConfigurableController extends BaseController
 
                 $this->repository->createVariants($created, $request, $scope, $attributes);
             });
-            $batch = Bus::batch([])->dispatch();
-            $batch->add(new ConfigurableIndexing($created));
+
+            $this->repository->configurableIndexing($created);
         }
         catch(Exception $exception)
         {
@@ -97,7 +95,8 @@ class ProductConfigurableController extends BaseController
                 return [
                     "scope" => $request->scope ?? "website",
                     "scope_id" => $request->scope_id ?? $product->website_id,
-                    "type" => "configurable"
+                    "type" => "configurable",
+                    "website_id" => $product->website_id
                 ];
             });
 
@@ -116,8 +115,7 @@ class ProductConfigurableController extends BaseController
 
                 $updated->load("variants");
             });
-            $batch = Bus::batch([])->dispatch();
-            $batch->add(new ConfigurableIndexing($updated));
+            $this->repository->configurableIndexing($updated);
         }
         catch(Exception $exception)
         {

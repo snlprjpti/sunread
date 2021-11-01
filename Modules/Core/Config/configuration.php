@@ -14,12 +14,12 @@ return[
                                 "path" => "default_country",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name","id"],
-                                "default" => "",
+                                "pluck" => ["name","iso_2_code"],
+                                "default" => "DZ",
                                 "options" => [],
-                                "rules" => "exists:countries,id",
+                                "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
-                                "scope" => "global",
+                                "scope" => "channel",
                                 "is_required" => 1
                             ],
                             [
@@ -27,13 +27,13 @@ return[
                                 "path" => "allow_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "id"],
-                                "default" => [],
+                                "pluck" => ["name", "iso_2_code"],
+                                "default" => ["SE","DZ"],
                                 "options" => [],
                                 "rules" => "array",
-                                "value_rules" => "exists:countries,id",
+                                "value_rules" => "exists:countries,iso_2_code",
                                 "multiple" => true,
-                                "scope" => "website",
+                                "scope" => "channel",
                                 "is_required" => 1
                             ],
                             [
@@ -41,12 +41,27 @@ return[
                                 "path" => "optional_zip_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "id"],
-                                "default" => "",
+                                "pluck" => ["name", "iso_2_code"],
+                                "default" => [],
                                 "options" => [],
-                                "rules" => "exists:countries,id",
-                                "multiple" => false,
-                                "scope" => "channel",
+                                "rules" => "array",
+                                "value_rules" => "exists:countries,iso_2_code",
+                                "multiple" => true,
+                                "scope" => "website",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "State is Optional for",
+                                "path" => "general_optional_state",
+                                "type" => "select",
+                                "provider" => "Modules\Country\Entities\Country",
+                                "pluck" => ["name", "iso_2_code"],
+                                "default" => [],
+                                "options" => [],
+                                "rules" => "array",
+                                "value_rules" => "exists:countries,iso_2_code",
+                                "multiple" => true,
+                                "scope" => "website",
                                 "is_required" => 1
                             ]
                         ]
@@ -59,10 +74,10 @@ return[
                                 "path" => "state_country",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "id"],
+                                "pluck" => ["name", "iso_2_code"],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "exists:countries,id",
+                                "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
@@ -114,12 +129,11 @@ return[
                                 "path" => "store_country",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "id"],
+                                "pluck" => ["name", "iso_2_code"],
                                 "default" => [],
                                 "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "exists:countries,id",
-                                "multiple" => true,
+                                "rules" => "exists:countries,iso_2_code",
+                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1
                             ],
@@ -208,6 +222,67 @@ return[
                                 "is_required" => 1
                             ]
                         ]
+                    ],
+                    [
+                        "title" => "Locale Options",
+                        "elements" => [
+                            [
+                                "title" => "Locale",
+                                "path" => "store_locale",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\Locale",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:locales,id",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Weight Unit",
+                                "path" => "locale_weight_unit",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "kgs",
+                                "options" => [
+                                    [ "value" => "lbs", "label" => "lbs" ],
+                                    [ "value" => "kgs", "label" => "kgs" ],
+                                ],
+                                "rules" => "in:lbs,kgs",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Global Timezone",
+                                "path" => "global_timezone",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\TimeZone",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:time_zones,id",
+                                "multiple" => false,
+                                "scope" => "website",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Channel Time Zone",
+                                "path" => "channel_time_zone",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\TimeZone",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:time_zones,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+
+                        ]
                     ]
                 ]
             ],
@@ -237,7 +312,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
                                 "is_required" => 1
                             ],
@@ -249,7 +324,7 @@ return[
                                 "pluck" => [],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
                                 "is_required" => 1
                             ]
@@ -334,31 +409,100 @@ return[
                         "title" => "Currency Options",
                         "elements" => [
                             [
-                                "title" => "Base Currency",
-                                "path" => "base_currency",
+                                "title" => "Channel Currency",
+                                "path" => "channel_currency",
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
-                                "default" => "",
+                                "default" => "142",
                                 "options" => [],
                                 "rules" => "exists:currencies,id",
                                 "multiple" => false,
-                                "scope" => "global",
+                                "scope" => "channel",
                                 "is_required" => 1
                             ],
                             [
-                                "title" => "Default Display Currency",
-                                "path" => "default_display_currency",
+                                "title" => "Symbol Position",
+                                "path" => "symbol_position",
                                 "type" => "select",
-                                "provider" => "Modules\Core\Entities\Currency",
-                                "pluck" => ["code","id"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "exists:currencies,id",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 4,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Before Value" ],
+                                    [ "value" => 2, "label" => "Before Value With Space" ],
+                                    [ "value" => 3, "label" => "After Value" ],
+                                    [ "value" => 4, "label" => "After Value With Space" ],
+                                ],
+                                "rules" => "in:1,2,3,4",
                                 "multiple" => false,
-                                "scope" => "website",
+                                "scope" => "channel",
                                 "is_required" => 1
                             ],
+                            [
+                                "title" => "Minus Sign",
+                                "path" => "minus_sign",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "-",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Minus Sign Position",
+                                "path" => "minus_sign_position",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Before Value" ],
+                                    [ "value" => 2, "label" => "Before Symbol" ],
+                                    [ "value" => 3, "label" => "After Value" ],
+                                    [ "value" => 4, "label" => "After Symbol" ]
+                                ],
+                                "rules" => "in:1,2,3,4",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Group Seperator",
+                                "path" => "group_seperator",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 2,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Comma (,)" ],
+                                    [ "value" => 2, "label" => "Dot (.)" ],
+                                    [ "value" => 3, "label" => "Space()" ],
+                                    [ "value" => 4, "label" => "None" ]
+                                ],
+                                "rules" => "in:1,2,3,4",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Decimal Seperator",
+                                "path" => "decimal_seperator",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Comma (,)" ],
+                                    [ "value" => 2, "label" => "Dot (.)" ]
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ]
                         ]
                     ],
                 ]
@@ -398,6 +542,69 @@ return[
                                 "rules" => "exists:stores,id",
                                 "multiple" => false,
                                 "scope" => "website",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+            [
+                "title" => "Email",
+                "subChildren" => [
+                    [
+                        "title" => "General",
+                        "elements" => [
+                            [
+                                "title" => "Sender Name",
+                                "path" => "email_sender_name",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "store",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Sender Email",
+                                "path" => "email_sender_email",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "store",
+                                "is_required" => 0
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Templates",
+                        "elements" => [
+                            [
+                                "title" => "Header",
+                                "path" => "template_header",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "store",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Footer",
+                                "path" => "template_footer",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "store",
                                 "is_required" => 0
                             ]
                         ]
@@ -475,26 +682,11 @@ return[
         "title" => "Customer",
         "children" => [
             [
-                "title" => "Customer Configuration",
+                "title" => "Customer",
                 "subChildren" => [
                     [
-                        "title" => "Create New Account Options",
+                        "title" => "New Account Options",
                         "elements" => [
-                            [
-                                "title" => "Enable Automatic Assignment to Customer Group",
-                                "path" => "customer_auto_customer_group",
-                                "type" => "radio",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "1",
-                                "options" => [
-                                    [ "value" => 1, "label" => "Yes" ],
-                                    [ "value" => 0, "label" => "No" ]
-                                ],
-                                "rules" => "in:0,1",
-                                "scope" => "global",
-                                "is_required" => 1
-                            ],
                             [
                                 "title" => "Default Customer Group",
                                 "path" => "customer_default_customer_group",
@@ -505,9 +697,271 @@ return[
                                 "options" => [],
                                 "rules" => "exists:customer_groups,id",
                                 "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Require Email Confirmation",
+                                "path" => "require_email_confirmation",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 2,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Yes" ],
+                                    [ "value" => 2, "label" => "No" ],
+                                ],
+                                "rules" => "",
+                                "multiple" => false,
                                 "scope" => "website",
                                 "is_required" => 1
                             ]
+                        ]
+                    ],
+                    [
+                        "title" => "Password Options",
+                        "elements" => [
+                            [
+                                "title" => "Recovery Link Expiration Period (hours)",
+                                "path" => "recovery_link_expiration_period",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 2,
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "global",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Minimum Password Length",
+                                "path" => "minimum_password_length",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 8,
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "global",
+                                "is_required" => 1
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "Email Templates",
+                        "elements" => [
+                            [
+                                "title" => "Default Welcome Email Template",
+                                "path" => "default_welcome_email_template",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Confirmation Link Email Template",
+                                "path" => "confirmation_link_email_template",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Welcome Email Template",
+                                "path" => "welcome_email_template",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "array",
+                                "value_rules" => "",
+                                "multiple" => true,
+                                "scope" => "website",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Forgot Password Email Template",
+                                "path" => "forgot_password_email_template",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Reset Password Email Template",
+                                "path" => "reset_password_email_template",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+
+        ]
+    ],
+    "sales" => [
+        "title" => "Sales",
+        "children" => [
+            [
+                "title" => "Sales",
+                "subChildren" => [
+                    [
+                        "title" => "Tax Classes",
+                        "elements" => [
+                            [
+                                "title" => "Default Tax Class for Product",
+                                "path" => "default_tax_class_for_product",
+                                "type" => "select",
+                                "provider" => "Modules\Tax\Entities\ProductTaxGroup",
+                                "pluck" => ["name", "id"],
+                                "default" => "1",
+                                "options" => [],
+                                "rules" => "exists:product_tax_groups,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Default Tax Class for Customer",
+                                "path" => "default_tax_class_for_customer",
+                                "type" => "select",
+                                "provider" => "Modules\Tax\Entities\CustomerTaxGroup",
+                                "pluck" => ["name", "id"],
+                                "default" => "1",
+                                "options" => [],
+                                "rules" => "exists:customer_tax_groups,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                        ]
+                    ],
+                    [
+                        "title" => "Calculation Settings",
+                        "elements" => [
+                            [
+                                "title" => "Tax Calculation Method Based On",
+                                "path" => "tax_calculation_method_based_on",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Total" ],
+                                    [ "value" => 2, "label" => "Raw Total" ],
+                                    [ "value" => 3, "label" => "Unit Price" ],
+                                ],
+                                "rules" => "in:1,2,3",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Tax Calculation Based On",
+                                "path" => "tax_calculation_based_on",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Shipping Address" ],
+                                    [ "value" => 2, "label" => "Billing Address" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Catalog Prices",
+                                "path" => "tax_catalog_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Shipping Prices",
+                                "path" => "tax_shipping_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Apply Customer Tax",
+                                "path" => "apply_customer_tax",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "After Discount" ],
+                                    [ "value" => 2, "label" => "Before Discount" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
+                            [
+                                "title" => "Apply Discount on Prices",
+                                "path" => "apply_discount_on_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1
+                            ],
                         ]
                     ]
                 ]

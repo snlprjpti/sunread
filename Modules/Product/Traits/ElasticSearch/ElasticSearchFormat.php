@@ -3,6 +3,7 @@
 namespace Modules\Product\Traits\ElasticSearch;
 
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
@@ -22,9 +23,11 @@ trait ElasticSearchFormat
 
             $inventory = $this->getInventoryData();
             if ($inventory) $array = array_merge($array, $inventory); 
+            $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
     
             $array['categories'] = $this->getCategoryData($store);
             $images = $this->getImages();
+            if($this->type == "simple" && !$this->parent_id) $array["list_status"] = 1;
         }
         catch (Exception $exception)
         {
@@ -37,13 +40,8 @@ trait ElasticSearchFormat
     public function getProductAttributes(object $store): array
     {
         try
-        {
-            $data = [];
-
-            $selected_attr = [ "id", "sku", "status", "website_id", "parent_id", "type" ];
-            $data = collect($this)->filter(function ($product, $key) use($selected_attr) {
-                if(in_array($key, $selected_attr)) return $product;
-            })->toArray();
+        {   
+            $data = $this->select("id", "sku", "status", "website_id", "parent_id", "type")->where("id", $this->id)->first()->toArray();
             
             $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
             
@@ -58,18 +56,22 @@ trait ElasticSearchFormat
                     "attribute_id" => $attributeId
                 ];
 
-                $data[$attribute->slug] = $this->value($match);
                 if(in_array($attribute->type, $this->options_fields))
                 {
-                    $value = $data[$attribute->slug];
-                    if (is_array($value)) {
-                        foreach($value as $key => $val)
+                    $values = $this->value($match);
+                    if ($values instanceof Collection) {
+                        $data[$attribute->slug] = $values->pluck("id")->toArray();
+                        foreach($values as $key => $val)
                         {
-                            $data["{$attribute->slug}_{$key}_value"] = $this->getAttributeOption($attribute, $val);
+                            $data["{$attribute->slug}_{$key}_value"] = $val?->name;
                         }
                     }
-                    else $data["{$attribute->slug}_value"] = $this->getAttributeOption($attribute, $value);
+                    else {
+                        $data[$attribute->slug] = $values?->id;
+                        $data["{$attribute->slug}_value"] = $values?->name;
+                    }
                 }
+                else  $data[$attribute->slug] = $this->value($match);
             }
         }
         catch (Exception $exception)
@@ -145,8 +147,11 @@ trait ElasticSearchFormat
 
             $images['gallery'] = $this->images()->wherehas("types", function($query) {
                 $query->whereSlug("gallery");
-            })->pluck('path')->map(function ($gallery) {
-                return Storage::url($gallery);
+            })->get()->map(function ($gallery) {
+                return [
+                    "url" => Storage::url($gallery->path),
+                    "background_color" => $gallery->background_color
+                ];
             })->toArray();
             
         }
@@ -157,7 +162,7 @@ trait ElasticSearchFormat
         return $images;
     }
 
-    Public function getFullPath($image_name): ?string
+    Public function getFullPath($image_name): ?array
     {
         try
         {
@@ -171,6 +176,9 @@ trait ElasticSearchFormat
             throw $exception;
         }
          
-        return $path;
+        return [
+            "url" => $path,
+            "background_color" => $image?->background_color
+        ];
     }
 }

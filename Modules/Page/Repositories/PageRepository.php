@@ -79,7 +79,7 @@ class PageRepository extends BaseRepository
             $this->parent = [];
 
             $data = collect($this->pageAttributeRepository->config_fields)->where("slug", $component->attribute)->first();
-            $this->getChildren($data["groups"], values:$component->value);
+            $this->getChildren($data["mainGroups"], values:$component->value);
         }
         catch( Exception $exception )
         {
@@ -90,7 +90,7 @@ class PageRepository extends BaseRepository
             "id" => $component->id,
             "title" => $data["title"],
             "slug" => $data["slug"],
-            "groups" => $this->parent
+            "mainGroups" => $this->parent
         ];
     }
 
@@ -100,15 +100,27 @@ class PageRepository extends BaseRepository
         {
             foreach($elements as $i => &$element)
             {
-                $append_key = isset($key) ? "$key.$i" : $i;
-                $append_slug_key = isset($slug_key) ? "$slug_key.{$element["slug"]}" : $element["slug"];
+                $append_key = isset($key) ? "{$key}.{$i}" : $i;
+                $append_slug_key = isset($slug_key) ? "{$slug_key}.{$element['slug']}" : $element["slug"];
 
+                if(isset($element["groups"])) {
+                    setDotToArray($append_key, $this->parent,  $element);
+                    $this->getChildren($element["groups"], "{$append_key}.groups", $values);
+                    continue;
+                }
+
+                if(isset($element["subGroups"])) {
+                    setDotToArray($append_key, $this->parent,  $element);
+                    $this->getChildren($element["subGroups"], "{$append_key}.subGroups", $values);
+                    continue;
+                }
+                
                 if ($element["hasChildren"] == 0) {
-                    if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery((object) $element, $element["pluck"]);
+                    //if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery((object) $element, $element["pluck"]);
                     unset($element["pluck"], $element["provider"], $element["rules"]);
 
                     if (count($values) > 0) {
-                        $default = getDotToArray($append_slug_key, $values);
+                        $default = decodeJsonNumeric(getDotToArray($append_slug_key, $values));
                         if($default) $element["default"] = ($element["type"] == "file") ? Storage::url($default) : $default;
                     }
 
@@ -126,19 +138,19 @@ class PageRepository extends BaseRepository
                         for($j=0; $j<$count; $j++)
                         {
                             if ($j==0) setDotToArray($append_key, $this->parent, $fake_element);
-                            $this->getChildren($element["attributes"][0], "$append_key.attributes.$j", $values, "$append_slug_key.$j");
+                            $this->getChildren($element["attributes"][0], "{$append_key}.attributes.{$j}", $values, "{$append_slug_key}.{$j}");
                         }
                         continue;
                     }
                     if ($element["type"] == "normal") {
                         setDotToArray($append_key, $this->parent,  $element);
-                        $this->getChildren($element["attributes"], "$append_key.attributes", $values, $append_slug_key);
+                        $this->getChildren($element["attributes"], "{$append_key}.attributes", $values, $append_slug_key);
                         continue;
                     }
                 }
 
                 setDotToArray($append_key, $this->parent,  $element);
-                $this->getChildren($element["attributes"], "$append_key.attributes", $values);
+                $this->getChildren($element["attributes"], "{$append_key}.attributes", $values);
             }
         }
         catch( Exception $exception )

@@ -14,8 +14,9 @@ class ConfigurationFactory extends Factory
 
     public function definition(): array
     {
-        $paths = [ "allow_countries", "optional_zip_countries", "state_country", "store_phone_number", "store_hours_operation", "store_country", "store_zip_code", "store_street_address", "store_address_line2", "store_image" ];
-        $absolute_paths = [ "0.elements.1", "0.elements.2", "1.elements.0", "2.elements.1", "2.elements.2",  "2.elements.3", "2.elements.5", "2.elements.7", "2.elements.8", "2.elements.9"];
+        $paths = [ "default_country", "allow_countries", "optional_zip_countries", "general_optional_state", "state_country", "store_phone_number", "store_hours_operation", "store_country", "store_zip_code", "store_street_address", "store_address_line2", "store_image", "store_locale", "locale_weight_unit", "global_timezone", "channel_time_zone"];
+        $absolute_paths = [ "0.elements.0", "0.elements.1", "0.elements.2", "0.elements.3", "1.elements.0", "2.elements.1", "2.elements.2",  "2.elements.3", "2.elements.5", "2.elements.7", "2.elements.8", "2.elements.9", "3.elements.0", "3.elements.1", "3.elements.2", "3.elements.3"  ];
+
 
         $scope = Arr::random([ "website", "channel", "store" ]);
 

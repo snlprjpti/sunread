@@ -5,105 +5,49 @@ namespace Modules\Customer\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
-use Modules\Customer\Exceptions\ActionUnauthorizedException;
-use Modules\Customer\Repositories\CustomerAddressRepository;
-use Modules\Customer\Transformers\CustomerAddressResource;
+use Modules\Customer\Repositories\StoreFront\AddressRepository;
 
 class CustomerAddressAccountController extends BaseController
 {
     protected $repository, $customer;
 
-    public function __construct(CustomerAddressRepository $customerAddressRepository, CustomerAddress $customerAddress)
+    public function __construct(AddressRepository $addressRepository, CustomerAddress $customerAddress)
     {
-        $this->repository = $customerAddressRepository;
+        $this->repository = $addressRepository;
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
-        $this->customer = auth()->guard("customer")->check() ? auth()->guard("customer")->user() : new Customer();
-        $exception_statuses = [
-            ActionUnauthorizedException::class => 403
-        ];
-        parent::__construct($this->model, $this->model_name, $exception_statuses);
-    }
-
-    public function collection(object $data): ResourceCollection
-    {
-        return CustomerAddressResource::collection($data);
-    }
-
-    public function resource(object $data): JsonResource
-    {
-        return new CustomerAddressResource($data);
+        $this->customer = auth()->guard("customer")->user();
+        parent::__construct($this->model, $this->model_name);
     }
 
     public function show(): JsonResponse
     {
         try
         {
-            $fetched = $this->customer->addresses;
+            $fetched["shipping"] = $this->repository->checkShippingAddress($this->customer->id)->first();
+            $fetched["billing"] =$this->repository->checkBillingAddress($this->customer->id)->first();
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang("fetch-success"));
+        return $this->successResponse($fetched, $this->lang("fetch-success"));
     }
 
     public function create(Request $request): JsonResponse
     {
         try
         {
-            $data = $this->repository->validateData($request);
-            $data["customer_id"] = $this->customer->id;
-            $created = $this->repository->create($data);
+            $created = $this->repository->createOrUpdate($request, $this->customer->id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($created), $this->lang("create-success"));
-    }
-
-    public function update(Request $request, int $id): JsonResponse
-    {
-        try
-        {
-            $this->checkAuthority($id);
-            $data = $this->repository->validateData($request);
-            $updated = $this->repository->update($data, $id);
-        }
-        catch (Exception $exception)
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse($this->resource($updated), $this->lang("update-success"));
-    }
-
-    public function delete(Request $request, int $id): JsonResponse
-    {
-        try
-        {
-            $this->checkAuthority($id);
-            $this->repository->delete($id);
-        }
-        catch (Exception $exception)
-        {
-            return $this->handleException($exception);
-        }
-    
-        return $this->successResponseWithMessage($this->lang("delete-success"));
-    }
-
-    protected function checkAuthority($id): void
-    {
-        $customer_address_ids = $this->customer->addresses->pluck("id")->toArray() ?? [];
-        if (!in_array($id, $customer_address_ids)) throw new ActionUnauthorizedException("Action not authorized.");
+        return $this->successResponse($created, $this->lang("create-success"));
     }
 }

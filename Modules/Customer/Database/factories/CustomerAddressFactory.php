@@ -2,6 +2,7 @@
 namespace Modules\Customer\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Country;
 use Modules\Country\Entities\Region;
@@ -13,9 +14,9 @@ class CustomerAddressFactory extends Factory
 
     public function definition(): array
     {
-        $country = Country::latest()->first();
-        $region = $country?->regions()->first();
-        $city = $region?->cities()->first();
+        $city = City::first();
+        $region = $city?->region()->first();
+        $country = $region?->country()->first();
 
         return [
             "customer_id" => Customer::inRandomOrder()->first()->id,

@@ -27,4 +27,14 @@ class TaxRule extends Model
     {
         return $this->belongsToMany(TaxRate::class);
     }
+
+    public function product_tax_groups(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductTaxGroup::class);
+    }
+
+    public function customer_tax_groups(): BelongsToMany
+    {
+        return $this->belongsToMany(CustomerTaxGroup::class);
+    }
 }

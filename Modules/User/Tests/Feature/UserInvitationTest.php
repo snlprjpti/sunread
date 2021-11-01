@@ -13,7 +13,7 @@ class UserInvitationTest extends BaseTestCase
 
         parent::setUp();
 
-        $this->model_name = "Admin account";
+        $this->model_name = "Admin";
         $this->route_prefix = "admin";
         $this->hasIndexTest = false;
         $this->hasShowTest = false;

@@ -88,4 +88,17 @@ class Product extends Model
     {
         return $this->hasMany(AttributeConfigurableProduct::class);
     }
+
+    public function attribute_options_child_products(): HasMany
+    {
+        return $this->hasMany(AttributeOptionsChildProduct::class);
+    }
+
+    /**
+     * Get the product builder values that owns the product.
+     */
+    public function productBuilderValues(): HasMany
+    {
+        return $this->hasMany(ProductBuilder::class);
+    }
 }

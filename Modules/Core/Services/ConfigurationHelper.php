@@ -3,13 +3,14 @@
 namespace Modules\Core\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
-use Modules\Core\Entities\Channel;
-use Modules\Core\Entities\Configuration;
 use Modules\Core\Entities\Store;
+use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
+use Modules\Core\Entities\Configuration;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Traits\Configuration as TraitsConfiguration;
 
 class ConfigurationHelper
@@ -33,7 +34,6 @@ class ConfigurationHelper
         try
         {
             $element = $this->getElement($path);
-
             $data = (object) [
                 "scope" => $scope,
                 "scope_id" => $scope_id,
@@ -42,7 +42,7 @@ class ConfigurationHelper
 
             $values = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data, $element["default"]);
             $fetched = $this->getProviderData($element, $values);
-            if($element["type"] == "file") $fetched = Storage::url($fetched);
+            if($fetched && $element["type"] == "file") $fetched = Storage::url($fetched);
         }
         catch( Exception $exception )
         {
@@ -60,7 +60,6 @@ class ConfigurationHelper
                 ->pluck("children")->flatten(1)
                 ->pluck("subChildren")->flatten(1)
                 ->pluck("elements")->flatten(1);
-
             $element = $elements->where("path", $path)->first();
             if(!$element) return throw ValidationException::withMessages(["path" => "Invalid path for configuration."]);
         }
@@ -76,11 +75,18 @@ class ConfigurationHelper
     {
         try
         {
+            if(Redis::exists("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}")) {
+                return unserialize(Redis::get("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}"));
+            }
             $value = $this->model->where([
                 ["scope", $request->scope],
                 ["scope_id", $request->scope_id],
                 ["path", $request->path]
             ])->first()?->value;
+            
+            if($value){
+            Redis::set("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}", serialize($value));
+            }
         }
         catch ( Exception $exception )
         {
@@ -139,9 +145,11 @@ class ConfigurationHelper
 
             if ( class_exists($element["provider"]) && $values !== null ) {
                 $model = new $element["provider"];
+                $pluck = $element["pluck"][1];
+
                 $fetched = is_array($values)
-                    ? $model->whereIn("id", $values)->get()
-                    : $model->find($values);
+                    ? $model->whereIn($pluck, $values)->get()
+                    : $model->where($pluck, $values)->first();
                 if ( !$fetched ) throw ValidationException::withMessages(["path" => "Invalid value for configuration."]);
             }
         }

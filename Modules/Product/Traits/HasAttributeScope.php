@@ -17,7 +17,15 @@ trait HasAttributeScope
     {
         try
         {
-            $this->attribute_val = Attribute::findorFail($data["attribute_id"]);
+            if(isset($data["attribute_id"])) {
+                $this->attribute_val = Attribute::find($data["attribute_id"]);
+            }
+
+            if(isset($data["attribute_slug"])) {
+                $this->attribute_val = Attribute::whereSlug($data["attribute_slug"])->first();
+                $data["attribute_id"] = $this->attribute_val->id;
+                unset($data["attribute_slug"]);
+            } 
 
             $existAttributeData = $this->product_attributes()->where($data)->first();
             $default = $existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($data);
@@ -59,6 +67,23 @@ trait HasAttributeScope
         }
         
         return $default_value;
+    }
+
+    public function getBuilderParentValues(array $data): mixed
+    {
+        try
+        {
+            $data = $this->getParentScope($data);  
+
+            $builders = $this->productBuilderValues()->whereScope($data["scope"])->whereScopeId($data["scope_id"])->get();
+            $fetched = ($builders->isEmpty() && ($data["scope"] != "website")) ? $this->getBuilderParentValues($data) : $builders;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $fetched;
     }
 
     public function getParentScope(array $scope): array

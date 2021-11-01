@@ -23,7 +23,8 @@ class AttributeTableSeeder extends Seeder
                 "is_required" => 1,
                 "is_searchable" => 1,
                 "search_weight" => 6,
-                "scope" => "store"
+                "scope" => "store",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "SKU",
@@ -34,7 +35,8 @@ class AttributeTableSeeder extends Seeder
                 "is_unique" => 1,
                 "is_visible_on_storefront" => 1,
                 "comparable_on_storefront" => 1,
-                "scope" => "website"
+                "scope" => "website",
+                "is_synchronized" => 0
             ],
             // [
             //     "name" => "New",
@@ -52,15 +54,17 @@ class AttributeTableSeeder extends Seeder
                 "validation" => "decimal",
                 "is_required" => 1,
                 "use_in_layered_navigation" => 1,
-                "scope" => "channel"
+                "scope" => "channel",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Cost",
                 "type" => "price",
                 "validation" => "decimal",
-                "is_required" => 1,
+                "is_required" => 0,
                 "use_in_layered_navigation" => 1,
-                "scope" => "channel"
+                "scope" => "channel",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Special Price",
@@ -94,7 +98,8 @@ class AttributeTableSeeder extends Seeder
                     ]
                 ],
                 "default_value" => "In stock",
-                "scope" => "website"
+                "scope" => "website",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Has Weight",
@@ -110,7 +115,7 @@ class AttributeTableSeeder extends Seeder
                         "code" => 0
                     ]
                 ],
-                "default_value" => "Yes",
+                "default_value" => "No",
                 "scope" => "website"
             ],
             // [
@@ -159,11 +164,11 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "store"
             ],
             [
-                "name" => "Tax Class",
+                "name" => "Tax Group",
                 "slug" => "tax_class_id",
                 "type" => "select",
                 "is_required" => 1,
-                "default_value" => "Taxable Goods",
+                "default_value" => "General",
                 "options" => [],
                 "scope" => "channel"
             ],
@@ -171,7 +176,8 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Categories",
                 "slug" => "category_ids",
                 "type" => "multiselect",
-                "scope" => "website"
+                "scope" => "website",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Set Product as New from Date",
@@ -214,21 +220,21 @@ class AttributeTableSeeder extends Seeder
                 "slug" => "meta_keywords",
                 "type" => "textarea",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Meta Title",
                 "slug" => "meta_title",
                 "type" => "text",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Meta Description",
                 "slug" => "meta_description",
                 "type" => "textarea",
                 "scope" => "store",
-                "is_required" => 1
+                "is_required" => 0
             ],
             [
                 "name" => "Product Status",
@@ -236,44 +242,24 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "options" => [
                     [
-                        "name" => "Yes",
+                        "name" => "Enabled",
                         "code" => 1
                     ],
                     [
-                        "name" => "No",
+                        "name" => "Disabled",
                         "code" => 0
                     ]
                 ],
                 "default_value" => "Yes",
                 "scope" => "website",
-                "is_required" => 1
-            ],
-            [
-                "name" => "Base Image",
-                "slug" => "base_image",
-                "type" => "image",
-                "scope" => "website",
-                "is_required" => 0
-            ],
-            [
-                "name" => "Small Image",
-                "slug" => "small_image",
-                "type" => "image",
-                "scope" => "website",
-                "is_required" => 0
-            ],
-            [
-                "name" => "Thumbnail Image",
-                "slug" => "thumbnail_image",
-                "type" => "image",
-                "scope" => "website",
-                "is_required" => 0
+                "is_required" => 1,
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Color",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "default_value" => "Red",
+                "default_value" => "",
                 "is_user_defined" => 1,
                 "options" => [
                     [
@@ -298,7 +284,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Size",
                 "type" => "select",
                 "use_in_layered_navigation" => 1,
-                "default_value" => "S",
+                "default_value" => "",
                 "is_user_defined" => 1,
                 "options" => [
                     [
@@ -334,18 +320,12 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "store"
             ],
             [
-                "name" => "Section Background Image",
-                "slug" => "section_background_image",
-                "type" => "image",
-                "scope" => "website",
-                "is_required" => 0
-            ],
-            [
                 "name" => "Gallery",
                 "slug" => "gallery",
                 "type" => "multiimages",
                 "scope" => "website",
-                "is_required" => 0
+                "is_required" => 0,
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Collection",
@@ -366,8 +346,16 @@ class AttributeTableSeeder extends Seeder
                         "name" => "Collection4",
                     ],
                 ]
-            ]
+            ],
+            [
+                "name" => "Component",
+                "slug" => "component",
+                "type" => "builder",
+                "scope" => "store",
+            ],
         ];
+
+
 
         array_map(function($attribute){
             $default_value = isset($attribute["default_value"]) && !in_array($attribute["type"], ["select", "multiselect", "checkbox"]) ? $attribute["default_value"] : null;
@@ -385,7 +373,8 @@ class AttributeTableSeeder extends Seeder
                 "search_weight" => $attribute["search_weight"] ?? null,
                 "is_user_defined" => $attribute["is_user_defined"] ?? 0,
                 "is_visible_on_storefront" => $attribute["is_visible_on_storefront"] ?? 0,
-                "default_value" => $default_value
+                "default_value" => $default_value,
+                "is_synchronized" => $attribute["is_synchronized"] ?? 1,
             ];
 
             $attribute_data = Attribute::withoutEvents( function () use ($attribute_array) {

@@ -32,7 +32,9 @@ class CustomerAddressRepository extends BaseRepository
             "phone" => "required",
             "vat_number" => "sometimes",
             "default_billing_address" => "sometimes|boolean",
-            "default_shipping_address" => "sometimes|boolean"
+            "default_shipping_address" => "sometimes|boolean",
+            "region_name" => "sometimes",
+            "city_name" => "sometimes"
         ];
     }
 
@@ -47,7 +49,7 @@ class CustomerAddressRepository extends BaseRepository
     public function unsetDefaultAddresses(array $data, int $customer_id, int $address_id): void
     {
         DB::beginTransaction();
-        
+
         try
         {
             $customer = Customer::findOrFail($customer_id);
@@ -87,7 +89,7 @@ class CustomerAddressRepository extends BaseRepository
         {
             DB::rollBack();
             throw $exception;
-        }        
+        }
 
         Event::dispatch("{$this->model_key}.updated-default.after", $updated);
         DB::commit();

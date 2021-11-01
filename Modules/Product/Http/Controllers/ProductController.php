@@ -17,6 +17,7 @@ use Modules\Product\Exceptions\ProductAttributeCannotChangeException;
 use Modules\Product\Repositories\ProductAttributeRepository;
 use Modules\Product\Rules\WebsiteWiseScopeRule;
 use Modules\Product\Transformers\List\ProductResource as ListProductResource;
+use Modules\Product\Transformers\VariantProductResource;
 
 class ProductController extends BaseController
 {
@@ -106,7 +107,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["categories", "parent", "brand", "website", "product_attributes", "catalog_inventories", "variants"]);
+            $fetched = $this->repository->fetch($id, ["categories", "parent", "brand", "website", "product_attributes", "productBuilderValues", "catalog_inventories", "variants"]);
         }
         catch( Exception $exception )
         {
@@ -127,7 +128,8 @@ class ProductController extends BaseController
                 return [
                     "scope" => $request->scope ?? "website",
                     "scope_id" => $request->scope_id ?? $product->website_id,
-                    "type" => "simple"
+                    "type" => "simple",
+                    "website_id" => $product->website_id
                 ];
             });
 
@@ -217,4 +219,21 @@ class ProductController extends BaseController
 
         return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
+
+    public function variants(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->fetchAll($request, callback:function () use ($request, $id) {
+                return $this->repository->getVariants($request, $id);
+            });
+        }
+        catch ( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse(VariantProductResource::collection($fetched), $this->lang('fetch-success'));
+    }
+    
 }

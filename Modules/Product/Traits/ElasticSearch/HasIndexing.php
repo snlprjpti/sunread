@@ -178,9 +178,9 @@ trait HasIndexing
             foreach($products as $product)
             {
                 $product->load("categories", "product_attributes", "catalog_inventories");
-                $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+                $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                     return $channel->stores;
-                });
+                })->flatten(1);
     
                 foreach($stores as $store)
                 {
@@ -205,28 +205,47 @@ trait HasIndexing
         }
     }
 
-    public function configurableIndexing(array $products): void
+    public function configurableIndexing(array $product, object $store): void
     {
         try
         {
-            foreach($products as $store_products)
+            $params["index"]  = $this->setIndexName($store->id);
+            $this->createIndexIfNotExist($params);
+
+            $params = array_merge($params, [
+                "id" => $product["id"],
+                "body" => $product
+            ]);
+            $this->client->index($params);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
+    public function bulkConfigurableRemoving(object $parent, object $store): void
+    {
+        try
+        {
+            $createParams["index"] = $this->setIndexName($store->id);
+            $this->createIndexIfNotExist($createParams);
+            $params["body"][] = [
+                "delete" => [
+                    "_index" => $createParams["index"],
+                    "_id" => $parent->id
+                ]
+            ];
+            foreach($parent->variants as $variant)
             {
-                foreach($store_products as $store => $store_product)
-                {
-                    $createParams["index"] = $this->setIndexName($store);
-                    $this->createIndexIfNotExist($createParams);
-    
-                    $params["body"][] = [
-                        "index" => [
-                            "_index" => $createParams["index"],
-                            "_id" => $store_product["id"]
-                        ]
-                    ];
-                
-                    $params["body"][] = $store_product;
-                }
+                $params["body"][] = [
+                    "delete" => [
+                        "_index" => $createParams["index"],
+                        "_id" => $variant->id
+                    ]
+                ];
             }
-            if(count($products) > 0) $this->client->bulk($params);
+            if(isset($params)) $this->client->bulk($params);
         }
         catch(Exception $exception)
         {
@@ -271,9 +290,9 @@ trait HasIndexing
     {
         try
         {
-            $stores = Website::find($product->website_id)->channels->mapWithKeys(function ($channel) {
+            $stores = Website::find($product->website_id)->channels->map(function ($channel) {
                 return $channel->stores;
-            });
+            })->flatten(1);
         }
         catch(Exception $exception)
         {

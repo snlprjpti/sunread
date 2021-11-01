@@ -7,28 +7,18 @@ use Illuminate\Database\Seeder;
 
 class CurrencyTableSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        DB::table('currencies')->delete();
-
-        DB::table('currencies')->insert([
-            [
-                'id' => 1,
-                'code' => 'USD',
-                // 'erp_code' => 'ENU',
-                'name' => 'US Dollar',
-                'symbol' => '$',
-                'created_at' => now(),
-                'updated_at' => now()
-            ], [
-                'id' => 2,
-                'code' => 'EUR',
-                // 'erp_code' => 'EUR',
-                'name' => 'Euro',
-                'symbol' => '€',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
-        ]);
+        $currency_data = config("currencies");
+        $currencies = [];
+        foreach ($currency_data as $currency)
+        {
+            $currencies[] = array_merge($currency, [
+                "is_default" => ($currency["code"] == "SEK") ? 1 : 0,
+                "created_at" => now(),
+                "updated_at" => now()
+            ]);
+        }
+        DB::table('currencies')->insert($currencies);
     }
 }

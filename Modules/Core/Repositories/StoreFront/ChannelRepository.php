@@ -5,6 +5,7 @@ namespace Modules\Core\Repositories\StoreFront;
 use Exception;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Repositories\BaseRepository;
 
 class ChannelRepository extends BaseRepository
@@ -20,8 +21,8 @@ class ChannelRepository extends BaseRepository
     {
         try
         {
-            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
-            $channels = $this->model->whereWebsiteId($website->id)->get();
+            $website = CoreCache::getWebsite($request->header("hc-host"));
+            $channels = $this->model->with("default_store")->whereWebsiteId($website->id)->get();
         }
         catch (Exception $exception)
         {

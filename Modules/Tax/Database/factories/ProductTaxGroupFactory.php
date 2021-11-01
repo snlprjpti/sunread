@@ -10,8 +10,8 @@ class ProductTaxGroupFactory extends Factory
     public function definition(): array
     {
         return [
-            "name" => $this->faker->name(),
-            "description" => $this->faker->sentence()
+            "name" => "None",
+            "description" => "None product tax group."
         ];
     }
 }

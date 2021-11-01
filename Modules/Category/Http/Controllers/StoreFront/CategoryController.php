@@ -26,9 +26,9 @@ class CategoryController extends BaseController
         $this->model = $category;
         $this->model_name = "Category";
 
-        $this->middleware('validate.website.host', ['only' => ['index']]);
-        $this->middleware('validate.channel.code', ['only' => ['index']]);
-        $this->middleware('validate.store.code', ['only' => ['index']]);
+        $this->middleware('validate.website.host')->only(['index']);
+        $this->middleware('validate.channel.code')->only(['index']);
+        $this->middleware('validate.store.code')->only(['index']);
 
         parent::__construct($this->model, $this->model_name);
     }

@@ -3,49 +3,38 @@
 namespace Modules\Product\Traits\ElasticSearch;
 
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Website;
+use Modules\Inventory\Entities\CatalogInventory;
+use Modules\Product\Entities\AttributeConfigurableProduct;
+use Modules\Product\Entities\AttributeOptionsChildProduct;
+use Modules\Product\Entities\Product;
 
 trait ConfigurableProductHandler
 {
     use HasIndexing;
 
-    public function createProduct(object $parent): void
+    public function createProduct(object $parent, object $store): void
     {
         try
         {
-            $stores = Website::find($parent->website_id)->channels->mapWithKeys(function ($channel) {
-                return $channel->stores;
-            });
-            $variants = $parent->variants()->with("categories", "product_attributes", "catalog_inventories")->get();
+            // $this->bulkConfigurableRemoving($parent, $store);
 
-            $state = [];
-            $items = [];
-            foreach($variants as $variant)
-            {
-                $variant_attributes = $variant->attribute_configurable_products()->pluck("attribute_id", "attribute_option_id")->toArray();
-                $color_attribute = Attribute::whereSlug("color")->first();
-                $group_by_attribute = in_array($color_attribute->id, $variant_attributes) ? $color_attribute->id : $variant_attributes[array_key_first($variant_attributes)];
-                $group_by_option = array_keys($variant_attributes, $group_by_attribute)[0];
-
-                foreach($stores as $store)
-                {
-                    if(!isset($state[$group_by_option][$store->id])) {
-                        $state[$group_by_option][$store->id] = $variant;
-
-                        $items[$variant->id][$store->id] = $variant->documentDataStructure($store); 
-
-                        $items = $this->getGroupAttributes($items, $variant_attributes, $variant, $store, $group_by_attribute, "main");    
-                    }
-                    else {
-                        $prev_product = $state[$group_by_option][$store->id];
-                        $items = $this->getGroupAttributes($items, $variant_attributes, $prev_product, $store, $group_by_attribute);  
-                    }
-                }
-            }
+            $variants = $parent->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
             
-            $this->configurableIndexing($items);
+            $variant_attribute_options = $variants->map(function($variant) {
+                return $variant->attribute_options_child_products->pluck("attribute_option_id", "product_id")->toArray();
+            })->flatten(1)->unique();
+
+            $product_format = $parent->documentDataStructure($store); 
+            $final_parent = array_merge($product_format, $this->getAttributeData($variant_attribute_options, $parent));
+
+            if(count($final_parent) > 0) {
+                $final_parent["list_status"] = ($this->checkVisibility($parent, $store)) ? 1 : 0;
+                $this->configurableIndexing($final_parent, $store);   
+            }
         }
         catch (Exception $exception)
         {
@@ -53,23 +42,164 @@ trait ConfigurableProductHandler
         }
     }
 
-    public function getGroupAttributes(array $items, array $variant_attributes, object $variant, object $store, int $group_by_attribute, ?string $main = null): array
+    public function createVariantProduct(object $parent, mixed $variants, object $variant, object $store): void
     {
-        foreach($variant_attributes as $key => $variant_attribute)
+        try
         {
-            if($variant_attribute == $group_by_attribute) continue;
+            $product_format = $variant->documentDataStructure($store); 
+            $configurable_attributes = $this->getConfigurableAttributes($variant, $store); 
+            $product_format = array_merge($product_format, [ "show_configurable_attributes" => $configurable_attributes ]);
+            
 
-            $attribute_data = Attribute::find($variant_attribute);
-            if($attribute_data) {
-                $items[$variant->id][$store->id]["configurable_{$attribute_data->slug}"][] = $key;
-                // $attribute_key = array_keys($items[$variant->id][$store->id]["configurable_{$attribute_data->slug}"], $key)[0];
-                $items[$variant->id][$store->id]["configurable_{$attribute_data->slug}_value"][] = AttributeOption::find($key)?->name;
-                if($main) unset($items[$variant->id][$store->id][$attribute_data->slug], $items[$variant->id][$store->id]["{$attribute_data->slug}_value"]);   
+            if (!$this->checkVisibility($variant, $store)) {
+                $product_format["list_status"] = 0;
+                if(count($product_format) > 0) $this->configurableIndexing($product_format, $store);  
             }
-        } 
-        
+
+            else {
+                $group_by_attribute = AttributeConfigurableProduct::whereProductId($parent->id)->whereUsedInGrouping(1)->first();
+                $is_group_attribute = $variant->value([
+                    "scope" => "store",
+                    "scope_id" => $store->id,
+                    "attribute_id" => $group_by_attribute->attribute_id
+                ]);
+    
+                $related_variants = AttributeOptionsChildProduct::whereIn("product_id", $variants->pluck("id")->toArray())->whereAttributeOptionId($is_group_attribute?->id)->get();
+                if($related_variants) {
+                    $variant_attribute_options = AttributeOptionsChildProduct::whereIn("product_id", $related_variants->pluck("product_id")->toArray())->where("attribute_option_id", "!=", $is_group_attribute?->id)->get()->pluck("attribute_option_id", "product_id");
+                }
+    
+                $final_variant = array_merge($product_format, $this->getAttributeData($variant_attribute_options, $variant));  
+                if(count($final_variant) > 0) $this->configurableIndexing($final_variant, $store); 
+            }   
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
+    public function getAttributeData(object $variant_options, object $product): array
+    {
+        try
+        {
+            $items = [];
+            $variant_options->map(function($variant_option, $key) use(&$items, $product) {
+                $attribute_option = AttributeOption::find($variant_option);
+                $attribute = $attribute_option->attribute;
+                
+                $items["configurable_{$attribute->slug}"][] = $variant_option;
+                $items["configurable_{$attribute->slug}_value"][] = $attribute_option->name;
+                
+                $catalog = CatalogInventory::whereProductId($key)->first();
+                // $items["configurable_attributes"][$attribute->slug][] = [
+                //     "label" => $attribute_option->name,
+                //     "value" => $variant_option,
+                //     "stock_status" => ($catalog?->is_in_stock && $catalog?->quantity > 0) ? 1 : 0
+                // ];
+                
+                $items["list_status"] = 1;
+                    
+                if(isset($items[$attribute->slug]) && isset($items["{$attribute->slug}_value"]))
+                unset($items[$attribute->slug], $items["{$attribute->slug}_value"]);
+            }); 
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
         return $items;
     }
 
- 
+    public function checkVisibility(object $product, object $store): bool
+    {
+        try
+        {
+            $visibility = Attribute::whereSlug("visibility")->first();
+            $visibility_option = AttributeOption::whereAttributeId($visibility?->id)->whereName("Not Visible Individually")->first();
+
+            $is_visibility = $product->value([
+                "scope" => "store",
+                "scope_id" => $store->id,
+                "attribute_id" => $visibility?->id
+            ]);
+            
+           $bool = ($is_visibility?->id != $visibility_option?->id);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $bool;
+    }
+
+    public function getConfigurableAttributes(object $variant, object $store): array
+    {
+        try
+        {
+            $configurable_attributes = $variant->attribute_options_child_products->map(function ($variant_option) use($variant, $store) {
+                $attribute_option = AttributeOption::find($variant_option->attribute_option_id);
+                $attribute = $attribute_option->attribute;
+                $catalog = CatalogInventory::whereProductId($variant->id)->first();
+                $store_data = [
+                    "scope" => "store",
+                    "scope_id" => $store->id
+                ];
+
+                $visibility_data_val = $variant->value(array_merge($store_data, ["attribute_slug" => "visibility"]));
+                return [
+                    "id" => $variant_option->attribute_option_id,
+                    "attribute_id" => $attribute->id,
+                    "attribute_slug" => $attribute->slug,
+                    "label" => $attribute_option->name,
+                    "code" => $attribute_option->code ?? $attribute_option->name,
+                    "product_id" => $variant->id,
+                    "product_sku" => $variant->sku,
+                    "url_key" => $variant->value(array_merge($store_data, ["attribute_slug" => "url_key"])),
+                    "visibility" => $visibility_data_val->id,
+                    "stock_status" => ($catalog?->is_in_stock && $catalog?->quantity > 0) ? 1 : 0,
+                    "attribute_combination" => $variant->attribute_options_child_products->pluck("attribute_option_id")->mapWithKeys( function($variant_att) {
+                        $f_attribute_option = AttributeOption::find($variant_att);
+                        return [
+                            $f_attribute_option->attribute->slug => $variant_att
+                        ];
+                    }),
+                    "image" => $this->getConfigurableImage($variant)
+                ];
+            })->toArray();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $configurable_attributes;
+    }
+
+    public function getConfigurableImage(object $product): ?array
+    {
+        try
+        {
+            $image = $product->images()->wherehas("types", function($query) {
+                $query->whereSlug("small_image");
+            })->first();
+            if(!$image) {
+                $image = $product->images()->wherehas("types", function($query) {
+                    $query->whereSlug("base_image");
+                })->first();
+            }
+            $path = $image ? Storage::url($image->path) : $image;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+         
+        return [
+            "url" => $path,
+            "background_color" => $image?->background_color
+        ];
+    }
 }

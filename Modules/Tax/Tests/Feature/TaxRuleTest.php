@@ -16,7 +16,7 @@ class TaxRuleTest extends BaseTestCase
 
         $this->model_name = "Tax Rule";
         $this->route_prefix = "admin.taxes.rules";
-        $this->hasStatusTest = true;
+        $this->hasStatusTest = false;
     }
 
     public function getNonMandotaryCreateData(): array

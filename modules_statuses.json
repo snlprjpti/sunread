@@ -14,5 +14,9 @@
     "Country": true,
     "Inventory": true,
     "Erp": true,
-    "Cart": true
+    "Cart": true,
+    "EmailTemplate": true,
+    "ProductStockAlert": true,
+    "ProductStockAlertResource": true,
+    "GeoIp": true
 }

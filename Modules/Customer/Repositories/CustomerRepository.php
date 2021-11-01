@@ -35,7 +35,9 @@ class CustomerRepository extends BaseRepository
             "website_id" => "required|exists:websites,id",
             "store_id" => "nullable|exists:stores,id",
             "subscribed_to_news_letter" => "sometimes|boolean",
-            "password" => "sometimes|nullable|min:6|confirmed"
+            "password" => "sometimes|nullable|min:6|confirmed",
+            "account_type" => "required|in:personal,company",
+            "phone" => "nullable"
         ];
     }
 
@@ -102,7 +104,7 @@ class CustomerRepository extends BaseRepository
 
             $path_array = explode("/", $updated->profile_image);
             unset($path_array[count($path_array) - 1]);
-    
+
             $delete_folder = implode("/", $path_array);
             Storage::disk("public")->deleteDirectory($delete_folder);
 

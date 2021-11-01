@@ -30,6 +30,7 @@ class ProductTest extends BaseTestCase
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
         $this->hasStatusTest = true;
+        $this->hasUpdateTest = false;
          
     }
 
@@ -44,9 +45,9 @@ class ProductTest extends BaseTestCase
         {
             foreach ($attribute_group->attributes as $attribute)
             {
-                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status"])) continue;
+                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status", "component"])) continue;
                 $attributes[] = [
-                    "attribute_id" => $attribute->id,
+                    "attribute_slug" => $attribute->slug,
                     "value" => $this->value($attribute)
                 ];
             }
@@ -132,7 +133,7 @@ class ProductTest extends BaseTestCase
     public function getInvalidUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
-            "website_id" => null
+            "parent_id" => 0
         ]);
     }
 

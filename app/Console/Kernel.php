@@ -5,9 +5,13 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Modules\Core\Console\PartialMigrate;
+use Modules\Core\Console\RedisClear;
+use Modules\Erp\Console\ErpAttributeOptionMigrate;
 use Modules\Erp\Console\ErpImport;
 use Modules\Erp\Console\ErpMigrate;
 use Modules\Product\Console\ElasticSearchImport;
+use Modules\GeoIp\Console\GeoIpDbUpdator;
+use Modules\Product\Console\ProductUrlGenerator;
 
 class Kernel extends ConsoleKernel
 {
@@ -21,7 +25,11 @@ class Kernel extends ConsoleKernel
         ErpMigrate::class,
         // CategoryMigrate::class,
         PartialMigrate::class,
-        ElasticSearchImport::class
+        ElasticSearchImport::class,
+        ErpAttributeOptionMigrate::class,
+        RedisClear::class,
+        GeoIpDbUpdator::class,
+        ProductUrlGenerator::class,
     ];
 
     /**
@@ -32,7 +40,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('telescope:prune')->daily();
+        $schedule->command('telescope:prune')->hourly();
+        $schedule->command('geoip:update')->weekly();
     }
 
     /**

@@ -21,6 +21,7 @@ use Modules\Core\Services\ActivityLogHelper;
 use Modules\Core\Observers\ExchangeRateObserver;
 use Modules\Core\Services\ConfigurationHelper;
 use Modules\Core\Services\CoreCacheHelper;
+use Modules\Core\Services\PriceFormatter;
 use Modules\Core\Services\ResolverHelper;
 
 class CoreServiceProvider extends ServiceProvider
@@ -81,6 +82,12 @@ class CoreServiceProvider extends ServiceProvider
         );
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/website.php'), "website"
+        );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/currencies.php'), "currencies"
+        );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/time_zones.php'), "time_zones"
         );
     }
 
@@ -163,6 +170,10 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->app->singleton('coreCache', function () {
             return new CoreCacheHelper(new Website(), new Channel(), new Store());
+        });
+
+        $this->app->singleton('priceFormat', function () {
+            return new PriceFormatter();
         });
     }
 

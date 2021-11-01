@@ -4,6 +4,8 @@ namespace Modules\Country\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Country\Entities\Country;
+use Modules\Country\Observers\CountryObserver;
 
 class CountryServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,7 @@ class CountryServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObserver();
     }
 
     /**
@@ -108,5 +111,10 @@ class CountryServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    public function registerObserver(): void
+    {
+        Country::observe(CountryObserver::class);
     }
 }

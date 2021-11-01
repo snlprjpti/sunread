@@ -34,9 +34,9 @@ class WebsiteWiseScopeRule implements Rule
 
         if($this->scope == "channel")  return (bool) in_array($value, $this->website_model->find($this->website_id)->channels->pluck('id')->toArray());
 
-        if($this->scope == "store")  return (bool) in_array($value, $this->website_model->find($this->website_id)->channels->mapWithKeys(function ($channel) {
+        if($this->scope == "store")  return (bool) in_array($value, $this->website_model->find($this->website_id)->channels->map(function ($channel) {
             return $channel->stores->pluck('id');
-        })->toArray());
+        })->flatten(1)->toArray());
 
         return true;       
     }

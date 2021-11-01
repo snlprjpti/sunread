@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Exception;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Page\Entities\Page;
 use Modules\Page\Repositories\StoreFront\PageRepository;
@@ -24,6 +25,7 @@ class PageController extends BaseController
         $this->model_name = "Page";
 
         $this->middleware('validate.website.host')->only(['show', 'index']);
+        $this->middleware('validate.channel.code')->only(['show']);
         $this->middleware('validate.store.code')->only(['show']);
 
         parent::__construct($this->model, $this->model_name);
@@ -43,7 +45,7 @@ class PageController extends BaseController
     {
         try
         {
-            $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
+            $website = CoreCache::getWebsite($request->header("hc-host"));
             $fetched = $this->repository->fetchAll($request, callback:function () use ($website) {
                 return $this->model->whereWebsiteId($website->id);
             });
@@ -67,6 +69,6 @@ class PageController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }

@@ -37,6 +37,16 @@ return [
         'no_parent_belong_to_website' => "Patent Category does not belong to this website",
         'inventory_cannot_be_zero' => 'Inventory quantity cannot be less than zero',
         'range-required' => ':name range is required',
+        'choose-address' => 'Type of address is required.',
+        'please-choose' => 'Please choose :name',
+        'cart-merged' => "cart merged successfully",
+        "not-enough-stock-quantity" => "stock quantity is not enough",
+        "channel-code-required" => "channel code is required",
+        'country-not-found' => 'Region does not belongs to country.',
+        "invalid-country" => "Invalid :name Country",
+        "product-stock-alert" => "You will be notified via Email once the product is available.",
+        "verification-success" => "Verification success",
+        "already-verified" => "Account already verified"
     ],
     'users' => [
         'forget-password' => [
@@ -95,7 +105,7 @@ return [
             'incorrect-password' => 'The password you entered is incorrect',
             'password-match' => 'Current password does not match.',
             'account-save' => 'Account changes saved successfully.',
-            'login-error' => 'Invalid credentials.',
+            'login-error' => 'Invalid Email Address or Password.',
             'login-success' => 'Logged in successfully.',
             'logout-success' => 'Logged out successfully.',
             'activate-warning' => 'Your account is yet to be activated, please contact administrator.',
@@ -133,4 +143,16 @@ return [
             'last-delete-error' => 'At least one Currency is required.',
         ],
     ],
+    'exception_message' => [
+        'channel-not-found' => "Channel Not Found",
+        "cart-id-required" => "cart id is required",
+        "product-qty-must-be-above-0" => "product quantity must be greater than 0",
+        "not-allowed" => "access denied"
+    ],
+    "cart" => [
+        "product-removed" => "product removed from cart",
+        "product-added" => "product added on cart",
+        "product-qty-updated" => "product quantity updated on cart",
+        "product-remove-due-to-channel-change" => "product removed from cart due to change in channel"
+    ]
 ];

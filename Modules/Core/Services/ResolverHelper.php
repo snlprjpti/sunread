@@ -3,12 +3,14 @@
 namespace Modules\Core\Services;
 
 use Exception;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Validation\ValidationException;
-use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Exceptions\PageNotFoundException;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
+use Modules\Core\Transformers\StoreFront\StoreResource;
 use Modules\Page\Entities\Page;
 
 class ResolverHelper {
@@ -34,22 +36,25 @@ class ResolverHelper {
         try
         {
             $websiteData = [];
-            $domain = $this->getDomain();
 
             $fallback_id = config("website.fallback_id");
-            if ($request->hasHeader('hc-host')) {
-                $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
-            }
-            else {
-                $website = Website::whereId($fallback_id)->firstOrFail();
-            }
-            $websiteData = $website->only(["id","name","code", "hostname"]);
+            if ($request->hasHeader('hc-host')) $website = CoreCache::getWebsite($request->header("hc-host"));
+            else $website = Website::whereId($fallback_id)->firstOrFail();
+            $websiteData = collect($website)->only(["id","name","code", "hostname"])->toArray();
 
             $channel = $this->getChannel($request, $website);
-            $websiteData["channel"] = $channel->only(["id","name","code"]);
+            $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
+
+            $all_stores = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
+                return new StoreResource(json_decode($store));
+            });
 
             $store = $this->getStore($request, $website, $channel);
-            $websiteData["store"] = $store->only(["id","name","code"]);
+            $storeData = collect($store)->only(["id","name","code"])->toArray();
+            $storeData["locale"] = SiteConfig::fetch("store_locale", "store", $store->id)?->code;
+            $websiteData["channel"]["store"] = $storeData;
+
+            $websiteData["stores"] = $all_stores;
 
             $websiteData["pages"] = $this->getPages($website);
 
@@ -68,11 +73,16 @@ class ResolverHelper {
         try
         {
             $channel_code = $request->header("hc-channel");
-
-            if($channel_code) $channel = Channel::whereCode($channel_code)->whereWebsiteId($website->id)->firstOrFail();
+            if($channel_code) { 
+                $channel = CoreCache::getChannel($website, $channel_code);
+            }
             else {
-                $channel= $this->checkCondition("website_default_channel", $website)?->firstOrFail(); 
-                if(!$channel) $channel = $website->channels()->firstOrFail();
+                $channel = $this->checkCondition("website_default_channel", $website);  
+                if(!$channel) {
+                    $cache = CoreCache::getWebsiteAllChannel($website);
+                    if(!$cache) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Channel"]));
+                    $channel = json_decode($cache[0]);
+                }
             }    
         }
         catch( Exception $exception )
@@ -89,10 +99,14 @@ class ResolverHelper {
         {
             $store_code = $request->header("hc-store");
 
-            if($store_code) $store = Store::whereChannelId($channel->id)->whereCode($store_code)->firstOrFail();
+            if($store_code) $store = CoreCache::getStore($website, $channel, $store_code);
             else {
-                $store = $this->checkCondition("website_default_store", $website)?->firstOrFail();
-                if(!$store) $store = $channel->stores()->firstOrFail();
+                $store = Store::find($channel->default_store_id);
+                if(!$store) {
+                    $cache = CoreCache::getChannelAllStore($website, $channel);
+                    if(!$cache) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Store"]));
+                    $store = json_decode($cache[0]);
+                }
             }
         }
         catch( Exception $exception )
@@ -107,14 +121,16 @@ class ResolverHelper {
     {
         try
         {
-           $pages = Page::whereWebsiteId($website->id)->get();
+            $pages = Page::whereWebsiteId($website->id)->get();
+            $data = [];
+            foreach ( $pages as $page ) $data[$page->slug] = [ "id" => $page->id, "code" => $page->slug ] ;
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $pages ? $pages->toArray() : $pages;
+        return $data;
     }
 
     public function checkCondition(string $slug, object $website): ?object

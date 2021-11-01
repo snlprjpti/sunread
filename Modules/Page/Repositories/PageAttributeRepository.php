@@ -11,6 +11,7 @@ use Modules\Page\Entities\PageAttribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Exceptions\PageNotFoundException;
 
 class PageAttributeRepository extends BaseRepository
 {
@@ -37,12 +38,25 @@ class PageAttributeRepository extends BaseRepository
         {
             $this->config_rules = [];
             $this->config_types = [];
+            $this->collect_elements = [];
 
             $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
             if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
 
 
-            $this->collect_elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("groups")->first();
+            $group_elements = collect($this->config_fields)->where("slug", $component["component"])->pluck("mainGroups")->flatten(1);
+            foreach($group_elements as $group_element)
+            {
+                if($group_element["type"] == "module") {
+                    foreach($group_element["subGroups"] as $module)
+                    {
+                        $this->collect_elements = array_merge($this->collect_elements, $module["groups"]);
+                    }
+                    continue;
+                }
+                $this->collect_elements = array_merge($this->collect_elements, $group_element["groups"]);
+            }
+
             $this->getRules($component, $this->collect_elements, method:$method);
         }
         catch( Exception $exception )
@@ -113,7 +127,7 @@ class PageAttributeRepository extends BaseRepository
                 $data = [];
                 foreach($repeator as $slug => $value)
                 {
-                    $append_key = "$parent_slug.$i.$slug";
+                    $append_key = "{$parent_slug}.{$i}.{$slug}";
                     $type = $this->config_types[$slug];
                     $data[$slug] = $this->getValue($type, $value, $append_key);
                 }  
@@ -136,7 +150,7 @@ class PageAttributeRepository extends BaseRepository
             foreach($normals as $slug => $value)
             {
                 $type = $this->config_types[$slug];
-                $element[$slug] = $this->getValue($type, $value, "$parent_slug.$slug");
+                $element[$slug] = $this->getValue($type, $value, "{$parent_slug}.{$slug}");
             } 
         }
         catch (Exception $exception)
@@ -169,8 +183,8 @@ class PageAttributeRepository extends BaseRepository
             $this->parent = [];
 
             $data = collect($this->config_fields)->where("slug", $slug)->first();
-            $this->getChildren($data["groups"]);
-
+            if(!$data) throw new PageNotFoundException(__("core::app.response.not-found", ["name" => "Component"]));
+            $this->getChildren($data["mainGroups"]);
         }
         catch (Exception $exception)
         {
@@ -180,7 +194,7 @@ class PageAttributeRepository extends BaseRepository
         return [
             "title" => $data["title"],
             "slug" => $data["slug"],
-            "groups" => $this->parent
+            "mainGroups" => $this->parent
         ];        
     }
 
@@ -190,19 +204,31 @@ class PageAttributeRepository extends BaseRepository
         {
             foreach($elements as $i => &$element)
             {
-                $append_key = isset($key) ? "$key.$i" : $i;
+                $append_key = isset($key) ? "{$key}.{$i}" : $i;
+
+                if(isset($element["groups"])) {
+                    setDotToArray($append_key, $this->parent,  $element);
+                    $this->getChildren($element["groups"], "{$append_key}.groups");
+                    continue;
+                }
+
+                if(isset($element["subGroups"])) {
+                    setDotToArray($append_key, $this->parent,  $element);
+                    $this->getChildren($element["subGroups"], "{$append_key}.subGroups");
+                    continue;
+                }
 
                 if (isset($element["type"])) {
                     unset($element["rules"]);
                     if ($element["type"] == "repeater") {
                         setDotToArray($append_key, $this->parent,  $element);           
-                        $this->getChildren($element["attributes"][0], "$append_key.attributes.0");
+                        $this->getChildren($element["attributes"][0], "{$append_key}.attributes.0");
                         continue;
                     }
                 } 
 
                 if ($element["hasChildren"] == 0) {
-                    if ( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
+                    //if ( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
                     unset($element["pluck"], $element["provider"]);
 
                     setDotToArray($append_key, $this->parent, $element);           
@@ -210,7 +236,7 @@ class PageAttributeRepository extends BaseRepository
                 }
 
                 setDotToArray($append_key, $this->parent,  $element);           
-                $this->getChildren($element["attributes"], "$append_key.attributes");
+                $this->getChildren($element["attributes"], "{$append_key}.attributes");
             }
         }
         catch (Exception $exception)
@@ -242,9 +268,9 @@ class PageAttributeRepository extends BaseRepository
                 //     $rule = "$rule|in:$option_str";
                 // }
 
-                $append_key = isset($key) ? "$key.{$element["slug"]}" : "{$element["slug"]}";
+                $append_key = isset($key) ? "{$key}.{$element['slug']}" : "{$element['slug']}";
 
-                $this->config_rules[$append_key] = "$rule|{$element["rules"]}"; 
+                $this->config_rules[$append_key] = "{$rule}|{$element['rules']}"; 
                 $this->config_types[$element["slug"]] = $element["type"];
 
                 if ($method == "update" && isset($component["id"]) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
@@ -252,10 +278,10 @@ class PageAttributeRepository extends BaseRepository
                 if ($element["hasChildren"] == 0) continue;
 
                 if ($element["type"] == "repeater") {
-                    $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
+                    $count = isset($component["attributes"][$element["slug"]]) ? count($component["attributes"][$element["slug"]]) : 0;
                     for( $i=0; $i < $count; $i++ )
                     {
-                        $this->getRules($component, $element["attributes"][0], "$append_key.$i", $method);
+                        $this->getRules($component, $element["attributes"][0], "{$append_key}.{$i}", $method);
                     } 
                     continue;     
                 } 
@@ -275,7 +301,7 @@ class PageAttributeRepository extends BaseRepository
         {
             $exist_component = $this->model->findOrFail($component["id"]);
             $exist_values = $exist_component->value;
-            $request_element_value = getDotToArray("attributes.$append_key", $component);
+            $request_element_value = getDotToArray("attributes.{$append_key}", $component);
             if ($request_element_value && !is_file($request_element_value)) {
                 $db_value = getDotToArray($append_key, $exist_values);
                 if ($db_value) {
@@ -323,7 +349,7 @@ class PageAttributeRepository extends BaseRepository
             $component = [];
             foreach($this->config_fields as $field)
             {
-                unset($field["groups"]);
+                unset($field["mainGroups"]);
                 $component[] = $field;
             }
         }

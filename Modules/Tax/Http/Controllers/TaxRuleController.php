@@ -39,7 +39,7 @@ class TaxRuleController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, [ "customer_group", "product_taxable", "tax_rates" ]);
+            $fetched = $this->repository->fetchAll($request, [ "customer_tax_groups", "product_tax_groups", "tax_rates" ]);
         }
         catch( Exception $exception )
         {
@@ -56,6 +56,8 @@ class TaxRuleController extends BaseController
             $data = $this->repository->validateData($request);
             $created = $this->repository->create($data, function($created) use($request) {
                 $created->tax_rates()->sync($request->get("tax_rates"));
+                $created->product_tax_groups()->sync($request->get("product_tax_groups"));
+                $created->customer_tax_groups()->sync($request->get("customer_tax_groups"));
             });
         }
         catch( Exception $exception )
@@ -70,7 +72,7 @@ class TaxRuleController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, [ "customer_group", "product_taxable", "tax_rates" ]);
+            $fetched = $this->repository->fetch($id, [ "customer_tax_groups", "product_tax_groups", "tax_rates" ]);
         }
         catch( Exception $exception )
         {
@@ -87,6 +89,8 @@ class TaxRuleController extends BaseController
             $data = $this->repository->validateData($request);
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
                 $updated->tax_rates()->sync($request->get("tax_rates"));
+                $updated->product_tax_groups()->sync($request->get("product_tax_groups"));
+                $updated->customer_tax_groups()->sync($request->get("customer_tax_groups"));
             });
         }
         catch( Exception $exception )

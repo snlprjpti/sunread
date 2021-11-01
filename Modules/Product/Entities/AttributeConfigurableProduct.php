@@ -9,21 +9,18 @@ use Modules\Attribute\Entities\AttributeOption;
 
 class AttributeConfigurableProduct extends Model
 {
-    protected $fillable = [ "product_id", "attribute_id", "attribute_option_id" ];
+    protected $fillable = [ "product_id", "attribute_id", "used_in_grouping" ];
 
     public function attribute(): BelongsTo
     {
         return $this->belongsTo(Attribute::class);
-    }
-
-    public function attribute_option(): BelongsTo
-    {
-        return $this->belongsTo(AttributeOption::class);
     }
     
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
+
+    
     
 }
