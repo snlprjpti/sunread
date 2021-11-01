@@ -144,13 +144,6 @@ class PageTest extends BaseTestCase
         return $value;
     }
 
-    public function getNonMandatoryCreateData(): array
-    {
-        return array_merge($this->getCreateData(), [
-            "position" => null
-        ]);
-    }
-
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
