@@ -46,8 +46,8 @@ class ProductSearchRepository extends ElasticSearchRepository
             $search = [];
 
             if(isset($request->q)) {
-                $search[] = $this->queryString($this->searchKeys, $request->q);
-                foreach($this->searchKeys as $key) $search[] = $this->wildcard($key, $request->q);
+                //$search[] = $this->queryString($this->searchKeys, $request->q);
+                foreach($this->searchKeys as $key) $search[] = $this->match($key, $request->q);
             }
             $query = $this->orwhereQuery($search);
         }
