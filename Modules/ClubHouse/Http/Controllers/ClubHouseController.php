@@ -81,7 +81,7 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $data = $this->clubHouseValueRepository->validateWithValues($request, null, "create");
+            $data = $this->clubHouseValueRepository->validateWithValuesCreate($request);
 
             $created = $this->repository->create($data, function ($created) use ($data) {
                 $this->clubHouseValueRepository->createOrUpdate($data, $created);
@@ -127,7 +127,7 @@ class ClubHouseController extends BaseController
         {
             $club_house = $this->model->findOrFail($id);
 
-            $data = $this->clubHouseValueRepository->validateWithValues($request, $club_house, "update");
+            $data = $this->clubHouseValueRepository->validateWithValuesUpdate($request, $club_house);
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->clubHouseValueRepository->createOrUpdate($data, $updated);

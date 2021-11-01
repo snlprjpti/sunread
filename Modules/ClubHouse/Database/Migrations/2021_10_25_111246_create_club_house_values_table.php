@@ -8,10 +8,8 @@ class CreateClubHouseValuesTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('club_house_values', function (Blueprint $table) {
             $table->id();
@@ -22,17 +20,14 @@ class CreateClubHouseValuesTable extends Migration
             $table->string('value')->nullable();
             $table->timestamps();
 
-            // Foreign Key
             $table->foreign('club_house_id')->references('id')->on('club_houses')->onDelete('cascade');
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('club_house_values');
     }

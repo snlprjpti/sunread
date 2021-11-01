@@ -101,39 +101,49 @@ class ClubHouseValueRepository
         return $value_rule;
     }
 
-     /**
+    /**
      * Validate the Request with Unique Slug and Create it
      */
-    public function validateWithValues(object $request, ?object $club_house = null , ?string $method = null): array
+    public function validateWithValuesCreate(object $request): array
     {
         try
         {
-            if($method == "update") {
-                $call_back = function () use ($club_house) {
-                    return [
-                        "website_id" => $club_house->website_id
-                    ];
-                };
-
-                $validation_items = [
-                    "items.slug.value" => new SlugUniqueRule($request, $club_house),
-                    "scope" => "required|in:website,channel,store",
-                    "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $club_house?->id)]
+            $data = $this->club_house_repository->validateData($request, array_merge($this->getValidationRules($request),[
+                "items.slug.value" => new SlugUniqueRule($request),
+                "website_id" => "required|exists:websites,id"
+            ]), function () use ($request) {
+                return [
+                    "scope" => "website",
+                    "scope_id" => $request->website_id
                 ];
-            } else {
-                $call_back = function () use ($request) {
-                    return [
-                        "scope" => "website",
-                        "scope_id" => $request->website_id
-                    ];
-                };
+            });
 
-                $validation_items = [
-                    "items.slug.value" => new SlugUniqueRule($request),
-                    "website_id" => "required|exists:websites,id"
+            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Validate the Request win Unique Slug and Update it
+     */
+    public function validateWithValuesUpdate(object $request, ?object $club_house = null): array
+    {
+        try
+        {
+            $data = $this->club_house_repository->validateData($request, array_merge($this->getValidationRules($request, $club_house?->id, "update"), [
+                "items.slug.value" => new SlugUniqueRule($request, $club_house),
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $club_house?->id)]
+            ]), function () use ($club_house) {
+                return [
+                    "website_id" => $club_house->website_id
                 ];
-            }
-            $data = $this->club_house_repository->validateData($request, array_merge($this->getValidationRules($request, $club_house?->id, $method), $validation_items), $call_back);
+            });
 
             if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->club_house_repository->createUniqueSlug($data, $club_house);
         }
@@ -179,7 +189,6 @@ class ClubHouseValueRepository
 
                 $value = $val["value"] ?? null;
                 $match["value"] = ($configDataArray["type"] == "file" && $value) ? $this->club_house_repository->storeScopeImage($value, "club_house") : $value;
-
 
                 if($configData = $this->checkCondition($match)->first())
                 {

@@ -30,7 +30,7 @@ class ClubHouseRepository extends BaseRepository
 
         $this->rules = [
             // ClubHouse validation
-            "position" => "sometimes|nullable|integer",
+            "position" => "required|nullable|integer",
             "website_id" => "required|exists:websites,id",
             "type" => "required|string|in:clubhouse,resort",
             "position" => "required|integer",
@@ -76,7 +76,6 @@ class ClubHouseRepository extends BaseRepository
         return $fetched;
     }
 
-
     /**
      * Get ClubHouse with it's Attributes and Values
      */
@@ -103,7 +102,6 @@ class ClubHouseRepository extends BaseRepository
         $fetched["attributes"] = $this->getConfigData($data);
         return $fetched;
     }
-
 
     /**
      * Creates a Unique Slug for ClubHouse

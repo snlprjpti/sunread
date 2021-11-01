@@ -60,10 +60,10 @@ class ClubHouseTest extends BaseTestCase
                     "value" => Str::random(10)
                 ],
                 "latitude" => [
-                    "value" => mt_rand(0 * 2, 5 * 2) / 2,
+                    "value" => Str::random(10),
                 ],
                 "longitude" => [
-                    "value" => mt_rand(0 * 2, 5 * 2) / 2,
+                    "value" => Str::random(10),
                 ],
                 "thumbnail" => [
                     "value" => UploadedFile::fake()->image("image.png")
@@ -88,7 +88,6 @@ class ClubHouseTest extends BaseTestCase
     {
         $websiteId = $this->default_resource->website_id;
         $updateData = $this->getCreateData();
-        //unset($updateData["website_id"]);
         return array_merge($updateData, $this->getScope($websiteId));
     }
 
@@ -120,7 +119,8 @@ class ClubHouseTest extends BaseTestCase
     public function getNonMandatoryUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
-            "latitude" => null
+            "latitude" => null,
+            "latitude" => null,
         ]);
     }
 
@@ -165,4 +165,5 @@ class ClubHouseTest extends BaseTestCase
         ];
 
     }
+
 }
