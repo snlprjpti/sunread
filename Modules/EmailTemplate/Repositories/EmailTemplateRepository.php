@@ -115,16 +115,19 @@ class EmailTemplateRepository extends BaseRepository
         /**
          * get variables used in template content with prefix of "{{$variables_name}}.
         */
-        preg_match_all("/{{(.*?)\}}/U", $request->content, $matches);
+        preg_match_all("/{{(.*)\}}/U", $request->content, $matches);
+
+        /**
+         * check variable exist or not.
+        */
         foreach ($matches[1] as $v) {
             if (str_contains($v, "\$")) {
-
                 /**
                  * remove 1st character. eg: remove "$" sign from variable.
                 */
                 $variable = substr($v, 1);
 
-                if (!collect($config_variables)->contains("variable", $variable)) throw ValidationException::withMessages(["content" => __("Undefined variables found!")]);
+                if (!collect($config_variables)->contains("variable", $variable)) throw ValidationException::withMessages(["content" => __("Variable not found")]);
             }
         }
     }
