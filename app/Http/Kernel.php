@@ -74,7 +74,8 @@ class Kernel extends HttpKernel
         'language' => Language::class,
         'validate.website.host' => ValidateWebsiteHost::class,
         'validate.channel.code' => ValidateChannelCode::class,
-        'validate.store.code' => ValidateStoreCode::class
+        'validate.store.code' => ValidateStoreCode::class,
+        'proxies' => \App\Http\Middleware\TrustProxies::class,
     ];
 
     /**

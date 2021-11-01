@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\Tax\Services;
+namespace Modules\GeoIp\Services;
 
 use Exception;
 use GeoIp2\Database\Reader;
-use Modules\Tax\Services\GeoServices\Location;
-use Modules\Tax\Traits\HasClientIp;
+use Modules\GeoIp\Services\Location;
+use Modules\GeoIp\Traits\HasClientIp;
 use PharData;
 use GeoIp2\Exception\AddressNotFoundException;
 
@@ -25,7 +25,7 @@ class GeoIp {
 
     public function connect(): mixed
     {
-        return new Reader($this->geoip_db_path, ["en"]);		
+        return new Reader($this->geoip_db_path, ["en"]);
     }
 
     public function hydrate(array $attributes = []): mixed
@@ -35,7 +35,7 @@ class GeoIp {
 
     public function getGeoLocation(): mixed
     {
-        return $this->locate($this->getClientIp());
+        return $this->locate($this->clientIp());
     }
 
     public function locate(string $ip): mixed

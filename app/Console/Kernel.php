@@ -10,7 +10,8 @@ use Modules\Erp\Console\ErpAttributeOptionMigrate;
 use Modules\Erp\Console\ErpImport;
 use Modules\Erp\Console\ErpMigrate;
 use Modules\Product\Console\ElasticSearchImport;
-use Modules\Tax\Console\GeoIpDbUpdator;
+use Modules\GeoIp\Console\GeoIpDbUpdator;
+use Modules\Product\Console\ProductUrlGenerator;
 
 class Kernel extends ConsoleKernel
 {
@@ -28,6 +29,7 @@ class Kernel extends ConsoleKernel
         ErpAttributeOptionMigrate::class,
         RedisClear::class,
         GeoIpDbUpdator::class,
+        ProductUrlGenerator::class,
     ];
 
     /**

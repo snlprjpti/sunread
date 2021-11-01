@@ -392,7 +392,7 @@ class CartRepository extends BaseRepository
                 // if product id already exist in that logged in user id
                 $cartItem = $this->cartItem->whereProductId($request->product_id)->whereCartId($checkIfUserHasCartAlready->id)->first();
                 if ($cartItem) {
-                    $qty =  ($cartItem->qty) + ($request->qty ?? 1);
+                    $qty =  $request->qty ?? 1;
                     
                     $whereConditions = [
                         "product_id" => $request->product_id,

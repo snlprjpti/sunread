@@ -60,4 +60,15 @@ class EmailTemplateTest extends BaseTestCase
             "message" => __("core::app.response.fetch-list-success", [ "name" => "Template Variable" ])
         ]);
     }
+
+    public function testAdminCanFetchTemplateContent()
+    {
+        $response = $this->withHeaders($this->headers)->get($this->getRoute("content", [$this->default_resource_id]));
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-success", [ "name" => "Email Template" ])
+        ]);
+    }
 }

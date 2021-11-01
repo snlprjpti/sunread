@@ -6,16 +6,11 @@ use Exception;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\PriceFormat;
 use Modules\Core\Facades\SiteConfig;
-use Modules\Country\Entities\Country;
-use Modules\Tax\Entities\CustomerTaxGroup;
-use Modules\Tax\Entities\ProductTaxGroup;
-use Modules\Tax\Entities\TaxRule;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Modules\Tax\Entities\TaxRate;
-use Modules\Tax\Facades\GeoIp;
+use Modules\GeoIp\Facades\GeoIp;
+use Modules\GeoIp\Traits\HasClientIp;
 use Modules\Tax\Facades\TaxCache;
-use Modules\Tax\Traits\HasClientIp;
 
 class TaxPrice {
 
@@ -36,7 +31,7 @@ class TaxPrice {
         try
         {
             $data = $this->getGeneralValue($request);
-            $current_geo_location = GeoIp::locate($this->getClientIp());
+            $current_geo_location = GeoIp::locate($this->requestIp());
             if ($use_current_location) {
                 if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
                 else $country = TaxCache::country()->where("iso_2_code", $current_geo_location?->iso_code)->first();

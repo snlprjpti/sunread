@@ -69,6 +69,23 @@ trait HasAttributeScope
         return $default_value;
     }
 
+    public function getBuilderParentValues(array $data): mixed
+    {
+        try
+        {
+            $data = $this->getParentScope($data);  
+
+            $builders = $this->productBuilderValues()->whereScope($data["scope"])->whereScopeId($data["scope_id"])->get();
+            $fetched = ($builders->isEmpty() && ($data["scope"] != "website")) ? $this->getBuilderParentValues($data) : $builders;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
+        return $fetched;
+    }
+
     public function getParentScope(array $scope): array
     {
         try

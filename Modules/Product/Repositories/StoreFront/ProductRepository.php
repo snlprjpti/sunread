@@ -23,12 +23,13 @@ use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Page\Repositories\StoreFront\PageRepository;
 
 class ProductRepository extends BaseRepository
 {
-    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product, $config_products;
+    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product = [], $config_products = [], $pageRepository, $final_product_val = [];
 
-    public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository)
+    public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository, PageRepository $pageRepository)
     {
         $this->model = $product;
         $this->search_repository = $search_repository;
@@ -36,10 +37,9 @@ class ProductRepository extends BaseRepository
         $this->model_name = "Product";
         $this->page_groups = ["hero_banner", "usp_banner_1", "usp_banner_2", "usp_banner_3"];
         $this->config_fields = config("category.attributes");
+        $this->pageRepository = $pageRepository;
         $this->count = 0;
         $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date"];
-        $this->nested_product = [];
-        $this->config_products = [];
     }
 
     public function productDetail(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
@@ -117,13 +117,9 @@ class ProductRepository extends BaseRepository
                 }
 
                 if($attribute->slug == "component") {
-                    $data["product_builder"] = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get()->map(function($builder) {
-                        return [
-                            "component" => $builder->attribute,
-                            "attributes" => $builder->value,
-                            "position" => $builder->position
-                        ];
-                    })->toArray();
+                    $product_builders = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
+                    if($product_builders->isEmpty()) $product_builders = $product->getBuilderParentValues($match);
+                    $data["product_builder"] = $product_builders ? $this->pageRepository->getComponent($coreCache, $product_builders) : [];
                     continue;
                 }
 
@@ -168,11 +164,15 @@ class ProductRepository extends BaseRepository
                 unset($fetched["new_from_date"], $fetched["new_to_date"]);
             }
 
+            $this->nested_product = [];
+            $this->config_products = [];
+            $this->final_product_val = [];
             if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
                 if(isset($product->parent_id)) $product = $product->parent;
                 $variant_ids = $product->variants->pluck("id")->toArray();
                 $elastic_fetched = [
                     "_source" => ["show_configurable_attributes"],
+                    "size" => count($variant_ids),
                     "query"=> [
                         "bool" => [
                             "must" => [
@@ -184,9 +184,9 @@ class ProductRepository extends BaseRepository
                 $elastic_data =  $this->search_repository->searchIndex($elastic_fetched, $store); 
                 $elastic_variant_products = isset($elastic_data["hits"]["hits"]) ? collect($elastic_data["hits"]["hits"])->pluck("_source.show_configurable_attributes")->flatten(1)->toArray() : [];
                 $this->config_products = $elastic_variant_products;
-                
+
                 $this->getVariations($elastic_variant_products);  
-                $fetched["configurable_products"] = $this->xyz;          
+                $fetched["configurable_products"] = $this->final_product_val;          
             }
         }
         catch (Exception $exception)
@@ -208,34 +208,35 @@ class ProductRepository extends BaseRepository
                 
                 $attribute_values = collect($elastic_variant_products)->where("attribute_slug", $attribute_slug)->values()->toArray();
                 $variations = collect($elastic_variant_products)->where("attribute_slug", "!=", $attribute_slug)->values()->toArray();
-                $count = collect($attribute_values)->unique("id")->count(); 
+                //$count = collect($attribute_values)->unique("id")->count(); 
 
                 $j = 0;
                 foreach($attribute_values as $attribute_value)
                 {
                     $append_key = $key ? "$key.{$attribute_slug}.{$j}" : "{$attribute_slug}.{$j}";
-                    $abc = [];
+                    $product_val_array = [];
                     if(!isset($state[$attribute_value["id"]])) {
                         $state[$attribute_value["id"]] = true;
-                        $abc["value"] = $attribute_value["id"];
-                        $abc["label"] = $attribute_value["label"];
-                        $abc["code"] = $attribute_value["code"];
+                        $product_val_array["value"] = $attribute_value["id"];
+                        $product_val_array["label"] = $attribute_value["label"];
+                        $product_val_array["code"] = $attribute_value["code"];
                         if($attribute_value["attribute_slug"] == "color") {
-                            $abc["url_key"] = $attribute_value["url_key"];
-                            $abc["image"] = $attribute_value["image"];
+                            $visibility_item = collect($attribute_values)->where("visibility", 8)->where("id", $attribute_value["id"])->first();
+                            $product_val_array["url_key"] = isset($visibility_item["url_key"]) ? $visibility_item["url_key"] : $attribute_value["url_key"];
+                            $product_val_array["image"] = isset($visibility_item["image"]) ? $visibility_item["image"] : $attribute_value["image"];
                         }
                         if(count($attribute_slugs) == 1) {
                             $fake_array = array_merge($this->nested_product, [$attribute_value["attribute_slug"] => $attribute_value["id"]]);
                             $dot_product = collect($this->config_products)->where("attribute_combination", $fake_array)->first();
-                            $abc["product_id"] = isset($dot_product["product_id"]) ? $dot_product["product_id"] : 0;
-                            $abc["sku"] = isset($dot_product["product_sku"]) ? $dot_product["product_sku"] : 0;
-                            $abc["stock_status"] = isset($dot_product["stock_status"]) ? $dot_product["stock_status"] : 0;
-                            if($count == ($j+1)) $this->nested_product = [];
+                            $product_val_array["product_id"] = isset($dot_product["product_id"]) ? $dot_product["product_id"] : 0;
+                            $product_val_array["sku"] = isset($dot_product["product_sku"]) ? $dot_product["product_sku"] : 0;
+                            $product_val_array["stock_status"] = isset($dot_product["stock_status"]) ? $dot_product["stock_status"] : 0;
+                            //if($count == ($j+1)) $this->nested_product = [];
                         } 
-                        setDotToArray($append_key, $this->xyz,  $abc);
+                        setDotToArray($append_key, $this->final_product_val,  $product_val_array);
                         $j = $j + 1;
                         if(count($attribute_slugs) > 1) {
-                            $this->nested_product = [ $attribute_value["attribute_slug"] => $attribute_value["id"] ];
+                            $this->nested_product[ $attribute_value["attribute_slug"] ] = $attribute_value["id"];
                             $this->getVariations($variations, "{$append_key}.variations"); 
                         }  
                     }

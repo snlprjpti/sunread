@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Website;
+use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\ProductAttribute;
@@ -113,7 +114,7 @@ class ProductConfigurableRepository extends BaseRepository
             $this->parentVisibilitySetup($product, $scope);
 
             $productAttributes = collect($request_attributes)->reject(function ($item) {
-                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility") || ($item["attribute_slug"] == "url_key"));
+                return (($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility") || ($item["attribute_slug"] == "url_key"));
             })->toArray();
 
             $this->state = [];
@@ -221,14 +222,15 @@ class ProductConfigurableRepository extends BaseRepository
         try 
         {
             $visibility = $this->childVisibilitySetup($variant_options, $variant);
+            $name = collect($productAttributes)->where("attribute_slug", "name")->first();
 
             $product_attributes = array_merge([
-                [
-                    // Attrubute name
-                    "attribute_slug" => "name",
-                    "value" => $product->sku."_".implode("_", $permutation_modify),
-                    "value_type" => "Modules\Product\Entities\ProductAttributeString"
-                ],
+                // [
+                //     // Attrubute name
+                //     "attribute_slug" => "name",
+                //     "value" => $product->sku."_".implode("_", $permutation_modify),
+                //     "value_type" => "Modules\Product\Entities\ProductAttributeString"
+                // ],
                 [
                     //Attribute slug
                     "attribute_slug" => "sku",
@@ -238,7 +240,7 @@ class ProductConfigurableRepository extends BaseRepository
                 [
                     //Attribute slug
                     "attribute_slug" => "url_key",
-                    "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
+                    "value" => $this->createSlug(Str::slug($name["value"])),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ],
             ], $productAttributes, $variant_options, [ $visibility ]);
@@ -357,5 +359,55 @@ class ProductConfigurableRepository extends BaseRepository
         {
             throw $exception;
         }
+    }
+
+    public function createSlug(string $title, int $id = 0): string
+    {
+       try
+       {
+            // Slugify
+            $slug = Str::slug($title);
+            $original_slug = $slug;
+
+            // Throw Error if slug could not be generated
+            if ($slug == "") throw new SlugCouldNotBeGenerated();
+
+            // Get any that could possibly be related.
+            // This cuts the queries down by doing it once.
+            $allSlugs = $this->getRelatedSlugs($slug, $id);
+
+            // If we haven't used it before then we are all good.
+            if (!$allSlugs->contains('value', $slug)) return $slug;
+
+            //if used,then count them
+            $count = $allSlugs->count();
+
+            // Loop through generated slugs
+            while ($this->checkIfSlugExist($slug, $id) && $slug != "") {
+                $slug = "{$original_slug}-{$count}";
+                $count++;
+            }
+       }
+       catch ( Exception $exception )
+       {
+           throw $exception;
+       }
+
+        // Finally return Slug
+        return $slug;
+    }
+
+    private function getRelatedSlugs(string $slug, int $id = 0): object
+    {
+        return ProductAttributeString::whereRaw("value RLIKE '^{$slug}(-[0-9]+)?$'")
+            ->where('id', '<>', $id)
+            ->get();
+    }
+
+    private function checkIfSlugExist(string $slug, int $id = 0): ?bool
+    {
+        return ProductAttributeString::select('value')->where('value', $slug)
+            ->where('id', '<>', $id)
+            ->exists();
     }
 }

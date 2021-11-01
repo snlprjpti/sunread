@@ -1,27 +1,27 @@
 <?php
 
-namespace Modules\Tax\Console;
+namespace Modules\Product\Console;
 
 use Illuminate\Console\Command;
-use Modules\Tax\Facades\GeoIp;
+use Modules\Product\Jobs\ProductUrlGeneratorJob;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class GeoIpDbUpdator extends Command
+class ProductUrlGenerator extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'geoip:update';
+    protected $signature = 'product:urlkey-generate';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Update the geoip database.';
+    protected $description = 'Product url key regenerate.';
 
     /**
      * Create a new command instance.
@@ -35,7 +35,8 @@ class GeoIpDbUpdator extends Command
 
     public function handle(): void
     {
-        $GeoIpUpdate = GeoIp::update();
-        $this->info($GeoIpUpdate);
+        ProductUrlGeneratorJob::dispatch()->onQueue("high");
+        $this->info("Product url key regenerate job dispatched.");
     }
+
 }

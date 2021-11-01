@@ -18,5 +18,5 @@
     "EmailTemplate": true,
     "ProductStockAlert": true,
     "ProductStockAlertResource": true,
-    "ClubHouse": true
+    "GeoIp": true
 }
