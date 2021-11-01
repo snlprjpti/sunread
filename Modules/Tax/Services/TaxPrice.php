@@ -181,7 +181,7 @@ class TaxPrice {
         try
         {	
             $data = $this->getGeneralValue($request);
-            $current_geo_location = GeoIp::locate($this->getClientIp());
+            $current_geo_location = GeoIp::locate($this->requestIp());
             if ($use_current_location) {
                 if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
                 else $country = TaxCache::country()->where("iso_2_code", $current_geo_location?->iso_code)->first();
