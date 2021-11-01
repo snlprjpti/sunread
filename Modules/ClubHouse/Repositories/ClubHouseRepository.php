@@ -32,7 +32,8 @@ class ClubHouseRepository extends BaseRepository
             // ClubHouse validation
             "position" => "sometimes|nullable|integer",
             "website_id" => "required|exists:websites,id",
-            "type" => "required|string|in:clubhouse,resort"
+            "type" => "required|string|in:clubhouse,resort",
+            "position" => "required|integer",
         ];
 
         $this->config_fields = config("clubhouse.attributes");
@@ -95,6 +96,7 @@ class ClubHouseRepository extends BaseRepository
         $fetched = [
             "id" => $club_house->id,
             "website_id" => $club_house->website_id,
+            "type" => $club_house->type,
             "title" => $title_value?->value
         ];
 

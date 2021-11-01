@@ -158,6 +158,8 @@ class ClubHouseValueRepository
             $match = [
                 "club_house_id" => $parent->id,
                 "scope" => $data["scope"],
+                "type" => $data["type"],
+                "position" => $data["position"],
                 "scope_id" => $data["scope_id"]
             ];
             foreach($data["items"] as $key => $val)

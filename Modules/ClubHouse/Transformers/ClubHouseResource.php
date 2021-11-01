@@ -3,7 +3,6 @@
 namespace Modules\ClubHouse\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Core\Transformers\ChannelResource;
 
 class ClubHouseResource extends JsonResource
 {
@@ -13,8 +12,8 @@ class ClubHouseResource extends JsonResource
             "id" => $this->id,
             "website_id" => $this->website_id,
             "position" => $this->position,
+            "type" => $this->type,
             "values" => $this->values,
-
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
