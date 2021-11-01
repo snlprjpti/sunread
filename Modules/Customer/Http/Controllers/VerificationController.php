@@ -8,16 +8,20 @@ use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
 use Exception;
+use Modules\Customer\Repositories\StoreFront\CustomerRepository;
 use Modules\Notification\Events\ConfirmEmail;
 use Modules\Notification\Events\NewAccount;
 
 class VerificationController extends BaseController
 {
-    public function __construct( Customer $customer)
+    private $repository;
+
+    public function __construct(Customer $customer, CustomerRepository $customerRepository)
     {
         $this->model = $customer;
         $this->model_name = "Customer";
         parent::__construct($this->model, $this->model_name);
+        $this->repository = $customerRepository;
     }
 
     /**
@@ -30,14 +34,8 @@ class VerificationController extends BaseController
             $customer = auth()->guard('customer')->user();
 
             if(!$customer->is_email_verified) {
-                $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $customer->website_id);
-                if($required_email_confirm == 1) {
-                    $customer["verification_token"] = Str::random(30);
-                    $customer->save();
-                    $message = "response.send-confirmation-link";
-
-                    event(new NewAccount($customer->id, $customer->verification_token));
-                }
+                $this->repository->sendVerificationLink($customer);
+                $message = "response.send-confirmation-link";
             }
             else {
                 $message = "response.already-verified";
@@ -61,12 +59,8 @@ class VerificationController extends BaseController
             $customer = $this->model::where("verification_token", $token)->firstOrFail();
 
             if(!$customer->is_email_verified) {
-                $customer->is_email_verified = 1;
-                $customer->verification_token = null;
-                $customer->save();
+                $this->repository->verifyCustomerAccount($customer);
                 $message = "response.verification-success";
-
-                event(new ConfirmEmail($customer->id));
             }
             else {
                 $message = "response.already-verified";

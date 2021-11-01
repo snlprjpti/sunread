@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Notification\Events\ConfirmEmail;
+use Modules\Notification\Events\NewAccount;
 
 class CustomerRepository extends BaseRepository
 {
@@ -193,5 +195,43 @@ class CustomerRepository extends BaseRepository
         DB::commit();
 
         return $updated;
+    }
+
+    public function sendVerificationLink(object $customer): bool
+    {
+        try
+        {
+            $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $customer->website_id);
+            if($required_email_confirm == 1) {
+                $customer["verification_token"] = Str::random(30);
+                $customer->save();
+
+                event(new NewAccount($customer->id, $customer->verification_token));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
+    }
+
+    public function verifyCustomerAccount(object $customer): bool
+    {
+        try
+        {
+            $customer->is_email_verified = 1;
+            $customer->verification_token = null;
+            $customer->save();
+
+            event(new ConfirmEmail($customer->id));
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
     }
 }
