@@ -85,17 +85,17 @@ class TaxPrice {
             "price" => $price,
             "tax_rate_percent" => $this->tax_value,
             "tax_rate_value" => $tax_rate_value,
-            "rules" => $this->getMultipleRules(),
+            "rules" => $this->getMultipleRules($price),
         ];
         if ($callback) $resource = array_merge($callback, $resource); 
         return $resource;
     }
 
-    public function getMultipleRules(): ?object
+    public function getMultipleRules(mixed $price): ?object
     {
         try
         {
-            $data = $this->multiple_rules?->map(function ($rule) {
+            $data = $this->multiple_rules?->map(function ($rule) use ($price) {
                 return (object) [
                     "id" => $rule->id,
                     "name" => $rule->name,
@@ -117,11 +117,13 @@ class TaxPrice {
                             }
                         }
                         return true;
-                    })->map(function ($rate) {
+                    })->map(function ($rate) use ($price) {
+                        $value_added_tax = ($rate->tax_rate / 100) * $price;
                         return (object) [
                             "id" => $rate->id,
                             "identifier" => $rate->identifier,
-                            "tax_rate" => $rate->tax_rate
+                            "tax_rate" => $rate->tax_rate,
+                            "tax_rate_value" => $value_added_tax
                         ];
                     })->toArray()
                 ];
@@ -137,18 +139,25 @@ class TaxPrice {
 
     public function getGeneralValue(object $request): object
     {
-        $website = CoreCache::getWebsite($request->header("hc-host"));
-        $channel = CoreCache::getChannel($website, $request->header("hc-channel"));
-        $store = CoreCache::getStore($website, $channel, $request->header("hc-store"));
-
-        $data = [
-            "website" => $website,
-            "channel" => $channel,
-            "store" => $store,
-            "allow_countries" => SiteConfig::fetch("allow_countries", "channel", $channel?->id),
-            "default_country" => SiteConfig::fetch("default_country", "channel", $channel?->id),
-            "check_tax_catalog_prices" => SiteConfig::fetch("tax_catalog_prices", "channel", $channel?->id)
-        ];
+        try
+        {
+            $website = CoreCache::getWebsite($request->header("hc-host"));
+            $channel = CoreCache::getChannel($website, $request->header("hc-channel"));
+            $store = CoreCache::getStore($website, $channel, $request->header("hc-store"));
+    
+            $data = [
+                "website" => $website,
+                "channel" => $channel,
+                "store" => $store,
+                "allow_countries" => SiteConfig::fetch("allow_countries", "channel", $channel?->id),
+                "default_country" => SiteConfig::fetch("default_country", "channel", $channel?->id),
+                "check_tax_catalog_prices" => SiteConfig::fetch("tax_catalog_prices", "channel", $channel?->id)
+            ];
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
         return (object) $data;
     }
@@ -172,7 +181,7 @@ class TaxPrice {
         try
         {	
             $data = $this->getGeneralValue($request);
-            $current_geo_location = GeoIp::locate($this->getClientIp());
+            $current_geo_location = GeoIp::locate($this->requestIp());
             if ($use_current_location) {
                 if (!in_array($current_geo_location?->iso_code, $data->allow_countries->pluck("iso_2_code")->toArray())) $country = $data->default_country;
                 else $country = TaxCache::country()->where("iso_2_code", $current_geo_location?->iso_code)->first();
@@ -187,7 +196,6 @@ class TaxPrice {
             }
             if (!$tax_group) throw ValidationException::withMessages(["tax_group_id" => "Tax group id is required either product or customer"]);
             $sort_priority_tax_rule = $tax_group->tax_rules->pluck("priority", "id")->toArray();
-            
             if (!empty(array_not_unique($sort_priority_tax_rule)["duplicate_array"])) {
                 $same_tax_rule_ids = array_keys(array_not_unique($sort_priority_tax_rule)["duplicate_array"]);	
                 $same_priority_tax_rate = $this->getPriorityTaxRate($same_tax_rule_ids, $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();

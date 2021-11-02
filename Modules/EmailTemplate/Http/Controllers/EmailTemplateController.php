@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\EmailTemplate\Entities\EmailTemplate;
+use Modules\EmailTemplate\Exceptions\DeleteSystemDefinedException;
 use Modules\EmailTemplate\Repositories\EmailTemplateRepository;
 use Modules\EmailTemplate\Transformers\EmailTemplateResource;
 use Exception;
@@ -21,7 +22,10 @@ class EmailTemplateController extends BaseController
         $this->model = $emailTemplate;
         $this->model_name = "Email Template";
         $this->repository = $emailTemplateRepository;
-        parent::__construct($this->model, $this->model_name);
+        $exception_statuses = [
+            DeleteSystemDefinedException::class => 401,
+        ];
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -54,6 +58,7 @@ class EmailTemplateController extends BaseController
         {
             $data = $this->repository->validateData($request, callback:function ($request) {
                 $this->repository->templateGroupValidation($request);
+                $this->repository->templateVariableValidation($request);
                 return [];
             });
             $created = $this->repository->create($data);
@@ -86,6 +91,7 @@ class EmailTemplateController extends BaseController
         {
             $data = $this->repository->validateData($request, callback:function ($request) {
                 $this->repository->templateGroupValidation($request);
+                $this->repository->templateVariableValidation($request);
                 return [];
             });
             $updated = $this->repository->update($data, $id);
@@ -102,7 +108,9 @@ class EmailTemplateController extends BaseController
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function ($deleted){
+                if( $deleted->is_system_defined == 1) throw new DeleteSystemDefinedException("Cannot Delete System Defined Template.");
+            });
         }
         catch (Exception $exception)
         {

@@ -14,7 +14,7 @@ class ScopeRule implements Rule
      *
      * @return void
      */
-    public $scope; 
+    public $scope;
 
     public function __construct($scope)
     {
@@ -37,7 +37,7 @@ class ScopeRule implements Rule
         if($this->scope == "channel")  return (bool) Channel::whereId($value)->first();
 
         if($this->scope == "store")  return (bool) Store::whereId($value)->first();
-        
+
     }
 
     /**

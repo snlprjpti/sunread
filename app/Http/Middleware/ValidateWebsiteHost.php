@@ -22,14 +22,14 @@ class ValidateWebsiteHost
     {
         try
         {
-            if(!$request->hasHeader('hc-host')) 
+            if(!$request->hasHeader('hc-host'))
             return $this->errorResponse("hc-host is required", 422);
         }
         catch(Exception $exception)
         {
             throw $exception;
         }
-        
+
         return $next($request);
     }
 }

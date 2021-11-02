@@ -59,7 +59,7 @@ class CategoryValueRepository
         {
             throw $exception;
         }
-        
+
         return $all_rules;
     }
 
@@ -67,7 +67,7 @@ class CategoryValueRepository
     {
         try
         {
-            $exist_category = Category::findOrFail($id); 
+            $exist_category = Category::findOrFail($id);
 
             if (isset($request->items[$item["slug"]])) {
                 $request_slug = $request->items[$item["slug"]];
@@ -108,16 +108,16 @@ class CategoryValueRepository
                 if(in_array($key, $this->global_file)) continue;
 
                 if(isset($val["use_default_value"]) && $val["use_default_value"] != 1) throw ValidationException::withMessages([ "use_default_value" => __("core::app.response.use_default_value") ]);
-    
+
                 if(!isset($val["use_default_value"]) && !array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
 
                 $absolute_path = config("category.absolute_path.{$key}");
                 $configDataArray = config("category.attributes.{$absolute_path}");
 
                 if($this->scopeFilter($match["scope"], $configDataArray["scope"])) continue;
-                
+
                 $match["attribute"] = $key;
-                
+
                 $value = $val["value"] ?? null;
                 $match["value"] = ($configDataArray["type"] == "file" && $value) ? $this->repository->storeScopeImage($value, "category") : $value;
 

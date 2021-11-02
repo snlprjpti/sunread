@@ -5,9 +5,12 @@ namespace Modules\Cart\Repositories;
 use Exception;
 use Modules\Cart\Entities\Cart;
 use Modules\Core\Entities\Store;
+use Modules\Tax\Facades\TaxPrice;
+use Illuminate\Support\Facades\DB;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Cart\Entities\CartItem;
+use Modules\Core\Facades\CoreCache;
 use Illuminate\Support\Facades\Event;
 use Modules\Core\Facades\PriceFormat;
 use Modules\Product\Entities\Product;
@@ -19,8 +22,6 @@ use Modules\Cart\Exceptions\OutOfStockException;
 use Modules\Cart\Repositories\CartItemRepository;
 use Modules\Cart\Exceptions\CartHashIdNotFoundException;
 use Elasticsearch\Common\Exceptions\Forbidden403Exception;
-use Illuminate\Support\Facades\DB;
-use Modules\Core\Facades\CoreCache;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 
 class CartRepository extends BaseRepository
@@ -168,6 +169,8 @@ class CartRepository extends BaseRepository
 
                 $subTotal = 0;
                 $grandTotal = 0;
+                $tax_rate_percent = 0;
+                $tax_rate_value = 0;
                 $cartId = null;
 
             // if cart hash id is sent
@@ -184,10 +187,11 @@ class CartRepository extends BaseRepository
                 $this->mergeGuestCart($request, $cart);
                 foreach ($cart->cartItems as $item)
                 {
-                   $productData = $this->getCartItemDetail($item, $relations, $checkChannel, $cart, $coreCache);
+                   $productData = $this->getCartItemDetail($item, $relations, $checkChannel, $cart, $coreCache, $request);
                    $products[] = $productData;
                    $subTotal += $productData['total_amount'];
-                   $grandTotal += $productData['total_amount'];
+                   $tax_rate_percent += $productData['tax_rate_percent'];
+                   $tax_rate_value += $productData['tax_rate_value'];
                 }
             }
             elseif (auth("customer")->id() && empty($request->header()["hc-cart"])) {
@@ -195,17 +199,21 @@ class CartRepository extends BaseRepository
                     $cart = $this->model::whereCustomerId(auth("customer")->id())->first();
                     $cartId = $cart->id;
                     $item = $cart->cartItems()->latest()->first();
-                   $productData = $this->getCartItemDetail($item, $relations, $checkChannel, $cart, $coreCache);
+                   $productData = $this->getCartItemDetail($item, $relations, $checkChannel, $cart, $coreCache, $request);
                    $products[] = $productData;
                    $subTotal += $productData['total_amount'];
-                   $grandTotal += $productData['total_amount'];
+                   $tax_rate_percent += $productData['tax_rate_percent'];
+                   $tax_rate_value += $productData['tax_rate_value'];
             }
-
+            $grandTotal = $subTotal + $tax_rate_value;
             $items = [
                 "items" => $products,
                 "count" => count($products),
                 "sub_total" => $subTotal,
                 "sub_total_formatted" => PriceFormat::get($subTotal, $coreCache->store->id, "store"),
+                "total_tax_percent" => $tax_rate_percent,
+                "total_tax_value" => $tax_rate_value,
+                "total_tax_value_formatted" => PriceFormat::get($tax_rate_value, $coreCache->store->id, "store"),
                 "grand_total" => $grandTotal,
                 "grand_total_formatted" => PriceFormat::get($grandTotal, $coreCache->store->id, "store"),
                 "cart_id" => $cartId,
@@ -222,7 +230,7 @@ class CartRepository extends BaseRepository
         return $items;
     }
 
-    private function getCartItemDetail(object $item, array $relations, object $checkChannel, object $cart, $coreCache): mixed
+    private function getCartItemDetail(object $item, array $relations, object $checkChannel, object $cart, object $coreCache, object $request): mixed
     {
         $product = $this->product::whereId($item->product_id)->whereStatus(1)->with($relations)->firstOrFail();
                     $channel_ids = $product->website->channels->pluck("id")->toArray();
@@ -235,7 +243,7 @@ class CartRepository extends BaseRepository
                         }
                         $this->responseData['message'] = $this->cartStatus["product_remove_due_to_channel_change"];
                     };
-        return $this->getProductDetail($product, $item, $coreCache);
+        return $this->getProductDetail($product, $item, $coreCache, $request);
     }
 
     private function mergeGuestCart(object $request, object $cart): bool
@@ -290,7 +298,7 @@ class CartRepository extends BaseRepository
         return count($this->responseData) > 0 ? $this->responseData : null; 
     }
 
-    private function getProductDetail($product, $cartItem, $coreCache): mixed
+    private function getProductDetail(object $product, object $cartItem, object $coreCache, object $request): mixed
     {
         try
         {
@@ -310,6 +318,7 @@ class CartRepository extends BaseRepository
                 if ($product_attribute->attribute->slug == "visibility") {
                     if ($product->value($match)?->name == "Not Visible Individually") throw new ProductNotFoundIndividuallyException();
                 }
+
                 return (!$product_attribute->attribute->is_user_defined) ? [$product_attribute->attribute->slug => ($product_attribute->attribute->type == "select") ? $product->value($match)?->name : $product->value($match)] : [];
             })->toArray();
 
@@ -323,6 +332,36 @@ class CartRepository extends BaseRepository
             if (!$special_from_date || !$special_to_date) $data["price"] = $product_details["special_price"] ?? $price;
             else ($special_from_date <= $currentDate && $currentDate <= $special_to_date) ? ($data["price"] = $product_details["special_price"] ?? $price) : $data["price"] = $price;
 
+            $match = [
+                      "scope" => "store",
+                      "scope_id" => $store->id,
+                      "attribute_slug" => "tax_class_id"
+                    ];
+            $product_tax_class_id = $product->value($match)?->id;
+            $tax_rate_percent = 0;
+            $tax_rate_value = 0;
+            $tax_summary = [];
+            if ($product_tax_class_id) {
+                $calculateTax = TaxPrice::calculate($request, $data["price"], $product_tax_class_id);
+                if ($calculateTax) {
+                    $tax_rate_percent = $calculateTax->tax_rate_percent;
+                    $tax_rate_value = $calculateTax->tax_rate_value;
+                    foreach ($calculateTax->rules as $key => $rule) {
+                        $tax_summary[$key]['rule'] = $rule->name;
+                        $total_tax_rates = 0;
+                        foreach ($rule->rates as $rate) {
+                            $total_tax_rates+= $rate->tax_rate_value;
+                        }
+                        $tax_summary[$key]['amount'] = $total_tax_rates;
+                        $tax_summary[$key]['amount_formatted'] = PriceFormat::get($total_tax_rates, $store->id, "store");
+                    }
+                }  
+            }
+
+            $data["tax_rate_value"] = $tax_rate_value;
+            $data["tax_rate_percent"] = $tax_rate_percent;
+            $data["tax_amount_formatted"] = PriceFormat::get($data["tax_rate_value"], $store->id, "store");
+            $data['tax_summary'] = $tax_summary;
             $data["price_formatted"] = PriceFormat::get($data["price"], $store->id, "store");
             
             if ($product->type == "simple" && $product->parent_id) {
@@ -348,13 +387,9 @@ class CartRepository extends BaseRepository
             $productStock = $product->catalog_inventories->first();
             $data["stock_status"] = ($productStock?->manage_stock && $productStock?->is_in_stock && $cartItem?->qty > $productStock?->quantity) ? false : true;
             $data["qty"] = $cartItem->qty;
-
-            $data["tax_amount"] = "";
-            $data["tax_amount_formatted"] = "";
             $data["total_amount"] = $data["price"] * $data["qty"];
             $data["total_amount_formatted"] = PriceFormat::get($data["total_amount"], $store->id, "store");
-            $data["total_tax_amount"] = "";
-            $data["total_tax_amount_formatted"] = "";
+           
 
             // Product Single Image
             $data["image"] = "";
@@ -579,11 +614,7 @@ class CartRepository extends BaseRepository
             // check product exist on product table, product status =1, has visibility and in stock
             $this->checkProductConditions($productId, $request);
 
-            $qty =  ($checkProductId->qty) + $request->qty ?? 1;
-            if($request->type == "update")
-            {
-                $qty = $request->qty ?? 1;
-            }
+            $qty = $request->qty ?? 1;
             $this->cartItemRepo->updateItemWithConditions($cartAndProductCheck, ["qty" => $qty]);
           
             $this->responseData["message"] = $this->cartStatus["product_qty_updated"];

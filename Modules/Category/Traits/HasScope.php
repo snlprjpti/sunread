@@ -11,7 +11,7 @@ use Modules\Core\Entities\Store;
 trait HasScope
 {
     public $channel_model, $store_model, $value_model;
-    
+
     public function createModel(): void
     {
         $this->channel_model = new Channel();
@@ -29,7 +29,7 @@ trait HasScope
                     $data["scope"] = "channel";
                     $data["scope_id"] = $this->store_model->find($data["scope_id"])->channel->id;
                     break;
-                            
+
                 case "channel":
                     $data["scope"] = "website";
                     $data["scope_id"] = $this->channel_model->find($data["scope_id"])->website->id;
@@ -59,14 +59,14 @@ trait HasScope
 
     public function checkCondition(array $data): object
     {
-        return $this->value_model->whereCategoryId($data["category_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);  
+        return $this->value_model->whereCategoryId($data["category_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);
     }
 
     public function checkSlug(array $data, ?string $slug, ?object $category = null): ?object
     {
         $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : $category?->parent_id;
         $website_id = isset($data["website_id"]) ? $data["website_id"] : $category?->website_id;
-        
+
         return Category::whereParentId($parent_id)->whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $category) {
             if($category) $query = $query->where('category_id', '!=', $category->id);
             $query->whereAttribute("slug")->whereValue($slug);

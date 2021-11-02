@@ -28,7 +28,7 @@ class CategoryController extends BaseController
     {
         $this->repository = $categoryRepository;
         $this->categoryValueRepository = $categoryValueRepository;
-        
+
         $this->model = $category;
         $this->model_name = "Category";
 
@@ -117,9 +117,9 @@ class CategoryController extends BaseController
 
             $category = $this->model->findOrFail($id);
             $data = [
-                "scope" => $request->scope ?? "website", 
+                "scope" => $request->scope ?? "website",
                 "scope_id" => $request->scope_id ?? $category->website_id,
-                "category_id" => $id 
+                "category_id" => $id
             ];
 
             $name_data = array_merge($data, ["attribute" => "name"]);
@@ -158,7 +158,7 @@ class CategoryController extends BaseController
                     "website_id" => $category->website_id
                 ];
             });
-            
+
             if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data, $category);
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
