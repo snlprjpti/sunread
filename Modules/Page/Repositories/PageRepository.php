@@ -51,7 +51,7 @@ class PageRepository extends BaseRepository
         {
             $attributes = [];
             $data = $this->fetch($id, [ "page_scopes", "page_attributes", "website" ]);
-            $components = $data->page_attributes()->get();
+            $components = $data->page_attributes()->orderBy("position", "asc")->get();
             $stores = $data->page_scopes()->pluck("scope_id")->toArray();
 
             foreach($components as $component)
