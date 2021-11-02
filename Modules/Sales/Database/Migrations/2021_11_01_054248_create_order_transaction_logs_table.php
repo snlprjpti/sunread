@@ -6,26 +6,25 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateOrderTransactionLogsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('order_transaction_logs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("order_id");
+            $table->decimal("amount");
+            $table->decimal("currency");
+            $table->string("ip_address")->nullable();
+            $table->json("request");
+            $table->json("response");
+            $table->string("response_code");
+            
+            $table->foreign("order_id")->references("id")->on("orders")->onDelete("cascade");
 
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('order_transaction_logs');
     }
