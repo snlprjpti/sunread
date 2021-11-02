@@ -349,7 +349,7 @@ class ProductBuilderRepository extends BaseRepository
                 }
                 
                 if ($element["hasChildren"] == 0) {
-                    //if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery((object) $element, $element["pluck"]);
+                    //if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery($element);
                     unset($element["pluck"], $element["provider"], $element["rules"]);
 
                     if (count($values) > 0) {
