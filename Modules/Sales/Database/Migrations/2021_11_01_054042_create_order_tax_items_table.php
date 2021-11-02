@@ -6,26 +6,24 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateOrderTaxItemsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('order_tax_items', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("tax_id");
+            $table->unsignedBigInteger("item_id")->nullable();
+            $table->decimal("tax_percent");
+            $table->decimal("amount");
+            $table->string("tax_item_type");
+
+            $table->foreign("tax_id")->references("id")->on("order_taxes")->onDelete("cascade");
+            $table->foreign("item_id")->references("id")->on("products");
 
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('order_tax_items');
     }

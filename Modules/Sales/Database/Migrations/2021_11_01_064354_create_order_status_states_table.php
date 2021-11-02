@@ -6,26 +6,19 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateOrderStatusStatesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('order_status_states', function (Blueprint $table) {
             $table->id();
-
+            $table->string("string");
+            $table->string("state");
+            $table->boolean("is_default")->default(0);
+            $table->integer("position");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('order_status_states');
     }
