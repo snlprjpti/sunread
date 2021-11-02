@@ -6,26 +6,20 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateOrderCommentsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('order_comments', function (Blueprint $table) {
             $table->id();
-
+            $table->unsignedBigInteger("order_id");
+            $table->unsignedBigInteger("user_id");
+            $table->boolean("is_customer_notified")->default(0);
+            $table->boolean("is_visible_on_storefornt")->default(0);
+            $table->string("comment");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('order_comments');
     }

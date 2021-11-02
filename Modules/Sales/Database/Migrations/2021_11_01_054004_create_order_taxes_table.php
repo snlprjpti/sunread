@@ -6,26 +6,21 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateOrderTaxesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('order_taxes', function (Blueprint $table) {
             $table->id();
-
+            $table->unsignedBigInteger("order_id");
+            $table->string("code");
+            $table->string("title");
+            $table->decimal("percent");
+            $table->decimal("amount");
+            $table->foreign("order_id")->references("id")->on("orders")->onDelete("cascade");
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('order_taxes');
     }
