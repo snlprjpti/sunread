@@ -306,7 +306,7 @@ class ProductSearchRepository extends ElasticSearchRepository
                 "size"=> $limit,
                 "query"=> $final_q,
                 "sort" => (count($filter["sort"]) > 0) ? $filter["sort"] : [
-                    ["id" => ["order" => "asc", "mode" => "avg"]]
+                    // ["id" => ["order" => "asc", "mode" => "avg"]]
                 ],
             ];
 
