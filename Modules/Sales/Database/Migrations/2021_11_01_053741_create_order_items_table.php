@@ -29,6 +29,7 @@ class CreateOrderItemsTable extends Migration
             $table->decimal("discount_amount_tax")->nullable();
             $table->decimal("tax_amount");
             $table->decimal("tax_percent");
+            $table->decimal("total_tax_amount");
             $table->decimal("row_total");
             $table->decimal("row_total_incl_tax");
             $table->decimal("row_weight");
