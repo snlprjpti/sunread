@@ -16,8 +16,8 @@ class CreateOrderTransactionLogsTable extends Migration
             $table->string("ip_address")->nullable();
             $table->json("request");
             $table->json("response");
-            $table->string("response_code");
-            
+            $table->string("response_code", 20);
+
             $table->foreign("order_id")->references("id")->on("orders")->onDelete("cascade");
 
             $table->timestamps();
