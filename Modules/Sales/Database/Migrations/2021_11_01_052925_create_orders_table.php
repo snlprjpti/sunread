@@ -48,8 +48,6 @@ class CreateOrdersTable extends Migration
             $table->foreign("billing_address_id")->references("id")->on("customer_addresses");
             $table->foreign("shipping_address_id")->references("id")->on("customer_addresses");
 
-            $table->unique(["billing_address_id", "shipping_address_id"], "customer_address_compound");
-
             $table->timestamps();
         });
     }
