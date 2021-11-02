@@ -290,7 +290,7 @@ class ProductBuilderRepository extends BaseRepository
             $whereCondition = array_merge($scope, ["product_id" => $id]);
 
             $attributes = [];
-            $components = $product->productBuilderValues()->where($whereCondition)->get();
+            $components = $product->productBuilderValues()->where($whereCondition)->orderBy("position", "asc")->get();
             foreach($components as $component)
             {
                 $attributes[] = $this->getParent($component);
@@ -353,7 +353,7 @@ class ProductBuilderRepository extends BaseRepository
                     unset($element["pluck"], $element["provider"], $element["rules"]);
 
                     if (count($values) > 0) {
-                        $default = getDotToArray($append_slug_key, $values);
+                        $default = decodeJsonNumeric(getDotToArray($append_slug_key, $values));
                         if($default) $element["default"] = ($element["type"] == "file") ? Storage::url($default) : $default;
                     }
 

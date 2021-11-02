@@ -40,7 +40,7 @@ class ProductAttributeRepository extends ProductRepository
             "gallery" => "gallery",
         ];
         $this->non_required_attributes = [ "price", "cost", "special_price", "special_from_date", "special_to_date", "quantity_and_stock_status" ];
-        $this->non_option_slug = [ "tax_class_id", "category_ids" ];
+        $this->non_option_slug = [ "tax_class_id", "category_ids", "quantity_and_stock_status" ];
     }
 
     public function attributeSetCache(): object
@@ -144,6 +144,7 @@ class ProductAttributeRepository extends ProductRepository
         if(in_array($attribute->slug, $this->non_option_slug))
         {
             if($attribute->slug == "tax_class_id") $attribute_options = CustomerTaxGroup::pluck("id")->toArray();
+            if($attribute->slug == "quantity_and_stock_status") $attribute_options = [ 0 => 0, 1 => 1];
         }
         else $attribute_options = AttributeOption::whereAttributeId($attribute->id)->pluck("id")->toArray();
 

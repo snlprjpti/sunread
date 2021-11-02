@@ -154,7 +154,7 @@ class PageRepository extends BaseRepository
             $pluck = $element["pluck"][1];
             $fetched = $model->where($pluck, $values)->first();
 
-            if($element["slug"] == "product") {
+            if($fetched && $element["slug"] == "product") {
                 $is_visibility = $fetched->value([
                     "scope" => "store",
                     "scope_id" => $store->id,
