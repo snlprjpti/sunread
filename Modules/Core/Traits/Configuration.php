@@ -41,19 +41,19 @@ trait Configuration
         
     }
 
-    public function cacheQuery(object $request, array $pluck): array
+    public function cacheQuery(array $element): array
     {
-        $resources = Cache::rememberForever($request->provider, function() use ($request) {
-           return $request->provider::orderBy("name", "asc")->get()->toArray();
+        $resources = Cache::rememberForever($element["provider"], function() use ($element) {
+            $provider = $element["provider"];
+            $pluck = $element["pluck"];
+
+            $model = new $provider();
+            $model = $model->select("{$pluck[1]} AS value", "{$pluck[0]} AS label");
+
+            if(isset($element["sort_by"]) && $element["sort_by"] != "") $model = $model->orderBy($element["sort_by"], "asc");
+            return $model->get()->toArray();
         });
-        $data = [];
-        foreach($resources as $resource)
-        {
-            array_push($data, [
-               'value' => $resource[$pluck[1]],
-               'label' => $resource[$pluck[0]]
-            ]);
-        }
-        return $data;
+
+        return $resources;
     }
 }
