@@ -43,6 +43,7 @@ class CreateOrdersTable extends Migration
             $table->string("customer_first_name");
             $table->string("customer_middle_name")->nullable();
             $table->string("customer_last_name");
+            $table->string("customer_phone");
             $table->string("customer_taxvat")->nullable();
             $table->string("customer_ip_address")->nullable();
             $table->string("status");
