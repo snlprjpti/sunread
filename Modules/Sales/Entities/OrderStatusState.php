@@ -2,8 +2,8 @@
 
 namespace Modules\Sales\Entities;
 
+use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OrderStatusState extends Model
 {
@@ -11,8 +11,4 @@ class OrderStatusState extends Model
 
     protected $fillable = [];
     
-    protected static function newFactory()
-    {
-        return \Modules\Sales\Database\factories\OrderStatusStateFactory::new();
-    }
 }
