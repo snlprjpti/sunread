@@ -290,7 +290,7 @@ class ProductBuilderRepository extends BaseRepository
             $whereCondition = array_merge($scope, ["product_id" => $id]);
 
             $attributes = [];
-            $components = $product->productBuilderValues()->where($whereCondition)->get();
+            $components = $product->productBuilderValues()->where($whereCondition)->orderBy("position", "asc")->get();
             foreach($components as $component)
             {
                 $attributes[] = $this->getParent($component);
