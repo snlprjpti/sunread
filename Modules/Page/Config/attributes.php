@@ -4915,7 +4915,7 @@ return [
                                         "description" => "",
                                         "conditions" => [],
                                         "rules" => "",
-                                        "is_required" => 1
+                                        "is_required" => 0
                                     ],
                                     [
                                         "title" => "Layout",
@@ -4924,7 +4924,7 @@ return [
                                         "type" => "select",
                                         "provider" => "",
                                         "pluck" => [],
-                                        "default" => "2",
+                                        "default" => "1",
                                         "options" => [
                                             [ "value" => 1, "label" => "One Column" ],
                                             [ "value" => 2, "label" => "Two Column" ]
