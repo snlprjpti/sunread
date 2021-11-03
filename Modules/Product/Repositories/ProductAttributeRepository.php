@@ -121,6 +121,10 @@ class ProductAttributeRepository extends ProductRepository
                 if(isset($product_attribute["value"]) && in_array($attribute->type, $this->option_fields)) $this->optionValidation($attribute, $product_attribute["value"]);
                 
                 if($attribute->slug == "quantity_and_stock_status") $product_attribute["catalog_inventory"] = $single_attribute_collection->pluck("catalog_inventory")->first();
+                if($attribute->slug == "component") {
+                    $product_components = array_merge($product_attribute, $validator->valid()); 
+                    continue;
+                }
 
                 $all_product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid()); 
             }
@@ -129,7 +133,9 @@ class ProductAttributeRepository extends ProductRepository
         {
             throw $exception;
         }
-        return collect($all_product_attributes)->where("value", "!=", null)->toArray();
+        $all_product_attributes = collect($all_product_attributes)->where("value", "!=", null)->toArray();
+        $all_product_attributes[] = $product_components;
+        return $all_product_attributes;
     }
 
     public function optionValidation(object $attribute, mixed $values): void
