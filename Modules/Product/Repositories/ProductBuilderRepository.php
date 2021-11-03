@@ -37,39 +37,40 @@ class ProductBuilderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            $productId = $product->id;
+            if(!isset($value['value'])) $product->productBuilderValues()->where($scopeArr)->delete();
+
             $components = $value['value'];
             if ( !is_array($components) || count($components) == 0 ) return false;
-        
-                foreach($components as $component)
-                {
-                    $this->parent = [];
-                    $all_attributes = [];
-                    $data = $this->validateData(new Request($component));
-                    $rules = $this->validateAttribute($component, $method);
-                    $attribute_request = new Request($component["attributes"]);
-        
-                    $data["attributes"] = $attribute_request->validate($rules);
 
-                    foreach($data["attributes"] as $slug => $value)
-                    {
-                        $type = $this->config_types[$slug];
-                        
-                        if (is_array($value) && $type == "repeater") $all_attributes[$slug] = $this->getRepeatorType($value, $slug);
-                        elseif (is_array($value) && $type == "normal") $all_attributes[$slug] = $this->getNormalType($value, $slug);
-                        else $all_attributes[$slug] = $this->getValue($type, $value, $slug);
-                    }
-                    $input = [
-                        "product_id" => $productId,
-                        "attribute" => $component["component"],
-                        "scope" => $scopeArr["scope"],
-                        "scope_id" => $scopeArr["scope_id"],
-                        "position" => isset($data["position"]) ? $data["position"] : null,
-                        "value" => $all_attributes
-                    ];
-                    $product_page_attributes[] = isset($component["id"]) ? $this->update($input, $component["id"]) : $this->create($input);
+            foreach($components as $component)
+            {
+                $this->parent = [];
+                $all_attributes = [];
+                $data = $this->validateData(new Request($component));
+                $rules = $this->validateAttribute($component, $method);
+                $attribute_request = new Request($component["attributes"]);
+    
+                $data["attributes"] = $attribute_request->validate($rules);
+
+                foreach($data["attributes"] as $slug => $value)
+                {
+                    $type = $this->config_types[$slug];
+                    
+                    if (is_array($value) && $type == "repeater") $all_attributes[$slug] = $this->getRepeatorType($value, $slug);
+                    elseif (is_array($value) && $type == "normal") $all_attributes[$slug] = $this->getNormalType($value, $slug);
+                    else $all_attributes[$slug] = $this->getValue($type, $value, $slug);
                 }
-                $product->productBuilderValues()->whereNotIn('id', array_filter(Arr::pluck($product_page_attributes, 'id')))->delete();
+                $input = [
+                    "product_id" => $product->id,
+                    "attribute" => $component["component"],
+                    "scope" => $scopeArr["scope"],
+                    "scope_id" => $scopeArr["scope_id"],
+                    "position" => isset($data["position"]) ? $data["position"] : null,
+                    "value" => $all_attributes
+                ];
+                $product_page_attributes[] = isset($component["id"]) ? $this->update($input, $component["id"]) : $this->create($input);
+            }
+            $product->productBuilderValues()->whereNotIn('id', array_filter(Arr::pluck($product_page_attributes, 'id')))->where($scopeArr)->delete();
         } 
         catch (Exception $exception)
         {
@@ -349,7 +350,7 @@ class ProductBuilderRepository extends BaseRepository
                 }
                 
                 if ($element["hasChildren"] == 0) {
-                    //if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery((object) $element, $element["pluck"]);
+                    //if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery($element);
                     unset($element["pluck"], $element["provider"], $element["rules"]);
 
                     if (count($values) > 0) {
