@@ -151,8 +151,8 @@ class ProductSearchRepository extends ElasticSearchRepository
             {
                 if(isset($product["price"])) {
                     $calculateTax = TaxPrice::calculate($request, $product["price"], isset($product["tax_class_id"]) ? $product["tax_class_id"] : null);
-                    $product["tax_amount"] = $calculateTax->tax_rate_value;
-                    $product["price"] += $product["tax_amount"];
+                    // $product["tax_amount"] = $calculateTax->tax_rate_value;
+                    $product["price"] += $calculateTax?->tax_rate_value;
                 }
                 $product["price_formatted"] = isset($product["price"]) ? PriceFormat::get($product["price"], $store->id, "store") : null;
 
