@@ -150,7 +150,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             foreach($products as &$product)
             {
                 if(isset($product["price"])) {
-                    $calculateTax = TaxPrice::calculate($request, $product["price"], isset($product["tax_class_id"]) ? $product["tax_class_id"] : 1);
+                    $calculateTax = TaxPrice::calculate($request, $product["price"], isset($product["tax_class_id"]) ? $product["tax_class_id"] : null);
                     $product["tax_amount"] = $calculateTax->tax_rate_value;
                     $product["price"] += $product["tax_amount"];
                 }
