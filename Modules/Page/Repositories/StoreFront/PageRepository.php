@@ -30,7 +30,7 @@ class PageRepository extends BaseRepository
             $fetched = []; 
             $coreCache = $this->getCoreCache($request);
 
-            $page = $this->model->with("page_attributes")->whereWebsiteId($coreCache->website->id)->whereSlug($slug)->firstOrFail();
+            $page = $this->model->with("page_attributes")->whereWebsiteId($coreCache->website->id)->whereStatus(1)->whereSlug($slug)->firstOrFail();
             $page_scope = $page->page_scopes()->whereScope("store");
             $all_scope = (clone $page_scope)->whereScopeId(0)->first();
             if (!$all_scope) $page_scope->whereScopeId($coreCache->store->id)->firstOrFail();
