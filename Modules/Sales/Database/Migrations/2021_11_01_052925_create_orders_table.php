@@ -15,8 +15,8 @@ class CreateOrdersTable extends Migration
             $table->unsignedBigInteger("customer_id")->nullable();
             $table->string("store_name");
             $table->boolean("is_guest")->default(0);
-            $table->unsignedBigInteger("billing_address_id");
-            $table->unsignedBigInteger("shipping_address_id");
+            $table->unsignedBigInteger("billing_address_id")->nullable();
+            $table->unsignedBigInteger("shipping_address_id")->nullable();
             $table->string("shipping_method");
             $table->string("shipping_method_label");
             $table->string("payment_method");
@@ -33,8 +33,8 @@ class CreateOrdersTable extends Migration
             $table->decimal("grand_total");
             $table->decimal("weight")->nullable();
             
-            $table->decimal("total_items_ordered")->nullable();
-            $table->decimal("total_qty_ordered")->nullable();
+            $table->decimal("total_items_ordered");
+            $table->decimal("total_qty_ordered");
             $table->string("customer_email");
             $table->string("customer_first_name");
             $table->string("customer_middle_name")->nullable();
