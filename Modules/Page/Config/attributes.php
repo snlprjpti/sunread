@@ -38,11 +38,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 1
                             ]
                         ]
@@ -529,11 +529,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
@@ -924,11 +924,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
@@ -1398,8 +1398,8 @@ return [
                                         "pluck" => [],
                                         "default" => "0",
                                         "options" => [
-                                            [ "value" => 0, "label" => "Show" ],
-                                            [ "value" => 1, "label" => "Hide" ]
+                                            [ "value" => 1, "label" => "Show" ],
+                                            [ "value" => 0, "label" => "Hide" ]
                                         ],
                                         "conditions" => [],
                                         "description" => "",
@@ -1415,8 +1415,8 @@ return [
                                         "pluck" => [],
                                         "default" => "0",
                                         "options" => [
-                                            [ "value" => 0, "label" => "Enabled" ],
-                                            [ "value" => 1, "label" => "Disable" ]
+                                            [ "value" => 1, "label" => "Enabled" ],
+                                            [ "value" => 0, "label" => "Disable" ]
                                         ],
                                         "conditions" => [],
                                         "description" => "",
@@ -1514,11 +1514,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
@@ -1947,11 +1947,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
@@ -2459,11 +2459,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
@@ -3076,11 +3076,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
@@ -3493,11 +3493,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
@@ -3934,11 +3934,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
@@ -4554,11 +4554,11 @@ return [
                                 "default" => "",
                                 "options" => [
                                     [ "value" => 1, "label" => "Enabled" ],
-                                    [ "value" => 2, "label" => "Disabled" ],
+                                    [ "value" => 0, "label" => "Disabled" ],
                                 ],
                                 "description" => "",
                                 "conditions" => [],
-                                "rules" => "in:1,2",
+                                "rules" => "in:1,0",
                                 "is_required" => 0
                             ]
                         ]
