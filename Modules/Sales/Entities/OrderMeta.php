@@ -10,7 +10,7 @@ class OrderMeta extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ["order_id", "meta_key", "meta_value"];
 
     public function order(): BelongsTo
     {

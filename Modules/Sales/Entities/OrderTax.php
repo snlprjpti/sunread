@@ -11,7 +11,7 @@ class OrderTax extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ["order_id", "code", "title", "percent", "amount"];
     
     public function order_tax_items(): HasMany
     {
