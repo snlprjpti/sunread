@@ -104,12 +104,23 @@ class PageRepository extends BaseRepository
                 
                 if ($element["hasChildren"] == 0) {
 
+                    //skip sibling of element product
+                    if(isset($product_null_state) && $product_null_state == $key) continue;
+
                     if (count($values) > 0) {
                         $default = decodeJsonNumeric(getDotToArray($append_slug_key, $values));
 
                         if ($element["slug"] == "view_more_link") $default = $this->getDynamicLink($default, $values, $coreCache);
                         
-                        if ($element["provider"] != "") $default = $this->getProviderData($coreCache->store, $element, $default);
+                        if ($element["provider"] != "") {
+                            $default = $this->getProviderData($coreCache->store, $element, $default);
+
+                            //skip element product itself if it is found to be null
+                            if($element["slug"] == "product" && !$default) {
+                                $product_null_state = $key;
+                                continue;  
+                            }
+                        }
                         
                         if($default && ($element["type"] == "file")) $default = Storage::url($default);
                     }
@@ -127,6 +138,8 @@ class PageRepository extends BaseRepository
                             if ($j==0) setDotToArray($append_key, $this->parent, []);
                             $this->getChildren($element["attributes"][0], $coreCache, "{$append_key}.{$j}", $values, "{$append_slug_key}.{$j}");
                         }
+                        $fake_product_values = getDotToArray($append_key, $this->parent);
+                        setDotToArray($append_key, $this->parent, collect($fake_product_values)->values()->toArray());         
                         continue;
                     }
                     if ($element["type"] == "normal") {
