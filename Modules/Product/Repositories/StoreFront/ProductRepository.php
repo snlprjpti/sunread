@@ -133,7 +133,10 @@ class ProductRepository extends BaseRepository
                 if(in_array($attribute->type, [ "select", "multiselect", "checkbox" ]))
                 {
                     if ($values instanceof Collection) $data[$attribute->slug] = $values->pluck("name")->toArray();
-                    else $data[$attribute->slug] = $values?->name;
+                    else {
+                        $data[$attribute->slug] = $values?->name;
+                        if($attribute->slug == "tax_class_id") $data["tax_class"] = $values?->id;
+                    }
                     continue;
                 }
 
@@ -157,7 +160,7 @@ class ProductRepository extends BaseRepository
             }
 
             if(isset($fetched["price"])) {
-                $calculateTax = TaxPrice::calculate($request, $fetched["price"], 1);
+                $calculateTax = TaxPrice::calculate($request, $fetched["price"], isset($fetched["tax_class"]) ? $fetched["tax_class"] : null);
                 $fetched["tax_amount"] = $calculateTax->tax_rate_value;
                 $fetched["price"] += $fetched["tax_amount"];
             }
