@@ -24,6 +24,7 @@ use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Page\Repositories\StoreFront\PageRepository;
+use Modules\Tax\Facades\TaxPrice;
 
 class ProductRepository extends BaseRepository
 {
@@ -155,7 +156,13 @@ class ProductRepository extends BaseRepository
                 else $fetched["special_price_formatted"] = (($currentDate >= $fromDate) && ($currentDate <= $toDate)) ? PriceFormat::get($fetched["special_price"], $store->id, "store") : null;
             }
 
-            if(isset($fetched["price"])) $fetched["price_formatted"] = isset($fetched["price"]) ? PriceFormat::get($fetched["price"], $store->id, "store") : null;
+            if(isset($fetched["price"])) {
+                $calculateTax = TaxPrice::calculate($request, $fetched["price"], isset($fetched["tax_class_id"]) ? $fetched["tax_class_id"] : 1);
+                $fetched["tax_amount"] = $calculateTax->tax_rate_value;
+                $fetched["price"] += $fetched["tax_amount"];
+            }
+
+            $fetched["price_formatted"] = isset($fetched["price"]) ? PriceFormat::get($fetched["price"], $store->id, "store") : null;
 
             if(isset($fetched["new_from_date"]) && isset($fetched["new_to_date"])) { 
                 if(isset($fetched["new_from_date"])) $fromNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_from_date"]));
