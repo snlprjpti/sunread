@@ -16,6 +16,7 @@ use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
 use Modules\Product\Jobs\SingleIndexing;
 use Modules\Product\Traits\ElasticSearch\HasIndexing;
+use Modules\Tax\Facades\TaxPrice;
 
 class ProductSearchRepository extends ElasticSearchRepository
 {
@@ -35,7 +36,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         $this->staticFilterKeys = ["color", "size", "collection", "configurable_size", "configurable_color"];
 
-        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "color", "color_value"];
+        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "color", "color_value", "tax_class_id"];
     }
 
     public function search(object $request): array
@@ -128,7 +129,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             $data = $this->finalQuery($filter, $request, $store);
             $total = isset($data["products"]["hits"]["total"]["value"]) ? $data["products"]["hits"]["total"]["value"] : 0;
             $products = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
-            $data["products"] = $this->productWithPriceFormat($products, $store);
+            $data["products"] = $this->productWithPriceFormat($request, $products, $store);
             $data["last_page"] = (int) ceil($total/$data["limit"]);
             $data["total"] = $total;    
         }
@@ -140,7 +141,7 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $data; 
     }
 
-    public function productWithPriceFormat(array $products, object $store): array
+    public function productWithPriceFormat(object $request, array $products, object $store): array
     {
         try
         {
@@ -148,6 +149,11 @@ class ProductSearchRepository extends ElasticSearchRepository
             $currentDate = date('Y-m-d H:m:s', strtotime($today));
             foreach($products as &$product)
             {
+                if(isset($product["price"])) {
+                    $calculateTax = TaxPrice::calculate($request, $product["price"], isset($product["tax_class_id"]) ? $product["tax_class_id"] : 1);
+                    $product["tax_amount"] = $calculateTax->tax_rate_value;
+                    $product["price"] += $product["tax_amount"];
+                }
                 $product["price_formatted"] = isset($product["price"]) ? PriceFormat::get($product["price"], $store->id, "store") : null;
 
                 if(isset($product["special_price"])) {
