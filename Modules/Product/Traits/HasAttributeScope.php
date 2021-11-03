@@ -86,20 +86,20 @@ trait HasAttributeScope
         return $fetched;
     }
 
-    public function getParentScope(array $scope): array
+    public function getParentScope(array $data): array
     {
         try
         {
-            switch($scope["scope"])
+            switch($data["scope"])
             {
                 case "store":
                     $data["scope"] = "channel";
-                    $data["scope_id"] = Store::find($scope["scope_id"])->channel->id;
+                    $data["scope_id"] = Store::find($data["scope_id"])->channel->id;
                     break;
                     
                 case "channel":
                     $data["scope"] = "website";
-                    $data["scope_id"] = Channel::find($scope["scope_id"])->website->id;
+                    $data["scope_id"] = Channel::find($data["scope_id"])->website->id;
                     break;
             }
         }
