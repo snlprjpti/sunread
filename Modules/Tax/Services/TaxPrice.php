@@ -88,6 +88,7 @@ class TaxPrice {
             "rules" => $this->getMultipleRules($price),
         ];
         if ($callback) $resource = array_merge($callback, $resource); 
+        $this->tax_value = 0;
         return $resource;
     }
 
