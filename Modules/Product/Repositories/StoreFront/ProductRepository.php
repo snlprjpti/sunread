@@ -157,7 +157,7 @@ class ProductRepository extends BaseRepository
             }
 
             if(isset($fetched["price"])) {
-                $calculateTax = TaxPrice::calculate($request, $fetched["price"], isset($fetched["tax_class_id"]) ? $fetched["tax_class_id"] : 1);
+                $calculateTax = TaxPrice::calculate($request, $fetched["price"], 1);
                 $fetched["tax_amount"] = $calculateTax->tax_rate_value;
                 $fetched["price"] += $fetched["tax_amount"];
             }
