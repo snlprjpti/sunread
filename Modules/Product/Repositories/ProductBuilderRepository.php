@@ -37,10 +37,8 @@ class ProductBuilderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            if(!isset($value['value'])) $product->productBuilderValues()->where($scopeArr)->delete();
-
-            $components = $value['value'];
-            if ( !is_array($components) || count($components) == 0 ) return false;
+            $product_page_attributes = [];
+            $components = isset($value['value']) ? $value['value'] : [];
 
             foreach($components as $component)
             {
@@ -288,10 +286,12 @@ class ProductBuilderRepository extends BaseRepository
         {
             $product = $this->product::findOrFail($id);
             AttributeSet::findOrFail($product->attribute_set_id);
-            $whereCondition = array_merge($scope, ["product_id" => $id]);
 
             $attributes = [];
-            $components = $product->productBuilderValues()->where($whereCondition)->orderBy("position", "asc")->get();
+            $components = $product->productBuilderValues()->where($scope)->orderBy("position", "asc")->get();
+
+            if($components->isEmpty()) $components = $product->getBuilderParentValues($scope);
+
             foreach($components as $component)
             {
                 $attributes[] = $this->getParent($component);
