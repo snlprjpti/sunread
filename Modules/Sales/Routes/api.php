@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/sales', function (Request $request) {
-    return $request->user();
+Route::group(['as' => 'order.', 'prefix' => 'public/checkout/order', 'middleware' => ['api','proxies']], function () {
+    
+    // CART ROUTES
+    Route::post("/", [\Modules\Cart\Http\Controllers\OrderController::class, "sendOrder"])->name('send');
+
 });
