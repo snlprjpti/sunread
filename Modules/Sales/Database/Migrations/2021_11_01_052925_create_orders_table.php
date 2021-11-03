@@ -33,12 +33,8 @@ class CreateOrdersTable extends Migration
             $table->decimal("grand_total");
             $table->decimal("weight")->nullable();
             
-            $table->decimal("total_tax_amount");
-            $table->decimal("total_discount_amount");
-            $table->decimal("total_discount_amount_tax");
-
-            $table->decimal("total_items_ordered");
-            $table->decimal("total_qty_ordered");
+            $table->decimal("total_items_ordered")->nullable();
+            $table->decimal("total_qty_ordered")->nullable();
             $table->string("customer_email");
             $table->string("customer_first_name");
             $table->string("customer_middle_name")->nullable();
