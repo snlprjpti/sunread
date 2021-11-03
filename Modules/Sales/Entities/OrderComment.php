@@ -10,7 +10,7 @@ class OrderComment extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ["order_id", "user_id", "is_customer_notified", "is_visible_on_storefornt", "comment"];
 
     public function order(): BelongsTo
     {
