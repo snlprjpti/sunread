@@ -2866,7 +2866,7 @@ return [
                                                     "options" => [],
                                                     "conditions" => [],
                                                     "description" => "",
-                                                    "rules" => "exists:products,sku",
+                                                    "rules" => "",
                                                     "is_required" => 1
                                                 ],
                                                 [
