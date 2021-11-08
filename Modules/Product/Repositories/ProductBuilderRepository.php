@@ -290,7 +290,14 @@ class ProductBuilderRepository extends BaseRepository
             $attributes = [];
             $components = $product->productBuilderValues()->where($scope)->orderBy("position", "asc")->get();
 
+            //fetched from parent scope
             if($components->isEmpty()) $components = $product->getBuilderParentValues($scope);
+
+            //fetched from parent product
+            if($components->isEmpty() && $product->parent_id) {
+                $components = $product->parent->productBuilderValues()->where($scope)->orderBy("position", "asc")->get();
+                if($components->isEmpty()) $components = $product->parent->getBuilderParentValues($scope);
+            }
 
             foreach($components as $component)
             {
