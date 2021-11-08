@@ -10,7 +10,7 @@ class OrderTaxItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ["tax_id", "item_id", "tax_percent", "amount", "tax_item_type"];
 
     public function order_tax(): BelongsTo
     {

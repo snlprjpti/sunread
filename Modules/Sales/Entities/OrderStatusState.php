@@ -9,6 +9,6 @@ class OrderStatusState extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ["status", "state", "is_default", "position"];
     
 }

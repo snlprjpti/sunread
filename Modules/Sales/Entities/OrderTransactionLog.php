@@ -10,7 +10,7 @@ class OrderTransactionLog extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ["order_id", "amount", "currency", "ip_address", "request", "response", "response_code"];
 
     public function order(): BelongsTo
     {

@@ -10,7 +10,7 @@ class CreateOrderStatusStatesTable extends Migration
     {
         Schema::create('order_status_states', function (Blueprint $table) {
             $table->id();
-            $table->string("string");
+            $table->string("status");
             $table->string("state");
             $table->boolean("is_default")->default(0);
             $table->integer("position");

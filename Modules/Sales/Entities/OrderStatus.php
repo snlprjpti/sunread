@@ -10,7 +10,7 @@ class OrderStatus extends Model
 {
     use HasFactory;
 
-    protected $fillable = [];
+    protected $fillable = ["name", "slug"];
 
     public function order_status_state(): HasMany
     {
