@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Cart\Http\Controllers;
+namespace Modules\Sales\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
