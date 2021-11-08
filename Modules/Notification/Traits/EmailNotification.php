@@ -129,7 +129,14 @@ trait EmailNotification
         {
             $customer = Customer::findOrFail($customer_id);
             /** get store data by its id */
-            $store = Store::findOrFail($customer->store_id);
+            if(empty($customer->store_id))
+            {
+                $store = SiteConfig::fetch("website_default_store", "website", $customer->website_id);
+            }
+            else
+            {
+                $store = Store::findOrFail($customer->store_id);
+            }
             /** get channel by store */
             $channel = $store->channel;
 
