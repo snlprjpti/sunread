@@ -37,6 +37,7 @@ trait EmailNotification
             $data->subject = htmlspecialchars_decode($this->render($email_template->subject, $variable_data));
             $data->template_id = $email_template->id;
             $data->to_email = $variable_data->customer_email_address;
+            $data->style = $email_template->style;
             $data->sender_name = SiteConfig::fetch("email_sender_name", "store", $variable_data->store_id) ?? env("MAIL_FROM_NAME");
             $data->sender_email = SiteConfig::fetch("email_sender_email", "store", $variable_data->store_id) ?? env("MAIL_USERNAME");
         }
