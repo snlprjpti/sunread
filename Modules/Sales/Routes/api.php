@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,10 +11,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::group(['as' => 'order.', 'prefix' => 'public/checkout/order', 'middleware' => ['api','proxies']], function () {
+Route::group(['middleware' => ['api','proxies']], function () {
     
-    Route::resource("order", [\Modules\Cart\Http\Controllers\OrderController::class])->only([
-        'store'
-    ]);
+    Route::group(['as' => 'orders.', 'prefix' => 'public/orders'], function () {
+        Route::resource("sales", OrderController::class);
+    });
 
 });
