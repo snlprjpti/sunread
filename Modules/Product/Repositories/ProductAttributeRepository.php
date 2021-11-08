@@ -232,7 +232,6 @@ class ProductAttributeRepository extends ProductRepository
                 if(is_array($attribute["value"])) $attribute["value"] = json_encode($attribute["value"], JSON_NUMERIC_CHECK);
 
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
-                dump($product_attribute, $attribute);
 
                 if ( $product_attribute->value_id != null ) {
                     $product_attribute->value()->each(function($attribute_value) use($attribute){
