@@ -12,7 +12,7 @@ class NotificationMail extends Mailable
 
     public $details, $subject, $style, $sender_name, $sender_email;
 
-    public function __construct(string $details, string $subject, string $style, string $sender_name, string $sender_email)
+    public function __construct(string $details, string $subject, string $sender_name, string $sender_email, string $style = null)
     {
         $this->details = $details;
         $this->subject = $subject;
