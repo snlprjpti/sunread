@@ -120,6 +120,11 @@ class ProductRepository extends BaseRepository
                 if($attribute->slug == "component") {
                     $product_builders = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
                     if($product_builders->isEmpty()) $product_builders = $product->getBuilderParentValues($match);
+                    
+                    if($product_builders->isEmpty() && $product->parent_id) {
+                        $product_builders = $product->parent->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
+                        if($product_builders->isEmpty()) $product_builders = $product->parent->getBuilderParentValues($match);
+                    }
                     $data["product_builder"] = $product_builders ? $this->pageRepository->getComponent($coreCache, $product_builders) : [];
                     continue;
                 }
