@@ -301,7 +301,7 @@ class ProductBuilderRepository extends BaseRepository
 
             foreach($components as $component)
             {
-                $attributes[] = $this->getParent($component);
+                $attributes[] = $this->getParent($component, $product, $scope);
             }
 
             $item = $attributes;
@@ -313,7 +313,7 @@ class ProductBuilderRepository extends BaseRepository
         return $item;
     }
 
-    public function getParent(object $component): array
+    public function getParent(object $component, object $product, array $scope = []): array
     {
         try
         {
@@ -321,18 +321,21 @@ class ProductBuilderRepository extends BaseRepository
 
             $data = collect($this->pageAttributeRepository->config_fields)->where("slug", $component->attribute)->first();
             $this->getChildren($data["mainGroups"], values:$component->value);
+
+            $final_component = [
+                "title" => $data["title"],
+                "slug" => $data["slug"],
+                "mainGroups" => $this->parent  
+            ];
+            
+            if($product->id == $component->product_id && $scope["scope"] == $component->scope) $final_component["id"] = $component->id;
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return [
-            "id" => $component->id,
-            "title" => $data["title"],
-            "slug" => $data["slug"],
-            "mainGroups" => $this->parent
-        ];
+        return $final_component;
     }
 
     private function getChildren(array $elements, ?string $key = null, array $values, ?string $slug_key = null): void
