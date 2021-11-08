@@ -14,6 +14,6 @@ class SendAccountConfirmation
 
     public function handle(ConfirmEmail $event): void
     {
-        SendNotificationJob::dispatch( $event->user_id, "confirm_email" );
+        SendNotificationJob::dispatch( $event->user_id, "confirm_email" )->onQueue("high");
     }
 }
