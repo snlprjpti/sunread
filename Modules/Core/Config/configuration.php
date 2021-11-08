@@ -669,6 +669,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "exists:email_templates,id",
+                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1,
                                 "sort_by" => "name"
@@ -682,6 +683,7 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "exists:email_templates,id",
+                                "multiple" => false,
                                 "scope" => "store",
                                 "is_required" => 1,
                                 "sort_by" => "name"
