@@ -86,8 +86,8 @@ class ProductConfigurableController extends BaseController
 
     public function update(Request $request, int $id): JsonResponse
     {
-        // try
-        // {
+        try
+        {
             $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
@@ -116,11 +116,11 @@ class ProductConfigurableController extends BaseController
                 $updated->load("variants");
             });
             $this->repository->configurableIndexing($updated);
-        // }
-        // catch(Exception $exception)
-        // {
-        //     return $this->handleException($exception);
-        // }
+        }
+        catch(Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
 
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
     }

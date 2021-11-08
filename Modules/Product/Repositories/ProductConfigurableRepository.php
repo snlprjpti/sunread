@@ -290,10 +290,13 @@ class ProductConfigurableRepository extends BaseRepository
                 "product_id" => $product->id,
                 "attribute_id" => 11
             ]))->first();
-            $product_attribute_string = ProductAttributeString::find($parent_product_attributes->value_id);
 
-            if($this->group_by_attribute) $product_attribute_string->update(["value" => $this->getVisibilityId("Not Visible Individually")]);
-            else $product_attribute_string->update(["value" => $this->getVisibilityId("Catalog, Search")]);
+            if($parent_product_attributes) {
+                $product_attribute_string = ProductAttributeString::find($parent_product_attributes->value_id);
+
+                if($this->group_by_attribute) $product_attribute_string->update(["value" => $this->getVisibilityId("Not Visible Individually")]);
+                else $product_attribute_string->update(["value" => $this->getVisibilityId("Catalog, Search")]);
+            }
         }
         catch ( Exception $exception )
         {
