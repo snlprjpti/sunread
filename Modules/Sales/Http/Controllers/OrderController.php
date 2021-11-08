@@ -9,6 +9,7 @@ use Modules\Sales\Entities\Order;
 use Modules\Sales\Transformers\OrderResource;
 use Modules\Sales\Repositories\OrderRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
 
 class OrderController extends BaseController
@@ -28,9 +29,14 @@ class OrderController extends BaseController
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function orderResource(object $order): JsonResource
+    public function resource(object $order): JsonResource
     {
         return new OrderResource($order);
+    }
+
+    public function collection(object $orders): ResourceCollection
+    {
+        return OrderResource::collection($orders);
     }
 
     public function store(Request $request): JsonResponse
@@ -44,7 +50,7 @@ class OrderController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->orderResource($response), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($response), $this->lang('create-success'), 201);
     }
 
 }
