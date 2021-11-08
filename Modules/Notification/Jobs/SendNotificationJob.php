@@ -8,7 +8,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Mail;
-use Modules\Core\Facades\SiteConfig;
 use Modules\Notification\Emails\NotificationMail;
 use Modules\Notification\Facades\NotificationLog;
 use Modules\Notification\Traits\EmailNotification;
