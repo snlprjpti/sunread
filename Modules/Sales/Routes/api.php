@@ -15,7 +15,8 @@ use Illuminate\Http\Request;
 
 Route::group(['as' => 'order.', 'prefix' => 'public/checkout/order', 'middleware' => ['api','proxies']], function () {
     
-    // CART ROUTES
-    Route::post("/", [\Modules\Cart\Http\Controllers\OrderController::class, "sendOrder"])->name('send');
+    Route::resource("order", [\Modules\Cart\Http\Controllers\OrderController::class])->only([
+        'store'
+    ]);
 
 });

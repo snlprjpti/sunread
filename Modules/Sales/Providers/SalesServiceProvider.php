@@ -2,8 +2,12 @@
 
 namespace Modules\Sales\Providers;
 
+use Modules\Sales\Entities\Order;
+use Modules\Sales\Entities\OrderItem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Sales\Observers\OrderObserver;
+use Modules\Sales\Observers\OrderItemObserver;
 
 class SalesServiceProvider extends ServiceProvider
 {
@@ -28,6 +32,7 @@ class SalesServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->registerObservers();
     }
 
     /**
@@ -108,5 +113,16 @@ class SalesServiceProvider extends ServiceProvider
             }
         }
         return $paths;
+    }
+
+    /**
+     * Register observers.
+     *
+     * @return void
+     */
+    public function registerObservers(): void
+    {
+        Order::observe(OrderObserver::class);
+        OrderItem::observe(OrderItemObserver::class);
     }
 }
