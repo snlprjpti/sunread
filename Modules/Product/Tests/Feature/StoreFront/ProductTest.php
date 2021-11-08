@@ -25,35 +25,35 @@ class ProductTest extends StoreFrontBaseTestCase
         $this->createHeader();
     }
 
-    public function testVisitorCanFetchIndividualResource()
-    {
-        $default_headers = [
-            "hc-host" => "international.co",
-            "hc-channel" => "international",
-            "hc-store" => "international-store" 
-        ];
-        $response = $this->withHeaders($default_headers)->get($this->getRoute("show", [$this->default_resource->id]));
+    // public function testVisitorCanFetchIndividualResource()
+    // {
+    //     $default_headers = [
+    //         "hc-host" => "international.co",
+    //         "hc-channel" => "international",
+    //         "hc-store" => "international-store" 
+    //     ];
+    //     $response = $this->withHeaders($default_headers)->get($this->getRoute("show", [$this->default_resource->id]));
 
-        $response->assertOk();
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
-        ]);
-    }
+    //     $response->assertOk();
+    //     $response->assertJsonFragment([
+    //         "status" => "success",
+    //         "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
+    //     ]);
+    // }
 
-    public function testShouldReturnErrorIfResourceDoesNotExist()
-    {
-        $default_headers = [
-            "hc-host" => "international.co",
-            "hc-channel" => "international",
-            "hc-store" => "international-store" 
-        ];
-        $response = $this->withHeaders($default_headers)->get($this->getRoute("show", [rand(10,100)]));
+    // public function testShouldReturnErrorIfResourceDoesNotExist()
+    // {
+    //     $default_headers = [
+    //         "hc-host" => "international.co",
+    //         "hc-channel" => "international",
+    //         "hc-store" => "international-store" 
+    //     ];
+    //     $response = $this->withHeaders($default_headers)->get($this->getRoute("show", [rand(10,100)]));
 
-        $response->assertNotFound();
-        $response->assertJsonFragment([
-            "status" => "error",
-            "message" => __("core::app.response.not-found", ["name" => $this->model_name])
-        ]);
-    }
+    //     $response->assertNotFound();
+    //     $response->assertJsonFragment([
+    //         "status" => "error",
+    //         "message" => __("core::app.response.not-found", ["name" => $this->model_name])
+    //     ]);
+    // }
 }
