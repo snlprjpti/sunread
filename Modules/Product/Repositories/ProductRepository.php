@@ -249,7 +249,7 @@ class ProductRepository extends BaseRepository
         {
             $validator = Validator::make($data, [
                 "*.type" => "required|array",
-                "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery",
+                "*.type.*" => "exists:image_types,slug",
                 "*.delete" => "required|boolean",
                 "*.id" => "required|exists:product_images,id",
                 "*.id" => Rule::in($product->images()->pluck("id")->toArray()),
