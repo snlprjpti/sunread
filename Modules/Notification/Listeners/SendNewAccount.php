@@ -16,6 +16,6 @@ class SendNewAccount
 
     public function handle(NewAccount $event): void
     {
-        SendNotificationJob::dispatch( $event->user_id, "new_account", $event->verification_token );
+        SendNotificationJob::dispatch( $event->user_id, "new_account", $event->verification_token )->onQueue("high");
     }
 }
