@@ -75,7 +75,7 @@ trait HasAttributeScope
         {
             $data = $this->getParentScope($data);  
 
-            $builders = $this->productBuilderValues()->whereScope($data["scope"])->whereScopeId($data["scope_id"])->get();
+            $builders = $this->productBuilderValues()->whereScope($data["scope"])->whereScopeId($data["scope_id"])->orderBy("position", "asc")->get();
             $fetched = ($builders->isEmpty() && ($data["scope"] != "website")) ? $this->getBuilderParentValues($data) : $builders;
         }
         catch (Exception $exception)
