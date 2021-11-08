@@ -5,7 +5,7 @@ namespace Modules\Sales\Observers;
 use Modules\Core\Facades\Audit;
 use Modules\Sales\Entities\OrderItem;
 
-class OrderObserver
+class OrderItemObserver
 {
     public function created(OrderItem $orderItem)
     {
