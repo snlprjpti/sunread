@@ -29,7 +29,7 @@ class ProductTableSeeder extends Seeder
                 "value" => 1 
             ],
             [
-                "attribute_id" => 11,
+                "attribute_id" => $this->attributeId("visibility"),
                 "value" => 8
             ]
         ];
