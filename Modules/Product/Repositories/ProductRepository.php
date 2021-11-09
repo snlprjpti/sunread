@@ -191,7 +191,7 @@ class ProductRepository extends BaseRepository
             if ( !empty($request_images) ) {
                 $validator = Validator::make($request_images, [
                     "*.type" => "required|array",
-                    "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery",
+                    "*.type.*" => "exists:image_types,slug",
                     "*.file" => "required|mimes:bmp,jpeg,jpg,png",
                     "*.background_color" => "sometimes|nullable",
                     "*.position" => "sometimes|nullable|numeric",
