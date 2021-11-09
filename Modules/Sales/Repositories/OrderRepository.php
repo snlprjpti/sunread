@@ -18,7 +18,7 @@ class OrderRepository extends BaseRepository
 {
     protected $orderItemRepository, $orderAddressRepository;
 
-    protected $discount_percent, $product, $total_tax_percent, $row_quantity;
+    protected $discount_percent, $product, $total_tax_percent, $row_quantity, $product_data;
 
     protected array $product_attribute_slug = [
         "name",
@@ -88,18 +88,18 @@ class OrderRepository extends BaseRepository
             $customer_data = isset($data['is_guest']) ? $customer_data : []; 
             $data = array_merge($data, $customer_data);
 
-            $order = $this->create($data, function ($order) use ($request) {
-                $this->orderAddressRepository->store($request, $order);
-            });
+            // $order = $this->create($data, function ($order) use ($request) {
+            //     $this->orderAddressRepository->store($request, $order);
+            // });
 
             foreach ( $request->orders as $order ) 
             {
-                $asd = $this->calculateTax($request, $order);
-                dd($asd);
-                $this->orderItemRepository->store($request, $order);
-                
+                $tax = $this->calculateTax($request, $order)->toArray();
+                $product_detail = (array) $this->getProductDetail($request, $order);
+                $order_item_details = (object) array_merge($order, $tax, $product_detail);
+                $this->orderItemRepository->store($request, $order, $order_item_details);
             }  
-
+            dd('asd');
             
         } 
         catch (Exception $exception)
@@ -112,15 +112,48 @@ class OrderRepository extends BaseRepository
         return $order;
     }
 
+    public function getProductDetail(object $request, array $order, ?callable $callback = null): ?object
+    {
+        try
+        {
+            $coreCache = $this->getCoreCache($request);
+            $with = [
+                "product_attributes",
+                "catalog_inventories",
+                "attribute_options_child_products"
+            ];
+            $product = Product::whereId($order["product_id"])->with($with)->first();
+            foreach ( $this->product_attribute_slug as $slug )
+            {
+                $data[$slug] = $product->value([
+                    "scope" => "store",
+                    "scope_id" => $coreCache->store->id,
+                    "attribute_slug" => $slug
+                ]);
+            }
+            $product_data = [ 
+                "sku" => $product->sku,
+                "type" => $product->type,
+                "configurable_attribute_options" => null
+            ];
+            $data = array_merge($data, $product_data);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        return (object) $data;
+    }
+
     public function calculateTax(object $request, array $order): ?object
     {
         try
         {
             $get_zip_code = collect($request->get("address"))->where("address_type", "shipping")->first();
             $zip_code = isset($get_zip_code['postal_code']) ? $get_zip_code['postal_code'] : null;
-            $product = Product::whereId($order["product_id"])->with(["product_attributes", "catalog_inventories", "attribute_configurable_products", "attribute_options_child_products"])->first();
-            $product_data = $this->getProductDetail($request, $product);
-            
+
+            $product_data = $this->getProductDetail($request, $order);
+
             if ( auth("customer")->id() ) {
                 $customer = Customer::whereId(auth("customer")->id())->with(["group.tax_group"])->first();
                 $customer_tax_group_id = $customer?->group?->tax_group?->id;
@@ -145,27 +178,6 @@ class OrderRepository extends BaseRepository
         }
 
         return $coupon; 
-    }
-
-    public function getProductDetail(object $request, object $product): ?object
-    {
-        try
-        {
-            $coreCache = $this->getCoreCache($request);
-            foreach ( $this->product_attribute_slug as $slug )
-            {
-                $data[$slug] = $product->value([
-                    "scope" => "store",
-                    "scope_id" => $coreCache->store->id,
-                    "attribute_slug" => $slug
-                ]);
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-        return (object) $data;
     }
 
 }

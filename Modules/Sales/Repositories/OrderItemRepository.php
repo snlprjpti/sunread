@@ -21,14 +21,13 @@ class OrderItemRepository extends BaseRepository
         ];
     }
 
-    public function store(object $request, object $order): mixed
+    public function store(object $request, object $order, object $orider_item_details): mixed
     {
         try
         {
             // $this->validateData($request);
             $coreCache = $this->getCoreCache($request);
             foreach ($request->orders as $item) {
-                $product = $this->product::whereId($item->product_id)->first();
                 $data = [
                     "website_id" => $coreCache?->website->id,
                     "store_id" => $coreCache?->store->id,

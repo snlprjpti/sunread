@@ -27,6 +27,11 @@ class TaxPrice {
     $value = 0,
     $multiple_rules,
     $country_id;
+
+    public function hydrate(array $attributes = []): mixed
+    {
+        return new TaxAttributes($attributes);
+    }
     
     public function get(object $request, bool $use_current_location = false, ?string $zip_code = null, ?callable $callback = null): object
     {
@@ -173,7 +178,7 @@ class TaxPrice {
         }
         else $over_all_tax_price = $this->taxResource($price, 0, $data->channel);
         
-        return (object) $over_all_tax_price;
+        return $this->hydrate($over_all_tax_price);
     }
 
     public function taxRate(object $request, ?int $product_tax_group_id = null, ?int $customer_tax_group_id = null, bool $use_current_location = false, ?string $zip_code = null): mixed
