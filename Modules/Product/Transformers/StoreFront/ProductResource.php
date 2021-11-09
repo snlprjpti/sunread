@@ -27,6 +27,7 @@ class ProductResource extends JsonResource
             "type" => $this->type,
             "sku" => $this->sku,           
             "status" => (bool) $this->status,
+            "description" => $this->value(array_merge($scope, [ "attribute_slug" => "description" ]))
         ];
     }
 }

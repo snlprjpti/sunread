@@ -51,7 +51,7 @@ class PageRepository extends BaseRepository
         {
             $attributes = [];
             $data = $this->fetch($id, [ "page_scopes", "page_attributes", "website" ]);
-            $components = $data->page_attributes()->get();
+            $components = $data->page_attributes()->orderBy("position", "asc")->get();
             $stores = $data->page_scopes()->pluck("scope_id")->toArray();
 
             foreach($components as $component)
@@ -116,7 +116,7 @@ class PageRepository extends BaseRepository
                 }
                 
                 if ($element["hasChildren"] == 0) {
-                    //if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery((object) $element, $element["pluck"]);
+                    //if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery($element);
                     unset($element["pluck"], $element["provider"], $element["rules"]);
 
                     if (count($values) > 0) {

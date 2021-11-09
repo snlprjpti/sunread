@@ -88,4 +88,13 @@ class ElasticSearchRepository
             ]
         ];
     }
+
+    public function wildcard(string $field, ?string $data): array
+    {
+        return [ 
+            "wildcard" => [
+                $field => "{$data}*"
+            ]
+        ];
+    }
 }

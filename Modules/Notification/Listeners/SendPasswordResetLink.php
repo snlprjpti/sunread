@@ -14,6 +14,6 @@ class SendPasswordResetLink
 
     public function handle(ForgotPassword $event): void
     {
-        SendNotificationJob::dispatch( $event->user_id, "forgot_password", $event->token );
+        SendNotificationJob::dispatch( $event->user_id, "forgot_password", $event->token )->onQueue("high");
     }
 }

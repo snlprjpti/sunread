@@ -30,7 +30,7 @@ class PageRepository extends BaseRepository
             $fetched = [];
             $coreCache = $this->getCoreCache($request);
 
-            $page = $this->model->with("page_attributes")->whereWebsiteId($coreCache->website->id)->whereSlug($slug)->firstOrFail();
+            $page = $this->model->with("page_attributes")->whereWebsiteId($coreCache->website->id)->whereStatus(1)->whereSlug($slug)->firstOrFail();
             $page_scope = $page->page_scopes()->whereScope("store");
             $all_scope = (clone $page_scope)->whereScopeId(0)->first();
             if (!$all_scope) $page_scope->whereScopeId($coreCache->store->id)->firstOrFail();
@@ -104,13 +104,24 @@ class PageRepository extends BaseRepository
 
                 if ($element["hasChildren"] == 0) {
 
+                    //skip sibling of element product
+                    if(isset($product_null_state) && $product_null_state == $key) continue;
+
                     if (count($values) > 0) {
                         $default = decodeJsonNumeric(getDotToArray($append_slug_key, $values));
 
                         if ($element["slug"] == "view_more_link") $default = $this->getDynamicLink($default, $values, $coreCache);
+                        
+                        if ($element["provider"] != "") {
+                            $default = $this->getProviderData($coreCache->store, $element, $default);
 
-                        if ($element["provider"] != "") $default = $this->getProviderData($coreCache->store, $element, $default);
-
+                            //skip element product itself if it is found to be null
+                            if($element["slug"] == "product" && !$default) {
+                                $product_null_state = $key;
+                                continue;  
+                            }
+                        }
+                        
                         if($default && ($element["type"] == "file")) $default = Storage::url($default);
                     }
 
@@ -127,6 +138,8 @@ class PageRepository extends BaseRepository
                             if ($j==0) setDotToArray($append_key, $this->parent, []);
                             $this->getChildren($element["attributes"][0], $coreCache, "{$append_key}.{$j}", $values, "{$append_slug_key}.{$j}");
                         }
+                        $fake_product_values = getDotToArray($append_key, $this->parent);
+                        setDotToArray($append_key, $this->parent, collect($fake_product_values)->values()->toArray());         
                         continue;
                     }
                     if ($element["type"] == "normal") {
@@ -154,7 +167,7 @@ class PageRepository extends BaseRepository
             $pluck = $element["pluck"][1];
             $fetched = $model->where($pluck, $values)->first();
 
-            if($element["slug"] == "product") {
+            if($fetched && $element["slug"] == "product") {
                 $is_visibility = $fetched->value([
                     "scope" => "store",
                     "scope_id" => $store->id,

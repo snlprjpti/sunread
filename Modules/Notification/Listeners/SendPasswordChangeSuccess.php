@@ -14,6 +14,6 @@ class SendPasswordChangeSuccess
 
     public function handle(ResetPassword $event): void
     {
-        SendNotificationJob::dispatch( $event->user_id, "reset_password" );
+        SendNotificationJob::dispatch( $event->user_id, "reset_password" )->onQueue("high");
     }
 }
