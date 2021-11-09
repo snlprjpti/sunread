@@ -145,7 +145,7 @@ trait ElasticSearchFormat
         try
         {
             $image_types = ImageType::where("slug", "!=", "gallery")->get();
-            foreach($image_types as $image_type) $images[$image_type->slug] = $this->getFullPath("base_image");
+            foreach($image_types as $image_type) $images[$image_type->slug] = $this->getFullPath($image_type->slug);
 
             $images['gallery'] = $this->images()->wherehas("types", function($query) {
                 $query->whereSlug("gallery");
