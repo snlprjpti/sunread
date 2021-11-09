@@ -3,7 +3,6 @@
 namespace Modules\Sales\Repositories;
 
 use Exception;
-use Illuminate\Contracts\Validation\Rule;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Facades\SiteConfig;
@@ -13,9 +12,12 @@ use Modules\Customer\Entities\Customer;
 use Modules\Tax\Facades\TaxPrice;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Product\Entities\Product;
+use Modules\Sales\Repositories\OrderItemRepository;
 
 class OrderRepository extends BaseRepository
 {
+    protected $orderItemRepository, $orderAddressRepository;
+
     protected $discount_percent, $product, $total_tax_percent, $row_quantity;
 
     protected array $product_attribute_slug = [
@@ -26,7 +28,7 @@ class OrderRepository extends BaseRepository
         "weight"
     ];
 
-    public function __construct(Order $order)
+    public function __construct(Order $order, OrderItemRepository $orderItemRepository, OrderAddressRepository $orderAddressRepository)
     {
         $this->model = $order;
         $this->model_key = "orders";
@@ -36,6 +38,9 @@ class OrderRepository extends BaseRepository
             "orders.*.qty" => "required|decimal",
             "coupon_code" => "sometimes|exists:coupons,code"
         ];
+
+        $this->orderItemRepository = $orderItemRepository;
+        $this->orderAddressRepository = $orderAddressRepository;
     }
 
     public function store(object $request): mixed
@@ -44,10 +49,7 @@ class OrderRepository extends BaseRepository
         try
         {
             $this->validateData($request);
-            foreach ( $request->orders as $order ) 
-            {
-                $asd = $this->calculateTax($request, $order);
-            }      
+                
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
             $data = [
@@ -59,19 +61,19 @@ class OrderRepository extends BaseRepository
                 "billing_address_id" => $request->billing_address_id,
                 "shipping_address_id" => $request->shipping_address_id,
                 "currency_code" => $currency_code->code,
-                "shipping_method" => $request->shipping_method,
-                "shipping_method_label" => $request->shipping_method_label,
-                "payment_method" => $request->payment_method,
-                "payment_method_label" => $request->payment_method_label,
-                "sub_total" => $request->sub_total ?? 0,
-                "sub_total_tax_amount" => $request->sub_total_tax_amount ?? 0,
-                "tax_amount" => $request->tax_amount ?? 0,
-                "grand_total" => $request->grand_total ?? 0,
-                "total_items_ordered" => $request->total_items_ordered ?? 0,
-                "total_qty_ordered" => $request->total_qty_ordered ?? 0
+                "shipping_method" => $request->shipping_method ?? 'online-delivery',
+                "shipping_method_label" => $request->shipping_method_label ?? 'online-delivery',
+                "payment_method" => $request->payment_method ?? 'stripe',
+                "payment_method_label" => $request->payment_method_label ?? 'stripe',
+                "sub_total" => $request->sub_total ?? 0.00,
+                "sub_total_tax_amount" => $request->sub_total_tax_amount ?? 0.00,
+                "tax_amount" => $request->tax_amount ?? 0.00,
+                "grand_total" => $request->grand_total ?? 0.00,
+                "total_items_ordered" => $request->total_items_ordered ?? 0.00,
+                "total_qty_ordered" => $request->total_qty_ordered ?? 0.00
             ];
 
-            if ($data['is_guest']) {
+            if ( $data['is_guest'] ) {
                 $customer_data = [
                     "customer_email" => $request->customer_details['email'],
                     "customer_first_name" => $request->customer_details['first_name'],
@@ -83,7 +85,22 @@ class OrderRepository extends BaseRepository
                     "status" => "pending"
                 ];
             }
-            $order = $this->create(array_merge($data, $customer_data));
+            $customer_data = isset($data['is_guest']) ? $customer_data : []; 
+            $data = array_merge($data, $customer_data);
+
+            $order = $this->create($data, function ($order) use ($request) {
+                $this->orderAddressRepository->store($request, $order);
+            });
+
+            foreach ( $request->orders as $order ) 
+            {
+                $asd = $this->calculateTax($request, $order);
+                dd($asd);
+                $this->orderItemRepository->store($request, $order);
+                
+            }  
+
+            
         } 
         catch (Exception $exception)
         {

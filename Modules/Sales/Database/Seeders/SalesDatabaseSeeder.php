@@ -3,7 +3,6 @@
 namespace Modules\Sales\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
 
 class SalesDatabaseSeeder extends Seeder
 {
@@ -13,5 +12,6 @@ class SalesDatabaseSeeder extends Seeder
         $this->call(OrderItemTableSeeder::class);
         $this->call(OrderTaxTableSeeder::class);
         $this->call(OrderTaxItemTableSeeder::class);
+        $this->call(OrderStatusTableSeeder::class);
     }
 }
