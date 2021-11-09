@@ -3,16 +3,18 @@
 namespace Modules\Sales\Repositories;
 
 use Exception;
-use Illuminate\Contracts\Validation\Rule;
+use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\GeoIp\Facades\GeoIp;
+use Modules\Sales\Repositories\OrderItemRepository;
 
 class OrderRepository extends BaseRepository
 {
-    public function __construct(Order $order)
+    protected $orderItemRepository, $orderAddressRepository;
+
+    public function __construct(Order $order, OrderItemRepository $orderItemRepository, OrderAddressRepository $orderAddressRepository)
     {
         $this->model = $order;
         $this->model_key = "orders";
@@ -39,6 +41,9 @@ class OrderRepository extends BaseRepository
             "orders.*.qty" => "required|decimal",
             "coupon_code" => "sometimes|exists:coupons,code"
         ];
+
+        $this->orderItemRepository = $orderItemRepository;
+        $this->orderAddressRepository = $orderAddressRepository;
     }
 
     public function store(object $request): mixed
@@ -57,10 +62,10 @@ class OrderRepository extends BaseRepository
                 "billing_address_id" => $request->billing_address_id,
                 "shipping_address_id" => $request->shipping_address_id,
                 "currency_code" => $currency_code->code,
-                "shipping_method" => $request->shipping_method,
-                "shipping_method_label" => $request->shipping_method_label,
-                "payment_method" => $request->payment_method,
-                "payment_method_label" => $request->payment_method_label,
+                "shipping_method" => $request->shipping_method ?? 'online-delivery',
+                "shipping_method_label" => $request->shipping_method_label ?? 'online-delivery',
+                "payment_method" => $request->payment_method ?? 'stripe',
+                "payment_method_label" => $request->payment_method_label ?? 'stripe',
                 "sub_total" => $request->sub_total ?? 0,
                 "sub_total_tax_amount" => $request->sub_total_tax_amount ?? 0,
                 "tax_amount" => $request->tax_amount ?? 0,
@@ -81,7 +86,10 @@ class OrderRepository extends BaseRepository
                     "status" => "pending"
                 ];
             }
+
             $order = $this->create(array_merge($data, $data1));
+            $this->orderItemRepository->store($request, $order, $coreCache);
+            $this->orderAddressRepository->store($request, $order);
         } 
         catch (Exception $exception)
         {
