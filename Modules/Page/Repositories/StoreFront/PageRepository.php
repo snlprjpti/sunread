@@ -26,8 +26,8 @@ class PageRepository extends BaseRepository
     public function findPage(object $request, string $slug): array
     {
         try
-        {     
-            $fetched = []; 
+        {
+            $fetched = [];
             $coreCache = $this->getCoreCache($request);
 
             $page = $this->model->with("page_attributes")->whereWebsiteId($coreCache->website->id)->whereSlug($slug)->firstOrFail();
@@ -101,16 +101,16 @@ class PageRepository extends BaseRepository
                     $this->getChildren($element["subGroups"], $coreCache, $append_key, $values);
                     continue;
                 }
-                
+
                 if ($element["hasChildren"] == 0) {
 
                     if (count($values) > 0) {
                         $default = decodeJsonNumeric(getDotToArray($append_slug_key, $values));
 
                         if ($element["slug"] == "view_more_link") $default = $this->getDynamicLink($default, $values, $coreCache);
-                        
+
                         if ($element["provider"] != "") $default = $this->getProviderData($coreCache->store, $element, $default);
-                        
+
                         if($default && ($element["type"] == "file")) $default = Storage::url($default);
                     }
 
@@ -160,16 +160,16 @@ class PageRepository extends BaseRepository
                     "scope_id" => $store->id,
                     "attribute_slug" => "visibility"
                 ]);
-                
+
                 $fetched = ($is_visibility?->name != "Not Visible Individually") ? new ProductResource($fetched) : null;
-            } 
+            }
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $fetched;   
+        return $fetched;
     }
 
     public function getDynamicLink(mixed $default_url, mixed $values, object $coreCache): mixed
@@ -184,14 +184,14 @@ class PageRepository extends BaseRepository
                 $default_url = implode("/", $array_url);
             }
             $final_url = url($default_url);
-            
+
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $final_url;   
+        return $final_url;
     }
 
 }

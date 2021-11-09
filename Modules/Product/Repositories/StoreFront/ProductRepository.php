@@ -79,9 +79,9 @@ class ProductRepository extends BaseRepository
                 $product = Product::whereId($identifier)
                 ->whereParentId($parent_identifier)
                 ->whereWebsiteId($coreCache->website->id)
-                ->whereStatus(1)->with($relations)->firstOrFail();    
+                ->whereStatus(1)->with($relations)->firstOrFail();
             }
-            
+
             $store = $coreCache->store;
 
             $attribute_set = AttributeSet::where("id", $product->attribute_set_id)->first();
@@ -147,19 +147,19 @@ class ProductRepository extends BaseRepository
 
             $today = date('Y-m-d');
             $currentDate = date('Y-m-d H:m:s', strtotime($today));
-            
+
             if(isset($fetched["special_price"])) {
                 if(isset($fetched["special_from_date"])) $fromDate = date('Y-m-d H:m:s', strtotime($fetched["special_from_date"]));
-                if(isset($fetched["special_to_date"])) $toDate = date('Y-m-d H:m:s', strtotime($fetched["special_to_date"])); 
+                if(isset($fetched["special_to_date"])) $toDate = date('Y-m-d H:m:s', strtotime($fetched["special_to_date"]));
                 if(!isset($fromDate) && !isset($toDate)) $fetched["special_price_formatted"] = PriceFormat::get($fetched["special_price"], $store->id, "store");
                 else $fetched["special_price_formatted"] = (($currentDate >= $fromDate) && ($currentDate <= $toDate)) ? PriceFormat::get($fetched["special_price"], $store->id, "store") : null;
             }
 
             if(isset($fetched["price"])) $fetched["price_formatted"] = isset($fetched["price"]) ? PriceFormat::get($fetched["price"], $store->id, "store") : null;
 
-            if(isset($fetched["new_from_date"]) && isset($fetched["new_to_date"])) { 
+            if(isset($fetched["new_from_date"]) && isset($fetched["new_to_date"])) {
                 if(isset($fetched["new_from_date"])) $fromNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_from_date"]));
-                if(isset($fetched["new_to_date"])) $toNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_to_date"])); 
+                if(isset($fetched["new_to_date"])) $toNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_to_date"]));
                 if(isset($fromNewDate) && isset($toNewDate)) $fetched["is_new_product"] = (($currentDate >= $fromNewDate) && ($currentDate <= $toNewDate)) ? 1 : 0;
                 unset($fetched["new_from_date"], $fetched["new_to_date"]);
             }
@@ -178,15 +178,15 @@ class ProductRepository extends BaseRepository
                             "must" => [
                                 $this->search_repository->terms("id", $variant_ids)
                             ]
-                        ]   
+                        ]
                     ],
-                ]; 
-                $elastic_data =  $this->search_repository->searchIndex($elastic_fetched, $store); 
+                ];
+                $elastic_data =  $this->search_repository->searchIndex($elastic_fetched, $store);
                 $elastic_variant_products = isset($elastic_data["hits"]["hits"]) ? collect($elastic_data["hits"]["hits"])->pluck("_source.show_configurable_attributes")->flatten(1)->toArray() : [];
                 $this->config_products = $elastic_variant_products;
 
-                $this->getVariations($elastic_variant_products);  
-                $fetched["configurable_products"] = $this->final_product_val;          
+                $this->getVariations($elastic_variant_products);
+                $fetched["configurable_products"] = $this->final_product_val;
             }
         }
         catch (Exception $exception)
@@ -201,14 +201,14 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $attribute_slugs = collect($elastic_variant_products)->pluck("attribute_slug")->unique()->values()->toArray();       
+            $attribute_slugs = collect($elastic_variant_products)->pluck("attribute_slug")->unique()->values()->toArray();
             foreach($attribute_slugs as $attribute_slug)
             {
                 $state = [];
-                
+
                 $attribute_values = collect($elastic_variant_products)->where("attribute_slug", $attribute_slug)->values()->toArray();
                 $variations = collect($elastic_variant_products)->where("attribute_slug", "!=", $attribute_slug)->values()->toArray();
-                //$count = collect($attribute_values)->unique("id")->count(); 
+                //$count = collect($attribute_values)->unique("id")->count();
 
                 $j = 0;
                 foreach($attribute_values as $attribute_value)
@@ -232,16 +232,16 @@ class ProductRepository extends BaseRepository
                             $product_val_array["sku"] = isset($dot_product["product_sku"]) ? $dot_product["product_sku"] : 0;
                             $product_val_array["stock_status"] = isset($dot_product["stock_status"]) ? $dot_product["stock_status"] : 0;
                             //if($count == ($j+1)) $this->nested_product = [];
-                        } 
+                        }
                         setDotToArray($append_key, $this->final_product_val,  $product_val_array);
                         $j = $j + 1;
                         if(count($attribute_slugs) > 1) {
                             $this->nested_product[ $attribute_value["attribute_slug"] ] = $attribute_value["id"];
-                            $this->getVariations($variations, "{$append_key}.variations"); 
-                        }  
+                            $this->getVariations($variations, "{$append_key}.variations");
+                        }
                     }
                 }
-            }     
+            }
         }
         catch(Exception $exception)
         {
@@ -263,7 +263,7 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-         
+
         return [
             "url" => $path,
             "background_color" => $image?->background_color
@@ -284,7 +284,7 @@ class ProductRepository extends BaseRepository
             throw $exception;
         }
 
-        return $category;  
+        return $category;
     }
 
     public function getOptions(object $request, string $category_slug): ?array
@@ -295,7 +295,7 @@ class ProductRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $category = $this->getCategory($scope, $category_slug);
 
@@ -319,7 +319,7 @@ class ProductRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $category = $this->getCategory($scope, $category_slug);
 
@@ -343,14 +343,14 @@ class ProductRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $category = $this->getCategory($scope, $category_slug);
 
             $fetched["category"] = $this->getPages($category, $scope);
             if($category->parent_id) $parent = Category::findOrFail($category->parent_id);
             $fetched["navigation"] = $this->categoryRepository->getCategories(isset($parent) ? $parent->children : $category->children, $scope);
-            $fetched["breadcrumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null); 
+            $fetched["breadcrumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null);
         }
         catch (Exception $exception)
         {
@@ -368,7 +368,7 @@ class ProductRepository extends BaseRepository
 
             $data["id"] = $category->id;
             foreach(["name", "slug", "description"] as $key) $data[$key] = $category->value($scope, $key);
-    
+
             foreach($this->page_groups as $group)
             {
                 $item = [];
@@ -414,7 +414,7 @@ class ProductRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $fetched = $this->search_repository->getSearchProducts($request, $coreCache->store);
         }
