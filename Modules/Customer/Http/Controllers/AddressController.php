@@ -70,6 +70,7 @@ class AddressController extends BaseController
                     "customer_id" => Customer::findOrFail($customer_id)->id
                 ];
             });
+            $data = $this->repository->checkRegionAndCity($data);
 
             $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $created->id);
@@ -154,7 +155,7 @@ class AddressController extends BaseController
         {
             return $this->handleException($exception);
         }
-        
+
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 

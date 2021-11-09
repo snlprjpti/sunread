@@ -5,6 +5,8 @@ namespace Modules\Customer\Repositories;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Modules\Country\Entities\City;
+use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Customer\Entities\CustomerAddress;
@@ -41,9 +43,39 @@ class CustomerAddressRepository extends BaseRepository
     public function regionAndCityRules(object $request): array
     {
         return [
-            "region_id" => "sometimes|nullable|exists:regions,id,country_id,{$request->country_id}",
-            "city_id" => "sometimes|nullable|exists:cities,id,region_id,{$request->region_id}",
+            "region_id" => "required_without|exists:regions,id,country_id,{$request->country_id}",
+            "city_id" => "required_without|exists:cities,id,region_id,{$request->region_id}",
+            "region_name" => "required_without:region_id",
+            "city_name" => "required_without:city_id",
         ];
+    }
+
+    public function checkRegionAndCity(array $data): array
+    {
+        try
+        {
+            if(isset($data["region_id"])) {
+                $data["region_name"] = null;
+                if(isset($data["city_id"])) $data["city_name"] = null;
+                else {
+                    $data["city_id"] = null;
+                    $cities = City::whereRegionId($data["region_id"])->count();
+                    if($cities > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "City" ]));
+                }
+            }
+            else {
+                $data["region_id"] = null;
+                $data["city_id"] = null;
+                $region = Region::whereCountryId($data["country_id"])->count();
+                if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "Region" ]));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 
     public function unsetDefaultAddresses(array $data, int $customer_id, int $address_id): void
