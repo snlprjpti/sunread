@@ -154,7 +154,7 @@ class ProductBuilderRepository extends BaseRepository
                 $this->config_rules[$append_key] = "$rule|{$element["rules"]}"; 
                 $this->config_types[$element["slug"]] = $element["type"];
 
-                if ($method == "update" && isset($component["id"]) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
+                if ($method == "update" && (isset($component["id"]) || isset($component["parent_value"])) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
 
                 if ($element["hasChildren"] == 0) continue;
 
@@ -331,6 +331,7 @@ class ProductBuilderRepository extends BaseRepository
             ];
             
             if($product->id == $component->product_id && $scope["scope"] == $component->scope) $final_component["id"] = $component->id;
+            else $final_component["parent_value"] = 1;
         }
         catch( Exception $exception )
         {
