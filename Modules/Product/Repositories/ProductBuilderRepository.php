@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Product\Entities\ProductBuilder;
 use Modules\Core\Repositories\BaseRepository;
@@ -46,9 +47,10 @@ class ProductBuilderRepository extends BaseRepository
                 $all_attributes = [];
                 $data = $this->validateData(new Request($component));
                 $rules = $this->validateAttribute($component, $method);
-                $attribute_request = new Request($component["attributes"]);
-    
-                $data["attributes"] = $attribute_request->validate($rules);
+
+                $validator = Validator::make($component["attributes"], $rules);
+                if ( $validator->fails() ) throw ValidationException::withMessages(["components" => $validator->errors()]);
+                $data["attributes"] = $validator->validated();
 
                 foreach($data["attributes"] as $slug => $value)
                 {
