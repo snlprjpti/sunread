@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Coupon\Entities\Coupon;
+use Modules\Customer\Entities\Customer;
 use Modules\Tax\Facades\TaxPrice;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Product\Entities\Product;
@@ -43,20 +44,10 @@ class OrderRepository extends BaseRepository
         try
         {
             $this->validateData($request);
-            // $this->calculate($request);
-            
-            foreach ( $request->orders as $order )
-            {  
-                $this->calculate($request, $order);
-            }
-
-            // dd($coupon);
-            dd($request->all());
-            // validate params
-            
-            
-            
-            
+            foreach ( $request->orders as $order ) 
+            {
+                $asd = $this->calculateTax($request, $order);
+            }      
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
             $data = [
@@ -104,34 +95,39 @@ class OrderRepository extends BaseRepository
         return $order;
     }
 
-    public function calculate(object $request, array $order): ?object
+    public function calculateTax(object $request, array $order): ?object
     {
-        // dd($order);
-        $product = Product::whereId($order["product_id"])->with(["product_attributes", "catalog_inventories", "attribute_configurable_products", "attribute_options_child_products"])->first();
-        // dd($product->catalog_inventories);
-        
-        $product_data = $this->getProductDetail($request, $product);
-        // dd($product_data);
-        // dd($product->product_attributes->pluck("value"));
-        // Discount 
-        if ($request->coupon_code) {
-            $coupon = Coupon::whereCode($request->coupon_code)->publiclyAvailable()->first();
-            if (!$coupon) throw new Exception("Coupon Expired");
-            //TODO check discount apply for the new customer          
-            $this->discount_percent = $coupon->discount_percent;
-            // dd($coupon);          
+        try
+        {
+            $get_zip_code = collect($request->get("address"))->where("address_type", "shipping")->first();
+            $zip_code = isset($get_zip_code['postal_code']) ? $get_zip_code['postal_code'] : null;
+            $product = Product::whereId($order["product_id"])->with(["product_attributes", "catalog_inventories", "attribute_configurable_products", "attribute_options_child_products"])->first();
+            $product_data = $this->getProductDetail($request, $product);
+            
+            if ( auth("customer")->id() ) {
+                $customer = Customer::whereId(auth("customer")->id())->with(["group.tax_group"])->first();
+                $customer_tax_group_id = $customer?->group?->tax_group?->id;
+                $customer_tax = TaxPrice::calculate($request, $product_data->price, customer_tax_group_id:$customer_tax_group_id, zip_code:$zip_code);
+            }
+            else $customer_tax = TaxPrice::calculate($request, $product_data->price, $product_data->tax_class_id?->id, zip_code:$zip_code);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
         }
 
-        if ( auth("customer")->id() ) $customer_tax = TaxPrice::calculate($request, 1000, customer_tax_group_id:1);
-        else $customer_tax = TaxPrice::calculate($request, 1000, 1);
+        return $customer_tax;
+    }
 
-        dd($customer_tax);
+    public function calculateDiscount(object $request): ?object
+    {
+        if ($request->coupon_code) {
+            $coupon = Coupon::whereCode($request->coupon_code)->publiclyAvailable()->first();
+            if (!$coupon) throw new Exception("Coupon Expired");  
+            $this->discount_percent = $coupon->discount_percent;          
+        }
 
-        
-
-
-
-        // Tax
+        return $coupon; 
     }
 
     public function getProductDetail(object $request, object $product): ?object
@@ -154,20 +150,5 @@ class OrderRepository extends BaseRepository
         }
         return (object) $data;
     }
-
-    public function getTax(object $request): ?object
-    {
-        try
-        {
-            $data = '';
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $data;
-    }
-
 
 }
