@@ -5,10 +5,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Customer\Notifications\CustomerResetPassword;
+use Modules\Notification\Events\ForgotPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Modules\Core\Traits\HasFactory;
 
@@ -63,7 +65,8 @@ class Customer extends Authenticatable implements  JWTSubject
 
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(new CustomerResetPassword($token));
+        event(new ForgotPassword($this->id, $token));
+//        $this->notify(new CustomerResetPassword($token));
     }
 
     public function getDefaultBillingAddressAttribute(): ?object
