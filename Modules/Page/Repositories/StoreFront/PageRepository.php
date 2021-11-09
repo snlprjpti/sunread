@@ -9,6 +9,7 @@ use Modules\Core\Repositories\BaseRepository;
 use Modules\Page\Entities\Page;
 use Modules\Core\Entities\Website;
 use Modules\Core\Facades\CoreCache;
+use Modules\Page\Entities\PageAttribute;
 use Modules\Product\Transformers\StoreFront\ProductResource;
 
 class PageRepository extends BaseRepository
@@ -26,16 +27,18 @@ class PageRepository extends BaseRepository
     public function findPage(object $request, string $slug): array
     {
         try
-        {
+        {     
             $fetched = [];
             $coreCache = $this->getCoreCache($request);
 
-            $page = $this->model->with("page_attributes")->whereWebsiteId($coreCache->website->id)->whereStatus(1)->whereSlug($slug)->firstOrFail();
+            $page = $this->model->whereWebsiteId($coreCache->website->id)->whereStatus(1)->whereSlug($slug)->firstOrFail();
             $page_scope = $page->page_scopes()->whereScope("store");
             $all_scope = (clone $page_scope)->whereScopeId(0)->first();
             if (!$all_scope) $page_scope->whereScopeId($coreCache->store->id)->firstOrFail();
             $fetched = $page->toArray();
-            $fetched["components"] = $this->getComponent($coreCache, $page->page_attributes);
+
+            $page_componnets = PageAttribute::wherePageId($page->id)->orderBy("position", "asc")->get();
+            $fetched["components"] = $this->getComponent($coreCache, $page_componnets);
             unset($fetched["page_attributes"], $fetched["created_at"], $fetched["updated_at"]);
         }
         catch( Exception $exception )
