@@ -13,12 +13,20 @@ class ProductTableSeeder extends Seeder
     {
         $attributes = [
             [
-                "attribute_id" => 1,
+                "attribute_id" => $this->attributeId("name"),
                 "value" => "Dell Laptop" 
             ],
             [
-                "attribute_id" => 3,
+                "attribute_id" => $this->attributeId("price"),
                 "value" => 75000.00 
+            ],
+            [
+                "attribute_id" => $this->attributeId("cost"),
+                "value" => 75000.00 
+            ],
+            [
+                "attribute_id" => $this->attributeId("tax_class_id"),
+                "value" => 1 
             ],
             [
                 "attribute_id" => 11,
@@ -51,5 +59,10 @@ class ProductTableSeeder extends Seeder
                 "scope_id" => 1
             ]);
         }             
+    }
+
+    public function attributeId(string $slug): ?int
+    {
+        return Attribute::whereSlug($slug)->first()?->id;
     }
 }
