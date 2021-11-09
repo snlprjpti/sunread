@@ -180,7 +180,8 @@ class ProductBuilderRepository extends BaseRepository
     {
         try
         {
-            $exist_component = $this->model->findOrFail($component["id"]);
+            $id = isset($component["id"]) ? $component["id"] : $component["parent_value"];
+            $exist_component = $this->model->findOrFail($id);
             $exist_values = $exist_component->value;
             $request_element_value = getDotToArray("attributes.$append_key", $component);
             if ($request_element_value && !is_file($request_element_value)) {
@@ -331,7 +332,7 @@ class ProductBuilderRepository extends BaseRepository
             ];
             
             if($product->id == $component->product_id && $scope["scope"] == $component->scope) $final_component["id"] = $component->id;
-            else $final_component["parent_value"] = 1;
+            else $final_component["parent_value"] = $component->id;
         }
         catch( Exception $exception )
         {
