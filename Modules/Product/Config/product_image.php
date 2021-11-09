@@ -31,6 +31,12 @@ return [
                 "width" => 1800,
                 "height" => 1800
             ]
-        ]
+        ],
+        "product_rollover_image" => [
+            [
+                "width" => 1800,
+                "height" => 1800
+            ]
+        ],
     ]
 ];
