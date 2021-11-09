@@ -164,7 +164,7 @@ trait ElasticSearchFormat
         return $images;
     }
 
-    Public function getFullPath($image_name): ?array
+    public function getFullPath($image_name): ?array
     {
         try
         {

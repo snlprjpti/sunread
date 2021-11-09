@@ -36,7 +36,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         $this->staticFilterKeys = ["color", "size", "collection", "configurable_size", "configurable_color"];
 
-        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "color", "color_value", "tax_class_id"];
+        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "rollover_image", "color", "color_value", "tax_class_id"];
     }
 
     public function search(object $request): array
