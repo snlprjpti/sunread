@@ -106,6 +106,7 @@ class ProductRepository extends BaseRepository
 
                 if($attribute->slug == "gallery") {
                     $data["image"] = $this->getBaseImage($product);
+                    $data["rollover_image"] = $this->getImages($product, "rollover_image");
                     $data["gallery"] = $product->images()->wherehas("types", function($query) {
                         $query->whereSlug("gallery");
                     })->get()->map(function ($gallery) {
@@ -264,7 +265,7 @@ class ProductRepository extends BaseRepository
         }
     }
 
-    Public function getBaseImage($product): ?array
+    public function getBaseImage($product): ?array
     {
         try
         {
@@ -272,6 +273,26 @@ class ProductRepository extends BaseRepository
                 $query->whereSlug("base_image");
             })->first();
             if(!$image) $image = $product->images()->first();
+            $path = $image ? Storage::url($image->path) : $image;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+         
+        return [
+            "url" => $path,
+            "background_color" => $image?->background_color
+        ];
+    }
+
+    public function getImages($product, $image_name): ?array
+    {
+        try
+        {
+            $image = $product->images()->wherehas("types", function($query) use($image_name) {
+                $query->whereSlug($image_name);
+            })->first();
             $path = $image ? Storage::url($image->path) : $image;
         }
         catch (Exception $exception)
