@@ -32,7 +32,6 @@ class OrderItemRepository extends BaseRepository
             //$discount_amount_tax = 0;
             $row_total_incl_tax = ( $row_total + $order_item_details->tax_rate_value );
             $row_weight = ( $order_item_details->weight * $order_item_details->qty );
-            
             $data = [
                 "website_id" => $coreCache?->website->id,
                 "store_id" => $coreCache?->store->id,

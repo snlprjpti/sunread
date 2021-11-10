@@ -20,7 +20,6 @@ class OrderRepository extends BaseRepository
     protected $orderItemRepository, $orderAddressRepository;
 
     protected array $product_attribute_slug = [
-        "id",
         "name",
         "tax_class_id",
         "cost",
@@ -47,7 +46,7 @@ class OrderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            $this->validateData($request);
+            // $this->validateData($request);
                 
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
@@ -91,7 +90,7 @@ class OrderRepository extends BaseRepository
                 // $this->orderAddressRepository->store($request, $order);
             });
 
-            $items = CartItem::where('cart_id', $request->cart_hash_id)->get();
+            $items = CartItem::where('cart_id', $request->cart_hash_id)->get()->toArray();
             foreach ( $items as $order_item ) 
             {
                 $tax = $this->calculateTax($request, $order_item)->toArray();
@@ -210,7 +209,6 @@ class OrderRepository extends BaseRepository
             $zip_code = isset($get_zip_code['postal_code']) ? $get_zip_code['postal_code'] : null;
 
             $product_data = $this->getProductDetail($request, $order);
-
             if ( auth("customer")->id() ) {
                 $customer = Customer::whereId(auth("customer")->id())->with(["group.tax_group"])->first();
                 $customer_tax_group_id = $customer?->group?->tax_group?->id;

@@ -11,7 +11,7 @@ class OrderObserver
     public function created(Order $order)
     {
         Audit::log($order, __FUNCTION__);
-        TransactionLog::log($order );
+        // TransactionLog::log($order);
     }
 
     public function updated(Order $order)

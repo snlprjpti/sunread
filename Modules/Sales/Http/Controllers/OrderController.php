@@ -42,7 +42,6 @@ class OrderController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
-        TransactionLog::create($request);
         try
         {
             $response = $this->orderRepository->store($request);
