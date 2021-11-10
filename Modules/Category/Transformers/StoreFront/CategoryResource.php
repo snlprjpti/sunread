@@ -9,7 +9,7 @@ use Modules\Core\Facades\CoreCache;
 class CategoryResource extends JsonResource
 {
     public function toArray($request): array
-    {  
+    {
         $store = CoreCache::getStoreWithCode($request->header("hc-store"));
         $data = [
             "scope" => "store",

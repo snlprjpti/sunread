@@ -8,10 +8,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Modules\ClubHouse\Entities\ClubHouse;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\ClubHouse\Transformers\ClubHouseResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\ClubHouse\Repositories\ClubHouseRepository;
+use Modules\ClubHouse\Transformers\StoreFront\ClubHouseResource;
 
 class ClubHouseController extends BaseController
 {
@@ -23,9 +24,9 @@ class ClubHouseController extends BaseController
         $this->model = $clubHouse;
         $this->model_name = "Clubhouse";
 
-        $this->middleware('validate.website.host')->only(['index']);
-        $this->middleware('validate.channel.code')->only(['index']);
-        $this->middleware('validate.store.code')->only(['index']);
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.channel.code');
+        $this->middleware('validate.store.code');
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -33,6 +34,11 @@ class ClubHouseController extends BaseController
     public function collection(object $data): ResourceCollection
     {
         return ClubHouseResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new ClubHouseResource($data);
     }
 
     public function index(Request $request): JsonResponse
@@ -49,19 +55,17 @@ class ClubHouseController extends BaseController
         return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
-    public function show(Request $request, int $id): JsonResponse
+    public function show(string $club_house_slug): JsonResponse
     {
         try
         {
-            $club_house = $this->model->findOrFail($id);
-
-            $data = $this->repository->fetchWithAttributes($request, $club_house);
+            $fetched = $this->repository->fetchWithSlug($club_house_slug);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($data, $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 }

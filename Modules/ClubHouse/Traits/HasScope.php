@@ -101,10 +101,10 @@ trait HasScope
     public function value(array $data, string $attribute): mixed
     {
         $this->createModel();
-        $elements = collect(config("cluhbouse.attributes"))->pluck("elements")->flatten(1);
+        $elements = collect(config("clubhouse.attributes"))->pluck("elements")->flatten(1);
         $attribute_data = $elements->where("slug", $attribute)->first();
         $data = array_merge($data, [ "attribute" => $attribute], ["club_house_id" => $this->id]);
-        $default = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
-        return ($attribute_data["type"] == "file" && $default?->value) ? Storage::url($default?->value) : $default?->value;
+        $attribute_value = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
+        return ($attribute_data["type"] == "file" && $attribute_value?->value) ? Storage::url($attribute_value?->value) : $attribute_value?->value;
     }
 }
