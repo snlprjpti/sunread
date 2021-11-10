@@ -43,7 +43,7 @@ class ProductSearchRepository extends ElasticSearchRepository
     {
         try
         {
-            $this->searchKeys = array_unique(array_merge($this->searchKeys, ["name", "sku", "description"]));
+            $this->searchKeys = ["name"];
             $search = [];
 
             if(isset($request->q)) {
