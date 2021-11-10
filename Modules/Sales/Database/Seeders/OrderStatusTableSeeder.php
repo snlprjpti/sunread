@@ -10,15 +10,15 @@ class OrderStatusTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $status = ['pending', 'delivered', 'paid'];
+        $status = ["new", "pending", "processing", "holded", "completed", "closed", "cancelled"];
         foreach ($status as $row) {
-            $data = [
+            $data[] = [
                 "name" => $row,
                 "slug" => Str::slug($row),
                 "created_at" => now()
             ];
-
-            DB::table("order_statuses")->insert($data);
         }
+
+        DB::table("order_statuses")->insert($data);
     }
 }
