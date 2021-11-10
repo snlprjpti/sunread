@@ -427,7 +427,10 @@ class CartRepository extends BaseRepository
                 // if product id already exist in that logged in user id
                 $cartItem = $this->cartItem->whereProductId($request->product_id)->whereCartId($checkIfUserHasCartAlready->id)->first();
                 if ($cartItem) {
-                    $qty =  $request->qty ?? 1;
+                    $qty = ($cartItem->qty) + ($request->qty ?? 1);
+                    if ($request->type == "update") {
+                        $qty = $request->qty ?? 1;
+                    }
                     
                     $whereConditions = [
                         "product_id" => $request->product_id,
@@ -451,7 +454,7 @@ class CartRepository extends BaseRepository
                     $this->responseData['message'] = $this->cartStatus["product_added"];
                     $this->responseData["cart"] = $checkIfUserHasCartAlready;
                 }
-            } 
+            }
             else {
                 $cartData = [
                     "customer_id" => $request->customer_id,
@@ -614,7 +617,10 @@ class CartRepository extends BaseRepository
             // check product exist on product table, product status =1, has visibility and in stock
             $this->checkProductConditions($productId, $request);
 
-            $qty = $request->qty ?? 1;
+            $qty =  ($checkProductId->qty) + ($request->qty ?? 1);
+            if ($request->type == "update") {
+                $qty = $request->qty ?? 1;
+            }
             $this->cartItemRepo->updateItemWithConditions($cartAndProductCheck, ["qty" => $qty]);
           
             $this->responseData["message"] = $this->cartStatus["product_qty_updated"];

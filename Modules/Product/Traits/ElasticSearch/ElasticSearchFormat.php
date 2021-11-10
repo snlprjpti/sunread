@@ -22,8 +22,10 @@ trait ElasticSearchFormat
             $array = $this->getProductAttributes($store);
 
             $inventory = $this->getInventoryData();
-            if ($inventory) $array = array_merge($array, $inventory); 
-            $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
+            if ($inventory) {
+                $array = array_merge($array, $inventory); 
+                $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
+            }
     
             $array['categories'] = $this->getCategoryData($store);
             $images = $this->getImages();

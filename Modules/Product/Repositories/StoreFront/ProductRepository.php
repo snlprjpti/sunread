@@ -24,6 +24,7 @@ use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Page\Repositories\StoreFront\PageRepository;
+use Modules\Tax\Facades\TaxPrice;
 
 class ProductRepository extends BaseRepository
 {
@@ -119,6 +120,11 @@ class ProductRepository extends BaseRepository
                 if($attribute->slug == "component") {
                     $product_builders = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
                     if($product_builders->isEmpty()) $product_builders = $product->getBuilderParentValues($match);
+                    
+                    if($product_builders->isEmpty() && $product->parent_id) {
+                        $product_builders = $product->parent->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
+                        if($product_builders->isEmpty()) $product_builders = $product->parent->getBuilderParentValues($match);
+                    }
                     $data["product_builder"] = $product_builders ? $this->pageRepository->getComponent($coreCache, $product_builders) : [];
                     continue;
                 }
@@ -132,7 +138,10 @@ class ProductRepository extends BaseRepository
                 if(in_array($attribute->type, [ "select", "multiselect", "checkbox" ]))
                 {
                     if ($values instanceof Collection) $data[$attribute->slug] = $values->pluck("name")->toArray();
-                    else $data[$attribute->slug] = $values?->name;
+                    else {
+                        $data[$attribute->slug] = $values?->name;
+                        if($attribute->slug == "tax_class_id") $data["tax_class"] = $values?->id;
+                    }
                     continue;
                 }
 
@@ -155,7 +164,13 @@ class ProductRepository extends BaseRepository
                 else $fetched["special_price_formatted"] = (($currentDate >= $fromDate) && ($currentDate <= $toDate)) ? PriceFormat::get($fetched["special_price"], $store->id, "store") : null;
             }
 
-            if(isset($fetched["price"])) $fetched["price_formatted"] = isset($fetched["price"]) ? PriceFormat::get($fetched["price"], $store->id, "store") : null;
+            if(isset($fetched["price"])) {
+                $calculateTax = TaxPrice::calculate($request, $fetched["price"], isset($fetched["tax_class"]) ? $fetched["tax_class"] : null);
+                $fetched["tax_amount"] = $calculateTax?->tax_rate_value;
+                $fetched["price"] += $fetched["tax_amount"];
+            }
+
+            $fetched["price_formatted"] = isset($fetched["price"]) ? PriceFormat::get($fetched["price"], $store->id, "store") : null;
 
             if(isset($fetched["new_from_date"]) && isset($fetched["new_to_date"])) {
                 if(isset($fetched["new_from_date"])) $fromNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_from_date"]));

@@ -81,7 +81,7 @@ class ConfigurationRepository extends BaseRepository
 
                             if($element["type"] == "file" && $element["default"]) $element["default"] = Storage::url($element["default"]);
 
-                            if( $element["provider"] !== "") $element["options"] = $this->cacheQuery((object) $checkKey, $element["pluck"]);
+                            if( $element["provider"] !== "") $element["options"] = $this->cacheQuery($element);
                             $element["absolute_path"] = $key.".children.".$i.".subChildren.".$j.".elements.".$k;
 
                             unset($element["pluck"], $element["provider"], $element["rules"], $element["showIn"]);

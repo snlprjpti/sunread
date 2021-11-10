@@ -88,6 +88,7 @@ class TaxPrice {
             "rules" => $this->getMultipleRules($price),
         ];
         if ($callback) $resource = array_merge($callback, $resource); 
+        $this->tax_value = 0;
         return $resource;
     }
 
@@ -179,7 +180,10 @@ class TaxPrice {
     public function taxRate(object $request, ?int $product_tax_group_id = null, ?int $customer_tax_group_id = null, bool $use_current_location = false, ?string $zip_code = null): mixed
     {
         try
-        {	
+        {
+            $this->value = 0;
+            $this->tax_rate = 0;
+            
             $data = $this->getGeneralValue($request);
             $current_geo_location = GeoIp::locate($this->requestIp());
             if ($use_current_location) {
