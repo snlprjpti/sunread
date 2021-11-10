@@ -11,6 +11,7 @@ use Modules\Sales\Repositories\OrderRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Sales\Facades\TransactionLog;
 
 class OrderController extends BaseController
 {
@@ -41,6 +42,7 @@ class OrderController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
+        TransactionLog::create($request);
         try
         {
             $response = $this->orderRepository->store($request);

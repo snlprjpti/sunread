@@ -5,9 +5,9 @@ namespace Modules\Sales\Providers;
 use Modules\Sales\Entities\Order;
 use Modules\Sales\Entities\OrderItem;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Factory;
 use Modules\Sales\Observers\OrderObserver;
 use Modules\Sales\Observers\OrderItemObserver;
+use Modules\Sales\Services\TransactionLog;
 
 class SalesServiceProvider extends ServiceProvider
 {
@@ -33,6 +33,7 @@ class SalesServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
         $this->registerObservers();
+        $this->registerActivityLogger();
     }
 
     /**
@@ -92,6 +93,13 @@ class SalesServiceProvider extends ServiceProvider
         } else {
             $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
         }
+    }
+
+    public function registerActivityLogger()
+    {
+        $this->app->singleton('TransactionLog', function () {
+            return new TransactionLog();
+        });
     }
 
     /**
