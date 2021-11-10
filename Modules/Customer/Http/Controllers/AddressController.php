@@ -105,11 +105,13 @@ class AddressController extends BaseController
     {
         try
         {
+            $customer = Customer::findOrFail($customer_id);
             $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
                 return [
-                    "customer_id" => Customer::findOrFail($customer_id)->id
+                    "customer_id" => $customer_id
                 ];
             });
+            $data = $this->repository->checkCountryRegionAndCity($data, $customer);
 
             $updated = $this->repository->update($data, $address_id, function($updated) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $updated->id);
