@@ -146,8 +146,10 @@ class ProductRepository extends BaseRepository
                     continue;
                 }
 
-                if(($attribute->type == "image" || $attribute->type == "file") && $values) $data[$attribute->slug] = Storage::url($values);
+                if(!in_array($attribute->slug, $this->mainAttribute)) $data["attributes"][$attribute->slug] = $values;
                 else $data[$attribute->slug] = $values;
+
+                if(($attribute->type == "image" || $attribute->type == "file") && $values) $data[$attribute->slug] = Storage::url($values);
 
             }
 
