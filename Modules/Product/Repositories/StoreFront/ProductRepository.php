@@ -146,7 +146,7 @@ class ProductRepository extends BaseRepository
                     continue;
                 }
 
-                if(!in_array($attribute->slug, $this->mainAttribute)) $data["attributes"][$attribute->slug] = $values;
+                if(($attribute->type == "image" || $attribute->type == "file") && $values) $data[$attribute->slug] = Storage::url($values);
                 else $data[$attribute->slug] = $values;
 
             }
@@ -178,6 +178,14 @@ class ProductRepository extends BaseRepository
                 if(isset($fetched["new_to_date"])) $toNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_to_date"])); 
                 if(isset($fromNewDate) && isset($toNewDate)) $fetched["is_new_product"] = (($currentDate >= $fromNewDate) && ($currentDate <= $toNewDate)) ? 1 : 0;
                 unset($fetched["new_from_date"], $fetched["new_to_date"]);
+            }
+
+            if(isset($fetched["disable_animation"])  && isset($fetched["animated_image"])) {
+                $fetched["animated_images"] = [
+                    "animated_image" => $fetched["animated_image"],
+                    "disable_animation" => $fetched["disable_animation"]
+                ];
+                unset($fetched["animated_image"], $fetched["disable_animation"] );
             }
 
             $this->nested_product = [];
