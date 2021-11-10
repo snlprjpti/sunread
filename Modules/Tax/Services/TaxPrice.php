@@ -130,7 +130,7 @@ class TaxPrice {
                             "tax_rate" => $rate->tax_rate,
                             "tax_rate_value" => $value_added_tax
                         ];
-                    })->toArray()
+                    })
                 ];
             })->values();
         }
