@@ -90,15 +90,17 @@ class OrderRepository extends BaseRepository
                 // $this->orderAddressRepository->store($request, $order);
             });
 
-            $items = CartItem::where('cart_id', $request->cart_hash_id)->get()->toArray();
+            $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
+
             foreach ( $items as $order_item ) 
             {
-                $tax = $this->calculateTax($request, $order_item)->toArray();
-                $product_detail = (array) $this->getProductDetail($request, $order_item, function ($product) use ($coreCache) {
-                    return $this->getProductOptions($coreCache, $product);
+                $order_item_details = $this->getProductDetail($request, $order_item, function ($product) use ($coreCache, &$tax, $request, $order_item) {
+                    $tax = $this->calculateTax($request, $order_item)->toArray();
+                    $product_options = $this->getProductOptions($coreCache, $product);
+                    return array_merge($product_options, $tax, $order_item);
                 });
-                $order_item_details = (object) array_merge($order_item, $tax, $product_detail);
                 $this->orderItemRepository->store($request, $order, $order_item_details);
+                dd($order_item_details);
             }  
             // dd('asd');
             
@@ -141,15 +143,6 @@ class OrderRepository extends BaseRepository
             throw $exception;
         }
         return (object) $data;
-    }
-
-    public function getAttributeValue(mixed $coreCache, object $product, string $slug): ?object
-    {
-        return $product->value([
-            "scope" => "store",
-            "scope_id" => $coreCache->store->id,
-            "attribute_slug" => $slug
-        ]);
     }
 
     public function getProductOptions(object $coreCache, object $product): ?array
@@ -199,6 +192,15 @@ class OrderRepository extends BaseRepository
         }
 
         return $product_options;
+    }
+
+    public function getAttributeValue(mixed $coreCache, object $product, string $slug): ?object
+    {
+        return $product->value([
+            "scope" => "store",
+            "scope_id" => $coreCache->store->id,
+            "attribute_slug" => $slug
+        ]);
     }
 
     public function calculateTax(object $request, array $order): ?object
