@@ -200,15 +200,17 @@ class TaxPrice {
             }
             if (!$tax_group) throw ValidationException::withMessages(["tax_group_id" => "Tax group id is required either product or customer"]);
             $sort_priority_tax_rule = $tax_group->tax_rules->pluck("priority", "id")->toArray();
-            if (!empty(array_not_unique($sort_priority_tax_rule)["duplicate_array"])) {
-                $same_tax_rule_ids = array_keys(array_not_unique($sort_priority_tax_rule)["duplicate_array"]);	
-                $same_priority_tax_rate = $this->getPriorityTaxRate($same_tax_rule_ids, $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
-                $this->tax_value = array_sum($same_priority_tax_rate);
-            }
-            else {
-                $unique_tax_rule_priorities = array_not_unique($sort_priority_tax_rule)["unique_array"];
-                $priority_tax_rate = $this->getPriorityTaxRate(array_flip(array_min($unique_tax_rule_priorities)), $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
-                $this->tax_value += array_sum($priority_tax_rate);
+            if(!empty($sort_priority_tax_rule)) {
+                if (!empty(array_not_unique($sort_priority_tax_rule)["duplicate_array"])) {
+                    $same_tax_rule_ids = array_keys(array_not_unique($sort_priority_tax_rule)["duplicate_array"]);	
+                    $same_priority_tax_rate = $this->getPriorityTaxRate($same_tax_rule_ids, $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
+                    $this->tax_value = array_sum($same_priority_tax_rate);
+                }
+                else {
+                    $unique_tax_rule_priorities = array_not_unique($sort_priority_tax_rule)["unique_array"];
+                    $priority_tax_rate = $this->getPriorityTaxRate(array_flip(array_min($unique_tax_rule_priorities)), $country, $data->allow_countries, $zip_code)?->pluck("tax_rate")->toArray();
+                    $this->tax_value += array_sum($priority_tax_rate);
+                }
             }
             
         }
