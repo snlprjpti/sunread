@@ -20,6 +20,9 @@ class OrderAddressRepository extends BaseRepository
         $this->country = $country;
         $this->city = $city;
         $this->region = $region;
+        $this->rules = [
+            
+        ];
     }
 
     public function store(object $request, object $order): bool
