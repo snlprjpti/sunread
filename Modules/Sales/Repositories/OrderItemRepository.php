@@ -3,6 +3,7 @@
 namespace Modules\Sales\Repositories;
 
 use Exception;
+use Modules\Cart\Entities\CartItem;
 use Modules\Sales\Entities\OrderItem;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Product\Entities\Product;
@@ -21,29 +22,31 @@ class OrderItemRepository extends BaseRepository
         ];
     }
 
-    public function store(object $request, object $order, object $orider_item_details): mixed
+    public function store(object $request, object $order, object $order_item_details): mixed
     {
         try
         {
             // $this->validateData($request);
             $coreCache = $this->getCoreCache($request);
-            foreach ($request->orders as $item) {
-                $data = [
-                    "website_id" => $coreCache?->website->id,
-                    "store_id" => $coreCache?->store->id,
-                    "product_id" => $item->product_id,
-                    "order_id" => $order->id,
-                    "product_options" => $item->product_options,
-                    "product_type" => $product->parent_id ? "configurable" : "simple",
-                    "sku" => $item->sku,
-                    "name" => $item->name,
-                    "weight" => $item->weight,
-                    "qty" => $item->qty,
-                    "price" => 0.00,
-                ];
 
-                $this->create($data);
-            }
+            $data = [
+                "website_id" => $coreCache?->website->id,
+                "store_id" => $coreCache?->store->id,
+                "product_id" => $order_item_details->id,
+                "order_id" => $order->id,
+                "product_options" => $order_item_details->configurable_attribute_options,
+                "product_type" => $order_item_details->type,
+                "sku" => $order_item_details->sku,
+                "name" => $order_item_details->name,
+                "weight" => $order_item_details->weight,
+                "qty" => $order_item_details->qty,
+                "cost" => $order_item_details->cost,
+                "price" => $order_item_details->price,
+                "row_total" => $order_item_details->price * $order_item_details->qty,
+                "row_weight" => $order_item_details->weight * $order_item_details->qty,
+            ];
+
+            $this->create($data);
 
         } 
         catch ( Exception $exception )

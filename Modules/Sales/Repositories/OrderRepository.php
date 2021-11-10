@@ -5,6 +5,7 @@ namespace Modules\Sales\Repositories;
 use Exception;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
+use Modules\Cart\Entities\CartItem;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Coupon\Entities\Coupon;
@@ -21,6 +22,7 @@ class OrderRepository extends BaseRepository
     protected $discount_percent, $product, $total_tax_percent, $row_quantity, $product_data;
 
     protected array $product_attribute_slug = [
+        "id",
         "name",
         "tax_class_id",
         "cost",
@@ -92,12 +94,14 @@ class OrderRepository extends BaseRepository
             //     $this->orderAddressRepository->store($request, $order);
             // });
 
-            foreach ( $request->orders as $order ) 
+            $items = CartItem::where('cart_id', $request->cart_hash_id)->get();
+
+            foreach ( $items as $item ) 
             {
-                $tax = $this->calculateTax($request, $order)->toArray();
-                $product_detail = (array) $this->getProductDetail($request, $order);
-                $order_item_details = (object) array_merge($order, $tax, $product_detail);
-                $this->orderItemRepository->store($request, $order, $order_item_details);
+                $tax = $this->calculateTax($request, $item)->toArray();
+                $product_detail = (array) $this->getProductDetail($request, $item);
+                $order_item_details = (object) array_merge($item, $tax, $product_detail);
+                $this->orderItemRepository->store($request, $item, $order_item_details);
             }  
             dd('asd');
             
@@ -109,7 +113,7 @@ class OrderRepository extends BaseRepository
         }
 
         DB::commit();        
-        return $order;
+        return '';
     }
 
     public function getProductDetail(object $request, array $order, ?callable $callback = null): ?object
