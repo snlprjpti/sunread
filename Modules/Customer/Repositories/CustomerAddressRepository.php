@@ -5,6 +5,7 @@ namespace Modules\Customer\Repositories;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
@@ -48,34 +49,6 @@ class CustomerAddressRepository extends BaseRepository
             "region_name" => "required_without:region_id",
             "city_name" => "required_without:city_id",
         ];
-    }
-
-    public function checkRegionAndCity(array $data): array
-    {
-        try
-        {
-            if(isset($data["region_id"])) {
-                $data["region_name"] = null;
-                if(isset($data["city_id"])) $data["city_name"] = null;
-                else {
-                    $data["city_id"] = null;
-                    $cities = City::whereRegionId($data["region_id"])->count();
-                    if($cities > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "City" ]));
-                }
-            }
-            else {
-                $data["region_id"] = null;
-                $data["city_id"] = null;
-                $region = Region::whereCountryId($data["country_id"])->count();
-                if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "Region" ]));
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $data;
     }
 
     public function unsetDefaultAddresses(array $data, int $customer_id, int $address_id): void
@@ -127,5 +100,88 @@ class CustomerAddressRepository extends BaseRepository
         DB::commit();
 
         return $updated;
+    }
+
+    public function checkCountryRegionAndCity(array $data, object $customer): array
+    {
+        try
+        {
+            $customer_channel = $this->getCustomerChannel($customer);
+            $countries = $this->getCountry($customer_channel);
+            if (!$countries->contains("id", $data["country_id"])) throw new Exception(__("core::app.response.country-not-allow"));
+
+            $data = $this->checkRegionAndCity($data);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    public function getCustomerChannel(object $customer): object
+    {
+        try
+        {
+            if(empty($customer->store_id)) {
+                $channel = SiteConfig::fetch("website_default_channel", "website", $customer->website_id);
+                if (!$channel) throw new Exception(__("core::app.response.not-found", ["name" => "Default Channel"]));
+            }
+            else {
+                $channel = $customer->store->channel;
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $channel;
+    }
+
+    public function getCountry(object $channel): object
+    {
+        try
+        {
+            $allow = SiteConfig::fetch("allow_countries", "channel", $channel->id);
+            $default[] = SiteConfig::fetch("default_country", "channel", $channel->id);
+
+            $fetched = $allow->merge($default);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function checkRegionAndCity(array $data): array
+    {
+        try
+        {
+            if(isset($data["region_id"])) {
+                $data["region_name"] = null;
+                if(isset($data["city_id"])) $data["city_name"] = null;
+                else {
+                    $data["city_id"] = null;
+                    $cities = City::whereRegionId($data["region_id"])->count();
+                    if($cities > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "City" ]));
+                }
+            }
+            else {
+                $data["region_id"] = null;
+                $data["city_id"] = null;
+                $region = Region::whereCountryId($data["country_id"])->count();
+                if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "Region" ]));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
     }
 }
