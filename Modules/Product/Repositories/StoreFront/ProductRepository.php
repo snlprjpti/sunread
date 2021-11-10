@@ -40,7 +40,7 @@ class ProductRepository extends BaseRepository
         $this->config_fields = config("category.attributes");
         $this->pageRepository = $pageRepository;
         $this->count = 0;
-        $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date"];
+        $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date", "animated_image", "disable_animation"];
     }
 
     public function productDetail(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
