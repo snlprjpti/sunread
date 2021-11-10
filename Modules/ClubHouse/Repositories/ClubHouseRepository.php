@@ -4,6 +4,7 @@ namespace Modules\ClubHouse\Repositories;
 
 use Exception;
 use Illuminate\Support\Str;
+use Modules\Core\Facades\CoreCache;
 use Modules\ClubHouse\Traits\HasScope;
 use Illuminate\Support\Facades\Storage;
 use Modules\ClubHouse\Entities\ClubHouse;
@@ -120,20 +121,41 @@ class ClubHouseRepository extends BaseRepository
         return $slug;
     }
 
-
-    public function fetchWithSlug(string $club_house_slug): object
+    public function fetchWithSlug(string $club_house_slug, $store): object
     {
         try
         {
             $club_house_value = ClubHouseValue::whereAttribute("slug")->whereValue($club_house_slug)->firstOrFail();
             $club_house = $club_house_value->clubHouse;
+
+            if(!$this->checkStatus($club_house, $store)) throw new ClubHouseNotFoundException();
         }
+
         catch(Exception $exception)
         {
             throw $exception;
         }
 
         return $club_house;
+    }
+
+    public function checkStatus(object $club_house, $store): bool
+    {
+        try
+        {
+            $store = CoreCache::getStoreWithCode($store);
+            $data = [
+                "scope" => "store",
+                "scope_id" => $store->id,
+            ];
+            $status_value = $club_house->value($data, "status");
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $status_value === "1" ? true : false;
     }
 
 }

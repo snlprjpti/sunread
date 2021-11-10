@@ -45,7 +45,9 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, callback:function () {
+                return $this->model->where("status", 1);
+            });
         }
         catch (Exception $exception)
         {
@@ -55,11 +57,12 @@ class ClubHouseController extends BaseController
         return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
-    public function show(string $club_house_slug): JsonResponse
+    public function show(Request $request, string $club_house_slug): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetchWithSlug($club_house_slug);
+            $scope = $request->header("hc-store");
+            $fetched = $this->repository->fetchWithSlug($club_house_slug, $scope);
         }
         catch( Exception $exception )
         {

@@ -12,8 +12,8 @@ class ClubHouseResource extends JsonResource
 
         $store = CoreCache::getStoreWithCode($request->header("hc-store"));
         $data = [
-            "scope" => "website",
-            "scope_id" => 1
+            "scope" => "store",
+            "scope_id" => $store->id,
         ];
 
         return [
@@ -21,7 +21,6 @@ class ClubHouseResource extends JsonResource
             "website_id" => $this->website_id,
             "position" => $this->position,
             "type" => $this->type,
-            // "value" => $this->values,
             "title" => $this->value($data, "title"),
             "slug" => $this->value($data, "slug"),
             "status" => $this->value($data, "status"),
