@@ -19,8 +19,6 @@ class OrderRepository extends BaseRepository
 {
     protected $orderItemRepository, $orderAddressRepository;
 
-    protected $discount_percent, $product, $total_tax_percent, $row_quantity, $product_data;
-
     protected array $product_attribute_slug = [
         "id",
         "name",
@@ -34,15 +32,14 @@ class OrderRepository extends BaseRepository
     {
         $this->model = $order;
         $this->model_key = "orders";
+        $this->orderItemRepository = $orderItemRepository;
+        $this->orderAddressRepository = $orderAddressRepository;
         $this->rules = [
             "orders" => "array",
             "orders.*.product_id" => "required|exists:products,id",
             "orders.*.qty" => "required|decimal",
             "coupon_code" => "sometimes|exists:coupons,code"
         ];
-
-        $this->orderItemRepository = $orderItemRepository;
-        $this->orderAddressRepository = $orderAddressRepository;
     }
 
     public function store(object $request): mixed
@@ -90,20 +87,21 @@ class OrderRepository extends BaseRepository
             $customer_data = isset($data['is_guest']) ? $customer_data : []; 
             $data = array_merge($data, $customer_data);
 
-            // $order = $this->create($data, function ($order) use ($request) {
-            //     $this->orderAddressRepository->store($request, $order);
-            // });
+            $order = $this->create($data, function ($order) use ($request) {
+                // $this->orderAddressRepository->store($request, $order);
+            });
 
             $items = CartItem::where('cart_id', $request->cart_hash_id)->get();
-
-            foreach ( $items as $item ) 
+            foreach ( $items as $order_item ) 
             {
-                $tax = $this->calculateTax($request, $item)->toArray();
-                $product_detail = (array) $this->getProductDetail($request, $item);
-                $order_item_details = (object) array_merge($item, $tax, $product_detail);
-                $this->orderItemRepository->store($request, $item, $order_item_details);
+                $tax = $this->calculateTax($request, $order_item)->toArray();
+                $product_detail = (array) $this->getProductDetail($request, $order_item, function ($product) use ($coreCache) {
+                    return $this->getProductOptions($coreCache, $product);
+                });
+                $order_item_details = (object) array_merge($order_item, $tax, $product_detail);
+                $this->orderItemRepository->store($request, $order, $order_item_details);
             }  
-            dd('asd');
+            // dd('asd');
             
         } 
         catch (Exception $exception)
@@ -124,7 +122,8 @@ class OrderRepository extends BaseRepository
             $with = [
                 "product_attributes",
                 "catalog_inventories",
-                "attribute_options_child_products"
+                "attribute_options_child_products.attribute_option.attribute",
+                "images"
             ];
             $product = Product::whereId($order["product_id"])->with($with)->first();
             foreach ( $this->product_attribute_slug as $slug )
@@ -135,18 +134,72 @@ class OrderRepository extends BaseRepository
                     "attribute_slug" => $slug
                 ]);
             }
-            $product_data = [ 
-                "sku" => $product->sku,
-                "type" => $product->type,
-                "configurable_attribute_options" => null
-            ];
-            $data = array_merge($data, $product_data);
+            if ($callback) $data = array_merge($data, $callback($product));
+            $data = array_merge($data, ["sku" => $product->sku, "type" => $product->type]);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
         return (object) $data;
+    }
+
+    public function getAttributeValue(mixed $coreCache, object $product, string $slug): ?object
+    {
+        return $product->value([
+            "scope" => "store",
+            "scope_id" => $coreCache->store->id,
+            "attribute_slug" => $slug
+        ]);
+    }
+
+    public function getProductOptions(object $coreCache, object $product): ?array
+    {
+        try
+        {
+            if ( $product->parent_id ) {
+                $product_options = [
+                    "product_options" => [
+                        "attributes" => $product->attribute_options_child_products->filter(fn ($child_product) => ($child_product->product_id == $product->id))->map(function ($child_product) use ($product) {
+                            return [
+                                "attribute_id" => $child_product->attribute_option?->attribute_id,
+                                "label" => $child_product->attribute_option?->attribute->name,
+                                "name" => $child_product->attribute_option?->attribute->name,
+                                "value" => $child_product->attribute_option?->name,
+                            ];
+                        })->toArray(),
+                        "image_url" => $product->product_images?->filter(fn ($product_image) => in_array("main_image", $product_image->types->toArray()) )->first() 
+                    ]
+                ];
+            }
+            else {
+                $product_options = [
+                    "product_options" => [
+                        "attributes" => [
+                            [
+                                "attribute_id" => $this->getAttributeValue($coreCache, $product, "size")?->attribute_id,
+                                "label" => "size",
+                                "name" => "Size",
+                                "value" => $this->getAttributeValue($coreCache, $product, "size")?->name
+                            ],
+                            [
+                                "attribute_id" => $this->getAttributeValue($coreCache, $product, "color")?->attribute_id,
+                                "label" => "color",
+                                "name" => "Color",
+                                "value" => $this->getAttributeValue($coreCache, $product, "color")?->name 
+                            ],
+                        ],
+                        "image_url" => $product->product_images?->filter(fn ($product_image) => in_array("main_image", $product_image->types->toArray()))->first()
+                    ]
+                ];
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $product_options;
     }
 
     public function calculateTax(object $request, array $order): ?object
