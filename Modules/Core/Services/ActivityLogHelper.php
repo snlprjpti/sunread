@@ -112,9 +112,9 @@ class ActivityLogHelper {
     public function modelCache(object $model): void
     {
         Cache::forget($model::class);
-        Cache::rememberForever($model::class, function() use ($model){
-            return $model->get();
-        });  
+        // Cache::rememberForever($model::class, function() use ($model){
+        //     return $model->get();
+        // });  
     }
 
     public function updateProductInventory(object $product, string $event): void

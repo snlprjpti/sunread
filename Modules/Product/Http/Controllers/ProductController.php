@@ -70,8 +70,8 @@ class ProductController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
-        // try
-        // {
+        try
+        {
             $data = $this->repository->validateData($request, [
                 "website_id" => "required|exists:websites,id",
                 "attribute_set_id" => "required|exists:attribute_sets,id"
@@ -94,11 +94,11 @@ class ProductController extends BaseController
 
                 $created->channels()->sync($request->get("channels"));
             });
-        // }
-        // catch( Exception $exception )
-        // {
-        //     return $this->handleException($exception);
-        // }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
 
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }

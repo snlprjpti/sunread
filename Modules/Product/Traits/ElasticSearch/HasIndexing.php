@@ -64,6 +64,33 @@ trait HasIndexing
             if (!$exist) {
                 $createparams = array_merge($params, [
                     "body" => [
+                        "settings" => [
+                            "analysis" => [
+                                "analyzer" => [
+                                    'autocomplete' => [
+                                        'tokenizer' => 'autocomplete',
+                                        'filter' =>[
+                                            'lowercase',
+                                            'asciifolding'
+                                        ],
+                                    ],
+                                    'autocomplete_search' => [
+                                        'tokenizer' => 'lowercase',
+                                    ]
+                                ],
+                                "tokenizer" => [
+                                    "autocomplete"=> [
+                                        "type"=> "edge_ngram",
+                                        "min_gram"=> 2,
+                                        "max_gram"=> 10,
+                                        "token_chars" => [
+                                            "letter",
+                                            "digit"
+                                        ]
+                                    ],
+                                ],
+                            ]
+                        ],
                         "mappings" => config("mapping")
                     ]
                 ]);
