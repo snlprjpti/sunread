@@ -5549,11 +5549,11 @@ return [
                                                     "type" => "select",
                                                     "provider" => "",
                                                     "pluck" => [],
-                                                    "default" => "6",
+                                                    "default" => 6,
                                                     "options" => [
                                                         [ "value" => 1, "label" => "One Column" ],
                                                         [ "value" => 2, "label" => "Two Column" ],
-                                                        [ "value" => 3, "label" => "THree Column" ],
+                                                        [ "value" => 3, "label" => "Three Column" ],
                                                         [ "value" => 4, "label" => "Four Column" ],
                                                         [ "value" => 5, "label" => "Five Column" ],
                                                         [ "value" => 6, "label" => "Six Column" ],
@@ -5562,7 +5562,7 @@ return [
                                                         [ "value" => 9, "label" => "Nine Column" ],
                                                         [ "value" => 10, "label" => "Ten Column" ],
                                                         [ "value" => 11, "label" => "Eleven Column" ],
-                                                        [ "value" => 12, "label" => "Tweleve Column" ]
+                                                        [ "value" => 12, "label" => "Twelve Column" ]
                                                     ],
                                                     "conditions" => [],
                                                     "description" => "",
@@ -5612,7 +5612,7 @@ return [
                                                     "description" => "",
                                                     "conditions" => [],
                                                     "rules" => "",
-                                                    "is_required" => 1
+                                                    "is_required" => 0
                                                 ],
                                                 [
                                                     "title" => "Content Position",
