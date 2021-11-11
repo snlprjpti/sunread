@@ -41,7 +41,9 @@ class ProductFormatRepository extends BaseRepository
         try
         {
             if(isset($fetched["price"])) {
-                $calculateTax = TaxPrice::calculate($request, $fetched["price"], isset($fetched["tax_class"]) ? $fetched["tax_class"] : null);
+                $tax_class_id = isset($fetched["tax_class"]) ? $fetched["tax_class"] : (isset($fetched["tax_class_id"]) ? $fetched["tax_class_id"] :
+                null);
+                $calculateTax = TaxPrice::calculate($request, $fetched["price"], $tax_class_id);
                 $fetched["tax_amount"] = $calculateTax?->tax_rate_value;
                 $fetched["price"] += $fetched["tax_amount"];
             }
