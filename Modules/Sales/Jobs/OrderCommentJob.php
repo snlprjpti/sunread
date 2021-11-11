@@ -16,21 +16,11 @@ class OrderCommentJob implements ShouldQueue
 
     protected $comment;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
     public function __construct(object $comment)
     {
         $this->comment = $comment;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle(): void
     {
         try

@@ -11,28 +11,32 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\DB;
 use Modules\Sales\Entities\OrderTax;
 use Modules\Sales\Entities\OrderTaxItem;
+use Modules\Sales\Traits\HasOrderProductDetail;
 
 class OrderTaxesJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasOrderProductDetail;
 
-    protected $items, $order;
+    protected $order_item_details, $order;
 
-    public function __construct(object $order, object $items)
+    public function __construct(object $order, object $order_item_details)
     {
-        $this->items = $items;
+        $this->order_item_details = $order_item_details;
         $this->order = $order;
-
     }
 
     public function handle(): void
     {
         try
         {
-            foreach ( $this->items as $item ) 
-            {
-                   
-            }
+            $this->storeOrderTax(function ($order_tax, $order_item_details, $rule) {
+
+                $order_tax_amount = $order_tax->amount;
+                $order_item_tax = $this->storeOrderTaxItem($order_tax, $order_item_details, $rule);
+                $order_item_tax_amount = $order_item_tax->amount;
+                $order_tax_amount = ($order_item_tax_amount + $order_tax_amount);
+                $order_tax->update(["amount" => $order_tax_amount]);
+            });
         }
         catch(Exception $exception)
         {
@@ -40,26 +44,25 @@ class OrderTaxesJob implements ShouldQueue
         }
     }
 
-    public function storeOrderTax(object $order, object $order_item_details, ?callable $callback = null): object
+    public function storeOrderTax(?callable $callback = null): void
     {
         DB::beginTransaction();
         try
         {
-            foreach ($order_item_details->rules as $rule)
+            foreach ($this->order_item_details->rules as $rule)
             {
-                $percent = array_sum($rule->rates->pluck("tax_rate")->toArray());
-                $amount = array_sum($rule->rates->pluck("tax_rate_value")->toArray());
-                
+                $amount = (($this->order_item_details->tax_rate_percent/100) * $this->order_item_details->price * $this->order_item_details->qty);
                 $data = [
-                    "order_id" => $order->id,
-                    "code" => $rule->name,
+                    "order_id" => $this->order->id,
+                    "code" => \Str::slug($rule->name),
                     "title" => $rule->name,
-                    "percent" => $percent,
+                    "percent" => $this->order_item_details->tax_rate_percent,
                     "amount" => $amount
                 ];
-
-                $order_tax = OrderTax::create($data);
-                if ($callback) $callback($order_tax, $rule);
+                $match = $data;
+                unset($match["title"], $match["percent"], $match["amount"]);
+                $order_tax = OrderTax::updateOrCreate($match, $data);
+                if ($callback) $callback($order_tax, $this->order_item_details, $rule);
             }
         }
         catch ( Exception $exception )
@@ -68,36 +71,31 @@ class OrderTaxesJob implements ShouldQueue
             throw $exception;
         }
 
-        DB::commit();        
-        return $order;
+        DB::commit();
     }
 
-    public function storeOrderTaxItem(object $order_tax, object $order_item, mixed $rule, ?callable $callback = null): void
+    public function storeOrderTaxItem(object $order_tax, object $order_item_details, mixed $rule): object
     {
         DB::beginTransaction();
         try
         {
-            $data = [];
-            foreach ($rule->rates as $rate) 
-            {
-                $data[] = [
-                    "tax_id" => $order_tax->id,
-                    "item_id" => $order_item->product_id,
-                    "tax_percent" => $rate->tax_rate,
-                    "amount" => $rate->tax_rate_value,
-                    "tax_item_type" => "product"
-                ];
-            }
 
-            if ($callback) $data = array_merge($data, $callback());
-            
-            OrderTaxItem::insert($data);  
+            $data = [
+                "tax_id" => $order_tax->id,
+                "item_id" => $order_item_details->product_id,
+                "tax_percent" => $order_tax->percent,
+                "amount" => $rule->rates?->pluck("tax_rate_value")->first(),
+                "tax_item_type" => "product"
+            ];            
+            $order_tax_item = OrderTaxItem::create($data);  
         }
         catch ( Exception $exception )
         {
             DB::rollback();
             throw $exception;
         }
+
         DB::commit(); 
+        return $order_tax_item;
     }
 }
