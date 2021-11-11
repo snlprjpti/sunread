@@ -5,6 +5,7 @@ namespace Modules\Sales\Repositories;
 use Exception;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Modules\Cart\Entities\CartItem;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
@@ -73,12 +74,12 @@ class OrderRepository extends BaseRepository
 
             if ( $data['is_guest'] ) {
                 $customer_data = [
-                    "customer_email" => $request->customer_details['email'],
-                    "customer_first_name" => $request->customer_details['first_name'],
-                    "customer_middle_name" => $request->customer_details['middle_name'],
-                    "customer_last_name" => $request->customer_details['last_name'],
-                    "customer_phone" => $request->customer_details['phone'],
-                    "customer_taxvat" => $request->customer_details['taxvat'],
+                    "customer_email" => $request->customer_details["email"],
+                    "customer_first_name" => $request->customer_details["first_name"],
+                    "customer_middle_name" => $request->customer_details["middle_name"],
+                    "customer_last_name" => $request->customer_details["last_name"],
+                    "customer_phone" => $request->customer_details["phone"],
+                    "customer_taxvat" => $request->customer_details["taxvat"],
                     "customer_ip_address" => GeoIp::requestIp(),
                     "status" => "pending"
                 ];
@@ -92,6 +93,7 @@ class OrderRepository extends BaseRepository
 
             $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
 
+
             foreach ( $items as $order_item ) 
             {
                 $order_item_details = $this->getProductDetail($request, $order_item, function ($product) use ($coreCache, &$tax, $request, $order_item) {
@@ -101,7 +103,18 @@ class OrderRepository extends BaseRepository
                 });
                 $this->orderItemRepository->store($request, $order, $order_item_details);
                 dd($order_item_details);
-            }  
+            }
+
+            $this->storeOrderTax($order, $order_item_details, function ($order_tax, $rule) use ($order_item) {
+                $this->storeOrderTaxItem($order_tax, $order_item, $rule);
+                /**
+                 * @TODO::Addition 
+                 * Sum order tax again for additional order items 
+                 * Order Items can be added in callback 
+                 * ie. Sum order tax form relations and update order taxes fields
+                 * Order Tax array format [["tax_id" => $order_tax->id,".."]]
+                 */
+            });
             // dd('asd');
             
         } 
@@ -124,7 +137,7 @@ class OrderRepository extends BaseRepository
                 "product_attributes",
                 "catalog_inventories",
                 "attribute_options_child_products.attribute_option.attribute",
-                "images"
+                "images.types"
             ];
             $product = Product::whereId($order["product_id"])->with($with)->first();
             foreach ( $this->product_attribute_slug as $slug )
@@ -149,6 +162,10 @@ class OrderRepository extends BaseRepository
     {
         try
         {
+
+            $image_path = $product->images?->filter(fn ($product_image) => in_array("base_image", $product_image->types->pluck("slug")->toArray()) )->first()?->path;
+            $url = ($image_path) ? Storage::url($image_path) : null;
+
             if ( $product->parent_id ) {
                 $product_options = [
                     "product_options" => [
@@ -160,7 +177,7 @@ class OrderRepository extends BaseRepository
                                 "value" => $child_product->attribute_option?->name,
                             ];
                         })->toArray(),
-                        "image_url" => $product->product_images?->filter(fn ($product_image) => in_array("main_image", $product_image->types->toArray()) )->first() 
+                        "image_url" => $url
                     ]
                 ];
             }
@@ -181,7 +198,7 @@ class OrderRepository extends BaseRepository
                                 "value" => $this->getAttributeValue($coreCache, $product, "color")?->name 
                             ],
                         ],
-                        "image_url" => $product->product_images?->filter(fn ($product_image) => in_array("main_image", $product_image->types->toArray()))->first()
+                        "image_url" => $url
                     ]
                 ];
             }

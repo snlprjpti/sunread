@@ -42,17 +42,8 @@ class OrderItemRepository extends BaseRepository
                 "product_type" => $order_item_details->type,
                 "product_options" => json_encode($order_item_details->product_options),
            ]);
-           $order_item = $this->create($data);
-           $this->storeOrderTax($order, $order_item_details, function ($order_tax, $rule) use ($order_item) {
-                $this->storeOrderTaxItem($order_tax, $order_item, $rule);
-                /**
-                 * @TODO::Addition 
-                 * Sum order tax again for additional order items 
-                 * Order Items can be added in callback 
-                 * ie. Sum order tax form relations and update order taxes fields
-                 * Order Tax array format [["tax_id" => $order_tax->id,".."]]
-                 */
-           });
+        //    dd($order_item_details);
+           $order_item = $this->create($data);  
         } 
         catch ( Exception $exception )
         {
@@ -104,65 +95,6 @@ class OrderItemRepository extends BaseRepository
         return $data;
     }
 
-    public function storeOrderTax(object $order, object $order_item_details, ?callable $callback = null): object
-    {
-        DB::beginTransaction();
-        try
-        {
-            foreach ($order_item_details->rules as $rule)
-            {
-                $percent = array_sum($rule->rates->pluck("tax_rate")->toArray());
-                $amount = array_sum($rule->rates->pluck("tax_rate_value")->toArray());
-                
-                $data = [
-                    "order_id" => $order->id,
-                    "code" => $rule->name,
-                    "title" => $rule->name,
-                    "percent" => $percent,
-                    "amount" => $amount
-                ];
-
-                $order_tax = OrderTax::create($data);
-                if ($callback) $callback($order_tax, $rule);
-            }
-        }
-        catch ( Exception $exception )
-        {
-            DB::rollback();
-            throw $exception;
-        }
-
-        DB::commit();        
-        return $order;
-    }
-
-    public function storeOrderTaxItem(object $order_tax, object $order_item, mixed $rule, ?callable $callback = null): void
-    {
-        DB::beginTransaction();
-        try
-        {
-            $data = [];
-            foreach ($rule->rates as $rate) 
-            {
-                $data[] = [
-                    "tax_id" => $order_tax->id,
-                    "item_id" => $order_item->product_id,
-                    "tax_percent" => $rate->tax_rate,
-                    "amount" => $rate->tax_rate_value,
-                    "tax_item_type" => "product"
-                ];
-            }
-
-            if ($callback) $data = array_merge($data, $callback());
-            
-            OrderTaxItem::insert($data);  
-        }
-        catch ( Exception $exception )
-        {
-            DB::rollback();
-            throw $exception;
-        }
-        DB::commit(); 
-    }
+    
 
 }
