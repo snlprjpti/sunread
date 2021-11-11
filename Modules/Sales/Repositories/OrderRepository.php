@@ -3,21 +3,26 @@
 namespace Modules\Sales\Repositories;
 
 use Exception;
+use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
+use Modules\Tax\Facades\TaxPrice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Modules\Sales\Traits\HasOrder;
 use Modules\Cart\Entities\CartItem;
-use Modules\Core\Facades\SiteConfig;
-use Modules\Core\Repositories\BaseRepository;
 use Modules\Coupon\Entities\Coupon;
-use Modules\Customer\Entities\Customer;
-use Modules\Tax\Facades\TaxPrice;
-use Modules\GeoIp\Facades\GeoIp;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\Product;
+use Modules\Customer\Entities\Customer;
+use Modules\Core\Repositories\BaseRepository;
 use Modules\Sales\Repositories\OrderItemRepository;
 
 class OrderRepository extends BaseRepository
 {
+    use HasOrder {
+        store as traitStore;
+    }
+
     protected $orderItemRepository, $orderAddressRepository;
 
     protected array $product_attribute_slug = [
@@ -47,7 +52,7 @@ class OrderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            // $this->validateData($request);
+            $this->validateData($request);
                 
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
@@ -87,9 +92,10 @@ class OrderRepository extends BaseRepository
             $customer_data = isset($data['is_guest']) ? $customer_data : []; 
             $data = array_merge($data, $customer_data);
 
-            $order = $this->create($data, function ($order) use ($request) {
+            $order = $this->traitStore($request);
+            // $order = $this->create($data, function ($order) use ($request) {
                 // $this->orderAddressRepository->store($request, $order);
-            });
+            // });
 
             $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
 
@@ -116,7 +122,6 @@ class OrderRepository extends BaseRepository
                  */
             });
             // dd('asd');
-            
         } 
         catch (Exception $exception)
         {
