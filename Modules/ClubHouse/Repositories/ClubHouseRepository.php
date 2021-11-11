@@ -121,14 +121,14 @@ class ClubHouseRepository extends BaseRepository
         return $slug;
     }
 
-    public function fetchWithSlug(string $club_house_slug, $store): object
+    public function fetchWithSlug(string $club_house_slug, $scope): object
     {
         try
         {
             $club_house_value = ClubHouseValue::whereAttribute("slug")->whereValue($club_house_slug)->firstOrFail();
             $club_house = $club_house_value->clubHouse;
 
-            if(!$this->checkStatus($club_house, $store)) throw new ClubHouseNotFoundException();
+            if(!$this->checkStatus($club_house, $scope)) throw new ClubHouseNotFoundException();
         }
 
         catch(Exception $exception)
@@ -139,14 +139,13 @@ class ClubHouseRepository extends BaseRepository
         return $club_house;
     }
 
-    public function checkStatus(object $club_house, $store): bool
+    public function checkStatus(object $club_house, $scope): bool
     {
         try
         {
-            $store = CoreCache::getStoreWithCode($store);
             $data = [
-                "scope" => "store",
-                "scope_id" => $store->id,
+                "scope" => "website",
+                "scope_id" => $scope->id,
             ];
             $status_value = $club_house->value($data, "status");
         }
@@ -155,7 +154,7 @@ class ClubHouseRepository extends BaseRepository
             throw $exception;
         }
 
-        return $status_value === "1" ? true : false;
+        return $status_value === 1 ? true : false;
     }
 
 }

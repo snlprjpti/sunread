@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Modules\Core\Facades\CoreCache;
 use Modules\ClubHouse\Entities\ClubHouse;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -45,8 +46,11 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, callback:function () {
-                return $this->model->where("status", 1);
+            $website = CoreCache::getWebsite($request->header("hc-host"));
+            $fetched = $this->repository->fetchAll($request, callback:function () use($website) {
+                return $this->model->whereHas('values', function($query) {
+                    $query->where("attribute", "status")->where("value", 1);
+                });
             });
         }
         catch (Exception $exception)
@@ -61,8 +65,8 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $scope = $request->header("hc-store");
-            $fetched = $this->repository->fetchWithSlug($club_house_slug, $scope);
+            $website = CoreCache::getWebsite($request->header("hc-host"));
+            $fetched = $this->repository->fetchWithSlug($club_house_slug, $website);
         }
         catch( Exception $exception )
         {
@@ -71,4 +75,5 @@ class ClubHouseController extends BaseController
 
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
+
 }
