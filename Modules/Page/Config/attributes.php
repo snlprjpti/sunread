@@ -5593,7 +5593,7 @@ return [
                                                     "type" => "select",
                                                     "provider" => "",
                                                     "pluck" => [],
-                                                    "default" => 1,
+                                                    "default" => 0,
                                                     "options" => [
                                                         [ "value" => 1, "label" => "Enabled" ],
                                                         [ "value" => 0, "label" => "Disabled" ],
