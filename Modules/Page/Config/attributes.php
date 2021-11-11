@@ -5576,7 +5576,24 @@ return [
                                                     "type" => "select",
                                                     "provider" => "",
                                                     "pluck" => [],
-                                                    "default" => "1",
+                                                    "default" => 1,
+                                                    "options" => [
+                                                        [ "value" => 1, "label" => "Enabled" ],
+                                                        [ "value" => 0, "label" => "Disabled" ],
+                                                    ],
+                                                    "description" => "",
+                                                    "conditions" => [],
+                                                    "rules" => "in:1,0",
+                                                    "is_required" => 1
+                                                ],
+                                                [
+                                                    "title" => "Show Video",
+                                                    "slug" => "show_video",
+                                                    "hasChildren" => 0,
+                                                    "type" => "select",
+                                                    "provider" => "",
+                                                    "pluck" => [],
+                                                    "default" => 1,
                                                     "options" => [
                                                         [ "value" => 1, "label" => "Enabled" ],
                                                         [ "value" => 0, "label" => "Disabled" ],
