@@ -16,31 +16,20 @@ class OrderCommentJob implements ShouldQueue
 
     protected $comment;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct(object $comment)
+    public function __construct(array $comment)
     {
         $this->comment = $comment;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle(): void
     {
         try
         {
             OrderComment::create([
-                "order_id" => $this->comment->order_id,
-                "user_id" => auth("customer")->id(),
-                "is_customer_notified" => $this->comment->is_customer_notified ?? 0,
-                "is_visible_on_storefornt" => $this->comment->is_visible_on_storefornt ?? 0,
-                "comment" => $this->comment->comment,
+                "order_id" => $this->comment['order_id'],
+                "user_id" => $this->comment['user_id'],
+                "is_visible_on_storefornt" => $this->comment['is_visible_on_storefornt'],
+                "comment" => $this->comment['comment'],
                 "created_at" => now()
             ]);
         }
