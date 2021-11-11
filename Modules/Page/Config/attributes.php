@@ -1367,6 +1367,20 @@ return [
                                                     "description" => "",
                                                     "rules" => "mimes:jpeg,jpg,bmp,png",
                                                     "is_required" => 1
+                                                ],
+                                                [
+                                                    "title" => "RollOver Image",
+                                                    "slug" => "rollover_image",
+                                                    "hasChildren" => 0,
+                                                    "type" => "file",
+                                                    "provider" => "",
+                                                    "pluck" => [],
+                                                    "default" => "",
+                                                    "options" => [],
+                                                    "conditions" => [],
+                                                    "description" => "",
+                                                    "rules" => "mimes:jpeg,jpg,bmp,png",
+                                                    "is_required" => 1
                                                 ]
                                             ]
                                         ]
