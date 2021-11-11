@@ -9,6 +9,7 @@ use Modules\Product\Entities\ProductAttribute;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\AttributeSet;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -108,7 +109,14 @@ class ProductAttributeRepository extends ProductRepository
                     $all_product_attributes[] = $product_attribute;
                     continue;
                 }
+
                 $product_attribute["value"] = in_array($attribute->slug, $request_attribute_slugs) ? $single_attribute_collection->pluck("value")->first() : null;
+
+                if($method == "update" && ($attribute->type == "image" || $attribute->type == "file") && isset($product_attribute["value"])) {
+                    $bool_val = $this->handleFileIssue($product, $request, $attribute, $product_attribute["value"]);
+                    if($bool_val) continue;
+                }
+
                 if($attribute->slug == "url_key") $product_attribute["value"] = $this->createUniqueSlug($product, $request_attribute_collection, $product_attribute["value"]);
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 
@@ -136,6 +144,24 @@ class ProductAttributeRepository extends ProductRepository
         $all_product_attributes = collect($all_product_attributes)->where("value", "!=", null)->toArray();
         $all_product_attributes[] = $product_components;
         return $all_product_attributes;
+    }
+
+    public function handleFileIssue(object $product, object $request, object $attribute, mixed $value): bool
+    {
+        try
+        {
+            if ($value && !is_file($value)) {
+                $exist_file = $product->product_attributes()->whereAttributeId($attribute->id)->whereScope($request->scope ?? "website")->whereScopeId($request->scope_id ?? $product->website_id)->first();
+                if ($exist_file?->value?->value && (Storage::url($exist_file?->value?->value) == $value)) {
+                    return true;
+                }
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        return false;
     }
 
     public function optionValidation(object $attribute, mixed $values): void
@@ -229,6 +255,7 @@ class ProductAttributeRepository extends ProductRepository
                     continue;
                 }
 
+                if(is_file($attribute["value"])) $attribute["value"] = $this->product_repository->storeScopeImage($attribute["value"], "product");
                 if(is_array($attribute["value"])) $attribute["value"] = json_encode($attribute["value"], JSON_NUMERIC_CHECK);
 
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
