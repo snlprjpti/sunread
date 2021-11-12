@@ -106,8 +106,9 @@ class OrderRepository extends BaseRepository
                     })->toArray();
                     $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
                 });
-            $this->orderCalculationUpdate($order);
             })->dispatch();
+            
+            $this->orderCalculationUpdate($order);
 
         } 
         catch (Exception $exception)

@@ -112,7 +112,7 @@ trait HasOrderCalculation
         return $customer_tax;
     }
 
-    public function calculateDiscount(object $order): ?object
+    public function calculateDiscount(object $order): mixed
     {
         if ($order->coupon_code) {
             $coupon = Coupon::whereCode($order->coupon_code)->publiclyAvailable()->first();
