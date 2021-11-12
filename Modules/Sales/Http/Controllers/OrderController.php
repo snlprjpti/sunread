@@ -15,9 +15,9 @@ use Modules\Sales\Facades\TransactionLog;
 
 class OrderController extends BaseController
 {
-    protected $orderRepository;
+    protected $repository;
 
-    public function __construct(OrderRepository $orderRepository, Order $order)
+    public function __construct(OrderRepository $repository, Order $order)
     {
         $this->middleware('validate.website.host');
         $this->middleware('validate.channel.code');
@@ -25,7 +25,7 @@ class OrderController extends BaseController
 
         $this->model = $order;
         $this->model_name = "Order";
-        $this->orderRepository = $orderRepository;
+        $this->repository = $repository;
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -40,11 +40,41 @@ class OrderController extends BaseController
         return OrderResource::collection($orders);
     }
 
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->fetchAll($request, ["order_items"], function () use ($request)   {
+                return $this->model->where("website_id", $request->website_id);
+            });
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
+    public function show(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->fetch($id, ["order_items"]);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
+
     public function store(Request $request): JsonResponse
     {
         try
         {
-            $response = $this->orderRepository->store($request);
+            $response = $this->repository->store($request);
         }
         catch( Exception $exception )
         {

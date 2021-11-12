@@ -13,8 +13,12 @@
 
 Route::group(['middleware' => ['api','proxies']], function () {
     
+    Route::group(['prefix' => 'admin/sales', 'as' => 'admin.sales.', 'middleware' => ['admin', 'language']], function () {
+        Route::resource("orders", OrderController::class)->only(["index", "show"]);
+    });
+
     Route::group(['as' => 'orders.', 'prefix' => 'public/orders'], function () {
-        Route::resource("sales", OrderController::class);
+        Route::resource("sales", OrderController::class)->only(["store"]);
     });
 
 });
