@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
+use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Website;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Country\Entities\City;
@@ -105,12 +106,11 @@ class CustomerAddressRepository extends BaseRepository
         return $updated;
     }
 
-    public function checkCustomerChannel(object $request, object $customer): ?int
+    public function checkCustomerChannel(object $request, object $customer): int
     {
         try
         {
-            $website = Website::findOrFail($customer->website_id);
-            $channel_id = $website->channels()->where("id", $request->channel_id)->first()?->id;
+            $channel_id = Channel::where("id", $request->channel_id)->whereWebsiteId(($customer->website_id))->firstOrFail()->id;
         }
         catch(Exception $exception)
         {
