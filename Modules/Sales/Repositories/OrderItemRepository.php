@@ -3,21 +3,12 @@
 namespace Modules\Sales\Repositories;
 
 use Exception;
-use Illuminate\Support\Facades\DB;
-use Modules\Cart\Entities\CartItem;
-use Modules\Sales\Entities\OrderTax;
 use Modules\Product\Entities\Product;
 use Modules\Sales\Entities\OrderItem;
-use Modules\Sales\Traits\HasOrderItem;
-use Modules\Sales\Entities\OrderTaxItem;
 use Modules\Core\Repositories\BaseRepository;
 
 class OrderItemRepository extends BaseRepository
-{
-    use HasOrderItem {
-        store as traitStore;
-    }
-    
+{   
     protected $product;
 
     public function __construct(OrderItem $orderItem, Product $product)
@@ -69,10 +60,10 @@ class OrderItemRepository extends BaseRepository
             $tax_amount = $order_item_details->tax_rate_value;
             $tax_percent = $order_item_details->tax_rate_percent;
     
-            $price_incl_tax = $price + $tax_amount;
-            $row_total = $price * $qty;
-            $row_total_incl_tax = $row_total + $tax_amount;
-            $row_weight = $weight * $qty;
+            $price_incl_tax = ($price + $tax_amount);
+            $row_total = ($price * $qty);
+            $row_total_incl_tax = ($row_total + $tax_amount);
+            $row_weight = ($weight * $qty);
     
             $discount_amount_tax = 0.00; // this is total discount amount including tax
             $discount_amount = 0.00;

@@ -21,7 +21,9 @@ class OrderAddressRepository extends BaseRepository
         $this->city = $city;
         $this->region = $region;
         $this->rules = [
-            
+            "country_id" => "required|exists:countries,id",
+            "region_id" => "sometimes|exists:regions,id",
+            "city_id" => "sometimes|exists:cities,id"
         ];
     }
 
@@ -48,11 +50,11 @@ class OrderAddressRepository extends BaseRepository
                     "address_line_1" => $order_address['address_line_1'],
                     "address_line_2" => $order_address['address_line_2'],
                     "postal_code" => $order_address['postal_code'],
-                    "country_id" => $countryId,
-                    "region_id" => $region?->id,
-                    "city_id" => $city?->id,
-                    "region_name" => $region->name,
-                    "city_name" => $city->name,
+                    "country_id" => $order_address["country_id"],
+                    "region_id" => $order_address["region_id"],
+                    "city_id" => $order_address["city_id"],
+                    "region_name" => $order_address["region_name"],
+                    "city_name" => $order_address["city_name"],
                     "vat_number" => $order_address['vat_number']
                 ];
 

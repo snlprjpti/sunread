@@ -23,9 +23,6 @@ use Modules\Sales\Traits\HasOrderProductDetail;
 
 class OrderRepository extends BaseRepository
 {
-    // use HasOrder {
-    //     store as traitStore;
-    // }
     use HasOrderProductDetail;
 
     protected $orderItemRepository, $orderAddressRepository;
@@ -88,10 +85,9 @@ class OrderRepository extends BaseRepository
             }
             $customer_data = isset($data['is_guest']) ? $customer_data : []; 
             $data = array_merge($data, $customer_data);
-
-            // $order = $this->traitStore($request);
+            
             $order = $this->create($data, function ($order) use ($request) {
-                // $this->orderAddressRepository->store($request, $order);
+                $this->orderAddressRepository->store($request, $order);
             });    
 
             $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
@@ -99,7 +95,6 @@ class OrderRepository extends BaseRepository
             $jobs = [];
             foreach ( $items as $order_item ) 
             {
-
                 $order_item_details = $this->getProductDetail($request, $order_item, function ($product) use ($coreCache, &$tax, $request, $order_item) {
                     $tax = $this->calculateTax($request, $order_item)->toArray();
                     $product_options = $this->getProductOptions($coreCache, $product);
@@ -153,7 +148,7 @@ class OrderRepository extends BaseRepository
             $total_tax = array_sum($taxes);
 
             $discount_amount = $this->calculateDiscount($order); // To-Do other discount will be added here...
-            $grand_total = $sub_total + $total_tax - $discount_amount;
+            $grand_total = ($sub_total + $total_tax - $discount_amount);
 
             $order->update([
                 "sub_total" => $sub_total,

@@ -7,7 +7,8 @@ use Modules\Sales\Entities\Order;
 use Modules\Core\Facades\SiteConfig;
 use Modules\GeoIp\Facades\GeoIp;
 
-trait HasOrder
+trait HasOrderCalculation
 {
+	
 
 }
