@@ -9,6 +9,6 @@ class ContactTemplateScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $builder->where("email_template_code", '=', "contact");
+        $builder->where("email_template_code", '=', "contact_form");
     }
 }
