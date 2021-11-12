@@ -255,8 +255,8 @@ class ProductAttributeRepository extends ProductRepository
                     continue;
                 }
 
-                if(is_file($attribute["value"])) $attribute["value"] = $this->product_repository->storeScopeImage($attribute["value"], "product");
                 if(is_array($attribute["value"])) $attribute["value"] = json_encode($attribute["value"], JSON_NUMERIC_CHECK);
+                if(is_file($attribute["value"])) $attribute["value"] = $this->product_repository->storeScopeImage($attribute["value"], "product");
 
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
 
