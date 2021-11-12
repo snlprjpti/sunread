@@ -90,7 +90,7 @@ class AddressRepository extends BaseRepository
             $core_cache = $this->getCoreCache($request);
             $channel_id = $core_cache->channel->id;
 
-            $countries = $this->getCountry($core_cache, $request);
+            $countries = $this->getCountry($core_cache);
 
             if($core_cache->website->id != $customer->website_id) throw ValidationException::withMessages([ "Country" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
 
@@ -174,7 +174,7 @@ class AddressRepository extends BaseRepository
         return $data;
     }
 
-    public function getCountry(object $core_cache, object $request): object
+    public function getCountry(object $core_cache): object
     {
         try
         {
