@@ -4,10 +4,7 @@ namespace Modules\Sales\Traits;
 
 use Exception;
 use Illuminate\Support\Facades\Storage;
-use Modules\Coupon\Entities\Coupon;
-use Modules\Customer\Entities\Customer;
 use Modules\Product\Entities\Product;
-use Modules\Tax\Facades\TaxPrice;
 
 trait HasOrderProductDetail
 {
@@ -111,40 +108,4 @@ trait HasOrderProductDetail
             "attribute_slug" => $slug
         ]);
     }
-
-    public function calculateTax(object $request, array $order): ?object
-    {
-        try
-        {
-            $get_zip_code = collect($request->get("address"))->where("address_type", "shipping")->first();
-            $zip_code = isset($get_zip_code['postal_code']) ? $get_zip_code['postal_code'] : null;
-
-            $product_data = $this->getProductDetail($request, $order);
-            if ( auth("customer")->id() ) {
-                $customer = Customer::whereId(auth("customer")->id())->with(["group.tax_group"])->first();
-                $customer_tax_group_id = $customer?->group?->tax_group?->id;
-                $customer_tax = TaxPrice::calculate($request, $product_data->price, customer_tax_group_id:$customer_tax_group_id, zip_code:$zip_code);
-            }
-            else $customer_tax = TaxPrice::calculate($request, $product_data->price, $product_data->tax_class_id?->id, zip_code:$zip_code);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $customer_tax;
-    }
-
-    public function calculateDiscount(object $order): ?object
-    {
-        if ($order->coupon_code) {
-            $coupon = Coupon::whereCode($order->coupon_code)->publiclyAvailable()->first();
-            if (!$coupon) throw new Exception("Coupon Expired");  
-            $this->discount_percent = $coupon->discount_percent;          
-        }
-
-        return $coupon ?? 0; 
-    }
-
-
 }

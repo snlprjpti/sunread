@@ -6,9 +6,12 @@ use Exception;
 use Modules\Product\Entities\Product;
 use Modules\Sales\Entities\OrderItem;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Sales\Traits\HasOrderCalculation;
 
 class OrderItemRepository extends BaseRepository
 {   
+    use HasOrderCalculation;
+    
     protected $product;
 
     public function __construct(OrderItem $orderItem, Product $product)
@@ -16,9 +19,6 @@ class OrderItemRepository extends BaseRepository
         $this->model = $orderItem;
         $this->model_key = "order_items";
         $this->product = $product;
-        $this->rules = [
-            
-        ];
     }
 
     public function store(object $request, object $order, object $order_item_details): object
@@ -48,47 +48,4 @@ class OrderItemRepository extends BaseRepository
 
         return $order_item;
     }
-
-    public function calculateItems(object $order_item_details): array
-    {
-        try
-        {
-            $price = $order_item_details->price;
-            $qty = $order_item_details->qty;
-            $weight = $order_item_details->weight;
-    
-            $tax_amount = $order_item_details->tax_rate_value;
-            $tax_percent = $order_item_details->tax_rate_percent;
-    
-            $price_incl_tax = ($price + $tax_amount);
-            $row_total = ($price * $qty);
-            $row_total_incl_tax = ($row_total + $tax_amount);
-            $row_weight = ($weight * $qty);
-    
-            $discount_amount_tax = 0.00; // this is total discount amount including tax
-            $discount_amount = 0.00;
-            $discount_percent = 0.00;
-    
-            $data = [
-                "price" => $price,
-                "qty" => $qty,
-                "weight" => $weight,
-                "tax_amount" => $tax_amount,
-                "tax_percent" => $tax_percent,
-                "price_incl_tax" => $price_incl_tax,
-                "row_total" => $row_total,
-                "row_total_incl_tax" => $row_total_incl_tax,
-                "row_weight" => $row_weight,
-                "discount_amount_tax" => $discount_amount_tax,
-                "discount_amount" => $discount_amount,
-                "discount_percent" => $discount_percent,
-            ];
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-        return $data;
-    }
-
 }

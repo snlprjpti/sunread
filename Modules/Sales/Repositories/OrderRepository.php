@@ -7,23 +7,18 @@ use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
-use Modules\Tax\Facades\TaxPrice;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Modules\Sales\Traits\HasOrder;
 use Modules\Cart\Entities\CartItem;
-use Modules\Coupon\Entities\Coupon;
 use Modules\Core\Facades\SiteConfig;
-use Modules\Product\Entities\Product;
-use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Sales\Jobs\OrderTaxesJob;
 use Modules\Sales\Repositories\OrderItemRepository;
+use Modules\Sales\Traits\HasOrderCalculation;
 use Modules\Sales\Traits\HasOrderProductDetail;
 
 class OrderRepository extends BaseRepository
 {
-    use HasOrderProductDetail;
+    use HasOrderProductDetail, HasOrderCalculation;
 
     protected $orderItemRepository, $orderAddressRepository;
 
@@ -88,7 +83,7 @@ class OrderRepository extends BaseRepository
             
             $order = $this->create($data, function ($order) use ($request) {
                 $this->orderAddressRepository->store($request, $order);
-            });    
+            });
 
             $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
 
@@ -103,9 +98,6 @@ class OrderRepository extends BaseRepository
                 $jobs[] = new OrderTaxesJob($order, $order_item_details);
                 $order_item = $this->orderItemRepository->store($request, $order, $order_item_details);
             }
-            
-            $this->orderCalculationUpdate($order);
-
             Bus::batch($jobs)->then( function (Batch $batch) use ($order) {
 
                 $order->order_taxes->map( function ($order_tax) {
@@ -114,7 +106,7 @@ class OrderRepository extends BaseRepository
                     })->toArray();
                     $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
                 });
-
+            $this->orderCalculationUpdate($order);
             })->dispatch();
 
         } 
@@ -126,43 +118,5 @@ class OrderRepository extends BaseRepository
 
         DB::commit();        
         return $order;
-    }
-
-    public function orderCalculationUpdate(object $order): void
-    {
-        try 
-        {
-            $sub_total = 0.00;
-            $sub_total_tax_amount = 0.00;
-            $total_qty_ordered = 0.00;
-            $item_discount_amount = 0.00;
-            
-            foreach ( $order->order_items as $item ) {
-                $sub_total += $item->row_total;
-                $sub_total_tax_amount += $item->row_total_incl_tax;
-                $total_qty_ordered += $item->qty;
-                $item_discount_amount += $item->discount_amount_tax;
-            }
-
-            $taxes = $order->order_taxes?->pluck('amount')->toArray();
-            $total_tax = array_sum($taxes);
-
-            $discount_amount = $this->calculateDiscount($order); // To-Do other discount will be added here...
-            $grand_total = ($sub_total + $total_tax - $discount_amount);
-
-            $order->update([
-                "sub_total" => $sub_total,
-                "sub_total_tax_amount" => $sub_total_tax_amount,
-                "tax_amount" => $total_tax,
-                "grand_total" => $grand_total,
-                "total_items_ordered" => $order->order_items->count(),
-                "total_qty_ordered" => $total_qty_ordered
-            ]);
-
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
     }
 }
