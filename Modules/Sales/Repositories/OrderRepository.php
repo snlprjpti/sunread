@@ -66,12 +66,12 @@ class OrderRepository extends BaseRepository
                 "shipping_method_label" => $request->shipping_method_label ?? 'online-delivery',
                 "payment_method" => $request->payment_method ?? 'stripe',
                 "payment_method_label" => $request->payment_method_label ?? 'stripe',
-                "sub_total" => $request->sub_total ?? 0.00,
-                "sub_total_tax_amount" => $request->sub_total_tax_amount ?? 0.00,
-                "tax_amount" => $request->tax_amount ?? 0.00,
-                "grand_total" => $request->grand_total ?? 0.00,
-                "total_items_ordered" => $request->total_items_ordered ?? 0.00,
-                "total_qty_ordered" => $request->total_qty_ordered ?? 0.00
+                "sub_total" => 0.00,
+                "sub_total_tax_amount" => 0.00,
+                "tax_amount" => 0.00,
+                "grand_total" => 0.00,
+                "total_items_ordered" => 0.00,
+                "total_qty_ordered" => 0.00
             ];
 
             if ( $data['is_guest'] ) {
@@ -108,6 +108,8 @@ class OrderRepository extends BaseRepository
                 $jobs[] = new OrderTaxesJob($order, $order_item_details);
                 $order_item = $this->orderItemRepository->store($request, $order, $order_item_details);
             }
+            
+            $this->orderCalculationUpdate($order);
 
             Bus::batch($jobs)->then( function (Batch $batch) use ($order) {
 
@@ -131,6 +133,41 @@ class OrderRepository extends BaseRepository
         return $order;
     }
 
+    public function orderCalculationUpdate(object $order): void
+    {
+        try 
+        {
+            $sub_total = 0.00;
+            $sub_total_tax_amount = 0.00;
+            $total_qty_ordered = 0.00;
+            $item_discount_amount = 0.00;
+            
+            foreach ( $order->order_items as $item ) {
+                $sub_total += $item->row_total;
+                $sub_total_tax_amount += $item->row_total_incl_tax;
+                $total_qty_ordered += $item->qty;
+                $item_discount_amount += $item->discount_amount_tax;
+            }
 
+            $taxes = $order->order_taxes?->pluck('amount')->toArray();
+            $total_tax = array_sum($taxes);
 
+            $discount_amount = $this->calculateDiscount($order); // To-Do other discount will be added here...
+            $grand_total = $sub_total + $total_tax - $discount_amount;
+
+            $order->update([
+                "sub_total" => $sub_total,
+                "sub_total_tax_amount" => $sub_total_tax_amount,
+                "tax_amount" => $total_tax,
+                "grand_total" => $grand_total,
+                "total_items_ordered" => $order->order_items->count(),
+                "total_qty_ordered" => $total_qty_ordered
+            ]);
+
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+    }
 }

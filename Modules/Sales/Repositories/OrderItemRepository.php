@@ -74,7 +74,7 @@ class OrderItemRepository extends BaseRepository
             $row_total_incl_tax = $row_total + $tax_amount;
             $row_weight = $weight * $qty;
     
-            $discount_amount_tax = 0.00;
+            $discount_amount_tax = 0.00; // this is total discount amount including tax
             $discount_amount = 0.00;
             $discount_percent = 0.00;
     
@@ -84,13 +84,13 @@ class OrderItemRepository extends BaseRepository
                 "weight" => $weight,
                 "tax_amount" => $tax_amount,
                 "tax_percent" => $tax_percent,
-                "price_incl_tax" =>$price_incl_tax,
-                "row_total" =>$row_total,
-                "row_total_incl_tax" =>$row_total_incl_tax,
-                "row_weight" =>$row_weight,
-                "discount_amount_tax" =>$discount_amount_tax,
-                "discount_amount" =>$discount_amount,
-                "discount_percent" =>$discount_percent,
+                "price_incl_tax" => $price_incl_tax,
+                "row_total" => $row_total,
+                "row_total_incl_tax" => $row_total_incl_tax,
+                "row_weight" => $row_weight,
+                "discount_amount_tax" => $discount_amount_tax,
+                "discount_amount" => $discount_amount,
+                "discount_percent" => $discount_percent,
             ];
         }
         catch ( Exception $exception )

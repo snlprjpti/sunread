@@ -14,6 +14,7 @@ class CreateOrderStatusStatesTable extends Migration
             $table->string("state");
             $table->boolean("is_default")->default(0);
             $table->integer("position");
+            $table->foreign("status")->references("slug")->on("order_statuses");
             $table->timestamps();
         });
     }
