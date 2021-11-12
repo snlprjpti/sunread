@@ -3,6 +3,8 @@
 namespace Modules\Sales\Repositories;
 
 use Exception;
+use Illuminate\Bus\Batch;
+use Illuminate\Support\Facades\Bus;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
 use Modules\Tax\Facades\TaxPrice;
@@ -93,18 +95,32 @@ class OrderRepository extends BaseRepository
             });    
 
             $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
+
+            $jobs = [];
             foreach ( $items as $order_item ) 
             {
+
                 $order_item_details = $this->getProductDetail($request, $order_item, function ($product) use ($coreCache, &$tax, $request, $order_item) {
                     $tax = $this->calculateTax($request, $order_item)->toArray();
                     $product_options = $this->getProductOptions($coreCache, $product);
                     return array_merge($product_options, $tax, $order_item);
                 });
-                // OrderTaxesJob::dispatchSync($order, $order_item_details);
+                $jobs[] = new OrderTaxesJob($order, $order_item_details);
                 $order_item = $this->orderItemRepository->store($request, $order, $order_item_details);
             }
             
             $this->orderCalculationUpdate($order);
+
+            Bus::batch($jobs)->then( function (Batch $batch) use ($order) {
+
+                $order->order_taxes->map( function ($order_tax) {
+                    $order_tax_item_amount = $order_tax->order_tax_items->map( function ($order_item) {
+                        return $order_item->amount;
+                    })->toArray();
+                    $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
+                });
+
+            })->dispatch();
 
         } 
         catch (Exception $exception)
