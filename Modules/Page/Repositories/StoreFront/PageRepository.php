@@ -104,7 +104,7 @@ class PageRepository extends BaseRepository
                     $this->getChildren($element["subGroups"], $coreCache, $append_key, $values);
                     continue;
                 }
-                
+
                 if ($element["hasChildren"] == 0) {
 
                     //skip sibling of element product
@@ -176,16 +176,16 @@ class PageRepository extends BaseRepository
                     "scope_id" => $store->id,
                     "attribute_slug" => "visibility"
                 ]);
-                
+
                 $fetched = ($is_visibility?->name != "Not Visible Individually") ? new ProductResource($fetched) : null;
-            } 
+            }
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $fetched;   
+        return $fetched;
     }
 
     public function getDynamicLink(mixed $default_url, mixed $values, object $coreCache): mixed
@@ -200,14 +200,14 @@ class PageRepository extends BaseRepository
                 $default_url = implode("/", $array_url);
             }
             $final_url = url($default_url);
-            
+
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $final_url;   
+        return $final_url;
     }
 
 }

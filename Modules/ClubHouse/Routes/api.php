@@ -19,3 +19,9 @@ Route::group(['middleware' => ['api']], function () {
         Route::resource('clubhouses', ClubHouseController::class)->except(["create","edit"]);
     });
 });
+
+
+Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+    Route::get('/clubhouses', [\Modules\ClubHouse\Http\Controllers\StoreFront\ClubHouseController::class, "index"])->name("clubhouses.index");
+    Route::get('/clubhouses/{club_house_slug}', [\Modules\ClubHouse\Http\Controllers\StoreFront\ClubHouseController::class, "show"])->name("clubhouses.show");
+});
