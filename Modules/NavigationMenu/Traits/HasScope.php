@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\ClubHouse\Traits;
+namespace Modules\NavigationMenu\Traits;
 
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Channel;
 use Illuminate\Support\Facades\Storage;
-use Modules\ClubHouse\Entities\ClubHouse;
-use Modules\ClubHouse\Entities\ClubHouseValue;
+use Modules\NavigationMenu\Entities\NavigationMenuItem;
+use Modules\NavigationMenu\Entities\NavigationMenuItemValue;
 
 trait HasScope
 {
@@ -14,13 +14,13 @@ trait HasScope
     public $channel_model, $store_model, $value_model;
 
     /**
-     * Create Model for Scope with ClubHouseValue
+     * Create Model for Scope with NavigationMenuItemValue
      */
     public function createModel(): void
     {
         $this->channel_model = new Channel();
         $this->store_model = new Store();
-        $this->value_model = new ClubHouseValue();
+        $this->value_model = new NavigationMenuItemValue();
     }
 
     /**
@@ -57,7 +57,7 @@ trait HasScope
     }
 
     /**
-     * Filter through scope for Club House
+     * Filter through scope for Navigation Menu
      */
     public function scopeFilter(string $scope, string $element_scope): bool
     {
@@ -75,21 +75,21 @@ trait HasScope
     // Check for condition if it exists
     public function checkCondition(array $data): object
     {
-        return $this->value_model->where('club_house_id', $data["club_house_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);
+        return $this->value_model->where('navigation_menu_item_id', $data["navigation_menu_item_id"])->whereScope($data["scope"])->whereScopeId($data["scope_id"])->whereAttribute($data["attribute"]);
     }
 
     /**
      * Check if Slug Exists Or Not
      */
-    public function checkSlug(array $data, ?string $slug, ?object $club_house = null): ?object
+    public function checkSlug(array $data, ?string $slug, ?object $navigation_menu_item = null): ?object
     {
-        $website_id = isset($data["website_id"]) ? $data["website_id"] : $club_house?->website_id;
+        $website_id = isset($data["website_id"]) ? $data["website_id"] : $navigation_menu_item?->website_id;
 
-        $club_house = ClubHouse::whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $club_house) {
-            if($club_house) $query = $query->where('club_house_id', '!=', $club_house->id);
+        $navigation_menu_item = NavigationMenuItem::whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $navigation_menu_item) {
+            if($navigation_menu_item) $query = $query->where('navigation_menu_item_id', '!=', $navigation_menu_item->id);
             $query->whereAttribute("slug")->whereValue($slug);
         })->first();
-        return $club_house;
+        return $navigation_menu_item;
     }
 
     /**
@@ -98,9 +98,9 @@ trait HasScope
     public function value(array $data, string $attribute): mixed
     {
         $this->createModel();
-        $elements = collect(config("clubhouse.attributes"))->pluck("elements")->flatten(1);
+        $elements = collect(config("navigation_menu.attributes"))->pluck("elements")->flatten(1);
         $attribute_data = $elements->where("slug", $attribute)->first();
-        $data = array_merge($data, [ "attribute" => $attribute], ["club_house_id" => $this->id]);
+        $data = array_merge($data, [ "attribute" => $attribute], ["navigation_menu_item_id" => $this->id]);
         $attribute_value = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
         return ($attribute_data["type"] == "file" && $attribute_value?->value) ? Storage::url($attribute_value?->value) : $attribute_value?->value;
     }

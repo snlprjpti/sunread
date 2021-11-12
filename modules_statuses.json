@@ -20,5 +20,6 @@
     "ProductStockAlert": true,
     "ProductStockAlertResource": true,
     "GeoIp": true,
-    "ClubHouse": true
+    "ClubHouse": true,
+    "NavigationMenu": true
 }

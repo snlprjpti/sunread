@@ -49,7 +49,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                    "rules" => "mimes:jpeg,jpg,bmp,png",
                     "is_required" => 1
                 ],
                 [
