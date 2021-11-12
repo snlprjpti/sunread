@@ -51,9 +51,9 @@ trait Configuration
             $model = $model->select("{$pluck[1]} AS value", "{$pluck[0]} AS label");
 
             if(isset($element["sort_by"]) && $element["sort_by"] != "") $model = $model->orderBy($element["sort_by"], "asc");
-            return $model->get()->toArray();
+            return $model->get();
         });
 
-        return $resources;
+        return $resources->toArray();
     }
 }

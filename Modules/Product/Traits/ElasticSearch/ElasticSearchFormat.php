@@ -22,8 +22,10 @@ trait ElasticSearchFormat
             $array = $this->getProductAttributes($store);
 
             $inventory = $this->getInventoryData();
-            if ($inventory) $array = array_merge($array, $inventory); 
-            $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
+            if ($inventory) {
+                $array = array_merge($array, $inventory); 
+                $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
+            }
     
             $array['categories'] = $this->getCategoryData($store);
             $images = $this->getImages();
@@ -143,7 +145,7 @@ trait ElasticSearchFormat
         try
         {
             $image_types = ImageType::where("slug", "!=", "gallery")->get();
-            foreach($image_types as $image_type) $images[$image_type->slug] = $this->getFullPath("base_image");
+            foreach($image_types as $image_type) $images[$image_type->slug] = $this->getFullPath($image_type->slug);
 
             $images['gallery'] = $this->images()->wherehas("types", function($query) {
                 $query->whereSlug("gallery");
@@ -162,7 +164,7 @@ trait ElasticSearchFormat
         return $images;
     }
 
-    Public function getFullPath($image_name): ?array
+    public function getFullPath($image_name): ?array
     {
         try
         {

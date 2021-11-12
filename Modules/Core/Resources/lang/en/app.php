@@ -47,7 +47,8 @@ return [
         "product-stock-alert" => "You will be notified via Email once the product is available.",
         "verification-success" => "Verification success",
         "already-verified" => "Account already verified",
-        "send-confirmation-link" => "Send confirmation link"
+        "send-confirmation-link" => "Send confirmation link",
+        "country-not-allow" => "Country is not allowed"
     ],
     'users' => [
         'forget-password' => [

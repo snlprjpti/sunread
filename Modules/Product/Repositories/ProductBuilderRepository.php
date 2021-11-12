@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Product\Entities\ProductBuilder;
 use Modules\Core\Repositories\BaseRepository;
@@ -37,10 +38,8 @@ class ProductBuilderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            if(!isset($value['value'])) $product->productBuilderValues()->where($scopeArr)->delete();
-
-            $components = $value['value'];
-            if ( !is_array($components) || count($components) == 0 ) return false;
+            $product_page_attributes = [];
+            $components = isset($value['value']) ? $value['value'] : [];
 
             foreach($components as $component)
             {
@@ -48,9 +47,10 @@ class ProductBuilderRepository extends BaseRepository
                 $all_attributes = [];
                 $data = $this->validateData(new Request($component));
                 $rules = $this->validateAttribute($component, $method);
-                $attribute_request = new Request($component["attributes"]);
-    
-                $data["attributes"] = $attribute_request->validate($rules);
+
+                $validator = Validator::make($component["attributes"], $rules);
+                if ( $validator->fails() ) throw ValidationException::withMessages(["components" => $validator->errors()]);
+                $data["attributes"] = $validator->validated();
 
                 foreach($data["attributes"] as $slug => $value)
                 {
@@ -154,7 +154,7 @@ class ProductBuilderRepository extends BaseRepository
                 $this->config_rules[$append_key] = "$rule|{$element["rules"]}"; 
                 $this->config_types[$element["slug"]] = $element["type"];
 
-                if ($method == "update" && isset($component["id"]) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
+                if ($method == "update" && (isset($component["id"]) || isset($component["parent_value"])) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
 
                 if ($element["hasChildren"] == 0) continue;
 
@@ -180,7 +180,8 @@ class ProductBuilderRepository extends BaseRepository
     {
         try
         {
-            $exist_component = $this->model->findOrFail($component["id"]);
+            $id = isset($component["id"]) ? $component["id"] : $component["parent_value"];
+            $exist_component = $this->model->findOrFail($id);
             $exist_values = $exist_component->value;
             $request_element_value = getDotToArray("attributes.$append_key", $component);
             if ($request_element_value && !is_file($request_element_value)) {
@@ -288,13 +289,22 @@ class ProductBuilderRepository extends BaseRepository
         {
             $product = $this->product::findOrFail($id);
             AttributeSet::findOrFail($product->attribute_set_id);
-            $whereCondition = array_merge($scope, ["product_id" => $id]);
 
             $attributes = [];
-            $components = $product->productBuilderValues()->where($whereCondition)->orderBy("position", "asc")->get();
+            $components = $product->productBuilderValues()->where($scope)->orderBy("position", "asc")->get();
+
+            //fetched from parent scope
+            if($components->isEmpty()) $components = $product->getBuilderParentValues($scope);
+
+            //fetched from parent product
+            if($components->isEmpty() && $product->parent_id) {
+                $components = $product->parent->productBuilderValues()->where($scope)->orderBy("position", "asc")->get();
+                if($components->isEmpty()) $components = $product->parent->getBuilderParentValues($scope);
+            }
+
             foreach($components as $component)
             {
-                $attributes[] = $this->getParent($component);
+                $attributes[] = $this->getParent($component, $product, $scope);
             }
 
             $item = $attributes;
@@ -306,7 +316,7 @@ class ProductBuilderRepository extends BaseRepository
         return $item;
     }
 
-    public function getParent(object $component): array
+    public function getParent(object $component, object $product, array $scope = []): array
     {
         try
         {
@@ -314,18 +324,22 @@ class ProductBuilderRepository extends BaseRepository
 
             $data = collect($this->pageAttributeRepository->config_fields)->where("slug", $component->attribute)->first();
             $this->getChildren($data["mainGroups"], values:$component->value);
+
+            $final_component = [
+                "title" => $data["title"],
+                "slug" => $data["slug"],
+                "mainGroups" => $this->parent  
+            ];
+            
+            if($product->id == $component->product_id && $scope["scope"] == $component->scope) $final_component["id"] = $component->id;
+            else $final_component["parent_value"] = $component->id;
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return [
-            "id" => $component->id,
-            "title" => $data["title"],
-            "slug" => $data["slug"],
-            "mainGroups" => $this->parent
-        ];
+        return $final_component;
     }
 
     private function getChildren(array $elements, ?string $key = null, array $values, ?string $slug_key = null): void

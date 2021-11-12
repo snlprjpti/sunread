@@ -42,18 +42,18 @@ class CategoryRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $fetched["categories"] = $this->getCategories($categories, $scope);
 
-            $fetched["logo"] = SiteConfig::fetch("logo", "channel", $coreCache->channel->id); 
+            $fetched["logo"] = SiteConfig::fetch("logo", "channel", $coreCache->channel->id);
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return $fetched;     
+        return $fetched;
     }
 
     public function getCategories(object $categories, array $scope): array
@@ -73,6 +73,6 @@ class CategoryRepository extends BaseRepository
         }
 
         return $fetched;
-    } 
+    }
 }
 
