@@ -61,4 +61,18 @@ class CountryController extends BaseController
 
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
+
+    public function channelCountry(Request $request): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->channelCountry($request->channel_id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
 }
