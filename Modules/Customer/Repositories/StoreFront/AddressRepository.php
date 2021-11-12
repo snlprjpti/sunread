@@ -92,7 +92,7 @@ class AddressRepository extends BaseRepository
 
             $countries = $this->getCountry($core_cache, $request);
 
-            if($core_cache->website->id != $customer->website_id) throw ValidationException::withMessages(["Country" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
+            if($core_cache->website->id != $customer->website_id) throw ValidationException::withMessages([ "Country" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
 
             if($request->shipping) {
                 /**
@@ -156,14 +156,14 @@ class AddressRepository extends BaseRepository
                 else {
                     $data["city_id"] = null;
                     $cities = City::whereRegionId($data["region_id"])->count();
-                    if($cities > 0) throw ValidationException::withMessages(["city_id" => __("core::app.response.please-choose", [ "name"=> "{$name} City" ])]);
+                    if($cities > 0) throw ValidationException::withMessages([ "city_id" => __("core::app.response.please-choose", [ "name"=> "{$name} City" ])]);
                 }
             }
             else {
                 $data["region_id"] = null;
                 $data["city_id"] = null;
                 $region = Region::whereCountryId($data["country_id"])->count();
-                if($region > 0) throw ValidationException::withMessages(["region_id" => __("core::app.response.please-choose", [ "name"=> "{$name} Region" ])]);
+                if($region > 0) throw ValidationException::withMessages([ "region_id" => __("core::app.response.please-choose", [ "name"=> "{$name} Region" ])]);
             }
         }
         catch (Exception $exception)
@@ -178,7 +178,7 @@ class AddressRepository extends BaseRepository
     {
         try
         {
-            if (!$core_cache->channel) throw ValidationException::withMessages(["country_id" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
+            if (!$core_cache->channel) throw ValidationException::withMessages([ "country_id" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
 
             $allow = SiteConfig::fetch("allow_countries", "channel", $core_cache->channel->id);
             $default[] = SiteConfig::fetch("default_country", "channel", $core_cache->channel->id);
@@ -215,8 +215,8 @@ class AddressRepository extends BaseRepository
         {
             $new_rules = $this->rules;
 
-            if(!isset($request->{$name}["country_id"])) throw ValidationException::withMessages(["country_id" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
-            if (!$countries->contains("id", $request->shipping["country_id"])) throw ValidationException::withMessages(["country_id" => __("core::app.response.invalid-country", [ "name"=> $name ])]);
+            if(!isset($request->{$name}["country_id"])) throw ValidationException::withMessages([ "country_id" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
+            if (!$countries->contains("id", $request->shipping["country_id"])) throw ValidationException::withMessages([ "country_id" => __("core::app.response.invalid-country", [ "name"=> $name ])]);
 
 
             $this->rules = [];
@@ -226,7 +226,7 @@ class AddressRepository extends BaseRepository
             }
 
             $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,$name)));
-            $data[$name] = array_merge($data[$name], ["customer_id" => $customer->id]);
+            $data[$name] = array_merge($data[$name], [ "customer_id" => $customer->id ]);
             $this->rules = $new_rules;
         }
         catch (Exception $exception)
