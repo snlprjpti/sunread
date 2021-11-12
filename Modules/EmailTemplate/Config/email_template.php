@@ -48,5 +48,9 @@ return [
     [
         "label" => "Guest Order Update",
         "code" => "order_update_guest"
+    ],
+    [
+        "label" => "Contact Form",
+        "code" => "contact_form"
     ]
 ];
