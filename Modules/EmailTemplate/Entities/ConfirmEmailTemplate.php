@@ -3,9 +3,9 @@
 namespace Modules\EmailTemplate\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\EmailTemplate\Scope\ConfirmAccountTemplateScope;
+use Modules\EmailTemplate\Scope\ConfirmEmailTemplateScope;
 
-class ConfirmAccountTemplate extends Model
+class ConfirmEmailTemplate extends Model
 {
     protected $table = "email_templates";
 
@@ -13,6 +13,6 @@ class ConfirmAccountTemplate extends Model
     {
         parent::boot();
 
-        return static::addGlobalScope(new ConfirmAccountTemplateScope());
+        return static::addGlobalScope(new ConfirmEmailTemplateScope());
     }
 }
