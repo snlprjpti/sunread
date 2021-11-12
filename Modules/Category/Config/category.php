@@ -117,7 +117,7 @@ return [
                     "rules" => "string",
                     "is_required" => 0
                 ],
-                                [
+                [
                     "title" => "Gradient Color",
                     "slug" => "gradient_color",
                     "type" => "text",
