@@ -4,8 +4,8 @@ Route::group(['middleware' => ['api']], function () {
     //ADMIN COUNTRY ROUTES
     Route::group(['prefix'=>'admin', 'as' => 'admin.', 'middleware' => ['admin', 'language']], function () {
 
-        Route::get('/country/regions', [Modules\Country\Http\Controllers\RegionController::class, "countryWiseRegion"])->name("country.regions.show");
-        Route::get('/regions/cities', [Modules\Country\Http\Controllers\CityController::class, "regionWiseCity"])->name("country.cities.show");
+        Route::get('/country/regions', [Modules\Country\Http\Controllers\RegionController::class, "countryWiseRegion"])->name("country.regions.list");
+        Route::get('/regions/cities', [Modules\Country\Http\Controllers\CityController::class, "regionWiseCity"])->name("region.cities.list");
 
         Route::resource('country', CountryController::class)->only(['index', 'show']);
         Route::resource('regions', RegionController::class)->only(['index', 'show']);
