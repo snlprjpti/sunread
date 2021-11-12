@@ -5,6 +5,7 @@ namespace Modules\Customer\Repositories;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Entities\Website;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Country\Entities\City;
@@ -125,7 +126,8 @@ class CustomerAddressRepository extends BaseRepository
         {
             $customer_channel = $this->getCustomerChannel($customer);
             $countries = $this->getCountry($customer_channel);
-            if (!$countries->contains("id", $data["country_id"])) throw new Exception(__("core::app.response.country-not-allow"));
+
+            if (!$countries->contains("id", $data["country_id"])) throw ValidationException::withMessages(["country_id" => __("core::app.response.country-not-allow")]);
 
             $data = $this->checkRegionAndCity($data);
         }
@@ -143,7 +145,7 @@ class CustomerAddressRepository extends BaseRepository
         {
             if(empty($customer->store_id)) {
                 $channel = SiteConfig::fetch("website_default_channel", "website", $customer->website_id);
-                if (!$channel) throw new Exception(__("core::app.response.not-found", ["name" => "Default Channel"]));
+                if (!$channel) throw ValidationException::withMessages(["channel_id" => __("core::app.response.not-found", ["name" => "Default Channel"])]);
             }
             else {
                 $channel = $customer->store->channel;
@@ -184,14 +186,14 @@ class CustomerAddressRepository extends BaseRepository
                 else {
                     $data["city_id"] = null;
                     $cities = City::whereRegionId($data["region_id"])->count();
-                    if($cities > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "City" ]));
+                    if($cities > 0) throw ValidationException::withMessages(["city_id" => __("core::app.response.please-choose", [ "name"=> "City" ])]);
                 }
             }
             else {
                 $data["region_id"] = null;
                 $data["city_id"] = null;
                 $region = Region::whereCountryId($data["country_id"])->count();
-                if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "Region" ]));
+                if($region > 0) throw ValidationException::withMessages(["region_id" => __("core::app.response.please-choose", [ "name"=> "Region" ])]);
             }
         }
         catch (Exception $exception)
