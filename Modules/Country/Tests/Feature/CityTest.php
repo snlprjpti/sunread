@@ -28,7 +28,7 @@ class CityTest extends BaseTestCase
         $post_data = [
             "region_id" => 1
         ];
-        $response = $this->withHeaders($this->headers)->get(route("admin.regions.cities.list", $post_data));
+        $response = $this->withHeaders($this->headers)->get(route("admin.region.cities.list", $post_data));
 
         $response->assertOk();
         $response->assertJsonFragment([
