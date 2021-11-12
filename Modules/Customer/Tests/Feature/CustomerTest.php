@@ -35,7 +35,7 @@ class CustomerTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "customer_group_id" => null

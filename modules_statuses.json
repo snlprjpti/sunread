@@ -15,5 +15,10 @@
     "Inventory": true,
     "Erp": true,
     "Cart": true,
-    "EmailTemplate": true
+    "EmailTemplate": true,
+    "Notification": true,
+    "ProductStockAlert": true,
+    "ProductStockAlertResource": true,
+    "GeoIp": true,
+    "ClubHouse": true
 }

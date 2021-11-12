@@ -38,10 +38,10 @@ class ProductConfigurableTest extends BaseTestCase
     public function getCreateData(): array
     {
         $product = $this->model::factory()->make();
-        $merge_product = $product->toArray(); 
+        $merge_product = $product->toArray();
 
         $attributes = [];
-  
+
         foreach ( $product->attribute_set->attribute_groups as $attribute_group )
         {
             foreach ($attribute_group->attributes as $attribute)
@@ -55,7 +55,7 @@ class ProductConfigurableTest extends BaseTestCase
         }
 
         $super_attributes = Attribute::inRandomOrder()->whereisUserDefined(1)->whereType("select")->where("slug", "!=", "tax_class_id")->take(2)->get();
-      
+
         foreach($super_attributes as $super_attribute)
         {
             $variant_attributes[] = [
@@ -63,7 +63,7 @@ class ProductConfigurableTest extends BaseTestCase
                 "value" => $super_attribute->attribute_options->take(2)->pluck('id')->toArray()
             ];
         }
-        
+
         return array_merge($merge_product, ["attributes" => $attributes], ["super_attributes" => $variant_attributes]);
     }
 
@@ -71,10 +71,10 @@ class ProductConfigurableTest extends BaseTestCase
     {
         $websiteId = $this->default_resource->website_id;
         $updateData = $this->getCreateData();
-        return array_merge($updateData, $this->getScope($websiteId)); 
+        return array_merge($updateData, $this->getScope($websiteId));
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "parent_id" => null,
@@ -98,11 +98,11 @@ class ProductConfigurableTest extends BaseTestCase
     {
         switch($attribute->type)
         {
-            case "price" : 
+            case "price" :
                 $value = 1000.1;
                 break;
 
-            case "boolean" : 
+            case "boolean" :
                 $value = true;
                 break;
 
@@ -114,7 +114,7 @@ class ProductConfigurableTest extends BaseTestCase
                 $value = rand(1,1000);
                 break;
 
-            case "select" : 
+            case "select" :
                 $attribute_option = ($attribute->slug == "tax_class_id") ? CustomerTaxGroup::inRandomOrder()->first() : AttributeOption::create([
                     "attribute_id" => $attribute->id,
                     "name" => Str::random(10),
@@ -134,7 +134,7 @@ class ProductConfigurableTest extends BaseTestCase
             case "image":
                 $value = UploadedFile::fake()->image('image.jpeg');
                 break;
-            
+
             case "multiimage":
                 $value[] = UploadedFile::fake()->image('image.jpeg');
                 break;
@@ -155,12 +155,12 @@ class ProductConfigurableTest extends BaseTestCase
             {
                 case "website":
                     $scope_id = $websiteId;
-                    break; 
-    
+                    break;
+
                 case "channel":
                     $scope_id = $channels->first()->id;
                     break;
-    
+
                 case "store":
                     $stores = $channels->first()->stores;
                     $scope_id = (count($stores) > 0) ? $stores->first()->id : $this->getScope("channel", $websiteId);

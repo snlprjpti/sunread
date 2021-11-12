@@ -4,7 +4,7 @@
 namespace Modules\Attribute\Observers;
 
 use Modules\Attribute\Entities\AttributeOption;
-use Modules\Product\Jobs\PartialModifyAttributeOption;
+use Modules\Product\Jobs\ReindexMigrator;
 
 class AttributeOptionObserver
 {
@@ -15,15 +15,11 @@ class AttributeOptionObserver
 
     public function updated(AttributeOption $attribute_option)
     {
-        // $attribute = $attribute_option?->attribute;
-        // $product_attributes = $attribute->product_attributes()->with("product")->get();
-        // PartialModifyAttributeOption::dispatch($product_attributes, $attribute, $attribute_option, "update");
+        ReindexMigrator::dispatch()->onQueue("index");
     }
 
     public function deleted(AttributeOption $attribute_option)
     {
-        // $attribute = $attribute_option?->attribute;
-        // $product_attributes = $attribute->product_attributes()->with("product")->get();
-        // PartialModifyAttributeOption::dispatch($product_attributes, $attribute, collect($attribute_option), "delete");
+        ReindexMigrator::dispatch()->onQueue("index");
     }
 }

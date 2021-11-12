@@ -3,8 +3,8 @@
 namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
-use Illuminate\Http\Request;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
 use Modules\Country\Entities\Region;
@@ -41,13 +41,13 @@ class AddressRepository extends BaseRepository
         ];
     }
 
-    public function regionAndCityRules(object $request): array
+    public function regionAndCityRules(object $request, string $name): array
     {
         return [
-            "region_id" => "required_without:region_name|exists:regions,id,country_id,{$request->country_id}",
-            "city_id" => "required_without:city_name",
-            "region_name" => "required_without:region_id",
-            "city_name" => "required_without:city_id",
+            "{$name}.region_id" => "required_without:{$name}.region_name|exists:regions,id,country_id,{$request->{$name}["country_id"]}",
+            "{$name}.city_id" => "required_without:{$name}.city_name",
+            "{$name}.region_name" => "required_without:{$name}.region_id",
+            "{$name}.city_name" => "required_without:{$name}.city_id",
         ];
     }
 
@@ -84,22 +84,27 @@ class AddressRepository extends BaseRepository
         try
         {
             $customer = Customer::findOrFail($customer_id);
+            $countries = $this->getCountry($request);
+
             $channel_code = $request->header("hc-channel");
+            $website = Website::findOrFail($customer->website_id);
             if($channel_code) {
-                $website = Website::findOrFail($customer->website_id);
                 $channel_id = $website->channels()->where("code", $channel_code)->first()?->id;
+            }
+            else {
+                $channel = SiteConfig::fetch("website_default_channel", "website", $website->id);
+                $channel_id = $channel->id;
             }
 
             if($request->shipping) {
-                $shipping = new Request($request->shipping);
+
                 $shipping["channel_id"] = $channel_id;
-                $data = $this->validateData($shipping, array_merge($this->regionAndCityRules($shipping)), function () use ($customer) {
-                    return [
-                        "customer_id" => $customer->id,
-                    ];
-                });
+
                 $shipping = $this->checkShippingAddress($customer->id, $channel_id)->first();
-                $data = $this->checkRegionAndCity($data, "shipping");
+                $data = $this->validateAddress($request, $customer, $countries, "shipping");
+
+                $data = $this->checkRegionAndCity($data["shipping"], "shipping");
+
                 if ($shipping) {
                     $created["shipping"] = $this->update($data, $shipping->id);
                 } else {
@@ -111,15 +116,12 @@ class AddressRepository extends BaseRepository
 
             if($request->billing) {
 
-                $billing = new Request($request->billing);
                 $billing["channel_id"] = $channel_id;
-                $data = $this->validateData($billing, array_merge($this->regionAndCityRules($billing)), function () use ($customer) {
-                    return [
-                        "customer_id" => $customer->id,
-                    ];
-                });
+
                 $billing = $this->checkBillingAddress($customer->id, $channel_id)->first();
-                $data = $this->checkRegionAndCity($data, "billing");
+                $data = $this->validateAddress($request, $customer, $countries, "billing");
+
+                $data = $this->checkRegionAndCity($data["billing"], "billing");
                 if ($billing) {
                     $created["billing"] = $this->update($data, $billing->id);
                 }
@@ -166,6 +168,26 @@ class AddressRepository extends BaseRepository
         return $data;
     }
 
+    public function getCountry(object $request): object
+    {
+        try
+        {
+            $data = $this->getCoreCache($request);
+
+            if (!$data->channel) throw new Exception(__("core::app.response.not-found", ["name" => "Country"]));
+            $allow = SiteConfig::fetch("allow_countries", "channel", $data->channel->id);
+            $default[] = SiteConfig::fetch("default_country", "channel", $data->channel->id);
+
+            $fetched = $allow->merge($default);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
     public function getCustomerAddress(object $request, object $customer): array
     {
         try
@@ -173,6 +195,33 @@ class AddressRepository extends BaseRepository
             $coreCache = $this->getCoreCache($request);
             $data["shipping"] = $this->checkShippingAddress($customer->id, $coreCache->channel->id)->first();
             $data["billing"] = $this->checkBillingAddress($customer->id, $coreCache->channel->id)->first();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    public function validateAddress(object $request, object $customer, object $countries, string $name): array
+    {
+        try
+        {
+            $new_rules = $this->rules;
+
+            if(!isset($request->{$name}["country_id"])) throw new Exception(__("core::app.response.not-found", [ "name" => "Country" ]));
+            if (!$countries->contains("id", $request->shipping["country_id"])) throw new Exception(__("core::app.response.invalid-country", [ "name" => $name]));
+
+            $this->rules = [];
+            foreach($new_rules as $key => $value)
+            {
+                $this->rules[$name.'.'.$key] = $value;
+            }
+
+            $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,$name)));
+            $data[$name] = array_merge($data[$name], ["customer_id" => $customer->id]);
+            $this->rules = $new_rules;
         }
         catch (Exception $exception)
         {

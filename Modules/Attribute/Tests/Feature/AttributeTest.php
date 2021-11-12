@@ -57,7 +57,7 @@ class AttributeTest extends BaseTestCase
             ], $translations);
     }
 
-    public function getNonMandotaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "slug" => null
@@ -71,7 +71,7 @@ class AttributeTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandodtaryUpdateData(): array
+    public function getNonMandatoryUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
             "validation" => null
@@ -136,7 +136,7 @@ class AttributeTest extends BaseTestCase
 
     public function testAdminCanCreateResourceWithNonMandatoryData()
     {
-        $post_data = $this->getNonMandodtaryCreateData();
+        $post_data = $this->getNonMandatoryCreateData();
         $post_data = $this->addAttributeOptionIfNecessary($post_data);
 
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);

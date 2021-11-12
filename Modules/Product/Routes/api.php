@@ -4,13 +4,13 @@ Route::group(["middleware" => ["api"]], function() {
     // ADMIN PRODUCT ROUTES
     Route::group(["prefix" => "admin/catalog", "as" => "admin.catalog.", "middleware" => ["admin", "language"]], function() {
 
-        //Product Attribute Routes 
+        //Product Attribute Routes
         Route::post('products/attributes', [\Modules\Product\Http\Controllers\ProductAttributeController::class, "store"])->name("products.attributes.store");
-        
+
         Route::get('products/search', [\Modules\Product\Http\Controllers\ProductSearchController::class, "index"]);
 
-        Route::post('products/bulk-reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "bulkReIndex"])->name('products.bulk-reindex');
-        Route::get('products/{id}/reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "reIndex"])->name('products.reindex');
+        //Route::post('products/bulk-reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "bulkReIndex"])->name('products.bulk-reindex');
+        //Route::get('products/{id}/reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "reIndex"])->name('products.reindex');
 
         // Catalog Product Routes
         Route::put("/products/{product_id}/status", [\Modules\Product\Http\Controllers\ProductController::class, "updateStatus"])->name("products.status");
@@ -30,12 +30,14 @@ Route::group(["middleware" => ["api"]], function() {
         // Product Images Routes
         Route::get('products/{category_id}/category', [\Modules\Product\Http\Controllers\ProductController::class,"categoryWiseProducts"])->name("products.categoryWiseProducts");
     });
-});
 
-Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
-    Route::get('catalog/category/{category_slug}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "category"])->name("products.category");
-    Route::get('catalog/category/{category_slug}/products', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "index"])->name("products.index");
-    Route::get('catalog/category/{category_slug}/navigation/layered', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "filter"])->name("products.filter");
-    Route::get('catalog/product/{sku}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "show"])->name("products.show");
-    Route::get('catalog/search', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "search"])->name("products.search");
+    Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
+
+        Route::get('catalog/product/{parent_id}/configurable/variant/{id}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "variantShow"])->name("products.configurable.variants");
+        Route::get('catalog/category/{category_slug}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "category"])->name("products.category");
+        Route::get('catalog/category/{category_slug}/products', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "index"])->name("products.index");
+        Route::get('catalog/category/{category_slug}/navigation/layered', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "filter"])->name("products.filter");
+        Route::get('catalog/product/{url_key}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "show"])->name("products.show");
+        Route::get('catalog/search', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "search"])->name("products.search");
+    });
 });

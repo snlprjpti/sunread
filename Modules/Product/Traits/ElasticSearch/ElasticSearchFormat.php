@@ -22,10 +22,14 @@ trait ElasticSearchFormat
             $array = $this->getProductAttributes($store);
 
             $inventory = $this->getInventoryData();
-            if ($inventory) $array = array_merge($array, $inventory); 
+            if ($inventory) {
+                $array = array_merge($array, $inventory); 
+                $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
+            }
     
             $array['categories'] = $this->getCategoryData($store);
             $images = $this->getImages();
+            if($this->type == "simple" && !$this->parent_id) $array["list_status"] = 1;
         }
         catch (Exception $exception)
         {
@@ -38,13 +42,8 @@ trait ElasticSearchFormat
     public function getProductAttributes(object $store): array
     {
         try
-        {
-            $data = [];
-
-            $selected_attr = [ "id", "sku", "status", "website_id", "parent_id", "type" ];
-            $data = collect($this)->filter(function ($product, $key) use($selected_attr) {
-                if(in_array($key, $selected_attr)) return $product;
-            })->toArray();
+        {   
+            $data = $this->select("id", "sku", "status", "website_id", "parent_id", "type")->where("id", $this->id)->first()->toArray();
             
             $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
             
@@ -146,12 +145,15 @@ trait ElasticSearchFormat
         try
         {
             $image_types = ImageType::where("slug", "!=", "gallery")->get();
-            foreach($image_types as $image_type) $images[$image_type->slug] = $this->getFullPath("base_image");
+            foreach($image_types as $image_type) $images[$image_type->slug] = $this->getFullPath($image_type->slug);
 
             $images['gallery'] = $this->images()->wherehas("types", function($query) {
                 $query->whereSlug("gallery");
-            })->pluck('path')->map(function ($gallery) {
-                return Storage::url($gallery);
+            })->get()->map(function ($gallery) {
+                return [
+                    "url" => Storage::url($gallery->path),
+                    "background_color" => $gallery->background_color
+                ];
             })->toArray();
             
         }
@@ -162,7 +164,7 @@ trait ElasticSearchFormat
         return $images;
     }
 
-    Public function getFullPath($image_name): ?string
+    public function getFullPath($image_name): ?array
     {
         try
         {
@@ -176,6 +178,9 @@ trait ElasticSearchFormat
             throw $exception;
         }
          
-        return $path;
+        return [
+            "url" => $path,
+            "background_color" => $image?->background_color
+        ];
     }
 }

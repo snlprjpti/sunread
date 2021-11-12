@@ -19,7 +19,7 @@ class ConfigurationTest extends BaseTestCase
 
         $this->model_name = "Configuration";
         $this->route_prefix = "admin.configurations";
-        
+
         $this->hasFilters = false;
         $this->hasShowTest = false;
         $this->hasUpdateTest = false;
@@ -28,7 +28,7 @@ class ConfigurationTest extends BaseTestCase
         $this->default_resource = Configuration::latest()->first();
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         $created_data = $this->getCreateData();
         $created_data["items"] = array_merge($created_data["items"], [
@@ -37,7 +37,7 @@ class ConfigurationTest extends BaseTestCase
                 "absolute_path" => "general.children.0.subChildren.2.elements.1"
             ]
         ]);
-        return $created_data;  
+        return $created_data;
     }
 
     public function getInvalidCreateData(): array
@@ -70,7 +70,7 @@ class ConfigurationTest extends BaseTestCase
 
     /**
      * POST tests
-     * 
+     *
      * 1. Assert if application returns correct error if scope is invalid
      * 2. Assert if application returns correct error if scope_id is invalid
      */
@@ -102,7 +102,7 @@ class ConfigurationTest extends BaseTestCase
 
     /**
      * Update tests
-     * 
+     *
      * 1. Using store route to update the resource.
      * 2. Using store route to update the resouce with non mandatory data.
     */
@@ -120,7 +120,7 @@ class ConfigurationTest extends BaseTestCase
 
     public function testAdminCanUpdateResourceWithNonMandatoryData()
     {
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $this->getNonMandodtaryUpdateData());
+        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $this->getNonMandatoryUpdateData());
 
         $response->assertStatus(201);
         $response->assertJsonFragment([

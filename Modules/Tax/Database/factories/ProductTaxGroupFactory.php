@@ -10,8 +10,8 @@ class ProductTaxGroupFactory extends Factory
     public function definition(): array
     {
         return [
-            "name" => "General",
-            "description" => "General product tax group."
+            "name" => "None",
+            "description" => "None product tax group."
         ];
     }
 }

@@ -5,14 +5,14 @@ return [
             "type" => "long"
         ],
         "name" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
-                ]
-            ],
-            "fielddata"=> true
+            "type" => "search_as_you_type",
+            // "fields" =>  [
+            //     "keyword" =>  [
+            //         "type" => "keyword",
+            //         "ignore_above" => 256
+            //     ]
+            // ],
+            // "fielddata"=> true
         ],
         "sku" =>  [
             "type" => "text",
@@ -53,6 +53,9 @@ return [
         "parent_id" =>  [
             "type" => "long"
         ],
+        "list_status" =>  [
+            "type" => "long"
+        ],
         "visibility" =>  [
             "type" => "long"
         ],
@@ -69,11 +72,24 @@ return [
             "type"=> "long"
         ],
         "base_image" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
@@ -209,39 +225,91 @@ return [
                 ]
             ]
         ],
-        "small_image" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+        "small_image"=> [
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
         "thumbnail_image" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
         "section_background" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],
         "gallery" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
+            "properties"=> [
+                "url" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
+                ],
+                "background_color" =>  [
+                    "type" => "text",
+                    "fields" =>  [
+                        "keyword" =>  [
+                            "type" => "keyword",
+                            "ignore_above" => 256
+                        ]
+                    ]
                 ]
             ]
         ],

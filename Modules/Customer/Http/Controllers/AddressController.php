@@ -66,13 +66,15 @@ class AddressController extends BaseController
     {
         try
         {
-            $channel_id = $this->repository->checkCustomerChannel($request, $customer_id);
+            $customer = Customer::findOrFail($customer_id);
+            $channel_id = $this->repository->checkCustomerChannel($request, $customer);
             $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id, $channel_id) {
                 return [
                     "customer_id" => $customer_id,
                     "channel_id" => $channel_id
                 ];
             });
+            $data = $this->repository->checkCountryRegionAndCity($data, $customer);
 
             $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $created->id);
@@ -106,13 +108,15 @@ class AddressController extends BaseController
     {
         try
         {
-            $channel_id = $this->repository->checkCustomerChannel($request, $customer_id);
+            $customer = Customer::findOrFail($customer_id);
+            $channel_id = $this->repository->checkCustomerChannel($request, $customer);
             $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id, $channel_id) {
                 return [
                     "customer_id" => $customer_id,
                     "channel_id" => $channel_id
                 ];
             });
+            $data = $this->repository->checkCountryRegionAndCity($data, $customer);
 
             $updated = $this->repository->update($data, $address_id, function($updated) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $updated->id);

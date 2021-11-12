@@ -9,8 +9,12 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Notification\Events\ConfirmEmail;
+use Modules\Notification\Events\NewAccount;
+use Modules\Notification\Events\RegistrationSuccess;
 
 class CustomerRepository extends BaseRepository
 {
@@ -30,7 +34,8 @@ class CustomerRepository extends BaseRepository
             "email" => "required|email|unique:customers,email",
             "gender" => "required|in:male,female,other",
             "date_of_birth" => "date|before:today",
-            "subscribed_to_news_letter" => "sometimes|boolean"
+            "subscribed_to_news_letter" => "sometimes|boolean",
+            "phone" => "nullable"
         ];
     }
 
@@ -50,13 +55,16 @@ class CustomerRepository extends BaseRepository
             });
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
             $data["password"] = Hash::make($request->password);
+            if(SiteConfig::fetch("require_email_confirmation", "website", $request->website_id) == 1) {
+                $data["verification_token"] = Str::random(30);
+            }
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return $data; 
+        return $data;
     }
     public function updateAccount(object $request, object $customer): array
     {
@@ -105,7 +113,7 @@ class CustomerRepository extends BaseRepository
         if (!Hash::check($request->current_password, auth()->guard('customer')->user()->password)) {
             throw new Exception("Password is incorrect.");
         }
-        return Hash::make($request->password);        
+        return Hash::make($request->password);
     }
 
     public function uploadProfileImage(object $request, int $id): object
@@ -171,7 +179,7 @@ class CustomerRepository extends BaseRepository
 
             $path_array = explode("/", $updated->profile_image);
             unset($path_array[count($path_array) - 1]);
-    
+
             $delete_folder = implode("/", $path_array);
             Storage::disk("public")->deleteDirectory($delete_folder);
 
@@ -188,5 +196,61 @@ class CustomerRepository extends BaseRepository
         DB::commit();
 
         return $updated;
+    }
+
+    public function sendRegistrationEmail(object $customer, object $request): bool
+    {
+        try
+        {
+            event(new RegistrationSuccess($customer->id));
+            $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $request->website_id);
+            if($required_email_confirm == 1) {
+                event(new NewAccount($customer->id, $customer->verification_token));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
+    }
+
+    public function sendVerificationLink(object $customer): bool
+    {
+        try
+        {
+            $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $customer->website_id);
+            if($required_email_confirm == 1) {
+                $customer["verification_token"] = Str::random(30);
+                $customer->save();
+
+                event(new NewAccount($customer->id, $customer->verification_token));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
+    }
+
+    public function verifyCustomerAccount(object $customer): bool
+    {
+        try
+        {
+            $customer->is_email_verified = 1;
+            $customer->verification_token = null;
+            $customer->save();
+
+            event(new ConfirmEmail($customer->id));
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
     }
 }

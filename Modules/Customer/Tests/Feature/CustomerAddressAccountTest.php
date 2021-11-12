@@ -77,6 +77,12 @@ class CustomerAddressAccountTest extends TestCase
 
     public function testCustomerCanAddOwnAddress()
     {
+        $website = Website::first();
+        $this->headers["hc-host"] = $website->hostname;
+        $channel = Channel::inRandomOrder()->whereWebsiteId($website->id)->first();
+        $this->headers["hc-channel"] = $channel->code;
+        $this->headers["hc-store"] = Store::inRandomOrder()->whereChannelId($channel->id)->first()->code;
+
         $post_data["shipping"] = $this->getCreateData();
         $post_data["billing"] = $this->getCreateData();
         $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.create"), $post_data);

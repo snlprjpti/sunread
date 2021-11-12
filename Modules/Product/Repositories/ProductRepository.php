@@ -191,7 +191,7 @@ class ProductRepository extends BaseRepository
             if ( !empty($request_images) ) {
                 $validator = Validator::make($request_images, [
                     "*.type" => "required|array",
-                    "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery",
+                    "*.type.*" => "exists:image_types,slug",
                     "*.file" => "required|mimes:bmp,jpeg,jpg,png",
                     "*.background_color" => "sometimes|nullable",
                     "*.position" => "sometimes|nullable|numeric",
@@ -249,7 +249,7 @@ class ProductRepository extends BaseRepository
         {
             $validator = Validator::make($data, [
                 "*.type" => "required|array",
-                "*.type.*" => "in:base_image,thumbnail_image,section_background_image,small_image,gallery",
+                "*.type.*" => "exists:image_types,slug",
                 "*.delete" => "required|boolean",
                 "*.id" => "required|exists:product_images,id",
                 "*.id" => Rule::in($product->images()->pluck("id")->toArray()),
@@ -520,6 +520,8 @@ class ProductRepository extends BaseRepository
                             else $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute);  
                             if($attributesData["value"] && !is_array($attributesData["value"])) $attributesData["value"] = json_decode($attributesData["value"]);
                         } 
+
+                        if(($attribute->type == "image" || $attribute->type == "file") && isset($attributesData["value"])) $attributesData["value"] = Storage::url($attributesData["value"]);
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->attribute_set_repository->getInventoryChildren($product->id);
                         
                         return $attributesData;

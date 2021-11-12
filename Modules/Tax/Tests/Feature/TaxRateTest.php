@@ -18,10 +18,10 @@ class TaxRateTest extends BaseTestCase
         $this->route_prefix = "admin.taxes.rates";
     }
 
-    public function getNonMandotaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "country_id" => null
+            "zip_code" => null
         ]);
     }
 

@@ -78,7 +78,7 @@ class CategoryTest extends BaseTestCase
         $websiteId = $this->default_resource->website_id;
         $updateData = $this->getCreateData();
         unset($updateData["website_id"]);
-        return array_merge($updateData, $this->getScope($websiteId)); 
+        return array_merge($updateData, $this->getScope($websiteId));
     }
 
     public function testAdminCanFetchResources()
@@ -99,7 +99,7 @@ class CategoryTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandotaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "parent_id" => null
@@ -113,7 +113,7 @@ class CategoryTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandodtaryUpdateData(): array
+    public function getNonMandatoryUpdateData(): array
     {
         return array_merge($this->getUpdateData(),[
             "parent_id" => null
@@ -160,12 +160,12 @@ class CategoryTest extends BaseTestCase
             {
                 case "website":
                     $scope_id = $websiteId;
-                    break; 
-    
+                    break;
+
                 case "channel":
                     $scope_id = $channels->first()->id;
                     break;
-    
+
                 case "store":
                     $stores = $channels->first()->stores;
                     $scope_id = (count($stores) > 0) ? $stores->first()->id : $this->getScope("channel", $websiteId);

@@ -38,6 +38,7 @@ class PageAttributeRepository extends BaseRepository
         {
             $this->config_rules = [];
             $this->config_types = [];
+            $this->collect_elements = [];
 
             $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
             if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
@@ -227,7 +228,7 @@ class PageAttributeRepository extends BaseRepository
                 } 
 
                 if ($element["hasChildren"] == 0) {
-                    if ( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
+                    //if ( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery($element);
                     unset($element["pluck"], $element["provider"]);
 
                     setDotToArray($append_key, $this->parent, $element);           
@@ -277,7 +278,7 @@ class PageAttributeRepository extends BaseRepository
                 if ($element["hasChildren"] == 0) continue;
 
                 if ($element["type"] == "repeater") {
-                    $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
+                    $count = isset($component["attributes"][$element["slug"]]) ? count($component["attributes"][$element["slug"]]) : 0;
                     for( $i=0; $i < $count; $i++ )
                     {
                         $this->getRules($component, $element["attributes"][0], "{$append_key}.{$i}", $method);

@@ -35,5 +35,12 @@ return [
 		"iso_3_code" => "ASM",
 		"numeric_code" => "016",
 		"dialing_code" => "1684"
-	]
+	],
+	[
+		"name" => "Sweden",
+		"iso_2_code" => "SE",
+		"iso_3_code" => "SWE",
+		"numeric_code" => "752",
+		"dialing_code" => "46"
+	],
 ];

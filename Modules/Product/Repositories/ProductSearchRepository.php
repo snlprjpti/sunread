@@ -2,6 +2,7 @@
 
 namespace Modules\Product\Repositories;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
@@ -9,21 +10,25 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\PriceFormat;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\Product;
 use Modules\Product\Jobs\BulkIndexing;
 use Modules\Product\Jobs\SingleIndexing;
+use Modules\Product\Repositories\StoreFront\ProductFormatRepository;
 use Modules\Product\Traits\ElasticSearch\HasIndexing;
+use Modules\Tax\Facades\TaxPrice;
 
 class ProductSearchRepository extends ElasticSearchRepository
 {
     use HasIndexing;
 
-    protected $model, $mainFilterKeys, $attributeFilterKeys, $searchKeys, $staticFilterKeys, $sortByKeys;
+    protected $model, $mainFilterKeys, $attributeFilterKeys, $searchKeys, $staticFilterKeys, $sortByKeys, $listSource, $product_format_repo;
 
-    public function __construct(Product $product)
+    public function __construct(Product $product, ProductFormatRepository $product_format_repo)
     {
         $this->model = $product;
+        $this->product_format_repo = $product_format_repo;
         $this->mainFilterKeys = [ "brand_id", "attribute_set_id", "type", "website_id" ];
 
         $this->attributeFilterKeys = Attribute::where('use_in_layered_navigation', 1)->pluck('slug')->toArray();
@@ -32,17 +37,19 @@ class ProductSearchRepository extends ElasticSearchRepository
         $this->sortByKeys = [ "sort_by_id", "sort_by_name", "sort_by_price" ];
 
         $this->staticFilterKeys = ["color", "size", "collection", "configurable_size", "configurable_color"];
+
+        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "rollover_image", "color", "color_value", "tax_class_id"];
     }
 
     public function search(object $request): array
     {
         try
         {
-            $this->searchKeys = array_unique(array_merge($this->searchKeys, ["name", "sku", "description"]));
+            $this->searchKeys = ["name"];
             $search = [];
 
             if(isset($request->q)) {
-                $search[] = $this->queryString($this->searchKeys, $request->q);
+                //$search[] = $this->queryString($this->searchKeys, $request->q);
                 foreach($this->searchKeys as $key) $search[] = $this->match($key, $request->q);
             }
             $query = $this->orwhereQuery($search);
@@ -123,7 +130,8 @@ class ProductSearchRepository extends ElasticSearchRepository
             $data = [];
             $data = $this->finalQuery($filter, $request, $store);
             $total = isset($data["products"]["hits"]["total"]["value"]) ? $data["products"]["hits"]["total"]["value"] : 0;
-            $data["products"] = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
+            $products = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
+            $data["products"] = $this->productWithFormat($request, $products, $store);
             $data["last_page"] = (int) ceil($total/$data["limit"]);
             $data["total"] = $total;    
         }
@@ -133,6 +141,29 @@ class ProductSearchRepository extends ElasticSearchRepository
         }
 
         return $data; 
+    }
+
+    public function productWithFormat(object $request, array $products, object $store): array
+    {
+        try
+        {
+            foreach($products as &$product)
+            {
+                $product = $this->product_format_repo->getProductInFormat($product, $request, $store);
+                
+                $product["image"] = isset($product["thumbnail_image"]) ? $product["thumbnail_image"] : $product["base_image"];
+                $product["quantity"] = (int) $product["quantity"];
+                $product["color"] = isset($product["color"]) ? $product["color"] : null;
+                $product["color_value"] = isset($product["color_value"]) ? $product["color_value"] : null;
+                unset($product["thumbnail_image"], $product["base_image"]);      
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $products;
     }
 
     public function getProduct(object $request): ?array
@@ -182,12 +213,14 @@ class ProductSearchRepository extends ElasticSearchRepository
             $filters = [];
             $data = $this->filterAndSort(category_id:$category_id);
             $aggregate = $this->aggregation();
+
+            $final_l[] = $data["query"];
+            $final_l[] = $this->term("list_status", 1);
+            $final_q = $this->whereQuery($final_l);
     
             $query = [
                 "size"=> 0,
-                "query"=> (count($data["query"]) > 0) ? $data["query"] : [
-                    "match_all"=> (object)[]
-                ],
+                "query"=> $final_q,
                 "aggs"=> $aggregate
             ];
     
@@ -247,17 +280,17 @@ class ProductSearchRepository extends ElasticSearchRepository
             $page = $request->page ?? 1;
             $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
+            $final_l[] = $filter["query"];
+            $final_l[] = $this->term("list_status", 1);
+            $final_q = $this->whereQuery($final_l);
+
             $fetched = [
-                "_source"=>[
-                    "exclude"=> "configurable_*",
-                ],
+                "_source" => $this->listSource,
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
-                "query"=> (count($filter["query"]) > 0) ? $filter["query"] : [
-                    "match_all"=> (object)[]
-                ],
+                "query"=> $final_q,
                 "sort" => (count($filter["sort"]) > 0) ? $filter["sort"] : [
-                    ["id" => ["order" => "asc", "mode" => "avg"]]
+                    // ["id" => ["order" => "asc", "mode" => "avg"]]
                 ],
             ];
 

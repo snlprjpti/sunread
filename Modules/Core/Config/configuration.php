@@ -15,12 +15,13 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name","iso_2_code"],
-                                "default" => "SE",
+                                "default" => "DZ",
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "Allow Countries",
@@ -28,13 +29,14 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name", "iso_2_code"],
-                                "default" => ["SE"],
+                                "default" => ["SE","DZ"],
                                 "options" => [],
                                 "rules" => "array",
                                 "value_rules" => "exists:countries,iso_2_code",
                                 "multiple" => true,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "Zip/Postal Code is Optional for",
@@ -42,13 +44,14 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name", "iso_2_code"],
-                                "default" => "",
+                                "default" => [],
                                 "options" => [],
                                 "rules" => "array",
                                 "value_rules" => "exists:countries,iso_2_code",
                                 "multiple" => true,
                                 "scope" => "website",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "State is Optional for",
@@ -56,13 +59,222 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["name", "iso_2_code"],
-                                "default" => "",
+                                "default" => [],
                                 "options" => [],
                                 "rules" => "array",
                                 "value_rules" => "exists:countries,iso_2_code",
                                 "multiple" => true,
                                 "scope" => "website",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
+                            ]
+                        ]
+                    ],
+                    [
+                        "title" => "State Options",
+                        "elements" => [
+                            [
+                                "title" => "State Country",
+                                "path" => "state_country",
+                                "type" => "select",
+                                "provider" => "Modules\Country\Entities\Country",
+                                "pluck" => ["name", "iso_2_code"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:countries,iso_2_code",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1,
+                                "sort_by" => "name"
+                            ],
+                        ]
+                    ],
+                    [
+                        "title" => "Store Information",
+                        "elements" => [
+                            [
+                                "title" => "Store Name",
+                                "path" => "store_name",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\Store",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:stores,id",
+                                "multiple" => false,
+                                "scope" => "global",
+                                "is_required" => 1,
+                                "sort_by" => "name"
+                            ],
+                            [
+                                "title" => "Store Phone Number",
+                                "path" => "store_phone_number",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "channel",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Store Hours of Operation",
+                                "path" => "store_hours_operation",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "website",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Country",
+                                "path" => "store_country",
+                                "type" => "select",
+                                "provider" => "Modules\Country\Entities\Country",
+                                "pluck" => ["name", "iso_2_code"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:countries,iso_2_code",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1,
+                                "sort_by" => "name"
+                            ],
+                            [
+                                "title" => "Region/State",
+                                "path" => "store_region",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Zip/Postal Code",
+                                "path" => "store_zip_code",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "numeric",
+                                "scope" => "store",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "City",
+                                "path" => "store_city",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Street Address",
+                                "path" => "store_street_address",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "website",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Street Address Line 2",
+                                "path" => "store_address_line2",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "channel",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Store Image",
+                                "path" => "store_image",
+                                "type" => "file",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "mimes:jpeg,jpg,bmp,png",
+                                "scope" => "store",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Pagination Limit",
+                                "path" => "pagination_limit",
+                                "type" => "number",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "numeric",
+                                "scope" => "global",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Store Vat Number",
+                                "path" => "store_vat_number",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Store Email Address",
+                                "path" => "store_email_address",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Store Email Logo Url",
+                                "path" => "store_email_logo_url",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "scope" => "global",
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ]
                         ]
                     ],
@@ -80,7 +292,8 @@ return[
                                 "rules" => "exists:locales,id",
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "Weight Unit",
@@ -96,7 +309,8 @@ return[
                                 "rules" => "in:lbs,kgs",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Global Timezone",
@@ -109,7 +323,8 @@ return[
                                 "rules" => "exists:time_zones,id",
                                 "multiple" => false,
                                 "scope" => "website",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Channel Time Zone",
@@ -122,7 +337,8 @@ return[
                                 "rules" => "exists:time_zones,id",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
 
                         ]
@@ -145,7 +361,8 @@ return[
                                 "options" => [],
                                 "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Favicon",
@@ -157,7 +374,8 @@ return[
                                 "options" => [],
                                 "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Channel Icon",
@@ -169,7 +387,8 @@ return[
                                 "options" => [],
                                 "rules" => "mimes:jpeg,jpg,bmp,png,svg",
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ]
                         ]
                     ],
@@ -186,7 +405,8 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "channel",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "404 Page",
@@ -198,7 +418,8 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "channel",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ]
                         ]
                     ],
@@ -215,7 +436,8 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "website",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Admin Dashboard URL",
@@ -227,7 +449,8 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "website",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Media URL",
@@ -239,14 +462,15 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "website",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ]
                         ]
                     ]
                 ]
             ],
             [
-                "title" => "Currency",
+                "title" => "Currency Setup",
                 "subChildren" => [
                     [
                         "title" => "Currency Options",
@@ -257,12 +481,13 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Currency",
                                 "pluck" => ["code","id"],
-                                "default" => "",
+                                "default" => "142",
                                 "options" => [],
                                 "rules" => "exists:currencies,id",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "Symbol Position",
@@ -270,17 +495,18 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "before_value",
+                                "default" => 4,
                                 "options" => [
-                                    [ "value" => "before_value", "label" => "Before Value" ],
-                                    [ "value" => "before_value_with_space", "label" => "Before Value With Space" ],
-                                    [ "value" => "after_value", "label" => "After Value" ],
-                                    [ "value" => "after_value_with_space", "label" => "After Value With Space" ],
+                                    [ "value" => 1, "label" => "Before Value" ],
+                                    [ "value" => 2, "label" => "Before Value With Space" ],
+                                    [ "value" => 3, "label" => "After Value" ],
+                                    [ "value" => 4, "label" => "After Value With Space" ],
                                 ],
-                                "rules" => "in:before_value,before_value_with_space,after_value,after_value_with_space",
+                                "rules" => "in:1,2,3,4",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Minus Sign",
@@ -288,11 +514,12 @@ return[
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "",
+                                "default" => "-",
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Minus Sign Position",
@@ -300,17 +527,18 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "before_value",
+                                "default" => 1,
                                 "options" => [
-                                    [ "value" => "before_value", "label" => "Before Value" ],
-                                    [ "value" => "after_value", "label" => "After Value" ],
-                                    [ "value" => "before_symbol", "label" => "Before Symbol" ],
-                                    [ "value" => "after_symbol", "label" => "After Symbol" ]
+                                    [ "value" => 1, "label" => "Before Value" ],
+                                    [ "value" => 2, "label" => "Before Symbol" ],
+                                    [ "value" => 3, "label" => "After Value" ],
+                                    [ "value" => 4, "label" => "After Symbol" ]
                                 ],
-                                "rules" => "in:before_value,before_value_with_space,after_value,after_value_with_space",
+                                "rules" => "in:1,2,3,4",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Group Seperator",
@@ -318,7 +546,7 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => 1,
+                                "default" => 2,
                                 "options" => [
                                     [ "value" => 1, "label" => "Comma (,)" ],
                                     [ "value" => 2, "label" => "Dot (.)" ],
@@ -328,7 +556,8 @@ return[
                                 "rules" => "in:1,2,3,4",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Decimal Seperator",
@@ -336,7 +565,7 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => 2,
+                                "default" => 1,
                                 "options" => [
                                     [ "value" => 1, "label" => "Comma (,)" ],
                                     [ "value" => 2, "label" => "Dot (.)" ]
@@ -344,10 +573,11 @@ return[
                                 "rules" => "in:1,2",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
-                            ],
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ]
                         ]
-                    ]
+                    ],
                 ]
             ],
             [
@@ -367,7 +597,8 @@ return[
                                 "rules" => "exists:channels,id",
                                 "multiple" => false,
                                 "scope" => "website",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => "name"
                             ]
                         ]
                     ],
@@ -385,7 +616,8 @@ return[
                                 "rules" => "exists:stores,id",
                                 "multiple" => false,
                                 "scope" => "website",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => "name"
                             ]
                         ]
                     ],
@@ -406,9 +638,9 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "",
-                                "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Sender Email",
@@ -419,9 +651,9 @@ return[
                                 "default" => "",
                                 "options" => [],
                                 "rules" => "",
-                                "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ]
                         ]
                     ],
@@ -430,27 +662,31 @@ return[
                         "elements" => [
                             [
                                 "title" => "Header",
-                                "path" => "template_header",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
+                                "path" => "header",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\HeaderTemplate",
+                                "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
+                                "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "Footer",
-                                "path" => "template_footer",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
+                                "path" => "footer",
+                                "type" => "select",
+                                "provider" => "Modules\EmailTemplate\Entities\FooterTemplate",
+                                "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
+                                "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ]
                         ]
                     ],
@@ -478,7 +714,8 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Mask for Meta Title",
@@ -490,7 +727,8 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "channel",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Mask for Meta Keywords",
@@ -502,7 +740,8 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Mask for Meta description",
@@ -514,7 +753,8 @@ return[
                                 "options" => [],
                                 "rules" => "",
                                 "scope" => "website",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                         ]
 
@@ -543,7 +783,8 @@ return[
                                 "rules" => "exists:customer_groups,id",
                                 "multiple" => false,
                                 "scope" => "channel",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "Require Email Confirmation",
@@ -559,7 +800,8 @@ return[
                                 "rules" => "",
                                 "multiple" => false,
                                 "scope" => "website",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ]
                         ]
                     ],
@@ -577,7 +819,8 @@ return[
                                 "rules" => "",
                                 "multiple" => false,
                                 "scope" => "global",
-                                "is_required" => 0
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ],
                             [
                                 "title" => "Minimum Password Length",
@@ -590,7 +833,8 @@ return[
                                 "rules" => "",
                                 "multiple" => false,
                                 "scope" => "global",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => ""
                             ]
                         ]
                     ],
@@ -599,75 +843,230 @@ return[
                         "elements" => [
                             [
                                 "title" => "Default Welcome Email Template",
-                                "path" => "default_welcome_email_template",
+                                "path" => "welcome_email",
                                 "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
-                                "title" => "Confirmation Link Email Template",
-                                "path" => "confirmation_link_email_template",
+                                "title" => "Confirmation Email Template",
+                                "path" => "confirm_email",
                                 "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 0
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
-                                "title" => "Welcome Email Template",
-                                "path" => "welcome_email_template",
+                                "title" => "New Account Template",
+                                "path" => "new_account",
                                 "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "",
-                                "multiple" => true,
-                                "scope" => "website",
-                                "is_required" => 0
+                                "rules" => "exists:email_templates,id",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "Forgot Password Email Template",
-                                "path" => "forgot_password_email_template",
+                                "path" => "forgot_password",
                                 "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ],
                             [
                                 "title" => "Reset Password Email Template",
-                                "path" => "reset_password_email_template",
+                                "path" => "reset_password",
                                 "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
+                                "provider" => "Modules\EmailTemplate\Entities\EmailTemplate",
+                                "pluck" => [ "name", "id" ],
                                 "default" => "",
                                 "options" => [],
-                                "rules" => "",
+                                "rules" => "exists:email_templates,id",
                                 "multiple" => false,
                                 "scope" => "store",
-                                "is_required" => 1
+                                "is_required" => 1,
+                                "sort_by" => "name"
                             ]
                         ]
                     ]
                 ]
             ]
-            
+
+        ]
+    ],
+    "sales" => [
+        "title" => "Sales",
+        "children" => [
+            [
+                "title" => "Sales",
+                "subChildren" => [
+                    [
+                        "title" => "Tax Classes",
+                        "elements" => [
+                            [
+                                "title" => "Default Tax Class for Product",
+                                "path" => "default_tax_class_for_product",
+                                "type" => "select",
+                                "provider" => "Modules\Tax\Entities\ProductTaxGroup",
+                                "pluck" => ["name", "id"],
+                                "default" => "1",
+                                "options" => [],
+                                "rules" => "exists:product_tax_groups,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => "name"
+                            ],
+                            [
+                                "title" => "Default Tax Class for Customer",
+                                "path" => "default_tax_class_for_customer",
+                                "type" => "select",
+                                "provider" => "Modules\Tax\Entities\CustomerTaxGroup",
+                                "pluck" => ["name", "id"],
+                                "default" => "1",
+                                "options" => [],
+                                "rules" => "exists:customer_tax_groups,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => "name"
+                            ],
+                        ]
+                    ],
+                    [
+                        "title" => "Calculation Settings",
+                        "elements" => [
+                            [
+                                "title" => "Tax Calculation Method Based On",
+                                "path" => "tax_calculation_method_based_on",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Total" ],
+                                    [ "value" => 2, "label" => "Raw Total" ],
+                                    [ "value" => 3, "label" => "Unit Price" ],
+                                ],
+                                "rules" => "in:1,2,3",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Tax Calculation Based On",
+                                "path" => "tax_calculation_based_on",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Shipping Address" ],
+                                    [ "value" => 2, "label" => "Billing Address" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Catalog Prices",
+                                "path" => "tax_catalog_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Shipping Prices",
+                                "path" => "tax_shipping_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Apply Customer Tax",
+                                "path" => "apply_customer_tax",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "After Discount" ],
+                                    [ "value" => 2, "label" => "Before Discount" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Apply Discount on Prices",
+                                "path" => "apply_discount_on_prices",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [
+                                    [ "value" => 1, "label" => "Excluding Tax" ],
+                                    [ "value" => 2, "label" => "Including Tax" ],
+                                ],
+                                "rules" => "in:1,2",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                        ]
+                    ]
+                ]
+            ]
         ]
     ]
 ];

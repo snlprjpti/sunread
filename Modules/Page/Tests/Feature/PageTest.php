@@ -51,7 +51,7 @@ class PageTest extends BaseTestCase
 
         for($i = 0; $i < rand(1,2); $i++)
         {
-            $components[] = Arr::random([ "banner" ]);
+            $components[] = Arr::random([ "feature" ]);
         }
 
         $singleItem = [];
@@ -59,7 +59,7 @@ class PageTest extends BaseTestCase
         {
             $this->attributes = [];
             $elements = [];
-            
+
             $group_elements = collect($this->config_fields)->where("slug", $component)->pluck("mainGroups")->flatten(1);
             foreach($group_elements as $group_element)
             {
@@ -81,7 +81,7 @@ class PageTest extends BaseTestCase
                 "position" => rand(1,2)
             ];
         }
-        
+
         return array_merge($this->model::factory()->make()->toArray(), [
             "stores" => [0],
             "components" => $singleItem
@@ -101,14 +101,14 @@ class PageTest extends BaseTestCase
 
             if($element["hasChildren"] == 0)
             {
-                setDotToArray($append_key, $this->attributes, $this->value($element));           
+                setDotToArray($append_key, $this->attributes, $this->value($element));
                 continue;
-            }  
+            }
             if($element["type"] == "repeater")
             {
                 $this->getAttributes($element["attributes"][0], "$append_key.0");
-                continue;     
-            } 
+                continue;
+            }
             $this->getAttributes($element["attributes"], $append_key);
         }
     }
@@ -117,7 +117,7 @@ class PageTest extends BaseTestCase
     {
         switch($element["type"])
         {
-            case "radio" : 
+            case "radio" :
                 $value = true;
                 break;
 
@@ -142,13 +142,6 @@ class PageTest extends BaseTestCase
                 break;
         }
         return $value;
-    }
-
-    public function getNonMandotaryCreateData(): array
-    {
-        return array_merge($this->getCreateData(), [
-            "position" => null
-        ]);
     }
 
     public function getInvalidCreateData(): array

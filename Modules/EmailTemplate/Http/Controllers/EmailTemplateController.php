@@ -2,78 +2,174 @@
 
 namespace Modules\EmailTemplate\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\EmailTemplate\Entities\EmailTemplate;
+use Modules\EmailTemplate\Exceptions\DeleteSystemDefinedException;
+use Modules\EmailTemplate\Repositories\EmailTemplateRepository;
+use Modules\EmailTemplate\Transformers\EmailTemplateResource;
+use Exception;
 
-class EmailTemplateController extends Controller
+class EmailTemplateController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    private $repository;
+
+    public function __construct(EmailTemplate $emailTemplate, EmailTemplateRepository $emailTemplateRepository)
     {
-        return view('emailtemplate::index');
+        $this->model = $emailTemplate;
+        $this->model_name = "Email Template";
+        $this->repository = $emailTemplateRepository;
+        $exception_statuses = [
+            DeleteSystemDefinedException::class => 401,
+        ];
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
+    }
+
+    public function collection(object $data): ResourceCollection
+    {
+        return EmailTemplateResource::collection($data);
+    }
+
+    public function resource(object $data): JsonResource
+    {
+        return new EmailTemplateResource($data);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->fetchAll($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request, callback:function ($request) {
+                $this->repository->templateGroupValidation($request);
+                $this->repository->templateVariableValidation($request);
+                return [];
+            });
+            $created = $this->repository->create($data);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->fetch($id);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try
+        {
+            $data = $this->repository->validateData($request, callback:function ($request) {
+                $this->repository->templateGroupValidation($request);
+                $this->repository->templateVariableValidation($request);
+                return [];
+            });
+            $updated = $this->repository->update($data, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($updated), $this->lang('update-success'));
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        try
+        {
+            $this->repository->delete($id, function ($deleted){
+                if( $deleted->is_system_defined == 1) throw new DeleteSystemDefinedException("Cannot Delete System Defined Template.");
+            });
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang('delete-success'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+     * fetch email template groupwise
+    */
+    public function templateGroup(Request $request): JsonResponse
     {
-        return view('emailtemplate::create');
+        try
+        {
+            $fetched = $this->repository->getConfigGroup($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Group" ]));
     }
 
     /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
+     * Fetch email template variables
+    */
+    public function templateVariable(Request $request): JsonResponse
     {
-        //
+        try
+        {
+            $this->repository->templateGroupValidation($request);
+            $fetched = $this->repository->getConfigVariable($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-list-success', [ "name" => "Template Variable" ]));
     }
 
     /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
+     * Fetch template content only
      */
-    public function show($id)
+    public function getTemplateContent(int $id): JsonResponse
     {
-        return view('emailtemplate::show');
-    }
+        try
+        {
+            $fetched = $this->repository->fetch($id);
+            $fetched = $fetched->content;
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('emailtemplate::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }

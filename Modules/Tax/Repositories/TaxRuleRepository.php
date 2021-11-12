@@ -12,13 +12,12 @@ class TaxRuleRepository extends BaseRepository
         $this->model = $taxRule;
         $this->model_key = "tax-rules";
         $this->rules = [
-            "customer_group_class" => "nullable|exists:customer_tax_groups,id",
-            "product_taxable_class" => "nullable|exists:product_tax_groups,id",
+            "customer_tax_groups" => "sometimes|array",
+            "customer_tax_groups.*" => "exists:customer_tax_groups,id",
+            "product_tax_groups" => "sometimes|array",
+            "product_tax_groups.*" => "exists:product_tax_groups,id",
             "name" => "required",
-            "position" => "required|numeric",
             "priority" => "required|numeric",
-            "subtotal" => "sometimes|nullable",
-            "status" => "sometimes|boolean",
             "tax_rates" => "sometimes|array",
             "tax_rates.*" => "exists:tax_rates,id"
         ];

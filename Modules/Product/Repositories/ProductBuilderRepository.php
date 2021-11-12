@@ -5,8 +5,10 @@ namespace Modules\Product\Repositories;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Modules\Attribute\Entities\AttributeSet;
 use Modules\Product\Entities\ProductBuilder;
 use Modules\Core\Repositories\BaseRepository;
@@ -21,6 +23,7 @@ class ProductBuilderRepository extends BaseRepository
     public function __construct(ProductBuilder $productBuilder, Product $product, PageAttributeRepository $pageAttributeRepository)
     {
         $this->model = $productBuilder;
+        $this->model_key = "product.page.attribute";
         $this->product = $product;
         $this->config_fields = config("attributes");
         $this->pageAttributeRepository = $pageAttributeRepository;
@@ -35,38 +38,39 @@ class ProductBuilderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            $productId = $product->id;
-            $components = $value['value'];
-            if ( !is_array($components) || count($components) == 0 ) return false;
-        
-                foreach($components as $component)
+            $product_page_attributes = [];
+            $components = isset($value['value']) ? $value['value'] : [];
+
+            foreach($components as $component)
+            {
+                $this->parent = [];
+                $all_attributes = [];
+                $data = $this->validateData(new Request($component));
+                $rules = $this->validateAttribute($component, $method);
+
+                $validator = Validator::make($component["attributes"], $rules);
+                if ( $validator->fails() ) throw ValidationException::withMessages(["components" => $validator->errors()]);
+                $data["attributes"] = $validator->validated();
+
+                foreach($data["attributes"] as $slug => $value)
                 {
-                    $this->parent = [];
-                    $all_attributes = [];
-                    $data = $this->validateData(new Request($component));
-                    $rules = $this->validateAttribute($component, $method);
-                    $attribute_request = new Request($component["attributes"]);
-        
-                    $data["attributes"] = $attribute_request->validate($rules);
-
-                    foreach($data["attributes"] as $slug => $value)
-                    {
-                        $type = $this->config_types[$slug];
-                        
-                        if (is_array($value) && $type == "repeater") $all_attributes[$slug] = $this->getRepeatorType($value, $slug);
-                        elseif (is_array($value) && $type == "normal") $all_attributes[$slug] = $this->getNormalType($value, $slug);
-                        else $all_attributes[$slug] = $this->getValue($type, $value, $slug);
-                    }
-                    $input = [
-                        "product_id" => $productId,
-                        "attribute" => $component["component"],
-                        "scope" => $scopeArr["scope"],
-                        "scope_id" => $scopeArr["scope_id"]
-                    ];
-
-                    $productBuilderData = array_merge($input, ["value" => json_encode($all_attributes), "position" => $data['position'] ?? 1]);
-                    $this->model->updateOrCreate($input, $productBuilderData);
+                    $type = $this->config_types[$slug];
+                    
+                    if (is_array($value) && $type == "repeater") $all_attributes[$slug] = $this->getRepeatorType($value, $slug);
+                    elseif (is_array($value) && $type == "normal") $all_attributes[$slug] = $this->getNormalType($value, $slug);
+                    else $all_attributes[$slug] = $this->getValue($type, $value, $slug);
                 }
+                $input = [
+                    "product_id" => $product->id,
+                    "attribute" => $component["component"],
+                    "scope" => $scopeArr["scope"],
+                    "scope_id" => $scopeArr["scope_id"],
+                    "position" => isset($data["position"]) ? $data["position"] : null,
+                    "value" => $all_attributes
+                ];
+                $product_page_attributes[] = isset($component["id"]) ? $this->update($input, $component["id"]) : $this->create($input);
+            }
+            $product->productBuilderValues()->whereNotIn('id', array_filter(Arr::pluck($product_page_attributes, 'id')))->where($scopeArr)->delete();
         } 
         catch (Exception $exception)
         {
@@ -84,6 +88,7 @@ class ProductBuilderRepository extends BaseRepository
         {
             $this->config_rules = [];
             $this->config_types = [];
+            $this->collect_elements = [];
 
             $all_component_slugs = collect($this->getComponents())->pluck("slug")->toArray();
             if (!in_array($component["component"], $all_component_slugs)) throw ValidationException::withMessages(["component" => "Invalid Component name"]);
@@ -149,12 +154,12 @@ class ProductBuilderRepository extends BaseRepository
                 $this->config_rules[$append_key] = "$rule|{$element["rules"]}"; 
                 $this->config_types[$element["slug"]] = $element["type"];
 
-                if ($method == "update" && isset($component["id"]) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
+                if ($method == "update" && (isset($component["id"]) || isset($component["parent_value"])) && $element["type"] == "file") $this->handleFileIssue($component, $append_key);
 
                 if ($element["hasChildren"] == 0) continue;
 
                 if ($element["type"] == "repeater") {
-                    $count = ($item = $component["attributes"][$element["slug"]]) ? count($item) : 0;
+                    $count = isset($component["attributes"][$element["slug"]]) ? count($component["attributes"][$element["slug"]]) : 0;
                     for( $i=0; $i < $count; $i++ )
                     {
                         $this->getRules($component, $element["attributes"][0], "$append_key.$i", $method);
@@ -175,7 +180,8 @@ class ProductBuilderRepository extends BaseRepository
     {
         try
         {
-            $exist_component = $this->model->findOrFail($component["id"]);
+            $id = isset($component["id"]) ? $component["id"] : $component["parent_value"];
+            $exist_component = $this->model->findOrFail($id);
             $exist_values = $exist_component->value;
             $request_element_value = getDotToArray("attributes.$append_key", $component);
             if ($request_element_value && !is_file($request_element_value)) {
@@ -283,13 +289,22 @@ class ProductBuilderRepository extends BaseRepository
         {
             $product = $this->product::findOrFail($id);
             AttributeSet::findOrFail($product->attribute_set_id);
-            $whereCondition = array_merge($scope, ["product_id" => $id]);
 
             $attributes = [];
-            $components = $product->productBuilderValues()->where($whereCondition)->get();
+            $components = $product->productBuilderValues()->where($scope)->orderBy("position", "asc")->get();
+
+            //fetched from parent scope
+            if($components->isEmpty()) $components = $product->getBuilderParentValues($scope);
+
+            //fetched from parent product
+            if($components->isEmpty() && $product->parent_id) {
+                $components = $product->parent->productBuilderValues()->where($scope)->orderBy("position", "asc")->get();
+                if($components->isEmpty()) $components = $product->parent->getBuilderParentValues($scope);
+            }
+
             foreach($components as $component)
             {
-                $attributes[] = $this->getParent($component);
+                $attributes[] = $this->getParent($component, $product, $scope);
             }
 
             $item = $attributes;
@@ -301,26 +316,30 @@ class ProductBuilderRepository extends BaseRepository
         return $item;
     }
 
-    public function getParent(object $component): array
+    public function getParent(object $component, object $product, array $scope = []): array
     {
         try
         {
             $this->parent = [];
 
             $data = collect($this->pageAttributeRepository->config_fields)->where("slug", $component->attribute)->first();
-            $this->getChildren($data["mainGroups"], values:json_decode($component->value, true));
+            $this->getChildren($data["mainGroups"], values:$component->value);
+
+            $final_component = [
+                "title" => $data["title"],
+                "slug" => $data["slug"],
+                "mainGroups" => $this->parent  
+            ];
+            
+            if($product->id == $component->product_id && $scope["scope"] == $component->scope) $final_component["id"] = $component->id;
+            else $final_component["parent_value"] = $component->id;
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return [
-            "id" => $component->id,
-            "title" => $data["title"],
-            "slug" => $data["slug"],
-            "mainGroups" => $this->parent
-        ];
+        return $final_component;
     }
 
     private function getChildren(array $elements, ?string $key = null, array $values, ?string $slug_key = null): void
@@ -345,11 +364,11 @@ class ProductBuilderRepository extends BaseRepository
                 }
                 
                 if ($element["hasChildren"] == 0) {
-                    if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery((object) $element, $element["pluck"]);
+                    //if ( $element["provider"] !== "" ) $element["options"] = $this->pageAttributeRepository->cacheQuery($element);
                     unset($element["pluck"], $element["provider"], $element["rules"]);
 
                     if (count($values) > 0) {
-                        $default = getDotToArray($append_slug_key, $values);
+                        $default = decodeJsonNumeric(getDotToArray($append_slug_key, $values));
                         if($default) $element["default"] = ($element["type"] == "file") ? Storage::url($default) : $default;
                     }
 

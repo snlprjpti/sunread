@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\Cart\Database\Seeders;
+namespace Modules\GeoIp\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class CartDatabaseSeeder extends Seeder
+class GeoIpDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.

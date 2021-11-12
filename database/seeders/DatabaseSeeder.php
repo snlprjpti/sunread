@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
         $this->call(\Modules\User\Database\Seeders\UserDatabaseSeeder::class);
         $this->call(\Modules\Customer\Database\Seeders\CustomerDatabaseSeeder::class);
         $this->call(\Modules\Category\Database\Seeders\CategoryDatabaseSeeder::class);
+        $this->call(\Modules\ClubHouse\Database\Seeders\ClubHouseDatabaseSeeder::class);
         $this->call(\Modules\Attribute\Database\Seeders\AttributeDatabaseSeeder::class);
         $this->call(\Modules\Brand\Database\Seeders\BrandDatabaseSeeder::class);
         $this->call(\Modules\Product\Database\Seeders\ProductDatabaseSeeder::class);
@@ -23,5 +24,6 @@ class DatabaseSeeder extends Seeder
         $this->call(\Modules\Tax\Database\Seeders\TaxDatabaseSeeder::class);
         $this->call(\Modules\Inventory\Database\Seeders\InventoryDatabaseSeeder::class);
         $this->call(\Modules\Erp\Database\Seeders\ErpDatabaseSeeder::class);
+        $this->call(\Modules\EmailTemplate\Database\Seeders\EmailTemplateDatabaseSeeder::class);
     }
 }

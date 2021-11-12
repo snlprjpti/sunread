@@ -7,15 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmailTemplateDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call(EmailTemplateSeeder::class);
     }
 }
