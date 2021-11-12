@@ -29,8 +29,7 @@ class OrderCommentJob implements ShouldQueue
                 "order_id" => $this->comment['order_id'],
                 "user_id" => $this->comment['user_id'],
                 "is_visible_on_storefornt" => $this->comment['is_visible_on_storefornt'],
-                "comment" => $this->comment['comment'],
-                "created_at" => now()
+                "comment" => $this->comment['comment']
             ]);
         }
         catch (Exception $exception)

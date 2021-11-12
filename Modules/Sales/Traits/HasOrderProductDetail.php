@@ -135,15 +135,15 @@ trait HasOrderProductDetail
         return $customer_tax;
     }
 
-    public function calculateDiscount(object $request): ?object
+    public function calculateDiscount(object $order): ?object
     {
-        if ($request->coupon_code) {
-            $coupon = Coupon::whereCode($request->coupon_code)->publiclyAvailable()->first();
+        if ($order->coupon_code) {
+            $coupon = Coupon::whereCode($order->coupon_code)->publiclyAvailable()->first();
             if (!$coupon) throw new Exception("Coupon Expired");  
             $this->discount_percent = $coupon->discount_percent;          
         }
 
-        return $coupon; 
+        return $coupon ?? 0; 
     }
 
 
