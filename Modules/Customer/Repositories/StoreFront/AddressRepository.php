@@ -79,6 +79,9 @@ class AddressRepository extends BaseRepository
         return $address;
     }
 
+    /**
+     * create or update default address
+     */
     public function createOrUpdate(object $request, int $customer_id): array
     {
         try
@@ -88,6 +91,9 @@ class AddressRepository extends BaseRepository
 
             $channel_code = $request->header("hc-channel");
             $website = Website::findOrFail($customer->website_id);
+            /**
+             * get channel id from header or from default configurations
+            */
             if($channel_code) {
                 $channel_id = $website->channels()->where("code", $channel_code)->first()?->id;
             }
@@ -97,8 +103,12 @@ class AddressRepository extends BaseRepository
             }
 
             if($request->shipping) {
-
-                $shipping["channel_id"] = $channel_id;
+                /**
+                 * add channel id into request shipping address
+                 */
+                $shipping_channel = $request->request->get("shipping");
+                $shipping_channel[ "channel_id" ] = $channel_id;
+                $request->request->add([ "shipping" => $shipping_channel ]);
 
                 $shipping = $this->checkShippingAddress($customer->id, $channel_id)->first();
                 $data = $this->validateAddress($request, $customer, $countries, "shipping");
@@ -115,8 +125,12 @@ class AddressRepository extends BaseRepository
             }
 
             if($request->billing) {
-
-                $billing["channel_id"] = $channel_id;
+                /**
+                 * add channel id into request billing address
+                 */
+                $billing_channel = $request->request->get("billing");
+                $billing_channel[ "channel_id" ] = $channel_id;
+                $request->request->add([ "billing" => $billing_channel ]);
 
                 $billing = $this->checkBillingAddress($customer->id, $channel_id)->first();
                 $data = $this->validateAddress($request, $customer, $countries, "billing");
