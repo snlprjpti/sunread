@@ -15,7 +15,7 @@ class CountryRepository extends BaseRepository
         $this->model_key = "country";
     }
 
-    public function channelCountry(int $channel_id): object
+    public function getChannelCountry(int $channel_id): object
     {
         try
         {

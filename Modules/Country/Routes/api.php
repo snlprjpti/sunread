@@ -4,7 +4,7 @@ Route::group(['middleware' => ['api']], function () {
     //ADMIN COUNTRY ROUTES
     Route::group(['prefix'=>'admin', 'as' => 'admin.', 'middleware' => ['admin', 'language']], function () {
 
-        Route::get('/channel/country', [ \Modules\Country\Http\Controllers\CountryController::class, "channelCountry" ]);
+        Route::get('/channel/{channel_id}/country', [ \Modules\Country\Http\Controllers\CountryController::class, "channelCountry" ]);
         Route::resource('country', CountryController::class)->only(['index', 'show']);
 
         Route::resource('regions', RegionController::class)->only(['index', 'show']);
