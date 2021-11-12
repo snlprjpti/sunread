@@ -3,7 +3,7 @@
 namespace Modules\Customer\Repositories\StoreFront;
 
 use Exception;
-use Modules\Core\Entities\Website;
+use Illuminate\Validation\ValidationException;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Country\Entities\City;
@@ -87,20 +87,12 @@ class AddressRepository extends BaseRepository
         try
         {
             $customer = Customer::findOrFail($customer_id);
-            $countries = $this->getCountry($request);
+            $core_cache = $this->getCoreCache($request);
+            $channel_id = $core_cache->channel->id;
 
-            $channel_code = $request->header("hc-channel");
-            $website = Website::findOrFail($customer->website_id);
-            /**
-             * get channel id from header or from default configurations
-            */
-            if($channel_code) {
-                $channel_id = $website->channels()->where("code", $channel_code)->first()?->id;
-            }
-            else {
-                $channel = SiteConfig::fetch("website_default_channel", "website", $website->id);
-                $channel_id = $channel->id;
-            }
+            $countries = $this->getCountry($core_cache, $request);
+
+            if($core_cache->website->id != $customer->website_id) throw ValidationException::withMessages(["Country" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
 
             if($request->shipping) {
                 /**
@@ -164,14 +156,14 @@ class AddressRepository extends BaseRepository
                 else {
                     $data["city_id"] = null;
                     $cities = City::whereRegionId($data["region_id"])->count();
-                    if($cities > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "{$name} City" ]));
+                    if($cities > 0) throw ValidationException::withMessages(["city_id" => __("core::app.response.please-choose", [ "name"=> "{$name} City" ])]);
                 }
             }
             else {
                 $data["region_id"] = null;
                 $data["city_id"] = null;
                 $region = Region::whereCountryId($data["country_id"])->count();
-                if($region > 0) throw new Exception(__("core::app.response.please-choose", [ "name" => "{$name} Region" ]));
+                if($region > 0) throw ValidationException::withMessages(["region_id" => __("core::app.response.please-choose", [ "name"=> "{$name} Region" ])]);
             }
         }
         catch (Exception $exception)
@@ -182,15 +174,14 @@ class AddressRepository extends BaseRepository
         return $data;
     }
 
-    public function getCountry(object $request): object
+    public function getCountry(object $core_cache, object $request): object
     {
         try
         {
-            $data = $this->getCoreCache($request);
+            if (!$core_cache->channel) throw ValidationException::withMessages(["country_id" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
 
-            if (!$data->channel) throw new Exception(__("core::app.response.not-found", ["name" => "Country"]));
-            $allow = SiteConfig::fetch("allow_countries", "channel", $data->channel->id);
-            $default[] = SiteConfig::fetch("default_country", "channel", $data->channel->id);
+            $allow = SiteConfig::fetch("allow_countries", "channel", $core_cache->channel->id);
+            $default[] = SiteConfig::fetch("default_country", "channel", $core_cache->channel->id);
 
             $fetched = $allow->merge($default);
         }
@@ -224,8 +215,9 @@ class AddressRepository extends BaseRepository
         {
             $new_rules = $this->rules;
 
-            if(!isset($request->{$name}["country_id"])) throw new Exception(__("core::app.response.not-found", [ "name" => "Country" ]));
-            if (!$countries->contains("id", $request->shipping["country_id"])) throw new Exception(__("core::app.response.invalid-country", [ "name" => $name]));
+            if(!isset($request->{$name}["country_id"])) throw ValidationException::withMessages(["country_id" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
+            if (!$countries->contains("id", $request->shipping["country_id"])) throw ValidationException::withMessages(["country_id" => __("core::app.response.invalid-country", [ "name"=> $name ])]);
+
 
             $this->rules = [];
             foreach($new_rules as $key => $value)
