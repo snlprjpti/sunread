@@ -37,6 +37,9 @@ trait EmailNotification
             $data->subject = htmlspecialchars_decode($this->render($email_template->subject, $variable_data));
             $data->template_id = $email_template->id;
             $data->to_email = $variable_data->customer_email_address;
+            $data->style = $email_template->style;
+            $data->sender_name = SiteConfig::fetch("email_sender_name", "store", $variable_data->store_id) ?? config("mail.from.name");
+            $data->sender_email = SiteConfig::fetch("email_sender_email", "store", $variable_data->store_id) ?? config("mail.from.address");
         }
         catch (Exception $exception)
         {
@@ -126,7 +129,12 @@ trait EmailNotification
         {
             $customer = Customer::findOrFail($customer_id);
             /** get store data by its id */
-            $store = Store::findOrFail($customer->store_id);
+            if(empty($customer->store_id)) {
+                $store = SiteConfig::fetch("website_default_store", "website", $customer->website_id);
+            }
+            else {
+                $store = Store::findOrFail($customer->store_id);
+            }
             /** get channel by store */
             $channel = $store->channel;
 

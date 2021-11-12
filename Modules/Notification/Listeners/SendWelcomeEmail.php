@@ -14,6 +14,6 @@ class SendWelcomeEmail
 
     public function handle(RegistrationSuccess $event): void
     {
-        SendNotificationJob::dispatch( $event->user_id, "welcome_email" );
+        SendNotificationJob::dispatch( $event->user_id, "welcome_email" )->onQueue("high");
     }
 }

@@ -10,13 +10,15 @@ class NotificationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $details, $subject, $style, $sender_name, $sender_email;
 
-    public $details, $subject;
-
-    public function __construct(string $details, string $subject)
+    public function __construct(string $details, string $subject, string $sender_name, string $sender_email, string $style = null)
     {
         $this->details = $details;
         $this->subject = $subject;
+        $this->style = $style;
+        $this->sender_name = $sender_name;
+        $this->sender_email = $sender_email;
     }
 
     public function getBody(): string
@@ -26,7 +28,8 @@ class NotificationMail extends Mailable
 
     public function build(): NotificationMail
     {
-        $this->subject($this->subject);
-        return $this->markdown('notification::emailNotification');
+        return $this->subject($this->subject)
+            ->from($this->sender_email, $this->sender_name)
+            ->markdown('notification::emailNotification');
     }
 }

@@ -4,12 +4,14 @@ namespace Modules\ClubHouse\Repositories;
 
 use Exception;
 use Illuminate\Support\Str;
+use Modules\Core\Facades\CoreCache;
 use Modules\ClubHouse\Traits\HasScope;
 use Illuminate\Support\Facades\Storage;
 use Modules\ClubHouse\Entities\ClubHouse;
 use Modules\ClubHouse\Rules\SlugUniqueRule;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\ClubHouse\Entities\ClubHouseValue;
+use Modules\ClubHouse\Exceptions\ClubHouseNotFoundException;
 
 class ClubHouseRepository extends BaseRepository
 {
@@ -107,7 +109,7 @@ class ClubHouseRepository extends BaseRepository
      */
     public function createUniqueSlug(array $data, ?object $club_house = null)
     {
-        $slug = isset($data["items"]["name"]["value"]) ? Str::slug($data["items"]["name"]["value"]) : $club_house->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug");
+        $slug = is_null($club_house) ? Str::slug($data["items"]["title"]["value"]) : (isset($data["items"]["title"]["value"]) ? Str::slug($data["items"]["title"]["value"]) : $club_house->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug"));
         $original_slug = $slug;
 
         $count = 1;
@@ -118,5 +120,42 @@ class ClubHouseRepository extends BaseRepository
         }
         return $slug;
     }
+
+    public function fetchWithSlug(string $club_house_slug, $scope): object
+    {
+        try
+        {
+            $club_house_value = ClubHouseValue::whereAttribute("slug")->whereValue($club_house_slug)->firstOrFail();
+            $club_house = $club_house_value->clubHouse;
+
+            if(!$this->checkStatus($club_house, $scope)) throw new ClubHouseNotFoundException();
+        }
+
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $club_house;
+    }
+
+    public function checkStatus(object $club_house, $scope): bool
+    {
+        try
+        {
+            $data = [
+                "scope" => "website",
+                "scope_id" => $scope->id,
+            ];
+            $status_value = $club_house->value($data, "status");
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $status_value === 1 ? true : false;
+    }
+
 }
 

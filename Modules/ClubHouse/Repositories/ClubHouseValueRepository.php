@@ -118,7 +118,7 @@ class ClubHouseValueRepository
                 ];
             });
 
-            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data);
+            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->club_house_repository->createUniqueSlug($data);
         }
         catch (Exception $exception)
         {

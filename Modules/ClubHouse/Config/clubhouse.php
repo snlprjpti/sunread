@@ -65,7 +65,7 @@ return [
                 [
                     "title" => "Opening hours",
                     "slug" => "opening_hours",
-                    "type" => "text",
+                    "type" => "textarea",
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
@@ -143,7 +143,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "mimes:jpeg,jpg,bmp,png",
+                    "rules" => "mimes:jpeg,jpg,bmp,png,gif",
                     "is_required" => 0
                 ],
             ]
