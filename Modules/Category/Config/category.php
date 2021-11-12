@@ -117,6 +117,16 @@ return [
                     "rules" => "string",
                     "is_required" => 0
                 ],
+                                [
+                    "title" => "Gradient Color",
+                    "slug" => "gradient_color",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "string",
+                    "is_required" => 0
+                ],
                 [
                     "title" => "Title",
                     "slug" => "hero_banner_title",
@@ -343,10 +353,11 @@ return [
         "background_type" => "hero_banner.elements.0",
         "background_image" => "hero_banner.elements.1",
         "youtube_link" => "hero_banner.elements.2",
-        "hero_banner_title" => "hero_banner.elements.3",
-        "hero_banner_content" => "hero_banner.elements.4",
-        "readmore_label" => "hero_banner.elements.5",
-        "readmore_link" => "hero_banner.elements.6",
+        "gradient_color" => "hero_banner.elements.3",
+        "hero_banner_title" => "hero_banner.elements.4",
+        "hero_banner_content" => "hero_banner.elements.5",
+        "readmore_label" => "hero_banner.elements.6",
+        "readmore_link" => "hero_banner.elements.7",
         "usp_banner_1_first_image" => "usp_banner_1.elements.0",
         "usp_banner_1_second_image" => "usp_banner_1.elements.1",
         "usp_banner_1_third_image" => "usp_banner_1.elements.2",
