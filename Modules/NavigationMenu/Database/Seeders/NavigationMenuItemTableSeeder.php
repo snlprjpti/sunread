@@ -5,7 +5,7 @@ namespace Modules\NavigationMenu\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class NavigationMenuDatabaseSeeder extends Seeder
+class NavigationMenuItemTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,8 +16,6 @@ class NavigationMenuDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(NavigationMenuTableSeeder::class);
-        $this->call(NavigationMenuItemTableSeeder::class);
-        $this->call(NavigationMenuItemValueTableSeeder::class);
+        // $this->call("OthersTableSeeder");
     }
 }

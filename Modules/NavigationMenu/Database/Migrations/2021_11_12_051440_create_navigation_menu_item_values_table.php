@@ -23,7 +23,7 @@ class CreateNavigationMenuItemValuesTable extends Migration
             $table->timestamps();
 
             // Foreign Key Constraint
-            $table->foreign('navigation_menu_item_id')->references('id')->on('club_houses')->onDelete('cascade');
+            $table->foreign('navigation_menu_item_id')->references('id')->on('navigation_menu_items')->onDelete('cascade');
         });
     }
 

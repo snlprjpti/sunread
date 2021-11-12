@@ -9,34 +9,13 @@ use Modules\Core\Entities\Website;
 class NavigationMenuLocationRule implements Rule
 {
     /**
-     * Create a new rule instance.
-     *
-     * @return void
-     */
-    public $data, $website_model;
-
-    public function __construct()
-    {
-    }
-
-    /**
      * Determine if the validation rule passes.
      */
     public function passes($attribute, $value)
     {
-        if($this->id) $website_id = NavigationMenuItem::findOrFail($this->id)->website_id ;
-
-        if(!isset($website_id) && $this->data->website_id) $website_id = $this->data->website_id;
-
-        if($this->data->scope == "website" && isset($website_id)) return (bool) $website_id == $value;
-
-        if($this->data->scope == "channel" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->pluck('id')->toArray());
-
-        if($this->data->scope == "store" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->map(function ($channel) {
-            return $channel->stores->pluck('id');
-        })->flatten(1)->toArray());
-
-        return true;
+        $location_fields = collect(config("navigation_menu.locations")["elements"])->pluck('slug')->toArray();
+        if(in_array($value, $location_fields)) return true;
+        return false;
     }
 
     /**
@@ -44,6 +23,6 @@ class NavigationMenuLocationRule implements Rule
      */
     public function message()
     {
-        return 'Scope Id does not belong to this NavigationMenuItem';
+        return 'Navigation Menu Item Location does not exist.';
     }
 }

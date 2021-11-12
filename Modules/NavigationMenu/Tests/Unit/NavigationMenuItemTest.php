@@ -1,28 +1,28 @@
 <?php
 
-namespace Modules\ClubHouse\Tests\Feature;
+namespace Modules\NavigationMenu\Tests\Unit;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
-use Modules\ClubHouse\Entities\ClubHouse;
-use Modules\Core\Tests\BaseTestCase;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 use Modules\Core\Entities\Website;
+use Modules\Core\Tests\BaseTestCase;
+use Illuminate\Support\Facades\Storage;
+use Modules\NavigationMenu\Entities\NavigationMenuItem;
 
-class ClubHouseTest extends BaseTestCase
+class NavigationMenuItemTest extends BaseTestCase
 {
     protected $default_resource;
 
     public function setUp(): void
     {
-        $this->model = ClubHouse::class;
+        $this->model = NavigationMenuItem::class;
 
         parent::setUp();
         $this->admin = $this->createAdmin();
 
-        $this->model_name = "Club House";
-        $this->route_prefix = "admin.clubhouses";
+        $this->model_name = "Navigation Menu Item";
+        $this->route_prefix = "admin.navigation-menu-items";
 
         $this->model::factory(10)->create();
 
@@ -35,49 +35,32 @@ class ClubHouseTest extends BaseTestCase
     public function getCreateData(): array
     {
         Storage::fake();
+        $title = Str::random(20);
         return array_merge($this->model::factory()->make()->toArray(), [
             "items" => [
                 "title" => [
-                    "value" => Str::random(10)
+                    "value" => $title
                 ],
                 "status" => [
                     "value" => rand(0,1)
                 ],
                 "slug" => [
-                    "value" => Str::slug(Str::random(10))
+                    "value" => Str::slug($title)
                 ],
-                "header_content" => [
-                    "value" => Str::random(30)
+                "type" => [
+                    "value" => Arr::random(["category", "page", "custom"]),
                 ],
-                "opening_hours" => [
-                    "value" => Str::random(10)
+                "type_id" => [
+                    "value" => null
                 ],
-                "address" => [
-                    "value" => Str::random(10)
+                "custom_link" => [
+                    "value" => Str::random(40),
                 ],
-                "contact" => [
-                    "value" => Str::random(10)
+                "additional_data" => [
+                    "value" => []
                 ],
-                "latitude" => [
-                    "value" => Str::random(10),
-                ],
-                "longitude" => [
-                    "value" => Str::random(10),
-                ],
-                "thumbnail" => [
-                    "value" => UploadedFile::fake()->image("image.png")
-                ],
-                "background_image" => [
-                    "value" => UploadedFile::fake()->image("image.png")
-                ],
-                "meta_title" => [
-                    "value" => Str::random(11)
-                ],
-                "meta_description" => [
-                    "value" => Str::random(15)
-                ],
-                "meta_keywords" => [
-                    "value" => Str::random(13)
+                "order" => [
+                    "value" => rand(0,10)
                 ],
             ]
         ]);
@@ -118,8 +101,8 @@ class ClubHouseTest extends BaseTestCase
     public function getNonMandatoryUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
-            "latitude" => null,
-            "latitude" => null,
+            "type_id" => null,
+            "custom_link" => null,
         ]);
     }
 
@@ -164,5 +147,4 @@ class ClubHouseTest extends BaseTestCase
         ];
 
     }
-
 }

@@ -16,10 +16,12 @@ class CreateNavigationMenuItemsTable extends Migration
         Schema::create('navigation_menu_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('navigation_menu_id');
+            $table->unsignedBigInteger('website_id');
             $table->timestamps();
 
             // Foreign Key Constraint
-            $table->foreign('navigation_menu_id')->references('id')->on('navigation_menu_items')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('navigation_menu_id')->references('id')->on('navigation_menus')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('website_id')->references('id')->on('websites')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

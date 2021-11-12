@@ -12,6 +12,7 @@ use Modules\NavigationMenu\Rules\SlugUniqueRule;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\NavigationMenu\Entities\NavigationMenuValue;
 use Modules\NavigationMenu\Exceptions\NavigationMenuNotFoundException;
+use Modules\NavigationMenu\Rules\NavigationMenuLocationRule;
 
 class NavigationMenuRepository extends BaseRepository
 {
@@ -30,9 +31,40 @@ class NavigationMenuRepository extends BaseRepository
         $this->rules = [
             // NavigationMenu validation
             "title" => "required|string|min:2|max:250",
-            "location" => "required|string",
+            "slug" => "string|min:2|max:250|unique:navigation_menus,slug",
+            "location" => ["string", new NavigationMenuLocationRule()],
         ];
     }
+
+    /**
+     * Check if Slug Exists. If not create it
+     */
+    public function examineSlug(array $data, ?object $club_house = null): array
+    {
+        if(!isset($data["slug"])) {
+            $slug = Str::slug($data["title"]);
+            $original_slug = $slug;
+            $count = 1;
+
+            while ($this->checkSlug($slug, $club_house)) {
+                $slug = "{$original_slug}-{$count}";
+                $count++;
+            }
+
+            $data["slug"] = $slug;
+        }
+        return $data;
+    }
+
+    /**
+     * Check if Slug Exists Or Not
+     */
+    public function checkSlug(string $slug, ?object $club_house = null)
+    {
+        $navigation_menu = $this->model->where('slug', $slug)->first();
+        return $navigation_menu;
+    }
+
 
     /**
      * Creates a Unique Slug for ClubHouse
@@ -67,24 +99,6 @@ class NavigationMenuRepository extends BaseRepository
     //     }
 
     //     return $club_house;
-    // }
-
-    // public function checkStatus(object $club_house, $scope): bool
-    // {
-    //     try
-    //     {
-    //         $data = [
-    //             "scope" => "website",
-    //             "scope_id" => $scope->id,
-    //         ];
-    //         $status_value = $club_house->value($data, "status");
-    //     }
-    //     catch (Exception $exception)
-    //     {
-    //         throw $exception;
-    //     }
-
-    //     return $status_value === 1 ? true : false;
     // }
 
 }

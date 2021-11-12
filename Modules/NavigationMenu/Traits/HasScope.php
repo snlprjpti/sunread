@@ -10,7 +10,7 @@ use Modules\NavigationMenu\Entities\NavigationMenuItemValue;
 
 trait HasScope
 {
-    // Proporties for HasScope Trait
+// Proporties for HasScope Trait
     public $channel_model, $store_model, $value_model;
 
     /**

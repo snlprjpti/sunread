@@ -61,8 +61,9 @@ class NavigationMenuItemController extends BaseController
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request)],
+                "website_id" => "sometimes|exists:websites,id"
             ]);
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, ["values"]);
         }
         catch (Exception $exception)
         {
@@ -104,9 +105,9 @@ class NavigationMenuItemController extends BaseController
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
             ]);
-            $club_house = $this->model->findOrFail($id);
+            $navigation_menu_item = $this->model->findOrFail($id);
 
-            $fetched = $this->repository->fetchWithAttributes($request, $club_house);
+            $fetched = $this->repository->fetchWithAttributes($request, $navigation_menu_item);
         }
         catch (Exception $exception)
         {
@@ -123,9 +124,9 @@ class NavigationMenuItemController extends BaseController
     {
         try
         {
-            $club_house = $this->model->findOrFail($id);
+            $navigation_menu_item = $this->model->findOrFail($id);
 
-            $data = $this->navigation_menu_item_value_repository->validateWithValuesUpdate($request, $club_house);
+            $data = $this->navigation_menu_item_value_repository->validateWithValuesUpdate($request, $navigation_menu_item);
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->navigation_menu_item_value_repository->createOrUpdate($data, $updated);
@@ -141,7 +142,7 @@ class NavigationMenuItemController extends BaseController
     }
 
     /**
-     * Finds and Deletes Clubhouse
+     * Finds and Deletes NavigationMenuItem
      */
     public function destroy(int $id): JsonResponse
     {
@@ -160,7 +161,7 @@ class NavigationMenuItemController extends BaseController
     }
 
     /**
-     * Updates the Status of Clubhouse with given Id
+     * Updates the Status of NavigationMenuItem with given Id
      */
     public function updateStatus(Request $request, int $id): JsonResponse
     {
@@ -177,7 +178,7 @@ class NavigationMenuItemController extends BaseController
     }
 
     /**
-     * Fetches and returns Attributes for ClubHouse Values
+     * Fetches and returns Attributes for NavigationMenuItem Values
      */
     public function attributes(Request $request): JsonResponse
     {

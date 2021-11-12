@@ -18,7 +18,7 @@ class NavigationMenuController extends BaseController
      protected $repository;
 
      /**
-      * ClubHouseController Class constructor
+      * NavigationMenuController Class constructor
       */
      public function __construct(NavigationMenuRepository $navigationMenuRepository, NavigationMenu $navigationMenu)
      {
@@ -32,7 +32,7 @@ class NavigationMenuController extends BaseController
      }
 
      /**
-      * Returns ClubHouseResource in Collection
+      * Returns NavigationMenuResource in Collection
       */
      public function collection(object $data): ResourceCollection
      {
@@ -40,7 +40,7 @@ class NavigationMenuController extends BaseController
      }
 
      /**
-      * Returns ClubHouseResource
+      * Returns NavigationMenuResource
       */
      public function resource(object $data): JsonResource
      {
@@ -48,7 +48,7 @@ class NavigationMenuController extends BaseController
      }
 
      /**
-      * Fetches and returns the list of ClubHouse
+      * Fetches and returns the list of NavigationMenu
       */
      public function index(Request $request): JsonResponse
      {
@@ -65,13 +65,15 @@ class NavigationMenuController extends BaseController
      }
 
      /**
-      * Validates and Creates Clubhouse with Clubhouse values
+      * Validates and Creates NavigationMenu
       */
      public function store(Request $request): JsonResponse
      {
          try
          {
              $data = $this->repository->validateData($request);
+
+             $data = $this->repository->examineSlug($data);
 
              $created = $this->repository->create($data);
          }
@@ -84,7 +86,7 @@ class NavigationMenuController extends BaseController
      }
 
      /**
-      * Fetches and returns the ClubHouse by Id
+      * Fetches and returns the NavigationMenu by Id
       */
      public function show(Request $request, int $id): JsonResponse
      {
@@ -97,11 +99,11 @@ class NavigationMenuController extends BaseController
              return $this->handleException($exception);
          }
 
-         return $this->successResponse($fetched, $this->lang('fetch-success'));
+         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
      }
 
      /**
-      * Validates and Updates Clubhouse with Clubhouse values
+      * Validates and Updates NavigationMenu
       */
      public function update(Request $request, int $id): JsonResponse
      {
@@ -109,7 +111,9 @@ class NavigationMenuController extends BaseController
          {
             $data = $this->repository->validateData($request);
 
-             $updated = $this->repository->update($data, $id);
+            $data = $this->repository->examineSlug($data);
+
+            $updated = $this->repository->update($data, $id);
          }
          catch (Exception $exception)
          {
@@ -120,7 +124,7 @@ class NavigationMenuController extends BaseController
      }
 
      /**
-      * Finds and Deletes Clubhouse
+      * Finds and Deletes NavigationMenu
       */
      public function destroy(int $id): JsonResponse
      {
@@ -139,7 +143,7 @@ class NavigationMenuController extends BaseController
      }
 
      /**
-      * Updates the Status of Clubhouse with given Id
+      * Updates the Status of NavigationMenu with given Id
       */
      public function updateStatus(Request $request, int $id): JsonResponse
      {

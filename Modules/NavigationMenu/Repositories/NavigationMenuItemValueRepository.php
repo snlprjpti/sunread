@@ -8,7 +8,6 @@ use Modules\Core\Rules\ScopeRule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Modules\NavigationMenu\Rules\SlugUniqueRule;
 use Modules\NavigationMenu\Traits\HasScope;
 use Illuminate\Validation\ValidationException;
 use Modules\NavigationMenu\Entities\NavigationMenuItem;
@@ -109,8 +108,7 @@ class NavigationMenuItemValueRepository
         try
         {
             $data = $this->navigation_menu_item_repository->validateData($request, array_merge($this->getValidationRules($request),[
-                "items.slug.value" => new SlugUniqueRule($request),
-                "website_id" => "required|exists:websites,id"
+                "website_id" => "required|exists:websites,id",
             ]), function () use ($request) {
                 return [
                     "scope" => "website",
@@ -118,7 +116,6 @@ class NavigationMenuItemValueRepository
                 ];
             });
 
-            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->navigation_menu_item_repository->createUniqueSlug($data);
         }
         catch (Exception $exception)
         {
@@ -136,16 +133,14 @@ class NavigationMenuItemValueRepository
         try
         {
             $data = $this->navigation_menu_item_repository->validateData($request, array_merge($this->getValidationRules($request, $navigation_menu_item?->id, "update"), [
-                "items.slug.value" => new SlugUniqueRule($request, $navigation_menu_item),
                 "scope" => "required|in:website,channel,store",
                 "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $navigation_menu_item?->id)]
             ]), function () use ($navigation_menu_item) {
                 return [
-                    "website_id" => $navigation_menu_item->website_id
+                    "website_id" => $navigation_menu_item->website_id,
+                    "navigation_menu_id" => $navigation_menu_item->navigation_menu_id,
                 ];
             });
-
-            if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->navigation_menu_item_repository->createUniqueSlug($data, $navigation_menu_item);
         }
         catch (Exception $exception)
         {
@@ -166,10 +161,8 @@ class NavigationMenuItemValueRepository
         {
             $created_data = [];
             $match = [
-                "navigation_menu_id" => $parent->id,
+                "navigation_menu_item_id" => $parent->id,
                 "scope" => $data["scope"],
-                "type" => $data["type"],
-                "position" => $data["position"],
                 "scope_id" => $data["scope_id"]
             ];
             foreach($data["items"] as $key => $val)

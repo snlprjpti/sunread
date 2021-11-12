@@ -12,6 +12,7 @@ class NavigationMenuItemResource extends JsonResource
             "id" => $this->id,
             "navigation_menu_id" => $this->navigation_menu_id,
             "navigation_menu_title" => $this->navigationMenu->title,
+            "values" => $this->values,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }

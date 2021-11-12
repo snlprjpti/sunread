@@ -2,7 +2,6 @@
 
 namespace Modules\NavigationMenu\Entities;
 
-use Modules\Core\Traits\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Modules\NavigationMenu\Traits\HasScope;
@@ -17,7 +16,7 @@ class NavigationMenuItem extends Model
     /**
      * Arrays that are Mass Assignable
      */
-    protected $fillable = ["position", "website_id", "type", "status"];
+    protected $fillable = ["navigation_menu_id", "website_id"];
 
     // Append data with Values [ClubHouseValue]
     protected $with = [ "values" ];

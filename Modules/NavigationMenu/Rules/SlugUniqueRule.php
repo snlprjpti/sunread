@@ -13,12 +13,12 @@ class SlugUniqueRule implements Rule
      *
      * @return void
      */
-    public $data, $club_house;
+    public $data, $navigation_menu_item;
 
-    public function __construct(object $data, ?object $club_house = null)
+    public function __construct(object $data, ?object $navigation_menu_item = null)
     {
         $this->data = $data;
-        $this->club_house = $club_house;
+        $this->navigation_menu_item = $navigation_menu_item;
     }
 
     /**
@@ -27,7 +27,7 @@ class SlugUniqueRule implements Rule
     public function passes($attribute, $value)
     {
         $arr = $this->data->toArray();
-        return (bool) !$this->checkSlug($arr, $value, $this->club_house);
+        return (bool) !$this->checkSlug($arr, $value, $this->navigation_menu_item);
     }
 
     /**

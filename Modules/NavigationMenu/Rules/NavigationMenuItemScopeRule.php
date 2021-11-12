@@ -8,14 +8,19 @@ use Modules\Core\Entities\Website;
 
 class NavigationMenuItemScopeRule implements Rule
 {
+
     /**
      * Create a new rule instance.
      *
      * @return void
      */
+    public $data, $website_model;
 
-    public function __construct()
+    public function __construct($data, $id=null)
     {
+        $this->data = $data;
+        $this->id = $id;
+        $this->website_model = new Website();
     }
 
     /**
@@ -23,7 +28,17 @@ class NavigationMenuItemScopeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $location_fields = config("navigation_menu.location");
+        if($this->id) $website_id = NavigationMenuItem::findOrFail($this->id)->website_id ;
+
+        if(!isset($website_id) && $this->data->website_id) $website_id = $this->data->website_id;
+
+        if($this->data->scope == "website" && isset($website_id)) return (bool) $website_id == $value;
+
+        if($this->data->scope == "channel" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->pluck('id')->toArray());
+
+        if($this->data->scope == "store" && isset($website_id))  return (bool) in_array($value, $this->website_model->find($website_id)->channels->map(function ($channel) {
+            return $channel->stores->pluck('id');
+        })->flatten(1)->toArray());
 
         return true;
     }

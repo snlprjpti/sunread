@@ -152,7 +152,7 @@ return [
             ],
             [
                 "label" => "Full Screen",
-                "slug" => "full_scree",
+                "slug" => "full_screen",
             ],
         ]
     ],
@@ -162,7 +162,7 @@ return [
         "type_id" => "general.elements.2",
         "type_id" => "general.elements.4",
         "custom_link" => "general.elements.5",
-        "additional_data" => "general.elements.6",
-        "order" => "general.elements.7",
+        "order" => "general.elements.6",
+        "additional_data" => "general.additional.0",
     ]
 ];
