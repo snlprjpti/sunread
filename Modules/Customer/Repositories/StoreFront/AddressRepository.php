@@ -146,6 +146,10 @@ class AddressRepository extends BaseRepository
         return $created;
     }
 
+    /**
+     * check region and city exist on country
+     * Set value according to country
+    */
     public function checkRegionAndCity(array $data, string $name): array
     {
         try
@@ -174,6 +178,9 @@ class AddressRepository extends BaseRepository
         return $data;
     }
 
+    /**
+     * get channel related country list
+    */
     public function getCountry(object $core_cache): object
     {
         try
@@ -193,6 +200,9 @@ class AddressRepository extends BaseRepository
         return $fetched;
     }
 
+    /**
+     * get customer default addresses
+    */
     public function getCustomerAddress(object $request, object $customer): array
     {
         try
@@ -209,15 +219,19 @@ class AddressRepository extends BaseRepository
         return $data;
     }
 
+    /**
+     * validation customer address
+    */
     public function validateAddress(object $request, object $customer, object $countries, string $name): array
     {
         try
         {
+            /** save validation rules to new rules */
             $new_rules = $this->rules;
 
+            /** Country validation */
             if(!isset($request->{$name}["country_id"])) throw ValidationException::withMessages([ "country_id" => __("core::app.response.not-found", [ "name"=> "Country" ])]);
-            if (!$countries->contains("id", $request->shipping["country_id"])) throw ValidationException::withMessages([ "country_id" => __("core::app.response.invalid-country", [ "name"=> $name ])]);
-
+            if (!$countries->contains("id", $request->{$name}["country_id"])) throw ValidationException::withMessages([ "country_id" => __("core::app.response.invalid-country", [ "name"=> $name ])]);
 
             $this->rules = [];
             foreach($new_rules as $key => $value)
@@ -225,8 +239,11 @@ class AddressRepository extends BaseRepository
                 $this->rules[$name.'.'.$key] = $value;
             }
 
+            /** validate data */
             $data = $this->validateData($request, array_merge($this->regionAndCityRules($request,$name)));
             $data[$name] = array_merge($data[$name], [ "customer_id" => $customer->id ]);
+
+            /** reset validation rules */
             $this->rules = $new_rules;
         }
         catch (Exception $exception)
