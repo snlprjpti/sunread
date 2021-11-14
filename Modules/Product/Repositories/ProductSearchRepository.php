@@ -45,12 +45,11 @@ class ProductSearchRepository extends ElasticSearchRepository
     {
         try
         {
-            $this->searchKeys = ["name"];
             $search = [];
 
             if(isset($request->q)) {
                 //$search[] = $this->queryString($this->searchKeys, $request->q);
-                foreach($this->searchKeys as $key) $search[] = $this->match($key, $request->q);
+                foreach($this->searchKeys as $key) $search[] = $this->multimatch($key, $request->q);
             }
             $query = $this->orwhereQuery($search);
         }
