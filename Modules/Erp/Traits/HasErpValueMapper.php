@@ -518,12 +518,13 @@ trait HasErpValueMapper
             $variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
             if ( $variants->count() > 1 ) {
                 $jobs = [];
-                $variants = $this->getValue($variants)->filter(fn ($variant) => $variant["webActive"] == true);
+                $variants = $this->getValue($variants);
                 foreach ( $variants as $variant ) {
+                    if ($variant["webActive"] == false) continue;
                     $jobs[] = new ErpMigrateVariantJob($product, $variant, $erp_product_iteration);
                 }
-                Bus::batch($jobs)->then(function (Batch $batch) use ($product) {
-                    ErpMigrateVisibilityUpdateJob::dispatch($product)->onQueue('erp');
+                Bus::batch($jobs)->then(function (Batch $batch) use ($product, $variants) {
+                    if ($variants->count() > 0) ErpMigrateVisibilityUpdateJob::dispatch($product)->onQueue('erp');
                 })->allowFailures()->onQueue('erp')->dispatch();
             }
         }
