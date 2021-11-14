@@ -516,9 +516,9 @@ trait HasErpValueMapper
         try
         {
             $variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
-            if ( $variants->count() > 1 ) {
+            $variants = $this->getValue($variants)->filter(fn ($variant) => $variant["webActive"] == true);
+            if ( $variants->count() > 0 ) {
                 $jobs = [];
-                $variants = $this->getValue($variants)->filter(fn ($variant) => $variant["webActive"] == true);
                 foreach ( $variants as $variant ) {
                     $jobs[] = new ErpMigrateVariantJob($product, $variant, $erp_product_iteration);
                 }
