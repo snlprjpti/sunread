@@ -112,4 +112,15 @@ class ElasticSearchRepository
             ]
         ];
     }
+
+    public function match_phrase_prefix(string $field, ?string $data): array
+    {
+        return [ 
+            "match_phrase_prefix" => [
+                $field => [
+                    "query" => $data
+                ]
+            ]
+        ];
+    }
 }
