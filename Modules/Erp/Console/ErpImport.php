@@ -26,16 +26,16 @@ class ErpImport extends Command
     public function handle(): bool
     {
         // Import from API
-        ListProducts::dispatch()->onQueue('erp');
-        ErpAttributeGroups::dispatch()->onQueue('erp');
-        EanCodes::dispatch()->onQueue('erp');
-        SalePrices::dispatch()->onQueue('erp');
-        WebInventories::dispatch()->onQueue('erp');
-        WebAssortments::dispatch()->onQueue('erp');
+        // ListProducts::dispatch()->onQueue('erp');
+        // ErpAttributeGroups::dispatch()->onQueue('erp');
+        // EanCodes::dispatch()->onQueue('erp');
+        // SalePrices::dispatch()->onQueue('erp');
+        // WebInventories::dispatch()->onQueue('erp');
+        // WebAssortments::dispatch()->onQueue('erp');
         ProductVariants::dispatch()->onQueue('erp');
 
         // Import from FTP
-        ProductImages::dispatch()->onQueue('erp');
+        // ProductImages::dispatch()->onQueue('erp');
 
         $this->info("All jobs dispatched.");
         return true;
