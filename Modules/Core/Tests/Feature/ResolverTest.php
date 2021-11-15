@@ -64,7 +64,11 @@ class ResolverTest extends BaseTestCase
 
     public function testChannelCanBeResolved(): void
     {
-        $this->headers["hc-channel"] = Channel::inRandomOrder()->first()->code;
+        $website = Website::first();
+        $this->headers["hc-host"] = $website->hostname;
+        $channel_code = $website->channels->first()->code;
+        $this->headers["hc-channel"] = $channel_code;
+
         $response = $this->withHeaders($this->headers)->get($this->getRoute("resolve"));
 
         $response->assertOk();
