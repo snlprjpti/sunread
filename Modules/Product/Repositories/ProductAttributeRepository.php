@@ -129,10 +129,6 @@ class ProductAttributeRepository extends ProductRepository
                 if(isset($product_attribute["value"]) && in_array($attribute->type, $this->option_fields)) $this->optionValidation($attribute, $product_attribute["value"]);
                 
                 if($attribute->slug == "quantity_and_stock_status") $product_attribute["catalog_inventory"] = $single_attribute_collection->pluck("catalog_inventory")->first();
-                if($attribute->slug == "component") {
-                    $product_components = array_merge($product_attribute, $validator->valid()); 
-                    continue;
-                }
 
                 $all_product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid()); 
             }
@@ -141,8 +137,6 @@ class ProductAttributeRepository extends ProductRepository
         {
             throw $exception;
         }
-        $all_product_attributes = collect($all_product_attributes)->where("value", "!=", null)->toArray();
-        $all_product_attributes[] = $product_components;
         return $all_product_attributes;
     }
 
@@ -248,7 +242,7 @@ class ProductAttributeRepository extends ProductRepository
                     "attribute_id" => $db_attribute->id
                 ];
 
-                if(isset($attribute["use_default_value"]) && $attribute["use_default_value"] == 1)
+                if((isset($attribute["use_default_value"]) && $attribute["use_default_value"] == 1) || !isset($attribute["value"]))
                 {
                     $product_attribute = ProductAttribute::where($match)->first();
                     if($product_attribute) $product_attribute->delete();
