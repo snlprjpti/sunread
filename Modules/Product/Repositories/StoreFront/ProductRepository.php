@@ -23,6 +23,7 @@ use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Modules\Page\Repositories\StoreFront\PageRepository;
 use Modules\Product\Repositories\ProductFormatRepository;
 use Modules\Product\Repositories\StoreFront\ProductFormatRepository as StoreFrontProductFormatRepository;
@@ -46,11 +47,12 @@ class ProductRepository extends BaseRepository
         $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date", "animated_image", "disable_animation"];
     }
 
-    public function productDetail(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
+    public function show(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
     {
         try
         {
             $coreCache = $this->getCoreCache($request);
+            
             $relations = [
                 "catalog_inventories",
                 "images",
@@ -83,9 +85,26 @@ class ProductRepository extends BaseRepository
                 $product = Product::whereId($identifier)
                 ->whereParentId($parent_identifier)
                 ->whereWebsiteId($coreCache->website->id)
-                ->whereStatus(1)->with($relations)->firstOrFail();
+                ->whereStatus(1)->with($relations)->firstOrFail();    
             }
 
+            $cache_name = "product_detail_{$product->id}_{$coreCache->channel->id}_{$coreCache->store->id}";
+            $product_details = Cache::rememberForever($cache_name, function () use($request, $product, $coreCache, $parent_identifier) {
+                return $this->productDetail($request, $product, $coreCache, $parent_identifier);
+            });
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $product_details;
+    }
+
+    public function productDetail(object $request, object $product, object $coreCache, ?int $parent_identifier = null): ?array
+    {
+        try
+        {
             $store = $coreCache->store;
 
             $attribute_set = AttributeSet::where("id", $product->attribute_set_id)->first();
