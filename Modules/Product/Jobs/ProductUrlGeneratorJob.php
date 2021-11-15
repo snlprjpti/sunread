@@ -42,7 +42,7 @@ class ProductUrlGeneratorJob implements ShouldQueue
                     ->whereAttributeId(18)->whereScope("website")
                     ->whereScopeId($variant->website_id)->first();
                     if ( !$product_attribute ) {
-                        $value_attribute_create = ProductAttributeString::create(["value" => "{$product_name}_{$i}"]);
+                        $value_attribute_create = ProductAttributeString::create(["value" => "{$product_name}-{$i}"]);
                         $product_attribute = ProductAttribute::create([
                             "scope" => "website",
                             "scope_id" => $variant->website_id,
@@ -54,7 +54,7 @@ class ProductUrlGeneratorJob implements ShouldQueue
                     }
                     else {
                         $product_attribute?->value()->each(function($attribute_value) use($product_name, $i) {
-                            $attribute_value->update(["value" => "{$product_name}_{$i}"]);
+                            $attribute_value->update(["value" => "{$product_name}-{$i}"]);
                         });
                     }
                     $i = $i + 1;
