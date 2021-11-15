@@ -68,7 +68,7 @@ class RegionController extends BaseController
         {
             $request->without_pagination = true;
             $fetched = $this->repository->fetchAll($request, callback:function () use($request) {
-                return $this->model::whereCountryId($request->country_id);
+                return $this->model->whereCountryId($request->country_id);
             });
         }
         catch (Exception $exception)

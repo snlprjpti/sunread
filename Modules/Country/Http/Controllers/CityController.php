@@ -68,7 +68,7 @@ class CityController extends BaseController
         {
             $request->without_pagination = true;
             $fetched = $this->repository->fetchAll($request, callback:function () use($request) {
-                return $this->model::whereRegionId($request->region_id);
+                return $this->model->whereRegionId($request->region_id);
             });
         }
         catch (Exception $exception)
