@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Sales\Repositories;
+namespace Modules\Sales\Repositories\StoreFront;
 
 use Exception;
 use Modules\Product\Entities\Product;

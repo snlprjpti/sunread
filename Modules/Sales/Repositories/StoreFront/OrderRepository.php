@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Sales\Repositories;
+namespace Modules\Sales\Repositories\StoreFront;
 
 use Exception;
 use Illuminate\Bus\Batch;
@@ -15,8 +15,9 @@ use Modules\Sales\Jobs\OrderCalculation;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Sales\Traits\HasOrderCalculation;
 use Modules\Sales\Traits\HasOrderProductDetail;
-use Modules\Sales\Repositories\OrderItemRepository;
 use Modules\Sales\Repositories\OrderMetaRepository;
+use Modules\Sales\Repositories\OrderAddressRepository;
+use Modules\Sales\Repositories\StoreFront\OrderItemRepository;
 
 class OrderRepository extends BaseRepository
 {

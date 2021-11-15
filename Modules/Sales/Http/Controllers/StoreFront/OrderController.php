@@ -6,12 +6,12 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Modules\Sales\Entities\Order;
-use Modules\Sales\Transformers\OrderResource;
-use Modules\Sales\Repositories\OrderRepository;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\Core\Http\Controllers\BaseController;
 use Modules\Sales\Facades\TransactionLog;
+use Modules\Sales\Transformers\OrderResource;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Http\Controllers\BaseController;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Sales\Repositories\StoreFront\OrderRepository;
 
 class OrderController extends BaseController
 {

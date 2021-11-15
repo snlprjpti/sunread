@@ -21,5 +21,7 @@
     "ProductStockAlertResource": true,
     "GeoIp": true,
     "Sales": true,
-    "ClubHouse": true
+    "ClubHouse": true,
+    "Controller": true,
+    "OrderStatus": true
 }
