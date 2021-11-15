@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Entities\Website;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 use Modules\Core\Http\Controllers\BaseController;
@@ -66,9 +67,11 @@ class AddressController extends BaseController
         try
         {
             $customer = Customer::findOrFail($customer_id);
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
+            $channel_id = $this->repository->checkCustomerChannel($request, $customer);
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id, $channel_id) {
                 return [
-                    "customer_id" => $customer_id
+                    "customer_id" => $customer_id,
+                    "channel_id" => $channel_id
                 ];
             });
             $data = $this->repository->checkCountryRegionAndCity($data, $customer);
@@ -106,9 +109,11 @@ class AddressController extends BaseController
         try
         {
             $customer = Customer::findOrFail($customer_id);
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
+            $channel_id = $this->repository->checkCustomerChannel($request, $customer);
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id, $channel_id) {
                 return [
-                    "customer_id" => $customer_id
+                    "customer_id" => $customer_id,
+                    "channel_id" => $channel_id
                 ];
             });
             $data = $this->repository->checkCountryRegionAndCity($data, $customer);
@@ -129,7 +134,7 @@ class AddressController extends BaseController
     {
         try
         {
-            $deleted = $this->repository->delete($address_id, function($deleted) use ($customer_id) {
+            $this->repository->delete($address_id, function($deleted) use ($customer_id) {
                 if ( $deleted->customer_id != $customer_id ) throw new ModelNotFoundException($this->lang("not-found"));
             });
         }

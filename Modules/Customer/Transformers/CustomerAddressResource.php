@@ -3,6 +3,7 @@
 namespace Modules\Customer\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Transformers\ChannelResource;
 use Modules\Country\Entities\Country;
 use Modules\Country\Transformers\CityResource;
 use Modules\Country\Transformers\CountryResource;
@@ -35,6 +36,7 @@ class CustomerAddressResource extends JsonResource
             "vat_number" => $this->vat_number,
             "default_billing_address" => (bool) $this->default_billing_address,
             "default_shipping_address" => (bool) $this->default_shipping_address,
+            "channel" => new ChannelResource($this->whenLoaded("channel")),
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }
