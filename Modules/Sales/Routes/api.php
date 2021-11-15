@@ -17,8 +17,8 @@ Route::group(['middleware' => ['api','proxies']], function () {
         Route::resource("orders", OrderController::class)->only(["index", "show"]);
     });
 
-    Route::group(['as' => 'orders.', 'prefix' => 'public/orders'], function () {
-        Route::resource("sales", OrderController::class)->only(["store"]);
+    Route::group(['as' => 'sales.', 'prefix' => 'public/orders'], function () {
+        Route::resource("orders", \StoreFront\OrderController::class)->only(["store"]);
     });
 
 });

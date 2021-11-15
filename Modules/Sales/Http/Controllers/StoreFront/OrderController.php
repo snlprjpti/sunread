@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Sales\Http\Controllers;
+namespace Modules\Sales\Http\Controllers\StoreFront;
 
 use Exception;
 use Illuminate\Http\Request;
@@ -11,6 +11,7 @@ use Modules\Sales\Repositories\OrderRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Sales\Facades\TransactionLog;
 
 class OrderController extends BaseController
 {
@@ -18,6 +19,10 @@ class OrderController extends BaseController
 
     public function __construct(OrderRepository $repository, Order $order)
     {
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.channel.code');
+        $this->middleware('validate.store.code');
+
         $this->model = $order;
         $this->model_name = "Order";
         $this->repository = $repository;
@@ -35,34 +40,18 @@ class OrderController extends BaseController
         return OrderResource::collection($orders);
     }
 
-    public function index(Request $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["order_items"], function () use ($request)   {
-                // return $this->model->where("website_id", $request->website_id);
-            });
+            $response = $this->repository->store($request);
         }
-        catch (Exception $exception)
+        catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
-    }
-
-    public function show(Request $request, int $id): JsonResponse
-    {
-        try
-        {
-            $fetched = $this->repository->fetch($id, ["order_items"]);
-        }
-        catch (Exception $exception)
-        {
-            return $this->handleException($exception);
-        }
-
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($response), $this->lang('create-success'), 201);
     }
 
 }
