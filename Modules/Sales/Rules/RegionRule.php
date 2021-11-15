@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 
 class RegionRule implements Rule
 {
-    protected $address;
+    protected $address, $name;
 
     public function __construct(array $address)
     {
@@ -23,11 +23,17 @@ class RegionRule implements Rule
     public function passes($attribute, $value)
     {
         foreach ($this->address as $row) {
-            if (!array_key_exists("region_id", $row) && !isset($row['region_name'])) 
-            return false;            
-            else continue;
+            if (!array_key_exists("region_id", $row) && !isset($row['region_name'])) {
+                $this->name =  "region name";
+                return false;
+            } elseif (!array_key_exists("city_id", $row) && !isset($row['city_name'])) {
+                $this->name =  "city name";
+                return false;
+            } else { 
+                continue;
+            }
         }
-
+        
         return true;
     }
 
@@ -38,6 +44,6 @@ class RegionRule implements Rule
      */
     public function message()
     {
-        return 'region name is required';
+        return "{$this->name} is required";
     }
 }

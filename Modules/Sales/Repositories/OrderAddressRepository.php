@@ -26,8 +26,6 @@ class OrderAddressRepository extends BaseRepository
             "address.*.country_id" => "required|exists:countries,id",
             "address.*.region_id" => "sometimes|exists:regions,id",
             "address.*.city_id" => "sometimes|exists:cities,id",
-            // "address.*.region_name" => "required_if:address.*.region_id,null",
-            // "address.*.city_name" => "required_if:city_id,null"
         ];
     }
 
@@ -36,7 +34,7 @@ class OrderAddressRepository extends BaseRepository
         try
         {
             $rules = [
-                "address.*.region_name" => [new RegionRule($request->address)]
+                "address" => [new RegionRule($request->address)]
             ];
 
             $this->validateData($request, $rules);
@@ -58,9 +56,9 @@ class OrderAddressRepository extends BaseRepository
                     "country_id" => $order_address["country_id"],
                     "region_id" => $order_address["region_id"] ?? null,
                     "city_id" => $order_address["city_id"] ?? null,
-                    "region_name" => $order_address["region_name"],
-                    "city_name" => $order_address["city_name"],
-                    "vat_number" => $order_address['vat_number']
+                    "region_name" => $order_address["region_name"] ?? null,
+                    "city_name" => $order_address["city_name"] ?? null,
+                    "vat_number" => $order_address['vat_number'] ?? null
                 ];
 
                 $this->create($orderAddressData);

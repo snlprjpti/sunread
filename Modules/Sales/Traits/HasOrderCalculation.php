@@ -29,12 +29,14 @@ trait HasOrderCalculation
             $total_tax = array_sum($taxes);
 
             $discount_amount = $this->calculateDiscount($order); // To-Do other discount will be added here...
+            $shipping_amount = 0.00;  // To-Do need to fetch its actual amount.
             $grand_total = ($sub_total + $total_tax - $discount_amount);
 
             $order->update([
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,
                 "tax_amount" => $total_tax,
+                "shipping_amount" => $shipping_amount,
                 "grand_total" => $grand_total,
                 "total_items_ordered" => $order->order_items->count(),
                 "total_qty_ordered" => $total_qty_ordered
