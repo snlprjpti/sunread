@@ -33,7 +33,6 @@ class ClubHouseRepository extends BaseRepository
         $this->rules = [
             // ClubHouse validation
             "website_id" => "required|exists:websites,id",
-            "type" => "required|string|in:clubhouse,resort",
             "position" => "required|integer",
         ];
 
