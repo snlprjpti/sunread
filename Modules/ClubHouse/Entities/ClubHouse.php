@@ -31,7 +31,7 @@ class ClubHouse extends Model
     /**
      * Arrays that are Mass Assignable
      */
-    protected $fillable = ["position", "website_id", "type", "status"];
+    protected $fillable = ["position", "website_id", "status"];
 
     // Append data with Values [ClubHouseValue]
     protected $with = [ "values" ];

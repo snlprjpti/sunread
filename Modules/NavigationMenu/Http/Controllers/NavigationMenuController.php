@@ -75,7 +75,7 @@ class NavigationMenuController extends BaseController
 
              $data = $this->repository->examineSlug($data);
 
-             $created = $this->repository->create($data);
+             $created = $this->repository->createWithUniqueLocation($data);
          }
          catch (Exception $exception)
          {
@@ -113,7 +113,7 @@ class NavigationMenuController extends BaseController
 
             $data = $this->repository->examineSlug($data);
 
-            $updated = $this->repository->update($data, $id);
+            $updated = $this->repository->updateWithUniqueLocation($data, $id);
          }
          catch (Exception $exception)
          {

@@ -15,7 +15,6 @@ class ClubHouseTableSeeder extends Seeder
     {
         ClubHouse::insert([
             [
-                "type" => "resort",
                 "position" => 1,
                 "website_id" => 1,
                 "created_at" => Carbon::now(),

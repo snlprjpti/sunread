@@ -163,7 +163,8 @@ class NavigationMenuItemValueRepository
             $match = [
                 "navigation_menu_item_id" => $parent->id,
                 "scope" => $data["scope"],
-                "scope_id" => $data["scope_id"]
+                "scope_id" => $data["scope_id"],
+                "status" => $data["items"] ?? 1,
             ];
             foreach($data["items"] as $key => $val)
             {

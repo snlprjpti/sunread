@@ -40,7 +40,7 @@ class NavigationMenu extends Model
     /**
      * One to Many Relation Between NavigationMenu and NavigationMenuItem
      */
-    public function values(): HasMany
+    public function navigationMenuItems(): HasMany
     {
         return $this->hasMany(NavigationMenuItem::class);
     }

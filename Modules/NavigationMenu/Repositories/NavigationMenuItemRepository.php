@@ -4,10 +4,13 @@ namespace Modules\NavigationMenu\Repositories;
 
 use Exception;
 use Illuminate\Support\Str;
-use Modules\NavigationMenu\Traits\HasScope;
+use Modules\Page\Entities\Page;
+use Modules\Core\Facades\CoreCache;
 use Illuminate\Support\Facades\Storage;
-use Modules\NavigationMenu\Entities\NavigationMenuItem;
+use Modules\Category\Entities\Category;
+use Modules\NavigationMenu\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\NavigationMenu\Entities\NavigationMenuItem;
 use Modules\NavigationMenu\Entities\NavigationMenuItemValue;
 
 class NavigationMenuItemRepository extends BaseRepository
@@ -15,16 +18,17 @@ class NavigationMenuItemRepository extends BaseRepository
     use HasScope;
 
     // Properties for NavigationMenuItemRepostiory
-    protected $repository, $config_fields;
+    protected $navigation_menu_item_repository, $repository, $config_fields, $location_fields;
     protected bool $without_pagination = true;
 
     /**
      * NavigationMenuItemRepostiory Class Constructor
      */
-    public function __construct(NavigationMenuItem $navigationMenuItem, NavigationMenuItemValue $navigationMenuItemValue)
+    public function __construct(NavigationMenuItem $navigationMenuItem, NavigationMenuRepository $navigation_menu_item_repository, NavigationMenuItemValue $navigationMenuItemValue)
     {
         $this->model = $navigationMenuItem;
         $this->value_model = $navigationMenuItemValue;
+        $this->navigation_menu_item_repository = $navigation_menu_item_repository;
         $this->model_key = "navigation_menu";
 
         $this->rules = [
@@ -32,6 +36,7 @@ class NavigationMenuItemRepository extends BaseRepository
         ];
 
         $this->config_fields = config("navigation_menu.attributes");
+        $this->location_fields = config("navigation_menu.locations");
 
         $this->createModel();
     }
@@ -66,9 +71,10 @@ class NavigationMenuItemRepository extends BaseRepository
 
                 $children_data["elements"][] = $element;
             }
-            $fetched[$key] = $children_data;
+            $attributes[$key] = $children_data;
+            $attributes["locations"] = $this->location_fields;
         }
-        return $fetched;
+        return $attributes;
     }
 
     /**
@@ -79,7 +85,7 @@ class NavigationMenuItemRepository extends BaseRepository
         $data = [
             "scope" => $request->scope ?? "website",
             "scope_id" => $request->scope_id ?? $navigation_menu_item->website_id,
-            "navigation_menu_item_id" => $navigation_menu_item->id
+            "navigation_menu_item_id" => $navigation_menu_item->id,
         ];
 
         // Accessing NavigationMenuItem title through values
@@ -129,6 +135,74 @@ class NavigationMenuItemRepository extends BaseRepository
         }
 
         return $status_value === 1 ? true : false;
+    }
+
+    /**
+     * Fetch Navigation Menu with Items
+     */
+    public function fetchWithItems(object $request, array $with = [], ?callable $callback = null): object
+    {
+        $data = $this->navigation_menu_item_repository->fetchAll($request, $with, $callback);
+
+        $data->each(function($nav_menu, $key) use($request){
+            $items = $nav_menu->navigationMenuItems->each(function ($nav_item) use($request){
+                $nav_item->link = $this->getFinalItemLink($nav_item, $request);
+            });
+        });
+        return $data;
+    }
+
+    public function getFinalItemLink(object $navigation_menu_item, $request)
+    {
+
+        $coreCache = $this->getCoreCache($request);
+        $data = [
+            "scope" => $request->scope ?? "website",
+            "scope_id" => $request->scope_id ?? $navigation_menu_item->website_id,
+        ];
+
+        $type = $navigation_menu_item->value($data, "type");
+        switch ($type) {
+            case 'category':
+                $type_id = $navigation_menu_item->value($data, "type_id");
+                $category = Category::find($type_id);
+                $slug = $category ? $category->value($data, "slug") : "";
+                $link = $this->getDynamicLink($slug, "category/", $coreCache);
+                return $link;
+                break;
+
+            case 'page':
+                $type_id = $navigation_menu_item->value($data, "type_id");
+                $page = Page::find($type_id);
+                $link = $this->getDynamicLink($page ? $page->slug : null, "page/", $coreCache);
+                return $link;
+                break;
+
+            case 'custom':
+                $custom_link = $navigation_menu_item->value($data, "custom_link");
+                $link = $this->getDynamicLink($custom_link, coreCache: $coreCache);
+                return $link;
+                break;
+
+            default:
+                return null;
+                break;
+        }
+    }
+
+    public function getDynamicLink(?string $slug, ?string $prepend = null, object $coreCache): mixed
+    {
+        try
+        {
+            $default_url = "{$coreCache->channel->code}/{$coreCache->store->code}/{$prepend}{$slug}";
+            $final_url = url($default_url);
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $final_url;
     }
 
 }

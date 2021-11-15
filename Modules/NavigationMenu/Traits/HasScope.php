@@ -2,6 +2,7 @@
 
 namespace Modules\NavigationMenu\Traits;
 
+use Exception;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Channel;
 use Illuminate\Support\Facades\Storage;

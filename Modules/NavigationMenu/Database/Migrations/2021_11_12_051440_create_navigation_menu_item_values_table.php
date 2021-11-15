@@ -19,7 +19,7 @@ class CreateNavigationMenuItemValuesTable extends Migration
             $table->unsignedBigInteger('navigation_menu_item_id');
             $table->unsignedBigInteger('scope_id');
             $table->string('attribute');
-            $table->string('value')->nullable();
+            $table->longText('value')->nullable();
             $table->timestamps();
 
             // Foreign Key Constraint

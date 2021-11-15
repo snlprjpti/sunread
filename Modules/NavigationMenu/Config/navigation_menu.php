@@ -25,7 +25,7 @@ return [
                         [ "value" => "page", "label" => "Page" ],
                         [ "value" => "custom", "label" => "Custom" ]
                     ],
-                    "rules" => "string",
+                    "rules" => "string|in:category,page,custom",
                     "is_required" => 1
                 ],
                 [
@@ -35,7 +35,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "integer",
+                    "rules" => "integer|required_if:items.type.value,page,category",
                     "is_required" => 0
                 ],
                 [
@@ -45,7 +45,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "string",
+                    "rules" => "string|required_if:type,custom",
                     "is_required" => 0
                 ],
                 [
@@ -160,9 +160,10 @@ return [
         "title" => "general.elements.0",
         "type" => "general.elements.1",
         "type_id" => "general.elements.2",
-        "type_id" => "general.elements.4",
-        "custom_link" => "general.elements.5",
-        "order" => "general.elements.6",
-        "additional_data" => "general.additional.0",
+        "custom_link" => "general.elements.3",
+        "additional_data" => "general.elements.4",
+        "order" => "general.elements.5",
+        "status" => "general.elements.6",
+        "additional_data_attributes" => "general.additional.0",
     ]
 ];

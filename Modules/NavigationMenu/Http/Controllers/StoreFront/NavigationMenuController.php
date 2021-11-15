@@ -2,78 +2,63 @@
 
 namespace Modules\NavigationMenu\Http\Controllers\StoreFront;
 
-use Illuminate\Contracts\Support\Renderable;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Modules\Core\Facades\CoreCache;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\NavigationMenu\Entities\NavigationMenu;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\ClubHouse\Repositories\ClubHouseRepository;
+use Modules\NavigationMenu\Repositories\NavigationMenuRepository;
+use Modules\NavigationMenu\Repositories\NavigationMenuItemRepository;
+use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuResource;
 
-class NavigationMenuController extends Controller
+class NavigationMenuController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    protected $repository, $navigation_menu_item_repository;
+
+    public function __construct(NavigationMenuRepository $navigation_menu_repository, NavigationMenuItemRepository $navigation_menu_item_repository, NavigationMenu $navigation_menu)
     {
-        return view('navigationmenu::index');
+        $this->repository = $navigation_menu_repository;
+        $this->navigation_menu_item_repository = $navigation_menu_item_repository;
+        $this->model = $navigation_menu;
+        $this->model_name = "NavigationMenu";
+
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.channel.code');
+        $this->middleware('validate.store.code');
+
+        parent::__construct($this->model, $this->model_name);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
+    public function collection(object $data): ResourceCollection
     {
-        return view('navigationmenu::create');
+        return NavigationMenuResource::collection($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
+    public function resource(object $data): JsonResource
     {
-        //
+        return new NavigationMenuResource($data);
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
+    public function index(Request $request): JsonResponse
     {
-        return view('navigationmenu::show');
-    }
+        try
+        {
+            $website = CoreCache::getWebsite($request->header("hc-host"));
+            $fetched = $this->navigation_menu_item_repository->fetchWithItems($request, ["navigationMenuItems"], callback:function() {
+                return $this->model->where('status', 1)->whereNotNull('location');
+            });
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('navigationmenu::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 }
