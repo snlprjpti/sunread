@@ -95,8 +95,7 @@ class ClubHouseRepository extends BaseRepository
         $fetched = [
             "id" => $club_house->id,
             "website_id" => $club_house->website_id,
-            "type" => $club_house->type,
-            "title" => $title_value?->value
+            "title" => $title_value?->value,
         ];
 
         $fetched["attributes"] = $this->getConfigData($data);
