@@ -6,8 +6,9 @@ Route::group(['middleware' => ['api']], function () {
 
         Route::get('/country/regions', [Modules\Country\Http\Controllers\RegionController::class, "countryWiseRegion"])->name("country.regions.list");
         Route::get('/regions/cities', [Modules\Country\Http\Controllers\CityController::class, "regionWiseCity"])->name("region.cities.list");
-
+        Route::get('/channel/{channel_id}/country', [ \Modules\Country\Http\Controllers\CountryController::class, "channelCountry" ]);
         Route::resource('country', CountryController::class)->only(['index', 'show']);
+
         Route::resource('regions', RegionController::class)->only(['index', 'show']);
         Route::resource('cities', CityController::class)->only(['index', 'show']);
     });

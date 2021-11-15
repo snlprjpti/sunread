@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Core\Entities\Website;
 use Illuminate\Support\Str;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Product\Entities\Product;
@@ -39,10 +38,23 @@ class ProductUrlGeneratorJob implements ShouldQueue
                 $product_attribute = ProductAttribute::whereProductId($product->id)
                 ->whereAttributeId(18)->whereScope("website")
                 ->whereScopeId($product->website_id)->first();
-
-                $product_attribute->value()->each(function($attribute_value) use($product_name) {
-                    $attribute_value->update(["value" => $this->createSlug($product_name)]);
-                });
+                
+                if ( !$product_attribute ) {
+                    $value_attribute_create = ProductAttributeString::create(["value" => $this->createSlug($product_name)]);
+                    $product_attribute = ProductAttribute::create([
+                        "scope" => "website",
+                        "scope_id" => $product->website_id,
+                        "attribute_id" => 18,
+                        "product_id" => $product->id,
+                        "value_type" => "Modules\Product\Entities\ProductAttributeString",
+                        "value_id" => $value_attribute_create->id,
+                    ]);
+                }
+                else {
+                    $product_attribute?->value()->each(function($attribute_value) use($product_name) {
+                        $attribute_value->update(["value" => $this->createSlug($product_name)]);
+                    });
+                }
            }
        }
        catch ( Exception $exception )
