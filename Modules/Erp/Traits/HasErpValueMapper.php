@@ -33,27 +33,17 @@ trait HasErpValueMapper
     {
         try
         {
-            $erp_details = ErpImportDetail::whereErpImportId(2)->whereJsonContains("value->webAssortmentWeb_Active", true)->whereJsonContains("value->webAssortmentWeb_Setup", "SR")->limit(50)->get();
-            $chunked = $erp_details->chunk(50);
-
-            $count = 0;
+            $erp_details = ErpImportDetail::whereErpImportId(2)->whereJsonContains("value->webAssortmentWeb_Active", true)->whereJsonContains("value->webAssortmentWeb_Setup", "SR")->get();
+            $chunked = $erp_details->chunk(100);
             foreach ( $chunked as $chunk )
             {
-                if( $count == 50 ) break;
-
                 foreach ( $chunk as $detail )
                 {
-                    if( $count >50 ) continue;
-                    if( $count == 50 ) break;
                     if ( $detail->status == 1 ) continue;
                     if ( $detail->value["webAssortmentWeb_Active"] == false ) continue;
                     if ( $detail->value["webAssortmentWeb_Setup"] != "SR" ) continue;
                     ErpMigratorJob::dispatch($detail)->onQueue("erp");
-                    $count++;
-
                 }
-                //@TODO: Remove break later
-                break;
             }
         }
         catch ( Exception $exception )
@@ -179,11 +169,11 @@ trait HasErpValueMapper
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("color"),
-                    "value" => ($product->type == "simple") ? $this->getAttributeOptionValue($variant, "color") : "",
+                    "value" => $this->getOptionValue($product, $variant, "color"),
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("size"),
-                    "value" => ($product->type == "simple") ? $this->getAttributeOptionValue($variant, "size") : "",
+                    "value" => $this->getOptionValue($product, $variant, "size"),
                 ],
                 [
                     "attribute_id" => $this->getAttributeId("features"),
@@ -309,8 +299,11 @@ trait HasErpValueMapper
 
                 $channel_code = 'se';
 
-                if( isset( $price_value["currencyCode"] ) && $price_value["currencyCode"] != '' && strtolower( $price_value["currencyCode"] ) == 'eur' ) {
+                if ( isset( $price_value["currencyCode"] ) && $price_value["currencyCode"] != '' && strtolower( $price_value["currencyCode"] ) == 'eur' ) {
                     $channel_code = 'fl';
+                }
+                elseif ( isset( $price_value["currencyCode"] ) && $price_value["currencyCode"] != '' && strtolower( $price_value["currencyCode"] ) == 'eur') {
+                    $channel_code = 'Eu';
                 }
 
                 return [
@@ -371,7 +364,7 @@ trait HasErpValueMapper
     {
         try
         {
-            $_channel = Channel::where('code', $code )->first();
+            $_channel = Channel::whereCode($code)->first();
 
             if( $_channel ) return $_channel;
 
@@ -405,6 +398,19 @@ trait HasErpValueMapper
         return $channel;
     }
 
+    private function getOptionValue(object $product, mixed $variant_iteration, string $attribute_slug): ?int
+    {
+        if ($product->type == "simple" && $product->parent_id) {
+           $option = $this->getAttributeOptionValue($variant_iteration, $attribute_slug);
+        }
+        elseif ($product->type == "simple" && $product->parent_id == null) {
+            $variant = $this->getDetailCollection("productVariants", $product->sku)->first();
+            $option = $this->getAttributeOptionValue($variant, $attribute_slug);
+        }
+
+        return isset($option) ? $option : null;
+    }
+
     private function getAttributeOptionValue(mixed $variant_iteration, string $attribute_slug): ?int
     {
         try
@@ -422,7 +428,6 @@ trait HasErpValueMapper
                     if ( !empty($data["name"]) ) $attribute_option = AttributeOption::updateOrCreate($data);
                 break;
             }
-
         }
         catch ( Exception $exception )
         {
@@ -523,9 +528,10 @@ trait HasErpValueMapper
         try
         {
             $variants = $this->getDetailCollection("productVariants", $erp_product_iteration->sku);
+            $variants = $this->getValue($variants)->filter(fn ($variant) => $variant["webActive"] == true);
             if ( $variants->count() > 1 ) {
                 $jobs = [];
-                foreach ( $this->getValue($variants) as $variant ) {
+                foreach ( $variants as $variant ) {
                     $jobs[] = new ErpMigrateVariantJob($product, $variant, $erp_product_iteration);
                 }
                 Bus::batch($jobs)->then(function (Batch $batch) use ($product) {

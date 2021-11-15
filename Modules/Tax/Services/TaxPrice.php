@@ -203,7 +203,7 @@ class TaxPrice {
             else {
                 $tax_group = TaxCache::customerTaxGroup()->where("id", $customer_tax_group_id)->first();
             }
-            if (!$tax_group) throw ValidationException::withMessages(["tax_group_id" => "Tax group id is required either product or customer"]);
+            if (!$tax_group) return $this->tax_rate;
             $sort_priority_tax_rule = $tax_group->tax_rules->pluck("priority", "id")->toArray();
             if(!empty($sort_priority_tax_rule)) {
                 if (!empty(array_not_unique($sort_priority_tax_rule)["duplicate_array"])) {

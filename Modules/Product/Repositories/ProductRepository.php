@@ -527,7 +527,7 @@ class ProductRepository extends BaseRepository
                         return $attributesData;
                     })->toArray()
                 ];
-            })->toArray();
+            })->values()->toArray();
         }
         catch( Exception $exception )
         {
