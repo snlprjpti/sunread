@@ -11,10 +11,8 @@ class ClubHouseFactory extends Factory
 
     public function definition(): array
     {
-        $club_house_type = ["resort", "clubhouse"];
         return [
             "position" => $this->faker->randomDigit(),
-            "type" => Arr::random($club_house_type),
             "website_id" => Website::factory()->create()->id
         ];
     }
