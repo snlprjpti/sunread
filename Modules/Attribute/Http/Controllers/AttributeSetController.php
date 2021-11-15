@@ -104,7 +104,11 @@ class AttributeSetController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, [ "attribute_groups.attributes" ]);
+            $fetched = $this->model->whereId($id)->with(["attribute_groups" => function($q) {
+                return $q->with(['attributes' => function($query) {
+                    return $query->orderBy('pivot_position', 'asc');
+                }])->orderBy('position', 'asc');
+            }])->firstOrFail();
         }
         catch( Exception $exception )
         {
