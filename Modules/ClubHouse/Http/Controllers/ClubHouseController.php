@@ -71,7 +71,7 @@ class ClubHouseController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang("fetch-list-success"));
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
     /**
