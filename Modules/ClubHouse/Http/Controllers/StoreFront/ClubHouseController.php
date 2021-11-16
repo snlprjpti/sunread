@@ -46,11 +46,12 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $website = CoreCache::getWebsite($request->header("hc-host"));
+            $coreCache = $this->repository->getCoreCache($request);
+            $website = $coreCache->website;
             $fetched = $this->repository->fetchAll($request, callback:function () use($website) {
                 return $this->model->whereHas('values', function($query) {
                     $query->where("attribute", "status")->where("value", 1);
-                });
+                })->where('website_id', $website->id);
             });
         }
         catch (Exception $exception)
@@ -65,7 +66,8 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $website = CoreCache::getWebsite($request->header("hc-host"));
+            $coreCache = $this->repository->getCoreCache($request);
+            $website = $coreCache->website;
             $fetched = $this->repository->fetchWithSlug($club_house_slug, $website);
         }
         catch( Exception $exception )
