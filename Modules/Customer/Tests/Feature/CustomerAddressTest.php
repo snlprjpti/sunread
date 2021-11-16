@@ -6,8 +6,6 @@ use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Country\Entities\City;
-use Modules\Country\Entities\Country;
-use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 
