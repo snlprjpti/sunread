@@ -488,7 +488,7 @@ class ProductRepository extends BaseRepository
                     "id" => $attribute_group->id,
                     "name" => $attribute_group->name,
                     "position" => $attribute_group->position,
-                    "attributes" => $attribute_group->attributes->map(function ($attribute) use ($product, $scope) {
+                    "attributes" => $attribute_group->attributes->sortBy("pivot.position")->map(function ($attribute) use ($product, $scope) {
                         $match = [
                             "attribute_id" => $attribute->id,
                             "scope" => $scope["scope"],
@@ -525,9 +525,9 @@ class ProductRepository extends BaseRepository
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->attribute_set_repository->getInventoryChildren($product->id);
                         
                         return $attributesData;
-                    })->toArray()
+                    })->values()->toArray()
                 ];
-            })->toArray();
+            })->values()->toArray();
         }
         catch( Exception $exception )
         {

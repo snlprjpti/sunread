@@ -50,7 +50,8 @@ class CountryController extends BaseController
     {
         try
         {
-            $fetched = $this->addressRepository->getCountry($request);
+            $core_cache = $this->repository->getCoreCache($request);
+            $fetched = $this->addressRepository->getCountry($core_cache);
         }
         catch (Exception $exception)
         {

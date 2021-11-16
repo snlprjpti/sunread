@@ -67,6 +67,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -165,8 +179,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -575,6 +603,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -673,8 +715,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -987,6 +1043,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -1085,8 +1155,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -1608,6 +1692,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -1706,8 +1804,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -2058,6 +2170,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -2156,8 +2282,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -2587,6 +2727,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -2685,8 +2839,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -3221,6 +3389,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -3319,8 +3501,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -3655,6 +3851,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -3753,8 +3963,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -4006,7 +4230,6 @@ return [
                                         "rules" => "mimes:jpeg,jpg,bmp,png",
                                         "is_required" => 0
                                     ],
-
                                     [
                                         "title" => "Bottom Left Image",
                                         "slug" => "bottom_left_image",
@@ -4103,6 +4326,20 @@ return [
                                 "slug" => "section_background_color",
                                 "hasChildren" => 0,
                                 "type" => "color_picker",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
                                 "default" => "",
@@ -4211,8 +4448,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -4750,6 +5001,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -4848,8 +5113,8 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -4861,7 +5126,21 @@ return [
                                 "rules" => "",
                                 "is_required" => 0
                             ],
-                        ]
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                        ],
                     ],
                     [
                         "title" => "Advanced",
@@ -5236,6 +5515,20 @@ return [
                                 "is_required" => 0
                             ],
                             [
+                                "title" => "Gradient Color",
+                                "slug" => "gradient_color",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
                                 "title" => "Background Image",
                                 "slug" => "section_background_image",
                                 "hasChildren" => 0,
@@ -5334,8 +5627,22 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left/Right",
-                                "slug" => "padding_left_right",
+                                "title" => "Padding Left",
+                                "slug" => "padding_left",
+                                "hasChildren" => 0,
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "description" => "",
+                                "conditions" => [],
+                                "rules" => "",
+                                "is_required" => 0
+                            ],
+                            [
+                                "title" => "Padding Right",
+                                "slug" => "padding_right",
                                 "hasChildren" => 0,
                                 "type" => "text",
                                 "provider" => "",
@@ -5576,7 +5883,24 @@ return [
                                                     "type" => "select",
                                                     "provider" => "",
                                                     "pluck" => [],
-                                                    "default" => "1",
+                                                    "default" => 1,
+                                                    "options" => [
+                                                        [ "value" => 1, "label" => "Enabled" ],
+                                                        [ "value" => 0, "label" => "Disabled" ],
+                                                    ],
+                                                    "description" => "",
+                                                    "conditions" => [],
+                                                    "rules" => "in:1,0",
+                                                    "is_required" => 1
+                                                ],
+                                                [
+                                                    "title" => "Show Video",
+                                                    "slug" => "show_video",
+                                                    "hasChildren" => 0,
+                                                    "type" => "select",
+                                                    "provider" => "",
+                                                    "pluck" => [],
+                                                    "default" => 0,
                                                     "options" => [
                                                         [ "value" => 1, "label" => "Enabled" ],
                                                         [ "value" => 0, "label" => "Disabled" ],
@@ -5671,5 +5995,4 @@ return [
             ]
         ]
     ],
-
 ];

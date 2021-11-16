@@ -46,6 +46,9 @@ class ClubHouseTest extends BaseTestCase
                 "slug" => [
                     "value" => Str::slug(Str::random(10))
                 ],
+                "type" => [
+                    "value" => Arr::random(["clubhouse", "resort"]),
+                ],
                 "header_content" => [
                     "value" => Str::random(30)
                 ],
