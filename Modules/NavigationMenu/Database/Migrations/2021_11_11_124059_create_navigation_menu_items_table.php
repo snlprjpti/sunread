@@ -6,12 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateNavigationMenuItemsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+
+    public function up(): void
     {
         Schema::create('navigation_menu_items', function (Blueprint $table) {
             $table->id();
@@ -25,12 +21,7 @@ class CreateNavigationMenuItemsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('navigation_menu_items');
     }

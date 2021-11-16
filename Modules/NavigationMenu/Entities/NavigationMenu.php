@@ -3,12 +3,9 @@
 namespace Modules\NavigationMenu\Entities;
 
 use Modules\Core\Traits\Sluggable;
+use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
-use Modules\NavigationMenu\Traits\HasScope;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Class NavigationMenu.
@@ -25,7 +22,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class NavigationMenu extends Model
 {
-    use HasFactory, Sluggable, HasScope;
+    use HasFactory, Sluggable;
 
     /**
      * Arrays that are Mass Assignable

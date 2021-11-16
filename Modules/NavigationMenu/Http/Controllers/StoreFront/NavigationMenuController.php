@@ -26,7 +26,7 @@ class NavigationMenuController extends BaseController
         $this->repository = $navigation_menu_repository;
         $this->navigation_menu_item_repository = $navigation_menu_item_repository;
         $this->model = $navigation_menu;
-        $this->model_name = "NavigationMenu";
+        $this->model_name = "Navigation Menu";
 
         $this->middleware('validate.website.host');
         $this->middleware('validate.channel.code');

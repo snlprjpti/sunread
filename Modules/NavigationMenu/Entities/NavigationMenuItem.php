@@ -2,11 +2,11 @@
 
 namespace Modules\NavigationMenu\Entities;
 
+use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Modules\NavigationMenu\Traits\HasScope;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NavigationMenuItem extends Model

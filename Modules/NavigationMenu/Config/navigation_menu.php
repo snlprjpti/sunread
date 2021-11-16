@@ -61,7 +61,7 @@ return [
                 [
                     "title" => "Order",
                     "slug" => "order",
-                    "type" => "text",
+                    "type" => "number",
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
