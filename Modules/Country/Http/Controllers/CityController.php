@@ -61,4 +61,21 @@ class CityController extends BaseController
 
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
+
+    public function regionWiseCity(Request $request): JsonResponse
+    {
+        try
+        {
+            $request->without_pagination = true;
+            $fetched = $this->repository->fetchAll($request, callback:function () use($request) {
+                return $this->model->whereRegionId($request->region_id);
+            });
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->collection($fetched), $this->lang('fetch-list-success'));
+    }
 }

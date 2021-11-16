@@ -22,4 +22,18 @@ class RegionTest extends BaseTestCase
         $this->hasUpdateTest = false;
         $this->hasDestroyTest = false;
     }
+
+    public function testAdminCanFetchCountryWiseRegions()
+    {
+        $post_data = [
+            "country_id" => 1
+        ];
+        $response = $this->withHeaders($this->headers)->get(route("admin.country.regions.list", $post_data));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
+    }
 }

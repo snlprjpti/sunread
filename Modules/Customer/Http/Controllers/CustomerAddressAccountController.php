@@ -5,6 +5,7 @@ namespace Modules\Customer\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Core\Entities\Website;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\CustomerAddress;
 use Modules\Customer\Repositories\StoreFront\AddressRepository;
@@ -19,15 +20,17 @@ class CustomerAddressAccountController extends BaseController
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
         $this->customer = auth()->guard("customer")->user();
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.channel.code');
+        $this->middleware('validate.store.code');
         parent::__construct($this->model, $this->model_name);
     }
 
-    public function show(): JsonResponse
+    public function show(Request $request): JsonResponse
     {
         try
         {
-            $fetched["shipping"] = $this->repository->checkShippingAddress($this->customer->id)->first();
-            $fetched["billing"] =$this->repository->checkBillingAddress($this->customer->id)->first();
+            $fetched = $this->repository->getCustomerAddress($request, $this->customer);
         }
         catch (Exception $exception)
         {
