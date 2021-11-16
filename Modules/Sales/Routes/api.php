@@ -1,6 +1,5 @@
 <?php
 
-use Modules\Sales\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,11 +15,12 @@ use Modules\Sales\Http\Controllers\OrderController;
 Route::group(['middleware' => ['api','proxies']], function () {
     
     Route::group(['prefix' => 'admin/sales', 'as' => 'admin.sales.', 'middleware' => ['admin', 'language']], function () {
-        Route::post('orders/status/{order_id}', [OrderController::class, 'orderStatus'])->name('order.status');
+        Route::post('orders/status/{order_id}', [Modules\Sales\Http\Controllers\OrderController::class, 'orderStatus'])->name('order.status');
+        Route::resource("comments", OrderCommentController::class);
         Route::resource("orders", OrderController::class)->only(["index", "show"]);
     });
 
-    Route::group(['as' => 'sales.', 'prefix' => 'public'], function () {
+    Route::group(['as' => 'public.sales.', 'prefix' => 'public'], function () {
         Route::resource("orders", \StoreFront\OrderController::class)->only(["store"]);
     });
 

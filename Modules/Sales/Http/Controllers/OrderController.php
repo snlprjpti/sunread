@@ -41,9 +41,7 @@ class OrderController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["order_items"], function () use ($request)   {
-                // return $this->model->where("website_id", $request->website_id);
-            });
+            $fetched = $this->repository->fetchAll($request, ["order_items"]);
         }
         catch (Exception $exception)
         {
@@ -67,7 +65,7 @@ class OrderController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    public function orderStatus(Request $request, $order_id): JsonResponse
+    public function orderStatus(Request $request, int $order_id): JsonResponse
     {
         try
         {
@@ -77,7 +75,7 @@ class OrderController extends BaseController
         {
             return $this->handleException($exception);
         }
-        return $this->successResponseWithMessage($this->lang('update-success'), "201");       
+        return $this->successResponseWithMessage($this->lang('update-success'), 201);       
     }
 
 }

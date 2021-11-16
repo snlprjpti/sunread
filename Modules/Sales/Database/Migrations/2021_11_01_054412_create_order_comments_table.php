@@ -14,7 +14,11 @@ class CreateOrderCommentsTable extends Migration
             $table->unsignedBigInteger("user_id");
             $table->boolean("is_customer_notified")->default(0);
             $table->boolean("is_visible_on_storefornt")->default(0);
-            $table->string("comment");
+
+            $table->foreign("order_id")->references("id")->on("orders")->onDelete("cascade");
+            $table->foreign("user_id")->references("id")->on("admins");
+
+            $table->text("comment");
             $table->timestamps();
         });
     }

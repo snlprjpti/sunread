@@ -14,5 +14,7 @@ class SalesDatabaseSeeder extends Seeder
         $this->call(OrderTaxItemTableSeeder::class);
         $this->call(OrderStatusTableSeeder::class);
         $this->call(OrderStatusStateTableSeeder::class);
+        $this->call(OrderCommentTableSeeder::class);
+
     }
 }
