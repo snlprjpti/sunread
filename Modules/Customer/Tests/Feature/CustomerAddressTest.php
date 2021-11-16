@@ -43,12 +43,14 @@ class CustomerAddressTest extends BaseTestCase
         $city = City::first();
         $region = $city->region()->first();
         $country = $region->country()->first();
+        echo $country;
         Configuration::factory()->make()->create([
             "scope" => "channel",
             "path" => "default_country",
             "scope_id" => $channel->id,
             "value" => $country->iso_2_code,
         ]);
+
         return array_merge($this->model::factory()->make()->toArray(), [
             "customer_id" => $customer->id,
             "channel_id" => $channel->id,
@@ -61,8 +63,8 @@ class CustomerAddressTest extends BaseTestCase
     public function testAdminCanCreateResource()
     {
         $post_data = $this->getCreateData();
+        dd($post_data);
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
-        dd($response->json());
 
         $response->assertCreated();
         $response->assertJsonFragment([
