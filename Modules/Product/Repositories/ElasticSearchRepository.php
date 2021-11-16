@@ -97,4 +97,30 @@ class ElasticSearchRepository
             ]
         ];
     }
+
+    public function multimatch(string $field, ?string $data): array
+    {
+        return [ 
+            "multi_match" => [
+                "query"=> $data,
+                "type" => "bool_prefix",
+                "fields" => [
+                    $field,
+                    "{$field}._2gram",
+                    "{$field}._3gram"
+                ]
+            ]
+        ];
+    }
+
+    public function match_phrase_prefix(string $field, ?string $data): array
+    {
+        return [ 
+            "match_phrase_prefix" => [
+                $field => [
+                    "query" => $data
+                ]
+            ]
+        ];
+    }
 }

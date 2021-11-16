@@ -150,6 +150,15 @@ class ProductConfigurableRepository extends BaseRepository
 
             $product_attributes = [];
             $this->configurable_attribute_options = [];
+            $variant_options = collect($permutation)->map(function ($option, $key) {
+                $this->configurable_attribute_options[] = $option;
+                $att_data = Attribute::find($key);
+                return [
+                    "attribute_slug" => $att_data->slug,
+                    "value" => $option,
+                    "value_type" => config("attribute_types")[($att_data->type) ?? "string"]
+                ];
+            })->toArray();
 
             if($method && $method == "update") $child_variant = $this->checkVariant($product);
 
@@ -165,15 +174,6 @@ class ProductConfigurableRepository extends BaseRepository
             }
             else
             {
-                $variant_options = collect($permutation)->map(function ($option, $key) {
-                    $this->configurable_attribute_options[] = $option;
-                    $att_data = Attribute::find($key);
-                    return [
-                        "attribute_slug" => $att_data->slug,
-                        "value" => $option,
-                        "value_type" => config("attribute_types")[($att_data->type) ?? "string"]
-                    ];
-                })->toArray();
                 $product_variant = $this->create($data, function ($variant) use ($product, $permutation_modify, $request, &$product_attributes, $productAttributes, $scope, $variant_options) {
                     $this->syncConfigurableAttributes($product, $permutation_modify, $request, $product_attributes, $productAttributes, $scope, $variant_options, $variant);
                 });

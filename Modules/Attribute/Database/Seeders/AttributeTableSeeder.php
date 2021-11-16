@@ -161,7 +161,8 @@ class AttributeTableSeeder extends Seeder
                         "name" => "Catalog, Search"
                     ],
                 ],
-                "scope" => "store"
+                "scope" => "store",
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Tax Group",
@@ -279,6 +280,7 @@ class AttributeTableSeeder extends Seeder
                         "code" => "423"
                     ]
                 ],
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Size",
@@ -300,6 +302,7 @@ class AttributeTableSeeder extends Seeder
                         "name" => "XL",
                     ],
                 ],
+                "is_synchronized" => 0
             ],
             [
                 "name" => "Features",
@@ -352,6 +355,19 @@ class AttributeTableSeeder extends Seeder
                 "slug" => "component",
                 "type" => "builder",
                 "scope" => "store",
+                "is_synchronized" => 0
+            ],
+            [
+                "name" => "Animated Image",
+                "slug" => "animated_image",
+                "type" => "image",
+                "scope" => "website",
+            ],
+            [
+                "name" => "Disable Animation",
+                "slug" => "disable_animation",
+                "type" => "boolean",
+                "scope" => "website",
             ],
         ];
 
