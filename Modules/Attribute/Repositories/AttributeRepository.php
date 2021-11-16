@@ -44,7 +44,7 @@ class AttributeRepository extends BaseRepository
 
     public function validateTranslationData(?array $translations): bool
     {
-        if (empty($translations)) return false;
+        // if (empty($translations)) return false;
 
         foreach ($translations as $translation) {
             if (!array_key_exists("store_id", $translation) || !array_key_exists("name", $translation)) return false;
