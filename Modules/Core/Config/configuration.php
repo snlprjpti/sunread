@@ -1075,7 +1075,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Country",
-                                "path" => "shipping_country",
+                                "path" => "shipping_settings_origins_country",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
@@ -1089,7 +1089,7 @@ return[
                             ],
                             [
                                 "title" => "Region/State",
-                                "path" => "shipping_region_state",
+                                "path" => "shipping_settings_origins_region_state",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Region",
                                 "pluck" => ["id", "name"],
@@ -1103,7 +1103,7 @@ return[
                             ],
                             [
                                 "title" => "ZIP/Postal Code",
-                                "path" => "zip_postal_code",
+                                "path" => "shipping_settings_origins_zip_postal_code",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1117,7 +1117,7 @@ return[
                             ],
                             [
                                 "title" => "City",
-                                "path" => "city",
+                                "path" => "shipping_settings_origins_city",
                                 "type" => "text",
                                 "provider" => "Modules\Country\Entities\City",
                                 "pluck" => ["id", "name"],
@@ -1131,7 +1131,7 @@ return[
                             ],
                             [
                                 "title" => "Street Address",
-                                "path" => "street_address",
+                                "path" => "shipping_settings_origins_street_address",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1145,7 +1145,7 @@ return[
                             ],
                             [
                                 "title" => "Street Address Line 2",
-                                "path" => "street_address_line_2",
+                                "path" => "shipping_settings_origins_street_address_line_2",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1169,7 +1169,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "bank_transfer_payment",
+                                "path" => "payment_methods_bank_transfer_payment",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1186,7 +1186,7 @@ return[
                             ],
                             [
                                 "title" => "Title",
-                                "path" => "title",
+                                "path" => "payment_methods_bank_transfer_title",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1200,7 +1200,7 @@ return[
                             ],
                             [
                                 "title" => "New Order Status",
-                                "path" => "new_order_status",
+                                "path" => "payment_methods_bank_transfer_new_order_status",
                                 "type" => "select",
                                 "provider" => "Modules\Sales\Entities\OrderStatus",
                                 "pluck" => ["slug", "name"],
@@ -1214,7 +1214,7 @@ return[
                             ],
                             [
                                 "title" => "Payment From Applicable Countries",
-                                "path" => "payment_from_applicable_countries",
+                                "path" => "payment_methods_bank_transfer_payment_from_applicable_countries",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1231,7 +1231,7 @@ return[
                             ],
                             [
                                 "title" => "Payment From Specific Countries",
-                                "path" => "payment_from_specific_countries",
+                                "path" => "payment_methods_bank_transfer_payment_from_specific_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
@@ -1250,7 +1250,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "enabled",
+                                "path" => "payment_methods_cash_delievery",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1267,7 +1267,7 @@ return[
                             ],
                             [
                                 "title" => "Title",
-                                "path" => "title",
+                                "path" => "payment_methods_cash_delievery_title",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1281,7 +1281,7 @@ return[
                             ],
                             [
                                 "title" => "New Order Status",
-                                "path" => "new_order_status",
+                                "path" => "payment_methods_cash_delievery_new_order_status",
                                 "type" => "select",
                                 "provider" => "Modules\Sales\Entities\OrderStatus",
                                 "pluck" => ["slug", "name"],
@@ -1295,7 +1295,7 @@ return[
                             ],
                             [
                                 "title" => "Payment From Applicable Countries",
-                                "path" => "payment_from_applicable_countries",
+                                "path" => "payment_methods_cash_delievery_payment_from_applicable_countries",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1312,11 +1312,11 @@ return[
                             ],
                             [
                                 "title" => "Payment From Specific Countries",
-                                "path" => "payment_from_specific_countries",
+                                "path" => "payment_methods_cash_delievery_payment_from_specific_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
-                                "default" => "yes",
+                                "default" => "",
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,
@@ -1381,7 +1381,7 @@ return[
                             ],
                             [
                                 "title" => "Type",
-                                "path" => "flat_type",
+                                "path" => "delivery_method_flat_rate_flat_type",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1398,7 +1398,7 @@ return[
                             ],
                             [
                                 "title" => "Price",
-                                "path" => "flat_price",
+                                "path" => "delivery_method_flat_rate_flat_price",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1412,11 +1412,11 @@ return[
                             ],
                             [
                                 "title" => "Calculate Handling Fee",
-                                "path" => "flat_cal_handling_fee",
+                                "path" => "delivery_method_flat_rate_calculate_handling_fee",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => 1,
+                                "default" => "fixed",
                                 "options" => [
                                     [ "value" => "fixed", "label" => "Fixed" ],
                                     [ "value" => "percent", "label" => "Percent" ]
@@ -1428,22 +1428,8 @@ return[
                                 "sort_by" => ""
                             ],
                             [
-                                "title" => "Displayed Error Message",
-                                "path" => "flat_display_error_msg",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "This shipping method is not available. To use this shipping method, please contact us.",
-                                "options" => [],
-                                "rules" => "",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
                                 "title" => "Ship to Applicable Countries",
-                                "path" => "ship_from_applicable_countries",
+                                "path" => "delivery_method_flat_rate_ship_from_applicable_countries",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1460,7 +1446,7 @@ return[
                             ],
                             [
                                 "title" => "Ship From Specific Countries",
-                                "path" => "ship_from_specific_countries",
+                                "path" => "delivery_method_flat_rate_ship_from_specific_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
@@ -1474,7 +1460,7 @@ return[
                             ],
                             [
                                 "title" => "Show Method if Not Applicable",
-                                "path" => "flat_show_method_if_not_applicable",
+                                "path" => "delivery_method_flat_rate_show_method_if_not_applicable",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1491,7 +1477,7 @@ return[
                             ],
                             [
                                 "title" => "Sort Order",
-                                "path" => "flat_sort_order",
+                                "path" => "delivery_method_flat_rate_sort_order",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1510,7 +1496,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "free_shipping_rate_enabled",
+                                "path" => "delivery_method_free_shipping",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1527,7 +1513,7 @@ return[
                             ],
                             [
                                 "title" => "Title",
-                                "path" => "free_shipping_title",
+                                "path" => "delivery_method_free_shipping_title",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1541,7 +1527,7 @@ return[
                             ],
                             [
                                 "title" => "Method Name",
-                                "path" => "free_shipping_method_name",
+                                "path" => "delivery_method_free_shipping_method_name",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1555,7 +1541,7 @@ return[
                             ],
                             [
                                 "title" => "Minimum Order Amount",
-                                "path" => "free_shipping_minimum_order_amt",
+                                "path" => "delivery_method_free_shipping_minimum_order_amt",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1569,7 +1555,7 @@ return[
                             ],
                             [
                                 "title" => "Include Tax to Amount",
-                                "path" => "free_shipping_include_tax_to_amt",
+                                "path" => "delivery_method_free_shipping_include_tax_to_amt",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1585,22 +1571,8 @@ return[
                                 "sort_by" => ""
                             ],
                             [
-                                "title" => "Displayed Error Message",
-                                "path" => "flat_display_error_msg",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "This shipping method is not available. To use this shipping method, please contact us.",
-                                "options" => [],
-                                "rules" => "",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
                                 "title" => "Ship to Applicable Countries",
-                                "path" => "ship_from_applicable_countries",
+                                "path" => "delivery_method_free_shipping_ship_from_applicable_countries",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1617,7 +1589,7 @@ return[
                             ],
                             [
                                 "title" => "Ship From Specific Countries",
-                                "path" => "ship_from_specific_countries",
+                                "path" => "delivery_method_free_shipping_ship_from_specific_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
@@ -1631,7 +1603,7 @@ return[
                             ],
                             [
                                 "title" => "Show Method if Not Applicable",
-                                "path" => "flat_show_method_if_not_applicable",
+                                "path" => "delivery_method_free_shipping_show_method_if_not_applicable",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1648,7 +1620,7 @@ return[
                             ],
                             [
                                 "title" => "Sort Order",
-                                "path" => "flat_sort_order",
+                                "path" => "delivery_method_free_shipping_sort_order",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],

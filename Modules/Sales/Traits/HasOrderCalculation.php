@@ -14,10 +14,11 @@ trait HasOrderCalculation
 
     protected $discount_percent, $shipping_amount;
 
-	public function orderCalculationUpdate(object $order): void
+	public function orderCalculationUpdate(object $order, object $request, object $coreCache): void
     {
         try 
         {
+
             $sub_total = 0.00;
             $sub_total_tax_amount = 0.00;
             $total_qty_ordered = 0.00;
@@ -46,7 +47,7 @@ trait HasOrderCalculation
                 "total_items_ordered" => $order->order_items->count(),
                 "total_qty_ordered" => $total_qty_ordered,
                 // "status" => SiteConfig::fetch(""),
-                "shipping_method" => SiteConfig::fetch($request->shipping_method."_title", "channel", $ch)
+                "shipping_method" => SiteConfig::fetch($request->shipping_method."_title", "channel", $coreCache?->channel->id)
             ]);
 
         }

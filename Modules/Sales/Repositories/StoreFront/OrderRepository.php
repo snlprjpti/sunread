@@ -106,8 +106,8 @@ class OrderRepository extends BaseRepository
                 $jobs[] = new OrderTaxesJob($order, $order_item_details);
                 $order_item = $this->orderItemRepository->store($request, $order, $order_item_details);
             }
-            Bus::batch($jobs)->then( function (Batch $batch) use ($order) {
-                OrderCalculation::dispatchSync($order);
+            Bus::batch($jobs)->then( function (Batch $batch) use ($order, $request, $coreCache) {
+                OrderCalculation::dispatchSync($order, $request, $coreCache);
             })->dispatch();
         } 
         catch (Exception $exception)
