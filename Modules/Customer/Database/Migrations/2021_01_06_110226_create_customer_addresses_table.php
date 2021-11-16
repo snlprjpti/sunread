@@ -26,10 +26,10 @@ class CreateCustomerAddressesTable extends Migration
             $table->string('address2')->nullable();
             $table->string('address3')->nullable();
 
-            $table->integer('postcode');
+            $table->string('postcode');
             $table->string('phone');
             $table->string('vat_number')->nullable();
-            
+
             $table->boolean('default_billing_address')->default(0);
             $table->boolean('default_shipping_address')->default(0);
             $table->timestamps();

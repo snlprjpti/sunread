@@ -24,14 +24,12 @@ return [
         'sort'  => 1,
         'module' => 'Product'
     ],
-
     [
         'key'   => 'catalog.products.store',
         'name'  => 'Create Product',
         'route' => 'admin.catalog.products.store',
         'module' => 'Product'
     ],
-
     [
         'key'   => 'catalog.products.show',
         'name'  => 'Show Product',
@@ -77,7 +75,6 @@ return [
         'sort'  => 3,
         'module' => 'Category'
     ],
-
     [
         'key'   => 'catalog.categories.update',
         'name'  => 'Update Category',
@@ -123,7 +120,7 @@ return [
         'module' => 'Core'
     ],
 
-    
+
     //LOCALE
     [
         'key'   => 'core.locales.index',
@@ -234,7 +231,7 @@ return [
         'sort'  => 5,
         'module' => 'Core'
     ],
-    
+
     //STORE
     [
         'key'   => 'core.stores.index',
@@ -309,7 +306,7 @@ return [
         'module' => 'Core'
     ],
 
-        
+
     //WEBSITES
     [
         'key'   => 'core.websites.index',
@@ -347,7 +344,6 @@ return [
         "module" => 'Core'
     ],
 
-
     //CONFIGURATION
     [
         'key'   => 'core.configurations.index',
@@ -384,7 +380,6 @@ return [
         'sort'  => 5,
         "module" => 'Core'
     ],
-
 
     //ATTRIBUTE FAMILIES
     [
@@ -439,7 +434,6 @@ return [
         'sort'  => 2,
         'module' => 'Attribute'
     ],
-
     [
         'key'   => 'catalog.attribute-groups.show',
         'name'  => 'Show Attribute Group',
@@ -483,7 +477,6 @@ return [
         'sort'  => 3,
         'module' => 'Attribute'
     ],
-
     [
         'key'   => 'catalog.attributes.update',
         'name'  => 'Update Attributes',
@@ -498,7 +491,6 @@ return [
         'sort'  => 5,
         'module' => 'Attribute'
     ],
-
 
     //CUSTOMERS
     [
@@ -536,7 +528,6 @@ return [
         'sort'  => 5,
         'module' => 'Customers'
     ],
-
 
     //CUSTOMER-GROUP
     [
@@ -612,8 +603,6 @@ return [
         'module' => 'Customers'
     ],
 
-
-
     //USER
     [
         'key'   => 'admin.roles.list',
@@ -650,7 +639,6 @@ return [
         'sort'  => 5,
         'module' => 'User'
     ],
-
     [
         'key'   => 'admin.users.list',
         'name'  => 'List  admins',
@@ -702,7 +690,6 @@ return [
         'sort'  => 2,
         'module' => 'Brand'
     ],
-
     [
         'key'   => 'admin.brands.show',
         'name'  => 'Show Brand',
@@ -809,7 +796,6 @@ return [
         'sort'  => 1,
         'module' => 'Review'
     ],
-
     [
         'key'   => 'admin.review_replies.store',
         'name'  => 'Create Review Reply',
@@ -817,7 +803,6 @@ return [
         'sort'  => 2,
         'module' => 'Review'
     ],
-
     [
         'key'   => 'admin.review_replies.show',
         'name'  => 'Show Review Reply',
@@ -856,7 +841,6 @@ return [
         'module' => 'Review'
     ],
 
-
     //URL REWRITE
     [
         'key'   => 'admin.url-rewrites.index',
@@ -865,7 +849,7 @@ return [
         'sort'  => 1,
         'module' => 'URL Rewrite'
     ],
-    
+
     [
         'key'   => 'admin.url-rewrites.store',
         'name'  => 'Create URL Rewrite',
@@ -904,7 +888,7 @@ return [
         'sort'  => 1,
         'module' => 'Coupon'
     ],
-    
+
     [
         'key'   => 'admin.coupons.store',
         'name'  => 'Create Coupon',
@@ -935,5 +919,267 @@ return [
         'module' => 'Coupon'
     ],
 
+    //EMAIL TEMPLATES MODULE
+    [
+        'key'   => 'admin.email-templates.index',
+        'name'  => 'List Email Template',
+        'route' => 'admin.email-templates.index',
+        'sort'  => 1,
+        'module' => 'Email Template'
+    ],
+    [
+        'key'   => 'admin.email-templates.store',
+        'name'  => 'Create Email Template',
+        'route' => 'admin.email-templates.store',
+        'sort'  => 2,
+        'module' => 'Email Template'
+    ],
+    [
+        'key'   => 'admin.email-templates.show',
+        'name'  => 'Show Email Template',
+        'route' => 'admin.email-templates.show',
+        'sort'  => 3,
+        'module' => 'Email Template'
+    ],
+    [
+        'key'   => 'admin.email-templates.update',
+        'name'  => 'Update Email Template',
+        'route' => 'admin.email-templates.update',
+        'sort'  => 4,
+        'module' => 'Email Template'
+    ],
+    [
+        'key'   => 'admin.email-templates.delete',
+        'name'  => 'Delete Email Template',
+        'route' => 'admin.email-templates.delete',
+        'sort'  => 5,
+        'module' => 'Email Template'
+    ],
+
+    //CLUB HOUSE MODULE
+    [
+        'key'   => 'admin.clubhouses.index',
+        'name'  => 'List ClubHouse',
+        'route' => 'admin.clubhouses.index',
+        'sort'  => 1,
+        'module' => 'ClubHouse'
+    ],
+
+    [
+        'key'   => 'admin.clubhouses.store',
+        'name'  => 'Create ClubHouse',
+        'route' => 'admin.clubhouses.store',
+        'sort'  => 2,
+        'module' => 'ClubHouse'
+    ],
+
+    [
+        'key'   => 'admin.clubhouses.show',
+        'name'  => 'Show ClubHouse',
+        'route' => 'admin.clubhouses.show',
+        'sort'  => 3,
+        'module' => 'ClubHouse'
+    ],
+    [
+        'key'   => 'admin.clubhouses.update',
+        'name'  => 'Update ClubHouse',
+        'route' => 'admin.clubhouses.update',
+        'sort'  => 4,
+        'module' => 'ClubHouse'
+    ],
+    [
+        'key'   => 'admin.clubhouses.delete',
+        'name'  => 'Delete ClubHouse',
+        'route' => 'admin.clubhouses.delete',
+        'sort'  => 5,
+        'module' => 'ClubHouse'
+    ],
+
+    //PAGE MODULE
+    [
+        'key'   => 'admin.pages.index',
+        'name'  => 'List Page',
+        'route' => 'admin.pages.index',
+        'sort'  => 1,
+        'module' => 'Page'
+    ],
+
+    [
+        'key'   => 'admin.pages.store',
+        'name'  => 'Create Page',
+        'route' => 'admin.pages.store',
+        'sort'  => 2,
+        'module' => 'Page'
+    ],
+
+    [
+        'key'   => 'admin.pages.show',
+        'name'  => 'Show Page',
+        'route' => 'admin.pages.show',
+        'sort'  => 3,
+        'module' => 'Page'
+    ],
+    [
+        'key'   => 'admin.pages.update',
+        'name'  => 'Update Page',
+        'route' => 'admin.pages.update',
+        'sort'  => 4,
+        'module' => 'Page'
+    ],
+    [
+        'key'   => 'admin.pages.delete',
+        'name'  => 'Delete Page',
+        'route' => 'admin.pages.delete',
+        'sort'  => 5,
+        'module' => 'Page'
+    ],
+
+    //TAX MODULE
+//    Tax Rate
+    [
+        'key'   => 'tax.taxes.rates.index',
+        'name'  => 'List Tax Rate',
+        'route' => 'admin.taxes.rates.index',
+        'sort'  => 1,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rates.store',
+        'name'  => 'Create Tax Rate',
+        'route' => 'admin.taxes.rates.store',
+        'sort'  => 2,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rates.show',
+        'name'  => 'Show Tax Rate',
+        'route' => 'admin.taxes.rates.show',
+        'sort'  => 3,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rates.update',
+        'name'  => 'Update Tax Rate',
+        'route' => 'admin.taxes.rates.update',
+        'sort'  => 4,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rates.delete',
+        'name'  => 'Delete Tax Rate',
+        'route' => 'admin.taxes.rates.delete',
+        'sort'  => 5,
+        'module' => 'Tax'
+    ],
+//    Customer Tax Group
+    [
+        'key'   => 'tax.taxes.groups.customers.index',
+        'name'  => 'List Customer Tax Group',
+        'route' => 'admin.taxes.groups.customers.index',
+        'sort'  => 1,
+        'module' => 'Tax'
+    ],
+
+    [
+        'key'   => 'tax.taxes.rates.store',
+        'name'  => 'Create Customer Tax Group',
+        'route' => 'admin.taxes.groups.customers.store',
+        'sort'  => 2,
+        'module' => 'Tax'
+    ],
+
+    [
+        'key'   => 'tax.taxes.groups.customers.show',
+        'name'  => 'Show Customer Tax Group',
+        'route' => 'admin.taxes.groups.customers.show',
+        'sort'  => 3,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.groups.customers.update',
+        'name'  => 'Update Customer Tax Group',
+        'route' => 'admin.taxes.groups.customers.update',
+        'sort'  => 4,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.groups.customers.delete',
+        'name'  => 'Delete Customer Tax Group',
+        'route' => 'admin.taxes.groups.customers.delete',
+        'sort'  => 5,
+        'module' => 'Tax'
+    ],
+//    Product Tax Group
+    [
+        'key'   => 'tax.taxes.groups.products.index',
+        'name'  => 'List Product Tax Group',
+        'route' => 'admin.taxes.groups.products.index',
+        'sort'  => 1,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rates.store',
+        'name'  => 'Create Product Tax Group',
+        'route' => 'admin.taxes.groups.products.store',
+        'sort'  => 2,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.groups.products.show',
+        'name'  => 'Show Product Tax Group',
+        'route' => 'admin.taxes.groups.products.show',
+        'sort'  => 3,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.groups.products.update',
+        'name'  => 'Update Product Tax Group',
+        'route' => 'admin.taxes.groups.products.update',
+        'sort'  => 4,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.groups.products.delete',
+        'name'  => 'Delete Product Tax Group',
+        'route' => 'admin.taxes.groups.products.delete',
+        'sort'  => 5,
+        'module' => 'Tax'
+    ],
+//    Tax Rule
+    [
+        'key'   => 'tax.taxes.rules.index',
+        'name'  => 'List Tax Rule',
+        'route' => 'admin.taxes.rules.index',
+        'sort'  => 1,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rates.store',
+        'name'  => 'Create Tax Rule',
+        'route' => 'admin.taxes.rules.store',
+        'sort'  => 2,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rules.show',
+        'name'  => 'Show Tax Rule',
+        'route' => 'admin.taxes.rules.show',
+        'sort'  => 3,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rules.update',
+        'name'  => 'Update Tax Rule',
+        'route' => 'admin.taxes.rules.update',
+        'sort'  => 4,
+        'module' => 'Tax'
+    ],
+    [
+        'key'   => 'tax.taxes.rules.delete',
+        'name'  => 'Delete Tax Rule',
+        'route' => 'admin.taxes.rules.delete',
+        'sort'  => 5,
+        'module' => 'Tax'
+    ],
 ];
 
