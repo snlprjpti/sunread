@@ -31,7 +31,8 @@ class OrderItemResource extends JsonResource
             "tax_percent" => $this->tax_percent,
             "row_total" => $this->row_total,
             "row_total_incl_tax" => $this->row_total_incl_tax,
-            "row_weight" => $this->row_weight
+            "row_weight" => $this->row_weight,
+            "created_at" => $this->created_at?->format("M d, Y H:i A")
         ];
     }
 }

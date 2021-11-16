@@ -28,14 +28,7 @@ trait HasOrderProductDetail
                 "images.types"
             ];
             $product = Product::whereId($order["product_id"])->with($with)->first();
-            foreach ( $this->product_attribute_slug as $slug )
-            {
-                $data[$slug] = $product->value([
-                    "scope" => "store",
-                    "scope_id" => $coreCache->store->id,
-                    "attribute_slug" => $slug
-                ]);
-            }
+            foreach ( $this->product_attribute_slug as $slug ) $data[$slug] = $this->getAttributeValue($coreCache, $product, $slug);
             if ($callback) $data = array_merge($data, $callback($product));
             $data = array_merge($data, ["sku" => $product->sku, "type" => $product->type]);
         }

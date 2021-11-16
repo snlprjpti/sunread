@@ -61,9 +61,9 @@ class OrderRepository extends BaseRepository
                 "shipping_address_id" => $request->shipping_address_id,
                 "currency_code" => $currency_code->code,
                 "shipping_method" => $request->shipping_method,
-                "shipping_method_label" => $request->shipping_method_label ?? 'online-delivery',
+                "shipping_method_label" => $request->shipping_method_label ?? 'free-delivery',
                 "payment_method" => $request->payment_method,
-                "payment_method_label" => $request->payment_method_label ?? 'stripe',
+                "payment_method_label" => $request->payment_method_label ?? 'cash-on-delivery',
                 "sub_total" => 0.00,
                 "sub_total_tax_amount" => 0.00,
                 "tax_amount" => 0.00,
@@ -106,18 +106,8 @@ class OrderRepository extends BaseRepository
                 $order_item = $this->orderItemRepository->store($request, $order, $order_item_details);
             }
             Bus::batch($jobs)->then( function (Batch $batch) use ($order) {
-
                 OrderCalculation::dispatchSync($order);
-                // $order->order_taxes->map( function ($order_tax) {
-                //     $order_tax_item_amount = $order_tax->order_tax_items->map( function ($order_item) {
-                //         return $order_item->amount;
-                //     })->toArray();
-                //     $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
-                // });
             })->dispatch();
-            
-            // $this->orderCalculationUpdate($order);
-
         } 
         catch (Exception $exception)
         {

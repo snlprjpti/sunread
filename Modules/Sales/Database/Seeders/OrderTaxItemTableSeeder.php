@@ -21,12 +21,6 @@ class OrderTaxItemTableSeeder extends Seeder
                 "amount" => 1.3,
                 "tax_item_type" => "product"
             ],
-            // [
-            //     "tax_id" => Order::first()?->id,
-            //     "tax_percent" => 10.00,
-            //     "amount" => 10.00,
-            //     "tax_item_type" => "shipping"
-            // ]
         ];
 
         DB::table("order_tax_items")->insert($data);

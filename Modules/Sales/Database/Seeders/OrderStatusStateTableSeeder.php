@@ -17,7 +17,8 @@ class OrderStatusStateTableSeeder extends Seeder
             "completed" => "completed",
             "closed" => "closed",
             "cancelled" => "cancelled"
-    ];
+        ];
+        
         foreach ($state_statuses as $state => $status) {
             $data[] = [
                 "status" => $status,

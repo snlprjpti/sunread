@@ -33,7 +33,7 @@ class OrderItemTableSeeder extends Seeder
                                 "attribute_id" => 2,
                                 "label" => "color",
                                 "name" => "Color",
-                                "value" => "L" 
+                                "value" => "red" 
                             ],
                         ],
                         "image_url" => url("product.png"), 

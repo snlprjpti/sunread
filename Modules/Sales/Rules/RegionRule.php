@@ -13,14 +13,7 @@ class RegionRule implements Rule
         $this->address = $address;
     }
 
-    /**
-     * Determine if the validation rule passes.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function passes($attribute, $value)
+    public function passes(mixed $attribute, mixed $value): bool
     {
         foreach ($this->address as $row) {
             if (!array_key_exists("region_id", $row) && !isset($row['region_name'])) {
@@ -37,12 +30,7 @@ class RegionRule implements Rule
         return true;
     }
 
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
+    public function message(): string
     {
         return "{$this->name} is required";
     }
