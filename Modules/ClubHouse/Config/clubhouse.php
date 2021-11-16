@@ -25,6 +25,19 @@ return [
                     "is_required" => 0
                 ],
                 [
+                    "title" => "Type",
+                    "slug" => "type",
+                    "type" => "select",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [
+                        [ "value" => "clubhouse", "label" => "Club House" ],
+                        [ "value" => "resort", "label" => "Resort" ]
+                    ],
+                    "rules" => "string|in:clubhouse,resort",
+                    "is_required" => 1
+                ],
+                [
                     "title" => "Status",
                     "slug" => "status",
                     "type" => "select",
@@ -39,6 +52,45 @@ return [
                 ],
             ]
         ],
+        "hero_banner" => [
+            "title" => "Hero Banner",
+            "elements" => [
+                [
+                    "title" => "Background Type",
+                    "slug" => "background_type",
+                    "type" => "select",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [
+                        [ "value" => "image", "label" => "Image" ],
+                        [ "value" => "video", "label" => "Video" ]
+                    ],
+                    "rules" => "in:image,video",
+                    "multiple" => false,
+                    "is_required" => 0
+                ],
+                [
+                    "title" => "Background Image",
+                    "slug" => "background_image",
+                    "type" => "file",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [],
+                    "rules" => "mimes:jpeg,jpg,bmp,png,gif|required_if:background_type,image",
+                    "is_required" => 0
+                ],
+                [
+                    "title" => "Background Video",
+                    "slug" => "background_video",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [],
+                    "rules" => "string|required_if:background_type,video",
+                    "is_required" => 0
+                ],
+            ]
+        ],
         "content" => [
             "title" => "Content",
             "elements" => [
@@ -49,13 +101,13 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
+                    "rules" => "mimes:jpeg,jpg,bmp,png",
                     "is_required" => 1
                 ],
                 [
                     "title" => "Header Content",
                     "slug" => "header_content",
-                    "type" => "text",
+                    "type" => "textarea",
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
@@ -75,7 +127,7 @@ return [
                 [
                     "title" => "Address",
                     "slug" => "address",
-                    "type" => "text",
+                    "type" => "textarea",
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
@@ -85,7 +137,7 @@ return [
                 [
                     "title" => "Contact",
                     "slug" => "contact",
-                    "type" => "text",
+                    "type" => "textarea",
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
@@ -115,35 +167,6 @@ return [
                     "scope" => "website",
                     "options" => [],
                     "rules" => "string",
-                    "is_required" => 0
-                ],
-            ]
-        ],
-        "hero_banner" => [
-            "title" => "Hero Banner",
-            "elements" => [
-                [
-                    "title" => "Background Type",
-                    "slug" => "background_type",
-                    "type" => "select",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [
-                        [ "value" => "image", "label" => "Image" ],
-                        [ "value" => "video", "label" => "Video" ]
-                    ],
-                    "rules" => "in:image,video",
-                    "multiple" => false,
-                    "is_required" => 0
-                ],
-                [
-                    "title" => "Background Image",
-                    "slug" => "background_image",
-                    "type" => "file",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [],
-                    "rules" => "mimes:jpeg,jpg,bmp,png,gif",
                     "is_required" => 0
                 ],
             ]
@@ -189,7 +212,8 @@ return [
     "absolute_path" => [
         "title" => "general.elements.0",
         "slug" => "general.elements.1",
-        "status" => "general.elements.2",
+        "type" => "general.elements.2",
+        "status" => "general.elements.3",
         "thumbnail" => "content.elements.0",
         "header_content" => "content.elements.1",
         "opening_hours" => "content.elements.2",
@@ -199,6 +223,7 @@ return [
         "longitude" => "location.elements.1",
         "background_type" => "hero_banner.elements.0",
         "background_image" => "hero_banner.elements.1",
+        "background_video" => "hero_banner.elements.2",
         "meta_title" => "search_engine_optimization.elements.0",
         "meta_keywords" => "search_engine_optimization.elements.1",
         "meta_description" => "search_engine_optimization.elements.2"

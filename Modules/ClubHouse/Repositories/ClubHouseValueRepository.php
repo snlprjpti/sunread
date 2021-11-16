@@ -168,7 +168,6 @@ class ClubHouseValueRepository
             $match = [
                 "club_house_id" => $parent->id,
                 "scope" => $data["scope"],
-                "type" => $data["type"],
                 "position" => $data["position"],
                 "scope_id" => $data["scope_id"]
             ];
@@ -198,6 +197,7 @@ class ClubHouseValueRepository
                 }
 
                 if(isset($val["use_default_value"])  && $val["use_default_value"] == 1) continue;
+
 
                 $created_data["data"][] = $this->model->create($match);
             }
