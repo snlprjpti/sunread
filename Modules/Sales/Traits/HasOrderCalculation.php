@@ -45,7 +45,8 @@ trait HasOrderCalculation
                 "grand_total" => $grand_total,
                 "total_items_ordered" => $order->order_items->count(),
                 "total_qty_ordered" => $total_qty_ordered,
-                // "status" => SiteConfig::fetch("")
+                // "status" => SiteConfig::fetch(""),
+                "shipping_method" => SiteConfig::fetch($request->shipping_method."_title", "channel", $ch)
             ]);
 
         }

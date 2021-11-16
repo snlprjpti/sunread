@@ -3,12 +3,14 @@
 return [
     "shipping_methods" => [
         [
-            "name" => "Free Shipping",
-            "slug" => "free_shipping",
-            "configuration_path" => "shipping"
+            "name" => "Flat Rate",
+            "slug" => "delivery_method_flat_rate",
+            "configuration_path" => "delivery_method_flat_rate_"
         ],
         [
-            "name" => ""
+            "name" => "Free Delivery",
+            "slug" => "delivery_method_free_delivery",
+            "configuration_path" => "delivery_method_free_delivery_"
         ]
     ]
 ];

@@ -1169,7 +1169,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "bank_transfer_payment_status",
+                                "path" => "bank_transfer_payment",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1218,7 +1218,7 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "yes",
+                                "default" => "all_allowed_countries",
                                 "options" => [
                                     [ "value" => "all_allowed_countries", "label" => "All Allowed Countries" ],
                                     [ "value" => "specific_countries", "label" => "Specific Counrtry" ]
@@ -1336,7 +1336,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "flat_rate_enabled",
+                                "path" => "delivery_method_flat_rate",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1353,7 +1353,7 @@ return[
                             ],
                             [
                                 "title" => "Title",
-                                "path" => "title",
+                                "path" => "delivery_method_flat_rate_title",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1367,7 +1367,7 @@ return[
                             ],
                             [
                                 "title" => "Method Name",
-                                "path" => "flat_method_name",
+                                "path" => "delivery_method_flat_rate_method_name",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1385,7 +1385,7 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => 1,
+                                "default" => "per_order",
                                 "options" => [
                                     [ "value" => "per_item", "label" => "Per Item" ],
                                     [ "value" => "per_order", "label" => "Per Order" ]
@@ -1402,7 +1402,7 @@ return[
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "5.00",
+                                "default" => "",
                                 "options" => [],
                                 "rules" => "decimal",
                                 "multiple" => false,
@@ -1621,7 +1621,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
-                                "default" => "yes",
+                                "default" => "iso_2_code",
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
                                 "multiple" => false,

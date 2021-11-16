@@ -8,6 +8,6 @@ trait HasShippingCalculation
 
 	public function getShippingMethod()
 	{
-		# code...
+		
 	}
 }

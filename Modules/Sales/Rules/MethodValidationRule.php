@@ -4,6 +4,7 @@ namespace Modules\Sales\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Modules\Core\Facades\CoreCache;
+use Modules\Core\Facades\SiteConfig;
 
 class MethodValidationRule implements Rule
 {
@@ -23,11 +24,16 @@ class MethodValidationRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        dd(config('sales.name'));
+        dd(config('sales.shipping_methods'));
+        
         dd($attribute, $value);
-        // if ( $attribute ==  )
-        CoreCache::getChannel($data["website"], $this->request->header("hc-channel"));
-        //
+        // if ( $attribute ==  "shipping_method")
+        {
+            $channel = CoreCache::getChannel($value, $this->request->header("hc-channel"));
+            $value = SiteConfig::fetch($value, "channel", $channel->id);
+        }
+
+        // if ( $value )
     }
 
     public function message(): string
