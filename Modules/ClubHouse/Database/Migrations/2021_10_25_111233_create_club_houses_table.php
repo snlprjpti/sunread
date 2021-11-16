@@ -15,7 +15,6 @@ class CreateClubHousesTable extends Migration
             $table->id();
             $table->integer('position');
             $table->unsignedBigInteger('website_id');
-            $table->string('type');
             $table->boolean('status')->default(1);
             $table->timestamps();
 
