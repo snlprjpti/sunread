@@ -49,9 +49,12 @@ class NavigationMenuController extends BaseController
     {
         try
         {
-            $website = CoreCache::getWebsite($request->header("hc-host"));
-            $fetched = $this->navigation_menu_item_repository->fetchWithItems($request, ["navigationMenuItems"], callback:function() {
-                return $this->model->where('status', 1)->whereNotNull('location');
+            $coreCache = $this->repository->getCoreCache($request);
+            $website = $coreCache->website;
+            $fetched = $this->navigation_menu_item_repository->fetchWithItems($request, ["navigationMenuItems"], callback:function() use($website){
+                return $this->model->where('status', 1)->whereNotNull('location')->whereHas('navigationMenuItems', function($q) use($website){
+                    $q->where('website_id', $website->id);
+                });
             });
         }
         catch (Exception $exception)

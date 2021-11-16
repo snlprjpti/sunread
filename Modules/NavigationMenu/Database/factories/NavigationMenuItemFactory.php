@@ -1,6 +1,7 @@
 <?php
 namespace Modules\NavigationMenu\Database\factories;
 
+use Modules\Core\Entities\Website;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\NavigationMenu\Entities\NavigationMenu;
 
@@ -21,7 +22,8 @@ class NavigationMenuItemFactory extends Factory
     public function definition()
     {
         return [
-            "navigation_menu_id" => NavigationMenu::factory()->create()->id
+            "navigation_menu_id" => NavigationMenu::factory()->create()->id,
+            "website_id" => Website::factory()->create()->id
         ];
     }
 }
