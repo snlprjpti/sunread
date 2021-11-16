@@ -61,10 +61,7 @@ return [
                     "type" => "select",
                     "value" => "",
                     "scope" => "website",
-                    "condition" => [
-                        [ "value" => 'image', "show" => 'background_image' ],
-                        [ "value" => 'video', "show" => 'background_video' ],
-                    ],
+                    "has_condition" => 1,
                     "options" => [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
