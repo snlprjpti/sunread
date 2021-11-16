@@ -1066,6 +1066,56 @@ return[
                         ]
                     ]
                 ]
+            ],
+            [
+                "title" => "Shipping Settings",
+                "subChildren" => [
+                    [
+                        "title" => "Shipping Methods",
+                        "elements" => [
+                            [
+                                "title" => "Choose Shipping Method",
+                                "path" => "choose_shipping_method",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => 1,
+                                "options" => [],
+                                "rules" => "exists:product_tax_groups,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 0,
+                                "sort_by" => "name"
+                            ]
+                        ]
+                    ]   
+                ]
+            ],
+            [
+                [
+                    "title" => "Payment Methods",
+                    "subChildren" => [
+                        [
+                            "title" => "Payment Methods",
+                            "elements" => [
+                                [
+                                    "title" => "Choose Payment Method",
+                                    "path" => "choose_payment_method",
+                                    "type" => "select",
+                                    "provider" => "Modules\Tax\Entities\ProductTaxGroup",
+                                    "pluck" => ["name", "id"],
+                                    "default" => "1",
+                                    "options" => [],
+                                    "rules" => "exists:product_tax_groups,id",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => "name"
+                                ]
+                            ]
+                        ]   
+                    ]
+                ]
             ]
         ]
     ]
