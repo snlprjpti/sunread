@@ -23,7 +23,6 @@ class OrderMetaRepository extends BaseRepository
         try
         {
             $this->validateData($request);
-
             $this->storeShippingMethod($request, $order);
             $this->storePaymentMethod($request, $order);
         }

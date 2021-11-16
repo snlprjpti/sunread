@@ -33,11 +33,9 @@ class OrderAddressRepository extends BaseRepository
     {
         try
         {
-            $rules = [
+            $this->validateData($request, [
                 "address" => [new RegionRule($request->address)]
-            ];
-
-            $this->validateData($request, $rules);
+            ]);
 
             foreach ($request->address as $order_address) {
                 $orderAddressData = [
@@ -60,7 +58,6 @@ class OrderAddressRepository extends BaseRepository
                     "city_name" => $order_address["city_name"] ?? null,
                     "vat_number" => $order_address['vat_number'] ?? null
                 ];
-
                 $this->create($orderAddressData);
             }
         }

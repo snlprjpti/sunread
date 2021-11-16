@@ -23,7 +23,6 @@ class OrderStatusRepository extends BaseRepository
 
     public function orderStatus(object $request, int $order_id): void
     {
-        DB::beginTransaction();
         try
         {
             $this->validateData($request);
@@ -45,9 +44,7 @@ class OrderStatusRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
-            DB::rollback();
             throw $exception;
         }
-        DB::commit();
     }
 }

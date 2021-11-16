@@ -8,7 +8,9 @@ use Modules\Coupon\Entities\Coupon;
 use Modules\Customer\Entities\Customer;
 
 trait HasOrderCalculation
-{    
+{
+    protected $discount_percent, $shipping_amount;
+
 	public function orderCalculationUpdate(object $order): void
     {
         try 
