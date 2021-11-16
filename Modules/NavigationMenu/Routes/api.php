@@ -18,8 +18,8 @@ Route::group(['middleware' => ['api']], function () {
     Route::group(["prefix" => "admin", "middleware" => ["admin", "language"], "as" => "admin."], function () {
         Route::resource('navigation-menus', NavigationMenuController::class)->except(["create","edit"]);
 
-        Route::get('navigation-menu-items/attributes', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, "attributes"])->name("navigation.menus.attributes");
-        Route::put('navigation-menu-items/{navigation_menu_id}/status', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, 'updateStatus'])->name('navigation.menus.status');
+        Route::get('navigation-menu-items/attributes', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, "attributes"])->name("navigation-menu-items.attributes");
+        Route::put('navigation-menu-items/{navigation_menu_id}/status', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, 'updateStatus'])->name('navigation-menu-items.status');
         Route::resource('navigation-menu-items', NavigationMenuItemController::class)->except(["create","edit"]);
     });
 });

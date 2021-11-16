@@ -53,7 +53,6 @@ class NavigationMenuRepository extends BaseRepository
         return $created;
     }
 
-
     /**
      * Update Navigation Menu with Unique Location
      */

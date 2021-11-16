@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\NavigationMenu\Tests\Unit;
+namespace Modules\NavigationMenu\Tests\Feature;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -44,20 +44,14 @@ class NavigationMenuItemTest extends BaseTestCase
                 "status" => [
                     "value" => rand(0,1)
                 ],
-                "slug" => [
-                    "value" => Str::slug($title)
-                ],
                 "type" => [
-                    "value" => Arr::random(["category", "page", "custom"]),
-                ],
-                "type_id" => [
-                    "value" => null
+                    "value" => "custom",
                 ],
                 "custom_link" => [
                     "value" => Str::random(40),
                 ],
                 "additional_data" => [
-                    "value" => []
+                    "value" => json_encode([])
                 ],
                 "order" => [
                     "value" => rand(0,10)
@@ -68,7 +62,7 @@ class NavigationMenuItemTest extends BaseTestCase
 
     public function getUpdateData(): array
     {
-        $websiteId = $this->default_resource->website_id;
+        $websiteId = $this->default_resource->navigationMenu->website_id;
         $updateData = $this->getCreateData();
         return array_merge($updateData, $this->getScope($websiteId));
     }
@@ -89,7 +83,11 @@ class NavigationMenuItemTest extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "navigation_menu_item_id" => null
+            "items" => [
+                "type" => [
+                    "value" => "invalid",
+                ],
+            ]
         ]);
     }
 

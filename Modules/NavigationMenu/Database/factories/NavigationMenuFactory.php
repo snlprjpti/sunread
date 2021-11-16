@@ -11,12 +11,10 @@ class NavigationMenuFactory extends Factory
 
     public function definition(): array
     {
-        $location = ["footer", "primary", "full_screen"];
         return [
             "title" => $this->faker->name(),
             "slug" => $this->faker->unique()->slug(),
             "status" => 1,
-            "location" => Arr::random($location),
             "website_id" => Website::factory()->create()->id,
         ];
     }
