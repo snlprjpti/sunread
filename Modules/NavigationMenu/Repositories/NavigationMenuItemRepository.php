@@ -84,7 +84,7 @@ class NavigationMenuItemRepository extends BaseRepository
     {
         $data = [
             "scope" => $request->scope ?? "website",
-            "scope_id" => $request->scope_id ?? $navigation_menu_item->website_id,
+            "scope_id" => $request->scope_id ?? $navigation_menu_item->navigation_menu->website_id,
             "navigation_menu_item_id" => $navigation_menu_item->id,
         ];
 

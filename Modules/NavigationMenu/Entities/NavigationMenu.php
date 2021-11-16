@@ -29,6 +29,7 @@ class NavigationMenu extends Model
      */
     protected $fillable = ['title', 'slug', 'status', 'location', 'website_id'];
 
+
     // Searchable
     public static $SEARCHABLE = [];
 

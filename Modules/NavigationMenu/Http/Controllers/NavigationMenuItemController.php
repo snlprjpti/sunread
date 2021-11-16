@@ -62,7 +62,7 @@ class NavigationMenuItemController extends BaseController
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request)],
             ]);
-            $fetched = $this->repository->fetchAll($request, ["values"]);
+            $fetched = $this->repository->fetchAll($request, ["values", "navigationMenu"]);
         }
         catch (Exception $exception)
         {
@@ -104,16 +104,15 @@ class NavigationMenuItemController extends BaseController
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
             ]);
-            $navigation_menu_item = $this->model->findOrFail($id);
 
-            $fetched = $this->repository->fetchWithAttributes($request, $navigation_menu_item);
+            $fetched = $this->repository->fetch($id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
     /**

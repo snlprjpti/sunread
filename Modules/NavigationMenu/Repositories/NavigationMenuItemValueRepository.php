@@ -19,18 +19,19 @@ class NavigationMenuItemValueRepository
     use HasScope;
 
     // Properties for NavigationMenuItemValueRepository
-    protected $model, $model_key, $navigation_menu_item_repository, $model_name, $parent_model, $global_file = [];
+    protected $model, $model_key, $navigation_menu_item_repository, $navigation_menu_repository, $model_name, $parent_model, $global_file = [];
 
     /**
      * NavigationMenuItemValueRepository Constructor
      */
-    public function __construct(NavigationMenuItemValue $navigation_menu_item_value, NavigationMenuItemRepository $navigation_item_repository, NavigationMenuItem $navigation_menu_item)
+    public function __construct(NavigationMenuItemValue $navigation_menu_item_value, NavigationMenuItemRepository $navigation_item_repository, NavigationMenuRepository $navigation_menu_repository, NavigationMenuItem $navigation_menu_item)
     {
         $this->model = $navigation_menu_item_value;
         $this->model_key = "navigation_menu_item.values";
         $this->navigation_menu_item_repository = $navigation_item_repository;
         $this->model_name = "NavigationMenuItemValue";
         $this->parent_model = $navigation_menu_item;
+        $this->navigation_menu_repository = $navigation_menu_repository;
 
         $this->createModel();
     }
@@ -107,12 +108,12 @@ class NavigationMenuItemValueRepository
     {
         try
         {
+            $navigation_menu = $this->navigation_menu_repository->fetch($request->navigation_menu_id);
             $data = $this->navigation_menu_item_repository->validateData($request, array_merge($this->getValidationRules($request),[
-                "website_id" => "required|exists:websites,id",
-            ]), function () use ($request) {
+            ]), function () use ($navigation_menu) {
                 return [
                     "scope" => "website",
-                    "scope_id" => $request->website_id
+                    "scope_id" => $navigation_menu->website_id
                 ];
             });
 
@@ -132,12 +133,12 @@ class NavigationMenuItemValueRepository
     {
         try
         {
-            $data = $this->navigation_menu_item_repository->validateData($request, array_merge($this->getValidationRules($request, $navigation_menu_item?->id, "update"), [
+            $method = "update";
+            $data = $this->navigation_menu_item_repository->validateData($request, array_merge($this->getValidationRules($request, $navigation_menu_item?->id, $method), [
                 "scope" => "required|in:website,channel,store",
                 "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $navigation_menu_item?->id)]
             ]), function () use ($navigation_menu_item) {
                 return [
-                    "website_id" => $navigation_menu_item->website_id,
                     "navigation_menu_id" => $navigation_menu_item->navigation_menu_id,
                 ];
             });
