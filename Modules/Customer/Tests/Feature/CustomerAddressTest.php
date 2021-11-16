@@ -2,6 +2,7 @@
 
 namespace Modules\Customer\Tests\Feature;
 
+use Illuminate\Support\Facades\Artisan;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
 use Modules\Core\Tests\BaseTestCase;
@@ -42,6 +43,9 @@ class CustomerAddressTest extends BaseTestCase
 
     public function getCreateData(): array
     {
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('redis:clear');
         $city = City::first();
         $region = $city->region()->first();
         $country = $region->country()->first();
