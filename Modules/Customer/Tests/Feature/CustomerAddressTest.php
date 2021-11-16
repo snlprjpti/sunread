@@ -19,7 +19,8 @@ class CustomerAddressTest extends BaseTestCase
         $this->admin = $this->createAdmin();
         $this->model_name = "Customer Address";
         $this->route_prefix = "admin.customers.addresses";
-        $this->append_to_route = Customer::latest("id")->first()->id;
+        $this->customer = Customer::first();
+        $this->append_to_route = $this->customer->id;
     }
 
     public function getNonMandatoryCreateData(): array
@@ -38,8 +39,7 @@ class CustomerAddressTest extends BaseTestCase
 
     public function getCreateData(): array
     {
-        $customer = Customer::first();
-        $channel = Channel::factory()->create(["website_id" => $customer->website_id]);
+        $channel = Channel::factory()->create(["website_id" => $this->customer->website_id]);
         $city = City::first();
         $region = $city->region()->first();
         $country = $region->country()->first();
@@ -51,24 +51,11 @@ class CustomerAddressTest extends BaseTestCase
         ]);
 
         return array_merge($this->model::factory()->make()->toArray(), [
-            "customer_id" => $customer->id,
+            "customer_id" => $this->customer->id,
             "channel_id" => $channel->id,
             "country_id" => $country->id,
             "region_id" => $region->id,
             "city_id" => $city->id
-        ]);
-    }
-
-    public function testAdminCanCreateResource()
-    {
-        $post_data = $this->getCreateData();
-        dd(Configuration::all());
-        $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
-
-        $response->assertCreated();
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
 
