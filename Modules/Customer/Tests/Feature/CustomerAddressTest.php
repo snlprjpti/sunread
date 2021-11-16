@@ -2,7 +2,12 @@
 
 namespace Modules\Customer\Tests\Feature;
 
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Configuration;
 use Modules\Core\Tests\BaseTestCase;
+use Modules\Country\Entities\City;
+use Modules\Country\Entities\Country;
+use Modules\Country\Entities\Region;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 
@@ -30,6 +35,28 @@ class CustomerAddressTest extends BaseTestCase
     {
         return array_merge($this->getCreateData(), [
             "address1" => null
+        ]);
+    }
+
+    public function getCreateData(): array
+    {
+        $customer = Customer::first();
+        $channel = Channel::factory()->create(["website_id" => $customer->website_id]);
+        $city = City::first();
+        $region = $city->region()->first();
+        $country = $region->country()->first();
+        Configuration::factory()->make()->create([
+            "scope" => "channel",
+            "path" => "default_country",
+            "scope_id" => $channel->id,
+            "value" => ["{$country->iso_2_code}"],
+        ]);
+        return array_merge($this->model::factory()->make()->toArray(), [
+            "customer_id" => $customer->id,
+            "channel_id" => $channel->id,
+            "country_id" => $country->id,
+            "region_id" => $region->id,
+            "city_id" => $city->id
         ]);
     }
 
