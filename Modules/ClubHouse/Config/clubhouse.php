@@ -61,6 +61,7 @@ return [
                     "type" => "select",
                     "value" => "",
                     "scope" => "website",
+                    "has_condition" => 1,
                     "options" => [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
