@@ -21,19 +21,20 @@ class OrderItemTableSeeder extends Seeder
                 "product_id" => 1,
                 "order_id" => Order::first()?->id,
                 "product_options" => json_encode([
-                    "image_url" => url("product.png"),
-                    "configurable_attributes" => [
-                        "size" => [
-                            "attribute_id" => 1,
-                            "label" => "size",
-                            "name" => "Size",
-                            "value" => "L" 
-                        ],
-                        "color" => [
-                            "attribute_id" => 2,
-                            "label" => "color",
-                            "name" => "Color",
-                            "value" => "L" 
+                    "product_options" => [
+                       "attributes" => [
+                            [
+                                "attribute_id" => 1,
+                                "label" => "size",
+                                "name" => "Size",
+                                "value" => "L" 
+                            ],
+                            [
+                                "attribute_id" => 2,
+                                "label" => "color",
+                                "name" => "Color",
+                                "value" => "L" 
+                            ],
                         ],
                         "image_url" => url("product.png"), 
                     ],
