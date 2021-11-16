@@ -35,7 +35,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "integer|required_if:items.type.value,page,category",
+                    "rules" => "required_if:items.type.value,page,category|integer",
                     "is_required" => 0
                 ],
                 [
@@ -45,7 +45,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "string|required_if:type,custom",
+                    "rules" => "required_if:items.type.value,custom|string",
                     "is_required" => 0
                 ],
                 [
