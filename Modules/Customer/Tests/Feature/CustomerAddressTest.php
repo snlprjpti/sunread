@@ -43,7 +43,6 @@ class CustomerAddressTest extends BaseTestCase
         $city = City::first();
         $region = $city->region()->first();
         $country = $region->country()->first();
-        echo $country;
         Configuration::factory()->make()->create([
             "scope" => "channel",
             "path" => "default_country",
@@ -63,7 +62,7 @@ class CustomerAddressTest extends BaseTestCase
     public function testAdminCanCreateResource()
     {
         $post_data = $this->getCreateData();
-        dd($post_data);
+        dd(Configuration::all());
         $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
 
         $response->assertCreated();
