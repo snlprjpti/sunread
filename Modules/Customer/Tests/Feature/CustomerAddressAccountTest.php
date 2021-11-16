@@ -5,8 +5,10 @@ namespace Modules\Customer\Tests\Feature;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Configuration;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
+use Modules\Country\Entities\City;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -43,9 +45,23 @@ class CustomerAddressAccountTest extends TestCase
 
     public function getCreateData(): array
     {
-        return $this->model::factory()->make([
-            "customer_id" => $this->customer->id
-        ])->toArray();
+        $city = City::first();
+        $region = $city->region()->first();
+        $country = $region->country()->first();
+        Configuration::factory()->make()->create([
+            "scope" => "channel",
+            "path" => "allow_countries",
+            "scope_id" => $this->channel->id,
+            "value" => ["{$country->iso_2_code}"],
+        ]);
+
+        return array_merge($this->model::factory()->make()->toArray(), [
+            "customer_id" => $this->customer->id,
+            "channel_id" => $this->channel->id,
+            "country_id" => $country->id,
+            "region_id" => $region->id,
+            "city_id" => $city->id
+        ]);
     }
 
     public function createCustomer(array $attributes = []): object
