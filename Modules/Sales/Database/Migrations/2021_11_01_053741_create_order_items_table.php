@@ -36,7 +36,7 @@ class CreateOrderItemsTable extends Migration
             $table->foreign("website_id")->references("id")->on("websites");
             $table->foreign("store_id")->references("id")->on("stores");
             $table->foreign("product_id")->references("id")->on("products");
-            $table->foreign("order_id")->references("id")->on("orders");
+            $table->foreign("order_id")->references("id")->on("orders")->onDelete("cascade");
 
             $table->timestamps();
         });
