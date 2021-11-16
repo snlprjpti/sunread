@@ -62,13 +62,13 @@ class RegionController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    public function countryWiseRegion(Request $request, int $country_id): JsonResponse
+    public function countryWiseRegion(Request $request): JsonResponse
     {
         try
         {
             $request->without_pagination = true;
-            $fetched = $this->repository->fetchAll($request, callback:function () use($country_id) {
-                return $this->model::whereCountryId($country_id);
+            $fetched = $this->repository->fetchAll($request, callback:function () use($request) {
+                return $this->model->whereCountryId($request->country_id);
             });
         }
         catch (Exception $exception)

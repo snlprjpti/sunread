@@ -57,7 +57,7 @@ class AttributeSetRepository extends BaseRepository
                     "id" => $attribute_group->id,
                     "name" => $attribute_group->name,
                     "position" => $attribute_group->position,
-                    "attributes" => $attribute_group->attributes->map(function ($attribute) {
+                    "attributes" => $attribute_group->attributes->sortBy("pivot.position")->map(function ($attribute) {
                         $attributesData = [
                             "id" => $attribute->id,
                             "name" => $attribute->name,
@@ -80,9 +80,9 @@ class AttributeSetRepository extends BaseRepository
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->getInventoryChildren();
 
                         return $attributesData;
-                    })->toArray()
+                    })->values()->toArray()
                 ];
-            })->toArray();
+            })->values()->toArray();
         }
         catch( Exception $exception )
         {

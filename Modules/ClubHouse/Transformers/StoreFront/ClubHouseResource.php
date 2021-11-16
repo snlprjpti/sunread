@@ -20,7 +20,7 @@ class ClubHouseResource extends JsonResource
             "id" => $this->id,
             "website_id" => $this->website_id,
             "position" => $this->position,
-            "type" => $this->type,
+            "type" => $this->value($data, "type"),
             "title" => $this->value($data, "title"),
             "slug" => $this->value($data, "slug"),
             "status" => $this->value($data, "status"),

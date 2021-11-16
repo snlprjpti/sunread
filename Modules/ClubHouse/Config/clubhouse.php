@@ -25,6 +25,19 @@ return [
                     "is_required" => 0
                 ],
                 [
+                    "title" => "Type",
+                    "slug" => "type",
+                    "type" => "select",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [
+                        [ "value" => "clubhouse", "label" => "Club House" ],
+                        [ "value" => "resort", "label" => "Resort" ]
+                    ],
+                    "rules" => "string|in:clubhouse,resort",
+                    "is_required" => 1
+                ],
+                [
                     "title" => "Status",
                     "slug" => "status",
                     "type" => "select",
@@ -35,86 +48,6 @@ return [
                         [ "value" => "0", "label" => "Disabled" ]
                     ],
                     "rules" => "nullable|in:0,1",
-                    "is_required" => 0
-                ],
-            ]
-        ],
-        "content" => [
-            "title" => "Content",
-            "elements" => [
-                [
-                    "title" => "Thumbnail",
-                    "slug" => "thumbnail",
-                    "type" => "file",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [],
-                    "rules" => "nullable|mimes:jpeg,jpg,bmp,png",
-                    "is_required" => 1
-                ],
-                [
-                    "title" => "Header Content",
-                    "slug" => "header_content",
-                    "type" => "text",
-                    "value" => "",
-                    "scope" => "store",
-                    "options" => [],
-                    "rules" => "string",
-                    "is_required" => 1
-                ],
-                [
-                    "title" => "Opening hours",
-                    "slug" => "opening_hours",
-                    "type" => "textarea",
-                    "value" => "",
-                    "scope" => "store",
-                    "options" => [],
-                    "rules" => "string",
-                    "is_required" => 1
-                ],
-                [
-                    "title" => "Address",
-                    "slug" => "address",
-                    "type" => "text",
-                    "value" => "",
-                    "scope" => "store",
-                    "options" => [],
-                    "rules" => "string",
-                    "is_required" => 1
-                ],
-                [
-                    "title" => "Contact",
-                    "slug" => "contact",
-                    "type" => "text",
-                    "value" => "",
-                    "scope" => "store",
-                    "options" => [],
-                    "rules" => "string",
-                    "is_required" => 1
-                ],
-            ]
-        ],
-        "location" => [
-            "title" => "Location",
-            "elements" => [
-                [
-                    "title" => "Latitude",
-                    "slug" => "latitude",
-                    "type" => "text",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [],
-                    "rules" => "string",
-                    "is_required" => 0
-                ],
-                [
-                    "title" => "Longitude",
-                    "slug" => "longitude",
-                    "type" => "text",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [],
-                    "rules" => "string",
                     "is_required" => 0
                 ],
             ]
@@ -147,7 +80,97 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "mimes:jpeg,jpg,bmp,png,gif",
+                    "rules" => "mimes:jpeg,jpg,bmp,png,gif|required_if:background_type,image",
+                    "is_required" => 0
+                ],
+                [
+                    "title" => "Background Video",
+                    "slug" => "background_video",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [],
+                    "rules" => "string|required_if:background_type,video",
+                    "is_required" => 0
+                ],
+            ]
+        ],
+        "content" => [
+            "title" => "Content",
+            "elements" => [
+                [
+                    "title" => "Thumbnail",
+                    "slug" => "thumbnail",
+                    "type" => "file",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [],
+                    "rules" => "mimes:jpeg,jpg,bmp,png",
+                    "is_required" => 1
+                ],
+                [
+                    "title" => "Header Content",
+                    "slug" => "header_content",
+                    "type" => "textarea",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "string",
+                    "is_required" => 1
+                ],
+                [
+                    "title" => "Opening hours",
+                    "slug" => "opening_hours",
+                    "type" => "textarea",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "string",
+                    "is_required" => 1
+                ],
+                [
+                    "title" => "Address",
+                    "slug" => "address",
+                    "type" => "textarea",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "string",
+                    "is_required" => 1
+                ],
+                [
+                    "title" => "Contact",
+                    "slug" => "contact",
+                    "type" => "textarea",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "string",
+                    "is_required" => 1
+                ],
+            ]
+        ],
+        "location" => [
+            "title" => "Location",
+            "elements" => [
+                [
+                    "title" => "Latitude",
+                    "slug" => "latitude",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [],
+                    "rules" => "string",
+                    "is_required" => 0
+                ],
+                [
+                    "title" => "Longitude",
+                    "slug" => "longitude",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "website",
+                    "options" => [],
+                    "rules" => "string",
                     "is_required" => 0
                 ],
             ]
@@ -193,7 +216,8 @@ return [
     "absolute_path" => [
         "title" => "general.elements.0",
         "slug" => "general.elements.1",
-        "status" => "general.elements.2",
+        "type" => "general.elements.2",
+        "status" => "general.elements.3",
         "thumbnail" => "content.elements.0",
         "header_content" => "content.elements.1",
         "opening_hours" => "content.elements.2",
@@ -203,6 +227,7 @@ return [
         "longitude" => "location.elements.1",
         "background_type" => "hero_banner.elements.0",
         "background_image" => "hero_banner.elements.1",
+        "background_video" => "hero_banner.elements.2",
         "meta_title" => "search_engine_optimization.elements.0",
         "meta_keywords" => "search_engine_optimization.elements.1",
         "meta_description" => "search_engine_optimization.elements.2"

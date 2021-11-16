@@ -99,7 +99,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $data = $this->store_front_repository->productDetail($request, $identifier);
+            $data = $this->store_front_repository->show($request, $identifier);
         }
         catch( Exception $exception )
         {
@@ -113,7 +113,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $data = $this->store_front_repository->productDetail($request, $identifier, $parent_identifier);
+            $data = $this->store_front_repository->show($request, $identifier, $parent_identifier);
         }
         catch( Exception $exception )
         {

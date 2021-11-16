@@ -22,4 +22,18 @@ class CityTest extends BaseTestCase
         $this->hasUpdateTest = false;
         $this->hasDestroyTest = false;
     }
+
+    public function testAdminCanFetchRegionWiseCities()
+    {
+        $post_data = [
+            "region_id" => 1
+        ];
+        $response = $this->withHeaders($this->headers)->get(route("admin.region.cities.list", $post_data));
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+        ]);
+    }
 }
