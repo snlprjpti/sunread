@@ -12,7 +12,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\NavigationMenu\Entities\NavigationMenu;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\ClubHouse\Repositories\ClubHouseRepository;
 use Modules\NavigationMenu\Repositories\NavigationMenuRepository;
 use Modules\NavigationMenu\Repositories\NavigationMenuItemRepository;
 use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuResource;
@@ -52,9 +51,7 @@ class NavigationMenuController extends BaseController
             $coreCache = $this->repository->getCoreCache($request);
             $website = $coreCache->website;
             $fetched = $this->navigation_menu_item_repository->fetchWithItems($request, ["navigationMenuItems"], callback:function() use($website){
-                return $this->model->where('status', 1)->whereNotNull('location')->whereHas('navigationMenuItems', function($q) use($website){
-                    $q->where('website_id', $website->id);
-                });
+                return $this->model->where('status', 1)->whereNotNull('location')->where('website_id', $website->id);
             });
         }
         catch (Exception $exception)

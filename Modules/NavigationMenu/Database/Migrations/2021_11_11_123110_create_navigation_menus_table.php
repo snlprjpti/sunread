@@ -14,7 +14,11 @@ class CreateNavigationMenusTable extends Migration
             $table->string('slug')->unique();
             $table->tinyInteger('status')->default(1);
             $table->string('location')->nullable();
+            $table->unsignedBigInteger('website_id');
             $table->timestamps();
+
+            $table->foreign('website_id')->references('id')->on('websites')->onUpdate('cascade')->onDelete('cascade');
+
         });
     }
 

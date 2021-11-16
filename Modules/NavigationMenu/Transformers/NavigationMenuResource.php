@@ -14,6 +14,7 @@ class NavigationMenuResource extends JsonResource
             "slug" => $this->slug,
             "status" => $this->status,
             "location" => $this->location,
+            "website_id" => $this->website_id,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }

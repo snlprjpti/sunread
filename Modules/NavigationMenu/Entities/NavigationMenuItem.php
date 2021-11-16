@@ -16,7 +16,7 @@ class NavigationMenuItem extends Model
     /**
      * Arrays that are Mass Assignable
      */
-    protected $fillable = ["navigation_menu_id", "website_id"];
+    protected $fillable = ["navigation_menu_id"];
 
     // Append data with Values [ClubHouseValue]
     protected $with = [ "values" ];

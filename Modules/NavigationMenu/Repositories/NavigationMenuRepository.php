@@ -32,6 +32,7 @@ class NavigationMenuRepository extends BaseRepository
         $this->rules = [
             // NavigationMenu validation
             "title" => "required|string|min:2|max:250",
+            "website_id" => 'required|integer|exists:websites,id',
             "slug" => "string|min:2|max:250|unique:navigation_menus,slug",
             "location" => ["string", new NavigationMenuLocationRule()],
         ];

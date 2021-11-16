@@ -23,7 +23,6 @@ class NavigationMenuItemFactory extends Factory
     {
         return [
             "navigation_menu_id" => NavigationMenu::factory()->create()->id,
-            "website_id" => Website::factory()->create()->id
         ];
     }
 }

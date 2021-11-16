@@ -61,7 +61,6 @@ class NavigationMenuItemController extends BaseController
             $request->validate([
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request)],
-                "website_id" => "sometimes|exists:websites,id"
             ]);
             $fetched = $this->repository->fetchAll($request, ["values"]);
         }

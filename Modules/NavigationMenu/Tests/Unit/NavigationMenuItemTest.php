@@ -77,11 +77,6 @@ class NavigationMenuItemTest extends BaseTestCase
     {
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
 
-        $websiteId = Website::inRandomOrder()->first()->id;
-        $this->filter = array_merge($this->getScope($websiteId), [
-            "website_id" => $websiteId
-        ]);
-
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
 
         $response->assertOk();
@@ -94,7 +89,7 @@ class NavigationMenuItemTest extends BaseTestCase
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "website_id" => null
+            "navigation_menu_item_id" => null
         ]);
     }
 

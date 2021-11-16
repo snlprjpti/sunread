@@ -27,7 +27,7 @@ class NavigationMenu extends Model
     /**
      * Arrays that are Mass Assignable
      */
-    protected $fillable = ['title', 'slug', 'status', 'location'];
+    protected $fillable = ['title', 'slug', 'status', 'location', 'website_id'];
 
     // Searchable
     public static $SEARCHABLE = [];
