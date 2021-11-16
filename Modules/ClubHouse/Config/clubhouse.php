@@ -79,6 +79,10 @@ return [
                     "type" => "file",
                     "value" => "",
                     "scope" => "website",
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'image'
+                    ],
                     "options" => [],
                     "rules" => "mimes:jpeg,jpg,bmp,png,gif|required_if:background_type,image",
                     "is_required" => 0
@@ -87,6 +91,10 @@ return [
                     "title" => "Background Video",
                     "slug" => "background_video",
                     "type" => "text",
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'video'
+                    ],
                     "value" => "",
                     "scope" => "website",
                     "options" => [],

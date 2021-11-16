@@ -152,7 +152,7 @@ class ClubHouseRepository extends BaseRepository
             throw $exception;
         }
 
-        return $status_value === 1 ? true : false;
+        return $status_value === "1" ? true : false;
     }
 
 }
