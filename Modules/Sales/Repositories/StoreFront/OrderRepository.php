@@ -18,6 +18,7 @@ use Modules\Sales\Traits\HasOrderProductDetail;
 use Modules\Sales\Repositories\OrderMetaRepository;
 use Modules\Sales\Repositories\OrderAddressRepository;
 use Modules\Sales\Repositories\StoreFront\OrderItemRepository;
+use Modules\Sales\Rules\MethodValidationRule;
 
 class OrderRepository extends BaseRepository
 {
@@ -47,7 +48,7 @@ class OrderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            $this->validateData($request);
+            $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
             
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);

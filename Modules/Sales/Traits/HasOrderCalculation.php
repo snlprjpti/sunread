@@ -3,12 +3,15 @@
 namespace Modules\Sales\Traits;
 
 use Exception;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Tax\Facades\TaxPrice;
 use Modules\Coupon\Entities\Coupon;
 use Modules\Customer\Entities\Customer;
 
 trait HasOrderCalculation
 {
+    use HasPayementCalculation, HasShippingCalculation;
+
     protected $discount_percent, $shipping_amount;
 
 	public function orderCalculationUpdate(object $order): void
@@ -41,7 +44,8 @@ trait HasOrderCalculation
                 "shipping_amount" => $shipping_amount,
                 "grand_total" => $grand_total,
                 "total_items_ordered" => $order->order_items->count(),
-                "total_qty_ordered" => $total_qty_ordered
+                "total_qty_ordered" => $total_qty_ordered,
+                // "status" => SiteConfig::fetch("")
             ]);
 
         }
