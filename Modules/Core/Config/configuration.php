@@ -1071,21 +1071,91 @@ return[
                 "title" => "Shipping Settings",
                 "subChildren" => [
                     [
-                        "title" => "Shipping Methods",
+                        "title" => "Origins",
                         "elements" => [
                             [
-                                "title" => "Choose Shipping Method",
-                                "path" => "choose_shipping_method",
+                                "title" => "Country",
+                                "path" => "country",
                                 "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
+                                "provider" => "Modules\Country\Entities\Country",
+                                "pluck" => ["id", "name"],
+                                "default" => "yes",
                                 "options" => [],
-                                "rules" => "exists:product_tax_groups,id",
+                                "rules" => "exists:countries,id",
                                 "multiple" => false,
                                 "scope" => "channel",
                                 "is_required" => 0,
-                                "sort_by" => "name"
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Region/State",
+                                "path" => "region_state",
+                                "type" => "select",
+                                "provider" => "Modules\Country\Entities\Region",
+                                "pluck" => ["id", "name"],
+                                "default" => "yes",
+                                "options" => [],
+                                "rules" => "exists:regions,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "ZIP/Postal Code",
+                                "path" => "zip_postal_code",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "City",
+                                "path" => "city",
+                                "type" => "text",
+                                "provider" => "Modules\Country\Entities\City",
+                                "pluck" => ["id", "name"],
+                                "default" => "yes",
+                                "options" => [],
+                                "rules" => "exists:cities,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Street Address",
+                                "path" => "street_address",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 0,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Street Address Line 2",
+                                "path" => "street_address_line_2",
+                                "type" => "text",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 0,
+                                "sort_by" => ""
                             ]
                         ]
                     ]   
@@ -1096,24 +1166,167 @@ return[
                     "title" => "Payment Methods",
                     "subChildren" => [
                         [
-                            "title" => "Payment Methods",
+                            "title" => "Bank Transfer Payment",
                             "elements" => [
                                 [
-                                    "title" => "Choose Payment Method",
-                                    "path" => "choose_payment_method",
+                                    "title" => "Enabled",
+                                    "path" => "enabled",
                                     "type" => "select",
-                                    "provider" => "Modules\Tax\Entities\ProductTaxGroup",
-                                    "pluck" => ["name", "id"],
-                                    "default" => "1",
-                                    "options" => [],
-                                    "rules" => "exists:product_tax_groups,id",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "yes",
+                                    "options" => [
+                                        [ "value" => "yes", "label" => "YES" ],
+                                        [ "value" => "no", "label" => "NO" ]
+                                    ],
+                                    "rules" => "in:yes,no",
                                     "multiple" => false,
                                     "scope" => "channel",
                                     "is_required" => 0,
-                                    "sort_by" => "name"
+                                    "sort_by" => ""
+                                ],
+                                [
+                                    "title" => "Title",
+                                    "path" => "title",
+                                    "type" => "text",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "yes",
+                                    "options" => [],
+                                    "rules" => "",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
+                                ],
+                                [
+                                    "title" => "New Order Status",
+                                    "path" => "new_order_status",
+                                    "type" => "select",
+                                    "provider" => "Modules\Sales\Entities\OrderStatus",
+                                    "pluck" => ["id", "name"],
+                                    "default" => "yes",
+                                    "options" => [],
+                                    "rules" => "exists:order_statuses,id",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
+                                ],
+                                [
+                                    "title" => "Payment From Applicable Countries",
+                                    "path" => "payment_from_applicable_countries",
+                                    "type" => "select",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "yes",
+                                    "options" => [
+                                        [ "value" => "all_allowed_countries", "label" => "All Allowed Countries" ],
+                                        [ "value" => "specific_countries", "label" => "Specific Counrtry" ]
+                                    ],
+                                    "rules" => "in:all_allowed_countries,specific_countries",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
+                                ],
+                                [
+                                    "title" => "Payment From Specific Countries",
+                                    "path" => "payment_from_specific_countries",
+                                    "type" => "select",
+                                    "provider" => "Modules\Country\Entities\Country",
+                                    "pluck" => ["id", "name"],
+                                    "default" => "yes",
+                                    "options" => [],
+                                    "rules" => "exists:countries,id",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
                                 ]
                             ]
-                        ]   
+                        ],
+                        [
+                            "title" => "Cash On Delivery Payment",
+                            "elements" => [
+                                [
+                                    "title" => "Enabled",
+                                    "path" => "enabled",
+                                    "type" => "select",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "yes",
+                                    "options" => [
+                                        [ "value" => "yes", "label" => "YES" ],
+                                        [ "value" => "no", "label" => "NO" ]
+                                    ],
+                                    "rules" => "in:yes,no",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
+                                ],
+                                [
+                                    "title" => "Title",
+                                    "path" => "title",
+                                    "type" => "text",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "yes",
+                                    "options" => [],
+                                    "rules" => "",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
+                                ],
+                                [
+                                    "title" => "New Order Status",
+                                    "path" => "new_order_status",
+                                    "type" => "select",
+                                    "provider" => "Modules\Sales\Entities\OrderStatus",
+                                    "pluck" => ["id", "name"],
+                                    "default" => "yes",
+                                    "options" => [],
+                                    "rules" => "exists:order_statuses,id",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
+                                ],
+                                [
+                                    "title" => "Payment From Applicable Countries",
+                                    "path" => "payment_from_applicable_countries",
+                                    "type" => "select",
+                                    "provider" => "",
+                                    "pluck" => [],
+                                    "default" => "yes",
+                                    "options" => [
+                                        [ "value" => "all_allowed_countries", "label" => "All Allowed Countries" ],
+                                        [ "value" => "specific_countries", "label" => "Specific Counrtry" ]
+                                    ],
+                                    "rules" => "in:all_allowed_countries,specific_countries",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
+                                ],
+                                [
+                                    "title" => "Payment From Specific Countries",
+                                    "path" => "payment_from_specific_countries",
+                                    "type" => "select",
+                                    "provider" => "Modules\Country\Entities\Country",
+                                    "pluck" => ["id", "name"],
+                                    "default" => "yes",
+                                    "options" => [],
+                                    "rules" => "exists:countries,id",
+                                    "multiple" => false,
+                                    "scope" => "channel",
+                                    "is_required" => 0,
+                                    "sort_by" => ""
+                                ]
+                            ]
+                        ], 
                     ]
                 ]
             ]
