@@ -192,6 +192,7 @@ return [
                                 "rules" => "",
                                 "is_required" => 0
                             ],
+                        ]
                     ],
                     [
                         "title" => "Advanced",
@@ -4117,7 +4118,6 @@ return [
                                         "rules" => "mimes:jpeg,jpg,bmp,png",
                                         "is_required" => 0
                                     ],
-
                                     [
                                         "title" => "Bottom Left Image",
                                         "slug" => "bottom_left_image",
@@ -4987,20 +4987,6 @@ return [
                                 "is_required" => 0
                             ],
                             [
-                                "title" => "Padding Left",
-                                "slug" => "padding_left",
-                                "hasChildren" => 0,
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "description" => "",
-                                "conditions" => [],
-                                "rules" => "",
-                                "is_required" => 0
-                            ],
-                            [
                                 "title" => "Padding Right",
                                 "slug" => "padding_right",
                                 "hasChildren" => 0,
@@ -5014,6 +5000,7 @@ return [
                                 "rules" => "",
                                 "is_required" => 0
                             ],
+                        ],
                     ],
                     [
                         "title" => "Advanced",
@@ -5837,5 +5824,4 @@ return [
             ]
         ]
     ],
-
 ];

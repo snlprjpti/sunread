@@ -128,6 +128,10 @@ return [
                     "type" => "select",
                     "value" => "",
                     "scope" => "website",
+                    "condition" => [
+                        [ "value" => 'image', "show" => 'background_image' ],
+                        [ "value" => 'video', "show" => 'background_video' ],
+                    ],
                     "options" => [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
