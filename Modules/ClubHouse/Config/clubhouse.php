@@ -66,7 +66,7 @@ return [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
                     ],
-                    "rules" => "in:image,video",
+                    "rules" => "nullable|in:image,video",
                     "multiple" => false,
                     "is_required" => 0
                 ],
@@ -81,7 +81,7 @@ return [
                         "value" => 'image'
                     ],
                     "options" => [],
-                    "rules" => "mimes:jpeg,jpg,bmp,png,gif|required_if:background_type,image",
+                    "rules" => "nullable|mimes:jpeg,jpg,bmp,png,gif|required_if:background_type,image",
                     "is_required" => 0
                 ],
                 [
@@ -95,7 +95,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "string|required_if:background_type,video",
+                    "rules" => "nullable|string|required_if:background_type,video",
                     "is_required" => 0
                 ],
             ]
@@ -165,7 +165,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "string",
+                    "rules" => "nullable|string",
                     "is_required" => 0
                 ],
                 [
@@ -175,7 +175,7 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
-                    "rules" => "string",
+                    "rules" => "nullable|string",
                     "is_required" => 0
                 ],
             ]
