@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Core\Entities\Website;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 use Modules\Core\Http\Controllers\BaseController;
@@ -74,6 +75,8 @@ class AddressController extends BaseController
                     "channel_id" => $channel_id
                 ];
             });
+            dd($data."<====>".SiteConfig::fetch("allow_countries", "channel", $channel_id) );
+
             $data = $this->repository->checkCountryRegionAndCity($data, $customer);
 
             $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
