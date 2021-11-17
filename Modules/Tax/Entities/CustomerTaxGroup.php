@@ -2,7 +2,7 @@
 
 namespace Modules\Tax\Entities;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,15 +20,9 @@ class CustomerTaxGroup extends Model
         return $this->belongsToMany(TaxRule::class);
     }
 
-    public function tax_rule_count(object $deleted): int
+    public function tax_group(): HasMany
     {
-        $tax_rule = DB::table("customer_tax_group_tax_rule")->where("customer_tax_group_id", $deleted->id)->count();
-        return $tax_rule;
+        return $this->hasMany(CustomerGroup::class);
     }
 
-    public function customer_group_count(object $deleted): int
-    {
-        $customer_group = CustomerGroup::whereCustomerTaxGroupId($deleted->id)->count();
-        return $customer_group;
-    }
 }
