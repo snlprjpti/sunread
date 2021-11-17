@@ -8,11 +8,12 @@ use Modules\Core\Facades\SiteConfig;
 
 class MethodValidationRule implements Rule
 {
-    protected $request, $attribute, $value;
+    protected $request, $attribute, $value, $config;
 
     public function __construct(object $request)
     {
         $this->request = $request;
+        $this->config = config("sales");
     }
 
     /**
@@ -24,15 +25,20 @@ class MethodValidationRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        dd(config('sales.shipping_methods'));
-        
-        dd($attribute, $value);
-        // if ( $attribute ==  "shipping_method")
+        $this->attribute = $attribute;
+        $this->value = $value;
+        if ( $attribute ==  "shipping_method")
         {
-            $channel = CoreCache::getChannel($value, $this->request->header("hc-channel"));
+            $shipping_methos = collect($this->config["shipping_methods"])->pluck("slug")->toArray();
+            if (!in_array($value, $shipping_methos)) return false;
+            $website = CoreCache::getWebsite($this->request->header("hc-host"));
+            $channel = CoreCache::getChannel($website, $this->request->header("hc-channel"));
+            dd($value);
             $value = SiteConfig::fetch($value, "channel", $channel->id);
-        }
+            dd($value);
 
+        }
+        return true;
         // if ( $value )
     }
 

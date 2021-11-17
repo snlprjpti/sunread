@@ -4,6 +4,8 @@ namespace Modules\Sales\Repositories\StoreFront;
 
 use Exception;
 use Illuminate\Bus\Batch;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
