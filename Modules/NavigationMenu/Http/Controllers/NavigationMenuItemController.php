@@ -115,15 +115,16 @@ class NavigationMenuItemController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
             ]);
 
-            $fetched = $this->repository->fetch($id);
-            if($fetched->navigation_menu_id !== $navigation_menu_id) throw new NavigationMenuItemNotFoundException();
+            $navigation_menu_item = $this->model->findOrFail($id);
+            $fetched = $this->repository->fetchWithAttributes($request, $navigation_menu_item);
+            if($fetched["navigation_menu_id"] !== $navigation_menu_id) throw new NavigationMenuItemNotFoundException();
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
     /**
@@ -194,7 +195,7 @@ class NavigationMenuItemController extends BaseController
     /**
      * Fetches and returns Attributes for NavigationMenuItem Values
      */
-    public function attributes(Request $request, int $navigation_menu_id): JsonResponse
+    public function attributes(Request $request): JsonResponse
     {
         try
         {

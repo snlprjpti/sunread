@@ -34,6 +34,7 @@ class NavigationMenuRepository extends BaseRepository
             "title" => "required|string|min:2|max:250",
             "website_id" => 'required|integer|exists:websites,id',
             "location" => ["string", new NavigationMenuLocationRule()],
+            "status" => "in:0,1"
         ];
     }
 
