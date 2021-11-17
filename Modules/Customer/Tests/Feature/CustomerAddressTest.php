@@ -4,7 +4,6 @@ namespace Modules\Customer\Tests\Feature;
 
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
-use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Country\Entities\City;
 use Modules\Customer\Entities\Customer;

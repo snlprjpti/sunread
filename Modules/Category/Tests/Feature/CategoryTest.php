@@ -32,7 +32,6 @@ class CategoryTest extends BaseTestCase
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
         $this->root_category_id = $this->model::oldest('id')->first()->id;
-        $this->hasStatusTest = true;
         $this->hasFilters = false;
         $this->hasStatusTest = false;
     }
