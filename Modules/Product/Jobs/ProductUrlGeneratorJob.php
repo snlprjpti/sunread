@@ -18,6 +18,9 @@ class ProductUrlGeneratorJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 10;
+    public $timeout = 90000;
+
     public function __construct()
     {
         //
