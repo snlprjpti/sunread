@@ -4,6 +4,7 @@ namespace Modules\Sales\Repositories\StoreFront;
 
 use Exception;
 use Illuminate\Bus\Batch;
+use Modules\Cart\Entities\Cart;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
@@ -13,12 +14,12 @@ use Modules\Core\Facades\SiteConfig;
 use Modules\Sales\Jobs\OrderTaxesJob;
 use Modules\Sales\Jobs\OrderCalculation;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Sales\Rules\MethodValidationRule;
 use Modules\Sales\Traits\HasOrderCalculation;
 use Modules\Sales\Traits\HasOrderProductDetail;
 use Modules\Sales\Repositories\OrderMetaRepository;
 use Modules\Sales\Repositories\OrderAddressRepository;
 use Modules\Sales\Repositories\StoreFront\OrderItemRepository;
-use Modules\Sales\Rules\MethodValidationRule;
 
 class OrderRepository extends BaseRepository
 {
@@ -48,10 +49,9 @@ class OrderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
+            // $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
             
             $coreCache = $this->getCoreCache($request);
-
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
             $data = [
                 "website_id" => $coreCache?->website->id,
@@ -94,8 +94,8 @@ class OrderRepository extends BaseRepository
                 $this->orderMetaRepository->store($request, $order);
             });
 
+            Cart::findOrFail($request->cart_hash_id);
             $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
-
             $jobs = [];
             foreach ( $items as $order_item ) 
             {

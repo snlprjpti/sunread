@@ -37,7 +37,7 @@ trait HasOrderCalculation
             $discount_amount = $this->calculateDiscount($order); // To-Do other discount will be added here...
             $shipping_amount = 0.00;  // To-Do need to fetch its actual amount.
             $grand_total = ($sub_total + $total_tax - $discount_amount);
-
+            $channel_id = $coreCache?->channel->id;
             $order->update([
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,
@@ -47,7 +47,10 @@ trait HasOrderCalculation
                 "total_items_ordered" => $order->order_items->count(),
                 "total_qty_ordered" => $total_qty_ordered,
                 // "status" => SiteConfig::fetch(""),
-                "shipping_method" => SiteConfig::fetch($request->shipping_method."_title", "channel", $coreCache?->channel->id)
+                "shipping_method" => SiteConfig::fetch($request->shipping_method."_method_name", "channel", $channel_id),
+                "shipping_method_label" => SiteConfig::fetch($request->shipping_method."_title", "channel", $channel_id),
+                "payment_method" => SiteConfig::fetch($request->payment_method."_titlr", "channel", $channel_id),
+                "payment_method_label" => SiteConfig::fetch($request->payment_method."_title", "channel", $channel_id),
             ]);
 
         }

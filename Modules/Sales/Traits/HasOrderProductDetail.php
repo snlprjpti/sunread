@@ -93,7 +93,7 @@ trait HasOrderProductDetail
         return $product_options;
     }
 
-    public function getAttributeValue(mixed $coreCache, object $product, string $slug): ?object
+    public function getAttributeValue(mixed $coreCache, object $product, string $slug): mixed
     {
         return $product->value([
             "scope" => "store",
