@@ -23,5 +23,6 @@
     "Sales": true,
     "ClubHouse": true,
     "Controller": true,
-    "OrderStatus": true
+    "OrderStatus": true,
+    "NavigationMenu": true
 }

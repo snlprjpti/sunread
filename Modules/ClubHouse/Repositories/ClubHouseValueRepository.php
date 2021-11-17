@@ -135,6 +135,7 @@ class ClubHouseValueRepository
     {
         try
         {
+
             $data = $this->club_house_repository->validateData($request, array_merge($this->getValidationRules($request, $club_house?->id, "update"), [
                 "items.slug.value" => new SlugUniqueRule($request, $club_house),
                 "scope" => "required|in:website,channel,store",

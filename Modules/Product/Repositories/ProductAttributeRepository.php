@@ -169,7 +169,10 @@ class ProductAttributeRepository extends ProductRepository
     {
         if(in_array($attribute->slug, $this->non_option_slug))
         {
-            if($attribute->slug == "tax_class_id") $attribute_options = CustomerTaxGroup::pluck("id")->toArray();
+            if($attribute->slug == "tax_class_id") { 
+                $attribute_options = CustomerTaxGroup::pluck("id")->toArray();
+                $attribute_options[] = 0;
+            }
             if($attribute->slug == "quantity_and_stock_status") $attribute_options = [ 0 => 0, 1 => 1];
         }
         else $attribute_options = AttributeOption::whereAttributeId($attribute->id)->pluck("id")->toArray();

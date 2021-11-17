@@ -8,6 +8,7 @@ return[
                 "subChildren" => [
                     [
                         "title" => "Country Options",
+                        "slug" => "country_options",
                         "elements" => [
                             [
                                 "title" => "Default Country",
@@ -72,6 +73,7 @@ return[
                     ],
                     [
                         "title" => "State Options",
+                        "slug" => "state_options",
                         "elements" => [
                             [
                                 "title" => "State Country",
@@ -91,6 +93,7 @@ return[
                     ],
                     [
                         "title" => "Store Information",
+                        "slug" => "store_information",
                         "elements" => [
                             [
                                 "title" => "Store Name",
@@ -280,6 +283,7 @@ return[
                     ],
                     [
                         "title" => "Locale Options",
+                        "slug" => "locale_options",
                         "elements" => [
                             [
                                 "title" => "Locale",
@@ -350,6 +354,7 @@ return[
                 "subChildren" => [
                     [
                         "title" => "General",
+                        "slug" => "general",
                         "elements" => [
                             [
                                 "title" => "Logo",
@@ -394,6 +399,7 @@ return[
                     ],
                     [
                         "title" => "Default Pages",
+                        "slug" => "default_pages",
                         "elements" => [
                             [
                                 "title" => "Home Page",
@@ -425,6 +431,7 @@ return[
                     ],
                     [
                         "title" => "Base URLs",
+                        "slug" => "base_urls",
                         "elements" => [
                             [
                                 "title" => "StoreFront Base URL",
@@ -471,9 +478,11 @@ return[
             ],
             [
                 "title" => "Currency Setup",
+                "slug" => "currency_setup",
                 "subChildren" => [
                     [
                         "title" => "Currency Options",
+                        "slug" => "currency_options",
                         "elements" => [
                             [
                                 "title" => "Channel Currency",
@@ -585,6 +594,7 @@ return[
                 "subChildren" => [
                     [
                         "title" => "Channel",
+                        "slug" => "channel",
                         "elements" => [
                             [
                                 "title" => "Default Channel",
@@ -604,6 +614,7 @@ return[
                     ],
                     [
                         "title" => "Store",
+                        "slug" => "store",
                         "elements" => [
                             [
                                 "title" => "Default Store",
@@ -628,6 +639,7 @@ return[
                 "subChildren" => [
                     [
                         "title" => "General",
+                        "slug" => "general",
                         "elements" => [
                             [
                                 "title" => "Sender Name",
@@ -659,6 +671,7 @@ return[
                     ],
                     [
                         "title" => "Templates",
+                        "slug" => "templates",
                         "elements" => [
                             [
                                 "title" => "Header",
@@ -703,6 +716,7 @@ return[
                 "subChildren" => [
                     [
                         "title" => "Product Fields Auto-Generation",
+                        "slug" => "product_fields_auto_generation",
                         "elements" => [
                             [
                                 "title" => "Mask for SKU",
@@ -771,6 +785,7 @@ return[
                 "subChildren" => [
                     [
                         "title" => "New Account Options",
+                        "slug" => "new_account_options",
                         "elements" => [
                             [
                                 "title" => "Default Customer Group",
@@ -807,6 +822,7 @@ return[
                     ],
                     [
                         "title" => "Password Options",
+                        "slug" => "password_options",
                         "elements" => [
                             [
                                 "title" => "Recovery Link Expiration Period (hours)",
@@ -840,6 +856,7 @@ return[
                     ],
                     [
                         "title" => "Email Templates",
+                        "slug" => "email_templates",
                         "elements" => [
                             [
                                 "title" => "Default Welcome Email Template",
@@ -926,6 +943,7 @@ return[
                 "subChildren" => [
                     [
                         "title" => "Tax Classes",
+                        "slug" => "tax_classes",
                         "elements" => [
                             [
                                 "title" => "Default Tax Class for Product",
@@ -959,6 +977,7 @@ return[
                     ],
                     [
                         "title" => "Calculation Settings",
+                        "slug" => "calculation_settings",
                         "elements" => [
                             [
                                 "title" => "Tax Calculation Method Based On",
