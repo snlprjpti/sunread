@@ -84,7 +84,7 @@ class NavigationMenuItemRepository extends BaseRepository
     {
         $data = [
             "scope" => $request->scope ?? "website",
-            "scope_id" => $request->scope_id ?? $navigation_menu_item->navigation_menu->website_id,
+            "scope_id" => $request->scope_id ?? $navigation_menu_item->navigationMenu->website_id,
             "navigation_menu_item_id" => $navigation_menu_item->id,
         ];
 
@@ -96,6 +96,7 @@ class NavigationMenuItemRepository extends BaseRepository
         $fetched = [
             "id" => $navigation_menu_item->id,
             "title" => $value?->value,
+            "navigation_menu_id" => $navigation_menu_item->navigation_menu_id,
         ];
 
         $fetched["attributes"] = $this->getConfigData($data);
