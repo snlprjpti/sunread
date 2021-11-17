@@ -112,7 +112,11 @@ class CustomerTaxGroupController extends BaseController
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function ($deleted){
+                $tax_rule_count = $this->model->tax_rule_count($deleted);
+                $tax_group_count = $this->model->customer_group_count($deleted);
+                if(($tax_group_count > 0) || ($tax_rule_count > 0)) throw new Exception($this->lang("response.delete-failed",["name" => $this->model_name]));
+            });
         }
         catch( Exception $exception )
         {
