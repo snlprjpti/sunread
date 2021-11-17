@@ -33,7 +33,6 @@ class NavigationMenuRepository extends BaseRepository
             // NavigationMenu validation
             "title" => "required|string|min:2|max:250",
             "website_id" => 'required|integer|exists:websites,id',
-            "slug" => "string|min:2|max:250|unique:navigation_menus,slug",
             "location" => ["string", new NavigationMenuLocationRule()],
         ];
     }
@@ -71,7 +70,7 @@ class NavigationMenuRepository extends BaseRepository
     /**
      * Check if Slug Exists. If not create it
      */
-    public function examineSlug(array $data): array
+    public function examineSlug(array $data, ?object $navigation_menu = null): array
     {
         if(!isset($data["slug"])) {
             $slug = Str::slug($data["title"]);
