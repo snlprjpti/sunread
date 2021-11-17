@@ -66,7 +66,8 @@ class ClubHouseController extends BaseController
     {
         try
         {
-            $website = CoreCache::getWebsite($request->header("hc-host"));
+            $coreCache = $this->repository->getCoreCache($request);
+            $website = $coreCache->website;
             $fetched = $this->repository->fetchWithSlug($club_house_slug, $website);
         }
         catch( Exception $exception )

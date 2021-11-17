@@ -61,10 +61,7 @@ return [
                     "type" => "select",
                     "value" => "",
                     "scope" => "website",
-                    "condition" => [
-                        [ "value" => 'image', "show" => 'background_image' ],
-                        [ "value" => 'video', "show" => 'background_video' ],
-                    ],
+                    "has_condition" => 1,
                     "options" => [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
@@ -79,6 +76,10 @@ return [
                     "type" => "file",
                     "value" => "",
                     "scope" => "website",
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'image'
+                    ],
                     "options" => [],
                     "rules" => "mimes:jpeg,jpg,bmp,png,gif|required_if:background_type,image",
                     "is_required" => 0
@@ -87,6 +88,10 @@ return [
                     "title" => "Background Video",
                     "slug" => "background_video",
                     "type" => "text",
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'video'
+                    ],
                     "value" => "",
                     "scope" => "website",
                     "options" => [],

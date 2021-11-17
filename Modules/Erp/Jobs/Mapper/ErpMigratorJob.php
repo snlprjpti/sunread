@@ -30,29 +30,34 @@ class ErpMigratorJob implements ShouldQueue
     {
         try
         {
-            $check_variants = ($this->getDetailCollection("productVariants", $this->detail->sku)->count() <= 1);
-            $type = ($check_variants) ? "simple" : "configurable";
-
-            $match = [
-                "website_id" => 1,
-                "sku" => $this->detail->sku
-            ];
-            $product_data = array_merge($match, [
-                "attribute_set_id" => 1,
-                "type" => $type,
-            ]);
-            if ($check_variants) $product_data["parent_id"] = null;
-            $product = Product::updateOrCreate($match, $product_data);
-            $product->categories()->sync(1);
-            //visibility attribute value
-            $visibility = ($check_variants) ? 8 : 5;
-            $this->createAttributeValue($product, $this->detail, false, $visibility);
+            $variants = $this->getDetailCollection("productVariants", $this->detail->sku);
+            $check_migratable_variants = ($this->getValue($variants)->filter(fn ($variant) => $variant["webActive"] == true)->count() >= 1);
+            $check_variants = ($this->getValue($variants)->filter(fn ($variant) => $variant["webActive"] == true)->count() <= 1);
             
-            if (!$check_variants) $this->createVariants($product, $this->detail);
-            $this->mapstoreImages($product, $this->detail);
+            if ($check_migratable_variants) {
+                $type = ($check_variants) ? "simple" : "configurable";
 
-            $this->createInventory($product, $this->detail);
-            ErpImportDetail::whereId($this->detail->id)->first()?->update(["status" => 1]);
+                $match = [
+                    "website_id" => 1,
+                    "sku" => $this->detail->sku
+                ];
+                $product_data = array_merge($match, [
+                    "attribute_set_id" => 1,
+                    "type" => $type,
+                ]);
+                if ($check_variants) $product_data["parent_id"] = null;
+                $product = Product::updateOrCreate($match, $product_data);
+                $product->categories()->sync(1);
+                //visibility attribute value
+                $visibility = ($check_variants) ? 8 : 5;
+                $this->createAttributeValue($product, $this->detail, false, $visibility);
+                
+                if (!$check_variants) $this->createVariants($product, $this->detail);
+                $this->mapstoreImages($product, $this->detail);
+    
+                $this->createInventory($product, $this->detail);
+                ErpImportDetail::whereId($this->detail->id)->first()?->update(["status" => 1]);
+            }
         }
         catch ( Exception $exception )
         {
