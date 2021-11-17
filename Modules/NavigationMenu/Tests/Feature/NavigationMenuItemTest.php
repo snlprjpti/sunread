@@ -1,93 +1,75 @@
 <?php
 
-namespace Modules\Category\Tests\Feature;
+namespace Modules\NavigationMenu\Tests\Feature;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
-use Modules\Category\Entities\Category;
-use Modules\Core\Entities\Store;
-use Modules\Core\Tests\BaseTestCase;
 use Illuminate\Support\Str;
-use Modules\Category\Entities\CategoryValue;
-use Modules\Core\Entities\Channel;
+use Illuminate\Http\UploadedFile;
 use Modules\Core\Entities\Website;
+use Modules\Core\Tests\BaseTestCase;
+use Illuminate\Support\Facades\Storage;
+use Modules\NavigationMenu\Entities\NavigationMenuItem;
 
-class CategoryTest extends BaseTestCase
+class NavigationMenuItemTest extends BaseTestCase
 {
-    protected int $root_category_id;
     protected $default_resource;
 
     public function setUp(): void
     {
-        $this->model = Category::class;
+        $this->model = NavigationMenuItem::class;
 
         parent::setUp();
         $this->admin = $this->createAdmin();
 
-        $this->model_name = "Category";
-        $this->route_prefix = "admin.catalog.categories";
+        $this->model_name = "Navigation Menu Item";
+        $this->route_prefix = "admin.navigation-menu-items";
 
         $this->model::factory(10)->create();
+
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
-        $this->root_category_id = $this->model::oldest('id')->first()->id;
-        $this->hasFilters = false;
         $this->hasStatusTest = false;
+        $this->hasFilters = false;
     }
 
     public function getCreateData(): array
     {
         Storage::fake();
+        $title = Str::random(20);
         return array_merge($this->model::factory()->make()->toArray(), [
             "items" => [
-                "name" => [
-                    "value" => Str::random(10)
-                ],
-                "image" => [
-                    "value" => UploadedFile::fake()->image("image.png")
-                ],
-                "slug" => [
-                    "value" => null
-                ],
-                "description" => [
-                    "value" => Str::random(20)
-                ],
-                "meta_title" => [
-                    "value" => Str::random(11)
-                ],
-                "meta_description" => [
-                    "value" => Str::random(15)
-                ],
-                "meta_keywords" => [
-                    "value" => Str::random(13)
+                "title" => [
+                    "value" => $title
                 ],
                 "status" => [
                     "value" => rand(0,1)
                 ],
-                "include_in_menu" => [
-                    "value" => rand(0,1)
-                ]
+                "type" => [
+                    "value" => "custom",
+                ],
+                "custom_link" => [
+                    "value" => Str::random(40),
+                ],
+                "additional_data" => [
+                    "value" => json_encode([])
+                ],
+                "order" => [
+                    "value" => rand(0,10)
+                ],
             ]
         ]);
     }
 
     public function getUpdateData(): array
     {
-        $websiteId = $this->default_resource->website_id;
+        $websiteId = $this->default_resource->navigationMenu->website_id;
         $updateData = $this->getCreateData();
-        unset($updateData["website_id"]);
         return array_merge($updateData, $this->getScope($websiteId));
     }
 
     public function testAdminCanFetchResources()
     {
         if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
-
-        $websiteId = Website::inRandomOrder()->first()->id;
-        $this->filter = array_merge($this->getScope($websiteId), [
-            "website_id" => $websiteId
-        ]);
 
         $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
 
@@ -98,24 +80,22 @@ class CategoryTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandatoryCreateData(): array
-    {
-        return array_merge($this->getCreateData(), [
-            "parent_id" => null
-        ]);
-    }
-
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "website_id" => null
+            "items" => [
+                "type" => [
+                    "value" => "invalid",
+                ],
+            ]
         ]);
     }
 
     public function getNonMandatoryUpdateData(): array
     {
-        return array_merge($this->getUpdateData(),[
-            "parent_id" => null
+        return array_merge($this->getUpdateData(), [
+            "type_id" => null,
+            "custom_link" => null,
         ]);
     }
 
@@ -133,26 +113,9 @@ class CategoryTest extends BaseTestCase
             "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
         ]);
     }
-
-    public function testAdminCanUpdateResourceWithPosition()
-    {
-        $category = Category::inRandomOrder()->first();
-        $post_data = [
-            "parent_id" => !in_array($this->default_resource_id, [$category->id, $category->parent_id]) ? $category->id : null,
-            "position" => rand(1,10)
-        ];
-        $response = $this->withHeaders($this->headers)->put($this->getRoute("position", [$this->default_resource_id]), $post_data);
-
-        $response->assertOk();
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.update-success", ["name" => $this->model_name])
-        ]);
-    }
-
     public function getScope($websiteId)
     {
-        $scope = Arr::random([ "website", "channel", "store" ]);
+        $scope = Arr::random(["website", "channel", "store"]);
         $channels = Website::find($websiteId)->channels;
         if(count($channels) > 0 ){
             switch($scope)

@@ -32,5 +32,5 @@ class RewriteBaseController
     protected function forwardResponse($url)
     {
         return Route::dispatch(Request::create('/'.ltrim($url, '/'), request()->getMethod()));
-    } 
+    }
 }
