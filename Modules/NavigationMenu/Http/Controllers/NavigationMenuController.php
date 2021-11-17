@@ -71,7 +71,9 @@ class NavigationMenuController extends BaseController
      {
          try
          {
-             $data = $this->repository->validateData($request);
+             $data = $this->repository->validateData($request, [
+                "slug" => "string|min:2|max:250|unique:navigation_menus,slug",
+             ]);
 
              $data = $this->repository->examineSlug($data);
 
@@ -109,7 +111,9 @@ class NavigationMenuController extends BaseController
      {
          try
          {
-            $data = $this->repository->validateData($request);
+            $data = $this->repository->validateData($request, [
+                "slug" => "string|min:2|max:250|unique:navigation_menus,slug," . $id,
+            ]);
 
             $data = $this->repository->examineSlug($data);
 

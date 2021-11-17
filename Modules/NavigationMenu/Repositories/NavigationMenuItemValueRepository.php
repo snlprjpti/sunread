@@ -137,11 +137,7 @@ class NavigationMenuItemValueRepository
             $data = $this->navigation_menu_item_repository->validateData($request, array_merge($this->getValidationRules($request, $navigation_menu_item?->id, $method), [
                 "scope" => "required|in:website,channel,store",
                 "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $navigation_menu_item?->id)]
-            ]), function () use ($navigation_menu_item) {
-                return [
-                    "navigation_menu_id" => $navigation_menu_item->navigation_menu_id,
-                ];
-            });
+            ]));
         }
         catch (Exception $exception)
         {
