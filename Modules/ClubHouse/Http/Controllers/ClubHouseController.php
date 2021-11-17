@@ -107,7 +107,6 @@ class ClubHouseController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $id)]
             ]);
             $club_house = $this->model->findOrFail($id);
-
             $fetched = $this->repository->fetchWithAttributes($request, $club_house);
         }
         catch (Exception $exception)

@@ -25,5 +25,6 @@
     "Controller": true,
     "OrderStatus": true,
     "ShippingMethods": true,
-    "PaymentMethods": true
+    "PaymentMethods": true,
+    "NavigationMenu": true
 }
