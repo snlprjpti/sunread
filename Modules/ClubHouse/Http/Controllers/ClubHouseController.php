@@ -106,16 +106,15 @@ class ClubHouseController extends BaseController
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new ClubHouseScopeRule($request, $id)]
             ]);
-            $club_house = $this->model->findOrFail($id);
 
-            $fetched = $this->repository->fetchWithAttributes($request, $club_house);
+            $fetched = $this->repository->fetch($id);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-success'));
+        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
     /**

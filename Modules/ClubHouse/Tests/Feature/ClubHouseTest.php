@@ -28,9 +28,8 @@ class ClubHouseTest extends BaseTestCase
 
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
-        $this->hasStatusTest = true;
-        $this->hasFilters = false;
         $this->hasStatusTest = false;
+        $this->hasFilters = false;
     }
 
     public function getCreateData(): array

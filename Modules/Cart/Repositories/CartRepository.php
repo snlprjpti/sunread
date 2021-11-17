@@ -315,9 +315,6 @@ class CartRepository extends BaseRepository
                     "scope_id" => $store->id,
                     "attribute_id" => $product_attribute->attribute->id
                 ];
-                if ($product_attribute->attribute->slug == "visibility") {
-                    if ($product->value($match)?->name == "Not Visible Individually") throw new ProductNotFoundIndividuallyException();
-                }
 
                 return (!$product_attribute->attribute->is_user_defined) ? [$product_attribute->attribute->slug => ($product_attribute->attribute->type == "select") ? $product->value($match)?->name : $product->value($match)] : [];
             })->toArray();
@@ -526,7 +523,7 @@ class CartRepository extends BaseRepository
         {
             $productStock = $product->catalog_inventories()->first();
             $qty = $request->qty ?? 1;
-            if ($productStock?->manage_stock && $productStock?->is_in_stock && $qty > $productStock?->quantity) {
+            if ($productStock?->is_in_stock && $qty > $productStock?->quantity) {
                 throw new OutOfStockException();
             }
         }
