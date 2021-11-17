@@ -53,7 +53,6 @@ class CustomerAddressTest extends BaseTestCase
             "value" => ["{$country->iso_2_code}"],
         ]);
 
-        dd(SiteConfig::fetch("allow_countries", "channel", $this->channel->id));
         return array_merge($this->model::factory()->make()->toArray(), [
             "customer_id" => $this->customer->id,
             "channel_id" => $this->channel->id,
