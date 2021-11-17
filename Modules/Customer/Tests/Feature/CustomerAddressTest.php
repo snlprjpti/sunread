@@ -4,6 +4,7 @@ namespace Modules\Customer\Tests\Feature;
 
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Configuration;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Country\Entities\City;
 use Modules\Customer\Entities\Customer;
@@ -52,6 +53,7 @@ class CustomerAddressTest extends BaseTestCase
             "value" => ["{$country->iso_2_code}"],
         ]);
 
+        dd(SiteConfig::fetch("allow_countries", "channel", $this->channel->id));
         return array_merge($this->model::factory()->make()->toArray(), [
             "customer_id" => $this->customer->id,
             "channel_id" => $this->channel->id,
