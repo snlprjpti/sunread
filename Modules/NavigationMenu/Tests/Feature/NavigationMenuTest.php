@@ -28,7 +28,7 @@ class NavigationMenuTest extends BaseTestCase
     public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
-            "status" => null
+            "testing" => null
         ]);
     }
 
