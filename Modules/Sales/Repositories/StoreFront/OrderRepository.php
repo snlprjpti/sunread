@@ -50,7 +50,6 @@ class OrderRepository extends BaseRepository
         try
         {
             // $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
-            
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
             $data = [

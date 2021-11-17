@@ -1411,23 +1411,6 @@ return[
                                 "sort_by" => ""
                             ],
                             [
-                                "title" => "Calculate Handling Fee",
-                                "path" => "delivery_method_flat_rate_calculate_handling_fee",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "fixed",
-                                "options" => [
-                                    [ "value" => "fixed", "label" => "Fixed" ],
-                                    [ "value" => "percent", "label" => "Percent" ]
-                                ],
-                                "rules" => "in:fixed,percent",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
                                 "title" => "Ship to Applicable Countries",
                                 "path" => "delivery_method_flat_rate_ship_from_applicable_countries",
                                 "type" => "select",
@@ -1453,37 +1436,6 @@ return[
                                 "default" => "yes",
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Show Method if Not Applicable",
-                                "path" => "delivery_method_flat_rate_show_method_if_not_applicable",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
-                                "options" => [
-                                    [ "value" => 1, "label" => "Yes" ],
-                                    [ "value" => 0, "label" => "No" ]
-                                ],
-                                "rules" => "boolean",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Sort Order",
-                                "path" => "delivery_method_flat_rate_sort_order",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
                                 "multiple" => false,
                                 "scope" => "channel",
                                 "is_required" => 0,
@@ -1596,37 +1548,6 @@ return[
                                 "default" => "iso_2_code",
                                 "options" => [],
                                 "rules" => "exists:countries,iso_2_code",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Show Method if Not Applicable",
-                                "path" => "delivery_method_free_shipping_show_method_if_not_applicable",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
-                                "options" => [
-                                    [ "value" => 1, "label" => "Yes" ],
-                                    [ "value" => 0, "label" => "No" ]
-                                ],
-                                "rules" => "boolean",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Sort Order",
-                                "path" => "delivery_method_free_shipping_sort_order",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
                                 "multiple" => false,
                                 "scope" => "channel",
                                 "is_required" => 0,
