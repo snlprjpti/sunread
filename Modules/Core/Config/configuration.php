@@ -5,6 +5,7 @@ return[
         "children" => [
             [
                 "title" => "General",
+                "slug" => "general",
                 "subChildren" => [
                     [
                         "title" => "Country Options",
@@ -351,6 +352,7 @@ return[
             ],
             [
                 "title" => "Web",
+                "slug" => "web",
                 "subChildren" => [
                     [
                         "title" => "General",
@@ -591,6 +593,7 @@ return[
             ],
             [
                 "title" => "Website Defaults",
+                "slug" => "website_defaults",
                 "subChildren" => [
                     [
                         "title" => "Channel",
@@ -636,6 +639,7 @@ return[
             ],
             [
                 "title" => "Email",
+                "slug" => "email",
                 "subChildren" => [
                     [
                         "title" => "General",
@@ -713,6 +717,7 @@ return[
         "children" => [
             [
                 "title" => "Catalog",
+                "slug" => "catalog",
                 "subChildren" => [
                     [
                         "title" => "Product Fields Auto-Generation",
@@ -782,6 +787,7 @@ return[
         "children" => [
             [
                 "title" => "Customer",
+                "slug" => "customer",
                 "subChildren" => [
                     [
                         "title" => "New Account Options",
@@ -940,6 +946,7 @@ return[
         "children" => [
             [
                 "title" => "Sales",
+                "slug" => "sales",
                 "subChildren" => [
                     [
                         "title" => "Tax Classes",
@@ -1088,9 +1095,11 @@ return[
             ],
             [
                 "title" => "Shipping Settings",
+                "slug" => "shipping_settings",
                 "subChildren" => [
                     [
                         "title" => "Origins",
+                        "slug" => "origins",
                         "elements" => [
                             [
                                 "title" => "Country",
@@ -1182,9 +1191,11 @@ return[
             ],
             [
                 "title" => "Payment Methods",
+                "slug" => "payment_methods",
                 "subChildren" => [
                     [
                         "title" => "Bank Transfer Payment",
+                        "slug" => "bank_transfer_payment",
                         "elements" => [
                             [
                                 "title" => "Enabled",
@@ -1266,6 +1277,7 @@ return[
                     ],
                     [
                         "title" => "Cash On Delivery Payment",
+                        "slug" => "cash_on_delivery_payment",
                         "elements" => [
                             [
                                 "title" => "Enabled",
@@ -1349,13 +1361,15 @@ return[
             ],
             [
                 "title" => "Delivery Methods",
+                "slug" => "delivery_methods",
                 "subChildren" => [
                     [
                         "title" => "Flat Rate",
+                        "slug" => "flat_rate",
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "delivery_method_flat_rate",
+                                "path" => "delivery_methods_flat_rate",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1464,10 +1478,11 @@ return[
                     ],
                     [
                         "title" => "Free Shipping",
+                        "slug" => "free_shipping",
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "delivery_method_free_shipping",
+                                "path" => "delivery_methods_free_shipping",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],

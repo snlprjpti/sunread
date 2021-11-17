@@ -24,20 +24,27 @@ class MethodValidationRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        dd(config('sales.shipping_methods'));
-        
-        dd($attribute, $value);
-        // if ( $attribute ==  "shipping_method")
-        {
-            $channel = CoreCache::getChannel($value, $this->request->header("hc-channel"));
-            $value = SiteConfig::fetch($value, "channel", $channel->id);
-        }
-
-        // if ( $value )
+        $this->attribute = $attribute;
+        $this->value = $value;
+        if ( $attribute ==  "shipping_method" ) return $this->check($value, "delivery_methods");
+        elseif ( $attribute ==  "payment_method" ) return $this->check($value, "payment_methods");
+        return true;
     }
 
     public function message(): string
     {
         return "{$this->value} is not valid {$this->attribute}.";
+    }
+
+    public function check(string $value, string $method): bool
+    {
+        $methods = SiteConfig::get($method);
+        $check_methods = $methods->pluck("slug")->toArray();
+        if (!in_array($value, $check_methods)) return false;
+        $website = CoreCache::getWebsite($this->request->header("hc-host"));
+        $channel = CoreCache::getChannel($website, $this->request->header("hc-channel"));
+        $value = SiteConfig::fetch("{$method}_{$value}", "channel", $channel->id);
+        if ($value) return true;
+        return false;
     }
 }
