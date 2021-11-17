@@ -25,6 +25,7 @@ return [
                         [ "value" => "page", "label" => "Page" ],
                         [ "value" => "custom", "label" => "Custom" ]
                     ],
+                    "has_condition" => 1,
                     "rules" => "string|in:category,page,custom",
                     "is_required" => 1
                 ],
@@ -34,6 +35,10 @@ return [
                     "type" => "select",
                     "value" => "",
                     "scope" => "website",
+                    "condition" => [
+                        "field" => 'type',
+                        "value" => 'category,page'
+                    ],
                     "options" => [],
                     "rules" => "required_if:items.type.value,page,category|integer",
                     "is_required" => 0
@@ -44,6 +49,10 @@ return [
                     "type" => "text",
                     "value" => "",
                     "scope" => "website",
+                    "condition" => [
+                        "field" => 'type',
+                        "value" => 'custom'
+                    ],
                     "options" => [],
                     "rules" => "required_if:items.type.value,custom|string",
                     "is_required" => 0
