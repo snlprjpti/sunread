@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Modules\Tax\Entities\CustomerTaxGroup;
+use Modules\Tax\Exceptions\CustomerTaxGroupCanNotBeDeleted;
 use Modules\Tax\Transformers\CustomerTaxGroupResource;
 use Modules\Tax\Repositories\CustomerTaxGroupRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,6 +22,9 @@ class CustomerTaxGroupController extends BaseController
         $this->repository = $customerTaxGroupRepository;
         $this->model = $customerTaxGroup;
         $this->model_name = "Customer Tax Group";
+        $exception_statuses = [
+            CustomerTaxGroupCanNotBeDeleted::class => 403
+        ];
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -115,7 +119,7 @@ class CustomerTaxGroupController extends BaseController
             $this->repository->delete($id, function ($deleted){
                 $tax_rule_count = $deleted->tax_rules->count();
                 $tax_group_count = $deleted->tax_group->count();
-                if(($tax_group_count > 0) || ($tax_rule_count > 0)) throw new Exception($this->lang("response.delete-failed",["name" => $this->model_name]));
+                if(($tax_group_count > 0) || ($tax_rule_count > 0)) throw new CustomerTaxGroupCanNotBeDeleted($this->lang("response.delete-failed", [ "name" => $this->model_name ]));
             });
         }
         catch( Exception $exception )
