@@ -2,6 +2,7 @@
 
 namespace Modules\Core\Http\Controllers;
 
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;

@@ -47,7 +47,7 @@ class PageController extends BaseController
         {
             $website = CoreCache::getWebsite($request->header("hc-host"));
             $fetched = $this->repository->fetchAll($request, callback:function () use ($website) {
-                return $this->model->whereWebsiteId($website->id);
+                return $this->model->whereWebsiteId($website->id)->where("status", 1);
             });
         }
         catch( Exception $exception )
@@ -69,6 +69,6 @@ class PageController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 }

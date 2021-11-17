@@ -12,5 +12,5 @@
 */
 
 Route::prefix('tax')->group(function() {
-    Route::get('/', 'TaxController@index');
+    // Route::get('/', 'TaxController@index');
 });

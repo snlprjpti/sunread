@@ -9,6 +9,7 @@ use Modules\Product\Entities\ProductAttribute;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\AttributeSet;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -40,7 +41,7 @@ class ProductAttributeRepository extends ProductRepository
             "gallery" => "gallery",
         ];
         $this->non_required_attributes = [ "price", "cost", "special_price", "special_from_date", "special_to_date", "quantity_and_stock_status" ];
-        $this->non_option_slug = [ "tax_class_id", "category_ids" ];
+        $this->non_option_slug = [ "tax_class_id", "category_ids", "quantity_and_stock_status" ];
     }
 
     public function attributeSetCache(): object
@@ -108,7 +109,14 @@ class ProductAttributeRepository extends ProductRepository
                     $all_product_attributes[] = $product_attribute;
                     continue;
                 }
+
                 $product_attribute["value"] = in_array($attribute->slug, $request_attribute_slugs) ? $single_attribute_collection->pluck("value")->first() : null;
+
+                if($method == "update" && ($attribute->type == "image" || $attribute->type == "file") && isset($product_attribute["value"])) {
+                    $bool_val = $this->handleFileIssue($product, $request, $attribute, $product_attribute["value"]);
+                    if($bool_val) continue;
+                }
+
                 if($attribute->slug == "url_key") $product_attribute["value"] = $this->createUniqueSlug($product, $request_attribute_collection, $product_attribute["value"]);
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 
@@ -129,7 +137,25 @@ class ProductAttributeRepository extends ProductRepository
         {
             throw $exception;
         }
-        return collect($all_product_attributes)->where("value", "!=", null)->toArray();
+        return $all_product_attributes;
+    }
+
+    public function handleFileIssue(object $product, object $request, object $attribute, mixed $value): bool
+    {
+        try
+        {
+            if ($value && !is_file($value)) {
+                $exist_file = $product->product_attributes()->whereAttributeId($attribute->id)->whereScope($request->scope ?? "website")->whereScopeId($request->scope_id ?? $product->website_id)->first();
+                if ($exist_file?->value?->value && (Storage::url($exist_file?->value?->value) == $value)) {
+                    return true;
+                }
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        return false;
     }
 
     public function optionValidation(object $attribute, mixed $values): void
@@ -144,6 +170,7 @@ class ProductAttributeRepository extends ProductRepository
         if(in_array($attribute->slug, $this->non_option_slug))
         {
             if($attribute->slug == "tax_class_id") $attribute_options = CustomerTaxGroup::pluck("id")->toArray();
+            if($attribute->slug == "quantity_and_stock_status") $attribute_options = [ 0 => 0, 1 => 1];
         }
         else $attribute_options = AttributeOption::whereAttributeId($attribute->id)->pluck("id")->toArray();
 
@@ -178,7 +205,7 @@ class ProductAttributeRepository extends ProductRepository
         }
     }
 
-    public function syncAttributes(array $data, object $product, array $scope, object $request, string $method = "store", ?string $product_type = null, ?array $update_attributes = null): bool
+    public function syncAttributes(array $data, object $product, array $scope, object $request, string $method = "store", ?string $product_type = null): bool
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.sync.before");
@@ -189,7 +216,6 @@ class ProductAttributeRepository extends ProductRepository
 
                 $scope_arr = $scope;
 
-                if($update_attributes && !in_array($product->id, $request->update_variants) && in_array($attribute["attribute_slug"], $update_attributes)) continue;
                 //removed some attributes in case of configurable products
                 if($product_type && in_array($attribute['attribute_slug'], $this->non_required_attributes)) continue;
 
@@ -220,7 +246,7 @@ class ProductAttributeRepository extends ProductRepository
                     "attribute_id" => $db_attribute->id
                 ];
 
-                if(isset($attribute["use_default_value"]) && $attribute["use_default_value"] == 1)
+                if((isset($attribute["use_default_value"]) && $attribute["use_default_value"] == 1) || !isset($attribute["value"]))
                 {
                     $product_attribute = ProductAttribute::where($match)->first();
                     if($product_attribute) $product_attribute->delete();
@@ -228,6 +254,7 @@ class ProductAttributeRepository extends ProductRepository
                 }
 
                 if(is_array($attribute["value"])) $attribute["value"] = json_encode($attribute["value"], JSON_NUMERIC_CHECK);
+                if(is_file($attribute["value"])) $attribute["value"] = $this->product_repository->storeScopeImage($attribute["value"], "product");
 
                 $product_attribute = ProductAttribute::updateOrCreate($match, $attribute);
 

@@ -15,14 +15,12 @@ use Modules\Attribute\Entities\Attribute;
 use Illuminate\Support\Str;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Attribute\Entities\AttributeOption;
-use Modules\Core\Entities\Website;
+use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Entities\AttributeOptionsChildProduct;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Entities\ProductAttributeString;
-use Modules\Product\Entities\ProductAttributeText;
-use Modules\Product\Jobs\ConfigurableIndexing;
-use Modules\Product\Jobs\VariantIndexing;
+use Modules\Product\Jobs\ProductIndexer;
 
 class ProductConfigurableRepository extends BaseRepository
 {
@@ -113,7 +111,7 @@ class ProductConfigurableRepository extends BaseRepository
             $this->parentVisibilitySetup($product, $scope);
 
             $productAttributes = collect($request_attributes)->reject(function ($item) {
-                return (($item["attribute_slug"] == "name") || ($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility") || ($item["attribute_slug"] == "url_key"));
+                return (($item["attribute_slug"] == "sku") || ($item["attribute_slug"] == "visibility") || ($item["attribute_slug"] == "url_key"));
             })->toArray();
 
             $this->state = [];
@@ -137,7 +135,7 @@ class ProductConfigurableRepository extends BaseRepository
     private function addVariant(object $product, mixed $permutation, object $request, array $productAttributes, array $scope, ?string $method): object
     {
         DB::beginTransaction();
-        Event::dispatch("{$this->model_key}.update-status.before");
+        Event::dispatch("{$this->model_key}.attibutes.sync.before");
 
         try 
         {
@@ -152,7 +150,6 @@ class ProductConfigurableRepository extends BaseRepository
 
             $product_attributes = [];
             $this->configurable_attribute_options = [];
-
             $variant_options = collect($permutation)->map(function ($option, $key) {
                 $this->configurable_attribute_options[] = $option;
                 $att_data = Attribute::find($key);
@@ -168,8 +165,11 @@ class ProductConfigurableRepository extends BaseRepository
             // create variant simple product
             if(isset($child_variant))
             {
-                $product_variant = $this->update($data, $child_variant->id, function ($variant) use ($product, $permutation_modify, $request, &$product_attributes, $productAttributes, $scope, $variant_options) {
-                    $this->syncConfigurableAttributes($product, $permutation_modify, $request, $product_attributes, $productAttributes, $scope, $variant_options, $variant, $request->update_attributes);
+                $product_variant = $this->update($data, $child_variant->id, function ($variant) use ($request, $productAttributes, $scope) {
+                    if($request->update_variants && in_array($variant->id, $request->update_variants)) {
+                        $update_productAttributes = collect($productAttributes)->whereIn("attribute_slug", $request->update_attributes)->toArray();
+                        $this->product_attribute_repository->syncAttributes($update_productAttributes, $variant, $scope, $request, "store");
+                    }
                 });
             }
             else
@@ -216,19 +216,14 @@ class ProductConfigurableRepository extends BaseRepository
         return $data ?? null;
     }
 
-    private function syncConfigurableAttributes(object $product, array $permutation_modify, object $request, array &$product_attributes, array $productAttributes, array $scope, array $variant_options, object $variant, ?array $update_attributes = null): void
+    private function syncConfigurableAttributes(object $product, array $permutation_modify, object $request, array &$product_attributes, array $productAttributes, array $scope, array $variant_options, object $variant): void
     {
         try 
         {
             $visibility = $this->childVisibilitySetup($variant_options, $variant);
+            $name = collect($productAttributes)->where("attribute_slug", "name")->first();
 
             $product_attributes = array_merge([
-                [
-                    // Attrubute name
-                    "attribute_slug" => "name",
-                    "value" => $product->sku."_".implode("_", $permutation_modify),
-                    "value_type" => "Modules\Product\Entities\ProductAttributeString"
-                ],
                 [
                     //Attribute slug
                     "attribute_slug" => "sku",
@@ -236,14 +231,14 @@ class ProductConfigurableRepository extends BaseRepository
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ],
                 [
-                    //Attribute slug
+                    //Attribute Url Key
                     "attribute_slug" => "url_key",
-                    "value" => Str::slug($product->sku)."_".implode("_", $permutation_modify),
+                    "value" => $this->createSlug(Str::slug($name["value"])),
                     "value_type" => "Modules\Product\Entities\ProductAttributeString"
                 ],
             ], $productAttributes, $variant_options, [ $visibility ]);
 
-            $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store", update_attributes:$update_attributes);
+            $this->product_attribute_repository->syncAttributes($product_attributes, $variant, $scope, $request, "store");
 
             array_map(function($child_attribute_option) use($variant) {
                 AttributeOptionsChildProduct::updateOrCreate([
@@ -294,10 +289,13 @@ class ProductConfigurableRepository extends BaseRepository
                 "product_id" => $product->id,
                 "attribute_id" => 11
             ]))->first();
-            $product_attribute_string = ProductAttributeString::find($parent_product_attributes->value_id);
 
-            if($this->group_by_attribute) $product_attribute_string->update(["value" => $this->getVisibilityId("Not Visible Individually")]);
-            else $product_attribute_string->update(["value" => $this->getVisibilityId("Catalog, Search")]);
+            if($parent_product_attributes) {
+                $product_attribute_string = ProductAttributeString::find($parent_product_attributes->value_id);
+
+                if($this->group_by_attribute) $product_attribute_string->update(["value" => $this->getVisibilityId("Not Visible Individually")]);
+                else $product_attribute_string->update(["value" => $this->getVisibilityId("Catalog, Search")]);
+            }
         }
         catch ( Exception $exception )
         {
@@ -340,22 +338,63 @@ class ProductConfigurableRepository extends BaseRepository
     public function configurableIndexing(object $configurable_product): void
     {
         try 
-        { 
-            $stores = Website::find($configurable_product->website_id)->channels->map(function ($channel) {
-                return $channel->stores;
-            })->flatten(1);
-            $variants = $configurable_product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
-
+        {
             $batch = Bus::batch([])->onQueue("index")->dispatch();
-
-            foreach( $stores as $store) {
-                $batch->add(new ConfigurableIndexing($configurable_product, $store));
-                foreach($variants as $variant) $batch->add(new VariantIndexing($configurable_product, $variants, $variant, $store));
-            }
+            $batch->add(new ProductIndexer($configurable_product)); 
         }
         catch ( Exception $exception )
         {
             throw $exception;
         }
+    }
+
+    public function createSlug(string $title, int $id = 0): string
+    {
+       try
+       {
+            // Slugify
+            $slug = Str::slug($title);
+            $original_slug = $slug;
+
+            // Throw Error if slug could not be generated
+            if ($slug == "") throw new SlugCouldNotBeGenerated();
+
+            // Get any that could possibly be related.
+            // This cuts the queries down by doing it once.
+            $allSlugs = $this->getRelatedSlugs($slug, $id);
+
+            // If we haven't used it before then we are all good.
+            if (!$allSlugs->contains('value', $slug)) return $slug;
+
+            //if used,then count them
+            $count = $allSlugs->count();
+
+            // Loop through generated slugs
+            while ($this->checkIfSlugExist($slug, $id) && $slug != "") {
+                $slug = "{$original_slug}-{$count}";
+                $count++;
+            }
+       }
+       catch ( Exception $exception )
+       {
+           throw $exception;
+       }
+
+        // Finally return Slug
+        return $slug;
+    }
+
+    private function getRelatedSlugs(string $slug, int $id = 0): object
+    {
+        return ProductAttributeString::whereRaw("value RLIKE '^{$slug}(-[0-9]+)?$'")
+            ->where('id', '<>', $id)
+            ->get();
+    }
+
+    private function checkIfSlugExist(string $slug, int $id = 0): ?bool
+    {
+        return ProductAttributeString::select('value')->where('value', $slug)
+            ->where('id', '<>', $id)
+            ->exists();
     }
 }

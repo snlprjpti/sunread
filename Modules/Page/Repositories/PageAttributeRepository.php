@@ -228,7 +228,7 @@ class PageAttributeRepository extends BaseRepository
                 } 
 
                 if ($element["hasChildren"] == 0) {
-                    if ( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery((object) $element, $element["pluck"]);
+                    //if ( $element["provider"] !== "" ) $element["options"] = $this->cacheQuery($element);
                     unset($element["pluck"], $element["provider"]);
 
                     setDotToArray($append_key, $this->parent, $element);           

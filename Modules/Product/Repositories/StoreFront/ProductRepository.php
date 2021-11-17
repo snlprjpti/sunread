@@ -23,12 +23,17 @@ use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
+use Modules\Page\Repositories\StoreFront\PageRepository;
+use Modules\Product\Repositories\ProductFormatRepository;
+use Modules\Product\Repositories\StoreFront\ProductFormatRepository as StoreFrontProductFormatRepository;
+use Modules\Tax\Facades\TaxPrice;
 
 class ProductRepository extends BaseRepository
 {
-    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product, $config_products;
+    public $search_repository, $categoryRepository, $page_groups, $config_fields, $count, $mainAttribute, $nested_product = [], $config_products = [], $pageRepository, $final_product_val = [], $product_format_repo;
 
-    public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository)
+    public function __construct(Product $product, ProductSearchRepository $search_repository, CategoryRepository $categoryRepository, PageRepository $pageRepository, StoreFrontProductFormatRepository $product_format_repo)
     {
         $this->model = $product;
         $this->search_repository = $search_repository;
@@ -36,17 +41,18 @@ class ProductRepository extends BaseRepository
         $this->model_name = "Product";
         $this->page_groups = ["hero_banner", "usp_banner_1", "usp_banner_2", "usp_banner_3"];
         $this->config_fields = config("category.attributes");
+        $this->pageRepository = $pageRepository;
+        $this->product_format_repo = $product_format_repo;
         $this->count = 0;
-        $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date"];
-        $this->nested_product = [];
-        $this->config_products = [];
+        $this->mainAttribute = [ "name", "sku", "type", "url_key", "quantity", "visibility", "price", "special_price", "special_from_date", "special_to_date", "short_description", "description", "meta_title", "meta_keywords", "meta_description", "new_from_date", "new_to_date", "animated_image", "disable_animation"];
     }
 
-    public function productDetail(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
+    public function show(object $request, mixed $identifier, ?int $parent_identifier = null): ?array
     {
         try
         {
             $coreCache = $this->getCoreCache($request);
+            
             $relations = [
                 "catalog_inventories",
                 "images",
@@ -81,7 +87,24 @@ class ProductRepository extends BaseRepository
                 ->whereWebsiteId($coreCache->website->id)
                 ->whereStatus(1)->with($relations)->firstOrFail();    
             }
-            
+
+            $cache_name = "product_detail_{$product->id}_{$coreCache->channel->id}_{$coreCache->store->id}";
+            $product_details = Cache::rememberForever($cache_name, function () use($request, $product, $coreCache, $parent_identifier) {
+                return $this->productDetail($request, $product, $coreCache, $parent_identifier);
+            });
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $product_details;
+    }
+
+    public function productDetail(object $request, object $product, object $coreCache, ?int $parent_identifier = null): ?array
+    {
+        try
+        {
             $store = $coreCache->store;
 
             $attribute_set = AttributeSet::where("id", $product->attribute_set_id)->first();
@@ -104,26 +127,13 @@ class ProductRepository extends BaseRepository
                 if ( !$parent_identifier && $attribute->slug == "visibility" && $values?->name == "Not Visible Individually" ) throw new ProductNotFoundIndividuallyException();
 
                 if($attribute->slug == "gallery") {
-                    $data["image"] = $this->getBaseImage($product);
-                    $data["gallery"] = $product->images()->wherehas("types", function($query) {
-                        $query->whereSlug("gallery");
-                    })->get()->map(function ($gallery) {
-                        return [
-                            "url" => Storage::url($gallery->path),
-                            "background_color" => $gallery->background_color
-                        ];
-                    })->toArray();
+                    $data = $this->getProductImages($product, $data);
                     continue;
                 }
 
                 if($attribute->slug == "component") {
-                    $data["product_builder"] = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get()->map(function($builder) {
-                        return [
-                            "component" => $builder->attribute,
-                            "attributes" => $builder->value,
-                            "position" => $builder->position
-                        ];
-                    })->toArray();
+                    $product_builders = $this->getProductComponents($product, $store, $match);
+                    $data["product_builder"] = $product_builders ? $this->pageRepository->getComponent($coreCache, $product_builders) : [];
                     continue;
                 }
 
@@ -136,12 +146,17 @@ class ProductRepository extends BaseRepository
                 if(in_array($attribute->type, [ "select", "multiselect", "checkbox" ]))
                 {
                     if ($values instanceof Collection) $data[$attribute->slug] = $values->pluck("name")->toArray();
-                    else $data[$attribute->slug] = $values?->name;
+                    else {
+                        $data[$attribute->slug] = $values?->name;
+                        if($attribute->slug == "tax_class_id") $data["tax_class"] = $values?->id;
+                    }
                     continue;
                 }
 
                 if(!in_array($attribute->slug, $this->mainAttribute)) $data["attributes"][$attribute->slug] = $values;
                 else $data[$attribute->slug] = $values;
+
+                if(($attribute->type == "image" || $attribute->type == "file") && $values) $data[$attribute->slug] = Storage::url($values);
 
             }
 
@@ -149,44 +164,21 @@ class ProductRepository extends BaseRepository
             $inventory = $product->catalog_inventories()->select("quantity", "is_in_stock")->first()?->toArray();
             $fetched = array_merge($fetched, $inventory, $data);
 
-            $today = date('Y-m-d');
-            $currentDate = date('Y-m-d H:m:s', strtotime($today));
-            
-            if(isset($fetched["special_price"])) {
-                if(isset($fetched["special_from_date"])) $fromDate = date('Y-m-d H:m:s', strtotime($fetched["special_from_date"]));
-                if(isset($fetched["special_to_date"])) $toDate = date('Y-m-d H:m:s', strtotime($fetched["special_to_date"])); 
-                if(!isset($fromDate) && !isset($toDate)) $fetched["special_price_formatted"] = PriceFormat::get($fetched["special_price"], $store->id, "store");
-                else $fetched["special_price_formatted"] = (($currentDate >= $fromDate) && ($currentDate <= $toDate)) ? PriceFormat::get($fetched["special_price"], $store->id, "store") : null;
-            }
+            $fetched = $this->product_format_repo->getProductInFormat($fetched, $request, $store);
 
-            if(isset($fetched["price"])) $fetched["price_formatted"] = isset($fetched["price"]) ? PriceFormat::get($fetched["price"], $store->id, "store") : null;
+            if(isset($fetched["disable_animation"])  && isset($fetched["animated_image"])) $fetched = $this->getAnimatedImage($fetched);
 
-            if(isset($fetched["new_from_date"]) && isset($fetched["new_to_date"])) { 
-                if(isset($fetched["new_from_date"])) $fromNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_from_date"]));
-                if(isset($fetched["new_to_date"])) $toNewDate = date('Y-m-d H:m:s', strtotime($fetched["new_to_date"])); 
-                if(isset($fromNewDate) && isset($toNewDate)) $fetched["is_new_product"] = (($currentDate >= $fromNewDate) && ($currentDate <= $toNewDate)) ? 1 : 0;
-                unset($fetched["new_from_date"], $fetched["new_to_date"]);
-            }
+            $this->nested_product = [];
+            $this->config_products = [];
+            $this->final_product_val = [];
 
             if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
-                if(isset($product->parent_id)) $product = $product->parent;
-                $variant_ids = $product->variants->pluck("id")->toArray();
-                $elastic_fetched = [
-                    "_source" => ["show_configurable_attributes"],
-                    "query"=> [
-                        "bool" => [
-                            "must" => [
-                                $this->search_repository->terms("id", $variant_ids)
-                            ]
-                        ]   
-                    ],
-                ]; 
-                $elastic_data =  $this->search_repository->searchIndex($elastic_fetched, $store); 
-                $elastic_variant_products = isset($elastic_data["hits"]["hits"]) ? collect($elastic_data["hits"]["hits"])->pluck("_source.show_configurable_attributes")->flatten(1)->toArray() : [];
+
+                $elastic_variant_products = $this->getConfigurableAttributesFromElasticSearch($product, $store);
                 $this->config_products = $elastic_variant_products;
-                
-                $this->getVariations($elastic_variant_products);  
-                $fetched["configurable_products"] = $this->xyz;          
+
+                $this->getVariations($elastic_variant_products);
+                $fetched["configurable_products"] = $this->final_product_val;
             }
         }
         catch (Exception $exception)
@@ -197,50 +189,143 @@ class ProductRepository extends BaseRepository
         return $fetched;
     }
 
+    public function getProductComponents(object $product, object $store, array $match): object
+    {
+        try
+        {
+            $product_builders = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
+            if($product_builders->isEmpty()) $product_builders = $product->getBuilderParentValues($match);
+           
+            //fetch from parent product
+            if($product_builders->isEmpty() && $product->parent_id) {
+                $product_builders = $product->parent->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
+                if($product_builders->isEmpty()) $product_builders = $product->parent->getBuilderParentValues($match);
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $product_builders;
+    }
+
+    public function getProductImages(object $product, array $data): array
+    {
+        try
+        {
+            $data["image"] = $this->getBaseImage($product);
+
+            $data["rollover_image"] = $this->getImages($product, "rollover_image");
+
+            $data["gallery"] = $product->images()->wherehas("types", function($query) {
+                $query->whereSlug("gallery");
+            })->get()->map(function ($gallery) {
+                return [
+                    "url" => Storage::url($gallery->path),
+                    "background_color" => $gallery->background_color
+                ];
+            })->toArray();
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $data;
+    }
+
+    public function getAnimatedImage(array $fetched): array
+    {
+        try
+        {
+            $fetched["animated_images"] = [
+                "animated_image" => $fetched["animated_image"],
+                "disable_animation" => $fetched["disable_animation"]
+            ];
+            unset($fetched["animated_image"], $fetched["disable_animation"] );
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function getConfigurableAttributesFromElasticSearch(object $product, object $store): array
+    {
+        try
+        {
+            if(isset($product->parent_id)) $product = $product->parent;
+            $variant_ids = $product->variants->pluck("id")->toArray();
+            $elastic_fetched = [
+                "_source" => ["show_configurable_attributes"],
+                "size" => count($variant_ids),
+                "query"=> [
+                    "bool" => [
+                        "must" => [
+                            $this->search_repository->terms("id", $variant_ids)
+                        ]
+                    ]   
+                ],
+            ]; 
+            $elastic_data =  $this->search_repository->searchIndex($elastic_fetched, $store); 
+            $elastic_variant_products = isset($elastic_data["hits"]["hits"]) ? collect($elastic_data["hits"]["hits"])->pluck("_source.show_configurable_attributes")->flatten(1)->toArray() : [];
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $elastic_variant_products;
+    }
+
     public function getVariations(array $elastic_variant_products, ?string $key = null)
     {
         try
         {
-            $attribute_slugs = collect($elastic_variant_products)->pluck("attribute_slug")->unique()->values()->toArray();       
+            $attribute_slugs = collect($elastic_variant_products)->pluck("attribute_slug")->unique()->values()->toArray();
             foreach($attribute_slugs as $attribute_slug)
             {
                 $state = [];
-                
+
                 $attribute_values = collect($elastic_variant_products)->where("attribute_slug", $attribute_slug)->values()->toArray();
                 $variations = collect($elastic_variant_products)->where("attribute_slug", "!=", $attribute_slug)->values()->toArray();
-                $count = collect($attribute_values)->unique("id")->count(); 
+                //$count = collect($attribute_values)->unique("id")->count();
 
                 $j = 0;
                 foreach($attribute_values as $attribute_value)
                 {
                     $append_key = $key ? "$key.{$attribute_slug}.{$j}" : "{$attribute_slug}.{$j}";
-                    $abc = [];
+                    $product_val_array = [];
                     if(!isset($state[$attribute_value["id"]])) {
                         $state[$attribute_value["id"]] = true;
-                        $abc["value"] = $attribute_value["id"];
-                        $abc["label"] = $attribute_value["label"];
-                        $abc["code"] = $attribute_value["code"];
+                        $product_val_array["value"] = $attribute_value["id"];
+                        $product_val_array["label"] = $attribute_value["label"];
+                        $product_val_array["code"] = $attribute_value["code"];
                         if($attribute_value["attribute_slug"] == "color") {
-                            $abc["url_key"] = $attribute_value["url_key"];
-                            $abc["image"] = $attribute_value["image"];
+                            $visibility_item = collect($attribute_values)->where("visibility", 8)->where("id", $attribute_value["id"])->first();
+                            $product_val_array["url_key"] = isset($visibility_item["url_key"]) ? $visibility_item["url_key"] : $attribute_value["url_key"];
+                            $product_val_array["image"] = isset($visibility_item["image"]) ? $visibility_item["image"] : $attribute_value["image"];
                         }
                         if(count($attribute_slugs) == 1) {
                             $fake_array = array_merge($this->nested_product, [$attribute_value["attribute_slug"] => $attribute_value["id"]]);
                             $dot_product = collect($this->config_products)->where("attribute_combination", $fake_array)->first();
-                            $abc["product_id"] = isset($dot_product["product_id"]) ? $dot_product["product_id"] : 0;
-                            $abc["sku"] = isset($dot_product["product_sku"]) ? $dot_product["product_sku"] : 0;
-                            $abc["stock_status"] = isset($dot_product["stock_status"]) ? $dot_product["stock_status"] : 0;
-                            if($count == ($j+1)) $this->nested_product = [];
-                        } 
-                        setDotToArray($append_key, $this->xyz,  $abc);
+                            $product_val_array["product_id"] = isset($dot_product["product_id"]) ? $dot_product["product_id"] : 0;
+                            $product_val_array["sku"] = isset($dot_product["product_sku"]) ? $dot_product["product_sku"] : 0;
+                            $product_val_array["stock_status"] = isset($dot_product["stock_status"]) ? $dot_product["stock_status"] : 0;
+                            //if($count == ($j+1)) $this->nested_product = [];
+                        }
+                        setDotToArray($append_key, $this->final_product_val,  $product_val_array);
                         $j = $j + 1;
                         if(count($attribute_slugs) > 1) {
-                            $this->nested_product = [ $attribute_value["attribute_slug"] => $attribute_value["id"] ];
-                            $this->getVariations($variations, "{$append_key}.variations"); 
-                        }  
+                            $this->nested_product[ $attribute_value["attribute_slug"] ] = $attribute_value["id"];
+                            $this->getVariations($variations, "{$append_key}.variations");
+                        }
                     }
                 }
-            }     
+            }
         }
         catch(Exception $exception)
         {
@@ -248,7 +333,7 @@ class ProductRepository extends BaseRepository
         }
     }
 
-    Public function getBaseImage($product): ?array
+    public function getBaseImage($product): ?array
     {
         try
         {
@@ -256,6 +341,26 @@ class ProductRepository extends BaseRepository
                 $query->whereSlug("base_image");
             })->first();
             if(!$image) $image = $product->images()->first();
+            $path = $image ? Storage::url($image->path) : $image;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return [
+            "url" => $path,
+            "background_color" => $image?->background_color
+        ];
+    }
+
+    public function getImages($product, $image_name): ?array
+    {
+        try
+        {
+            $image = $product->images()->wherehas("types", function($query) use($image_name) {
+                $query->whereSlug($image_name);
+            })->first();
             $path = $image ? Storage::url($image->path) : $image;
         }
         catch (Exception $exception)
@@ -283,7 +388,7 @@ class ProductRepository extends BaseRepository
             throw $exception;
         }
 
-        return $category;  
+        return $category;
     }
 
     public function getOptions(object $request, string $category_slug): ?array
@@ -294,7 +399,7 @@ class ProductRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $category = $this->getCategory($scope, $category_slug);
 
@@ -318,7 +423,7 @@ class ProductRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $category = $this->getCategory($scope, $category_slug);
 
@@ -342,14 +447,14 @@ class ProductRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $category = $this->getCategory($scope, $category_slug);
 
             $fetched["category"] = $this->getPages($category, $scope);
             if($category->parent_id) $parent = Category::findOrFail($category->parent_id);
             $fetched["navigation"] = $this->categoryRepository->getCategories(isset($parent) ? $parent->children : $category->children, $scope);
-            $fetched["breadcrumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null); 
+            $fetched["breadcrumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null);
         }
         catch (Exception $exception)
         {
@@ -367,7 +472,7 @@ class ProductRepository extends BaseRepository
 
             $data["id"] = $category->id;
             foreach(["name", "slug", "description"] as $key) $data[$key] = $category->value($scope, $key);
-    
+
             foreach($this->page_groups as $group)
             {
                 $item = [];
@@ -413,7 +518,7 @@ class ProductRepository extends BaseRepository
             $scope = [
                 "scope" => "store",
                 "scope_id" => $coreCache->store->id
-            ]; 
+            ];
 
             $fetched = $this->search_repository->getSearchProducts($request, $coreCache->store);
         }

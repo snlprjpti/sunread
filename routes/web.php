@@ -18,10 +18,3 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/check', function (\Illuminate\Http\Request $request) {
-    $ip = \Modules\Tax\Facades\GeoIp::clientIp();
-    return response()->json([
-        "ip" => $ip
-    ]);
-    //return view('check');
-});

@@ -28,7 +28,7 @@ class ChannelTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandodtaryUpdateData(): array
+    public function getNonMandatoryUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
             "description" => null

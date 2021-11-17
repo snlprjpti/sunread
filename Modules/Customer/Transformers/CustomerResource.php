@@ -36,6 +36,7 @@ class CustomerResource extends JsonResource
             "is_lock" => (bool) $this->is_lock,
             "last_login_at" => ($this->last_login_at) ? $this->last_login_at->format('M d, Y H:i A') : "Never Logged in",
             "account_type" => $this->account_type,
+            "phone" => $this->phone,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }

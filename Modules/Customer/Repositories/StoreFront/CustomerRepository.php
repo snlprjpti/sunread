@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Notification\Events\ConfirmEmail;
+use Modules\Notification\Events\NewAccount;
+use Modules\Notification\Events\RegistrationSuccess;
 
 class CustomerRepository extends BaseRepository
 {
@@ -31,7 +34,8 @@ class CustomerRepository extends BaseRepository
             "email" => "required|email|unique:customers,email",
             "gender" => "required|in:male,female,other",
             "date_of_birth" => "date|before:today",
-            "subscribed_to_news_letter" => "sometimes|boolean"
+            "subscribed_to_news_letter" => "sometimes|boolean",
+            "phone" => "nullable"
         ];
     }
 
@@ -192,5 +196,61 @@ class CustomerRepository extends BaseRepository
         DB::commit();
 
         return $updated;
+    }
+
+    public function sendRegistrationEmail(object $customer, object $request): bool
+    {
+        try
+        {
+            event(new RegistrationSuccess($customer->id));
+            $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $request->website_id);
+            if($required_email_confirm == 1) {
+                event(new NewAccount($customer->id, $customer->verification_token));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
+    }
+
+    public function sendVerificationLink(object $customer): bool
+    {
+        try
+        {
+            $required_email_confirm = SiteConfig::fetch("require_email_confirmation", "website", $customer->website_id);
+            if($required_email_confirm == 1) {
+                $customer["verification_token"] = Str::random(30);
+                $customer->save();
+
+                event(new NewAccount($customer->id, $customer->verification_token));
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
+    }
+
+    public function verifyCustomerAccount(object $customer): bool
+    {
+        try
+        {
+            $customer->is_email_verified = 1;
+            $customer->verification_token = null;
+            $customer->save();
+
+            event(new ConfirmEmail($customer->id));
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
     }
 }

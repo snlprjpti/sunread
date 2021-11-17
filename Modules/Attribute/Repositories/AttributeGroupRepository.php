@@ -85,12 +85,19 @@ class AttributeGroupRepository extends BaseRepository
 
             $item['attribute_set_id'] = $parent->id;
             $data = !isset($item["id"]) ? $this->create($item) : $this->update($item, $item["id"]);
+
+            $i = 0;
+            foreach($item["attributes"] as $attribute_id)
+            {
+                $attributes[$attribute_id]["position"] = ++$i;
+            }
+            $final_data = $data->attributes()->sync($attributes);
         }
         catch(Exception $exception)
         {
             throw $exception;
         }
 
-        return $data->attributes()->sync($item["attributes"]);
+        return $final_data;
     }
 }

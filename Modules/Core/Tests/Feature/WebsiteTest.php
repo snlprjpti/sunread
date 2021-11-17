@@ -19,7 +19,7 @@ class WebsiteTest extends BaseTestCase
         $this->hasStatusTest = true;
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "description" => null

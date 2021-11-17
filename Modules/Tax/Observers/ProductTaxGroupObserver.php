@@ -3,6 +3,7 @@
 namespace Modules\Tax\Observers;
 
 use Modules\Core\Facades\Audit;
+use Modules\Product\Jobs\ReindexMigrator;
 use Modules\Tax\Entities\ProductTaxGroup;
 use Modules\Tax\Facades\TaxCache;
 
@@ -18,11 +19,13 @@ class ProductTaxGroupObserver
     {
         Audit::log($productTaxProductTaxGroup, __FUNCTION__);
         TaxCache::setProductTaxGroup();
+        ReindexMigrator::dispatch()->onQueue("index");
     }
 
     public function deleted(ProductTaxGroup $productTaxProductTaxGroup)
     {
         Audit::log($productTaxProductTaxGroup, __FUNCTION__);
         TaxCache::setProductTaxGroup();
+        ReindexMigrator::dispatch()->onQueue("index");
     }
 }

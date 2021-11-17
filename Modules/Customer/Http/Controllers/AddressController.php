@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Entities\Website;
 use Modules\Customer\Entities\Customer;
 use Modules\Customer\Entities\CustomerAddress;
 use Modules\Core\Http\Controllers\BaseController;
@@ -65,11 +66,15 @@ class AddressController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
+            $customer = Customer::findOrFail($customer_id);
+            $channel_id = $this->repository->checkCustomerChannel($request, $customer);
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id, $channel_id) {
                 return [
-                    "customer_id" => Customer::findOrFail($customer_id)->id
+                    "customer_id" => $customer_id,
+                    "channel_id" => $channel_id
                 ];
             });
+            $data = $this->repository->checkCountryRegionAndCity($data, $customer);
 
             $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $created->id);
@@ -103,11 +108,15 @@ class AddressController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id) {
+            $customer = Customer::findOrFail($customer_id);
+            $channel_id = $this->repository->checkCustomerChannel($request, $customer);
+            $data = $this->repository->validateData($request, $this->repository->regionAndCityRules($request), function () use ($customer_id, $channel_id) {
                 return [
-                    "customer_id" => Customer::findOrFail($customer_id)->id
+                    "customer_id" => $customer_id,
+                    "channel_id" => $channel_id
                 ];
             });
+            $data = $this->repository->checkCountryRegionAndCity($data, $customer);
 
             $updated = $this->repository->update($data, $address_id, function($updated) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $updated->id);
@@ -125,7 +134,7 @@ class AddressController extends BaseController
     {
         try
         {
-            $deleted = $this->repository->delete($address_id, function($deleted) use ($customer_id) {
+            $this->repository->delete($address_id, function($deleted) use ($customer_id) {
                 if ( $deleted->customer_id != $customer_id ) throw new ModelNotFoundException($this->lang("not-found"));
             });
         }
@@ -154,7 +163,7 @@ class AddressController extends BaseController
         {
             return $this->handleException($exception);
         }
-        
+
         return $this->successResponse($this->resource($updated), $this->lang('update-success'));
     }
 

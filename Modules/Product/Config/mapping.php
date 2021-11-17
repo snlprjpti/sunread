@@ -1,18 +1,18 @@
-<?php 
+<?php
 return [
     "properties" =>  [
         "id" =>  [
             "type" => "long"
         ],
         "name" =>  [
-            "type" => "text",
-            "fields" =>  [
-                "keyword" =>  [
-                    "type" => "keyword",
-                    "ignore_above" => 256
-                ]
-            ],
-            "fielddata"=> true
+            "type" => "search_as_you_type",
+            // "fields" =>  [
+            //     "keyword" =>  [
+            //         "type" => "keyword",
+            //         "ignore_above" => 256
+            //     ]
+            // ],
+            // "fielddata"=> true
         ],
         "sku" =>  [
             "type" => "text",
@@ -167,7 +167,7 @@ return [
                     "ignore_above" => 256
                 ]
             ]
-        ],        
+        ],
         "special_price" =>  [
             "type" => "text",
             "fields" =>  [
@@ -359,7 +359,7 @@ return [
                     "type" => "keyword",
                     "ignore_above" => 256
                 ]
-            ],      
+            ],
         ],
         "size-and-care" => [
             "type" => "text",
@@ -368,7 +368,7 @@ return [
                     "type" => "keyword",
                     "ignore_above" => 256
                 ]
-            ],      
+            ],
         ],
         "features" => [
             "type" => "text",
@@ -377,7 +377,7 @@ return [
                     "type" => "keyword",
                     "ignore_above" => 256
                 ]
-            ],      
+            ],
         ],
         "categories"=> [
             "properties"=> [

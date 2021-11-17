@@ -28,7 +28,7 @@ class EmailTemplateTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "style" => null

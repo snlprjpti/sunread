@@ -19,7 +19,7 @@ class TaxRuleTest extends BaseTestCase
         $this->hasStatusTest = false;
     }
 
-    public function getNonMandotaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "subtotal" => null

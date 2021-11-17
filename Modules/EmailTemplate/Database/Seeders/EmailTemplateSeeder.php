@@ -3,9 +3,7 @@
 namespace Modules\EmailTemplate\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class EmailTemplateSeeder extends Seeder
 {
@@ -16,7 +14,7 @@ class EmailTemplateSeeder extends Seeder
                 "name" => "Header",
                 "subject" => "Header",
                 "email_template_code" => "header",
-                "content" => '<!DOCTYPE html> <head> </head> <body> <table class="wrapper" width="100%"><tr><td class="wrapper-inner" align="center"><table class="main" align="center"><tr><td class="header"><a class="logo" href="/"></a></td></tr><tr><td class="main-content">',
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/header.blade.php')),
                 "style" => "",
                 "is_system_defined" => true,
                 "created_at" => now(),
@@ -26,7 +24,7 @@ class EmailTemplateSeeder extends Seeder
                 "name" => "Footer",
                 "subject" => "Footer",
                 "email_template_code" => "footer",
-                "content" => '</td></tr><tr><td class="footer"><p class="closing">Thank you!</p></td></tr></table></td></tr></table></body></html>',
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/footer.blade.php')),
                 "style" => "",
                 "is_system_defined" => true,
                 "created_at" => now(),
@@ -36,7 +34,27 @@ class EmailTemplateSeeder extends Seeder
                 "name" => "Welcome",
                 "subject" => "Welcome",
                 "email_template_code" => "welcome_email",
-                "content" => "<h2>Welcome Here</h2>",
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/welcomeEmail.blade.php')),
+                "style" => "",
+                "is_system_defined" => true,
+                "created_at" => now(),
+                "updated_at" => now()
+            ],
+            [
+                "name" => "New Account",
+                "subject" => "New Account",
+                "email_template_code" => "new_account",
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/newAccount.blade.php')),
+                "style" => "",
+                "is_system_defined" => true,
+                "created_at" => now(),
+                "updated_at" => now()
+            ],
+            [
+                "name" => "Confirmation Email",
+                "subject" => "Confirmation Email",
+                "email_template_code" => "confirm_email",
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/confirmEmail.blade.php')),
                 "style" => "",
                 "is_system_defined" => true,
                 "created_at" => now(),
@@ -46,7 +64,7 @@ class EmailTemplateSeeder extends Seeder
                 "name" => "Forgot Password",
                 "subject" => "Forgot Password",
                 "email_template_code" => "forgot_password",
-                "content" => "<h2>Forgot Password</h2>",
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/forgotPassword.blade.php')),
                 "style" => "",
                 "is_system_defined" => true,
                 "created_at" => now(),
@@ -55,8 +73,28 @@ class EmailTemplateSeeder extends Seeder
             [
                 "name" => "Reset Password",
                 "subject" => "Reset Password",
-                "email_template_code" => "Reset_password",
-                "content" => "<h2>Reset Password</h2>",
+                "email_template_code" => "reset_password",
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/resetPassword.blade.php')),
+                "style" => "",
+                "is_system_defined" => true,
+                "created_at" => now(),
+                "updated_at" => now()
+            ],
+            [
+                "name" => "Contact Form",
+                "subject" => "Contact Form",
+                "email_template_code" => "contact_form",
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/contactForm.blade.php')),
+                "style" => "",
+                "is_system_defined" => true,
+                "created_at" => now(),
+                "updated_at" => now()
+            ],
+            [
+                "name" => "New Order",
+                "subject" => "New Order",
+                "email_template_code" => "new_order",
+                "content" => file_get_contents(module_path('EmailTemplate', 'Resources/views/templates/newOrder.blade.php')),
                 "style" => "",
                 "is_system_defined" => true,
                 "created_at" => now(),

@@ -20,16 +20,16 @@ use Modules\Product\Repositories\StoreFront\ProductRepository as StoreFrontProdu
 
 class ProductController extends BaseController
 {
-    protected $repository, $search_repository, $category_repository, $store_fornt_repository;
+    protected $repository, $search_repository, $category_repository, $store_front_repository;
 
-    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository, CategoryRepository $category_repository, StoreFrontProductRepository $store_fornt_repository)
+    public function __construct(Product $product, ProductRepository $repository, ProductSearchRepository $search_repository, CategoryRepository $category_repository, StoreFrontProductRepository $store_front_repository)
     {
         $this->model = $product;
         $this->model_name = "Product";
         $this->repository = $repository;
         $this->search_repository = $search_repository;
         $this->category_repository = $category_repository;
-        $this->store_fornt_repository = $store_fornt_repository;
+        $this->store_front_repository = $store_front_repository;
 
         $this->middleware('validate.website.host');
         $this->middleware('validate.store.code');
@@ -57,7 +57,7 @@ class ProductController extends BaseController
                 "collection.*" => "sometimes|exists:attribute_options,id",
             ]);
 
-            $fetched = $this->store_fornt_repository->categoryWiseProduct($request, $category_slug);
+            $fetched = $this->store_front_repository->categoryWiseProduct($request, $category_slug);
         }
         catch( Exception $exception )
         {
@@ -71,7 +71,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->store_fornt_repository->getCategoryData($request, $category_slug);
+            $fetched = $this->store_front_repository->getCategoryData($request, $category_slug);
         }
         catch( Exception $exception )
         {
@@ -85,7 +85,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->store_fornt_repository->getOptions($request, $category_slug);
+            $fetched = $this->store_front_repository->getOptions($request, $category_slug);
         }
         catch( Exception $exception )
         {
@@ -99,7 +99,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $data = $this->store_fornt_repository->productDetail($request, $identifier);
+            $data = $this->store_front_repository->show($request, $identifier);
         }
         catch( Exception $exception )
         {
@@ -113,7 +113,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $data = $this->store_fornt_repository->productDetail($request, $identifier, $parent_identifier);
+            $data = $this->store_front_repository->show($request, $identifier, $parent_identifier);
         }
         catch( Exception $exception )
         {
@@ -127,7 +127,7 @@ class ProductController extends BaseController
     {
         try
         {
-            $data = $this->store_fornt_repository->searchWiseProduct($request);
+            $data = $this->store_front_repository->searchWiseProduct($request);
         }
         catch( Exception $exception )
         {

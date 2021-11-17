@@ -19,7 +19,7 @@ class ReviewTest extends BaseTestCase
         $this->hasStatusTest = true;
     }
 
-    public function getNonMandodtaryCreateData(): array
+    public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
             "description" => null
@@ -33,7 +33,7 @@ class ReviewTest extends BaseTestCase
         ]);
     }
 
-    public function getNonMandodtaryUpdateData(): array
+    public function getNonMandatoryUpdateData(): array
     {
         return array_merge($this->getUpdateData(), [
             "title" => null

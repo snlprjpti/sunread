@@ -5,10 +5,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Customer\Notifications\CustomerResetPassword;
+use Modules\Notification\Events\ForgotPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Modules\Core\Traits\HasFactory;
 
@@ -17,7 +19,7 @@ class Customer extends Authenticatable implements  JWTSubject
     use Notifiable, HasFactory;
 
     public static $SEARCHABLE =  [ "first_name", "last_name", "email" ];
-    protected $fillable = [ "first_name", "middle_name", "last_name", "gender", "date_of_birth", "email", "tax_number", "password", "customer_group_id", "subscribed_to_news_letter", "status" , "profile_image", "website_id", "store_id", "is_lock", "last_login_at", "account_type", "verification_token", "is_email_verified" ];
+    protected $fillable = [ "first_name", "middle_name", "last_name", "gender", "date_of_birth", "email", "tax_number", "password", "customer_group_id", "subscribed_to_news_letter", "status" , "profile_image", "website_id", "store_id", "is_lock", "last_login_at", "account_type", "verification_token", "is_email_verified", "phone" ];
     protected $hidden = [ "password", "api_token", "remember_token" ];
     protected $dates = [ 'last_login_at' ];
 
@@ -63,7 +65,8 @@ class Customer extends Authenticatable implements  JWTSubject
 
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(new CustomerResetPassword($token));
+        event(new ForgotPassword($this->id, $token));
+//        $this->notify(new CustomerResetPassword($token));
     }
 
     public function getDefaultBillingAddressAttribute(): ?object

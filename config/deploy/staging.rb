@@ -47,7 +47,7 @@ end
 task :reload_supervisor do
     puts "==================restart supervisor======================"
     on roles(:all) do
-        execute :sudo, :supervisorctl, "restart php_serve"
+        execute :sudo, :supervisorctl, "restart php_serve:*"
         execute :sudo, :supervisorctl, "restart php_queue:*"
         execute :sudo, :supervisorctl, "restart php_queue_index:*"
         execute :sudo, :supervisorctl, "restart php_queue_erp:*"
@@ -66,8 +66,8 @@ task :link_storage do
 end
 
 after "deploy:published", "install_composer"
-after "deploy:published", "reload_supervisor"
 after "deploy:published", "get_geoip_files"
+after "deploy:published", "reload_supervisor"
 after "deploy:published", "link_storage"
 
 
