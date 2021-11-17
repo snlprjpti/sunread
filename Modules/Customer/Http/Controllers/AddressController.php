@@ -74,8 +74,8 @@ class AddressController extends BaseController
                     "channel_id" => $channel_id
                 ];
             });
-            $data = $this->repository->checkCountryRegionAndCity($data, $customer);
             dd($data);
+            $data = $this->repository->checkCountryRegionAndCity($data, $customer);
 
             $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $created->id);
