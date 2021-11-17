@@ -47,7 +47,7 @@ return [
                         [ "value" => "1", "label" => "Enabled" ],
                         [ "value" => "0", "label" => "Disabled" ]
                     ],
-                    "rules" => "nullable|in:0,1",
+                    "rules" => "in:0,1",
                     "is_required" => 0
                 ],
             ]
@@ -62,7 +62,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "nullable",
+                    "rules" => "",
                     "is_required" => 0
                 ],
                 [
@@ -72,7 +72,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "nullable",
+                    "rules" => "",
                     "is_required" => 0
 
                 ],
@@ -83,7 +83,7 @@ return [
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
-                    "rules" => "nullable",
+                    "rules" => "",
                     "is_required" => 0
                 ]
             ]
@@ -102,7 +102,7 @@ return [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
                     ],
-                    "rules" => "in:image,video",
+                    "rules" => "nullable|in:image,video",
                     "multiple" => false,
                     "is_required" => 0
                 ],
