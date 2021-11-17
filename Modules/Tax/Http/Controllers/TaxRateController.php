@@ -112,9 +112,9 @@ class TaxRateController extends BaseController
     {
         try
         {
-            $fetched = $this->model->find($id);
-            if($fetched->tax_rules->count() != 0) throw new TaxRateCanNotBeDeleted(__("core::app.response.delete-failed", ["name" => $this->model_name]));
-            $this->repository->delete($id);
+            $this->repository->delete($id, function($deleted) {
+                if($deleted->tax_rules->count() != 0) throw new TaxRateCanNotBeDeleted(__("core::app.response.delete-failed", ["name" => $this->model_name]));
+            });
         }
         catch( Exception $exception )
         {
