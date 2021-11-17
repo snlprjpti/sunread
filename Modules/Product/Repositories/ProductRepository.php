@@ -518,7 +518,7 @@ class ProductRepository extends BaseRepository
                                 $attributesData["options"] = [["value" => 1, "label" => "In Stock"],["value" => 0, "label" => "Out of Stock"]];
                             }
                             else $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute);  
-                            if($attributesData["value"] && !is_array($attributesData["value"])) $attributesData["value"] = json_decode($attributesData["value"]);
+                            if(isset($attributesData["value"]) && !is_array($attributesData["value"])) $attributesData["value"] = json_decode($attributesData["value"]);
                         } 
 
                         if(($attribute->type == "image" || $attribute->type == "file") && isset($attributesData["value"])) $attributesData["value"] = Storage::url($attributesData["value"]);
