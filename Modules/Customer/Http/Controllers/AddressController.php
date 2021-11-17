@@ -75,6 +75,7 @@ class AddressController extends BaseController
                 ];
             });
             $data = $this->repository->checkCountryRegionAndCity($data, $customer);
+            dd($data);
 
             $created = $this->repository->create($data, function($created) use ($data, $customer_id) {
                 $this->repository->unsetDefaultAddresses($data, $customer_id, $created->id);
