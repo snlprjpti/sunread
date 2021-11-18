@@ -159,20 +159,6 @@ return [
             ]
         ]
     ],
-    "locations" => [
-        [
-            "label" => "Footer",
-            "value" => "footer",
-        ],
-        [
-            "label" => "Primary",
-            "value" => "primary",
-        ],
-        [
-            "label" => "Full Screen",
-            "value" => "full_screen",
-        ],
-    ],
     "absolute_path" => [
         "title" => "general.elements.0",
         "type" => "general.elements.1",
