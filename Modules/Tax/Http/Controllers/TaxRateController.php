@@ -63,6 +63,7 @@ class TaxRateController extends BaseController
                 $this->repository->validateRegionCountry($request);
                 return [];
             });
+            if(!isset($data["zip_code"]) && !$data["use_zip_range"]) $data["zip_code"] = "*";
 
             $created = $this->repository->create($data);
         }
@@ -98,6 +99,7 @@ class TaxRateController extends BaseController
                 $this->repository->validateRegionCountry($request);
                 return [];
             });
+            if(!isset($data["zip_code"]) && !$data["use_zip_range"]) $data["zip_code"] = "*";
             $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )
