@@ -1,0 +1,13 @@
+{
+    "name": "ShippingMethods",
+    "alias": "shippingmethods",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ShippingMethods\\Providers\\ShippingMethodsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

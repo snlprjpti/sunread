@@ -10,14 +10,12 @@ class StoreResource extends JsonResource
 {
     public function toArray($request): array
     {
-        $icon = SiteConfig::fetch("store_icon", "store", $this->id);
-
         return [
             "id" => $this->id,
             "name" => $this->name,
             "code" => $this->code,
             "locale" => SiteConfig::fetch("store_locale", "store", $this->id)?->code,
-            "icon" => $icon ? Storage::url($icon) : $icon
+            "icon" => SiteConfig::fetch("store_icon", "store", $this->id)
         ];
     }
 }
