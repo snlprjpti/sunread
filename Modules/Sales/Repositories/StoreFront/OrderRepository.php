@@ -107,7 +107,6 @@ class OrderRepository extends BaseRepository
                 $this->createOrderTax($order, $order_item_details);
             }
             $this->updateOrderTax($order, $request, $coreCache);
-            $order->load(["order_items", "order_taxes.order_items", "order_metas", "order_addresses"]);
         } 
         catch (Exception $exception)
         {
