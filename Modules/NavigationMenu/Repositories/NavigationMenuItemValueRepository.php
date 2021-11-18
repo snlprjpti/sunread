@@ -160,7 +160,7 @@ class NavigationMenuItemValueRepository
                 "navigation_menu_item_id" => $parent->id,
                 "scope" => $data["scope"],
                 "scope_id" => $data["scope_id"],
-                "status" => $data["items"] ?? 1,
+                "status" => isset($data["items"]["status"]["value"]) ? $data["items"]["status"]["value"] : 1,
             ];
             foreach($data["items"] as $key => $val)
             {
