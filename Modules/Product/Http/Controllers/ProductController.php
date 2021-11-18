@@ -235,5 +235,20 @@ class ProductController extends BaseController
 
         return $this->successResponse(VariantProductResource::collection($fetched), $this->lang('fetch-success'));
     }
+
+    public function configurations(Request $request): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->configurations($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, "Configuration fetched Successfully");
+    }
+
     
 }
