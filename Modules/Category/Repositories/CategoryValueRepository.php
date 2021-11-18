@@ -32,6 +32,7 @@ class CategoryValueRepository
     {
         try
         {
+            $this->global_file = [];
             $scope = $request->scope ?? "website";
             $all_rules = collect(config("category.attributes"))->pluck("elements")->flatten(1)->map(function($data) {
                 return $data;
