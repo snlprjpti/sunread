@@ -87,7 +87,7 @@ return [
                         [ "value" => "1", "label" => "Enabled" ],
                         [ "value" => "0", "label" => "Disabled" ]
                     ],
-                    "rules" => "nullable|in:0,1",
+                    "rules" => "in:0,1",
                     "is_required" => 0
                 ],
             ]
@@ -98,10 +98,14 @@ return [
                 [
                     "title" => "Background Type",
                     "slug" => "background_type",
-                    "type" => "text",
+                    "type" => "select",
                     "value" => "",
                     "scope" => "website",
-                    "options" => [],
+                    "has_condition" => 1,
+                    "options" => [
+                        [ "value" => "image", "label" => "Image" ],
+                        [ "value" => "video", "label" => "Video" ]
+                    ],
                     "rules" => "string",
                     "is_required" => 0
                 ],
@@ -112,6 +116,10 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'image'
+                    ],
                     "rules" => "mimes:jpeg,jpg,bmp,png,gif",
                     "is_required" => 0
                 ],
@@ -122,6 +130,10 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'video'
+                    ],
                     "rules" => "string",
                     "is_required" => 0
                 ],
@@ -132,13 +144,17 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'video'
+                    ],
                     "rules" => "string",
                     "is_required" => 0
                 ],
                 [
                     "title" => "Background Overlay Color",
                     "slug" => "background_overlay_color",
-                    "type" => "text",
+                    "type" => "color_picker",
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
@@ -173,6 +189,10 @@ return [
         "additional_data" => "general.elements.4",
         "order" => "general.elements.5",
         "status" => "general.elements.6",
-        "additional_data_attributes" => "general.additional.0",
+        "background_type" => "additional_data.elements.0",
+        "background_image" => "additional_data.elements.1",
+        "background_video_type" => "additional_data.elements.2",
+        "background_video" => "additional_data.elements.3",
+        "background_overlay_color" => "additional_data.elements.4",
     ]
 ];

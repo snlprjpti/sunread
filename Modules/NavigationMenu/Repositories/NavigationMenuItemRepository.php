@@ -31,9 +31,7 @@ class NavigationMenuItemRepository extends BaseRepository
         $this->navigation_menu_item_repository = $navigation_menu_item_repository;
         $this->model_key = "navigation_menu";
 
-        $this->rules = [
-            "navigation_menu_id" => 'required|integer|exists:navigation_menus,id',
-        ];
+        $this->rules = [];
 
         $this->config_fields = config("navigation_menu.attributes");
         $this->location_fields = config("navigation_menu.locations");
@@ -72,15 +70,23 @@ class NavigationMenuItemRepository extends BaseRepository
                 $children_data["elements"][] = $element;
             }
             $attributes[$key] = $children_data;
-            $attributes["locations"] = $this->location_fields;
         }
+        return $attributes;
+    }
+
+    /**
+     * Get Attributes value from Config Data
+     */
+    public function getLocationData(): array
+    {
+        $attributes["locations"] = $this->location_fields;
         return $attributes;
     }
 
     /**
      * Get NavigationMenuItem with it's Attributes and Values
      */
-    public function fetchWithAttributes(object $request, NavigationMenuItem $navigation_menu_item)
+    public function fetchWithAttributes(object $request, object $navigation_menu_item)
     {
         $data = [
             "scope" => $request->scope ?? "website",
@@ -93,14 +99,41 @@ class NavigationMenuItemRepository extends BaseRepository
         $navigation_menu_item->createModel();
         $value = $navigation_menu_item->has($title_data) ? $navigation_menu_item->getValues($title_data) : $navigation_menu_item->getDefaultValues($title_data);
 
+        $additional_data_requestor = array_merge($data, ["attribute" => "additional_data"]);
+        $additional_data_value = $navigation_menu_item->has($additional_data_requestor) ? $navigation_menu_item->getValues($additional_data_requestor) : $navigation_menu_item->getDefaultValues($additional_data_requestor);
+
         $fetched = [
             "id" => $navigation_menu_item->id,
             "title" => $value?->value,
             "navigation_menu_id" => $navigation_menu_item->navigation_menu_id,
         ];
-
-        $fetched["attributes"] = $this->getConfigData($data);
+        $attribute = $this->getConfigData($data, $navigation_menu_item);
+        $attribute["additional_data"] = $this->getAdditionalData($additional_data_value?->value);
+        $fetched["attributes"] = $attribute;
         return $fetched;
+    }
+
+    /**
+     * Get Additional Data
+     */
+    public function getAdditionalData(string $additional_data_value)
+    {
+        $additional_data_attributes = collect(config('navigation_menu.attributes.additional_data'));
+        $decoded_additional_data = json_decode($additional_data_value);
+
+        $additional_data = [];
+        foreach($additional_data_attributes["elements"] as $attribute) {
+            foreach($decoded_additional_data as $key => $value) {
+                if($key == $attribute["slug"]) {
+                    $attribute["value"] = $value;
+                }
+            }
+            array_push($additional_data, $attribute);
+        }
+
+        $data["title"] = $additional_data_attributes["title"];
+        $data["elements"] = $additional_data;
+        return $data;
     }
 
     /**
