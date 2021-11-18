@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Sales\Traits;
+namespace Modules\ShippingMethods\Traits;
 
 use Modules\Core\Facades\SiteConfig;
 use Modules\Sales\Entities\OrderTaxItem;
@@ -34,7 +34,9 @@ trait HasShippingCalculation
 				$total_shipping_amount = $minimum_order_amt;
 				if (!$incl_tax_to_amt) {
 					$order->order_taxes->map( function ($order_tax) use (&$total_shipping_amount) {
-						$order_item_total_amount = $order_tax->order_tax_items->filter(fn ($order_tax_item) => ($order_tax_item == "product"))->map( function ($order_item) use ($order_tax, &$total_shipping_amount) {
+						$order_item_total_amount = $order_tax->order_tax_items
+						->filter(fn ($order_tax_item) => ($order_tax_item == "product"))
+						->map( function ($order_item) use ($order_tax, &$total_shipping_amount) {
 							$amount = (($order_tax->percent/100) * $order_item->amount);
 							$total_shipping_amount += $amount;
 							$data = [

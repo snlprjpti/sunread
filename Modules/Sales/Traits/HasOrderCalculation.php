@@ -18,7 +18,6 @@ trait HasOrderCalculation
     {
         try 
         {
-
             $sub_total = 0.00;
             $sub_total_tax_amount = 0.00;
             $total_qty_ordered = 0.00;

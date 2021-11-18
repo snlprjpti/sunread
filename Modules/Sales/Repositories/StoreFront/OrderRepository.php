@@ -35,6 +35,7 @@ class OrderRepository extends BaseRepository
         $this->orderAddressRepository = $orderAddressRepository;
         $this->orderMetaRepository = $orderMetaRepository;
         $this->rules = [
+            "cart_hash_id" => "required|exists:carts,id",
             "orders" => "array",
             "orders.*.product_id" => "required|exists:products,id",
             "orders.*.qty" => "required|decimal",
@@ -94,7 +95,6 @@ class OrderRepository extends BaseRepository
                 $this->orderMetaRepository->store($request, $order);
             });
 
-            Cart::findOrFail($request->cart_hash_id);
             $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
             $jobs = [];
             foreach ( $items as $order_item ) 

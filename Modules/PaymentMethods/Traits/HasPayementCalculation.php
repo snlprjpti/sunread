@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Sales\Traits;
+namespace Modules\PaymentMethods\Traits;
 
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
@@ -9,7 +9,7 @@ trait HasPayementCalculation
 {
 	protected $payment_method;
 
-	public function getPayemntMethods(): mixed
+	public function get(): mixed
 	{
 		return SiteConfig::get("payment_methods");
 	}

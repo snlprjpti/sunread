@@ -4,6 +4,7 @@ namespace Modules\Sales\Traits;
 
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use Modules\Attribute\Entities\Attribute;
 use Modules\Product\Entities\Product;
 
 trait HasOrderProductDetail
@@ -68,13 +69,13 @@ trait HasOrderProductDetail
                     "product_options" => [
                         "attributes" => [
                             [
-                                "attribute_id" => $this->getAttributeValue($coreCache, $product, "size")?->attribute_id,
+                                "attribute_id" => $this->attributeId("size"),
                                 "label" => "size",
                                 "name" => "Size",
                                 "value" => $this->getAttributeValue($coreCache, $product, "size")?->name
                             ],
                             [
-                                "attribute_id" => $this->getAttributeValue($coreCache, $product, "color")?->attribute_id,
+                                "attribute_id" => $this->attributeId("color"),
                                 "label" => "color",
                                 "name" => "Color",
                                 "value" => $this->getAttributeValue($coreCache, $product, "color")?->name 
@@ -91,6 +92,11 @@ trait HasOrderProductDetail
         }
 
         return $product_options;
+    }
+
+    public function attributeId(string $slug): ?int
+    {
+        return Attribute::whereSlug($slug)->first()?->id;
     }
 
     public function getAttributeValue(mixed $coreCache, object $product, string $slug): mixed
