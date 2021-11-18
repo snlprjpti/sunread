@@ -45,7 +45,7 @@ class TaxRateController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, [ "country", "region" ]);
         }
         catch( Exception $exception )
         {
@@ -62,8 +62,8 @@ class TaxRateController extends BaseController
             $data = $this->repository->validateData($request, callback:function () use ($request) {
                 $this->repository->validateRegionCountry($request);
                 return [];
-            }); 
-            
+            });
+
             $created = $this->repository->create($data);
         }
         catch( Exception $exception )
