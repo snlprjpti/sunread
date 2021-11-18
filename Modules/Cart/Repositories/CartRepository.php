@@ -523,7 +523,7 @@ class CartRepository extends BaseRepository
         {
             $productStock = $product->catalog_inventories()->first();
             $qty = $request->qty ?? 1;
-            if ($productStock?->is_in_stock && $qty > $productStock?->quantity) {
+            if (!($productStock?->is_in_stock) && ($qty > $productStock?->quantity)) {
                 throw new OutOfStockException();
             }
         }
