@@ -214,4 +214,21 @@ class NavigationMenuItemController extends BaseController
 
         return $this->successResponse($fetched, $this->lang("fetch-success"));
     }
+
+    /**
+     * Fetches and returns Attributes for NavigationMenuItem Values
+     */
+    public function locations(): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->getLocationData();
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang("fetch-success"));
+    }
 }

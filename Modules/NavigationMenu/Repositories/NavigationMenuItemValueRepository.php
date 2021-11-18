@@ -64,6 +64,7 @@ class NavigationMenuItemValueRepository
                 ];
                 return isset($default_rule) ? array_merge($rules, [ $default_path => $default_rule ]) : $rules;
             })->toArray();
+
         }
         catch (Exception $exception)
         {
@@ -116,7 +117,6 @@ class NavigationMenuItemValueRepository
                     "scope_id" => $navigation_menu->website_id
                 ];
             });
-
         }
         catch (Exception $exception)
         {
