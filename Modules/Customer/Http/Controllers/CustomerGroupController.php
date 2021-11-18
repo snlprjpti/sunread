@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Customer\Entities\CustomerGroup;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Customer\Exceptions\DefaultGroupCannotUpdateException;
 use Modules\Customer\Transformers\CustomerGroupResource;
 use Modules\Customer\Repositories\CustomerGroupRepository;
 use Exception;
@@ -83,6 +84,7 @@ class CustomerGroupController extends BaseController
     {
         try
         {
+            if($id == 1) throw new DefaultGroupCannotUpdateException(__("core::app.response.cannot-update-default", [ "name" => $this->model_name ]));
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:customer_groups,slug,{$id}"
             ]);
