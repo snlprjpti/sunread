@@ -32,7 +32,7 @@ return [
                 [
                     "title" => "Type Id",
                     "slug" => "type_id",
-                    "type" => "select",
+                    "type" => "text",
                     "value" => "",
                     "scope" => "website",
                     "condition" => [
@@ -55,16 +55,6 @@ return [
                     ],
                     "options" => [],
                     "rules" => "required_if:items.type.value,custom|string",
-                    "is_required" => 0
-                ],
-                [
-                    "title" => "Additional Data",
-                    "slug" => "additional_data",
-                    "type" => "json",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [],
-                    "rules" => "json",
                     "is_required" => 0
                 ],
                 [
@@ -126,10 +116,15 @@ return [
                 [
                     "title" => "Background Video Type",
                     "slug" => "background_video_type",
-                    "type" => "text",
+                    "type" => "select",
                     "value" => "",
                     "scope" => "website",
-                    "options" => [],
+                    "options" => [
+                        ["value" => "wistia", "label" => "Wistia"],
+                        ["value" => "youtube", "label" => "YouTube"],
+                        ["value" => "selfhosted", "label" => "Self Hosted"],
+                        ["value" => "vimeo", "label" => "Vimeo"],
+                    ],
                     "condition" => [
                         "field" => 'background_type',
                         "value" => 'video'
@@ -186,9 +181,8 @@ return [
         "type" => "general.elements.1",
         "type_id" => "general.elements.2",
         "custom_link" => "general.elements.3",
-        "additional_data" => "general.elements.4",
-        "order" => "general.elements.5",
-        "status" => "general.elements.6",
+        "order" => "general.elements.4",
+        "status" => "general.elements.5",
         "background_type" => "additional_data.elements.0",
         "background_image" => "additional_data.elements.1",
         "background_video_type" => "additional_data.elements.2",

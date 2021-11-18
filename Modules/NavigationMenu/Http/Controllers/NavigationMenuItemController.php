@@ -68,7 +68,7 @@ class NavigationMenuItemController extends BaseController
 
             $this->navigation_menu->findOrFail($navigation_menu_id);
             $fetched = $this->repository->fetchAll($request, ["values", "navigationMenu"], function() use($navigation_menu_id){
-                $this->model->where('navigation_menu_id', $navigation_menu_id);
+                return $this->model->where('navigation_menu_id', $navigation_menu_id);
             });
         }
         catch (Exception $exception)
