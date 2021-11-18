@@ -46,7 +46,7 @@ class OrderRepository extends BaseRepository
 
     public function store(object $request): mixed
     {
-        // DB::beginTransaction();
+        DB::beginTransaction();
         try
         {
             $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
@@ -107,19 +107,14 @@ class OrderRepository extends BaseRepository
                 $this->createOrderTax($order, $order_item_details);
                 $this->updateOrderTax($order, $request, $coreCache);
             }
-            // dd($jobs);
-            // Bus::batch($jobs)->then( function (Batch $batch) use ($order, $request, $coreCache) {
-                // OrderCalculation::dispatchSync($order, $request, $coreCache);
-                
-            // })->onQueue("high")->dispatch();
         } 
         catch (Exception $exception)
         {
-            // DB::rollback();
+            DB::rollback();
             throw $exception;
         }
 
-        // DB::commit();        
+        DB::commit();        
         return $order;
     }
 
