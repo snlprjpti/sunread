@@ -27,6 +27,7 @@ use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Attribute\Repositories\AttributeRepository;
 use Modules\Product\Transformers\VariantProductResource;
 use Modules\Attribute\Repositories\AttributeSetRepository;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Transformers\ProductGalleryRescouce;
 
@@ -684,6 +685,54 @@ class ProductRepository extends BaseRepository
         }
 
         return $product;
+    }
+
+    public function configurations(object $request): array
+    {
+        try
+        {
+            $request->validate([
+                "scope" => "sometimes|in:global,website,channel,store",
+                "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
+            ]);
+    
+            $scope = [
+                "scope" => $request->scope ?? "global",
+                "scope_id" => $request->scope_id ?? 0,
+            ];
+
+            $fields = [ "channel_currency", "symbol_position", "minus_sign", "minus_sign_position", "group_seperator", "decimal_seperator" ];
+            $fetched = $this->configuration_data($fields, $scope);
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+        
+        return $fetched;
+    }
+
+    public function configuration_data(array $fields, array $scope): array
+    {
+        try
+        {
+            $fetched = [];
+            foreach($fields as $field)
+            {
+                $value = SiteConfig::fetch($field, $scope["scope"], $scope["scope_id"]);  
+                if($field == "channel_currency") {
+                    $fetched["currency"] = $value?->code;
+                    continue;
+                }  
+                $fetched[$field] = $value;
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+        
+        return $fetched;
     }
 
 }
