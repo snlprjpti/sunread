@@ -247,7 +247,7 @@ class ProductController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, "Configuration fetched Successfully");
+        return $this->successResponse($fetched, $this->lang('fetch-success', ["name" => "Configuration"]));
     }
 
     
