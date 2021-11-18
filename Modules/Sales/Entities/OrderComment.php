@@ -13,6 +13,8 @@ class OrderComment extends Model
 
     protected $fillable = ["order_id", "user_id", "is_customer_notified", "is_visible_on_storefornt", "comment"];
 
+    public $preventsLazyLoading = false;
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
