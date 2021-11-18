@@ -12,9 +12,10 @@ class NavigationMenuItemResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $store = CoreCache::getStoreWithCode($request->header("hc-store"));
         $data = [
-            "scope" => $request->scope ?? "website",
-            "scope_id" => $request->scope_id ?? $this->website_id,
+            "scope" => "store",
+            "scope_id" => $store->id,
             "navigation_menu_item_id" => $this->id
         ];
         return  [

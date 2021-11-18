@@ -151,7 +151,7 @@ class NavigationMenuItemRepository extends BaseRepository
         $data = $this->navigation_menu_item_repository->fetchAll($request, $with, $callback);
 
         $data->each(function($nav_menu, $key) use($request){
-            $items = $nav_menu->navigationMenuItems->each(function ($nav_item) use($request){
+            $nav_menu->navigationMenuItems->each(function ($nav_item) use($request){
                 $nav_item->link = $this->getFinalItemLink($nav_item, $request);
             });
         });
