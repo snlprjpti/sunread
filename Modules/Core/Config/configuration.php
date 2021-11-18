@@ -1418,7 +1418,7 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "per_item",
+                                "default" => "per_order",
                                 "options" => [
                                     [ "value" => "per_item", "label" => "Per Item" ],
                                     [ "value" => "per_order", "label" => "Per Order" ]
