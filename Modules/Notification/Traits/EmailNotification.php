@@ -151,6 +151,7 @@ trait EmailNotification
                 "customer_name" => "{$customer->first_name} {$customer->middle_name} {$customer->last_name}",
                 "customer_email_address" => $customer->email,
                 "customer_dashboard_url" => $customer_dashboard_url,
+                "customer_store_url" => $storefront_url,
                 "store_id" => $customer->store_id
             ];
         }
@@ -200,7 +201,7 @@ trait EmailNotification
         try
         {
             $data = $this->getCustomerData($customer_id);
-            $data->password_reset_url =  route('customers.reset-password.create', $append_data);
+            $data->password_reset_url = url("{$data->customer_store_url}/reset-password/{$append_data }");
         }
         catch (Exception $exception)
         {
