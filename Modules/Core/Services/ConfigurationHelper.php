@@ -160,4 +160,13 @@ class ConfigurationHelper
 
         return $fetched;   
     }
+
+    public function get(string $slug): mixed
+    {
+        return collect($this->config_fields)
+        ->pluck("children")->flatten(1)
+        ->where("slug", $slug)
+        ->pluck("subChildren")
+        ->flatten(1);
+    }
 }
