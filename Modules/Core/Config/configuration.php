@@ -1531,7 +1531,7 @@ return[
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => 1,
+                                "default" => 0.00,
                                 "options" => [],
                                 "rules" => "decimal",
                                 "multiple" => false,

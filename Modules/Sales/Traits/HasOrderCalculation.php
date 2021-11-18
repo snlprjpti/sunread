@@ -3,10 +3,12 @@
 namespace Modules\Sales\Traits;
 
 use Exception;
-use Modules\Core\Facades\SiteConfig;
 use Modules\Tax\Facades\TaxPrice;
 use Modules\Coupon\Entities\Coupon;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
+use Modules\Sales\Traits\HasPayementCalculation;
+use Modules\Sales\Traits\HasShippingCalculation;
 
 trait HasOrderCalculation
 {
@@ -34,21 +36,22 @@ trait HasOrderCalculation
             $total_tax = array_sum($taxes);
 
             $discount_amount = $this->calculateDiscount($order); // To-Do other discount will be added here...
-            $shipping_amount = 0.00;  // To-Do need to fetch its actual amount.
-            $grand_total = ($sub_total + $total_tax - $discount_amount);
+            $arr_shipping_amount = $this->getInternalShippingValue($request, $order, $coreCache);
+            $cal_shipping_amt = $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
+            $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
             $channel_id = $coreCache?->channel->id;
             $order->update([
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,
                 "tax_amount" => $total_tax,
-                "shipping_amount" => $shipping_amount,
+                "shipping_amount" => $arr_shipping_amount['shipping_amount'],
                 "grand_total" => $grand_total,
                 "total_items_ordered" => $order->order_items->count(),
                 "total_qty_ordered" => $total_qty_ordered,
-                // "status" => SiteConfig::fetch(""),
+                // "status" => SiteConfig::fetch(""), // TO-DO
                 "shipping_method" => SiteConfig::fetch($request->shipping_method."_method_name", "channel", $channel_id),
                 "shipping_method_label" => SiteConfig::fetch($request->shipping_method."_title", "channel", $channel_id),
-                "payment_method" => SiteConfig::fetch($request->payment_method."_titlr", "channel", $channel_id),
+                "payment_method" => SiteConfig::fetch($request->payment_method."_title", "channel", $channel_id),
                 "payment_method_label" => SiteConfig::fetch($request->payment_method."_title", "channel", $channel_id),
             ]);
 

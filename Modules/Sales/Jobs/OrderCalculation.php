@@ -14,7 +14,7 @@ class OrderCalculation implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasOrderCalculation;
 
-    protected $order, $request;
+    protected $order, $request, $coreCache;
 
     public function __construct(object $order, object $request, object $coreCache)
     {
