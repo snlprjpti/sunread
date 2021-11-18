@@ -163,8 +163,8 @@ class NavigationMenuItemRepository extends BaseRepository
 
         $coreCache = $this->getCoreCache($request);
         $data = [
-            "scope" => $request->scope ?? "website",
-            "scope_id" => $request->scope_id ?? $navigation_menu_item->website_id,
+            "scope" => "store",
+            "scope_id" => $coreCache->store->id,
         ];
 
         $type = $navigation_menu_item->value($data, "type");
