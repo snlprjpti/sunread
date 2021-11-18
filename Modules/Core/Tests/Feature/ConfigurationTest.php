@@ -117,15 +117,4 @@ class ConfigurationTest extends BaseTestCase
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
-
-    public function testAdminCanUpdateResourceWithNonMandatoryData()
-    {
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $this->getNonMandatoryUpdateData());
-
-        $response->assertStatus(201);
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
-        ]);
-    }
 }

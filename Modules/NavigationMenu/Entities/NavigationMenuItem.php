@@ -18,7 +18,7 @@ class NavigationMenuItem extends Model
      */
     protected $fillable = ["navigation_menu_id"];
 
-    // Append data with Values [ClubHouseValue]
+    // Append data with Values [NavigationMenuItem]
     protected $with = [ "values"];
 
     // Searchable

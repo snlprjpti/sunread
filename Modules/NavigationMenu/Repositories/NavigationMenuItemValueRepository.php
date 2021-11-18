@@ -64,12 +64,12 @@ class NavigationMenuItemValueRepository
                 ];
                 return isset($default_rule) ? array_merge($rules, [ $default_path => $default_rule ]) : $rules;
             })->toArray();
+
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
-
         return $all_rules;
     }
 
@@ -116,7 +116,6 @@ class NavigationMenuItemValueRepository
                     "scope_id" => $navigation_menu->website_id
                 ];
             });
-
         }
         catch (Exception $exception)
         {
@@ -161,7 +160,7 @@ class NavigationMenuItemValueRepository
                 "navigation_menu_item_id" => $parent->id,
                 "scope" => $data["scope"],
                 "scope_id" => $data["scope_id"],
-                "status" => $data["items"] ?? 1,
+                "status" => isset($data["items"]["status"]["value"]) ? $data["items"]["status"]["value"] : 1,
             ];
             foreach($data["items"] as $key => $val)
             {
@@ -189,6 +188,7 @@ class NavigationMenuItemValueRepository
                 }
 
                 if(isset($val["use_default_value"])  && $val["use_default_value"] == 1) continue;
+
 
                 $created_data["data"][] = $this->model->create($match);
             }

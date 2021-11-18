@@ -25,15 +25,20 @@ return [
                         [ "value" => "page", "label" => "Page" ],
                         [ "value" => "custom", "label" => "Custom" ]
                     ],
+                    "has_condition" => 1,
                     "rules" => "string|in:category,page,custom",
                     "is_required" => 1
                 ],
                 [
                     "title" => "Type Id",
                     "slug" => "type_id",
-                    "type" => "select",
+                    "type" => "text",
                     "value" => "",
                     "scope" => "website",
+                    "condition" => [
+                        "field" => 'type',
+                        "value" => 'category,page'
+                    ],
                     "options" => [],
                     "rules" => "required_if:items.type.value,page,category|integer",
                     "is_required" => 0
@@ -44,18 +49,12 @@ return [
                     "type" => "text",
                     "value" => "",
                     "scope" => "website",
+                    "condition" => [
+                        "field" => 'type',
+                        "value" => 'custom'
+                    ],
                     "options" => [],
                     "rules" => "required_if:items.type.value,custom|string",
-                    "is_required" => 0
-                ],
-                [
-                    "title" => "Additional Data",
-                    "slug" => "additional_data",
-                    "type" => "json",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [],
-                    "rules" => "json",
                     "is_required" => 0
                 ],
                 [
@@ -78,7 +77,7 @@ return [
                         [ "value" => "1", "label" => "Enabled" ],
                         [ "value" => "0", "label" => "Disabled" ]
                     ],
-                    "rules" => "nullable|in:0,1",
+                    "rules" => "in:0,1",
                     "is_required" => 0
                 ],
             ]
@@ -89,10 +88,14 @@ return [
                 [
                     "title" => "Background Type",
                     "slug" => "background_type",
-                    "type" => "text",
+                    "type" => "select",
                     "value" => "",
                     "scope" => "website",
-                    "options" => [],
+                    "has_condition" => 1,
+                    "options" => [
+                        [ "value" => "image", "label" => "Image" ],
+                        [ "value" => "video", "label" => "Video" ]
+                    ],
                     "rules" => "string",
                     "is_required" => 0
                 ],
@@ -103,16 +106,29 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'image'
+                    ],
                     "rules" => "mimes:jpeg,jpg,bmp,png,gif",
                     "is_required" => 0
                 ],
                 [
                     "title" => "Background Video Type",
                     "slug" => "background_video_type",
-                    "type" => "text",
+                    "type" => "select",
                     "value" => "",
                     "scope" => "website",
-                    "options" => [],
+                    "options" => [
+                        ["value" => "wistia", "label" => "Wistia"],
+                        ["value" => "youtube", "label" => "YouTube"],
+                        ["value" => "selfhosted", "label" => "Self Hosted"],
+                        ["value" => "vimeo", "label" => "Vimeo"],
+                    ],
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'video'
+                    ],
                     "rules" => "string",
                     "is_required" => 0
                 ],
@@ -123,13 +139,17 @@ return [
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
+                    "condition" => [
+                        "field" => 'background_type',
+                        "value" => 'video'
+                    ],
                     "rules" => "string",
                     "is_required" => 0
                 ],
                 [
                     "title" => "Background Overlay Color",
                     "slug" => "background_overlay_color",
-                    "type" => "text",
+                    "type" => "color_picker",
                     "value" => "",
                     "scope" => "website",
                     "options" => [],
@@ -161,9 +181,12 @@ return [
         "type" => "general.elements.1",
         "type_id" => "general.elements.2",
         "custom_link" => "general.elements.3",
-        "additional_data" => "general.elements.4",
-        "order" => "general.elements.5",
-        "status" => "general.elements.6",
-        "additional_data_attributes" => "general.additional.0",
+        "order" => "general.elements.4",
+        "status" => "general.elements.5",
+        "background_type" => "additional_data.elements.0",
+        "background_image" => "additional_data.elements.1",
+        "background_video_type" => "additional_data.elements.2",
+        "background_video" => "additional_data.elements.3",
+        "background_overlay_color" => "additional_data.elements.4",
     ]
 ];
