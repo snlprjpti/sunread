@@ -45,7 +45,7 @@ class ResolverHelper {
 
             $channel = $this->getChannel($request, $website);
             $websiteData["channel"] = collect($channel)->only(["id","name","code"])->toArray();
-            $websiteData["channel"]["logo"] = SiteConfig::fetch("logo", "channel", $channel->id);
+            $websiteData["channel"]["icon"] = SiteConfig::fetch("channel_icon", "channel", $channel->id);
 
             $all_stores = collect(CoreCache::getChannelAllStore($website, $channel))->map(function ($store) {
                 return new StoreResource(json_decode($store));
@@ -62,6 +62,8 @@ class ResolverHelper {
             $websiteData["stores"] = $all_stores;
 
             $websiteData["pages"] = $this->getPages($website);
+
+            $websiteData["meta"]["logo"] = SiteConfig::fetch("logo", "channel", $channel->id);
 
             if ($callback) $website = $callback($websiteData);
         }
