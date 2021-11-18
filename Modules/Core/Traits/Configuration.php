@@ -41,14 +41,16 @@ trait Configuration
         
     }
 
-    public function cacheQuery(array $element): array
+    public function cacheQuery(array $element, object $request, array $scope): array
     {
-        $resources = Cache::rememberForever($element["provider"], function() use ($element) {
+        $resources = Cache::rememberForever($element["provider"], function() use ($element, $scope) {
             $provider = $element["provider"];
             $pluck = $element["pluck"];
 
             $model = new $provider();
             $model = $model->select("{$pluck[1]} AS value", "{$pluck[0]} AS label");
+
+            if($element["path"] == "website_default_channel") $model->where("website_id", $scope["scope_id"]);
 
             if(isset($element["sort_by"]) && $element["sort_by"] != "") $model = $model->orderBy($element["sort_by"], "asc");
             return $model->get();
