@@ -91,6 +91,7 @@ class OrderRepository extends BaseRepository
             $order = $this->create($data, function ($order) use ($request) {
                 $this->orderAddressRepository->store($request, $order);
                 $this->orderMetaRepository->store($request, $order);
+                $order->load(["order_items", "order_taxes.order_items", "order_metas", "order_addresses"]);
             });
 
             $items = CartItem::whereCartId($request->cart_id)->select("product_id", "qty")->get()->toArray();
