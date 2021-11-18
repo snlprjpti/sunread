@@ -3,7 +3,6 @@
 namespace Modules\Sales\Repositories\StoreFront;
 
 use Exception;
-use Illuminate\Bus\Batch;
 use Modules\Cart\Entities\Cart;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
@@ -49,8 +48,7 @@ class OrderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-
-            $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
+            // $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
             $data = [
@@ -107,9 +105,12 @@ class OrderRepository extends BaseRepository
                 $jobs[] = new OrderTaxesJob($order, $order_item_details);
                 $order_item = $this->orderItemRepository->store($request, $order, $order_item_details);
             }
+          
             Bus::batch($jobs)->then( function (Batch $batch) use ($order, $request, $coreCache) {
-                OrderCalculation::dispatchSync($order, $request, $coreCache);
-            })->dispatch();
+                OrderCalculation::dispatch($order, $request, $coreCache);
+            })->allowFailures()->dispatch();
+
+            dd($jobs);
         } 
         catch (Exception $exception)
         {

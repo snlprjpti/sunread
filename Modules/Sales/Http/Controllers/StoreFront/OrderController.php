@@ -42,14 +42,14 @@ class OrderController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
-        try
-        {
+        // try
+        // {
             $response = $this->repository->store($request);
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
+        // }
+        // catch( Exception $exception )
+        // {
+        //     return $this->handleException($exception);
+        // }
 
         return $this->successResponse($this->resource($response), $this->lang('create-success'), 201);
     }
