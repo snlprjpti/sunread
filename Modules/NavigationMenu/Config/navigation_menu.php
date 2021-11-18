@@ -162,15 +162,15 @@ return [
     "locations" => [
         [
             "label" => "Footer",
-            "slug" => "footer",
+            "value" => "footer",
         ],
         [
             "label" => "Primary",
-            "slug" => "primary",
+            "value" => "primary",
         ],
         [
             "label" => "Full Screen",
-            "slug" => "full_screen",
+            "value" => "full_screen",
         ],
     ],
     "absolute_path" => [
