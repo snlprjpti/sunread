@@ -13,12 +13,13 @@ Route::group(["middleware" => ["api"]], function() {
         //Route::get('products/{id}/reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "reIndex"])->name('products.reindex');
 
         // Catalog Product Routes
+        Route::get("product/configurations", [\Modules\Product\Http\Controllers\ProductController::class, "configurations"])->name("products.configurations");
         Route::put("/products/{product_id}/status", [\Modules\Product\Http\Controllers\ProductController::class, "updateStatus"])->name("products.status");
         Route::resource("products", ProductController::class)->except(["create", "edit"]);
         Route::get("product/attributes/{id}", [\Modules\Product\Http\Controllers\ProductController::class, "product_attributes"])->name("products.attributes.show");
         Route::get("product/configurable/{id}", [\Modules\Product\Http\Controllers\ProductController::class, "variants"])->name("products.configurable.show");
         Route::resource("configurable-products", ProductConfigurableController::class)->except(["create", "edit", "index", "show"]);
-        Route::get("products/cache", [\Modules\Product\Http\Controllers\ProductController::class, "cache"])->name("products.cache");
+        //Route::get("products/cache", [\Modules\Product\Http\Controllers\ProductController::class, "cache"])->name("products.cache");
 
         // Product Images Routes
         Route::group(['prefix' => 'product', 'as' => 'products.'], function() {

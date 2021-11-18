@@ -5,6 +5,7 @@ namespace Modules\Core\Services;
 use Exception;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Storage;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
 use Modules\Core\Exceptions\PageNotFoundException;
@@ -51,7 +52,11 @@ class ResolverHelper {
 
             $store = $this->getStore($request, $website, $channel);
             $storeData = collect($store)->only(["id","name","code"])->toArray();
+
             $storeData["locale"] = SiteConfig::fetch("store_locale", "store", $store->id)?->code;
+            $store_icon= SiteConfig::fetch("store_icon", "store", $store->id);
+            $storeData["icon"] = $store_icon ? Storage::url($store_icon) : $store_icon;
+
             $websiteData["channel"]["store"] = $storeData;
 
             $websiteData["stores"] = $all_stores;

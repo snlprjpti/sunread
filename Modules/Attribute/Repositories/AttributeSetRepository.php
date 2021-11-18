@@ -94,24 +94,33 @@ class AttributeSetRepository extends BaseRepository
         ];
     }
 
-    public function getAttributeOption(object $attribute)
+    public function getAttributeOption(object $attribute): array
     {
         try
         {
             $configOptions = $attribute->getConfigOption();
 
             $options = $configOptions ?? $attribute->attribute_options;
-            return $options->map( function ($option) {
+            $attribute_options = $options->map( function ($option) {
                 return [
                     "value" => $option->id,
                     "label" => $option->name
                 ];
-            });
+            })->toArray();
+
+            if($attribute->slug == "tax_class_id") {
+                $attribute_options[] = [
+                    "value" => 0,
+                    "label" => "None"
+                ];
+            }
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
+
+        return $attribute_options;
     }
 
     public function getInventoryChildren(?int $id = null): array

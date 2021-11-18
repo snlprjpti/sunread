@@ -47,9 +47,45 @@ return [
                         [ "value" => "1", "label" => "Enabled" ],
                         [ "value" => "0", "label" => "Disabled" ]
                     ],
-                    "rules" => "nullable|in:0,1",
+                    "rules" => "in:0,1",
                     "is_required" => 0
                 ],
+            ]
+        ],
+        "search_engine_optimization" => [
+            "title" => "Search Engine Optimization",
+            "elements" => [
+                [
+                    "title" => "Meta Title",
+                    "slug" => "meta_title",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "",
+                    "is_required" => 0
+                ],
+                [
+                    "title" => "Meta KeyWords",
+                    "slug" => "meta_keywords",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "",
+                    "is_required" => 0
+
+                ],
+                [
+                    "title" => "Meta Description",
+                    "slug" => "meta_description",
+                    "type" => "textarea",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "",
+                    "is_required" => 0
+                ]
             ]
         ],
         "hero_banner" => [
@@ -66,7 +102,7 @@ return [
                         [ "value" => "image", "label" => "Image" ],
                         [ "value" => "video", "label" => "Video" ]
                     ],
-                    "rules" => "in:image,video",
+                    "rules" => "nullable|in:image,video",
                     "multiple" => false,
                     "is_required" => 0
                 ],
@@ -98,6 +134,26 @@ return [
                     "rules" => "string|required_if:background_type,video",
                     "is_required" => 0
                 ],
+                [
+                    "title" => "Subtitle",
+                    "slug" => "subtitle",
+                    "type" => "text",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "string",
+                    "is_required" => 0
+                ],
+                [
+                    "title" => "Hero Content",
+                    "slug" => "hero_content",
+                    "type" => "textarea",
+                    "value" => "",
+                    "scope" => "store",
+                    "options" => [],
+                    "rules" => "string",
+                    "is_required" => 0
+                ],
             ]
         ],
         "content" => [
@@ -114,19 +170,9 @@ return [
                     "is_required" => 1
                 ],
                 [
-                    "title" => "Header Content",
-                    "slug" => "header_content",
-                    "type" => "textarea",
-                    "value" => "",
-                    "scope" => "store",
-                    "options" => [],
-                    "rules" => "string",
-                    "is_required" => 1
-                ],
-                [
                     "title" => "Opening hours",
                     "slug" => "opening_hours",
-                    "type" => "textarea",
+                    "type" => "texteditor",
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
@@ -136,7 +182,7 @@ return [
                 [
                     "title" => "Address",
                     "slug" => "address",
-                    "type" => "textarea",
+                    "type" => "texteditor",
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
@@ -146,7 +192,7 @@ return [
                 [
                     "title" => "Contact",
                     "slug" => "contact",
-                    "type" => "textarea",
+                    "type" => "texteditor",
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
@@ -180,43 +226,6 @@ return [
                 ],
             ]
         ],
-        "search_engine_optimization" => [
-            "title" => "Search Engine Optimization",
-            "elements" => [
-                [
-                    "title" => "Meta Title",
-                    "slug" => "meta_title",
-                    "type" => "text",
-                    "value" => "",
-                    "scope" => "store",
-                    "options" => [],
-                    "rules" => "nullable",
-                    "is_required" => 0
-
-                ],
-                [
-                    "title" => "Meta KeyWords",
-                    "slug" => "meta_keywords",
-                    "type" => "text",
-                    "value" => "",
-                    "scope" => "store",
-                    "options" => [],
-                    "rules" => "nullable",
-                    "is_required" => 0
-
-                ],
-                [
-                    "title" => "Meta Description",
-                    "slug" => "meta_description",
-                    "type" => "textarea",
-                    "value" => "",
-                    "scope" => "store",
-                    "options" => [],
-                    "rules" => "nullable",
-                    "is_required" => 0
-                ]
-            ]
-        ],
     ],
     "absolute_path" => [
         "title" => "general.elements.0",
@@ -224,15 +233,16 @@ return [
         "type" => "general.elements.2",
         "status" => "general.elements.3",
         "thumbnail" => "content.elements.0",
-        "header_content" => "content.elements.1",
-        "opening_hours" => "content.elements.2",
-        "address" => "content.elements.3",
-        "contact" => "content.elements.4",
+        "opening_hours" => "content.elements.1",
+        "address" => "content.elements.2",
+        "contact" => "content.elements.3",
         "latitude" => "location.elements.0",
         "longitude" => "location.elements.1",
         "background_type" => "hero_banner.elements.0",
         "background_image" => "hero_banner.elements.1",
         "background_video" => "hero_banner.elements.2",
+        "subtitle" => "hero_banner.elements.3",
+        "hero_content" => "hero_banner.elements.4",
         "meta_title" => "search_engine_optimization.elements.0",
         "meta_keywords" => "search_engine_optimization.elements.1",
         "meta_description" => "search_engine_optimization.elements.2"

@@ -18,9 +18,6 @@ class ProductUrlGeneratorJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 10;
-    public $timeout = 90000;
-
     public function __construct()
     {
         //
@@ -30,7 +27,7 @@ class ProductUrlGeneratorJob implements ShouldQueue
     {
        try
        {
-           $products = Product::with(["product_attributes"])->get();
+           $products = Product::with(["variants", "product_attributes"])->where("type", "configurable")->get();
            foreach ($products as $product)
            {
                $product_name = $product->value([
@@ -38,13 +35,31 @@ class ProductUrlGeneratorJob implements ShouldQueue
                    "scope_id" => $product->website_id,
                    "attribute_slug" => "name"
                 ]);
-                $product_attribute = ProductAttribute::whereProductId($product->id)
-                ->whereAttributeId(18)->whereScope("website")
-                ->whereScopeId($product->website_id)->first();
-                
-                $product_attribute?->value()->each(function($attribute_value) use($product_name) {
-                    $attribute_value->update(["value" => $this->createSlug($product_name)]);
-                });
+                $product_slug = Str::slug($product_name);
+                $i = 1;
+                foreach($product->variants as $variant)
+                {
+                    $product_attribute = ProductAttribute::whereProductId($variant->id)
+                    ->whereAttributeId(18)->whereScope("website")
+                    ->whereScopeId($variant->website_id)->first();
+                    if ( !$product_attribute ) {
+                        $value_attribute_create = ProductAttributeString::create(["value" => "{$product_slug}-{$i}"]);
+                        $product_attribute = ProductAttribute::create([
+                            "scope" => "website",
+                            "scope_id" => $variant->website_id,
+                            "attribute_id" => 18,
+                            "product_id" => $variant->id,
+                            "value_type" => "Modules\Product\Entities\ProductAttributeString",
+                            "value_id" => $value_attribute_create->id
+                        ]);
+                    }
+                    else {
+                        $product_attribute?->value()->each(function($attribute_value) use($product_slug, $i) {
+                            $attribute_value->update(["value" => "{$product_slug}-{$i}"]);
+                        });
+                    }
+                    $i = $i + 1;
+                }
             }
        }
        catch ( Exception $exception )
