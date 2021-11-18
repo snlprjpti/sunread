@@ -12,6 +12,8 @@ class OrderAddress extends Model
 
     protected $fillable = ["order_id", "customer_id", "customer_address_id", "address_type", "first_name", "middle_name", "last_name", "phone", "email", "address_line_1", "address_line_2", "postal_code", "country_id", "region_id", "city_id", "region_name", "city_name", "vat_number"];
 
+    public $preventsLazyLoading = false;
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);

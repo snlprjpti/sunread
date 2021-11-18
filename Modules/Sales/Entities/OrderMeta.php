@@ -12,6 +12,8 @@ class OrderMeta extends Model
 
     protected $fillable = ["order_id", "meta_key", "meta_value"];
 
+    public $preventsLazyLoading = false;
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
