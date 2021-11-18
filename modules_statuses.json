@@ -20,6 +20,11 @@
     "ProductStockAlert": true,
     "ProductStockAlertResource": true,
     "GeoIp": true,
+    "Sales": true,
     "ClubHouse": true,
+    "Controller": true,
+    "OrderStatus": true,
+    "ShippingMethods": true,
+    "PaymentMethods": true,
     "NavigationMenu": true
 }
