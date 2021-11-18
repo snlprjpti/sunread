@@ -11,6 +11,7 @@ use Modules\Sales\Transformers\OrderResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Sales\Exceptions\FreeShippingNotAllowedException;
 use Modules\Sales\Repositories\StoreFront\OrderRepository;
 
 class OrderController extends BaseController
@@ -26,8 +27,11 @@ class OrderController extends BaseController
         $this->model = $order;
         $this->model_name = "Order";
         $this->repository = $repository;
+        $exception_statuses = [
+            FreeShippingNotAllowedException::class => 403
+        ];
 
-        parent::__construct($this->model, $this->model_name);
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function resource(object $order): JsonResource
@@ -42,14 +46,14 @@ class OrderController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
-        // try
-        // {
+        try
+        {
             $response = $this->repository->store($request);
-        // }
-        // catch( Exception $exception )
-        // {
-        //     return $this->handleException($exception);
-        // }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
 
         return $this->successResponse($this->resource($response), $this->lang('create-success'), 201);
     }
