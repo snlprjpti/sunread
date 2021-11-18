@@ -160,21 +160,18 @@ return [
         ]
     ],
     "locations" => [
-        "title" => "Menu Location",
-        "elements" => [
-            [
-                "label" => "Footer",
-                "slug" => "footer",
-            ],
-            [
-                "label" => "Primary",
-                "slug" => "primary",
-            ],
-            [
-                "label" => "Full Screen",
-                "slug" => "full_screen",
-            ],
-        ]
+        [
+            "label" => "Footer",
+            "slug" => "footer",
+        ],
+        [
+            "label" => "Primary",
+            "slug" => "primary",
+        ],
+        [
+            "label" => "Full Screen",
+            "slug" => "full_screen",
+        ],
     ],
     "absolute_path" => [
         "title" => "general.elements.0",
