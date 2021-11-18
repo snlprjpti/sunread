@@ -70,7 +70,6 @@ class NavigationMenuItemValueRepository
         {
             throw $exception;
         }
-
         return $all_rules;
     }
 
@@ -189,6 +188,7 @@ class NavigationMenuItemValueRepository
                 }
 
                 if(isset($val["use_default_value"])  && $val["use_default_value"] == 1) continue;
+
 
                 $created_data["data"][] = $this->model->create($match);
             }
