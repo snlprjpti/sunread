@@ -25,13 +25,15 @@ trait HasOrderCalculation
         {
             $sub_total = 0.00;
             $sub_total_tax_amount = 0.00;
-            $total_qty_ordered = 0.00;
+            $total_qty_ordered = 0;
             $item_discount_amount = 0.00;
             
+            $total_items = 0;
             foreach ( $order->order_items as $item ) {
                 $sub_total += $item->row_total;
                 $sub_total_tax_amount += $item->row_total_incl_tax;
                 $total_qty_ordered += $item->qty;
+                $total_items += 1;
                 $item_discount_amount += $item->discount_amount_tax;
             }
 
@@ -49,7 +51,7 @@ trait HasOrderCalculation
                 "tax_amount" => $total_tax,
                 "shipping_amount" => $arr_shipping_amount['shipping_amount'],
                 "grand_total" => $grand_total,
-                "total_items_ordered" => $order->order_items->count(),
+                "total_items_ordered" => $total_items,
                 "total_qty_ordered" => $total_qty_ordered,
                 // "status" => SiteConfig::fetch(""), // TO-DO
                 "shipping_method" => SiteConfig::fetch("delivery_methods_{$request->shipping_method}_method_name", "channel", $channel_id),

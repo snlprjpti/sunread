@@ -22,7 +22,6 @@ class NavigationMenuItemResource extends JsonResource
             "type_id" => $this->value($data, "type_id"),
             "custom_link" => $this->value($data, "custom_link"),
             "type" => $this->value($data, "type"),
-            "additional_data" => $this->value($data, "additional_data"),
             "order" => $this->value($data, "order"),
             "status" => $this->value($data, "status"),
             "values" => $this->values,

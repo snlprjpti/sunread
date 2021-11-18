@@ -3,12 +3,10 @@
 namespace Modules\Sales\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Modules\Core\Entities\Store;
-use Modules\Core\Entities\Website;
-use Modules\Product\Entities\Product;
 use Modules\Sales\Entities\Order;
+use Illuminate\Support\Facades\DB;
+use Modules\Core\Entities\Website;
 
 class OrderItemTableSeeder extends Seeder
 {
@@ -24,13 +22,13 @@ class OrderItemTableSeeder extends Seeder
                     "product_options" => [
                        "attributes" => [
                             [
-                                "attribute_id" => 1,
+                                "attribute_id" => 24,
                                 "label" => "size",
                                 "name" => "Size",
                                 "value" => "L" 
                             ],
                             [
-                                "attribute_id" => 2,
+                                "attribute_id" => 23,
                                 "label" => "color",
                                 "name" => "Color",
                                 "value" => "red" 
@@ -62,19 +60,20 @@ class OrderItemTableSeeder extends Seeder
                 "product_id" => 1,
                 "order_id" => 1,
                 "product_options" => json_encode([
-                    "image_url" => url("product.png"),
-                    "configurable_attributes" => [
-                        "size" => [
-                            "attribute_id" => 1,
-                            "label" => "size",
-                            "name" => "Size",
-                            "value" => "L" 
-                        ],
-                        "color" => [
-                            "attribute_id" => 2,
-                            "label" => "color",
-                            "name" => "Color",
-                            "value" => "L" 
+                    "product_options" => [
+                        "attributes" => [
+                            [
+                                "attribute_id" => 24,
+                                "label" => "size",
+                                "name" => "Size",
+                                "value" => "L" 
+                            ],
+                            [
+                                "attribute_id" => 23,
+                                "label" => "color",
+                                "name" => "Color",
+                                "value" => "red" 
+                            ],
                         ],
                         "image_url" => url("product.png"), 
                     ],

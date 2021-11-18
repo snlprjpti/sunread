@@ -29,11 +29,11 @@ trait HasShippingCalculation
 				}
 				else {
 					$order->order_taxes->map( function ($order_tax) use (&$total_shipping_amount) {
-						$order_item_total_amount = $order_tax->order_tax_items->filter(fn ($order_tax_item) => ($order_tax_item == "product"))->map( function ($order_item) use ($order_tax, &$total_shipping_amount) {
+						$order_item_total_amount = $order_tax->order_tax_items->filter(fn ($order_tax_item) => ($order_tax_item->tax_item_type == "product"))->map( function ($order_item) use ($order_tax, &$total_shipping_amount) {
 							$amount = (($order_tax->percent/100) * $order_item->amount);
 							$total_shipping_amount += $amount;
 							$data = [
-								"order_id" => $order_tax->id,
+								"tax_id" => $order_tax->id,
 								"tax_percent" => $order_tax->percent,
 								"amount" => $amount,
 								"tax_item_type" => "shipping"
@@ -55,10 +55,10 @@ trait HasShippingCalculation
 				$sub_total = $order->order_items->sum('row_total');
 				$sub_total_incl_tax = $order->order_items->sum('row_total_incl_tax');
 
-				if (!($incl_tax_to_amt && ($minimum_order_amt <= $sub_total_incl_tax))) {
+				if (($incl_tax_to_amt && ($minimum_order_amt > $sub_total_incl_tax))) {
 					throw new FreeShippingNotAllowedException("Total order must be more than {$sub_total_incl_tax}", 403);
 				} 
-				elseif (!$incl_tax_to_amt && ($minimum_order_amt <= $sub_total)) {
+				elseif (!$incl_tax_to_amt && ($minimum_order_amt > $sub_total)) {
 					throw new FreeShippingNotAllowedException("Total order must be more than {$sub_total}", 403);
 				}
 				break;
