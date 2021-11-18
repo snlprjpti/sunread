@@ -19,9 +19,7 @@ Route::group(["middleware" => ["api"]], function () {
         Route::post("/reset-password", [ResetPasswordController::class, "store"])->name("reset-password.store");
 
         Route::post("/send-confirmation/", [VerificationController::class, "sendConfirmation"])->middleware("jwt.verify")->name("account-confirmation.store");
-        Route::get("/verify-account/{token}", [VerificationController::class, "verifyAccount"])->name("account-verify");
     });
-    Route::get("/{store_url}/reset-password/{token}", [ResetPasswordController::class, "create"])->name("customers.reset-password.create");
 
     Route::group(["middleware" => ["customer"], "prefix" => "customers", "as" => "customers."], function () {
         // CUSTOMER PROFILE

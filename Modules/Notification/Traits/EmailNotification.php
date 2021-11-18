@@ -151,8 +151,9 @@ trait EmailNotification
                 "customer_name" => "{$customer->first_name} {$customer->middle_name} {$customer->last_name}",
                 "customer_email_address" => $customer->email,
                 "customer_dashboard_url" => $customer_dashboard_url,
-                "customer_store_url" => $storefront_url,
-                "store_id" => $customer->store_id
+                "store_id" => $customer->store_id,
+                "channel_code" => $channel->code,
+                "store_code" => $store->code
             ];
         }
         catch (Exception $exception)
@@ -201,7 +202,7 @@ trait EmailNotification
         try
         {
             $data = $this->getCustomerData($customer_id);
-            $data->password_reset_url = url("{$data->customer_store_url}/reset-password/{$append_data }");
+            $data->password_reset_url = url("{$data->channel_code}/{$data->store_code}/reset-password/{$append_data }");
         }
         catch (Exception $exception)
         {
@@ -218,15 +219,15 @@ trait EmailNotification
     {
         try
         {
-            $customer_data = $this->getCustomerData($customer_id);
-            $customer_data->account_confirmation_url = route('customers.account-verify', $append_data);
+            $data = $this->getCustomerData($customer_id);
+            $data->account_confirmation_url = url("{$data->channel_code}/{$data->store_code}/verify-account/{$append_data }");
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return $customer_data;
+        return $data;
     }
 
     /**
