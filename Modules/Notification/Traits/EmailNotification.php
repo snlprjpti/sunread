@@ -144,7 +144,7 @@ trait EmailNotification
 
             $storefront_url = "{$store_front_baseurl}/{$channel->code}/{$store->code}";
 
-            $customer_dashboard_url = "{$storefront_url}/account";
+            $customer_dashboard_url = url("{$storefront_url}/account");
 
             $customer_data = [
                 "customer_id" => $customer->id,
