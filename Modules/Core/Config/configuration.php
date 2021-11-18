@@ -1195,11 +1195,11 @@ return[
                 "subChildren" => [
                     [
                         "title" => "Bank Transfer Payment",
-                        "slug" => "bank_transfer_payment",
+                        "slug" => "bank_transfer",
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "payment_methods_bank_transfer_payment",
+                                "path" => "payment_methods_bank_transfer",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1277,11 +1277,11 @@ return[
                     ],
                     [
                         "title" => "Cash On Delivery Payment",
-                        "slug" => "cash_on_delivery_payment",
+                        "slug" => "cash_on_delivery",
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "payment_methods_cash_delievery",
+                                "path" => "payment_methods_cash_on_delievery",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1298,7 +1298,7 @@ return[
                             ],
                             [
                                 "title" => "Title",
-                                "path" => "payment_methods_cash_delievery_title",
+                                "path" => "payment_methods_cash_on_delievery_title",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1312,7 +1312,7 @@ return[
                             ],
                             [
                                 "title" => "New Order Status",
-                                "path" => "payment_methods_cash_delievery_new_order_status",
+                                "path" => "payment_methods_cash_on_delievery_new_order_status",
                                 "type" => "select",
                                 "provider" => "Modules\Sales\Entities\OrderStatus",
                                 "pluck" => ["slug", "name"],
@@ -1326,7 +1326,7 @@ return[
                             ],
                             [
                                 "title" => "Payment From Applicable Countries",
-                                "path" => "payment_methods_cash_delievery_payment_from_applicable_countries",
+                                "path" => "payment_methods_cash_on_delievery_payment_from_applicable_countries",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1343,7 +1343,7 @@ return[
                             ],
                             [
                                 "title" => "Payment From Specific Countries",
-                                "path" => "payment_methods_cash_delievery_payment_from_specific_countries",
+                                "path" => "payment_methods_cash_on_delievery_payment_from_specific_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
@@ -1386,7 +1386,7 @@ return[
                             ],
                             [
                                 "title" => "Title",
-                                "path" => "delivery_method_flat_rate_title",
+                                "path" => "delivery_methods_flat_rate_title",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1400,7 +1400,7 @@ return[
                             ],
                             [
                                 "title" => "Method Name",
-                                "path" => "delivery_method_flat_rate_method_name",
+                                "path" => "delivery_methods_flat_rate_method_name",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1414,7 +1414,7 @@ return[
                             ],
                             [
                                 "title" => "Type",
-                                "path" => "delivery_method_flat_rate_flat_type",
+                                "path" => "delivery_methods_flat_rate_flat_type",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1431,7 +1431,7 @@ return[
                             ],
                             [
                                 "title" => "Price",
-                                "path" => "delivery_method_flat_rate_flat_price",
+                                "path" => "delivery_methods_flat_rate_flat_price",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1445,7 +1445,7 @@ return[
                             ],
                             [
                                 "title" => "Ship to Applicable Countries",
-                                "path" => "delivery_method_flat_rate_ship_from_applicable_countries",
+                                "path" => "delivery_methods_flat_rate_ship_from_applicable_countries",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1462,7 +1462,7 @@ return[
                             ],
                             [
                                 "title" => "Ship From Specific Countries",
-                                "path" => "delivery_method_flat_rate_ship_from_specific_countries",
+                                "path" => "delivery_methods_flat_rate_ship_from_specific_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
@@ -1499,7 +1499,7 @@ return[
                             ],
                             [
                                 "title" => "Title",
-                                "path" => "delivery_method_free_shipping_title",
+                                "path" => "delivery_methods_free_shipping_title",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1513,7 +1513,7 @@ return[
                             ],
                             [
                                 "title" => "Method Name",
-                                "path" => "delivery_method_free_shipping_method_name",
+                                "path" => "delivery_methods_free_shipping_method_name",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1527,7 +1527,7 @@ return[
                             ],
                             [
                                 "title" => "Minimum Order Amount",
-                                "path" => "delivery_method_free_shipping_minimum_order_amt",
+                                "path" => "delivery_methods_free_shipping_minimum_order_amt",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1541,7 +1541,7 @@ return[
                             ],
                             [
                                 "title" => "Include Tax to Amount",
-                                "path" => "delivery_method_free_shipping_include_tax_to_amt",
+                                "path" => "delivery_methods_free_shipping_include_tax_to_amt",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1558,7 +1558,7 @@ return[
                             ],
                             [
                                 "title" => "Ship to Applicable Countries",
-                                "path" => "delivery_method_free_shipping_ship_from_applicable_countries",
+                                "path" => "delivery_methods_free_shipping_ship_from_applicable_countries",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1575,7 +1575,7 @@ return[
                             ],
                             [
                                 "title" => "Ship From Specific Countries",
-                                "path" => "delivery_method_free_shipping_ship_from_specific_countries",
+                                "path" => "delivery_methods_free_shipping_ship_from_specific_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
