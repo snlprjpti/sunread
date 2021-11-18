@@ -105,8 +105,8 @@ class OrderRepository extends BaseRepository
                 $jobs[] = new OrderTaxesJob($order, $order_item_details);
                 $order_item = $this->orderItemRepository->store($request, $order, $order_item_details); 
                 $this->createOrderTax($order, $order_item_details);
-                $this->updateOrderTax($order, $request, $coreCache);
             }
+            $this->updateOrderTax($order, $request, $coreCache);
         } 
         catch (Exception $exception)
         {

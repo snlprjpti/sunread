@@ -1281,7 +1281,7 @@ return[
                         "elements" => [
                             [
                                 "title" => "Enabled",
-                                "path" => "payment_methods_cash_on_delievery",
+                                "path" => "payment_methods_cash_on_delivery",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1298,7 +1298,7 @@ return[
                             ],
                             [
                                 "title" => "Title",
-                                "path" => "payment_methods_cash_on_delievery_title",
+                                "path" => "payment_methods_cash_on_delivery_title",
                                 "type" => "text",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1312,7 +1312,7 @@ return[
                             ],
                             [
                                 "title" => "New Order Status",
-                                "path" => "payment_methods_cash_on_delievery_new_order_status",
+                                "path" => "payment_methods_cash_on_delivery_new_order_status",
                                 "type" => "select",
                                 "provider" => "Modules\Sales\Entities\OrderStatus",
                                 "pluck" => ["slug", "name"],
@@ -1326,7 +1326,7 @@ return[
                             ],
                             [
                                 "title" => "Payment From Applicable Countries",
-                                "path" => "payment_methods_cash_on_delievery_payment_from_applicable_countries",
+                                "path" => "payment_methods_cash_on_delivery_payment_from_applicable_countries",
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
@@ -1343,7 +1343,7 @@ return[
                             ],
                             [
                                 "title" => "Payment From Specific Countries",
-                                "path" => "payment_methods_cash_on_delievery_payment_from_specific_countries",
+                                "path" => "payment_methods_cash_on_delivery_payment_from_specific_countries",
                                 "type" => "select",
                                 "provider" => "Modules\Country\Entities\Country",
                                 "pluck" => ["iso_2_code", "name"],
@@ -1418,7 +1418,7 @@ return[
                                 "type" => "select",
                                 "provider" => "",
                                 "pluck" => [],
-                                "default" => "per_order",
+                                "default" => "per_item",
                                 "options" => [
                                     [ "value" => "per_item", "label" => "Per Item" ],
                                     [ "value" => "per_order", "label" => "Per Order" ]
