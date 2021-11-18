@@ -12,6 +12,8 @@ class OrderStatus extends Model
 
     protected $fillable = ["name", "slug"];
 
+    public $preventsLazyLoading = false;
+
     public function order_status_state(): HasMany
     {
         return $this->hasMany(OrderStatusState::class, 'status', 'slug');
