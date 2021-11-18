@@ -118,14 +118,14 @@ class ConfigurationTest extends BaseTestCase
         ]);
     }
 
-    public function testAdminCanUpdateResourceWithNonMandatoryData()
-    {
-        $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $this->getNonMandatoryUpdateData());
+    // public function testAdminCanUpdateResourceWithNonMandatoryData()
+    // {
+    //     $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $this->getNonMandatoryUpdateData());
 
-        $response->assertStatus(201);
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
-        ]);
-    }
+    //     $response->assertStatus(201);
+    //     $response->assertJsonFragment([
+    //         "status" => "success",
+    //         "message" => __("core::app.response.create-success", ["name" => $this->model_name])
+    //     ]);
+    // }
 }
