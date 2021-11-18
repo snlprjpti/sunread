@@ -59,7 +59,6 @@ trait HasOrderCalculation
                 "payment_method" => SiteConfig::fetch("payment_methods_{$request->payment_method}_title", "channel", $channel_id),
                 "payment_method_label" => SiteConfig::fetch("payment_methods_{$request->payment_method}_title", "channel", $channel_id),
             ]);
-            $order->load(["order_items", "order_taxes.order_items", "order_metas", "order_addresses"]);
 
         }
         catch ( Exception $exception )
