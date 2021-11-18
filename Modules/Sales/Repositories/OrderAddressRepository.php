@@ -15,7 +15,7 @@ class OrderAddressRepository extends BaseRepository
         $this->model_key = "order_addresses";
         $this->rules = [
             "address" => "required|array",
-            "address.*.customer_address_id" => "required|exists:customer_addresses,id",
+            "address.*.customer_address_id" => "sometimes|exists:customer_addresses,id",
             "address.*.type" => "required|in:shipping,billing",
             "address.*.first_name" => "required",
             "address.*.last_name" => "required",
@@ -41,7 +41,7 @@ class OrderAddressRepository extends BaseRepository
                 $orderAddressData = [
                     "order_id" => $order->id,
                     "customer_id" => auth("customer")->id(),
-                    "customer_address_id" => $order_address['customer_address_id'],
+                    "customer_address_id" => $order_address['customer_address_id'] ?? null,
                     "address_type" => $order_address['type'],
                     "first_name" => $order_address['first_name'],
                     "middle_name" => $order_address['middle_name'] ?? null,
