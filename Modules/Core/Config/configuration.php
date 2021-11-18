@@ -38,59 +38,10 @@ return[
                                 "scope" => "channel",
                                 "is_required" => 1,
                                 "sort_by" => "name"
-                            ],
-                            [
-                                "title" => "Zip/Postal Code is Optional for",
-                                "path" => "optional_zip_countries",
-                                "type" => "select",
-                                "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "iso_2_code"],
-                                "default" => [],
-                                "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "exists:countries,iso_2_code",
-                                "multiple" => true,
-                                "scope" => "website",
-                                "is_required" => 1,
-                                "sort_by" => "name"
-                            ],
-                            [
-                                "title" => "State is Optional for",
-                                "path" => "general_optional_state",
-                                "type" => "select",
-                                "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "iso_2_code"],
-                                "default" => [],
-                                "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "exists:countries,iso_2_code",
-                                "multiple" => true,
-                                "scope" => "website",
-                                "is_required" => 1,
-                                "sort_by" => "name"
                             ]
                         ]
                     ],
-                    [
-                        "title" => "State Options",
-                        "slug" => "state_options",
-                        "elements" => [
-                            [
-                                "title" => "State Country",
-                                "path" => "state_country",
-                                "type" => "select",
-                                "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "iso_2_code"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "exists:countries,iso_2_code",
-                                "multiple" => false,
-                                "scope" => "store",
-                                "is_required" => 1,
-                                "sort_by" => "name"
-                            ],
-                        ]
-                    ],
+
                     [
                         "title" => "Store Information",
                         "slug" => "store_information",
@@ -215,8 +166,8 @@ return[
                                 "sort_by" => ""
                             ],
                             [
-                                "title" => "Store Image",
-                                "path" => "store_image",
+                                "title" => "Store Icon",
+                                "path" => "store_icon",
                                 "type" => "file",
                                 "provider" => "",
                                 "pluck" => [],
@@ -611,27 +562,7 @@ return[
                                 "sort_by" => "name"
                             ]
                         ]
-                    ],
-                    [
-                        "title" => "Store",
-                        "slug" => "store",
-                        "elements" => [
-                            [
-                                "title" => "Default Store",
-                                "path" => "website_default_store",
-                                "type" => "select",
-                                "provider" => "Modules\Core\Entities\Store",
-                                "pluck" => ["code","id"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "exists:stores,id",
-                                "multiple" => false,
-                                "scope" => "website",
-                                "is_required" => 0,
-                                "sort_by" => "name"
-                            ]
-                        ]
-                    ],
+                    ]
                 ]
             ],
             [
@@ -706,75 +637,6 @@ return[
                 ]
             ]
 
-        ]
-    ],
-    "catalog" => [
-        "title" => "Catalog",
-        "children" => [
-            [
-                "title" => "Catalog",
-                "subChildren" => [
-                    [
-                        "title" => "Product Fields Auto-Generation",
-                        "slug" => "product_fields_auto_generation",
-                        "elements" => [
-                            [
-                                "title" => "Mask for SKU",
-                                "path" => "catalog_masks_sku",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
-                                "scope" => "store",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Mask for Meta Title",
-                                "path" => "catalog_meta_title",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Mask for Meta Keywords",
-                                "path" => "catalog_meta_keywords",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
-                                "scope" => "store",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Mask for Meta description",
-                                "path" => "catalog_meta_description",
-                                "type" => "textarea",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
-                                "scope" => "website",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                        ]
-
-                    ]
-                ]
-            ]
         ]
     ],
     "customer" => [
