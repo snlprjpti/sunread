@@ -3,7 +3,7 @@
 namespace Modules\Sales\Repositories\StoreFront;
 
 use Exception;
-use Modules\Cart\Entities\Cart;
+use Illuminate\Bus\Batch;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +34,7 @@ class OrderRepository extends BaseRepository
         $this->orderAddressRepository = $orderAddressRepository;
         $this->orderMetaRepository = $orderMetaRepository;
         $this->rules = [
+            "cart_id" => "required|exists:carts,id",
             "orders" => "array",
             "orders.*.product_id" => "required|exists:products,id",
             "orders.*.qty" => "required|decimal",
@@ -45,10 +46,10 @@ class OrderRepository extends BaseRepository
 
     public function store(object $request): mixed
     {
-        DB::beginTransaction();
+        // DB::beginTransaction();
         try
         {
-            // $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
+            $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
             $data = [
@@ -92,8 +93,7 @@ class OrderRepository extends BaseRepository
                 $this->orderMetaRepository->store($request, $order);
             });
 
-            Cart::findOrFail($request->cart_hash_id);
-            $items = CartItem::whereCartId($request->cart_hash_id)->select("product_id", "qty")->get()->toArray();
+            $items = CartItem::whereCartId($request->cart_id)->select("product_id", "qty")->get()->toArray();
             $jobs = [];
             foreach ( $items as $order_item ) 
             {
@@ -103,22 +103,42 @@ class OrderRepository extends BaseRepository
                     return array_merge($product_options, $tax, $order_item);
                 });
                 $jobs[] = new OrderTaxesJob($order, $order_item_details);
-                $order_item = $this->orderItemRepository->store($request, $order, $order_item_details);
+                $order_item = $this->orderItemRepository->store($request, $order, $order_item_details); 
+                $this->createOrderTax($order, $order_item_details);
+                $this->updateOrderTax($order, $request, $coreCache);
             }
-          
-            Bus::batch($jobs)->then( function (Batch $batch) use ($order, $request, $coreCache) {
-                OrderCalculation::dispatch($order, $request, $coreCache);
-            })->allowFailures()->dispatch();
-
-            dd($jobs);
+            // dd($jobs);
+            // Bus::batch($jobs)->then( function (Batch $batch) use ($order, $request, $coreCache) {
+                // OrderCalculation::dispatchSync($order, $request, $coreCache);
+                
+            // })->onQueue("high")->dispatch();
         } 
         catch (Exception $exception)
         {
-            DB::rollback();
+            // DB::rollback();
             throw $exception;
         }
 
-        DB::commit();        
+        // DB::commit();        
         return $order;
+    }
+
+    public function createOrderTax(object $order, object $order_item_details): void
+    {
+        $this->storeOrderTax($order, $order_item_details, function ($order_tax, $order_tax_item_details, $rule) {
+            $this->storeOrderTaxItem($order_tax, $order_tax_item_details, $rule);
+        });
+    }
+
+    public function updateOrderTax(object $order, object $request, object $coreCache): void
+    {
+        $order->order_taxes->map( function ($order_tax) {
+            $order_tax_item_amount = $order_tax->order_tax_items->map( function ($order_item) {
+                return $order_item->amount;
+            })->toArray();
+            $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
+        });
+
+        $this->orderCalculationUpdate($order, $request, $coreCache);
     }
 }

@@ -3,10 +3,13 @@
 namespace Modules\Sales\Traits;
 
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Modules\Tax\Facades\TaxPrice;
 use Modules\Coupon\Entities\Coupon;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
+use Modules\Sales\Entities\OrderTax;
+use Modules\Sales\Entities\OrderTaxItem;
 use Modules\Sales\Traits\HasPayementCalculation;
 use Modules\Sales\Traits\HasShippingCalculation;
 
@@ -49,10 +52,10 @@ trait HasOrderCalculation
                 "total_items_ordered" => $order->order_items->count(),
                 "total_qty_ordered" => $total_qty_ordered,
                 // "status" => SiteConfig::fetch(""), // TO-DO
-                "shipping_method" => SiteConfig::fetch($request->shipping_method."_method_name", "channel", $channel_id),
-                "shipping_method_label" => SiteConfig::fetch($request->shipping_method."_title", "channel", $channel_id),
-                "payment_method" => SiteConfig::fetch($request->payment_method."_title", "channel", $channel_id),
-                "payment_method_label" => SiteConfig::fetch($request->payment_method."_title", "channel", $channel_id),
+                "shipping_method" => SiteConfig::fetch("delivery_methods_{$request->shipping_method}_method_name", "channel", $channel_id),
+                "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$request->shipping_method}_title", "channel", $channel_id),
+                "payment_method" => SiteConfig::fetch("payment_methods_{$request->payment_method}_title", "channel", $channel_id),
+                "payment_method_label" => SiteConfig::fetch("payment_methods_{$request->payment_method}_title", "channel", $channel_id),
             ]);
 
         }
@@ -136,5 +139,58 @@ trait HasOrderCalculation
         }
 
         return $coupon ?? 0; 
+    }
+
+    public function storeOrderTax(object $order, object $order_item_details, ?callable $callback = null): void
+    {
+        DB::beginTransaction();
+        try
+        {
+            foreach ($order_item_details->rules as $rule)
+            {
+                $data = [
+                    "order_id" => $order->id,
+                    "code" => \Str::slug($rule->name),
+                    "title" => $rule->name,
+                    "percent" => $order_item_details->tax_rate_percent,
+                    "amount" => 0
+                ];
+                $match = $data;
+                unset($match["title"], $match["percent"], $match["amount"]);
+                $order_tax = OrderTax::updateOrCreate($match, $data);
+                if ($callback) $callback($order_tax, $order_item_details, $rule);
+            }
+        }
+        catch ( Exception $exception )
+        {
+            DB::rollback();
+            throw $exception;
+        }
+
+        DB::commit();
+    }
+
+    public function storeOrderTaxItem(object $order_tax, object $order_item_details, mixed $rule): object
+    {
+        DB::beginTransaction();
+        try
+        {
+            $data = [
+                "tax_id" => $order_tax->id,
+                "item_id" => $order_item_details->product_id,
+                "tax_percent" => $order_tax->percent,
+                "amount" => ($rule->rates?->pluck("tax_rate_value")->first() * $order_item_details->qty),
+                "tax_item_type" => "product"
+            ];            
+            $order_tax_item = OrderTaxItem::create($data);  
+        }
+        catch ( Exception $exception )
+        {
+            DB::rollback();
+            throw $exception;
+        }
+
+        DB::commit(); 
+        return $order_tax_item;
     }
 }
