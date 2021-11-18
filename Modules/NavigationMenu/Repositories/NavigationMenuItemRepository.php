@@ -79,7 +79,7 @@ class NavigationMenuItemRepository extends BaseRepository
      */
     public function getLocationData(): array
     {
-        $attributes["locations"] = $this->location_fields;
+        $attributes = $this->location_fields;
         return $attributes;
     }
 
