@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Str;
+use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Transformers\CustomerResource;
@@ -67,9 +69,14 @@ class CustomerController extends BaseController
             if(isset($data["password"])) $data["password"] = Hash::make($data["password"]);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
 
+            if(SiteConfig::fetch("require_email_confirmation", "website", $request->website_id) == 1) {
+                $data["verification_token"] = Str::random(30);
+            }
             $created = $this->repository->create($data, function($created) {
                 return $created->load("group", "website");
             });
+
+            $this->repository->sendRegistrationEmail($created, $request);
         }
         catch (Exception $exception)
         {
@@ -107,7 +114,7 @@ class CustomerController extends BaseController
 
             if(isset($data["password"])) $data["password"] = Hash::make($data["password"]);
             if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
-            
+
             $updated = $this->repository->update($data, $id, function($updated) {
                 return $updated->load("group", "website");
             });
