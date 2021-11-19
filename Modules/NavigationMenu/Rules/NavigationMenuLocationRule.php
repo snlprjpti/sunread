@@ -13,7 +13,7 @@ class NavigationMenuLocationRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $location_fields = collect(config("navigation_menu.locations")["elements"])->pluck('slug')->toArray();
+        $location_fields = collect(config("locations.locations"))->pluck('value')->toArray();
         if(in_array($value, $location_fields)) return true;
         return false;
     }

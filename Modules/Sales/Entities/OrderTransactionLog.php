@@ -12,8 +12,6 @@ class OrderTransactionLog extends Model
 
     protected $fillable = ["order_id", "amount", "currency", "ip_address", "request", "response", "response_code"];
 
-    public $preventsLazyLoading = false;
-
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);

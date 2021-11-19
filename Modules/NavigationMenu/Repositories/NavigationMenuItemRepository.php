@@ -34,7 +34,7 @@ class NavigationMenuItemRepository extends BaseRepository
         $this->rules = [];
 
         $this->config_fields = config("navigation_menu.attributes");
-        $this->location_fields = config("navigation_menu.locations");
+        $this->location_fields = config("locations.locations");
 
         $this->createModel();
     }
