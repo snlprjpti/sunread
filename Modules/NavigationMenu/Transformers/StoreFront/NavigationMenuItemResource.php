@@ -22,7 +22,7 @@ class NavigationMenuItemResource extends JsonResource
             "id" => $this->id,
             "title" => $this->value($data, "title"),
             "type" => $this->value($data, "type"),
-            "order" => $this->value($data, "order"),
+            "order" => (int) $this->value($data, "order"),
             "background_type" => $this->value($data, "background_type"),
             "background_image" => $this->value($data, "background_image"),
             "background_video_type" => $this->value($data, "background_video_type"),
