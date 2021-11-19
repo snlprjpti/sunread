@@ -170,7 +170,7 @@ class NavigationMenuItemRepository extends BaseRepository
         $type = $navigation_menu_item->value($data, "type");
         switch ($type) {
             case 'category':
-                $type_id = $navigation_menu_item->value($data, "type_id");
+                $type_id = $navigation_menu_item->value($data, "category_id");
                 $category = Category::find($type_id);
                 $slug = $category ? $category->value($data, "slug") : "";
                 $link = $this->getDynamicLink($slug, "category/", $coreCache);
@@ -178,7 +178,7 @@ class NavigationMenuItemRepository extends BaseRepository
                 break;
 
             case 'page':
-                $type_id = $navigation_menu_item->value($data, "type_id");
+                $type_id = $navigation_menu_item->value($data, "page_id");
                 $page = Page::find($type_id);
                 $link = $this->getDynamicLink($page ? $page->slug : null, "page/", $coreCache);
                 return $link;
@@ -186,8 +186,13 @@ class NavigationMenuItemRepository extends BaseRepository
 
             case 'custom':
                 $custom_link = $navigation_menu_item->value($data, "custom_link");
-                $link = $this->getDynamicLink($custom_link, coreCache: $coreCache);
-                return $link;
+                return $custom_link;
+                break;
+
+            case 'dynamic':
+                $custom_link = $navigation_menu_item->value($data, "dynamic_link");
+                $dynamic_link = $this->getDynamicLink($custom_link, coreCache: $coreCache);
+                return $dynamic_link;
                 break;
 
             default:
@@ -201,7 +206,7 @@ class NavigationMenuItemRepository extends BaseRepository
         try
         {
             $default_url = "{$coreCache->channel->code}/{$coreCache->store->code}/{$prepend}{$slug}";
-            $final_url = url($default_url);
+            $final_url = $default_url;
         }
         catch( Exception $exception )
         {
