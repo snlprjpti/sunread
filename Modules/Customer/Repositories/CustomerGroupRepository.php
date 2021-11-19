@@ -17,6 +17,6 @@ class CustomerGroupRepository extends BaseRepository
             "slug" => "nullable|unique:customer_groups,slug",
             "customer_tax_group_id" => "required|exists:customer_tax_groups,id"
         ];
-        $this->restrict_default_delete = true;
+//        $this->restrict_default_delete = true;
     }
 }

@@ -84,7 +84,7 @@ class CustomerGroupController extends BaseController
     {
         try
         {
-            if($id == 1) throw new DefaultGroupCannotUpdateException(__("core::app.response.cannot-update-default", [ "name" => $this->model_name ]));
+//            if($id == 1) throw new DefaultGroupCannotUpdateException(__("core::app.response.cannot-update-default", [ "name" => $this->model_name ]));
             $data = $this->repository->validateData($request, [
                 "slug" => "nullable|unique:customer_groups,slug,{$id}"
             ]);
