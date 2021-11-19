@@ -28,7 +28,7 @@ class NavigationMenuItemResource extends JsonResource
             "background_video_type" => $this->value($data, "background_video_type"),
             "background_video" => $this->value($data, "background_video"),
             "background_overlay_color" => $this->value($data, "background_overlay_color"),
-            "status" => $this->value($data, "status"),
+            "status" => (int) $this->value($data, "status"),
             "link" => $this->link,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
