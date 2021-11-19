@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Customer\Entities\CustomerGroup;
 use Modules\Notification\Events\ConfirmEmail;
 use Modules\Notification\Events\NewAccount;
 use Modules\Notification\Events\RegistrationSuccess;
@@ -53,7 +54,10 @@ class CustomerRepository extends BaseRepository
                     "is_lock" => 0,
                 ];
             });
-            if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
+
+            $customer_group_id = $this->getCustomerGroupId();
+            if(is_null($request->customer_group_id)) $data["customer_group_id"] = $customer_group_id;
+
             $data["password"] = Hash::make($request->password);
             if(SiteConfig::fetch("require_email_confirmation", "website", $request->website_id) == 1) {
                 $data["verification_token"] = Str::random(30);
@@ -74,13 +78,15 @@ class CustomerRepository extends BaseRepository
                 "email" => "required|email|unique:customers,email,{$customer->id}"
             ]);
 
-            $data = $this->validateData($request, $merge, function () use($customer) {
+            $customer_group_id = $this->getCustomerGroupId();
+
+            $data = $this->validateData($request, $merge, function () use($customer, $customer_group_id) {
                 return [
                     "website_id" => $customer->website_id,
                     "store_id" => $customer->store_id,
                     "status" => 1,
                     "is_lock" => 1,
-                    "customer_group_id" => 1,
+                    "customer_group_id" => $customer_group_id,
                     "email" => $customer->email
                 ];
             });
@@ -94,6 +100,11 @@ class CustomerRepository extends BaseRepository
         }
 
         return $data;
+    }
+
+    public function getCustomerGroupId(): ?int
+    {
+        return CustomerGroup::whereSlug("general")->first()?->id ?? null;
     }
 
     public function getPasswordRules(object $request) : array
