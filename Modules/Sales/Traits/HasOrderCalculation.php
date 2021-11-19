@@ -35,7 +35,7 @@ trait HasOrderCalculation
                 $total_qty_ordered += (float) $item->qty;
                 $total_items += 1;
                 $item_discount_amount += (float) $item->discount_amount_tax;
-                dump($item->row_total);
+               // dump($item->row_total);
             }
             dd($sub_total);
             $taxes = $order->order_taxes?->pluck('amount')->toArray();
