@@ -76,13 +76,15 @@ class CustomerRepository extends BaseRepository
                 "email" => "required|email|unique:customers,email,{$customer->id}"
             ]);
 
-            $data = $this->validateData($request, $merge, function () use($customer) {
+            $customer_group_id = CustomerGroup::whereSlug("general")->first()?->id ?? null;
+
+            $data = $this->validateData($request, $merge, function () use($customer, $customer_group_id) {
                 return [
                     "website_id" => $customer->website_id,
                     "store_id" => $customer->store_id,
                     "status" => 1,
                     "is_lock" => 1,
-                    "customer_group_id" => 1,
+                    "customer_group_id" => $customer_group_id,
                     "email" => $customer->email
                 ];
             });
