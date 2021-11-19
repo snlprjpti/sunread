@@ -12,6 +12,7 @@ use Modules\Sales\Entities\OrderTax;
 use Modules\Sales\Entities\OrderTaxItem;
 use Modules\Sales\Traits\HasPayementCalculation;
 use Modules\Sales\Traits\HasShippingCalculation;
+use Modules\Sales\Entities\Order;
 
 trait HasOrderCalculation
 {
@@ -44,7 +45,7 @@ trait HasOrderCalculation
             $cal_shipping_amt = (float) $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
             $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
             $channel_id = $coreCache?->channel->id;
-            $order->update([
+            Order::whereId($order->id)->update([
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,
                 "tax_amount" => $total_tax,
@@ -77,10 +78,10 @@ trait HasOrderCalculation
             $tax_amount = (float) $order_item_details->tax_rate_value;
             $tax_percent = (float) $order_item_details->tax_rate_percent;
     
-            $price_incl_tax = ($price + $tax_amount);
-            $row_total = ($price * $qty);
-            $row_total_incl_tax = ($row_total + $tax_amount);
-            $row_weight = ($weight * $qty);
+            $price_incl_tax = (float) ($price + $tax_amount);
+            $row_total = (float) ($price * $qty);
+            $row_total_incl_tax = (float) ($row_total + $tax_amount);
+            $row_weight = (float) ($weight * $qty);
     
             $discount_amount_tax = 0.00; // this is total discount amount including tax
             $discount_amount = 0.00;
