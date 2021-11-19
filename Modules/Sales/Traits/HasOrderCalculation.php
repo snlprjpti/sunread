@@ -30,19 +30,19 @@ trait HasOrderCalculation
             
             $total_items = 0;
             foreach ( $order->order_items as $item ) {
-                $sub_total += $item->row_total;
-                $sub_total_tax_amount += $item->row_total_incl_tax;
-                $total_qty_ordered += $item->qty;
+                $sub_total += (float) $item->row_total;
+                $sub_total_tax_amount += (float) $item->row_total_incl_tax;
+                $total_qty_ordered += (float) $item->qty;
                 $total_items += 1;
-                $item_discount_amount += $item->discount_amount_tax;
+                $item_discount_amount += (float) $item->discount_amount_tax;
             }
 
             $taxes = $order->order_taxes?->pluck('amount')->toArray();
             $total_tax = array_sum($taxes);
 
-            $discount_amount = $this->calculateDiscount($order); // To-Do other discount will be added here...
+            $discount_amount = (float) $this->calculateDiscount($order); // To-Do other discount will be added here...
             $arr_shipping_amount = $this->getInternalShippingValue($request, $order, $coreCache);
-            $cal_shipping_amt = $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
+            $cal_shipping_amt = (float) $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
             $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
             $channel_id = $coreCache?->channel->id;
             $order->update([
@@ -71,12 +71,12 @@ trait HasOrderCalculation
     {
         try
         {
-            $price = $order_item_details->price;
-            $qty = $order_item_details->qty;
-            $weight = $order_item_details->weight;
+            $price = (float) $order_item_details->price;
+            $qty = (float) $order_item_details->qty;
+            $weight = (float) $order_item_details->weight;
     
-            $tax_amount = $order_item_details->tax_rate_value;
-            $tax_percent = $order_item_details->tax_rate_percent;
+            $tax_amount = (float) $order_item_details->tax_rate_value;
+            $tax_percent = (float) $order_item_details->tax_rate_percent;
     
             $price_incl_tax = ($price + $tax_amount);
             $row_total = ($price * $qty);

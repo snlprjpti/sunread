@@ -13,8 +13,8 @@ class OrderTaxResource extends JsonResource
            "tax_items" => OrderTaxItemsResource::collection($this->whenLoaded("tax_items")),
            "code" => $this->code,
            "title" => $this->title,
-           "percent" => $this->percent,
-           "amount" => $this->amount,
+           "percent" => (float) $this->percent,
+           "amount" => (float) $this->amount,
            "created_at" => $this->created_at?->format("M d, Y H:i A")
         ];
     }
