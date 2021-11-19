@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Modules\Core\Facades\CoreCache;
 use Modules\Customer\Entities\Customer;
 use Illuminate\Support\Facades\Password;
 use Modules\Core\Http\Controllers\BaseController;
@@ -29,8 +30,10 @@ class ResetPasswordController extends BaseController
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
-    public function create(?string $token = null): JsonResponse
+    public function create(string $channel_code, string $store_code, ?string $token = null): JsonResponse
     {
+        CoreCache::getChannelWithCode($channel_code);
+        CoreCache::getStoreWithCode($store_code);
         return $token
             ? $this->successResponse(['token' => $token])
             : $this->errorResponse("Missing token", 400);
