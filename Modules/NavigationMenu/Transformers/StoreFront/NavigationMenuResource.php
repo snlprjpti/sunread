@@ -15,7 +15,7 @@ class NavigationMenuResource extends JsonResource
             "title" => $this->title,
             "location" => $this->location,
             "website_id" => $this->website_id,
-            "items" => NavigationMenuItemResource::collection($this->navigationMenuItems),
+            "items" => NavigationMenuItemResource::collection($this->navigationMenuItems)->sortBy("order"),
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];
     }

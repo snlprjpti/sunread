@@ -19,7 +19,7 @@ class NavigationMenuItem extends Model
     protected $fillable = ["navigation_menu_id"];
 
     // Append data with Values [NavigationMenuItem]
-    protected $with = [ "values"];
+    protected $with = [ "values" ];
 
     // Searchable
     public static $SEARCHABLE = [];
