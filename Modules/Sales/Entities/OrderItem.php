@@ -12,8 +12,6 @@ class OrderItem extends Model
 
     protected $fillable = ["website_id", "store_id", "product_id", "order_id", "product_options", "product_type", "sku", "name", "weight", "qty", "cost", "price", "price_incl_tax", "coupon_code", "discount_amount", "discount_percent", "discount_amount_tax", "tax_amount", "tax_percent", "row_total", "row_total_incl_tax", "row_weight"];
 
-    public $preventsLazyLoading = false;
-
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
