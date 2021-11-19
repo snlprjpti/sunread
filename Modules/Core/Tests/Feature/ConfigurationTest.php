@@ -28,18 +28,6 @@ class ConfigurationTest extends BaseTestCase
         $this->default_resource = Configuration::latest()->first();
     }
 
-    public function getNonMandatoryCreateData(): array
-    {
-        $created_data = $this->getCreateData();
-        $created_data["items"] = array_merge($created_data["items"], [
-            "store_phone_number" => [
-                "value" => null,
-                "absolute_path" => "general.children.0.subChildren.2.elements.1"
-            ]
-        ]);
-        return $created_data;
-    }
-
     public function getInvalidCreateData(): array
     {
         return array_merge($this->getCreateData(), [
@@ -117,15 +105,4 @@ class ConfigurationTest extends BaseTestCase
             "message" => __("core::app.response.create-success", ["name" => $this->model_name])
         ]);
     }
-
-    // public function testAdminCanUpdateResourceWithNonMandatoryData()
-    // {
-    //     $response = $this->withHeaders($this->headers)->post(route("{$this->route_prefix}.store"), $this->getNonMandatoryUpdateData());
-
-    //     $response->assertStatus(201);
-    //     $response->assertJsonFragment([
-    //         "status" => "success",
-    //         "message" => __("core::app.response.create-success", ["name" => $this->model_name])
-    //     ]);
-    // }
 }
