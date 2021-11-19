@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Customer\Entities\CustomerGroup;
 use Modules\Notification\Events\ConfirmEmail;
 use Modules\Notification\Events\NewAccount;
 use Modules\Notification\Events\RegistrationSuccess;
@@ -53,7 +54,8 @@ class CustomerRepository extends BaseRepository
                     "is_lock" => 0,
                 ];
             });
-            if(is_null($request->customer_group_id)) $data["customer_group_id"] = 1;
+            $customer_group_id = CustomerGroup::whereSlug("general")->first()?->id ?? null;
+            if(is_null($request->customer_group_id)) $data["customer_group_id"] = $customer_group_id;
             $data["password"] = Hash::make($request->password);
             if(SiteConfig::fetch("require_email_confirmation", "website", $request->website_id) == 1) {
                 $data["verification_token"] = Str::random(30);
