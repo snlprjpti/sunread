@@ -28,7 +28,7 @@ class ProductResource extends JsonResource
             $size_options = AttributeOptionsChildProduct::with(["attribute_option", "variant_product"])->whereIn("product_id", $color_variants)->where("attribute_option_id", "!=", $color->id)->get();
             foreach($size_options as $size_option)
             {
-                $size_stock = $size_options->variant_product->catalog_inventories()->first();
+                $size_stock = $size_option->variant_product->catalog_inventories()->first();
 
                 $sizes[] = [
                     "product_id" => $size_option?->product_id,
