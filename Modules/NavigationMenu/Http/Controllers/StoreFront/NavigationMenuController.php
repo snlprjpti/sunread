@@ -53,6 +53,7 @@ class NavigationMenuController extends BaseController
             $fetched = $this->navigation_menu_item_repository->fetchWithItems($request, ["navigationMenuItems"], callback:function() use($website){
                 return $this->model->where('status', 1)->whereNotNull('location')->where('website_id', $website->id);
             });
+
         }
         catch (Exception $exception)
         {
