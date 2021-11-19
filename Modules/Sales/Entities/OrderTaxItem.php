@@ -12,8 +12,6 @@ class OrderTaxItem extends Model
 
     protected $fillable = ["tax_id", "item_id", "tax_percent", "amount", "tax_item_type"];
 
-    public $preventsLazyLoading = false;
-
     public function order_tax(): BelongsTo
     {
         return $this->belongsTo(Order::class);

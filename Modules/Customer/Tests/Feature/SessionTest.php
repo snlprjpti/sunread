@@ -225,7 +225,10 @@ class SessionTest extends TestCase
 
     public function testCustomerVerifyAccount()
     {
-        $response = $this->get(route("customers.account-verify", $this->customer->verification_token));
+        $store = $this->customer->store;
+        $store_code = $store->code;
+        $channel_code = $store->channel->code;
+        $response = $this->get(route("customers.account-verify", [ $channel_code, $store_code, $this->customer->verification_token ]));
 
         $response->assertStatus(201);
         $response->assertJsonFragment([

@@ -34,7 +34,7 @@ class OrderItemRepository extends BaseRepository
                 "product_id" => $order_item_details->product_id,
                 "name" => $order_item_details->name,
                 "sku" => $order_item_details->sku,
-                "cost" => $order_item_details->cost,
+                "cost" => (float) $order_item_details->cost,
                 "product_type" => $order_item_details->type,
                 "product_options" => json_encode($order_item_details->product_options),
            ]);

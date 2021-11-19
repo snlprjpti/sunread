@@ -6,13 +6,14 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Modules\Sales\Entities\Order;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Sales\Facades\TransactionLog;
 use Modules\Sales\Transformers\OrderResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\Sales\Exceptions\FreeShippingNotAllowedException;
 use Modules\Sales\Repositories\StoreFront\OrderRepository;
+use Modules\Sales\Exceptions\FreeShippingNotAllowedException;
 
 class OrderController extends BaseController
 {
@@ -30,6 +31,8 @@ class OrderController extends BaseController
         $exception_statuses = [
             FreeShippingNotAllowedException::class => 403
         ];
+        
+        Model::preventLazyLoading(false);
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
@@ -49,6 +52,7 @@ class OrderController extends BaseController
         try
         {
             $response = $this->repository->store($request);
+            $response = $this->repository->fetch($response->id, ["order_items", "order_taxes.order_tax_items"]);
         }
         catch( Exception $exception )
         {
