@@ -58,6 +58,9 @@ class NavigationMenuServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'Config/navigation_menu.php'), "navigation_menu"
         );
+        $this->mergeConfigFrom(
+            module_path($this->moduleName, 'Config/locations.php'), "locations"
+        );
     }
 
     /**
