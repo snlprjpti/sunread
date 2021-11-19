@@ -25,7 +25,7 @@ class ProductResource extends JsonResource
             $color = $this->value(array_merge($scope, [ "attribute_slug" => "color" ]));
             $attribute_option_variants = AttributeOptionsChildProduct::whereIn("product_id", $this->parent->variants->pluck("id")->toArray())->get();
             $color_variants = $attribute_option_variants->where("attribute_option_id", $color->id)->pluck("product_id")->toArray();
-            $size_options = AttributeOptionsChildProduct::with("attribute_option")->whereIn("product_id", $color_variants)->where("attribute_option_id", "!=", $color->id)->get();
+            $size_options = AttributeOptionsChildProduct::with(["attribute_option", "variant_product"])->whereIn("product_id", $color_variants)->where("attribute_option_id", "!=", $color->id)->get();
             foreach($size_options as $size_option)
             {
                 $size_stock = $size_options->variant_product->catalog_inventories()->first();
