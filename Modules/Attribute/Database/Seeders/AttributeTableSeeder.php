@@ -23,8 +23,7 @@ class AttributeTableSeeder extends Seeder
                 "is_required" => 1,
                 "is_searchable" => 1,
                 "search_weight" => 6,
-                "scope" => "store",
-                "is_synchronized" => 0
+                "scope" => "store"
             ],
             [
                 "name" => "SKU",
@@ -63,8 +62,7 @@ class AttributeTableSeeder extends Seeder
                 "validation" => "decimal",
                 "is_required" => 0,
                 "use_in_layered_navigation" => 1,
-                "scope" => "channel",
-                "is_synchronized" => 0
+                "scope" => "channel"
             ],
             [
                 "name" => "Special Price",
@@ -177,8 +175,7 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Categories",
                 "slug" => "category_ids",
                 "type" => "multiselect",
-                "scope" => "website",
-                "is_synchronized" => 0
+                "scope" => "website"
             ],
             [
                 "name" => "Set Product as New from Date",
@@ -253,8 +250,7 @@ class AttributeTableSeeder extends Seeder
                 ],
                 "default_value" => "Yes",
                 "scope" => "website",
-                "is_required" => 1,
-                "is_synchronized" => 0
+                "is_required" => 1
             ],
             [
                 "name" => "Color",
