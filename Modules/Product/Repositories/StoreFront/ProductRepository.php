@@ -162,8 +162,11 @@ class ProductRepository extends BaseRepository
 
             $fetched = $product->only(["id", "sku", "status", "website_id", "parent_id", "type"]);
             $inventory = $product->catalog_inventories()->select("quantity", "is_in_stock")->first()?->toArray();
-            if(is_array($inventory)) $fetched = array_merge($fetched, $inventory);
-            $fetched = array_merge($fetched, $data);
+            if(!$inventory) $inventory = [
+                "quantity" => 0,
+                "is_in_stock" => 0
+            ];
+            $fetched = array_merge($fetched, $inventory, $data);
 
             $fetched = $this->product_format_repo->getProductInFormat($fetched, $request, $store);
 
