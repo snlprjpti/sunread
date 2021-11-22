@@ -151,7 +151,7 @@ class ProductSearchRepository extends ElasticSearchRepository
                 $product = $this->product_format_repo->getProductInFormat($product, $request, $store);
                 
                 $product["image"] = isset($product["thumbnail_image"]) ? $product["thumbnail_image"] : $product["base_image"];
-                $product["quantity"] = (int) $product["quantity"];
+                $product["quantity"] = (int) isset($product["quantity"]) ? $product["quantity"] : 0;
                 $product["color"] = isset($product["color"]) ? $product["color"] : null;
                 $product["color_value"] = isset($product["color_value"]) ? $product["color_value"] : null;
                 unset($product["thumbnail_image"], $product["base_image"]);      
