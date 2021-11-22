@@ -38,7 +38,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         $this->staticFilterKeys = ["color", "size", "collection", "configurable_size", "configurable_color"];
 
-        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "rollover_image", "color", "color_value", "tax_class_id"];
+        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "rollover_image", "color", "color_value", "tax_class_id", "configurable_attributes"];
     }
 
     public function search(object $request): array
@@ -151,7 +151,7 @@ class ProductSearchRepository extends ElasticSearchRepository
                 $product = $this->product_format_repo->getProductInFormat($product, $request, $store);
                 
                 $product["image"] = isset($product["thumbnail_image"]) ? $product["thumbnail_image"] : $product["base_image"];
-                $product["quantity"] = (int) isset($product["quantity"]) ? $product["quantity"] : 0;
+                $product["quantity"] = isset($product["quantity"]) ? decodeJsonNumeric($product["quantity"]) : 0;
                 $product["color"] = isset($product["color"]) ? $product["color"] : null;
                 $product["color_value"] = isset($product["color_value"]) ? $product["color_value"] : null;
                 unset($product["thumbnail_image"], $product["base_image"]);      
