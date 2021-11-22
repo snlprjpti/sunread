@@ -24,6 +24,7 @@ use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Modules\Page\Repositories\StoreFront\PageRepository;
 use Modules\Product\Repositories\ProductFormatRepository;
 use Modules\Product\Repositories\StoreFront\ProductFormatRepository as StoreFrontProductFormatRepository;
@@ -89,9 +90,16 @@ class ProductRepository extends BaseRepository
             }
 
             $cache_name = "product_detail_{$product->id}_{$coreCache->channel->id}_{$coreCache->store->id}";
-            $product_details = Cache::rememberForever($cache_name, function () use($request, $product, $coreCache, $parent_identifier) {
-                return $this->productDetail($request, $product, $coreCache, $parent_identifier);
-            });
+
+            $product_details = json_decode(Redis::get($cache_name));
+
+            if(!$product_details) {
+                $product_details = $this->productDetail($request, $product, $coreCache, $parent_identifier);
+                Redis::set($cache_name, json_encode($product_details));
+            }
+            else  {
+                $product_details = collect($product_details)->toArray();
+            }
         }
         catch(Exception $exception)
         {
