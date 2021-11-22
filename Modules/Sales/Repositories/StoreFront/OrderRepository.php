@@ -65,6 +65,7 @@ class OrderRepository extends BaseRepository
                 "shipping_method_label" => $request->shipping_method_label ?? 'free-delivery',
                 "payment_method" => $request->payment_method,
                 "payment_method_label" => $request->payment_method_label ?? 'cash-on-delivery',
+                "status" => "pending",
                 "sub_total" => 0.00,
                 "sub_total_tax_amount" => 0.00,
                 "tax_amount" => 0.00,
@@ -82,20 +83,19 @@ class OrderRepository extends BaseRepository
                     "customer_phone" => $request->customer_details["phone"],
                     "customer_taxvat" => $request->customer_details["taxvat"],
                     "customer_ip_address" => GeoIp::requestIp(),
-                    "status" => "pending"
                 ];
             }
-            $customer_data = isset($data['is_guest']) ? $customer_data : []; 
+            $customer_data = $data['is_guest'] ? $customer_data : [];
             $data = array_merge($data, $customer_data);
             
             $order = $this->create($data, function ($order) use ($request) {
                 $this->orderAddressRepository->store($request, $order);
                 $this->orderMetaRepository->store($request, $order);
-                $order->load(["order_items", "order_taxes.order_items", "order_metas", "order_addresses"]);
+                // $order->load(["order_items", "order_taxes.order_items", "order_metas", "order_addresses"]);
             });
 
             $items = CartItem::whereCartId($request->cart_id)->select("product_id", "qty")->get()->toArray();
-            $jobs = [];
+            // $jobs = [];
             foreach ( $items as $order_item ) 
             {
                 $order_item_details = $this->getProductDetail($request, $order_item, function ($product) use ($coreCache, &$tax, $request, $order_item) {
@@ -103,7 +103,7 @@ class OrderRepository extends BaseRepository
                     $product_options = $this->getProductOptions($coreCache, $product);
                     return array_merge($product_options, $tax, $order_item);
                 });
-                $jobs[] = new OrderTaxesJob($order, $order_item_details);
+                // $jobs[] = new OrderTaxesJob($order, $order_item_details);
                 $order_item = $this->orderItemRepository->store($request, $order, $order_item_details); 
                 $this->createOrderTax($order, $order_item_details);
             }

@@ -32,7 +32,7 @@ class OrderController extends BaseController
             FreeShippingNotAllowedException::class => 403
         ];
         
-        Model::preventLazyLoading(false);
+        // Model::preventLazyLoading(false);
 
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
