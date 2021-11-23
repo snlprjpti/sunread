@@ -47,27 +47,34 @@ class CacheManagementController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($fetched, $this->lang('fetch-list-success'));
+        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
     }
 
-    public function clearCache(Request $request)
+    public function clearCache(Request $request): JsonResponse
     {
         try
         {
-            $cache = config("cache_list");
-            $tags = collect($cache)->pluck("tag")->toArray();
-            if (count($request->tag) != count(array_intersect_assoc($tags, $request->tag))) throw ValidationException::withMessages(["tag" => __("Invalid Tags")]);
-
-            foreach ($request->tag as $tag) {
-                $data = collect($cache)->where("tag", $tag)->pluck("data");
-                if (count(Redis::keys("{$data}*")) > 0) Redis::del(Redis::keys("{$data}*"));
-            }
+           $this->repository->clearCustomCache($request);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang('delete-success'));
+        return $this->successResponseWithMessage($this->lang("clear-success"));
+    }
+
+    public function clearAllCache(): JsonResponse
+    {
+        try
+        {
+            if (count(Redis::keys("*")) > 0) Redis::del(Redis::keys("*"));
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponseWithMessage($this->lang("clear-success"));
     }
 }
