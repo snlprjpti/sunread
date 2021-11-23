@@ -35,9 +35,9 @@ class OrderRepository extends BaseRepository
         $this->orderMetaRepository = $orderMetaRepository;
         $this->rules = [
             "cart_id" => "required|exists:carts,id",
-            "orders" => "array",
-            "orders.*.product_id" => "required|exists:products,id",
-            "orders.*.qty" => "required|decimal",
+            // "orders" => "array",
+            // "orders.*.product_id" => "required|exists:products,id",
+            // "orders.*.qty" => "required|decimal",
             "coupon_code" => "sometimes|exists:coupons,code",
             "shipping_method" => "required",
             "payment_method" => "required"
@@ -75,13 +75,19 @@ class OrderRepository extends BaseRepository
             ];
 
             if ( $data['is_guest'] ) {
+                $request->validate([
+                    "email" => "required|email",
+                    "first_name" => "required",
+                    "last_name" => "required",
+                    "phone" => "required",
+                ]);
                 $customer_data = [
-                    "customer_email" => $request->customer_details["email"],
-                    "customer_first_name" => $request->customer_details["first_name"],
-                    "customer_middle_name" => $request->customer_details["middle_name"],
-                    "customer_last_name" => $request->customer_details["last_name"],
-                    "customer_phone" => $request->customer_details["phone"],
-                    "customer_taxvat" => $request->customer_details["taxvat"],
+                    "customer_email" => $request->email,
+                    "customer_first_name" => $request->first_name,
+                    "customer_middle_name" => $request->middle_name,
+                    "customer_last_name" => $request->last_name,
+                    "customer_phone" => $request->phone,
+                    "customer_taxvat" => $request->taxvat,
                     "customer_ip_address" => GeoIp::requestIp(),
                 ];
             }
