@@ -9,5 +9,7 @@ class CacheManagement extends Model
 {
     use HasFactory;
 
+    public static $SEARCHABLE = [ "name", "slug", "description", "tag", "key" ];
+
     protected $fillable = [ "name", "slug", "description", "tag", "key" ];
 }
