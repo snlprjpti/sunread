@@ -61,7 +61,7 @@ class CacheManagementController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang("clear-success"));
+        return $this->successResponseWithMessage($this->lang("response.clear-success", [ "name" => "Cache" ]));
     }
 
     public function clearAllCache(): JsonResponse
@@ -75,6 +75,6 @@ class CacheManagementController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang("clear-success"));
+        return $this->successResponseWithMessage($this->lang("response.clear-success", [ "name" => "Cache" ]));
     }
 }
