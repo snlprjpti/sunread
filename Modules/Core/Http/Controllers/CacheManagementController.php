@@ -75,6 +75,6 @@ class CacheManagementController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponseWithMessage($this->lang("response.clear-success", [ "name" => "Cache" ]));
+        return $this->successResponseWithMessage($this->lang("response.clear-success", [ "name" => "All Cache" ]));
     }
 }
