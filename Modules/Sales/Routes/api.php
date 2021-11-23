@@ -21,6 +21,7 @@ Route::group(['middleware' => ['api','proxies']], function () {
     });
 
     Route::group(['as' => 'public.sales.', 'prefix' => 'public'], function () {
+        Route::get('shipping/payment/methods', [Modules\Sales\Http\Controllers\StoreFront\OrderController::class, 'getShippingAndPaymentMethods'])->name('shipping.payment.methods');
         Route::resource("checkout", \StoreFront\OrderController::class)->only(["store"]);
     });
 
