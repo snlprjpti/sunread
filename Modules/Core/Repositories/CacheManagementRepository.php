@@ -20,7 +20,7 @@ class CacheManagementRepository extends BaseRepository
         {
             $request->validate([
                 "ids" => "array|required",
-                "ids.*" => "required|exists:{$this->model->getTable()},id",
+                "ids.*" => "required|exists:cache,id",
             ]);
 
             foreach ($request->ids as $id) {
