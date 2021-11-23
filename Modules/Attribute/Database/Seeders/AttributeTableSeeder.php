@@ -53,8 +53,7 @@ class AttributeTableSeeder extends Seeder
                 "validation" => "decimal",
                 "is_required" => 1,
                 "use_in_layered_navigation" => 1,
-                "scope" => "channel",
-                "is_synchronized" => 0
+                "scope" => "channel"
             ],
             [
                 "name" => "Cost",
