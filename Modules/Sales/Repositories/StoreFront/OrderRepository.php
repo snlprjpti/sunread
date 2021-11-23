@@ -49,7 +49,21 @@ class OrderRepository extends BaseRepository
         DB::beginTransaction();
         try
         {
-            $this->validateData($request, ["shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ]);
+            if (!auth("customer")->id()) {
+                $guestValidation = [
+                    "email" => "required|email",
+                    "first_name" => "required",
+                    "last_name" => "required",
+                    "phone" => "required",
+                ];
+            }
+            $validation = [
+                "shipping_method" => new MethodValidationRule($request),
+                "payment_method" => new MethodValidationRule($request) 
+            ];
+            $guestValidation = isset($guestValidation) ? $guestValidation : [];
+            $validate = array_merge($guestValidation, $validation);
+            $this->validateData($request, $validate);
             $coreCache = $this->getCoreCache($request);
             $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
             $data = [
@@ -58,8 +72,6 @@ class OrderRepository extends BaseRepository
                 "customer_id" => auth("customer")->id(),
                 "store_name" => $coreCache?->store->name,
                 "is_guest" => auth("customer")->id() ? 0 : 1,
-                "billing_address_id" => $request->billing_address_id,
-                "shipping_address_id" => $request->shipping_address_id,
                 "currency_code" => $currency_code->code,
                 "shipping_method" => $request->shipping_method,
                 "shipping_method_label" => $request->shipping_method_label ?? 'free-delivery',
@@ -74,24 +86,16 @@ class OrderRepository extends BaseRepository
                 "total_qty_ordered" => 0.00
             ];
 
-            if ( $data['is_guest'] ) {
-                $request->validate([
-                    "email" => "required|email",
-                    "first_name" => "required",
-                    "last_name" => "required",
-                    "phone" => "required",
-                ]);
-                $customer_data = [
-                    "customer_email" => $request->email,
-                    "customer_first_name" => $request->first_name,
-                    "customer_middle_name" => $request->middle_name,
-                    "customer_last_name" => $request->last_name,
-                    "customer_phone" => $request->phone,
-                    "customer_taxvat" => $request->taxvat,
+            $customer_data = [
+                    "customer_email" => $request->email ?? auth('customer')->user()?->email,
+                    "customer_first_name" => $request->first_name ?? auth('customer')->user()?->first_name,
+                    "customer_middle_name" => $request->middle_name ?? auth('customer')->user()?->middle_name,
+                    "customer_last_name" => $request->last_name ?? auth('customer')->user()?->last_name,
+                    "customer_phone" => $request->phone ?? auth('customer')->user()?->phone,
+                    "customer_taxvat" => $request->taxvat ?? auth('customer')->user()?->tax_number,
                     "customer_ip_address" => GeoIp::requestIp(),
-                ];
-            }
-            $customer_data = $data['is_guest'] ? $customer_data : [];
+            ];
+
             $data = array_merge($data, $customer_data);
             
             $order = $this->create($data, function ($order) use ($request) {
