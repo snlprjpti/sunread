@@ -11,7 +11,7 @@ class CacheManagementRepository extends BaseRepository
     public function __construct(CacheManagement $cacheManagement)
     {
         $this->model = $cacheManagement;
-        $this->model_key = "Cache Management";
+        $this->model_key = "core.cache_management";
     }
 
     public function clearCustomCache(object $request): bool
