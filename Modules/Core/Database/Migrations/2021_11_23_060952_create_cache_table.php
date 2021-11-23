@@ -13,7 +13,7 @@ class CreateCacheTable extends Migration
             $table->string("name");
             $table->string("slug")->unique();
             $table->string("description")->nullable();
-            $table->string("tag")->unique()->nullable();
+            $table->string("tag")->nullable();
             $table->string("key")->unique();
             $table->timestamps();
         });
