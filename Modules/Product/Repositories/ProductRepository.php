@@ -546,7 +546,7 @@ class ProductRepository extends BaseRepository
     public function getDefaultValues(object $product, array $data): mixed
     {
         $attribute = Attribute::findorFail($data["attribute_id"]);
-        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributeOptions = AttributeOption::whereAttributeId($attribute->id)->first();
+        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributeOptions = AttributeOption::whereAttributeId($attribute->id)->whereIsDefault(1)->first();
         $defaultValue = isset($attributeOptions) ? $attributeOptions->id : $attribute->default_value;
 
         if($data["scope"] != "website")
