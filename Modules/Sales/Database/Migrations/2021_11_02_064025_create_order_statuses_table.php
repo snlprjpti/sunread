@@ -12,6 +12,8 @@ class CreateOrderStatusesTable extends Migration
             $table->id();
             $table->string("name");
             $table->string("slug")->unique();
+            $table->unsignedBigInteger("state_id");
+            $table->foreign("state_id")->references("id")->on("order_status_states");
             $table->timestamps();
         });
     }

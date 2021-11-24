@@ -22,37 +22,47 @@ class PartialMigrate extends Command
     {
         Schema::disableForeignKeyConstraints();
 
-        DB::table('products')->truncate();
-        DB::table('attribute_configurable_products')->truncate();
-        DB::table('attribute_options_child_products')->truncate();
-        DB::table('category_product')->truncate();
-        DB::table('channel_product')->truncate();
-        DB::table('catalog_inventories')->truncate();
-        DB::table('catalog_inventory_items')->truncate();
-        DB::table('product_attributes')->truncate();
-        DB::table('product_images')->truncate();
-        DB::table('image_type_product_image')->truncate();
-        DB::table('product_attribute_boolean')->truncate();
-        DB::table('product_attribute_decimal')->truncate();
-        DB::table('product_attribute_integer')->truncate();
-        DB::table('product_attribute_string')->truncate();
-        DB::table('product_attribute_text')->truncate();
-        DB::table('product_attribute_timestamp')->truncate();
-        DB::table('product_images')->truncate();
-        DB::table('product_tax_groups')->truncate();
-        DB::table('carts')->truncate();
-        DB::table('cart_items')->truncate();
-        DB::table('attributes')->truncate();
-        DB::table('attribute_sets')->truncate();
-        DB::table('attribute_options')->truncate();
-        DB::table('attribute_option_translations')->truncate();
-        DB::table('attribute_groups')->truncate();
-        DB::table('attribute_group_attributes')->truncate();
-        DB::table('attribute_group_translations')->truncate();
-        DB::table('attribute_translations')->truncate();
-
-        
+        // DB::table('products')->truncate();
+        // DB::table('attribute_configurable_products')->truncate();
+        // DB::table('attribute_options_child_products')->truncate();
+        // DB::table('category_product')->truncate();
+        // DB::table('channel_product')->truncate();
+        // DB::table('catalog_inventories')->truncate();
+        // DB::table('catalog_inventory_items')->truncate();
+        // DB::table('product_attributes')->truncate();
+        // DB::table('product_images')->truncate();
+        // DB::table('image_type_product_image')->truncate();
+        // DB::table('product_attribute_boolean')->truncate();
+        // DB::table('product_attribute_decimal')->truncate();
+        // DB::table('product_attribute_integer')->truncate();
+        // DB::table('product_attribute_string')->truncate();
+        // DB::table('product_attribute_text')->truncate();
+        // DB::table('product_attribute_timestamp')->truncate();
+        // DB::table('product_images')->truncate();
+        // DB::table('product_tax_groups')->truncate();
+        // DB::table('carts')->truncate();
+        // DB::table('cart_items')->truncate();
+        // DB::table('attributes')->truncate();
+        // DB::table('attribute_sets')->truncate();
+        // DB::table('attribute_options')->truncate();
+        // DB::table('attribute_option_translations')->truncate();
+        // DB::table('attribute_groups')->truncate();
+        // DB::table('attribute_group_attributes')->truncate();
+        // DB::table('attribute_group_translations')->truncate();
+        // DB::table('attribute_translations')->truncate();        
         //  DB::table('email_templates')->truncate();
+
+        Schema::dropIfExists('orders');
+        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('order_addresses');
+        Schema::dropIfExists('order_taxes');
+        Schema::dropIfExists('order_tax_items');
+        Schema::dropIfExists('order_metas');
+        Schema::dropIfExists('order_transaction_logs');
+        Schema::dropIfExists('order_comments');
+        Schema::dropIfExists('order_status_states');
+        Schema::dropIfExists('order_statuses');
+
         Schema::enableForeignKeyConstraints();
 
         $this->info("Values truncated");
@@ -60,12 +70,12 @@ class PartialMigrate extends Command
         Artisan::call("migrate");
         $this->info("Migrated");
 
-        Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeSetTableSeeder"]);
-        Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeTableSeeder"]);
-        Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeGroupTableSeeder"]);
-        Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeOptionTableSeeder"]);
-        Artisan::call("db:seed", ["--class" => "Modules\Product\Database\Seeders\ProductTableSeeder"]);
-        Artisan::call("db:seed", ["--class" => "Modules\Inventory\Database\Seeders\CatalogInventoryTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeSetTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeGroupTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeOptionTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Product\Database\Seeders\ProductTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Inventory\Database\Seeders\CatalogInventoryTableSeeder"]);
         //  Artisan::call("db:seed", ["--class" => "Modules\EmailTemplate\Database\Seeders\EmailTemplateSeeder"]);
 
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderCommentTableSeeder"]);

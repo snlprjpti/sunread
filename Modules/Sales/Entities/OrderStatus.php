@@ -11,11 +11,11 @@ class OrderStatus extends Model
 {
     use HasFactory, Sluggable;
 
-    protected $fillable = ["name", "slug"];
+    protected $fillable = ["name", "slug", "state_id"];
 
     public function order_status_state(): BelongsTo
     {
-        return $this->belongsTo(OrderStatusState::class, "status", "slug");
+        return $this->belongsTo(OrderStatusState::class, "state_id");
     }
     
 }

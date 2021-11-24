@@ -2,6 +2,7 @@
 
 namespace Modules\Sales\Database\Seeders;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -9,20 +10,11 @@ class OrderStatusStateTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $state_statuses = [
-            "new" => "new" ,
-            "pending_payment" => "pending",
-            "processing" => "processing",
-            "holded" => "holded",
-            "completed" => "completed",
-            "closed" => "closed",
-            "cancelled" => "cancelled"
-        ];
-        
-        foreach ($state_statuses as $state => $status) {
+        $state_statuses = ["new", "pending", "processing", "holded", "completed", "closed", "cancelled"];
+        foreach ($state_statuses as $status) {
             $data[] = [
-                "status" => $status,
-                "state" => $state,
+                "name" => $status,
+                "state" => Str::slug($status),
                 "is_default" => 0,
                 "position" => 1,
                 "created_at" => now()

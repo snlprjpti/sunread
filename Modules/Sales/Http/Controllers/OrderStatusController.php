@@ -21,7 +21,6 @@ class OrderStatusController extends BaseController
         $this->model = $order_status;
         $this->model_name = "OrderStatus";
         $this->repository = $repository;
-
         parent::__construct($this->model, $this->model_name);
     }
 
@@ -53,8 +52,10 @@ class OrderStatusController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request); 
-            $data["slug"] = $data["slug"] ?? $this->model->createSlug($request->name);
+            $data = $this->repository->validateData($request, [
+                "name" => "unique:order_statuses,name"
+            ]); 
+            $data["slug"] = $this->model->createSlug($request->name);
             $created = $this->repository->create($data);
         }
         catch (Exception $exception)
@@ -83,7 +84,7 @@ class OrderStatusController extends BaseController
         try
         {
             $data = $this->repository->validateData($request,[
-                "slug" => "nullable|unique:order_statuses,slug,{$id}",
+                "name" => "unique:order_statuses,name,{$id}",
             ]);
             $updated = $this->repository->update($data, $id);
         }

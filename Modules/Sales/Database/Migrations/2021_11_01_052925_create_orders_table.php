@@ -47,9 +47,6 @@ class CreateOrdersTable extends Migration
             $table->foreign("website_id")->references("id")->on("websites");
             $table->foreign("store_id")->references("id")->on("stores");
             $table->foreign("customer_id")->references("id")->on("customers");
-            $table->foreign("billing_address_id")->references("id")->on("order_addresses");
-            $table->foreign("shipping_address_id")->references("id")->on("order_addresses");
-
             $table->timestamps();
         });
     }
