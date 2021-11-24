@@ -3,7 +3,7 @@
 namespace  Modules\NavigationMenu\Exceptions;
 
 
-class NavigationMenuItemNotFoundException extends \Exception
+class NavigationMenuNotFoundException extends \Exception
 {
     // NavigationMenuNotFoundException
 	public function __construct()

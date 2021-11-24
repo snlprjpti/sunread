@@ -27,10 +27,10 @@ class ConfigurationCache implements ShouldQueue
         try
         {
             foreach($this->configurationData as $config){
-            if(Redis::exists("configuration-data-{$config->scope}-{$config->scope_id}-{$config->path}")) {
-                Redis::del("configuration-data-{$config->scope}-{$config->scope_id}-{$config->path}");
+            if(Redis::exists("configuration_data_{$config->scope}_{$config->scope_id}_{$config->path}")) {
+                Redis::del("configuration_data_{$config->scope}_{$config->scope_id}_{$config->path}");
             }
-            Redis::set("configuration-data-{$config->scope}-{$config->scope_id}-{$config->path}", serialize($config->value));
+            Redis::set("configuration_data_{$config->scope}_{$config->scope_id}_{$config->path}", serialize($config->value));
             }
         }
         catch (Exception $exception)

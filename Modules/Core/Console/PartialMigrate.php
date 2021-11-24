@@ -66,7 +66,17 @@ class PartialMigrate extends Command
         Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeOptionTableSeeder"]);
         Artisan::call("db:seed", ["--class" => "Modules\Product\Database\Seeders\ProductTableSeeder"]);
         Artisan::call("db:seed", ["--class" => "Modules\Inventory\Database\Seeders\CatalogInventoryTableSeeder"]);
-    //  Artisan::call("db:seed", ["--class" => "Modules\EmailTemplate\Database\Seeders\EmailTemplateSeeder"]);
+        //  Artisan::call("db:seed", ["--class" => "Modules\EmailTemplate\Database\Seeders\EmailTemplateSeeder"]);
+
+        // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderCommentTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderItemTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderStatusStateTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderStatusTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTaxItemTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTaxTableSeeder"]);
+
+        Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\SalesDatabaseSeeder"]);
 
         $this->info("Seeding completed");
         return true;

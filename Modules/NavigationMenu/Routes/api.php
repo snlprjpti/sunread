@@ -19,12 +19,13 @@ Route::group(['middleware' => ['api']], function () {
         Route::put('navigation-menus/{id}/status', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuController::class, 'updateStatus'])->name('navigation-menus.status');
         Route::resource('navigation-menus', NavigationMenuController::class)->except(["create","edit"]);
 
-        Route::group(["prefix" => "navigation-menu/{navigation_menu_id}/", "as" => "navigation-menu."], function () {
-            Route::put('items/{navigation_menu_item_id}/status', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, 'updateStatus'])->name('items.status');
-            Route::resource('items', NavigationMenuItemController::class)->except(["create","edit"]);
+        Route::group(["prefix" => "navigation-menu/", "as" => "navigation-menu."], function () {
+            Route::put('{navigation_menu_id}/items/{navigation_menu_item_id}/status', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, 'updateStatus'])->name('items.status');
+            Route::resource('{navigation_menu_id}/items', NavigationMenuItemController::class)->except(["create","edit"]);
         });
 
-        Route::get('navigation-menu-items/attributes', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, "attributes"])->name("navigation-menu.items.attributes");
+        Route::get('navigation-menu/attributes', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, "attributes"])->name("navigation-menu.items.attributes");
+        Route::get('navigation-menu/locations', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, "locations"])->name("navigation-menu.items.attributes");
     });
 });
 

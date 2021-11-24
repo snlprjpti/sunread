@@ -6,6 +6,7 @@ use Exception;
 use Modules\Sales\Rules\RegionRule;
 use Modules\Sales\Entities\OrderAddress;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Customer\Entities\CustomerAddress;
 
 class OrderAddressRepository extends BaseRepository
 {    
@@ -15,7 +16,7 @@ class OrderAddressRepository extends BaseRepository
         $this->model_key = "order_addresses";
         $this->rules = [
             "address" => "required|array",
-            "address.*.customer_address_id" => "required|exists:customer_addresses,id",
+            // "address.*.customer_address_id" => "sometimes|exists:customer_addresses,id",
             "address.*.type" => "required|in:shipping,billing",
             "address.*.first_name" => "required",
             "address.*.last_name" => "required",
@@ -39,25 +40,42 @@ class OrderAddressRepository extends BaseRepository
 
             foreach ($request->address as $order_address) {
                 $orderAddressData = [
-                    "order_id" => $order->id,
                     "customer_id" => auth("customer")->id(),
-                    "customer_address_id" => $order_address['customer_address_id'],
-                    "address_type" => $order_address['type'],
                     "first_name" => $order_address['first_name'],
                     "middle_name" => $order_address['middle_name'] ?? null,
                     "last_name" => $order_address['last_name'],
                     "phone" => $order_address['phone'],
-                    "email" => $order_address['email'],
-                    "address_line_1" => $order_address['address_line_1'],
-                    "address_line_2" => $order_address['address_line_2'] ?? null,
-                    "postal_code" => $order_address['postal_code'],
+                    "address1" => $order_address['address_line_1'],
+                    "address2" => $order_address['address_line_2'] ?? null,
+                    "postcode" => $order_address['postal_code'],
+                    "phone" => $order_address['phone'],
+                    "vat_number" => $order_address['vat_number'] ?? null,
                     "country_id" => $order_address["country_id"],
                     "region_id" => $order_address["region_id"] ?? null,
                     "city_id" => $order_address["city_id"] ?? null,
                     "region_name" => $order_address["region_name"] ?? null,
-                    "city_name" => $order_address["city_name"] ?? null,
-                    "vat_number" => $order_address['vat_number'] ?? null
+                    "city_name" => $order_address["city_name"] ?? null
                 ];
+                if (auth("customer")->id() && $order_address["type"] == "billing") {
+                    $data = ["default_billing_address" => 1];
+                    $orderAddressData["default_billing_address"] = 1;
+                } elseif (auth("customer")->id() && $order_address["type"] == "shipping") {
+                    $data = ["default_shipping_address" => 1];
+                    $orderAddressData["default_shipping_address"] = 1;
+                }
+
+                if (auth("customer")->id()) {
+                    $data['customer_id'] = auth("customer")->id();
+                    $customer_address = CustomerAddress::updateOrCreate($data, $orderAddressData);
+                }
+                unset($orderAddressData["address1"], $orderAddressData["address2"], $orderAddressData["postcode"]);
+                $orderAddressData["order_id"] = $order->id;
+                $orderAddressData["customer_address_id"] = isset($customer_address) ? $customer_address->id : null; 
+                $orderAddressData["address_type"] = $order_address['type'];
+                $orderAddressData["email"] = $order_address['email'];
+                $orderAddressData["address_line_1"] = $order_address['address_line_1'];
+                $orderAddressData["address_line_2"] = $order_address['address_line_2'] ?? null;
+                $orderAddressData["postal_code"] = $order_address['postal_code'] ?? null;
                 $this->create($orderAddressData);
             }
         }

@@ -4,11 +4,12 @@ namespace Modules\NavigationMenu\Tests\Feature;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
 use Modules\Core\Entities\Website;
 use Modules\Core\Tests\BaseTestCase;
 use Illuminate\Support\Facades\Storage;
+use Modules\NavigationMenu\Entities\NavigationMenu;
 use Modules\NavigationMenu\Entities\NavigationMenuItem;
-use PHPUnit\Framework\TestCase;
 
 class NavigationMenuItemTest extends TestCase
 {
@@ -71,12 +72,35 @@ class NavigationMenuItemTest extends TestCase
     // {
     //     if ( $this->createFactories ) $this->model::factory($this->factory_count)->create();
 
-    //     $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $this->filter));
+    //     $params = array_merge($this->filter, [
+    //         "navigation_menu_id" => NavigationMenu::inRandomOrder()->first()->id,
+    //         "item" => NavigationMenuItem::inRandomOrder()->first()->id,
+    //     ]);
+
+    //     $response = $this->withHeaders($this->headers)->get($this->getRoute("index", $params));
 
     //     $response->assertOk();
     //     $response->assertJsonFragment([
     //         "status" => "success",
     //         "message" => __("core::app.response.fetch-list-success", ["name" => $this->model_name])
+    //     ]);
+    // }
+
+    // public function testAdminCanFetchIndividualResource()
+    // {
+    //     if ( !$this->hasShowTest ) $this->markTestSkipped("Show method not available.");
+
+    //     $params = array_merge($this->filter, [
+    //         "navigation_menu_id" => NavigationMenu::inRandomOrder()->first()->id,
+    //         "item" => NavigationMenuItem::inRandomOrder()->first()->id,
+    //     ]);
+
+    //     $response = $this->withHeaders($this->headers)->get($this->getRoute("show", $params));
+
+    //     $response->assertOk();
+    //     $response->assertJsonFragment([
+    //         "status" => "success",
+    //         "message" => __("core::app.response.fetch-success", ["name" => $this->model_name])
     //     ]);
     // }
 

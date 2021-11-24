@@ -16,12 +16,13 @@ Route::group(['middleware' => ['api','proxies']], function () {
     
     Route::group(['prefix' => 'admin/sales', 'as' => 'admin.sales.', 'middleware' => ['admin', 'language']], function () {
         Route::post('orders/status/{order_id}', [Modules\Sales\Http\Controllers\OrderController::class, 'orderStatus'])->name('order.status');
-        Route::resource("comments", OrderCommentController::class);
+        Route::resource("order/{order_id}/comments", OrderCommentController::class);
         Route::resource("orders", OrderController::class)->only(["index", "show"]);
     });
 
     Route::group(['as' => 'public.sales.', 'prefix' => 'public'], function () {
-        Route::resource("orders", \StoreFront\OrderController::class)->only(["store"]);
+        Route::get('shipping/payment/methods', [Modules\Sales\Http\Controllers\StoreFront\OrderController::class, 'getShippingAndPaymentMethods'])->name('shipping.payment.methods');
+        Route::resource("checkout", \StoreFront\OrderController::class)->only(["store"]);
     });
 
 });

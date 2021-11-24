@@ -3,7 +3,7 @@
 namespace Modules\Product\Listeners;
 
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Modules\Core\Entities\Website;
 use Modules\Product\Jobs\SingleIndexing;
 use Modules\Product\Jobs\VariantIndexing;
@@ -45,8 +45,9 @@ class ProductListener
     public function cacheClear($product)
     {
         Website::find($product->website_id)->channels->map(function ($channel) use($product) {
-            return $channel->stores->map(function ($store) use($product, $channel) {
-                Cache::forget("product_detail_{$product->id}_{$channel->id}_{$store->id}");
+            $channel->stores->map(function ($store) use($product, $channel) {
+                $cache_name = "product_details_{$product->id}_{$channel->id}_{$store->id}";
+                Redis::del($cache_name);
             });
         });
     }

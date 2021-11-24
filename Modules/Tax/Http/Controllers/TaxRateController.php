@@ -45,7 +45,7 @@ class TaxRateController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, [ "country", "region" ]);
         }
         catch( Exception $exception )
         {
@@ -62,8 +62,9 @@ class TaxRateController extends BaseController
             $data = $this->repository->validateData($request, callback:function () use ($request) {
                 $this->repository->validateRegionCountry($request);
                 return [];
-            }); 
-            
+            });
+            if(!isset($data["zip_code"]) && !$data["use_zip_range"]) $data["zip_code"] = "*";
+
             $created = $this->repository->create($data);
         }
         catch( Exception $exception )
@@ -98,6 +99,7 @@ class TaxRateController extends BaseController
                 $this->repository->validateRegionCountry($request);
                 return [];
             });
+            if(!isset($data["zip_code"]) && !$data["use_zip_range"]) $data["zip_code"] = "*";
             $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )

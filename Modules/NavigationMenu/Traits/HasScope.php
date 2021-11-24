@@ -84,7 +84,7 @@ trait HasScope
      */
     public function checkSlug(array $data, ?string $slug, ?object $navigation_menu_item = null): ?object
     {
-        $website_id = isset($data["website_id"]) ? $data["website_id"] : $navigation_menu_item?->website_id;
+        $website_id = isset($data["website_id"]) ? $data["website_id"] : $navigation_menu_item?->navigationMenu->website_id;
 
         $navigation_menu_item = NavigationMenuItem::whereWebsiteId($website_id)->whereHas("values", function ($query) use ($slug, $navigation_menu_item) {
             if($navigation_menu_item) $query = $query->where('navigation_menu_item_id', '!=', $navigation_menu_item->id);

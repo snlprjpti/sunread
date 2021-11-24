@@ -31,12 +31,10 @@ class NavigationMenuItemRepository extends BaseRepository
         $this->navigation_menu_item_repository = $navigation_menu_item_repository;
         $this->model_key = "navigation_menu";
 
-        $this->rules = [
-            "navigation_menu_id" => 'required|integer|exists:navigation_menus,id',
-        ];
+        $this->rules = [];
 
         $this->config_fields = config("navigation_menu.attributes");
-        $this->location_fields = config("navigation_menu.locations");
+        $this->location_fields = config("locations.locations");
 
         $this->createModel();
     }
@@ -72,15 +70,23 @@ class NavigationMenuItemRepository extends BaseRepository
                 $children_data["elements"][] = $element;
             }
             $attributes[$key] = $children_data;
-            $attributes["locations"] = $this->location_fields;
         }
+        return $attributes;
+    }
+
+    /**
+     * Get Attributes value from Config Data
+     */
+    public function getLocationData(): array
+    {
+        $attributes = $this->location_fields;
         return $attributes;
     }
 
     /**
      * Get NavigationMenuItem with it's Attributes and Values
      */
-    public function fetchWithAttributes(object $request, NavigationMenuItem $navigation_menu_item)
+    public function fetchWithAttributes(object $request, object $navigation_menu_item)
     {
         $data = [
             "scope" => $request->scope ?? "website",
@@ -98,8 +104,7 @@ class NavigationMenuItemRepository extends BaseRepository
             "title" => $value?->value,
             "navigation_menu_id" => $navigation_menu_item->navigation_menu_id,
         ];
-
-        $fetched["attributes"] = $this->getConfigData($data);
+        $fetched["attributes"] = $this->getConfigData($data, $navigation_menu_item);
         return $fetched;
     }
 
@@ -146,7 +151,7 @@ class NavigationMenuItemRepository extends BaseRepository
         $data = $this->navigation_menu_item_repository->fetchAll($request, $with, $callback);
 
         $data->each(function($nav_menu, $key) use($request){
-            $items = $nav_menu->navigationMenuItems->each(function ($nav_item) use($request){
+            $nav_menu->navigationMenuItems->each(function ($nav_item) use($request){
                 $nav_item->link = $this->getFinalItemLink($nav_item, $request);
             });
         });
@@ -158,14 +163,14 @@ class NavigationMenuItemRepository extends BaseRepository
 
         $coreCache = $this->getCoreCache($request);
         $data = [
-            "scope" => $request->scope ?? "website",
-            "scope_id" => $request->scope_id ?? $navigation_menu_item->website_id,
+            "scope" => "store",
+            "scope_id" => $coreCache->store->id,
         ];
 
         $type = $navigation_menu_item->value($data, "type");
         switch ($type) {
             case 'category':
-                $type_id = $navigation_menu_item->value($data, "type_id");
+                $type_id = $navigation_menu_item->value($data, "category_id");
                 $category = Category::find($type_id);
                 $slug = $category ? $category->value($data, "slug") : "";
                 $link = $this->getDynamicLink($slug, "category/", $coreCache);
@@ -173,7 +178,7 @@ class NavigationMenuItemRepository extends BaseRepository
                 break;
 
             case 'page':
-                $type_id = $navigation_menu_item->value($data, "type_id");
+                $type_id = $navigation_menu_item->value($data, "page_id");
                 $page = Page::find($type_id);
                 $link = $this->getDynamicLink($page ? $page->slug : null, "page/", $coreCache);
                 return $link;
@@ -181,8 +186,13 @@ class NavigationMenuItemRepository extends BaseRepository
 
             case 'custom':
                 $custom_link = $navigation_menu_item->value($data, "custom_link");
-                $link = $this->getDynamicLink($custom_link, coreCache: $coreCache);
-                return $link;
+                return $custom_link;
+                break;
+
+            case 'dynamic':
+                $custom_link = $navigation_menu_item->value($data, "dynamic_link");
+                $dynamic_link = $this->getDynamicLink($custom_link, coreCache: $coreCache);
+                return $dynamic_link;
                 break;
 
             default:
@@ -196,7 +206,7 @@ class NavigationMenuItemRepository extends BaseRepository
         try
         {
             $default_url = "{$coreCache->channel->code}/{$coreCache->store->code}/{$prepend}{$slug}";
-            $final_url = url($default_url);
+            $final_url = $default_url;
         }
         catch( Exception $exception )
         {

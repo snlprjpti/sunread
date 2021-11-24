@@ -35,6 +35,9 @@ class NavigationMenu extends Model
 
     protected $casts = [];
 
+    protected $with = [ "navigationMenuItems"];
+
+
     /**
      * One to Many Relation Between NavigationMenu and NavigationMenuItem
      */
