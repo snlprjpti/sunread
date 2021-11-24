@@ -54,14 +54,14 @@ class OrderController extends BaseController
         try
         {
             $order = $this->repository->store($request);
-            $response = $this->repository->fetch($order->id, ["order_items", "order_taxes", "website", "billing_address", "shipping_address"]);
+            $response = $this->repository->fetch($order->id, ["order_items", "order_taxes", "website", "billing_address", "shipping_address", "customer"]);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($response), $this->lang('create-success'), 201);
+        return $this->successResponse($this->resource($response), $this->lang('create-success'));
     }
 
     public function getShippingAndPaymentMethods(Request $request): JsonResponse
