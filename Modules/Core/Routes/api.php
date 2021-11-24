@@ -42,6 +42,11 @@ Route::group(["middleware" => ["api"]], function () {
         Route::get("failed/jobs", [\Modules\Core\Http\Controllers\FailedJobController::class, "index"])->name("failed-jobs.index");
         Route::get("failed/jobs/{id}", [\Modules\Core\Http\Controllers\FailedJobController::class, "show"])->name("failed-jobs.show");
 
+        //Cache Routes
+        Route::get("cache-management", [\Modules\Core\Http\Controllers\CacheManagementController::class, "index"])->name("cache.index");
+        Route::post("cache-management", [\Modules\Core\Http\Controllers\CacheManagementController::class, "clearCache"])->name("cache.clear-cache");
+        Route::get("cache-all", [\Modules\Core\Http\Controllers\CacheManagementController::class, "clearAllCache"])->name("cache.clear-all-cache");
+
     });
 });
 

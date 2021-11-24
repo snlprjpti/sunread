@@ -24,6 +24,7 @@ use Modules\Product\Exceptions\ProductNotFoundIndividuallyException;
 use Modules\Product\Repositories\ProductSearchRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Modules\Page\Repositories\StoreFront\PageRepository;
 use Modules\Product\Repositories\ProductFormatRepository;
 use Modules\Product\Repositories\StoreFront\ProductFormatRepository as StoreFrontProductFormatRepository;
@@ -88,10 +89,17 @@ class ProductRepository extends BaseRepository
                 ->whereStatus(1)->with($relations)->firstOrFail();
             }
 
-            $cache_name = "product_detail_{$product->id}_{$coreCache->channel->id}_{$coreCache->store->id}";
-            $product_details = Cache::rememberForever($cache_name, function () use($request, $product, $coreCache, $parent_identifier) {
-                return $this->productDetail($request, $product, $coreCache, $parent_identifier);
-            });
+            $cache_name = "product_details_{$product->id}_{$coreCache->channel->id}_{$coreCache->store->id}";
+
+            $product_details = json_decode(Redis::get($cache_name));
+
+            if(!$product_details) {
+                $product_details = $this->productDetail($request, $product, $coreCache, $parent_identifier);
+                Redis::set($cache_name, json_encode($product_details));
+            }
+            else  {
+                $product_details = collect($product_details)->toArray();
+            }
         }
         catch(Exception $exception)
         {
@@ -162,6 +170,10 @@ class ProductRepository extends BaseRepository
 
             $fetched = $product->only(["id", "sku", "status", "website_id", "parent_id", "type"]);
             $inventory = $product->catalog_inventories()->select("quantity", "is_in_stock")->first()?->toArray();
+            if(!$inventory) $inventory = [
+                "quantity" => 0,
+                "is_in_stock" => 0
+            ];
             $fetched = array_merge($fetched, $inventory, $data);
 
             $fetched = $this->product_format_repo->getProductInFormat($fetched, $request, $store);

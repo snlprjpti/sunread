@@ -18,15 +18,38 @@ class ConfigurationHelper
     use TraitsConfiguration;
 
     protected object $model, $channel_model, $store_model;
-    protected array $config_fields;
 
     public function __construct(Configuration $configuration)
     {
         $this->model = $configuration;
-        $this->config_fields = ($data = Cache::get("configurations.all")) ? $data : config("configuration");
         $this->channel_model = new Channel();
         $this->store_model = new Store();
         $this->createModel();
+    }
+
+    public function getConfigFile(): object
+    {
+        try
+        {
+            $config_data = config("configuration");
+
+            $modules = app()->modules->getByStatus(1);
+            foreach ($modules as $module)
+            {
+                $config_name = strtolower($module->getName());
+                $config_merge = config("{$config_name}.configuration_merge");
+                if (!$config_merge) continue;
+                $config_data = array_merge($config_data, config("{$config_name}.configuration"));
+            }
+
+            $config_fields = collect($config_data)->sortBy("position");
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $config_fields;
     }
 
     public function fetch(string $path, string $scope = "global", int $scope_id = 0): mixed
@@ -56,7 +79,8 @@ class ConfigurationHelper
     {
         try
         {
-            $elements = collect($this->config_fields)
+            $config_fields = $this->getConfigFile();
+            $elements = $config_fields
                 ->pluck("children")->flatten(1)
                 ->pluck("subChildren")->flatten(1)
                 ->pluck("elements")->flatten(1);
@@ -75,8 +99,8 @@ class ConfigurationHelper
     {
         try
         {
-            if(Redis::exists("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}")) {
-                return unserialize(Redis::get("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}"));
+            if(Redis::exists("configuration_data_{$request->scope}_{$request->scope_id}_{$request->path}")) {
+                return unserialize(Redis::get("configuration_data_{$request->scope}_{$request->scope_id}_{$request->path}"));
             }
             $value = $this->model->where([
                 ["scope", $request->scope],
@@ -85,7 +109,7 @@ class ConfigurationHelper
             ])->first()?->value;
             
             if($value){
-            Redis::set("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}", serialize($value));
+            Redis::set("configuration_data_{$request->scope}_{$request->scope_id}_{$request->path}", serialize($value));
             }
         }
         catch ( Exception $exception )
@@ -163,7 +187,8 @@ class ConfigurationHelper
 
     public function get(string $slug): mixed
     {
-        return collect($this->config_fields)
+        $config_fields = $this->getConfigFile();
+        return $config_fields
         ->pluck("children")->flatten(1)
         ->where("slug", $slug)
         ->pluck("subChildren")

@@ -7,12 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CoreDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
         Model::unguard();
         $this->call(CurrencyTableSeeder::class);
@@ -23,5 +18,6 @@ class CoreDatabaseSeeder extends Seeder
         $this->call(ConfigurationTableSeeder::class);
         $this->call(LocalesTableSeeder::class);
         $this->call(TimeZoneTableSeeder::class);
+        $this->call(CacheTableSeeder::class);
     }
 }

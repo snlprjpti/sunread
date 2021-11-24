@@ -55,10 +55,10 @@ class PartialMigrate extends Command
         //  DB::table('email_templates')->truncate();
         // Schema::enableForeignKeyConstraints();
 
-        $this->info("Values truncated");
+        // $this->info("Values truncated");
 
         // Artisan::call("migrate");
-        $this->info("Migrated");
+        // $this->info("Migrated");
 
         // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeSetTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeTableSeeder"]);
@@ -66,7 +66,7 @@ class PartialMigrate extends Command
         // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeOptionTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Product\Database\Seeders\ProductTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Inventory\Database\Seeders\CatalogInventoryTableSeeder"]);
-    //  Artisan::call("db:seed", ["--class" => "Modules\EmailTemplate\Database\Seeders\EmailTemplateSeeder"]);
+        //  Artisan::call("db:seed", ["--class" => "Modules\EmailTemplate\Database\Seeders\EmailTemplateSeeder"]);
 
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderCommentTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderItemTableSeeder"]);
@@ -76,7 +76,7 @@ class PartialMigrate extends Command
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTaxItemTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTaxTableSeeder"]);
 
-        Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\SalesDatabaseSeeder"]);
+        Artisan::call("db:seed", ["--class" => "Modules\Core\Database\Seeders\CacheTableSeeder"]);
 
         $this->info("Seeding completed");
         return true;
