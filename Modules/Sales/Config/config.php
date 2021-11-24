@@ -2,8 +2,8 @@
 
 return [
     "name" => "sales",
-    'configuration_merge' => true,
-    'configuration' => [
+    "configuration_merge" => true,
+    "configuration" => [
         "sales" => [
             "title" => "Sales",
             "position" => 3,

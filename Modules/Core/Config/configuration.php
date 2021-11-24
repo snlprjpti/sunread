@@ -234,72 +234,72 @@ return[
                             ]
                         ]
                     ],
-                    // [
-                    //     "title" => "Locale Options",
-                    //     "slug" => "locale_options",
-                    //     "elements" => [
-                    //         [
-                    //             "title" => "Locale",
-                    //             "path" => "store_locale",
-                    //             "type" => "select",
-                    //             "provider" => "Modules\Core\Entities\Locale",
-                    //             "pluck" => ["name", "id"],
-                    //             "default" => "",
-                    //             "options" => [],
-                    //             "rules" => "exists:locales,id",
-                    //             "multiple" => false,
-                    //             "scope" => "store",
-                    //             "is_required" => 1,
-                    //             "sort_by" => "name"
-                    //         ],
-                    //         [
-                    //             "title" => "Weight Unit",
-                    //             "path" => "locale_weight_unit",
-                    //             "type" => "select",
-                    //             "provider" => "",
-                    //             "pluck" => [],
-                    //             "default" => "kgs",
-                    //             "options" => [
-                    //                 [ "value" => "lbs", "label" => "lbs" ],
-                    //                 [ "value" => "kgs", "label" => "kgs" ],
-                    //             ],
-                    //             "rules" => "in:lbs,kgs",
-                    //             "multiple" => false,
-                    //             "scope" => "channel",
-                    //             "is_required" => 1,
-                    //             "sort_by" => ""
-                    //         ],
-                    //         [
-                    //             "title" => "Global Timezone",
-                    //             "path" => "global_timezone",
-                    //             "type" => "select",
-                    //             "provider" => "Modules\Core\Entities\TimeZone",
-                    //             "pluck" => ["name", "id"],
-                    //             "default" => "",
-                    //             "options" => [],
-                    //             "rules" => "exists:time_zones,id",
-                    //             "multiple" => false,
-                    //             "scope" => "website",
-                    //             "is_required" => 1,
-                    //             "sort_by" => ""
-                    //         ],
-                    //         [
-                    //             "title" => "Channel Time Zone",
-                    //             "path" => "channel_time_zone",
-                    //             "type" => "select",
-                    //             "provider" => "Modules\Core\Entities\TimeZone",
-                    //             "pluck" => ["name", "id"],
-                    //             "default" => "",
-                    //             "options" => [],
-                    //             "rules" => "exists:time_zones,id",
-                    //             "multiple" => false,
-                    //             "scope" => "channel",
-                    //             "is_required" => 1,
-                    //             "sort_by" => "name"
-                    //         ],
+                    [
+                        "title" => "Locale Options",
+                        "slug" => "locale_options",
+                        "elements" => [
+                            [
+                                "title" => "Locale",
+                                "path" => "store_locale",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\Locale",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:locales,id",
+                                "multiple" => false,
+                                "scope" => "store",
+                                "is_required" => 1,
+                                "sort_by" => "name"
+                            ],
+                            [
+                                "title" => "Weight Unit",
+                                "path" => "locale_weight_unit",
+                                "type" => "select",
+                                "provider" => "",
+                                "pluck" => [],
+                                "default" => "kgs",
+                                "options" => [
+                                    [ "value" => "lbs", "label" => "lbs" ],
+                                    [ "value" => "kgs", "label" => "kgs" ],
+                                ],
+                                "rules" => "in:lbs,kgs",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Global Timezone",
+                                "path" => "global_timezone",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\TimeZone",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:time_zones,id",
+                                "multiple" => false,
+                                "scope" => "website",
+                                "is_required" => 1,
+                                "sort_by" => ""
+                            ],
+                            [
+                                "title" => "Channel Time Zone",
+                                "path" => "channel_time_zone",
+                                "type" => "select",
+                                "provider" => "Modules\Core\Entities\TimeZone",
+                                "pluck" => ["name", "id"],
+                                "default" => "",
+                                "options" => [],
+                                "rules" => "exists:time_zones,id",
+                                "multiple" => false,
+                                "scope" => "channel",
+                                "is_required" => 1,
+                                "sort_by" => "name"
+                            ],
 
-                    //     ]
-                    // ]
+                        ]
+                    ]
                 ]
             ],
             [
