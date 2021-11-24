@@ -122,7 +122,7 @@ class ProductAttributeRepository extends ProductRepository
                     if($bool_val) continue;
                 }
 
-                if($attribute->slug == "url_key") $product_attribute["value"] = $this->createUniqueSlug($product, $request_attribute_collection, $product_attribute["value"]);
+                if($attribute->slug == "url_key") $product_attribute["value"] = $this->createUniqueSlug($product, $request_attribute_collection, Str::slug($product_attribute["value"]));
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 
                 $validator = Validator::make($product_attribute, [

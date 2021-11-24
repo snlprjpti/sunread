@@ -19,6 +19,7 @@ use Modules\Category\Rules\CategoryScopeRule;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Core\Rules\ScopeRule;
 use Modules\Product\Entities\Product;
+use Illuminate\Support\Str;
 
 class CategoryController extends BaseController
 {
@@ -87,7 +88,8 @@ class CategoryController extends BaseController
                 ];
             });
 
-            if(!isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data);
+            if(isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = Str::slug($data["items"]["slug"]["value"]);
+            else $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data);
 
             if(isset($data["parent_id"])) if(strcmp(strval($this->model->find($data["parent_id"])->website_id), $data["website_id"]))
             throw ValidationException::withMessages(["website_id" => $this->lang("response.no_parent_belong_to_website")]);
@@ -159,7 +161,10 @@ class CategoryController extends BaseController
                 ];
             });
 
-            if(!isset($data["items"]["slug"]["value"]) && !isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data, $category);
+            if(isset($data["items"]["slug"]["value"])) $data["items"]["slug"]["value"] = Str::slug($data["items"]["slug"]["value"]);
+            else {
+                if(!isset($data["items"]["slug"]["use_default_value"])) $data["items"]["slug"]["value"] = $this->repository->createUniqueSlug($data, $category);
+            }
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->categoryValueRepository->createOrUpdate($data, $updated);

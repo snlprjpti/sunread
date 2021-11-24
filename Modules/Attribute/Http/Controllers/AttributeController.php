@@ -17,6 +17,7 @@ use Modules\Attribute\Repositories\AttributeTranslationRepository;
 use Modules\Attribute\Exceptions\AttributeTranslationOptionDoesNotExist;
 use Modules\Attribute\Exceptions\AttributeNotUserDefinedException;
 use Modules\Attribute\Exceptions\AttributeCannotChangeException;
+use Illuminate\Support\Str;
 
 class AttributeController extends BaseController
 {
@@ -72,7 +73,7 @@ class AttributeController extends BaseController
             $rules = $type_check ? [ "attribute_options" => "required|array" ] : [ "default_value" => [ "nullable", config("validation.{$request->type}") ] ];
             $data = $this->repository->validateData($request, $rules,  function() use ($request) {
                 return [
-                    'slug' => $request->slug ?? $this->model->createSlug($request->name)
+                    'slug' => Str::slug($request->slug) ?? $this->model->createSlug($request->name)
                 ];
             });
             $this->repository->validateTranslation($request);
@@ -124,7 +125,7 @@ class AttributeController extends BaseController
                 "slug" => "nullable|unique:attributes,slug,{$id}"
             ]), function() use ($request) {
                 return [
-                    'slug' => $request->slug ?? $this->model->createSlug($request->name)
+                    'slug' => Str::slug($request->slug) ?? $this->model->createSlug($request->name)
                 ];
             });
 
