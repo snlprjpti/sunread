@@ -3,9 +3,12 @@
 namespace Modules\CheckOutMethods\Repositories;
 
 use Exception;
+use Modules\CheckOutMethods\Traits\HasPayementCalculation;
 
 class BasePaymentMethodRepository 
 {
+	use HasPayementCalculation;
+
 	protected $payment_data, $encryptor;
 	
 	protected $attributes = [];

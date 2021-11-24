@@ -20,6 +20,7 @@ trait HasShippingCalculation
 	{
 		try
 		{
+			
 			$total_shipping_amount = 0.00;
 			$arr_shipping = [ "shipping_tax" => false ];
 			switch ($request->shipping_method) {

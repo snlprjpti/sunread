@@ -40,8 +40,10 @@ trait HasOrderCalculation
             $total_tax = array_sum($taxes);
 
             $discount_amount = (float) $this->calculateDiscount($order); // To-Do other discount will be added here...
+            
             $arr_shipping_amount = $this->getInternalShippingValue($request, $order, $coreCache);
             $cal_shipping_amt = (float) $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
+            
             $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
             $channel_id = $coreCache?->channel->id;
 

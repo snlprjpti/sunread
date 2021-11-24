@@ -14,6 +14,7 @@ use Modules\Sales\Transformers\OrderResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\Sales\Repositories\StoreFront\OrderRepository;
 use Modules\Sales\Exceptions\FreeShippingNotAllowedException;
 
@@ -34,8 +35,6 @@ class OrderController extends BaseController
             FreeShippingNotAllowedException::class => 403
         ];
         
-        // Model::preventLazyLoading(false);
-
         parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
