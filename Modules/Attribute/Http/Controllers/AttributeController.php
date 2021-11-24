@@ -125,7 +125,7 @@ class AttributeController extends BaseController
                 "slug" => "nullable|unique:attributes,slug,{$id}"
             ]), function() use ($request) {
                 return [
-                    'slug' => Str::slug($request->slug) ?? $this->model->createSlug($request->name)
+                    'slug' => $request->slug ?? $this->model->createSlug($request->name)
                 ];
             });
 
