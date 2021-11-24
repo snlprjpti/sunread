@@ -12,6 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\NavigationMenu\Entities\NavigationMenu;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Redis;
 use Modules\NavigationMenu\Repositories\NavigationMenuRepository;
 use Modules\NavigationMenu\Repositories\NavigationMenuItemRepository;
 use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuResource;
@@ -50,16 +51,30 @@ class NavigationMenuController extends BaseController
         {
             $coreCache = $this->repository->getCoreCache($request);
             $website = $coreCache->website;
-            $fetched = $this->navigation_menu_item_repository->fetchWithItems($request, ["navigationMenuItems"], callback:function() use($website){
-                return $this->model->where('status', 1)->whereNotNull('location')->where('website_id', $website->id);
-            });
+            $channel = $coreCache->channel;
+            $store = $coreCache->channel;
 
+            $redis_nav_menu_key = "sf_nav_menu_website_{$website->hostname}_channel_{$channel->code}_store_{$store->code}";
+
+            if($this->repository->checkIfRedisKeyExists($redis_nav_menu_key)) {
+                $navigation_menu = collect(json_decode(Redis::get($redis_nav_menu_key)));
+            } else {
+                $fetched = $this->navigation_menu_item_repository->fetchWithItems($request, ["navigationMenuItems"], callback:function() use($website){
+                    return $this->model->where('status', 1)->whereNotNull('location')->where('website_id', $website->id);
+                });
+                $navigation_menu = $fetched;
+                $this->repository->storeCache($redis_nav_menu_key, $navigation_menu);
+            }
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
+        return response()->json([
+            "status" => "success",
+            "payload" => ['data' => $navigation_menu],
+            "message" => "Navigation Menu Fetched Successfully"
+        ]);
     }
 }

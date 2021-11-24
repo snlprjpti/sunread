@@ -5,6 +5,7 @@ namespace Modules\NavigationMenu\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\NavigationMenu\Entities\NavigationMenu;
@@ -78,6 +79,9 @@ class NavigationMenuController extends BaseController
              $data = $this->repository->examineSlug($data);
 
              $created = $this->repository->createWithUniqueLocation($data);
+
+             // Delete Cache on Create Items
+             $this->repository->deleteCache("sf_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -118,6 +122,8 @@ class NavigationMenuController extends BaseController
             $data = $this->repository->examineSlug($data);
 
             $updated = $this->repository->updateWithUniqueLocation($data, $id);
+
+            $this->repository->deleteCache("sf_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -130,13 +136,15 @@ class NavigationMenuController extends BaseController
      /**
       * Finds and Deletes NavigationMenu
       */
-     public function destroy(int $id): JsonResponse
+     public function destroy(Request $request, int $id): JsonResponse
      {
          try
          {
              $this->model->findOrFail($id);
 
              $this->repository->delete($id);
+
+             $this->repository->deleteCache("sf_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -153,7 +161,9 @@ class NavigationMenuController extends BaseController
      {
          try
          {
-             $updated = $this->repository->updateStatus($request, $id);
+            $updated = $this->repository->updateStatus($request, $id);
+
+            $this->repository->deleteCache("sf_nav_menu_website_*");
          }
          catch (Exception $exception)
          {

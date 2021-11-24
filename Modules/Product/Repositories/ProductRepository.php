@@ -56,7 +56,7 @@ class ProductRepository extends BaseRepository
     }
 
     public function validataInventoryData(array $data): array
-    { 
+    {
         try
         {
             $config_rules = (isset($data["manage_stock"]) && $data["manage_stock"] == 1) ? 0 : 1;
@@ -80,9 +80,9 @@ class ProductRepository extends BaseRepository
     public function catalogInventory(object $product, object $request, string $method, array $value): bool
     {
         try
-        {  
+        {
             if (isset($value["value"]) && isset($value["catalog_inventory"]))
-            {                
+            {
                 $data = $this->validataInventoryData($value["catalog_inventory"]);
                 $data["product_id"] = $product->id;
                 $data["website_id"] = $product->website_id;
@@ -92,9 +92,9 @@ class ProductRepository extends BaseRepository
                     "website_id" => $product->website_id
                 ];
 
-                unset($data["quantity"]); 
+                unset($data["quantity"]);
                 $catalog_inventory = CatalogInventory::updateOrCreate($match, $data);
-      
+
                 $original_quantity = (float) $catalog_inventory->quantity;
                 $adjustment_type = (($value["catalog_inventory"]["quantity"] - $original_quantity) > 0) ? "addition" : "deduction";
                 LogCatalogInventoryItem::dispatchSync([
@@ -111,7 +111,7 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-        
+
         return true;
     }
 
@@ -125,7 +125,7 @@ class ProductRepository extends BaseRepository
                 $validator = Validator::make(["sku" => $value["value"] ], [
                     "sku" => "required|unique:products,sku,".$product->id
                 ]);
-    
+
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
                 $product->update($validator->validated());
             }
@@ -146,7 +146,7 @@ class ProductRepository extends BaseRepository
             {
                 $attributeOption = AttributeOption::find($value["value"]);
                 if($attributeOption) $product->update(["status" => $attributeOption?->code]);
-            } 
+            }
         }
         catch ( Exception $exception )
         {
@@ -158,7 +158,7 @@ class ProductRepository extends BaseRepository
     public function categories(object $product, object $request, string $method, array $value): bool
     {
         try
-        {           
+        {
             if (isset($value["value"]))
             {
                 $validator = Validator::make(["categories" => $value["value"]], [
@@ -166,7 +166,7 @@ class ProductRepository extends BaseRepository
                     "categories.*" => "required|exists:categories,id"
                 ]);
                 if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
-    
+
                 $product->categories()->sync($validator->validated()["categories"]);
             }
         }
@@ -211,7 +211,7 @@ class ProductRepository extends BaseRepository
             throw $exception;
         }
 
-        return true; 
+        return true;
     }
 
     private function updateImageType(mixed $data, object $product): bool
@@ -237,7 +237,7 @@ class ProductRepository extends BaseRepository
                 }
             }
         }
-        catch (Exception $exception) 
+        catch (Exception $exception)
         {
             throw $exception;
         }
@@ -276,7 +276,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            
+
             $image = $values["file"];
             $image_types = array_unique($values["type"]);
             if ( isset($image) ) {
@@ -293,7 +293,7 @@ class ProductRepository extends BaseRepository
                         $height = $dimension["height"];
                         $path = "images/products/{$key}/{$image_type}";
                         if(!Storage::has($path)) Storage::makeDirectory($path, 0777, true, true);
-    
+
                         $image = Image::make($image)
                             ->fit($width, $height, function($constraint) {
                                 $constraint->upsize();
@@ -334,12 +334,12 @@ class ProductRepository extends BaseRepository
                 "scope" => "sometimes|in:website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
             ]);
-    
+
             $scope = [
                 "scope" => $request->scope ?? "website",
                 "scope_id" => $request->scope_id ??  $product->website_id,
             ];
-    
+
             $fetched = [];
             $fetched = [
                 "parent_id" => $product->id,
@@ -354,7 +354,7 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-        
+
         return $fetched;
     }
 
@@ -363,13 +363,13 @@ class ProductRepository extends BaseRepository
         try
         {
             $product = Product::whereId($id)->firstOrFail();
-            $variants = $this->filterVariants($product, $request);          
+            $variants = $this->filterVariants($product, $request);
         }
         catch ( Exception $exception )
         {
             throw $exception;
         }
-        
+
         return $variants;
 
     }
@@ -389,7 +389,7 @@ class ProductRepository extends BaseRepository
             ]);
 
             $this->validateListFiltering($request);
-            
+
             $variant = Product::whereParentId($product->id)->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"]);
 
             if (isset($request->sku)) $variant->whereLike("sku", $request->sku);
@@ -423,9 +423,9 @@ class ProductRepository extends BaseRepository
     public function getConfigurableData(object $product): array
     {
         try
-        {    
-            $fetched = [];       
-            
+        {
+            $fetched = [];
+
             $variant_attribute_options = $product->variants->map(function($variant) {
                 return $variant->attribute_options_child_products->pluck("attribute_option_id")->toArray();
             })->flatten(1)->unique();
@@ -437,7 +437,7 @@ class ProductRepository extends BaseRepository
 
                 $items[$attribute->id]["attribute_id"] = $attribute->id;
                 $items[$attribute->id]["attribute_option_id"][] = $attribute_option->id;
-            })->toArray(); 
+            })->toArray();
             $fetched["configurable"]["attributes"] = array_values($items);
 
             $group_attribute = AttributeConfigurableProduct::whereProductId($product->id)->whereUsedInGrouping(1)->first();
@@ -461,7 +461,7 @@ class ProductRepository extends BaseRepository
                     $data["scope"] = "channel";
                     $data["scope_id"] = $this->store_model->find($scope["scope_id"])->channel->id;
                     break;
-                    
+
                 case "channel":
                     $data["scope"] = "website";
                     $data["scope_id"] = $this->channel_model->find($scope["scope_id"])->website->id;
@@ -481,10 +481,10 @@ class ProductRepository extends BaseRepository
         try
         {
             $product = $this->model->with([ "parent", "brand", "website" ])->findOrFail($id);
-        
+
             $attribute_set = AttributeSet::findOrFail($product->attribute_set_id);
-    
-            $groups = $attribute_set->attribute_groups->sortBy("position")->map(function ($attribute_group) use ($product, $scope)  { 
+
+            $groups = $attribute_set->attribute_groups->sortBy("position")->map(function ($attribute_group) use ($product, $scope)  {
                 return [
                     "id" => $attribute_group->id,
                     "name" => $attribute_group->name,
@@ -518,13 +518,13 @@ class ProductRepository extends BaseRepository
                             if ($attribute->slug == "quantity_and_stock_status") {
                                 $attributesData["options"] = [["value" => 1, "label" => "In Stock"],["value" => 0, "label" => "Out of Stock"]];
                             }
-                            else $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute);  
+                            else $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute);
                             if(isset($attributesData["value"]) && !is_array($attributesData["value"])) $attributesData["value"] = json_decode($attributesData["value"]);
-                        } 
+                        }
 
                         if(($attribute->type == "image" || $attribute->type == "file") && isset($attributesData["value"])) $attributesData["value"] = Storage::url($attributesData["value"]);
                         if($attribute->slug == "quantity_and_stock_status") $attributesData["children"] = $this->attribute_set_repository->getInventoryChildren($product->id);
-                        
+
                         return $attributesData;
                     })->values()->toArray()
                 ];
@@ -549,7 +549,7 @@ class ProductRepository extends BaseRepository
             $data["scope"] = $parent_scope["scope"];
             $data["scope_id"] = $parent_scope["scope_id"];
             $data["product_id"] = $product->id;
-            return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $this->getDefaultValues($product, $data);           
+            return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $this->getDefaultValues($product, $data);
         }
         return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $defaultValue;
     }
@@ -561,7 +561,7 @@ class ProductRepository extends BaseRepository
         {
             $statusOption = AttributeOption::whereAttributeId($attribute->id)->whereCode($product->status)->first();
             return $statusOption?->id;
-        } 
+        }
         if($attribute->slug == "category_ids") return $product->categories()->pluck('category_id')->toArray();
         if($attribute->slug == "gallery") return $this->getImages($product);
 
@@ -572,7 +572,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $images = ["existing" => ProductGalleryRescouce::collection($product->images) ];   
+            $images = ["existing" => ProductGalleryRescouce::collection($product->images) ];
         }
         catch( Exception $exception )
         {
@@ -593,7 +593,7 @@ class ProductRepository extends BaseRepository
             ]);
 
             $this->validateListFiltering($request);
-            
+
             $product = Product::whereWebsiteId($request->website_id);
 
             $validator = Validator::make( $request->all(), [
@@ -610,10 +610,10 @@ class ProductRepository extends BaseRepository
                 "show_variants" => "sometimes|boolean"
             ]);
 
-            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());    
-           
+            if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+
             if ( isset($request->show_variants) && (!$request->show_variants) ) $product->where("parent_id", null);
-            
+
             if (isset($request->product_name))
             {
                 $product_attributes = ProductAttribute::whereAttributeId(1)
@@ -643,7 +643,7 @@ class ProductRepository extends BaseRepository
                 {
                     $value = $product_attribute->value()->query();
                     $matched = $value->where("value", $request->visibility)->get();
-                    if(count($matched) > 0) $product_ids[] = $product_attribute->product()->pluck("id"); 
+                    if(count($matched) > 0) $product_ids[] = $product_attribute->product()->pluck("id");
                 }
                 $product->whereIn("id", Arr::flatten($product_ids));
             }
@@ -670,7 +670,7 @@ class ProductRepository extends BaseRepository
                 $product->whereBetween("id", [$request->id_from ?? 0, $request->id_to]);
             }
 
-            if (isset($request->type)) $product->where("type", $request->type); 
+            if (isset($request->type)) $product->where("type", $request->type);
 
             if (isset($request->sku)) $product->whereLike("sku", $request->sku);
 
@@ -695,7 +695,7 @@ class ProductRepository extends BaseRepository
                 "scope" => "sometimes|in:global,website,channel,store",
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope)]
             ]);
-    
+
             $scope = [
                 "scope" => $request->scope ?? "global",
                 "scope_id" => $request->scope_id ?? 0,
@@ -708,7 +708,7 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-        
+
         return $fetched;
     }
 
@@ -719,11 +719,11 @@ class ProductRepository extends BaseRepository
             $fetched = [];
             foreach($fields as $field)
             {
-                $value = SiteConfig::fetch($field, $scope["scope"], $scope["scope_id"]);  
+                $value = SiteConfig::fetch($field, $scope["scope"], $scope["scope_id"]);
                 if($field == "channel_currency") {
                     $fetched["currency"] = $value?->code;
                     continue;
-                }  
+                }
                 $fetched[$field] = $value;
             }
         }
@@ -731,7 +731,7 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-        
+
         return $fetched;
     }
 

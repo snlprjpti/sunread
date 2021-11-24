@@ -18,17 +18,17 @@ class NavigationMenuItemRepository extends BaseRepository
     use HasScope;
 
     // Properties for NavigationMenuItemRepostiory
-    protected $navigation_menu_item_repository, $repository, $config_fields, $location_fields;
+    protected $navigation_menu_repository, $repository, $config_fields, $location_fields;
     protected bool $without_pagination = true;
 
     /**
      * NavigationMenuItemRepostiory Class Constructor
      */
-    public function __construct(NavigationMenuItem $navigationMenuItem, NavigationMenuRepository $navigation_menu_item_repository, NavigationMenuItemValue $navigationMenuItemValue)
+    public function __construct(NavigationMenuItem $navigationMenuItem, NavigationMenuRepository $navigation_menu_repository, NavigationMenuItemValue $navigationMenuItemValue)
     {
         $this->model = $navigationMenuItem;
         $this->value_model = $navigationMenuItemValue;
-        $this->navigation_menu_item_repository = $navigation_menu_item_repository;
+        $this->navigation_menu_repository = $navigation_menu_repository;
         $this->model_key = "navigation_menu";
 
         $this->rules = [];
@@ -148,51 +148,78 @@ class NavigationMenuItemRepository extends BaseRepository
      */
     public function fetchWithItems(object $request, array $with = [], ?callable $callback = null): object
     {
-        $data = $this->navigation_menu_item_repository->fetchAll($request, $with, $callback);
+        $data = $this->navigation_menu_repository->fetchAll($request, $with, $callback);
+        $store = CoreCache::getStoreWithCode($request->header("hc-store"));
+        $channel = CoreCache::getChannelWithCode($request->header("hc-channel"));
 
-        $data->each(function($nav_menu, $key) use($request){
-            $nav_menu->navigationMenuItems->each(function ($nav_item) use($request){
-                $nav_item->link = $this->getFinalItemLink($nav_item, $request);
-            });
+        $scope_data = [
+            "scope" => "store",
+            "scope_id" => $store->id,
+        ];
+
+        $data->each(function($item) use($store, $channel, $scope_data) {
+            $item->items = $this->getNavigationMenuItems($item->navigationMenuItems, $scope_data, $store, $channel);
+            return $item;
         });
+
         return $data;
     }
 
-    public function getFinalItemLink(object $navigation_menu_item, $request)
+    /**
+     * Get Navigation Menu Items
+     */
+    private function getNavigationMenuItems($navigationMenuItems, $scope_data, $store, $channel)
+    {
+        $navigationMenuItems->transform(function($item) use($scope_data, $channel, $store){
+            $item->title = $item->value($scope_data, "title");
+            $item->type = $item->value($scope_data, "type");
+            $item->order = (int) $item->value($scope_data, "order");
+            $item->background_type = $item->value($scope_data, "background_type");
+            $item->background_image = $item->value($scope_data, "background_image");
+            $item->background_video_type = $item->value($scope_data, "background_video_type");
+            $item->background_video = $item->value($scope_data, "background_video");
+            $item->background_overlay_color = $item->value($scope_data, "background_overlay_color");
+            $item->status = (int) $item->value($scope_data, "status");
+            $item->link = $this->getFinalItemLink($item, $store, $channel);
+            unset($item->values);
+            return $item;
+        });
+    }
+
+    public function getFinalItemLink(object $navigation_menu_item, $store, $channel)
     {
 
-        $coreCache = $this->getCoreCache($request);
-        $data = [
+        $store_data = [
             "scope" => "store",
-            "scope_id" => $coreCache->store->id,
+            "scope_id" => $store->id,
         ];
 
-        $type = $navigation_menu_item->value($data, "type");
+        $type = $navigation_menu_item->value($store_data, "type");
         switch ($type) {
             case 'category':
-                $type_id = $navigation_menu_item->value($data, "category_id");
+                $type_id = $navigation_menu_item->value($store_data, "category_id");
                 $category = Category::find($type_id);
-                $slug = $category ? $category->value($data, "slug") : "";
-                $link = $this->getDynamicLink($slug, "category/", $coreCache);
+                $slug = $category ? $category->value($store_data, "slug") : "";
+                $link = $this->getDynamicLink($slug, $store, $channel, "category/");
                 return $link;
                 break;
 
             case 'page':
-                $type_id = $navigation_menu_item->value($data, "page_id");
+                $type_id = $navigation_menu_item->value($store_data, "page_id");
                 $page = Page::find($type_id);
-                $link = $this->getDynamicLink($page ? $page->slug : null, "page/", $coreCache);
+                $link = $this->getDynamicLink($page ? $page->slug : null, $store, $channel, "page/");
                 return $link;
                 break;
 
             case 'custom':
-                $custom_link = $navigation_menu_item->value($data, "custom_link");
+                $custom_link = $navigation_menu_item->value($store_data, "custom_link");
                 return $custom_link;
                 break;
 
             case 'dynamic':
-                $custom_link = $navigation_menu_item->value($data, "dynamic_link");
-                $dynamic_link = $this->getDynamicLink($custom_link, coreCache: $coreCache);
-                return $dynamic_link;
+                $dynamic_link = $navigation_menu_item->value($store_data, "dynamic_link");
+                $link = $this->getDynamicLink($dynamic_link, $store, $channel);
+                return $link;
                 break;
 
             default:
@@ -201,11 +228,11 @@ class NavigationMenuItemRepository extends BaseRepository
         }
     }
 
-    public function getDynamicLink(?string $slug, ?string $prepend = null, object $coreCache): mixed
+    public function getDynamicLink(?string $slug, object $store, $channel, ?string $prepend = null): mixed
     {
         try
         {
-            $default_url = "{$coreCache->channel->code}/{$coreCache->store->code}/{$prepend}{$slug}";
+            $default_url = "{$channel->code}/{$store->code}/{$prepend}{$slug}";
             $final_url = $default_url;
         }
         catch( Exception $exception )

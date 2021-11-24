@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Modules\Core\Facades\CoreCache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Storage;
 use Modules\NavigationMenu\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
@@ -95,6 +96,31 @@ class NavigationMenuRepository extends BaseRepository
     {
         $navigation_menu = $this->model->where('slug', $slug)->first();
         return $navigation_menu;
+    }
+
+
+    /**
+     * Store Redis Cache
+     */
+    public function storeCache(string $key, object $data)
+    {
+        Redis::SETNX($key, $data);
+    }
+
+    /**
+     * Check if Redis Key Exists
+     */
+    public function checkIfRedisKeyExists(string $key)
+    {
+        return Redis::exists($key);
+    }
+
+    /**
+     * Delete Redis Cache through key
+     */
+    public function deleteCache(string $key)
+    {
+        Redis::del(Redis::keys($key));
     }
 
 }

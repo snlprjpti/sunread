@@ -2,7 +2,6 @@
 
 namespace Modules\NavigationMenu\Transformers\StoreFront;
 
-use Modules\Core\Facades\CoreCache;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuItemResource;
 
