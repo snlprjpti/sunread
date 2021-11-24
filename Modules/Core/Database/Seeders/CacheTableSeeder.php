@@ -28,7 +28,7 @@ class CacheTableSeeder extends Seeder
             ],
             [
                 "name" => "Product Details",
-                "slug" => "product-details",
+                "slug" => "product_details",
                 "description" => "Product Details",
                 "key" => "product_details",
                 "created_at" => now(),
