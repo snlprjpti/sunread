@@ -14,7 +14,7 @@ class CacheTableSeeder extends Seeder
                 "name" => "Configuration",
                 "slug" => "configuration",
                 "description" => "All Configuration",
-                "key" => "configuration-data",
+                "key" => "configuration_data",
                 "created_at" => now(),
                 "updated_at" => now()
             ],
@@ -28,9 +28,9 @@ class CacheTableSeeder extends Seeder
             ],
             [
                 "name" => "Product Details",
-                "slug" => "product-details",
+                "slug" => "product_details",
                 "description" => "Product Details",
-                "key" => "product_detail",
+                "key" => "product_details",
                 "created_at" => now(),
                 "updated_at" => now()
             ],

@@ -24,7 +24,7 @@ trait Configuration
 
     public function has(object $request)
     {
-        if(Redis::exists("configuration-data-{$request->scope}-{$request->scope_id}-{$request->path}")) {
+        if(Redis::exists("configuration_data_{$request->scope}_{$request->scope_id}_{$request->path}")) {
             return (boolean) true;
         } else{
         return (boolean) $this->checkCondition($request)->count();
