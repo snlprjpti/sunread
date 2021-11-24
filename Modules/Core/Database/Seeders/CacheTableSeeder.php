@@ -26,6 +26,14 @@ class CacheTableSeeder extends Seeder
                 "created_at" => now(),
                 "updated_at" => now()
             ],
+            [
+                "name" => "Product Details",
+                "slug" => "product-details",
+                "description" => "Product Details",
+                "key" => "product_detail",
+                "created_at" => now(),
+                "updated_at" => now()
+            ],
         ];
 
         DB::table("cache")->insert($templates);
