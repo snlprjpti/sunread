@@ -18,6 +18,7 @@ class OrderStatusRepository extends BaseRepository
         $this->model_key = "order_statuses";
         $this->rules = [
             "status" => "required|exists:order_statuses,slug",
+            "name" => "required",
         ];
     }
 

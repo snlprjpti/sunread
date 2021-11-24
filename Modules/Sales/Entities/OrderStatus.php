@@ -4,6 +4,7 @@ namespace Modules\Sales\Entities;
 
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrderStatus extends Model
@@ -12,9 +13,9 @@ class OrderStatus extends Model
 
     protected $fillable = ["name", "slug"];
 
-    public function order_status_state(): HasMany
+    public function order_status_state(): BelongsTo
     {
-        return $this->hasMany(OrderStatusState::class, 'status', 'slug');
+        return $this->belongsTo(OrderStatusState::class, "status", "slug");
     }
     
 }

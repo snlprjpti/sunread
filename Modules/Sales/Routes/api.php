@@ -18,6 +18,7 @@ Route::group(['middleware' => ['api','proxies']], function () {
         Route::post('orders/status/{order_id}', [Modules\Sales\Http\Controllers\OrderController::class, 'orderStatus'])->name('order.status');
         Route::resource("order/{order_id}/comments", OrderCommentController::class);
         Route::resource("orders", OrderController::class)->only(["index", "show"]);
+        Route::resource("statuses", OrderStatusController::class)->only(["index", "show", "update", "store"]);
     });
 
     Route::group(['as' => 'public.sales.', 'prefix' => 'public'], function () {
