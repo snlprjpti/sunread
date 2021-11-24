@@ -120,7 +120,10 @@ class NavigationMenuRepository extends BaseRepository
      */
     public function deleteCache(string $key)
     {
-        Redis::del(Redis::keys($key));
+        if(Redis::exists($key))
+        {
+            Redis::del(Redis::keys($key));
+        }
     }
 
 }
