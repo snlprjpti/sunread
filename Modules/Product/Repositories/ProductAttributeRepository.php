@@ -85,6 +85,8 @@ class ProductAttributeRepository extends ProductRepository
 
             $request_attribute_collection = collect($request["attributes"]);
 
+            if($product->parent_id) $configurable_attribute_ids = $product->parent->attribute_configurable_products->pluck("attribute_id")->toArray();
+
             $all_product_attributes = [];
 
             if($product_type) $super_attributes = Arr::pluck($request->super_attributes, 'attribute_slug');
@@ -98,6 +100,9 @@ class ProductAttributeRepository extends ProductRepository
 
                 //Super attribute filter in case of configurable products
                 if(isset($super_attributes) && (in_array($attribute->slug, $super_attributes))) continue;
+
+                //Skip if product is variant and attribute is configurable
+                if($method == "update" && isset($configurable_attribute_ids) && in_array($attribute->id, $configurable_attribute_ids)) continue;
 
                 $single_attribute_collection = $request_attribute_collection->where('attribute_slug', $attribute->slug);
                 $default_value_exist = $single_attribute_collection->pluck("use_default_value")->first();
