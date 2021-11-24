@@ -8,12 +8,10 @@ use Modules\Tax\Facades\TaxPrice;
 use Modules\Coupon\Entities\Coupon;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
-use Modules\Sales\Entities\OrderAddress;
 use Modules\Sales\Entities\OrderTax;
 use Modules\Sales\Entities\OrderTaxItem;
-use Modules\Sales\Traits\HasPayementCalculation;
-use Modules\Sales\Traits\HasShippingCalculation;
-use Modules\Sales\Entities\Order;
+use Modules\CheckOutMethods\Traits\HasPayementCalculation;
+use Modules\CheckOutMethods\Traits\HasShippingCalculation;
 
 trait HasOrderCalculation
 {

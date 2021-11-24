@@ -4,6 +4,7 @@ namespace Modules\Sales\Transformers;
 
 use Modules\Core\Transformers\WebsiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Transformers\StoreResource;
 use Modules\Customer\Transformers\CustomerResource;
 use Modules\Sales\Transformers\OrderAddressResource;
 
@@ -16,7 +17,7 @@ class OrderResource extends JsonResource
             "order_items" => OrderItemResource::collection($this->whenLoaded("order_items")),
             "order_taxes" => OrderTaxResource::collection($this->whenLoaded("order_taxes")),
             "website" => new WebsiteResource($this->whenLoaded("website")),
-            "store_id" => $this->store_id,
+            "store" => new StoreResource($this->whenLoaded("store")),
             "store_name" => $this->store_name,
             "customer" => $this->when($this->customer_id, new CustomerResource($this->whenLoaded("customer"))),
             "is_guest" => (bool) $this->is_guest,

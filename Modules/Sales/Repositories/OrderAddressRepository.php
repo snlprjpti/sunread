@@ -16,7 +16,6 @@ class OrderAddressRepository extends BaseRepository
         $this->model_key = "order_addresses";
         $this->rules = [
             "address" => "required|array",
-            // "address.*.customer_address_id" => "sometimes|exists:customer_addresses,id",
             "address.*.type" => "required|in:shipping,billing",
             "address.*.first_name" => "required",
             "address.*.last_name" => "required",
@@ -34,9 +33,7 @@ class OrderAddressRepository extends BaseRepository
     {
         try
         {
-            $this->validateData($request, [
-                "address" => [new RegionRule($request->address)]
-            ]);
+            $this->validateData($request, [ "address" => new RegionRule($request->address) ]);
 
             foreach ($request->address as $order_address) {
                 $orderAddressData = [
@@ -76,6 +73,7 @@ class OrderAddressRepository extends BaseRepository
                 $orderAddressData["address_line_1"] = $order_address['address_line_1'];
                 $orderAddressData["address_line_2"] = $order_address['address_line_2'] ?? null;
                 $orderAddressData["postal_code"] = $order_address['postal_code'] ?? null;
+                
                 $this->create($orderAddressData);
             }
         }

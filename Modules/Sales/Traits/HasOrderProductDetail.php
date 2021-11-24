@@ -40,10 +40,11 @@ trait HasOrderProductDetail
         return (object) $data;
     }
 
-    public function getProductOptions(object $coreCache, object $product): ?array
+    public function getProductOptions(object $request, object $product): ?array
     {
         try
         {
+            $coreCache = $this->getCoreCache($request);
             $image_path = $product->images?->filter(fn ($product_image) => in_array("base_image", $product_image->types->pluck("slug")->toArray()) )->first()?->path;
             $url = ($image_path) ? Storage::url($image_path) : null;
 
