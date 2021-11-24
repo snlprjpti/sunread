@@ -46,13 +46,9 @@ trait HasOrderCalculation
             $cal_shipping_amt = (float) $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
             $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
             $channel_id = $coreCache?->channel->id;
-<<<<<<< HEAD
 
             $order_addresses = $order->order_addresses()->get();
             $order->update([
-=======
-            Order::whereId($order->id)->update([
->>>>>>> 3b0d3bef848e02a5ebf2c58d6e4cb208da2dc565
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,
                 "tax_amount" => $total_tax,

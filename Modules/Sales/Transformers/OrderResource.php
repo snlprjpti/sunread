@@ -46,7 +46,8 @@ class OrderResource extends JsonResource
             "customer_taxvat" => $this->customer_taxvat,
             "customer_ip_address" => $this->customer_ip_address,
             "status" => $this->status,
-            "created_at" => $this->created_at?->format("M d, Y H:i A")
+            "created_at" => $this->created_at?->format("M d, Y H:i A"),
+            "updated_at" => $this->updated_at?->format("M d, Y H:i A")
         ];
     }
 }
