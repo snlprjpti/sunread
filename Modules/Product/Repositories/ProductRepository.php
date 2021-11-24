@@ -481,6 +481,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
+            $configurable_attribute_ids = [];
             $product = $this->model->with([ "parent", "brand", "website" ])->findOrFail($id);
 
             if($product->parent_id) $configurable_attribute_ids = $product->parent->attribute_configurable_products->pluck("attribute_id")->toArray();
@@ -512,7 +513,7 @@ class ProductRepository extends BaseRepository
                             "is_required" => $attribute->is_required,
                             "is_user_defined" => (bool) $attribute->is_user_defined,
                             "is_synchronized" => (bool) $attribute->is_synchronized,
-                            "is_configurable_attribute" => (isset($configurable_attribute_ids) && in_array($attribute->id, $configurable_attribute_ids)) ? 1 : 0
+                            "is_configurable_attribute" => in_array($attribute->id, $configurable_attribute_ids) ? 1 : 0
                         ];
                         if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
