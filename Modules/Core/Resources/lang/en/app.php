@@ -48,7 +48,9 @@ return [
         "verification-success" => "Verification success",
         "already-verified" => "Account already verified",
         "send-confirmation-link" => "Send confirmation link",
-        "country-not-allow" => "Country is not allowed"
+        "country-not-allow" => "Country is not allowed",
+        'cannot-update-default' => 'Cannot update the default :name',
+        'clear-success' => ':name clear successfully',
     ],
     'users' => [
         'forget-password' => [

@@ -41,6 +41,7 @@ class NavigationMenuItemValueRepository
      */
     public function getValidationRules(object $request, ?int $id = null, ?string $method = null): array
     {
+
         try
         {
             $scope = $request->scope ?? "website";

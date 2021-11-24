@@ -1004,20 +1004,20 @@ return[
                                 "is_required" => 0,
                                 "sort_by" => ""
                             ],
-                            [
-                                "title" => "City",
-                                "path" => "shipping_settings_origins_city",
-                                "type" => "text",
-                                "provider" => "Modules\Country\Entities\City",
-                                "pluck" => ["id", "name"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "exists:cities,id",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
+                            // [
+                            //     "title" => "City",
+                            //     "path" => "shipping_settings_origins_city",
+                            //     "type" => "text",
+                            //     "provider" => "Modules\Country\Entities\City",
+                            //     "pluck" => ["id", "name"],
+                            //     "default" => "",
+                            //     "options" => [],
+                            //     "rules" => "exists:cities,id",
+                            //     "multiple" => false,
+                            //     "scope" => "channel",
+                            //     "is_required" => 0,
+                            //     "sort_by" => ""
+                            // ],
                             [
                                 "title" => "Street Address",
                                 "path" => "shipping_settings_origins_street_address",

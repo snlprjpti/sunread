@@ -30,6 +30,7 @@ use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\AttributeConfigurableProduct;
 use Modules\Product\Transformers\ProductGalleryRescouce;
+use Modules\Tax\Entities\ProductTaxGroup;
 
 class ProductRepository extends BaseRepository
 {
@@ -519,7 +520,12 @@ class ProductRepository extends BaseRepository
                                 $attributesData["options"] = [["value" => 1, "label" => "In Stock"],["value" => 0, "label" => "Out of Stock"]];
                             }
                             else $attributesData["options"] = $this->attribute_set_repository->getAttributeOption($attribute);  
-                            if(isset($attributesData["value"]) && !is_array($attributesData["value"])) $attributesData["value"] = json_decode($attributesData["value"]);
+                            if(isset($attributesData["value"]) && !is_array($attributesData["value"])) {
+
+                                if($attribute->slug == "tax_class_id") $attribute_option_check = ProductTaxGroup::find($attributesData["value"]);
+                                else $attribute_option_check = AttributeOption::whereId($attributesData["value"])->whereAttributeId($attribute->id)->first();
+                                $attributesData["value"] = $attribute_option_check ? json_decode($attributesData["value"]) : null;
+                            }
                         } 
 
                         if(($attribute->type == "image" || $attribute->type == "file") && isset($attributesData["value"])) $attributesData["value"] = Storage::url($attributesData["value"]);
@@ -540,7 +546,7 @@ class ProductRepository extends BaseRepository
     public function getDefaultValues(object $product, array $data): mixed
     {
         $attribute = Attribute::findorFail($data["attribute_id"]);
-        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributeOptions = AttributeOption::whereAttributeId($attribute->id)->first();
+        if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields)) $attributeOptions = AttributeOption::whereAttributeId($attribute->id)->whereIsDefault(1)->first();
         $defaultValue = isset($attributeOptions) ? $attributeOptions->id : $attribute->default_value;
 
         if($data["scope"] != "website")
