@@ -515,7 +515,10 @@ class ProductRepository extends BaseRepository
                             "is_synchronized" => (bool) $attribute->is_synchronized,
                             "is_configurable_attribute" => in_array($attribute->id, $configurable_attribute_ids) ? 1 : 0
                         ];
-                        if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
+                        if($match["scope"] != "website") {
+                            $scopeFilter = $this->scopeFilter($scope["scope"], $attribute->scope);
+                            $attributesData["use_default_value"] = $scopeFilter ? 0 : ($mapper ? 0 : ($existAttributeData ? 0 : 1));
+                        }
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
 
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
