@@ -13,6 +13,7 @@ use Modules\Page\Transformers\PageResource;
 use Exception;
 use Modules\Page\Repositories\PageAttributeRepository;
 use Modules\Page\Repositories\PageScopeRepository;
+use Illuminate\Support\Str;
 
 class PageController extends BaseController
 {
@@ -62,7 +63,7 @@ class PageController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, callback:function ($request) {
-                return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
+                return ["slug" => Str::slug($request->slug) ?? $this->model->createSlug($request->title)];
             });
             $this->repository->validateSlug($data);
 
@@ -98,7 +99,7 @@ class PageController extends BaseController
         try
         {
             $data = $this->repository->validateData($request, callback:function ($request) {
-                return ["slug" => $request->slug ?? $this->model->createSlug($request->title)];
+                return ["slug" => Str::slug($request->slug) ?? $this->model->createSlug($request->title)];
             });
             $this->repository->validateSlug($data, $id);
 
