@@ -46,7 +46,7 @@ class ProductListener
     {
         Website::find($product->website_id)->channels->map(function ($channel) use($product) {
             $channel->stores->map(function ($store) use($product, $channel) {
-                $cache_name = "product_detail_{$product->id}_{$channel->id}_{$store->id}";
+                $cache_name = "product_details_{$product->id}_{$channel->id}_{$store->id}";
                 Redis::del($cache_name);
             });
         });

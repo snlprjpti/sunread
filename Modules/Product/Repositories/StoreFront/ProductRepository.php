@@ -89,7 +89,7 @@ class ProductRepository extends BaseRepository
                 ->whereStatus(1)->with($relations)->firstOrFail();    
             }
 
-            $cache_name = "product_detail_{$product->id}_{$coreCache->channel->id}_{$coreCache->store->id}";
+            $cache_name = "product_details_{$product->id}_{$coreCache->channel->id}_{$coreCache->store->id}";
 
             $product_details = json_decode(Redis::get($cache_name));
 
