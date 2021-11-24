@@ -733,7 +733,7 @@ class ProductRepository extends BaseRepository
             {
                 $value = SiteConfig::fetch($field, $scope["scope"], $scope["scope_id"]);  
                 if($field == "channel_currency") {
-                    $fetched["currency"] = $value?->code;
+                    $fetched["currency"] = $value;
                     continue;
                 }  
                 $fetched[$field] = $value;

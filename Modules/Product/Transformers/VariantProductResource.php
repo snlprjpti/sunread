@@ -5,6 +5,7 @@ namespace Modules\Product\Transformers;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 use Modules\Attribute\Entities\AttributeOption;
+use Modules\Core\Facades\PriceFormat;
 
 class VariantProductResource extends JsonResource
 {
@@ -21,12 +22,14 @@ class VariantProductResource extends JsonResource
 
         $config_attributes = $this->attribute_options_child_products()->get();
 
+        $price = $this->value(array_merge($scope, [ "attribute_slug" => "price" ]));
+
         return [
             "id" => $this->id,
             "name" => $this->value(array_merge($scope, [ "attribute_slug" => "name" ])),
             "type" => $this->type,
             "sku" => $this->sku,   
-            "price" => $this->value(array_merge($scope, [ "attribute_slug" => "price" ])),       
+            "price" => PriceFormat::get($price, $scope["scope_id"], $scope["scope"]),       
             "stock" => (int) $stock?->quantity,
             "status" => (bool) $this->status,
             "visibility" => $this->value(array_merge($scope, [ "attribute_slug" => "visibility" ]))?->name,
