@@ -97,14 +97,14 @@ class ProductController extends BaseController
 
     public function show(Request $request, mixed $identifier): JsonResponse
     {
-        // try
-        // {
+        try
+        {
             $data = $this->store_front_repository->show($request, $identifier);
-        // }
-        // catch( Exception $exception )
-        // {
-        //     return $this->handleException($exception);
-        // }
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
 
         return $this->successResponse($data, $this->lang('fetch-success'));
     }
