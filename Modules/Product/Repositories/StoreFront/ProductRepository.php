@@ -122,7 +122,7 @@ class ProductRepository extends BaseRepository
             }
             if($custom_scope == "website") {
                 $scope_product_attr = ProductAttribute::whereAttributeId($attribute_id)->whereProductId($product_id)->whereScope("channel")->whereScopeId($coreCache->channel->id)->first();
-                if($scope_product_attr) $this->checkScopeForUrlKey($product_id, $attribute_id, $coreCache, $scope_product_attr?->scope);
+                if($scope_product_attr) throw new ProductNotFoundIndividuallyException();
                 else $this->checkScopeForUrlKey($product_id, $attribute_id, $coreCache, "channel");
             }
         }
