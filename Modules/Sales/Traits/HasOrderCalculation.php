@@ -23,6 +23,8 @@ trait HasOrderCalculation
     {
         try 
         {
+            $channel_id = $coreCache?->channel->id;
+
             $sub_total = 0.00;
             $sub_total_tax_amount = 0.00;
             $total_qty_ordered = 0;
@@ -36,20 +38,23 @@ trait HasOrderCalculation
                 $total_items += 1;
                 $item_discount_amount += (float) $item->discount_amount_tax;
             }
+            
+            $discount_amount = (float) $this->calculateDiscount($order); // To-Do other discount will be added here...
+            $arr_shipping_amount = $this->getInternalShippingValue($request, $order, $coreCache);
+            $cal_shipping_amt = (float) ($arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount']);
+
             $taxes = $order->order_taxes?->pluck('amount')->toArray();
             $total_tax = array_sum($taxes);
 
-            $discount_amount = (float) $this->calculateDiscount($order); // To-Do other discount will be added here...
-            $arr_shipping_amount = $this->getInternalShippingValue($request, $order, $coreCache);
-            $cal_shipping_amt = (float) $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
             $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
-            $channel_id = $coreCache?->channel->id;
 
+            $total_tax_without_shipping = $total_tax - ($arr_shipping_amount['shipping_tax'] ? $arr_shipping_amount['shipping_amount'] : 0.00);
             $order_addresses = $order->order_addresses()->get();
+
             $order->update([
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,
-                "tax_amount" => $total_tax,
+                "tax_amount" => $total_tax_without_shipping,
                 "shipping_amount" => $arr_shipping_amount['shipping_amount'],
                 "grand_total" => $grand_total,
                 "total_items_ordered" => $total_items,

@@ -482,7 +482,7 @@ return [
                                     "type" => "select",
                                     "provider" => "",
                                     "pluck" => [],
-                                    "default" => "per_order",
+                                    "default" => "per_item",
                                     "options" => [
                                         [ "value" => "per_item", "label" => "Per Item" ],
                                         [ "value" => "per_order", "label" => "Per Order" ]
@@ -499,7 +499,7 @@ return [
                                     "type" => "text",
                                     "provider" => "",
                                     "pluck" => [],
-                                    "default" => "",
+                                    "default" => 20.00,
                                     "options" => [],
                                     "rules" => "decimal",
                                     "multiple" => false,
