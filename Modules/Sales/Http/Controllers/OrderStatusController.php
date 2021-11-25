@@ -36,7 +36,7 @@ class OrderStatusController extends BaseController
         return OrderStatusResource::collection($orders);
     }
 
-    public function orderStateResource(object $states): JsonResource
+    public function orderStateResource(object $states): ResourceCollection
     {
         return OrderStateResource::collection($states);
     }
