@@ -4,7 +4,7 @@ namespace Modules\Sales\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OrderStateResource extends JsonResource
+class OrderStateCollection extends JsonResource
 {
     public function toArray($request): array
     {

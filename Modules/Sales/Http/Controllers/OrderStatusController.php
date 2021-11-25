@@ -9,8 +9,8 @@ use Modules\Sales\Entities\OrderStatus;
 use Modules\Sales\Entities\OrderStatusState;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\Sales\Transformers\OrderStateResource;
 use Modules\Sales\Transformers\OrderStatusResource;
+use Modules\Sales\Transformers\OrderStateCollection;
 use Modules\Sales\Repositories\OrderStatusRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -38,7 +38,7 @@ class OrderStatusController extends BaseController
 
     public function orderStateResource(object $states): ResourceCollection
     {
-        return OrderStateResource::collection($states);
+        return OrderStateCollection::collection($states);
     }
 
     public function index(Request $request): JsonResponse
