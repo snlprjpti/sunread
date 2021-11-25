@@ -419,7 +419,7 @@ class ProductRepository extends BaseRepository
             $category_value = CategoryValue::whereAttribute("slug")->whereValue($category_slug)->firstOrFail();
             $category = $category_value->category;
 
-            if(!$this->categoryRepository->checkMenuStatus($category, $scope)) throw new CategoryNotFoundException();
+            if(!$this->categoryRepository->checkStatus($category, $scope)) throw new CategoryNotFoundException();
         }
         catch(Exception $exception)
         {
