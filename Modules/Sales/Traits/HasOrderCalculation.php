@@ -23,6 +23,8 @@ trait HasOrderCalculation
     {
         try 
         {
+            $channel_id = $coreCache?->channel->id;
+
             $sub_total = 0.00;
             $sub_total_tax_amount = 0.00;
             $total_qty_ordered = 0;
@@ -45,17 +47,10 @@ trait HasOrderCalculation
             $total_tax = array_sum($taxes);
 
             $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
-            $channel_id = $coreCache?->channel->id;
 
             $total_tax_without_shipping = $total_tax - ($arr_shipping_amount['shipping_tax'] ? $arr_shipping_amount['shipping_amount'] : 0.00);
-
-            // dd($total_tax);
-            // total_tax_without_shipping => 1842
-            // shipping = 339.30
-            // sub total = 10000
-            // arr_shipping_amount['shipping_amount']
-            // dd($total_tax_without_shipping, $arr_shipping_amount['shipping_amount'], $sub_total, $cal_shipping_amt, $total_tax);
             $order_addresses = $order->order_addresses()->get();
+
             $order->update([
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,
