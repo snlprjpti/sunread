@@ -71,7 +71,8 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->store_front_repository->getCategoryData($request, $category_slug);
+            $all_categories = array_slice($request->segments(), 4);
+            $fetched = $this->category_repository->getCategoryData($request, $all_categories);
         }
         catch( Exception $exception )
         {
