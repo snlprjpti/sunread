@@ -52,12 +52,8 @@ class OrderRepository extends BaseRepository
             $items = CartItem::whereCartId($request->cart_id)->select("product_id", "qty")->get()->toArray();
             foreach ( $items as $order_item ) 
             {
-                $order_item_details = $this->getProductDetail($request, $order_item, function ($product) use (&$tax, $request, $order_item) {
-                    $tax = $this->calculateTax($request, $order_item)->toArray();
-                    $product_options = $this->getProductOptions($request, $product);
-                    return array_merge($product_options, $tax, $order_item);
-                });
-                $order_item = $this->orderItemRepository->store($request, $order, $order_item_details); 
+                $order_item_details = $this->getProductItemData($request, $order_item);
+                $this->orderItemRepository->store($request, $order, $order_item_details); 
                 $this->createOrderTax($order, $order_item_details);
             }
             $this->updateOrderTax($order, $request);
@@ -70,6 +66,15 @@ class OrderRepository extends BaseRepository
 
         DB::commit();        
         return $order;
+    }
+
+    private function getProductItemData(object $request, mixed $order_item): mixed
+    {
+        return $this->getProductDetail($request, $order_item, function ($product) use (&$tax, $request, $order_item) {
+            $tax = $this->calculateTax($request, $order_item)->toArray();
+            $product_options = $this->getProductOptions($request, $product);
+            return array_merge($product_options, $tax, $order_item);
+        });
     }
 
     private function validateRequestData(object $request, ?callable $callback = null): ?array

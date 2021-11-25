@@ -31,6 +31,20 @@ class CategoryRepository extends BaseRepository
         return (isset($include_value) && $include_value == "1");
     }
 
+    public function checkStatus(object $category, array $scope): bool
+    {
+        try
+        {
+            $status_value = $category->value($scope, "status");
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return (isset($status_value) && $status_value == "1");
+    }
+
     public function getMenu(object $request): array
     {
         try
@@ -64,6 +78,7 @@ class CategoryRepository extends BaseRepository
             foreach($categories as $category)
             {
                 if(!$this->checkMenuStatus($category, $scope)) continue;
+                if(!$this->checkStatus($category, $scope)) continue;
                 $fetched[] = new CategoryResource($category);
             }
         }
