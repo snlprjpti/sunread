@@ -13,6 +13,7 @@ class OrderCommentRepository extends BaseRepository
         $this->model_key = "OrderComment";
         $this->rules = [
             "comment" => "required",
+            "order_id" => "required|exists:order_comments,id",
             "is_customer_notified" => "sometimes|boolean",
             "is_visible_on_storefornt" => "sometimes|boolean"
         ];

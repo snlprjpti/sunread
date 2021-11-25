@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Sales\Transformers\OrderCommentResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Validation\ValidationException;
 use Modules\Sales\Repositories\OrderCommentRepository;
 
 class OrderCommentController extends BaseController
@@ -35,11 +36,13 @@ class OrderCommentController extends BaseController
         return new OrderCommentResource($data);
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, int $order_id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, callback:function() use ($order_id) {
+                return $this->model->where("order_id", $order_id);
+            });
         }
         catch (Exception $exception)
         {
@@ -53,13 +56,8 @@ class OrderCommentController extends BaseController
     {
         try
         {
-            Order::findOrFail($order_id);
-            $data = $this->repository->validateData($request, callback:function() use ($order_id) {
-                return [
-                    "user_id" => auth('admin')->id(),
-                    "order_id" => $order_id
-                ];
-            });
+            $request->merge(["order_id" => $order_id]);
+            $data = $this->repository->validateData($request, callback:fn() => [ "user_id" => auth('admin')->id() ]);
             $created = $this->repository->create($data);
         }
         catch (Exception $exception)
@@ -74,7 +72,9 @@ class OrderCommentController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($comment_id);
+            $fetched = $this->repository->fetch($comment_id, callback:function () use ($order_id) {
+                return $this->model->where("order_id", $order_id);
+            });
         }
         catch (Exception $exception)
         {
@@ -87,9 +87,8 @@ class OrderCommentController extends BaseController
     {
         try
         {
-            $data = $this->repository->validateData($request, callback:function() {
-                return [ "user_id" => auth('admin')->id() ];
-            });
+            $request->merge(["order_id" => $order_id]);
+            $data = $this->repository->validateData($request, callback:fn() => [ "user_id" => auth('admin')->id() ] );
             $updated = $this->repository->update($data, $comment_id);
         }
         catch (Exception $exception)
@@ -104,7 +103,9 @@ class OrderCommentController extends BaseController
     {
         try
         {
-            $this->repository->delete($comment_id);
+            $this->repository->delete($comment_id, callback:function () use ($order_id) {
+                return $this->model->where("order_id", $order_id);
+            });
         }
         catch (Exception $exception)
         {
