@@ -7,7 +7,7 @@ use Modules\Sales\Entities\OrderComment;
 
 class OrderCommentRepository extends BaseRepository
 {   
-	public function __construct(OrderComment $order_comment)
+    public function __construct(OrderComment $order_comment)
     {
         $this->model = $order_comment;
         $this->model_key = "OrderComment";

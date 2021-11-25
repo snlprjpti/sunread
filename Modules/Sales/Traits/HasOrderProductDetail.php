@@ -17,7 +17,7 @@ trait HasOrderProductDetail
         "weight"
     ];
 
-	public function getProductDetail(object $request, array $order, ?callable $callback = null): ?object
+    public function getProductDetail(object $request, array $order, ?callable $callback = null): ?object
     {
         try
         {

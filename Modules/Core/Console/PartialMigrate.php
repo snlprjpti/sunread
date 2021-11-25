@@ -62,7 +62,7 @@ class PartialMigrate extends Command
         Schema::dropIfExists('order_comments');
         Schema::dropIfExists('order_status_states');
         Schema::dropIfExists('order_statuses');
-
+        
         Schema::enableForeignKeyConstraints();
 
         $this->info("Values truncated");
@@ -85,6 +85,8 @@ class PartialMigrate extends Command
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTaxItemTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTaxTableSeeder"]);
+
+        // Artisan::call("db:seed", ["--class" => "Modules\Core\Database\Seeders\CacheTableSeeder"]);
 
         Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\SalesDatabaseSeeder"]);
 

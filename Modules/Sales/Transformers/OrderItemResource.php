@@ -2,9 +2,7 @@
 
 namespace Modules\Sales\Transformers;
 
-use Modules\Core\Facades\SiteConfig;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Core\Repositories\BaseRepository;
 
 class OrderItemResource extends JsonResource
 {
@@ -17,7 +15,7 @@ class OrderItemResource extends JsonResource
             "product_id" => $this->product_id,
             "order_id" => $this->order_id,
             "currency_code" => $this->order->currency_code,
-            "product_options" => $this->product_options,
+            "product_options" => json_decode($this->product_options),
             "product_type" => $this->product_type,
             "sku" => $this->sku,
             "name" => $this->name,

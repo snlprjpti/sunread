@@ -3,6 +3,7 @@
 namespace Modules\Core\Repositories;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +18,6 @@ use Modules\Core\Traits\Configuration as TraitsConfiguration;
 
 class ConfigurationRepository extends BaseRepository
 {
-    protected $config_fields;
     protected $channel_model, $store_model, $global_file_slug;
     use TraitsConfiguration;
 
@@ -28,12 +28,36 @@ class ConfigurationRepository extends BaseRepository
         $this->rules = [
             "scope" => [ "sometimes", "in:global,website,channel,store" ]
         ];
-        $this->config_fields = ($data = Cache::get("configurations.all")) ? $data : config("configuration");
         $this->createModel();
 
         $this->website_model = $website_model;
         $this->channel_model = $channel_model;
         $this->store_model = $store_model;
+    }
+
+    public function getConfigFile(): object
+    {
+        try
+        {
+            $config_data = config("configuration");
+
+            $modules = app()->modules->getByStatus(1);
+            foreach ($modules as $module)
+            {
+                $config_name = strtolower($module->getName());
+                $config_merge = config("{$config_name}.configuration_merge");
+                if (!$config_merge) continue;
+                $config_data = array_merge($config_data, config("{$config_name}.configuration"));
+            }
+
+            $config_fields = collect($config_data)->sortBy("position");
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $config_fields;
     }
 
     public function getConfigData(object $request): array
@@ -42,7 +66,7 @@ class ConfigurationRepository extends BaseRepository
         {
             $this->validateData($request, $this->scopeValidation($request));
 
-            $fetched = $this->config_fields;
+            $fetched = $this->getConfigFile()->toArray();
             $checkKey = [ "scope" => $request->scope ?? "global", "scope_id" => $request->scope_id ?? 0 ];
             if($checkKey["scope"] != "global") $fetched_data['entity'] = $this->getEntityData($checkKey);
 
@@ -147,8 +171,12 @@ class ConfigurationRepository extends BaseRepository
 
     public function getValidationRules(object $request): array
     {
+        $config_fields = $this->getConfigFile()->toArray();
         $scope = $request->scope ?? "global";
-        return collect(config('configuration.'.$request->absolute_path))->pluck('elements')->flatten(1)->map(function($data) {
+
+        $filter_config_fields = getDotToArray($request->absolute_path, $config_fields);
+
+        return collect($filter_config_fields)->pluck('elements')->flatten(1)->map(function($data) {
             return $data;
         })->reject(function ($data) use($scope, $request) {
             if($data["type"] == "file") return $this->handleFileIssue($request, $data, $scope);
@@ -217,6 +245,8 @@ class ConfigurationRepository extends BaseRepository
     {
         $item['scope'] = $request->scope;
         $item['scope_id'] = $request->scope_id;
+        $config_fields = $this->getConfigFile()->toArray();
+
         foreach($request->items as $key => $val)
         {
             if(is_array($this->global_file_slug) && in_array($key, $this->global_file_slug)) continue;
@@ -225,7 +255,8 @@ class ConfigurationRepository extends BaseRepository
 
             if(!isset($val["use_default_value"]) && !array_key_exists("value", $val)) throw ValidationException::withMessages([ "value" => __("core::app.response.value_missing", ["name" => $key]) ]);
 
-            $configDataArray = config("configuration.{$val["absolute_path"]}");
+
+            $configDataArray = getDotToArray($val["absolute_path"], $config_fields);
             if(!$configDataArray) throw ValidationException::withMessages([ "absolute_path" =>  __("core::app.response.absolute_path_not_exist", ["name" => $key]) ]);
 
             if($configDataArray["path"] != $key) throw ValidationException::withMessages([ "absolute_path" =>  __("core::app.response.wrong_absolute_path", ["name" => $key])]);
@@ -306,7 +337,8 @@ class ConfigurationRepository extends BaseRepository
     {
         try
         {
-            $elements = collect($this->config_fields)->pluck("children")->flatten(1)->pluck("subChildren")->flatten(1)->pluck("elements")->flatten(1);
+            $config_fields = $this->getConfigFile();
+            $elements = $config_fields->pluck("children")->flatten(1)->pluck("subChildren")->flatten(1)->pluck("elements")->flatten(1);
             $element = $elements->where("path", $request->path)->first();
 
             if(!$element) throw ValidationException::withMessages([ "path" => "Invalid Path" ]);

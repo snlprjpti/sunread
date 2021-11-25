@@ -19,7 +19,7 @@ trait HasOrderCalculation
 
     protected $discount_percent, $shipping_amount;
 
-	public function orderCalculationUpdate(object $order, object $request, object $coreCache): void
+    public function orderCalculationUpdate(object $order, object $request, object $coreCache): void
     {
         try 
         {

@@ -4,6 +4,4 @@ namespace Modules\Repositories;
 
 class BaseDeliveryMethodRepository
 {
-	
-
 }
