@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Repositories;
+namespace Modules\CheckOutMethods\Repositories;
 
 class BaseDeliveryMethodRepository
 {

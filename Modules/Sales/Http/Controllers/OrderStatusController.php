@@ -19,7 +19,7 @@ class OrderStatusController extends BaseController
     public function __construct(OrderStatus $order_status, OrderStatusRepository $repository)
     {
         $this->model = $order_status;
-        $this->model_name = "OrderStatus";
+        $this->model_name = "Order Status";
         $this->repository = $repository;
         parent::__construct($this->model, $this->model_name);
     }
