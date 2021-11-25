@@ -24,7 +24,10 @@
     "ClubHouse": true,
     "Controller": true,
     "OrderStatus": true,
-    "ShippingMethods": true,
-    "PaymentMethods": true,
-    "NavigationMenu": true
+    "NavigationMenu": true,
+    "PaymentBankTransfer": true,
+    "PaymentCashOnDelivery": true,
+    "DeliveryFlatRate": true,
+    "DeliveryFreeShipping": true,
+    "CheckOutMethods": true
 }

@@ -20,7 +20,7 @@ class PartialMigrate extends Command
 
     public function handle(): bool
     {
-        // Schema::disableForeignKeyConstraints();
+        Schema::disableForeignKeyConstraints();
 
         // DB::table('products')->truncate();
         // DB::table('attribute_configurable_products')->truncate();
@@ -49,16 +49,26 @@ class PartialMigrate extends Command
         // DB::table('attribute_groups')->truncate();
         // DB::table('attribute_group_attributes')->truncate();
         // DB::table('attribute_group_translations')->truncate();
-        // DB::table('attribute_translations')->truncate();
-
-        
+        // DB::table('attribute_translations')->truncate();        
         //  DB::table('email_templates')->truncate();
-        // Schema::enableForeignKeyConstraints();
 
-        // $this->info("Values truncated");
+        Schema::dropIfExists('orders');
+        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('order_addresses');
+        Schema::dropIfExists('order_taxes');
+        Schema::dropIfExists('order_tax_items');
+        Schema::dropIfExists('order_metas');
+        Schema::dropIfExists('order_transaction_logs');
+        Schema::dropIfExists('order_comments');
+        Schema::dropIfExists('order_status_states');
+        Schema::dropIfExists('order_statuses');
+        
+        Schema::enableForeignKeyConstraints();
 
-        // Artisan::call("migrate");
-        // $this->info("Migrated");
+        $this->info("Values truncated");
+
+        Artisan::call("migrate");
+        $this->info("Migrated");
 
         // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeSetTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Attribute\Database\Seeders\AttributeTableSeeder"]);
@@ -76,7 +86,9 @@ class PartialMigrate extends Command
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTaxItemTableSeeder"]);
         // Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\OrderTaxTableSeeder"]);
 
-        Artisan::call("db:seed", ["--class" => "Modules\Core\Database\Seeders\CacheTableSeeder"]);
+        // Artisan::call("db:seed", ["--class" => "Modules\Core\Database\Seeders\CacheTableSeeder"]);
+
+        Artisan::call("db:seed", ["--class" => "Modules\Sales\Database\Seeders\SalesDatabaseSeeder"]);
 
         $this->info("Seeding completed");
         return true;

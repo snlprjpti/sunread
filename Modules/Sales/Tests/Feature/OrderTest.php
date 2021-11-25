@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Sales\Entities\Order;
 use Modules\Sales\Entities\OrderStatus;
+use Modules\Sales\Entities\OrderStatusState;
 
 class OrderTest extends BaseTestCase
 {
@@ -27,11 +28,10 @@ class OrderTest extends BaseTestCase
 
     public function testAdminCanUpdateOrderStatus()
     {
-        $order_status = OrderStatus::get()->pluck("slug")->toArray();
+        $order_status_state_id = OrderStatusState::first()->id;
         $order_id = Order::first()->id;
-        $post_data = [ "status" => Arr::shuffle($order_status) ];
+        $post_data = [ "state_id" => $order_status_state_id, "name" => rand(0, 10) ];
         $response = $this->withHeaders($this->headers)->post(route("admin.sales.order.status", ["order_id" =>$order_id]), $post_data);
-
         $response->assertCreated();
         $response->assertJsonFragment([
             "status" => "success",

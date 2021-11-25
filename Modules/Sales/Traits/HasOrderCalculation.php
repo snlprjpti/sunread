@@ -10,9 +10,8 @@ use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Sales\Entities\OrderTax;
 use Modules\Sales\Entities\OrderTaxItem;
-use Modules\Sales\Traits\HasPayementCalculation;
-use Modules\Sales\Traits\HasShippingCalculation;
-use Modules\Sales\Entities\Order;
+use Modules\CheckOutMethods\Traits\HasPayementCalculation;
+use Modules\CheckOutMethods\Traits\HasShippingCalculation;
 
 trait HasOrderCalculation
 {
@@ -20,7 +19,7 @@ trait HasOrderCalculation
 
     protected $discount_percent, $shipping_amount;
 
-	public function orderCalculationUpdate(object $order, object $request, object $coreCache): void
+    public function orderCalculationUpdate(object $order, object $request, object $coreCache): void
     {
         try 
         {
@@ -45,7 +44,9 @@ trait HasOrderCalculation
             $cal_shipping_amt = (float) $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
             $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
             $channel_id = $coreCache?->channel->id;
-            Order::whereId($order->id)->update([
+
+            $order_addresses = $order->order_addresses()->get();
+            $order->update([
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,
                 "tax_amount" => $total_tax,
@@ -58,6 +59,8 @@ trait HasOrderCalculation
                 "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$request->shipping_method}_title", "channel", $channel_id),
                 "payment_method" => SiteConfig::fetch("payment_methods_{$request->payment_method}_title", "channel", $channel_id),
                 "payment_method_label" => SiteConfig::fetch("payment_methods_{$request->payment_method}_title", "channel", $channel_id),
+                "billing_address_id" => $order_addresses->where('address_type', "billing")->first()?->id,
+                "shipping_address_id" => $order_addresses->where('address_type', "shipping")->first()?->id
             ]);
 
         }
