@@ -16,8 +16,17 @@ Route::group(['middleware' => ['api','proxies']], function () {
     
     Route::group(['prefix' => 'admin/sales', 'as' => 'admin.sales.', 'middleware' => ['admin', 'language']], function () {
         Route::post('orders/status/{order_id}', [Modules\Sales\Http\Controllers\OrderController::class, 'orderStatus'])->name('order.status');
-        Route::resource("order/{order_id}/comments", OrderCommentController::class);
+        
+        Route::group(["prefix" => "order", "as" => "comments."], function () {
+            Route::get("{order_id}/comments", [Modules\Sales\Http\Controllers\OrderCommentController::class, "index"])->name("index");
+            Route::post("{order_id}/comments", [Modules\Sales\Http\Controllers\OrderCommentController::class, "store"])->name("store");
+            Route::put("{order_id}/comments/{comment_id}", [Modules\Sales\Http\Controllers\OrderCommentController::class, "update"])->name("update");
+            Route::get("{order_id}/comments/{comment_id}", [Modules\Sales\Http\Controllers\OrderCommentController::class, "show"])->name("show");
+            Route::delete("{order_id}/comments/{comment_id}", [Modules\Sales\Http\Controllers\OrderCommentController::class, "destroy"])->name("destroy");
+        });
+        
         Route::resource("orders", OrderController::class)->only(["index", "show"]);
+        Route::resource("statuses", OrderStatusController::class)->only(["index", "show", "update", "store"]);
     });
 
     Route::group(['as' => 'public.sales.', 'prefix' => 'public'], function () {

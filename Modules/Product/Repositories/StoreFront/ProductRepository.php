@@ -77,6 +77,12 @@ class ProductRepository extends BaseRepository
                 $product_attr = ProductAttribute::query()->with(["value"]);
                 $attribute_id = Attribute::whereSlug("url_key")->first()?->id;
                 $product_attr = $product_attr->whereAttributeId($attribute_id)->get()->filter( fn ($attr_product) => $attr_product->value->value == $identifier)->first();
+            
+                if(isset($product_attr->scope)) {
+                    if(in_array($product_attr->scope, ["channel", "website"])) $this->checkScopeForUrlKey($product_attr?->product_id, $attribute_id, $coreCache, $product_attr?->scope);
+                    if($product_attr->scope == "store" && $product_attr?->scope_id != $coreCache->store->id) throw new ProductNotFoundIndividuallyException();
+                }
+                
                 $product = Product::whereId($identifier)
                 ->orWhere("id", $product_attr?->product_id)
                 ->whereWebsiteId($coreCache->website->id)
@@ -107,6 +113,26 @@ class ProductRepository extends BaseRepository
         }
 
         return $product_details;
+    }
+
+    public function checkScopeForUrlKey(?int $product_id, int $attribute_id, object $coreCache, ?string $custom_scope): void
+    {
+        try
+        {
+            if($custom_scope == "channel") {
+                $scope_product_attr = ProductAttribute::whereAttributeId($attribute_id)->whereProductId($product_id)->whereScope("store")->whereScopeId($coreCache->store->id)->first();
+                if($scope_product_attr) throw new ProductNotFoundIndividuallyException();
+            }
+            if($custom_scope == "website") {
+                $scope_product_attr = ProductAttribute::whereAttributeId($attribute_id)->whereProductId($product_id)->whereScope("channel")->whereScopeId($coreCache->channel->id)->first();
+                if($scope_product_attr) throw new ProductNotFoundIndividuallyException();
+                else $this->checkScopeForUrlKey($product_id, $attribute_id, $coreCache, "channel");
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
     }
 
     public function productDetail(object $request, object $product, object $coreCache, ?int $parent_identifier = null): ?array
