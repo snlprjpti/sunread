@@ -10,16 +10,13 @@ class OrderItemResource extends JsonResource
 {
     public function toArray($request): array
     {
-        $coreCache = (new BaseRepository())->getCoreCache($request);
-        $currency_code = SiteConfig::fetch('channel_currency', 'channel', $coreCache?->channel->id);
-        
         return [
             "id" => $this->id,
             "website_id" => $this->website_id,
             "store_id" => $this->store_id,
             "product_id" => $this->product_id,
             "order_id" => $this->order_id,
-            "currency_code" => $currency_code->code,
+            "currency_code" => $this->order->currency_code,
             "product_options" => $this->product_options,
             "product_type" => $this->product_type,
             "sku" => $this->sku,
