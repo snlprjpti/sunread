@@ -481,16 +481,19 @@ class ProductRepository extends BaseRepository
     {
         try
         {
+            $configurable_attribute_ids = [];
             $product = $this->model->with([ "parent", "brand", "website" ])->findOrFail($id);
+
+            if($product->parent_id) $configurable_attribute_ids = $product->parent->attribute_configurable_products->pluck("attribute_id")->toArray();
         
             $attribute_set = AttributeSet::findOrFail($product->attribute_set_id);
     
-            $groups = $attribute_set->attribute_groups->sortBy("position")->map(function ($attribute_group) use ($product, $scope)  { 
+            $groups = $attribute_set->attribute_groups->sortBy("position")->map(function ($attribute_group) use ($product, $scope, $configurable_attribute_ids)  { 
                 return [
                     "id" => $attribute_group->id,
                     "name" => $attribute_group->name,
                     "position" => $attribute_group->position,
-                    "attributes" => $attribute_group->attributes->sortBy("pivot.position")->map(function ($attribute) use ($product, $scope) {
+                    "attributes" => $attribute_group->attributes->sortBy("pivot.position")->map(function ($attribute) use ($product, $scope, $configurable_attribute_ids) {
                         $match = [
                             "attribute_id" => $attribute->id,
                             "scope" => $scope["scope"],
@@ -509,9 +512,13 @@ class ProductRepository extends BaseRepository
                             "position" => $attribute->position,
                             "is_required" => $attribute->is_required,
                             "is_user_defined" => (bool) $attribute->is_user_defined,
-                            "is_synchronized" => (bool) $attribute->is_synchronized
+                            "is_synchronized" => (bool) $attribute->is_synchronized,
+                            "is_configurable_attribute" => in_array($attribute->id, $configurable_attribute_ids) ? 1 : 0
                         ];
-                        if($match["scope"] != "website") $attributesData["use_default_value"] = $mapper ? 0 : ($existAttributeData ? 0 : 1);
+                        if($match["scope"] != "website") {
+                            $scopeFilter = $this->scopeFilter($scope["scope"], $attribute->scope);
+                            $attributesData["use_default_value"] = $scopeFilter ? 0 : ($mapper ? 0 : ($existAttributeData ? 0 : 1));
+                        }
                         $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
 
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
@@ -727,7 +734,7 @@ class ProductRepository extends BaseRepository
             {
                 $value = SiteConfig::fetch($field, $scope["scope"], $scope["scope_id"]);  
                 if($field == "channel_currency") {
-                    $fetched["currency"] = $value?->code;
+                    $fetched["currency"] = $value;
                     continue;
                 }  
                 $fetched[$field] = $value;
