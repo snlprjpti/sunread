@@ -99,7 +99,7 @@ class CategoryRepository extends BaseRepository
                 if($category) $query = $query->where('category_id', '!=', $category->id);
                 $query->whereAttribute("slug")->whereValue($slug);
             })->first();
-            if($check_slug) throw ValidationException::withMessages(["Category slug already exists on this level"]);
+            if($check_slug) throw ValidationException::withMessages([ "parent_id" => "Category slug already exists on this level"]);
 
             $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : null;
 
