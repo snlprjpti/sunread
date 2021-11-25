@@ -15,7 +15,7 @@ class OrderItemResource extends JsonResource
             "product_id" => $this->product_id,
             "order_id" => $this->order_id,
             "currency_code" => $this->order->currency_code,
-            "product_options" => json_decode($this->product_options),
+            "product_options" => $this->product_options,
             "product_type" => $this->product_type,
             "sku" => $this->sku,
             "name" => $this->name,
