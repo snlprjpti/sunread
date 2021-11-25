@@ -77,6 +77,9 @@ class ProductRepository extends BaseRepository
                 $product_attr = ProductAttribute::query()->with(["value"]);
                 $attribute_id = Attribute::whereSlug("url_key")->first()?->id;
                 $product_attr = $product_attr->whereAttributeId($attribute_id)->get()->filter( fn ($attr_product) => $attr_product->value->value == $identifier)->first();
+            
+                if(isset($product_attr->scope) && in_array($product_attr?->scope, ["channel", "website"])) $this->checkScopeForUrlKey($product_attr, $attribute_id, $coreCache);
+                
                 $product = Product::whereId($identifier)
                 ->orWhere("id", $product_attr?->product_id)
                 ->whereWebsiteId($coreCache->website->id)
@@ -107,6 +110,25 @@ class ProductRepository extends BaseRepository
         }
 
         return $product_details;
+    }
+
+    public function checkScopeForUrlKey(object $product_attr, int $attribute_id, object $coreCache): void
+    {
+        try
+        {
+            if($product_attr->scope == "channel") {
+                $scope_product_attr = ProductAttribute::whereAttributeId($attribute_id)->whereProductId($product_attr?->product_id)->whereScope("store")->whereScopeId($coreCache->store->id)->first();
+                if($scope_product_attr) throw new ProductNotFoundIndividuallyException();
+            }
+            if($product_attr->scope == "website") {
+                $scope_product_attr = ProductAttribute::whereAttributeId($attribute_id)->whereProductId($product_attr?->product_id)->whereScope("channel")->whereScopeId($coreCache->channel->id)->first();
+                if($scope_product_attr) $this->checkScopeForUrlKey($scope_product_attr, $attribute_id, $coreCache);
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
     }
 
     public function productDetail(object $request, object $product, object $coreCache, ?int $parent_identifier = null): ?array
