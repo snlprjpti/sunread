@@ -78,7 +78,10 @@ class ProductRepository extends BaseRepository
                 $attribute_id = Attribute::whereSlug("url_key")->first()?->id;
                 $product_attr = $product_attr->whereAttributeId($attribute_id)->get()->filter( fn ($attr_product) => $attr_product->value->value == $identifier)->first();
             
-                if(isset($product_attr->scope) && in_array($product_attr?->scope, ["channel", "website"])) $this->checkScopeForUrlKey($product_attr?->product_id, $attribute_id, $coreCache, $product_attr?->scope);
+                if(isset($product_attr->scope)) {
+                    if(in_array($product_attr->scope, ["channel", "website"])) $this->checkScopeForUrlKey($product_attr?->product_id, $attribute_id, $coreCache, $product_attr?->scope);
+                    if($product_attr->scope == "store" && $product_attr?->scope_id != $coreCache->store->id) throw new ProductNotFoundIndividuallyException();
+                }
                 
                 $product = Product::whereId($identifier)
                 ->orWhere("id", $product_attr?->product_id)
