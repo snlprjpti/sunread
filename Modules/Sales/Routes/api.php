@@ -26,6 +26,9 @@ Route::group(['middleware' => ['api','proxies']], function () {
         });
         
         Route::resource("orders", OrderController::class)->only(["index", "show"]);
+
+        Route::get("states", [Modules\Sales\Http\Controllers\OrderStatusController::class, "getAllOrderState"])->name("order.states");
+
         Route::resource("statuses", OrderStatusController::class)->only(["index", "show", "update", "store"]);
     });
 
