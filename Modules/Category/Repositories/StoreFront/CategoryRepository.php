@@ -137,19 +137,16 @@ class CategoryRepository extends BaseRepository
 
             foreach($slugs as $slug)
             {
-                $category_slug = CategoryValue::whereAttribute("slug")->whereValue($slug)->first();
-                if(!$category_slug) throw new CategoryNotFoundException();
+                $category_slug = CategoryValue::whereHas("category", function ($query) use ($parent_id) {
+                    $query->whereParentId($parent_id);
+                })->whereAttribute("slug")->whereValue($slug)->firstorFail();
 
                 $category = $category_slug->category;
+                $parent_id = $category_slug->category_id;
 
                 if(isset($category_slug->scope)) {
-                    if(in_array($category_slug->scope, ["channel", "website"])) $this->checkScopeForUrlKey($category_slug?->category_id, $coreCache, $category_slug?->scope);
+                    if(in_array($category_slug->scope, ["channel", "website"])) $this->checkScopeForUrlKey($category_slug?->category_id, $coreCache, $category_slug?->scope, $parent_id);
                     if($category_slug->scope == "store" && $category_slug?->scope_id != $coreCache->store->id) throw new CategoryNotFoundException();
-                }
-
-                if(isset($category_slug->category_id)) {
-                    if($parent_id == $category->parent_id) $parent_id = $category_slug->category_id;
-                    else throw new CategoryNotFoundException();
                 }
 
                 if(!$this->checkStatus($category, $scope)) throw new CategoryNotFoundException();
@@ -245,18 +242,22 @@ class CategoryRepository extends BaseRepository
         return $fetched;
     }
 
-    public function checkScopeForUrlKey(?int $category_id, object $coreCache, ?string $custom_scope): void
+    public function checkScopeForUrlKey(?int $category_id, object $coreCache, ?string $custom_scope, ?int $parent_id): void
     {
         try
         {
             if($custom_scope == "channel") {
-                $scope_product_attr = CategoryValue::whereAttribute("slug")->whereCategoryId($category_id)->whereScope("store")->whereScopeId($coreCache->store->id)->first();
+                $scope_product_attr = CategoryValue::whereHas("category", function ($query) use ($parent_id) {
+                    $query->whereParentId($parent_id);
+                })->whereAttribute("slug")->whereCategoryId($category_id)->whereScope("store")->whereScopeId($coreCache->store->id)->first();
                 if($scope_product_attr) throw new CategoryNotFoundException();
             }
             if($custom_scope == "website") {
-                $scope_product_attr = CategoryValue::whereAttribute("slug")->whereCategoryId($category_id)->whereScope("channel")->whereScopeId($coreCache->channel->id)->first();
+                $scope_product_attr = CategoryValue::whereHas("category", function ($query) use ($parent_id) {
+                    $query->whereParentId($parent_id);
+                })->whereAttribute("slug")->whereCategoryId($category_id)->whereScope("channel")->whereScopeId($coreCache->channel->id)->first();
                 if($scope_product_attr) throw new CategoryNotFoundException();
-                else $this->checkScopeForUrlKey($category_id, $coreCache, "channel");
+                else $this->checkScopeForUrlKey($category_id, $coreCache, "channel", $parent_id);
             }
         }
         catch(Exception $exception)
