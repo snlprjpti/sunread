@@ -429,7 +429,7 @@ class ProductRepository extends BaseRepository
         return $category;
     }
 
-    public function getOptions(object $request, string $category_slug): ?array
+    public function getOptions(object $request, array $category_slugs): ?array
     {
         try
         {
@@ -439,7 +439,8 @@ class ProductRepository extends BaseRepository
                 "scope_id" => $coreCache->store->id
             ];
 
-            $category = $this->getCategory($scope, $category_slug);
+            $data = $this->categoryRepository->getNestedcategory($coreCache, $scope, $category_slugs, "productFilter");
+            $category = $data["category"];
 
             $fetched = $this->search_repository->getFilterOptions($category->id, $coreCache->store);
         }
