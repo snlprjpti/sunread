@@ -31,22 +31,23 @@ class OrderStatusUpdateRepository extends BaseRepository
 
             $status = $this->fetch($request->order_status_id, ["order_status_state"]);
 
-            $order = Order::find($request->order_id);
+            $order = Order::whereId($request->order_id)->with(["order_items"])->first();
 
             $order->update(["status" => $status->name]);
 
             if ($status->order_status_state->state == "completed") {
                 $order_items = $order->order_items;
-                foreach ($order_items->count() > 0 as $item) {
-                    Product::findOrFail($item->product_id);
-                    LogCatalogInventoryItem::dispatchSync([
-                        "product_id" => $item->product_id,
-                        "website_id" => $item->website_id,
-                        "event" => "{$this->model_key}.order_status_updated",
-                        "adjustment_type" => "deduction",
-                        "order_id" => $request->order_id,
-                        "quantity" => $item->qty
-                    ]);
+                if ($order_items->count() > 0) {
+                    foreach ($order_items as $item) {
+                        LogCatalogInventoryItem::dispatchSync([
+                            "product_id" => $item->product_id,
+                            "website_id" => $item->website_id,
+                            "event" => "{$this->model_key}.order_status_updated",
+                            "adjustment_type" => "deduction",
+                            "order_id" => $request->order_id,
+                            "quantity" => $item->qty
+                        ]);
+                    }
                 }
             }
         }
