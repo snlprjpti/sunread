@@ -2,7 +2,7 @@
 
 namespace Modules\DeliveryFreeShipping\Repositories;
 
-use Modules\Repositories\BaseDeliveryMethodRepository;
+use Modules\CheckOutMethods\Repositories\BaseDeliveryMethodRepository;
 
 class DeliveryFreeShippingRepository extends BaseDeliveryMethodRepository
 {

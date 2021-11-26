@@ -2,13 +2,13 @@
 
 namespace Modules\DeliveryFlatRate\Repositories;
 
-use Modules\Repositories\BaseDeliveryMethodRepository;
+use Modules\CheckOutMethods\Repositories\BaseDeliveryMethodRepository;
 
 class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository
 {
 	public function __construct()
 	{
-
+		
 	}
 
 
