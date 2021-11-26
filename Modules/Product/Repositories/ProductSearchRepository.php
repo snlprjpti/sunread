@@ -149,6 +149,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             foreach($products as &$product)
             {
                 $product = $this->product_format_repo->getProductInFormat($product, $request, $store);
+                $product = $this->product_format_repo->changeProductStockStatus($product);
                 
                 $product["image"] = isset($product["thumbnail_image"]) ? $product["thumbnail_image"] : $product["base_image"];
                 $product["quantity"] = isset($product["quantity"]) ? decodeJsonNumeric($product["quantity"]) : 0;
