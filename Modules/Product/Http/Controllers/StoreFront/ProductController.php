@@ -57,7 +57,9 @@ class ProductController extends BaseController
                 "collection.*" => "sometimes|exists:attribute_options,id",
             ]);
 
-            $fetched = $this->store_front_repository->categoryWiseProduct($request, $category_slug);
+            $all_categories = array_slice($request->segments(), 4);
+
+            $fetched = $this->store_front_repository->categoryWiseProduct($request, $all_categories);
         }
         catch( Exception $exception )
         {
@@ -71,7 +73,8 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->store_front_repository->getCategoryData($request, $category_slug);
+            $all_categories = array_slice($request->segments(), 4);
+            $fetched = $this->category_repository->getCategoryData($request, $all_categories);
         }
         catch( Exception $exception )
         {
@@ -85,7 +88,8 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->store_front_repository->getOptions($request, $category_slug);
+            $all_categories = array_slice($request->segments(), 4);
+            $fetched = $this->store_front_repository->getOptions($request, $all_categories);
         }
         catch( Exception $exception )
         {
