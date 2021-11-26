@@ -451,7 +451,7 @@ class ProductRepository extends BaseRepository
         return $fetched;
     }
 
-    public function categoryWiseProduct(object $request, string $category_slug): ?array
+    public function categoryWiseProduct(object $request, array $category_slugs): ?array
     {
         try
         {
@@ -463,7 +463,8 @@ class ProductRepository extends BaseRepository
                 "scope_id" => $coreCache->store->id
             ];
 
-            $category = $this->getCategory($scope, $category_slug);
+            $data = $this->categoryRepository->getNestedcategory($coreCache, $scope, $category_slugs, "productFetch");
+            $category = $data["category"];
 
             $fetched = $this->search_repository->getFilterProducts($request, $category->id, $coreCache->store);
         }

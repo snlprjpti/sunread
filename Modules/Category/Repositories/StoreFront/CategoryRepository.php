@@ -121,13 +121,18 @@ class CategoryRepository extends BaseRepository
         return $fetched;
     }
 
-    public function getNestedcategory(object $coreCache, array $scope, array $slugs): array
+    public function getNestedcategory(object $coreCache, array $scope, array $slugs, ?string $type = null): array
     {
         try
         {
             $parent_id = null;
             $fetched = [];
             $custom_url = [];
+
+            if($type) {
+                $count = count($slugs);
+                unset($slugs[--$count]);
+            }
 
             foreach($slugs as $slug)
             {
@@ -148,14 +153,17 @@ class CategoryRepository extends BaseRepository
 
                 if(!$this->checkStatus($category, $scope)) throw new CategoryNotFoundException();
 
-                $custom_url[] = $slug;
+                if(!$type) {
 
-                $fetched["breadcrumbs"][] = [
-                    "id" => $category->id,
-                    "slug" => $category->value($scope, "slug"),
-                    "name" => $category->value($scope, "name"),
-                    "url" => implode("/", $custom_url)
-                ];
+                    $custom_url[] = $slug;
+
+                    $fetched["breadcrumbs"][] = [
+                        "id" => $category->id,
+                        "slug" => $category->value($scope, "slug"),
+                        "name" => $category->value($scope, "name"),
+                        "url" => implode("/", $custom_url)
+                    ];
+                }
                 $fetched["category"] = $category;
             }
         }

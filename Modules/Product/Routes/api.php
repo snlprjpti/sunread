@@ -35,9 +35,9 @@ Route::group(["middleware" => ["api"]], function() {
 
     Route::group(['prefix'=>'public', 'as' => 'public.'], function () {
 
+        Route::get('catalog/category/{category_slug?}/products', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "index"])->name("products.index")->where('category_slug', '.*');
         Route::get('catalog/product/{parent_id}/configurable/variant/{id}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "variantShow"])->name("products.configurable.variants");
-        Route::get('catalog/category/{category_slug?}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "category"])->name("products.category")->where('category_slug', '.*');;
-        Route::get('catalog/category/{category_slug}/products', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "index"])->name("products.index");
+        Route::get('catalog/category/{category_slug?}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "category"])->name("products.category")->where('category_slug', '.*');
         Route::get('catalog/category/{category_slug}/navigation/layered', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "filter"])->name("products.filter");
         Route::get('catalog/product/{url_key}', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "show"])->name("products.show");
         Route::get('catalog/search', [\Modules\Product\Http\Controllers\StoreFront\ProductController::class, "search"])->name("products.search");

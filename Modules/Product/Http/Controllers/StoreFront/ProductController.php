@@ -57,7 +57,9 @@ class ProductController extends BaseController
                 "collection.*" => "sometimes|exists:attribute_options,id",
             ]);
 
-            $fetched = $this->store_front_repository->categoryWiseProduct($request, $category_slug);
+            $all_categories = array_slice($request->segments(), 4);
+
+            $fetched = $this->store_front_repository->categoryWiseProduct($request, $all_categories);
         }
         catch( Exception $exception )
         {
