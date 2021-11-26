@@ -32,6 +32,7 @@ class ProductConfigurableRepository extends BaseRepository
         $this->model_key = "catalog.products";
         $this->rules = [
             "brand_id" => "sometimes|nullable|exists:brands,id",
+            "super_attributes" => "required|array",
             "attributes" => "required|array",
             "scope" => "sometimes|in:website,channel,store",
             "grouping_attributes" => "sometimes|exists:attributes,slug",
