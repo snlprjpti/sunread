@@ -2,19 +2,20 @@
 
 namespace Modules\CheckOutMethods\Services;
 
+use Exception;
 use Illuminate\Support\Collection;
 use Modules\Core\Facades\SiteConfig;
 
 class BaseCheckOutMethods
 {
-
 	protected array $checkout_methods;
-
 	protected array $method_attributes;
+	protected mixed $check_out_method;
 
-	public function __construct()
+	public function __construct(?string $check_out_method = null)
 	{
 		$this->checkout_methods = ["delivery_methods", "payment_methods"];
+		$this->check_out_method = isset($check_out_method) ?  $this->fetch($check_out_method) : $check_out_method;
 	}
 
 	public function object(array $attributes = []): mixed
@@ -44,10 +45,27 @@ class BaseCheckOutMethods
 
 	public function fetch(string $method_slug, ?callable $callback = null): mixed
 	{
-		return config("sales");
 		$fetched = $this->all()->flatten(2)->where("slug", $method_slug)->first();
 		if ($callback) $fetched = array_merge($fetched, $callback($fetched));
+		if (!$fetched) throw new Exception("Could not fetch required attributes.");// exception for dev
 		return $this->object($fetched);
+	}
+
+	public function process(object $request, ?array $parameter = [], ?object $method_data = null): mixed
+	{
+		if (!empty($parameter)) $parameter = $this->object($parameter);
+		if ($this->check_out_method) $data = $this->getRepositoryData($this->check_out_method, $request, $parameter);
+		elseif (isset($method_data)) $data = $this->getRepositoryData($method_data, $request, $parameter);
+		else throw new Exception("Could not process method. Method is not initialize."); // Exception for dev
+		return $data;
+	}
+
+	private function getRepositoryData(object $method_data, object $request, ?object $parameter): mixed
+	{
+		$method_repository = $method_data->repository;
+		$method_repository = new $method_repository($request, $parameter);
+		$data = $method_repository->get();
+		return $data;
 	}
 
 	private function getData(string $checkout_method, ?callable $callback = null): mixed
