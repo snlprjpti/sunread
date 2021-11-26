@@ -91,7 +91,7 @@ class ProductConfigurableController extends BaseController
             $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)],
-                "update_configurable_attributes" => "required|boolean"
+                // "update_configurable_attributes" => "required|boolean"
             ], function ($request) use($product) {
                 return [
                     "scope" => $request->scope ?? "website",
@@ -112,7 +112,7 @@ class ProductConfigurableController extends BaseController
 
                 $updated->channels()->sync($request->get("channels"));
 
-                if($data["update_configurable_attributes"] == 1) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
+                if(isset($data["update_configurable_attributes"]) && $data["update_configurable_attributes"] == 1) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
 
                 $updated->load("variants");
             });
