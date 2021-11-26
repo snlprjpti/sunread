@@ -51,7 +51,8 @@ class ProductConfigurableController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "website_id" => "required|exists:websites,id",
-                "attribute_set_id" => "required|exists:attribute_sets,id"
+                "attribute_set_id" => "required|exists:attribute_sets,id",
+                "super_attributes" => "required|array",
             ], function ($request) {
                 return [
                     "scope" => "website",
@@ -71,7 +72,7 @@ class ProductConfigurableController extends BaseController
 
                 $created->channels()->sync($request->get("channels"));
 
-                $this->repository->createVariants($created, $request, $scope, $attributes);
+                if(isset($data["super_attributes"])) $this->repository->createVariants($created, $request, $scope, $attributes);
             });
 
             $this->repository->configurableIndexing($created);
@@ -90,7 +91,8 @@ class ProductConfigurableController extends BaseController
         {
             $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
-                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)],
+                "super_attributes" => "sometimes|array",
             ], function ($request) use($product) {
                 return [
                     "scope" => $request->scope ?? "website",
@@ -111,7 +113,7 @@ class ProductConfigurableController extends BaseController
 
                 $updated->channels()->sync($request->get("channels"));
 
-                $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
+                if(isset($data["super_attributes"])) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
 
                 $updated->load("variants");
             });
