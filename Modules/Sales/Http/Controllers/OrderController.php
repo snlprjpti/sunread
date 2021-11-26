@@ -69,13 +69,13 @@ class OrderController extends BaseController
     {
         try
         {
-            $this->orderStatusUpdateRepository->orderStatus($request);
+            $fetched = $this->orderStatusUpdateRepository->orderStatus($request);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
-        return $this->successResponseWithMessage($this->lang('update-success'), 201);       
+        return $this->successResponse($this->resource($fetched), $this->lang('update-success'));       
     }
 
 }
