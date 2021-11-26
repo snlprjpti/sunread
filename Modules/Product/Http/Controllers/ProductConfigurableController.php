@@ -51,8 +51,7 @@ class ProductConfigurableController extends BaseController
         {
             $data = $this->repository->validateData($request, [
                 "website_id" => "required|exists:websites,id",
-                "attribute_set_id" => "required|exists:attribute_sets,id",
-                "super_attributes" => "required|array",
+                "attribute_set_id" => "required|exists:attribute_sets,id"
             ], function ($request) {
                 return [
                     "scope" => "website",
@@ -72,7 +71,7 @@ class ProductConfigurableController extends BaseController
 
                 $created->channels()->sync($request->get("channels"));
 
-                if(isset($data["super_attributes"])) $this->repository->createVariants($created, $request, $scope, $attributes);
+                $this->repository->createVariants($created, $request, $scope, $attributes);
             });
 
             $this->repository->configurableIndexing($created);
@@ -92,7 +91,7 @@ class ProductConfigurableController extends BaseController
             $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
                 "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)],
-                "super_attributes" => "sometimes|array",
+                "update_configurable_attributes" => "required|boolean"
             ], function ($request) use($product) {
                 return [
                     "scope" => $request->scope ?? "website",
@@ -107,13 +106,13 @@ class ProductConfigurableController extends BaseController
                 "scope_id" => $data["scope_id"]
             ];
 
-            $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope) {
+            $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope, $data) {
                 $attributes = $this->product_attribute_repository->validateAttributes($updated, $request, $scope, "update", "configurable");
                 $this->product_attribute_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
 
                 $updated->channels()->sync($request->get("channels"));
 
-                if(isset($data["super_attributes"])) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
+                if($data["update_configurable_attributes"] == 1) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
 
                 $updated->load("variants");
             });
