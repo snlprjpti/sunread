@@ -106,6 +106,9 @@ class ProductRepository extends BaseRepository
             else  {
                 $product_details = collect($product_details)->toArray();
             }
+
+            $this->getConfigurableAttributes($product, $coreCache->store);
+            $product_details["configurable_products"] = $this->final_product_val;
         }
         catch(Exception $exception)
         {
@@ -205,7 +208,19 @@ class ProductRepository extends BaseRepository
             $fetched = $this->product_format_repo->getProductInFormat($fetched, $request, $store);
 
             if(isset($fetched["disable_animation"])  && isset($fetched["animated_image"])) $fetched = $this->getAnimatedImage($fetched);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
+        return $fetched;
+    }
+
+    public function getConfigurableAttributes(object $product, object $store): void
+    {
+        try
+        {
             $this->nested_product = [];
             $this->config_products = [];
             $this->final_product_val = [];
@@ -216,15 +231,12 @@ class ProductRepository extends BaseRepository
                 $this->config_products = $elastic_variant_products;
 
                 $this->getVariations($elastic_variant_products);
-                $fetched["configurable_products"] = $this->final_product_val;
             }
         }
-        catch (Exception $exception)
+        catch(Exception $exception)
         {
             throw $exception;
         }
-
-        return $fetched;
     }
 
     public function getProductComponents(object $product, object $store, array $match): object
