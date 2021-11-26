@@ -111,7 +111,7 @@ class CategoryRepository extends BaseRepository
 
             $fetched["category"] = $this->getPages($category, $scope);
             $fetched["navigation"] = $this->getNavigation($category, $scope, $category_slugs);
-            $fetched["breadcrumbs"] = $all_fetched_data["breadcrumbs"] ;
+            $fetched["breadcrumbs"] = $all_fetched_data["breadcrumbs"];
         }
         catch (Exception $exception)
         {
