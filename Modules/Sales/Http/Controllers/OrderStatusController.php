@@ -9,8 +9,8 @@ use Modules\Sales\Entities\OrderStatus;
 use Modules\Sales\Entities\OrderStatusState;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
+use Modules\Sales\Transformers\OrderStateResource;
 use Modules\Sales\Transformers\OrderStatusResource;
-use Modules\Sales\Transformers\OrderStateCollection;
 use Modules\Sales\Repositories\OrderStatusRepository;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -36,9 +36,9 @@ class OrderStatusController extends BaseController
         return OrderStatusResource::collection($orders);
     }
 
-    public function orderStateResource(object $states): ResourceCollection
+    public function orderStateCollection(object $states): ResourceCollection
     {
-        return OrderStateCollection::collection($states);
+        return OrderStateResource::collection($states);
     }
 
     public function index(Request $request): JsonResponse
@@ -114,6 +114,6 @@ class OrderStatusController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->orderStateResource($fetched), $this->lang('fetch-list-success'));
+        return $this->successResponse($this->orderStateCollection($fetched), $this->lang('fetch-list-success'));
     }
 }
