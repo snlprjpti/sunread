@@ -114,7 +114,7 @@ class ProductTaxGroupController extends BaseController
         try
         {
             $this->repository->delete($id, function ($deleted) {
-                $product_count = $this->repository->getProduct($deleted->id);
+                $product_count = $this->repository->checkTaxOnProduct($deleted->id);
                 $tax_rule_count = $deleted->tax_rules->count();
                 if(($product_count > 0) || ($tax_rule_count > 0)) throw new ProductTaxGroupCanNotBeDeleted($this->lang("response.delete-failed", [ "name" => $this->model_name ]));
             });

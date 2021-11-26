@@ -21,7 +21,7 @@ class ProductTaxGroupRepository extends BaseRepository
         ];
     }
 
-    public function getProduct(int $id): ?int
+    public function checkTaxOnProduct(int $id): ?int
     {
         try
         {
