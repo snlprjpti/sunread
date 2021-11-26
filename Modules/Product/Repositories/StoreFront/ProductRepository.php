@@ -107,8 +107,15 @@ class ProductRepository extends BaseRepository
                 $product_details = collect($product_details)->toArray();
             }
 
-            $this->getConfigurableAttributes($product, $coreCache->store);
-            $product_details["configurable_products"] = $this->final_product_val;
+            
+            $this->nested_product = [];
+            $this->config_products = [];
+            $this->final_product_val = [];
+
+            if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
+                $this->getConfigurableAttributes($product, $coreCache->store);
+                $product_details["configurable_products"] = $this->final_product_val;
+            }
         }
         catch(Exception $exception)
         {
@@ -221,17 +228,11 @@ class ProductRepository extends BaseRepository
     {
         try
         {
-            $this->nested_product = [];
-            $this->config_products = [];
-            $this->final_product_val = [];
+            $elastic_variant_products = $this->getConfigurableAttributesFromElasticSearch($product, $store);
+            $this->config_products = $elastic_variant_products;
 
-            if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
-
-                $elastic_variant_products = $this->getConfigurableAttributesFromElasticSearch($product, $store);
-                $this->config_products = $elastic_variant_products;
-
-                $this->getVariations($elastic_variant_products);
-            }
+            $this->getVariations($elastic_variant_products);
+            
         }
         catch(Exception $exception)
         {
