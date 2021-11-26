@@ -132,6 +132,7 @@ class CategoryRepository extends BaseRepository
             if($type) {
                 $count = count($slugs);
                 unset($slugs[--$count]);
+                if($type == "productFilter") unset($slugs[--$count]);
             }
 
             foreach($slugs as $slug)

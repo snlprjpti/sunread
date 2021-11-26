@@ -88,7 +88,8 @@ class ProductController extends BaseController
     {
         try
         {
-            $fetched = $this->store_front_repository->getOptions($request, $category_slug);
+            $all_categories = array_slice($request->segments(), 4);
+            $fetched = $this->store_front_repository->getOptions($request, $all_categories);
         }
         catch( Exception $exception )
         {
