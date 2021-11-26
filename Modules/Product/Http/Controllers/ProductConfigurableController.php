@@ -112,7 +112,7 @@ class ProductConfigurableController extends BaseController
 
                 $updated->channels()->sync($request->get("channels"));
 
-                if(isset($data["update_configurable_attributes"]) && $data["update_configurable_attributes"] == 1) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
+                $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
 
                 $updated->load("variants");
             });
