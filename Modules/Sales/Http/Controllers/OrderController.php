@@ -75,7 +75,7 @@ class OrderController extends BaseController
         {
             return $this->handleException($exception);
         }
-        return $this->successResponse($this->resource($fetched), $this->lang('update-success'));       
+        return $this->successResponse($this->resource($fetched), $this->lang('update-success'));     
     }
 
 }

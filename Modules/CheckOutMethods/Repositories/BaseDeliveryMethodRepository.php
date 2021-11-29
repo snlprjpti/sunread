@@ -7,16 +7,16 @@ use Modules\Core\Facades\CoreCache;
 
 class BaseDeliveryMethodRepository
 {
-	protected object $request;
-	protected string $method_key;
+    protected object $request;
+    protected string $method_key;
 
-	public function __construct(object $request, string $method_key)
-	{
-		$this->request = $request;
-		$this->method_key = $method_key;
-	}
+    public function __construct(object $request, string $method_key)
+    {
+        $this->request = $request;
+        $this->method_key = $method_key;
+    }
 
-	public function getCoreCache(): object
+    public function getCoreCache(): object
     {
         try
         {

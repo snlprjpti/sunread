@@ -30,7 +30,7 @@ class OrderTest extends BaseTestCase
         $order_id = Order::first()->id;
         $post_data = [ "order_status_id" => $order_status_id, "order_id" => $order_id];
         $response = $this->withHeaders($this->headers)->post(route("admin.sales.order.status"), $post_data);
-        $response->assertCreated();
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])
