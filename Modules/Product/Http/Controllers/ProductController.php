@@ -162,6 +162,10 @@ class ProductController extends BaseController
                 $deleted->product_attributes()->each(function ($product_attribute) {
                     $product_attribute->delete();
                 });
+                
+                $deleted->variants()->each(function ($variant) {
+                    $this->repository->delete($variant->id);
+                });
             });
         }
         catch( Exception $exception )
