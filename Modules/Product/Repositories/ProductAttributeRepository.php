@@ -17,6 +17,7 @@ use Modules\Attribute\Entities\Attribute;
 use Modules\Attribute\Entities\AttributeOption;
 use Modules\Tax\Entities\CustomerTaxGroup;
 use Illuminate\Support\Str;
+use Modules\Core\Entities\Store;
 use Modules\Product\Entities\ProductAttributeString;
 
 class ProductAttributeRepository extends ProductRepository
@@ -234,8 +235,8 @@ class ProductAttributeRepository extends ProductRepository
                     /**
                      * enable or disable channel products
                     */
-                    if($attribute["attribute_slug"] == "status" && $scope_arr["scope"] == "channel") {
-                        $this->changeStatus($attribute, $product, $request, $db_attribute);
+                    if($attribute["attribute_slug"] == "status" && $scope_arr["scope"] != "website") {
+                        $this->changeStatus($attribute, $product, $scope_arr, $db_attribute);
                         continue;
                     }
                     // store mapped attributes on respective function. ( sku, categories.)
@@ -331,14 +332,16 @@ class ProductAttributeRepository extends ProductRepository
         return $data;
     }
 
-    public function changeStatus(array $value, object $product, object $request, object $attribute): bool
+    public function changeStatus(array $value, object $product, array $scope, object $attribute): bool
     {
         try
         {
+            if($scope["scope"] == "store") $scope["scope_id"] = Store::find($scope["scope_id"])?->channel_id;
+
             $attribute_option = AttributeOption::whereAttributeId($attribute->id)->whereCode(0)->first();
             
-            if($value["value"] == $attribute_option->id) $product->channels()->sync($request->get("scope_id"), false);
-            else $product->channels()->detach($request->get("scope_id"));
+            if($value["value"] == $attribute_option->id) $product->channels()->sync($scope["scope_id"], false);
+            else $product->channels()->detach($scope["scope_id"]);
         }
         catch(Exception $exception)
         {
