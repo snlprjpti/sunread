@@ -106,6 +106,16 @@ class ProductRepository extends BaseRepository
             else  {
                 $product_details = collect($product_details)->toArray();
             }
+
+            
+            $this->nested_product = [];
+            $this->config_products = [];
+            $this->final_product_val = [];
+
+            if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
+                $this->getConfigurableAttributes($product, $coreCache->store);
+                $product_details["configurable_products"] = $this->final_product_val;
+            }
         }
         catch(Exception $exception)
         {
@@ -205,19 +215,6 @@ class ProductRepository extends BaseRepository
             $fetched = $this->product_format_repo->getProductInFormat($fetched, $request, $store);
 
             if(isset($fetched["disable_animation"])  && isset($fetched["animated_image"])) $fetched = $this->getAnimatedImage($fetched);
-
-            $this->nested_product = [];
-            $this->config_products = [];
-            $this->final_product_val = [];
-
-            if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
-
-                $elastic_variant_products = $this->getConfigurableAttributesFromElasticSearch($product, $store);
-                $this->config_products = $elastic_variant_products;
-
-                $this->getVariations($elastic_variant_products);
-                $fetched["configurable_products"] = $this->final_product_val;
-            }
         }
         catch (Exception $exception)
         {
@@ -225,6 +222,22 @@ class ProductRepository extends BaseRepository
         }
 
         return $fetched;
+    }
+
+    public function getConfigurableAttributes(object $product, object $store): void
+    {
+        try
+        {
+            $elastic_variant_products = $this->getConfigurableAttributesFromElasticSearch($product, $store);
+            $this->config_products = $elastic_variant_products;
+
+            $this->getVariations($elastic_variant_products);
+            
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
     }
 
     public function getProductComponents(object $product, object $store, array $match): object
