@@ -15,7 +15,7 @@
 Route::group(['middleware' => ['api','proxies']], function () {
     
     Route::group(['prefix' => 'admin/sales', 'as' => 'admin.sales.', 'middleware' => ['admin', 'language']], function () {
-        Route::post('orders/status/{order_id}', [Modules\Sales\Http\Controllers\OrderController::class, 'orderStatus'])->name('order.status');
+        Route::post('orders/status/update', [Modules\Sales\Http\Controllers\OrderController::class, 'orderStatus'])->name('order.status');
         
         Route::group(["prefix" => "order", "as" => "comments."], function () {
             Route::get("{order_id}/comments", [Modules\Sales\Http\Controllers\OrderCommentController::class, "index"])->name("index");

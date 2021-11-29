@@ -19,23 +19,21 @@ class OrderItemTableSeeder extends Seeder
                 "product_id" => 1,
                 "order_id" => Order::first()?->id,
                 "product_options" => json_encode([
-                    "product_options" => [
-                       "attributes" => [
-                            [
-                                "attribute_id" => 24,
-                                "label" => "size",
-                                "name" => "Size",
-                                "value" => "L" 
-                            ],
-                            [
-                                "attribute_id" => 23,
-                                "label" => "color",
-                                "name" => "Color",
-                                "value" => "red" 
-                            ],
+                    "attributes" => [
+                        [
+                            "attribute_id" => 24,
+                            "label" => "size",
+                            "name" => "Size",
+                            "value" => "L" 
                         ],
-                        "image_url" => url("product.png"), 
+                        [
+                            "attribute_id" => 23,
+                            "label" => "color",
+                            "name" => "Color",
+                            "value" => "red" 
+                        ],
                     ],
+                    "image_url" => url("product.png"),
                 ]),
                 "product_type" => "simple",
                 "sku" => "dell-laptop",
@@ -60,23 +58,21 @@ class OrderItemTableSeeder extends Seeder
                 "product_id" => 1,
                 "order_id" => 1,
                 "product_options" => json_encode([
-                    "product_options" => [
-                        "attributes" => [
-                            [
-                                "attribute_id" => 24,
-                                "label" => "size",
-                                "name" => "Size",
-                                "value" => "L" 
-                            ],
-                            [
-                                "attribute_id" => 23,
-                                "label" => "color",
-                                "name" => "Color",
-                                "value" => "red" 
-                            ],
+                    "attributes" => [
+                        [
+                            "attribute_id" => 24,
+                            "label" => "size",
+                            "name" => "Size",
+                            "value" => "L" 
                         ],
-                        "image_url" => url("product.png"), 
+                        [
+                            "attribute_id" => 23,
+                            "label" => "color",
+                            "name" => "Color",
+                            "value" => "red" 
+                        ],
                     ],
+                    "image_url" => url("product.png"),
                 ]),
                 "product_type" => "simple",
                 "sku" => "dell-laptop",
