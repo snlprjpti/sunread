@@ -574,7 +574,9 @@ class ProductRepository extends BaseRepository
         {
             $status_code = $product->status;
 
-            if($scope["scope"] == "channel") {
+            if($scope["scope"] != "website") {
+                if($scope["scope"] == "store") $scope["scope_id"] = Store::find($scope["scope_id"])?->channel_id;
+                
                 $channel_product = $product->channels()->whereChannelId($scope["scope_id"])->first();
                 if($channel_product) $status_code = 0;
             }
