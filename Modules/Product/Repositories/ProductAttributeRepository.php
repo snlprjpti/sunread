@@ -234,7 +234,10 @@ class ProductAttributeRepository extends ProductRepository
                     /**
                      * enable or disable channel products
                     */
-                    if($attribute["attribute_slug"] == "status" && $scope["scope"] == "channel") $this->changeStatus($attribute, $product, $request, $db_attribute);
+                    if($attribute["attribute_slug"] == "status" && $scope_arr["scope"] == "channel") {
+                        $this->changeStatus($attribute, $product, $request, $db_attribute);
+                        continue;
+                    }
                     // store mapped attributes on respective function. ( sku, categories.)
                     $function_name = $this->functionMapper[$attribute["attribute_slug"]];
                     $this->product_repository->$function_name($product, $request, $method, $attribute);
