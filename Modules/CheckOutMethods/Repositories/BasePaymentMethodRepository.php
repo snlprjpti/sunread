@@ -15,18 +15,4 @@ class BasePaymentMethodRepository
         $this->attributes = $attributes;
     }
 
-    public function all(): mixed
-    {
-        try
-        {
-            $data = [];
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $data;
-    }
-
 }

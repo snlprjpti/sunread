@@ -5,7 +5,7 @@ namespace Modules\PaymentMethods\Repositories;
 use Modules\CheckOutMethods\Repositories\BasePaymentMethodRepository;
 
 
-class BankTransferRepositories extends BasePaymentMethodRepository
+class BankTransferRepository extends BasePaymentMethodRepository
 {
 	public function __construct()
 	{

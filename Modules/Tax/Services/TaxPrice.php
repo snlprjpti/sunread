@@ -46,7 +46,7 @@ class TaxPrice {
             }
             else $country = $data->default_country;
 
-            $tax_rate_data = TaxCache::taxRate()->where("country_id",$country->id)->filter(function ($tax_rate) use ($zip_code) {
+            $tax_rate_data = TaxCache::taxRate()->where("country_id", $country->id)->filter(function ($tax_rate) use ($zip_code) {
                 if ($zip_code) {
                     if ($tax_rate->use_zip_range) {
                         $zip_code_range = range($tax_rate->postal_code_form, $tax_rate->postal_code_to);

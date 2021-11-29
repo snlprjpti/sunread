@@ -7,6 +7,7 @@ use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
 use Modules\Cart\Entities\CartItem;
+use Modules\CheckOutMethods\Services\BaseCheckOutMethods;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Sales\Rules\MethodValidationRule;
@@ -20,15 +21,20 @@ class OrderRepository extends BaseRepository
 {
     use HasOrderProductDetail, HasOrderCalculation;
 
-    protected $orderItemRepository, $orderAddressRepository, $orderMetaRepository;
+    protected $orderItemRepository, $orderAddressRepository, $orderMetaRepository, $check_out_method_helper;
 
-    public function __construct(Order $order, OrderItemRepository $orderItemRepository, OrderAddressRepository $orderAddressRepository, OrderMetaRepository $orderMetaRepository)
+    public function __construct(Order $order,
+    OrderItemRepository $orderItemRepository,
+    OrderAddressRepository $orderAddressRepository,
+    OrderMetaRepository $orderMetaRepository,
+    BaseCheckOutMethods $check_out_method_helper)
     {
         $this->model = $order;
         $this->model_key = "orders";
         $this->orderItemRepository = $orderItemRepository;
         $this->orderAddressRepository = $orderAddressRepository;
         $this->orderMetaRepository = $orderMetaRepository;
+        $this->check_out_method_helper = $check_out_method_helper;
         $this->rules = [
             "cart_id" => "required|exists:carts,id",
             "coupon_code" => "sometimes|exists:coupons,code",
