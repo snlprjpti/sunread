@@ -94,6 +94,13 @@ class CategoryRepository extends BaseRepository
         try
         {
             $category = $this->model->findOrFail($id);
+            $slug = $category->value($data, "slug");
+            $check_slug = $this->model->whereParentId($data["parent_id"])->whereWebsiteId($category->website_id)->whereHas("values", function ($query) use ($slug, $category) {
+                if($category) $query = $query->where('category_id', '!=', $category->id);
+                $query->whereAttribute("slug")->whereValue($slug);
+            })->first();
+            if($check_slug) throw ValidationException::withMessages([ "parent_id" => "Category slug already exists on this level"]);
+
             $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : null;
 
             if($parent_id)

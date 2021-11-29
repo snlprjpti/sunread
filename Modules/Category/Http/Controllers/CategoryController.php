@@ -237,7 +237,9 @@ class CategoryController extends BaseController
         {
             $data = $request->validate([
                 "parent_id" => "nullable|numeric|exists:categories,id",
-                "position" => "required|numeric"
+                "position" => "required|numeric",
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new CategoryScopeRule($request, $id)]
             ]);
 
             $category = $this->repository->updatePosition($data, $id);

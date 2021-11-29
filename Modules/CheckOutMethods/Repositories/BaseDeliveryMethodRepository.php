@@ -12,13 +12,13 @@ class BaseDeliveryMethodRepository
 	protected string $method_key;
     protected string $user_name, $password;
 
-	public function __construct(object $request, string $method_key)
-	{
-		$this->request = $request;
-		$this->method_key = $method_key;
-	}
+    public function __construct(object $request, string $method_key)
+    {
+        $this->request = $request;
+        $this->method_key = $method_key;
+    }
 
-	public function getCoreCache(): object
+    public function getCoreCache(): object
     {
         try
         {

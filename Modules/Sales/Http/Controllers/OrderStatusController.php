@@ -3,14 +3,16 @@
 namespace Modules\Sales\Http\Controllers;
 
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\Core\Http\Controllers\BaseController;
+use Illuminate\Http\JsonResponse;
 use Modules\Sales\Entities\OrderStatus;
-use Modules\Sales\Repositories\OrderStatusRepository;
+use Modules\Sales\Entities\OrderStatusState;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\Sales\Transformers\OrderStateResource;
 use Modules\Sales\Transformers\OrderStatusResource;
+use Modules\Sales\Repositories\OrderStatusRepository;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class OrderStatusController extends BaseController
 {
@@ -32,6 +34,11 @@ class OrderStatusController extends BaseController
     public function collection(object $orders): ResourceCollection
     {
         return OrderStatusResource::collection($orders);
+    }
+
+    public function orderStateCollection(object $states): ResourceCollection
+    {
+        return OrderStateResource::collection($states);
     }
 
     public function index(Request $request): JsonResponse
@@ -94,5 +101,19 @@ class OrderStatusController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("update-success"));
+    }
+
+    public function getAllOrderState(): JsonResponse
+    {
+        try
+        {
+            $fetched = OrderStatusState::all();
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->orderStateCollection($fetched), $this->lang('fetch-list-success'));
     }
 }

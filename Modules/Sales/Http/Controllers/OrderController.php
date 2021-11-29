@@ -10,19 +10,19 @@ use Modules\Sales\Transformers\OrderResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Modules\Sales\Repositories\OrderStatusRepository;
 use Modules\Sales\Repositories\StoreFront\OrderRepository;
+use Modules\Sales\Repositories\OrderStatusUpdateRepository;
 
 class OrderController extends BaseController
 {
-    protected $repository, $orderStatusRepository;
+    protected $repository, $orderStatusUpdateRepository;
 
-    public function __construct(OrderRepository $repository, Order $order, OrderStatusRepository $orderStatusRepository)
+    public function __construct(OrderRepository $repository, Order $order, OrderStatusUpdateRepository $orderStatusUpdateRepository)
     {
         $this->model = $order;
         $this->model_name = "Order";
         $this->repository = $repository;
-        $this->orderStatusRepository = $orderStatusRepository;
+        $this->orderStatusUpdateRepository = $orderStatusUpdateRepository;
 
         parent::__construct($this->model, $this->model_name);
     }
@@ -41,7 +41,7 @@ class OrderController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["order_items.order", "order_taxes.order_tax_items"]);
+            $fetched = $this->repository->fetchAll($request, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer"]);
         }
         catch (Exception $exception)
         {
@@ -55,7 +55,7 @@ class OrderController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["order_items.order", "order_taxes.order_tax_items"]);
+            $fetched = $this->repository->fetch($id, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer"]);
         }
         catch (Exception $exception)
         {
@@ -65,17 +65,17 @@ class OrderController extends BaseController
         return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
     }
 
-    public function orderStatus(Request $request, int $order_id): JsonResponse
+    public function orderStatus(Request $request): JsonResponse
     {
         try
         {
-            $this->orderStatusRepository->orderStatus($request, $order_id);
+            $fetched = $this->orderStatusUpdateRepository->orderStatus($request);
         }
         catch (Exception $exception)
         {
             return $this->handleException($exception);
         }
-        return $this->successResponseWithMessage($this->lang('update-success'), 201);       
+        return $this->successResponse($this->resource($fetched), $this->lang('update-success'));     
     }
 
 }
