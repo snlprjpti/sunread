@@ -110,13 +110,16 @@ class ProductFormatRepository extends BaseRepository
         try
         {
             $product = Product::with([ "parent", "variants" ])->whereId($fetched["id"])->first();
-            if($product->type == "simple" && $product->parent_id) $variant_ids = $product->parent->variants->pluck("id")->toArray();
-            if($product->type == "configurable") $variant_ids = $product->variants->pluck("id")->toArray();
 
-            if(isset($variant_ids)) {
-                $variant_stock = CatalogInventory::whereIn("product_id", $variant_ids)->whereIsInStock(1)->where("quantity", ">", 0)->first();
-                $fetched["is_in_stock"] = $variant_stock ? 1 : 0;
-                $fetched["stock_status_value"] = $variant_stock ? "In stock" : "Out of stock";
+            if($product) {
+                if($product->type == "simple" && $product->parent_id) $variant_ids = $product->parent->variants->pluck("id")->toArray();
+                if($product->type == "configurable") $variant_ids = $product->variants->pluck("id")->toArray();
+    
+                if(isset($variant_ids)) {
+                    $variant_stock = CatalogInventory::whereIn("product_id", $variant_ids)->whereIsInStock(1)->where("quantity", ">", 0)->first();
+                    $fetched["is_in_stock"] = $variant_stock ? 1 : 0;
+                    $fetched["stock_status_value"] = $variant_stock ? "In stock" : "Out of stock";
+                }
             }
         }
         catch (Exception $exception)
