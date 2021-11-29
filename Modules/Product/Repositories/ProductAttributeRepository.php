@@ -227,12 +227,14 @@ class ProductAttributeRepository extends ProductRepository
                 //removed some attributes in case of configurable products
                 if($product_type && in_array($attribute['attribute_slug'], $this->non_required_attributes)) continue;
 
+                $db_attribute = Attribute::whereSlug($attribute['attribute_slug'])->first();
+
                 if( in_array($attribute["attribute_slug"], $this->attributeMapperSlug) )
                 {
                     /**
                      * enable or disable channel products
                     */
-                    if($attribute["attribute_slug"] == "status" && $scope["scope"] == "channel") $this->changeStatus($attribute, $product, $request);
+                    if($attribute["attribute_slug"] == "status" && $scope["scope"] == "channel") $this->changeStatus($attribute, $product, $request, $db_attribute);
                     // store mapped attributes on respective function. ( sku, categories.)
                     $function_name = $this->functionMapper[$attribute["attribute_slug"]];
                     $this->product_repository->$function_name($product, $request, $method, $attribute);
@@ -244,7 +246,6 @@ class ProductAttributeRepository extends ProductRepository
                     continue;
                 }
 
-                $db_attribute = Attribute::whereSlug($attribute['attribute_slug'])->first();
                 if($this->product_repository->scopeFilter($scope_arr["scope"], $db_attribute->scope)) $scope_arr = $this->product_repository->getParentScope($scope_arr);
 
                 $match = [
@@ -327,16 +328,14 @@ class ProductAttributeRepository extends ProductRepository
         return $data;
     }
 
-    public function changeStatus(array $attribute, object $product, object $request): bool
+    public function changeStatus(array $value, object $product, object $request, object $attribute): bool
     {
         try
         {
-            if($attribute["value"] == 10) {
-                $product->channels()->sync($request->get("scope_id"), false);
-            }
-            else {
-                $product->channels()->detach($request->get("scope_id"));
-            }
+            $attribute_option = AttributeOption::whereAttributeId($attribute->id)->whereCode(0)->first();
+            
+            if($value["value"] == $attribute_option->id) $product->channels()->sync($request->get("scope_id"), false);
+            else $product->channels()->detach($request->get("scope_id"));
         }
         catch(Exception $exception)
         {

@@ -519,7 +519,7 @@ class ProductRepository extends BaseRepository
                             $scopeFilter = $this->scopeFilter($scope["scope"], $attribute->scope);
                             $attributesData["use_default_value"] = $scopeFilter ? 0 : ($mapper ? 0 : ($existAttributeData ? 0 : 1));
                         }
-                        $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
+                        $attributesData["value"] = $mapper ? $this->getMapperValue($attribute, $product, $match) : ($existAttributeData ? $existAttributeData->value?->value : $this->getDefaultValues($product, $match));
 
                         if(in_array($attribute->type, $this->attribute_repository->non_filterable_fields))
                         {
@@ -567,12 +567,19 @@ class ProductRepository extends BaseRepository
         return ($item = $product->product_attributes()->where($data)->first()) ? $item->value?->value : $defaultValue;
     }
 
-    public function getMapperValue($attribute, $product)
+    public function getMapperValue(object $attribute, object $product, array $scope): mixed
     {
         if($attribute->slug == "sku") return $product->sku;
         if($attribute->slug == "status")
         {
-            $statusOption = AttributeOption::whereAttributeId($attribute->id)->whereCode($product->status)->first();
+            $status_code = $product->status;
+
+            if($scope["scope"] == "channel") {
+                $channel_product = $product->channels()->whereChannelId($scope["scope_id"])->first();
+                if($channel_product) $status_code = 0;
+            }
+
+            $statusOption = AttributeOption::whereAttributeId($attribute->id)->whereCode($status_code)->first();
             return $statusOption?->id;
         } 
         if($attribute->slug == "category_ids") return $product->categories()->pluck('category_id')->toArray();
