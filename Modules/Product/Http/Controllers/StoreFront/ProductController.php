@@ -45,8 +45,8 @@ class ProductController extends BaseController
 
     public function index(Request $request, string $category_slug): JsonResponse
     {
-        try
-        {
+        // try
+        // {
             $request->validate([
                 "page" => "numeric|min:1",
                 "color" => "sometimes|array",
@@ -60,11 +60,11 @@ class ProductController extends BaseController
             $all_categories = array_slice($request->segments(), 4);
 
             $fetched = $this->store_front_repository->categoryWiseProduct($request, $all_categories);
-        }
-        catch( Exception $exception )
-        {
-            return $this->handleException($exception);
-        }
+        // }
+        // catch( Exception $exception )
+        // {
+        //     return $this->handleException($exception);
+        // }
 
         return $this->successResponse($fetched,  $this->lang('fetch-list-success'));
     }
