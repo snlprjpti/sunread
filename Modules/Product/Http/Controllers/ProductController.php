@@ -91,8 +91,6 @@ class ProductController extends BaseController
             $created = $this->repository->create($data, function(&$created) use($request, $scope) {
                 $attributes = $this->product_attribute_repository->validateAttributes($created, $request, $scope, "store");
                 $this->product_attribute_repository->syncAttributes($attributes, $created, $scope, $request);
-
-//                $created->channels()->sync($request->get("channels"));
             });
         }
         catch( Exception $exception )
@@ -141,8 +139,6 @@ class ProductController extends BaseController
             $updated = $this->repository->update($data, $id, function($updated) use($request, $scope) {
                 $attributes = $this->product_attribute_repository->validateAttributes($updated, $request, $scope, "update");
                 $this->product_attribute_repository->syncAttributes($attributes, $updated, $scope, $request, "update");
-
-//                $updated->channels()->sync($request->get("channels"));
             });
         }
         catch( Exception $exception )
