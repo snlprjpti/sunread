@@ -30,6 +30,7 @@ class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements
 			$arr_shipping = [ "shipping_amount" => 0.00, "shipping_tax" => false ];
 			$flat_type = SiteConfig::fetch("delivery_methods_{$this->method_key}_flat_type", "channel", $coreCache?->channel->id);
 			$flat_price = SiteConfig::fetch("delivery_methods_{$this->method_key}_flat_price", "channel", $coreCache?->channel->id);
+			$total_shipping_amount = 0.00;
 			if ($flat_type == "per_order") $total_shipping_amount = $flat_price;
 			else {
 				$this->parameter->order->order_taxes->map( function ($order_tax) use (&$total_shipping_amount) {

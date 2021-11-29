@@ -43,7 +43,8 @@ class OrderStatusUpdateRepository extends BaseRepository
                             "product_id" => $item->product_id,
                             "website_id" => $item->website_id,
                             "event" => "{$this->model_key}.order_status_updated",
-                            "adjustment_type" => auth("admin")->id(),
+                            "adjustment_type" => "deduction",
+                            "adjustment_by" => auth("admin")->id(),
                             "order_id" => $request->order_id,
                             "quantity" => $item->qty
                         ]);
