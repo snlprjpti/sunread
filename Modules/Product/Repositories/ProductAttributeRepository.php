@@ -59,7 +59,7 @@ class ProductAttributeRepository extends ProductRepository
         {
             throw $exception;
         }
-        
+
         return Cache::get("attributes_attribute_set");
     }
 
@@ -80,7 +80,7 @@ class ProductAttributeRepository extends ProductRepository
             $request_attribute_slugs = array_map( function ($request_attribute) {
                 if(!isset($request_attribute["attribute_slug"])) throw ValidationException::withMessages(["attribute_slug" => "Invalid attribute format."]);
                 return $request_attribute["attribute_slug"];
-                
+
             }, $request->get("attributes"));
 
             $request_attribute_collection = collect($request["attributes"]);
@@ -90,7 +90,7 @@ class ProductAttributeRepository extends ProductRepository
             $all_product_attributes = [];
 
             if($product_type) $super_attributes = Arr::pluck($request->super_attributes, 'attribute_slug');
-            
+
             foreach ( $attributes as $attribute )
             {
                 $product_attribute = [];
@@ -128,14 +128,14 @@ class ProductAttributeRepository extends ProductRepository
                 $validator = Validator::make($product_attribute, [
                     "value" => $attribute->type_validation
                 ]);
-                
+
                 if ( $validator->fails() ) throw ValidationException::withMessages([$attribute->name => $validator->errors()->toArray()]);
 
                 if(isset($product_attribute["value"]) && in_array($attribute->type, $this->option_fields)) $this->optionValidation($attribute, $product_attribute["value"]);
-                
+
                 if($attribute->slug == "quantity_and_stock_status") $product_attribute["catalog_inventory"] = $single_attribute_collection->pluck("catalog_inventory")->first();
 
-                $all_product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid()); 
+                $all_product_attributes[] = array_merge($product_attribute, ["value_type" => $attribute_type], $validator->valid());
             }
         }
         catch (Exception $exception)
@@ -227,8 +227,14 @@ class ProductAttributeRepository extends ProductRepository
                 //removed some attributes in case of configurable products
                 if($product_type && in_array($attribute['attribute_slug'], $this->non_required_attributes)) continue;
 
+                $db_attribute = Attribute::whereSlug($attribute['attribute_slug'])->first();
+
                 if( in_array($attribute["attribute_slug"], $this->attributeMapperSlug) )
                 {
+                    /**
+                     * enable or disable channel products
+                    */
+                    if($attribute["attribute_slug"] == "status" && $scope["scope"] == "channel") $this->changeStatus($attribute, $product, $request, $db_attribute);
                     // store mapped attributes on respective function. ( sku, categories.)
                     $function_name = $this->functionMapper[$attribute["attribute_slug"]];
                     $this->product_repository->$function_name($product, $request, $method, $attribute);
@@ -240,9 +246,8 @@ class ProductAttributeRepository extends ProductRepository
                     continue;
                 }
 
-                $db_attribute = Attribute::whereSlug($attribute['attribute_slug'])->first();
-                if($this->product_repository->scopeFilter($scope_arr["scope"], $db_attribute->scope)) $scope_arr = $this->product_repository->getParentScope($scope_arr); 
-           
+                if($this->product_repository->scopeFilter($scope_arr["scope"], $db_attribute->scope)) $scope_arr = $this->product_repository->getParentScope($scope_arr);
+
                 $match = [
                     "product_id" => $product->id,
                     "scope" => $scope_arr["scope"],
@@ -291,9 +296,9 @@ class ProductAttributeRepository extends ProductRepository
             $name = $collection->where('attribute_slug', "name")->pluck("value")->first();
             if(!$slug) $slug = Str::slug($name);
             $original_slug = $slug;
-    
+
             $count = 1;
-    
+
             while ($this->checkSlug($product, $slug)) {
                 $slug = "{$original_slug}-{$count}";
                 $count++;
@@ -321,5 +326,22 @@ class ProductAttributeRepository extends ProductRepository
         }
 
         return $data;
+    }
+
+    public function changeStatus(array $value, object $product, object $request, object $attribute): bool
+    {
+        try
+        {
+            $attribute_option = AttributeOption::whereAttributeId($attribute->id)->whereCode(0)->first();
+            
+            if($value["value"] == $attribute_option->id) $product->channels()->sync($request->get("scope_id"), false);
+            else $product->channels()->detach($request->get("scope_id"));
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
     }
 }
