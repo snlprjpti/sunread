@@ -12,5 +12,5 @@
 */
 
 Route::prefix('geoip')->group(function() {
-    Route::get('/', 'GeoIpController@index');
+    // Route::get('/', 'GeoIpController@index');
 });

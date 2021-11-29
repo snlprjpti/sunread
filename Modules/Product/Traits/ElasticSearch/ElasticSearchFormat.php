@@ -26,6 +26,11 @@ trait ElasticSearchFormat
                 $array = array_merge($array, $inventory); 
                 $array["stock_status_value"] = ($array["is_in_stock"] == 1) ? "In stock" : "Out of stock";
             }
+            else {
+                $array["quantity"] = 0;
+                $array["is_in_stock"] = 0;
+                $array["stock_status_value"] = "Out of stock";
+            }
     
             $array['categories'] = $this->getCategoryData($store);
             $images = $this->getImages();

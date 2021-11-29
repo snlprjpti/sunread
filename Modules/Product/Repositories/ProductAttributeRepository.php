@@ -85,6 +85,8 @@ class ProductAttributeRepository extends ProductRepository
 
             $request_attribute_collection = collect($request["attributes"]);
 
+            if($product->parent_id) $configurable_attribute_ids = $product->parent->attribute_configurable_products->pluck("attribute_id")->toArray();
+
             $all_product_attributes = [];
 
             if($product_type) $super_attributes = Arr::pluck($request->super_attributes, 'attribute_slug');
@@ -98,6 +100,9 @@ class ProductAttributeRepository extends ProductRepository
 
                 //Super attribute filter in case of configurable products
                 if(isset($super_attributes) && (in_array($attribute->slug, $super_attributes))) continue;
+
+                //Skip if product is variant and attribute is configurable
+                if($method == "update" && isset($configurable_attribute_ids) && in_array($attribute->id, $configurable_attribute_ids)) continue;
 
                 $single_attribute_collection = $request_attribute_collection->where('attribute_slug', $attribute->slug);
                 $default_value_exist = $single_attribute_collection->pluck("use_default_value")->first();
@@ -117,7 +122,7 @@ class ProductAttributeRepository extends ProductRepository
                     if($bool_val) continue;
                 }
 
-                if($attribute->slug == "url_key") $product_attribute["value"] = $this->createUniqueSlug($product, $request_attribute_collection, $product_attribute["value"]);
+                if($attribute->slug == "url_key") $product_attribute["value"] = $this->createUniqueSlug($product, $request_attribute_collection, Str::slug($product_attribute["value"]));
                 $attribute_type = config("attribute_types")[$attribute->type ?? "string"];
 
                 $validator = Validator::make($product_attribute, [
@@ -169,7 +174,10 @@ class ProductAttributeRepository extends ProductRepository
     {
         if(in_array($attribute->slug, $this->non_option_slug))
         {
-            if($attribute->slug == "tax_class_id") $attribute_options = CustomerTaxGroup::pluck("id")->toArray();
+            if($attribute->slug == "tax_class_id") { 
+                $attribute_options = CustomerTaxGroup::pluck("id")->toArray();
+                $attribute_options[] = 0;
+            }
             if($attribute->slug == "quantity_and_stock_status") $attribute_options = [ 0 => 0, 1 => 1];
         }
         else $attribute_options = AttributeOption::whereAttributeId($attribute->id)->pluck("id")->toArray();

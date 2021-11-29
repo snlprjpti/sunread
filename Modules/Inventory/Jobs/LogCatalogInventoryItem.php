@@ -60,7 +60,7 @@ class LogCatalogInventoryItem implements ShouldQueue
                 "adjustment_type" => "required|in:addition,deduction",
                 "event" => "required",
                 "adjusted_by" => "sometimes|nullable|exists:admins,id",
-                "order_id" => "sometimes|nullable" // exists:orders,id
+                "order_id" => "sometimes|nullable|exists:orders,id"
             ]);
             if ( $validator->fails() ) throw ValidationException::withMessages(["logging_error" => $validator->errors()->toArray()]);
         }

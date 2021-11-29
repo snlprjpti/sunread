@@ -2,12 +2,15 @@
 return[
     "general" => [
         "title" => "General",
+        "position" => 1,
         "children" => [
             [
                 "title" => "General",
+                "slug" => "general",
                 "subChildren" => [
                     [
                         "title" => "Country Options",
+                        "slug" => "country_options",
                         "elements" => [
                             [
                                 "title" => "Default Country",
@@ -37,60 +40,13 @@ return[
                                 "scope" => "channel",
                                 "is_required" => 1,
                                 "sort_by" => "name"
-                            ],
-                            [
-                                "title" => "Zip/Postal Code is Optional for",
-                                "path" => "optional_zip_countries",
-                                "type" => "select",
-                                "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "iso_2_code"],
-                                "default" => [],
-                                "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "exists:countries,iso_2_code",
-                                "multiple" => true,
-                                "scope" => "website",
-                                "is_required" => 1,
-                                "sort_by" => "name"
-                            ],
-                            [
-                                "title" => "State is Optional for",
-                                "path" => "general_optional_state",
-                                "type" => "select",
-                                "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "iso_2_code"],
-                                "default" => [],
-                                "options" => [],
-                                "rules" => "array",
-                                "value_rules" => "exists:countries,iso_2_code",
-                                "multiple" => true,
-                                "scope" => "website",
-                                "is_required" => 1,
-                                "sort_by" => "name"
                             ]
                         ]
                     ],
-                    [
-                        "title" => "State Options",
-                        "elements" => [
-                            [
-                                "title" => "State Country",
-                                "path" => "state_country",
-                                "type" => "select",
-                                "provider" => "Modules\Country\Entities\Country",
-                                "pluck" => ["name", "iso_2_code"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "exists:countries,iso_2_code",
-                                "multiple" => false,
-                                "scope" => "store",
-                                "is_required" => 1,
-                                "sort_by" => "name"
-                            ],
-                        ]
-                    ],
+
                     [
                         "title" => "Store Information",
+                        "slug" => "store_information",
                         "elements" => [
                             [
                                 "title" => "Store Name",
@@ -212,8 +168,8 @@ return[
                                 "sort_by" => ""
                             ],
                             [
-                                "title" => "Store Image",
-                                "path" => "store_image",
+                                "title" => "Store Icon",
+                                "path" => "store_icon",
                                 "type" => "file",
                                 "provider" => "",
                                 "pluck" => [],
@@ -280,6 +236,7 @@ return[
                     ],
                     [
                         "title" => "Locale Options",
+                        "slug" => "locale_options",
                         "elements" => [
                             [
                                 "title" => "Locale",
@@ -347,9 +304,11 @@ return[
             ],
             [
                 "title" => "Web",
+                "slug" => "web",
                 "subChildren" => [
                     [
                         "title" => "General",
+                        "slug" => "general",
                         "elements" => [
                             [
                                 "title" => "Logo",
@@ -394,6 +353,7 @@ return[
                     ],
                     [
                         "title" => "Default Pages",
+                        "slug" => "default_pages",
                         "elements" => [
                             [
                                 "title" => "Home Page",
@@ -425,6 +385,7 @@ return[
                     ],
                     [
                         "title" => "Base URLs",
+                        "slug" => "base_urls",
                         "elements" => [
                             [
                                 "title" => "StoreFront Base URL",
@@ -471,9 +432,11 @@ return[
             ],
             [
                 "title" => "Currency Setup",
+                "slug" => "currency_setup",
                 "subChildren" => [
                     [
                         "title" => "Currency Options",
+                        "slug" => "currency_options",
                         "elements" => [
                             [
                                 "title" => "Channel Currency",
@@ -582,9 +545,11 @@ return[
             ],
             [
                 "title" => "Website Defaults",
+                "slug" => "website_defaults",
                 "subChildren" => [
                     [
                         "title" => "Channel",
+                        "slug" => "channel",
                         "elements" => [
                             [
                                 "title" => "Default Channel",
@@ -601,33 +566,16 @@ return[
                                 "sort_by" => "name"
                             ]
                         ]
-                    ],
-                    [
-                        "title" => "Store",
-                        "elements" => [
-                            [
-                                "title" => "Default Store",
-                                "path" => "website_default_store",
-                                "type" => "select",
-                                "provider" => "Modules\Core\Entities\Store",
-                                "pluck" => ["code","id"],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "exists:stores,id",
-                                "multiple" => false,
-                                "scope" => "website",
-                                "is_required" => 0,
-                                "sort_by" => "name"
-                            ]
-                        ]
-                    ],
+                    ]
                 ]
             ],
             [
                 "title" => "Email",
+                "slug" => "email",
                 "subChildren" => [
                     [
                         "title" => "General",
+                        "slug" => "general",
                         "elements" => [
                             [
                                 "title" => "Sender Name",
@@ -659,6 +607,7 @@ return[
                     ],
                     [
                         "title" => "Templates",
+                        "slug" => "templates",
                         "elements" => [
                             [
                                 "title" => "Header",
@@ -695,82 +644,17 @@ return[
 
         ]
     ],
-    "catalog" => [
-        "title" => "Catalog",
-        "children" => [
-            [
-                "title" => "Catalog",
-                "subChildren" => [
-                    [
-                        "title" => "Product Fields Auto-Generation",
-                        "elements" => [
-                            [
-                                "title" => "Mask for SKU",
-                                "path" => "catalog_masks_sku",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
-                                "scope" => "store",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Mask for Meta Title",
-                                "path" => "catalog_meta_title",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
-                                "scope" => "channel",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Mask for Meta Keywords",
-                                "path" => "catalog_meta_keywords",
-                                "type" => "text",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
-                                "scope" => "store",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Mask for Meta description",
-                                "path" => "catalog_meta_description",
-                                "type" => "textarea",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => "",
-                                "options" => [],
-                                "rules" => "",
-                                "scope" => "website",
-                                "is_required" => 0,
-                                "sort_by" => ""
-                            ],
-                        ]
-
-                    ]
-                ]
-            ]
-        ]
-    ],
     "customer" => [
         "title" => "Customer",
+        "position" => 2,
         "children" => [
             [
                 "title" => "Customer",
+                "slug" => "customer",
                 "subChildren" => [
                     [
                         "title" => "New Account Options",
+                        "slug" => "new_account_options",
                         "elements" => [
                             [
                                 "title" => "Default Customer Group",
@@ -807,6 +691,7 @@ return[
                     ],
                     [
                         "title" => "Password Options",
+                        "slug" => "password_options",
                         "elements" => [
                             [
                                 "title" => "Recovery Link Expiration Period (hours)",
@@ -840,6 +725,7 @@ return[
                     ],
                     [
                         "title" => "Email Templates",
+                        "slug" => "email_templates",
                         "elements" => [
                             [
                                 "title" => "Default Welcome Email Template",
@@ -916,157 +802,6 @@ return[
                 ]
             ]
 
-        ]
-    ],
-    "sales" => [
-        "title" => "Sales",
-        "children" => [
-            [
-                "title" => "Sales",
-                "subChildren" => [
-                    [
-                        "title" => "Tax Classes",
-                        "elements" => [
-                            [
-                                "title" => "Default Tax Class for Product",
-                                "path" => "default_tax_class_for_product",
-                                "type" => "select",
-                                "provider" => "Modules\Tax\Entities\ProductTaxGroup",
-                                "pluck" => ["name", "id"],
-                                "default" => "1",
-                                "options" => [],
-                                "rules" => "exists:product_tax_groups,id",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 1,
-                                "sort_by" => "name"
-                            ],
-                            [
-                                "title" => "Default Tax Class for Customer",
-                                "path" => "default_tax_class_for_customer",
-                                "type" => "select",
-                                "provider" => "Modules\Tax\Entities\CustomerTaxGroup",
-                                "pluck" => ["name", "id"],
-                                "default" => "1",
-                                "options" => [],
-                                "rules" => "exists:customer_tax_groups,id",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 1,
-                                "sort_by" => "name"
-                            ],
-                        ]
-                    ],
-                    [
-                        "title" => "Calculation Settings",
-                        "elements" => [
-                            [
-                                "title" => "Tax Calculation Method Based On",
-                                "path" => "tax_calculation_method_based_on",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
-                                "options" => [
-                                    [ "value" => 1, "label" => "Total" ],
-                                    [ "value" => 2, "label" => "Raw Total" ],
-                                    [ "value" => 3, "label" => "Unit Price" ],
-                                ],
-                                "rules" => "in:1,2,3",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 1,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Tax Calculation Based On",
-                                "path" => "tax_calculation_based_on",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
-                                "options" => [
-                                    [ "value" => 1, "label" => "Shipping Address" ],
-                                    [ "value" => 2, "label" => "Billing Address" ],
-                                ],
-                                "rules" => "in:1,2",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 1,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Catalog Prices",
-                                "path" => "tax_catalog_prices",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
-                                "options" => [
-                                    [ "value" => 1, "label" => "Excluding Tax" ],
-                                    [ "value" => 2, "label" => "Including Tax" ],
-                                ],
-                                "rules" => "in:1,2",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 1,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Shipping Prices",
-                                "path" => "tax_shipping_prices",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
-                                "options" => [
-                                    [ "value" => 1, "label" => "Excluding Tax" ],
-                                    [ "value" => 2, "label" => "Including Tax" ],
-                                ],
-                                "rules" => "in:1,2",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 1,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Apply Customer Tax",
-                                "path" => "apply_customer_tax",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
-                                "options" => [
-                                    [ "value" => 1, "label" => "After Discount" ],
-                                    [ "value" => 2, "label" => "Before Discount" ],
-                                ],
-                                "rules" => "in:1,2",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 1,
-                                "sort_by" => ""
-                            ],
-                            [
-                                "title" => "Apply Discount on Prices",
-                                "path" => "apply_discount_on_prices",
-                                "type" => "select",
-                                "provider" => "",
-                                "pluck" => [],
-                                "default" => 1,
-                                "options" => [
-                                    [ "value" => 1, "label" => "Excluding Tax" ],
-                                    [ "value" => 2, "label" => "Including Tax" ],
-                                ],
-                                "rules" => "in:1,2",
-                                "multiple" => false,
-                                "scope" => "channel",
-                                "is_required" => 1,
-                                "sort_by" => ""
-                            ],
-                        ]
-                    ]
-                ]
-            ]
         ]
     ]
 ];

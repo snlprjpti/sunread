@@ -27,7 +27,7 @@ class PageRepository extends BaseRepository
     public function findPage(object $request, string $slug): array
     {
         try
-        {     
+        {
             $fetched = [];
             $coreCache = $this->getCoreCache($request);
 
@@ -114,17 +114,17 @@ class PageRepository extends BaseRepository
                         $default = decodeJsonNumeric(getDotToArray($append_slug_key, $values));
 
                         if ($element["slug"] == "view_more_link") $default = $this->getDynamicLink($default, $values, $coreCache);
-                        
+
                         if ($element["provider"] != "") {
                             $default = $this->getProviderData($coreCache->store, $element, $default);
 
                             //skip element product itself if it is found to be null
                             if($element["slug"] == "product" && !$default) {
                                 $product_null_state = $key;
-                                continue;  
+                                continue;
                             }
                         }
-                        
+
                         if($default && ($element["type"] == "file")) $default = Storage::url($default);
                     }
 
@@ -142,7 +142,7 @@ class PageRepository extends BaseRepository
                             $this->getChildren($element["attributes"][0], $coreCache, "{$append_key}.{$j}", $values, "{$append_slug_key}.{$j}");
                         }
                         $fake_product_values = getDotToArray($append_key, $this->parent);
-                        setDotToArray($append_key, $this->parent, collect($fake_product_values)->values()->toArray());         
+                        setDotToArray($append_key, $this->parent, collect($fake_product_values)->values()->toArray());
                         continue;
                     }
                     if ($element["type"] == "normal") {

@@ -90,7 +90,8 @@ class ProductConfigurableController extends BaseController
         {
             $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
-                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)],
+                // "update_configurable_attributes" => "required|boolean"
             ], function ($request) use($product) {
                 return [
                     "scope" => $request->scope ?? "website",
@@ -105,7 +106,7 @@ class ProductConfigurableController extends BaseController
                 "scope_id" => $data["scope_id"]
             ];
 
-            $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope) {
+            $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope, $data) {
                 $attributes = $this->product_attribute_repository->validateAttributes($updated, $request, $scope, "update", "configurable");
                 $this->product_attribute_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
 

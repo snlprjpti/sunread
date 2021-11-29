@@ -92,11 +92,12 @@ trait ConfigurableProductHandler
                 $items["configurable_{$attribute->slug}_value"][] = $attribute_option->name;
                 
                 $catalog = CatalogInventory::whereProductId($key)->first();
-                // $items["configurable_attributes"][$attribute->slug][] = [
-                //     "label" => $attribute_option->name,
-                //     "value" => $variant_option,
-                //     "stock_status" => ($catalog?->is_in_stock && $catalog?->quantity > 0) ? 1 : 0
-                // ];
+                $items["configurable_attributes"][$attribute->slug][] = [
+                    "label" => $attribute_option->name,
+                    "value" => $variant_option,
+                    "product_id" => $key,
+                    "stock_status" => ($catalog?->is_in_stock && $catalog?->quantity > 0) ? 1 : 0
+                ];
                 
                 $items["list_status"] = 1;
                     

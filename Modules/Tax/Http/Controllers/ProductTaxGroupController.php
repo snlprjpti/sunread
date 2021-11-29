@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Modules\Tax\Entities\ProductTaxGroup;
+use Modules\Tax\Exceptions\ProductTaxGroupCanNotBeDeleted;
 use Modules\Tax\Transformers\ProductTaxGroupResource;
 use Modules\Tax\Repositories\ProductTaxGroupRepository;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -112,7 +113,11 @@ class ProductTaxGroupController extends BaseController
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function ($deleted) {
+                $product_count = $this->repository->checkTaxOnProduct($deleted->id);
+                $tax_rule_count = $deleted->tax_rules->count();
+                if(($product_count > 0) || ($tax_rule_count > 0)) throw new ProductTaxGroupCanNotBeDeleted($this->lang("response.delete-failed", [ "name" => $this->model_name ]));
+            });
         }
         catch( Exception $exception )
         {

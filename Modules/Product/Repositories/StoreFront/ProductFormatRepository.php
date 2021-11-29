@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use Modules\Core\Facades\PriceFormat;
 use Modules\Core\Repositories\BaseRepository;
+use Modules\Inventory\Entities\CatalogInventory;
 use Modules\Product\Entities\Product;
 use Modules\Tax\Facades\TaxPrice;
 
@@ -95,6 +96,31 @@ class ProductFormatRepository extends BaseRepository
                 unset($fetched["new_from_date"], $fetched["new_to_date"]);
             }
             else $fetched["is_new_product"] = 0;
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function changeProductStockStatus(array $fetched): array
+    {
+        try
+        {
+            $product = Product::with([ "parent", "variants" ])->whereId($fetched["id"])->first();
+
+            if($product) {
+                if($product->type == "simple" && $product->parent_id) $variant_ids = $product->parent->variants->pluck("id")->toArray();
+                if($product->type == "configurable") $variant_ids = $product->variants->pluck("id")->toArray();
+    
+                if(isset($variant_ids)) {
+                    $variant_stock = CatalogInventory::whereIn("product_id", $variant_ids)->whereIsInStock(1)->where("quantity", ">", 0)->first();
+                    $fetched["is_in_stock"] = $variant_stock ? 1 : 0;
+                    $fetched["stock_status_value"] = $variant_stock ? "In stock" : "Out of stock";
+                }
+            }
         }
         catch (Exception $exception)
         {

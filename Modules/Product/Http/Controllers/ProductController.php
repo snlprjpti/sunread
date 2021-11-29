@@ -162,6 +162,10 @@ class ProductController extends BaseController
                 $deleted->product_attributes()->each(function ($product_attribute) {
                     $product_attribute->delete();
                 });
+                
+                $deleted->variants()->each(function ($variant) {
+                    $this->repository->delete($variant->id);
+                });
             });
         }
         catch( Exception $exception )
@@ -236,4 +240,19 @@ class ProductController extends BaseController
         return $this->successResponse(VariantProductResource::collection($fetched), $this->lang('fetch-success'));
     }
 
+    public function configurations(Request $request): JsonResponse
+    {
+        try
+        {
+            $fetched = $this->repository->configurations($request);
+        }
+        catch( Exception $exception )
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($fetched, $this->lang('fetch-success', ["name" => "Configuration"]));
+    }
+
+    
 }

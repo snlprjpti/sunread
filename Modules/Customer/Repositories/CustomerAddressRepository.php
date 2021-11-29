@@ -120,12 +120,11 @@ class CustomerAddressRepository extends BaseRepository
         return $channel_id;
     }
 
-    public function checkCountryRegionAndCity(array $data, object $customer): array
+    public function checkCountryRegionAndCity(array $data, int $channel_id): array
     {
         try
         {
-            $customer_channel = $this->getCustomerChannel($customer);
-            $countries = $this->getCountry($customer_channel);
+            $countries = $this->getCountry($channel_id);
 
             if (!$countries->contains("id", $data["country_id"])) throw ValidationException::withMessages([ "country_id" => __("core::app.response.country-not-allow") ]);
 
@@ -139,32 +138,12 @@ class CustomerAddressRepository extends BaseRepository
         return $data;
     }
 
-    public function getCustomerChannel(object $customer): object
+    public function getCountry(int $channel_id): object
     {
         try
         {
-            if(empty($customer->store_id)) {
-                $channel = SiteConfig::fetch("website_default_channel", "website", $customer->website_id);
-                if (!$channel) throw ValidationException::withMessages([ "channel_id" => __("core::app.response.not-found", ["name" => "Default Channel" ]) ]);
-            }
-            else {
-                $channel = $customer->store->channel;
-            }
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $channel;
-    }
-
-    public function getCountry(object $channel): object
-    {
-        try
-        {
-            $allow = SiteConfig::fetch("allow_countries", "channel", $channel->id);
-            $default[] = SiteConfig::fetch("default_country", "channel", $channel->id);
+            $allow = SiteConfig::fetch("allow_countries", "channel", $channel_id);
+            $default[] = SiteConfig::fetch("default_country", "channel", $channel_id);
 
             $fetched = $allow->merge($default);
         }

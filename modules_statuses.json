@@ -20,5 +20,14 @@
     "ProductStockAlert": true,
     "ProductStockAlertResource": true,
     "GeoIp": true,
-    "ClubHouse": true
+    "Sales": true,
+    "ClubHouse": true,
+    "Controller": true,
+    "OrderStatus": true,
+    "NavigationMenu": true,
+    "PaymentBankTransfer": true,
+    "PaymentCashOnDelivery": true,
+    "DeliveryFlatRate": true,
+    "DeliveryFreeShipping": true,
+    "CheckOutMethods": true
 }

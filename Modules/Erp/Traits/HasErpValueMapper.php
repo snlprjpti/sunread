@@ -404,7 +404,7 @@ trait HasErpValueMapper
            $option = $this->getAttributeOptionValue($variant_iteration, $attribute_slug);
         }
         elseif ($product->type == "simple" && $product->parent_id == null) {
-            $variant = $this->getDetailCollection("productVariants", $product->sku)->first();
+            $variant = $this->getValue($this->getDetailCollection("productVariants", $product->sku))->first();
             $option = $this->getAttributeOptionValue($variant, $attribute_slug);
         }
 

@@ -2,7 +2,6 @@
 
 namespace Modules\ClubHouse\Entities;
 
-use Kalnoy\Nestedset\NodeTrait;
 use Modules\Core\Entities\Website;
 use Modules\Core\Traits\Sluggable;
 use Modules\Core\Traits\HasFactory;

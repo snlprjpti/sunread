@@ -13,6 +13,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Validation\ValidationException;
 use Modules\Country\Entities\Region;
+use Modules\Tax\Exceptions\TaxRateCanNotBeDeleted;
 
 class TaxRateController extends BaseController
 {
@@ -23,8 +24,11 @@ class TaxRateController extends BaseController
         $this->repository = $taxRateRepository;
         $this->model = $taxRate;
         $this->model_name = "Tax Rate";
+        $exception_statuses = [
+            TaxRateCanNotBeDeleted::class => 403
+        ];
 
-        parent::__construct($this->model, $this->model_name);
+        parent::__construct($this->model, $this->model_name, $exception_statuses);
     }
 
     public function collection(object $data): ResourceCollection
@@ -41,7 +45,7 @@ class TaxRateController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request);
+            $fetched = $this->repository->fetchAll($request, [ "country", "region" ]);
         }
         catch( Exception $exception )
         {
@@ -58,8 +62,9 @@ class TaxRateController extends BaseController
             $data = $this->repository->validateData($request, callback:function () use ($request) {
                 $this->repository->validateRegionCountry($request);
                 return [];
-            }); 
-            
+            });
+            if(!isset($data["zip_code"]) && !$data["use_zip_range"]) $data["zip_code"] = "*";
+
             $created = $this->repository->create($data);
         }
         catch( Exception $exception )
@@ -94,6 +99,7 @@ class TaxRateController extends BaseController
                 $this->repository->validateRegionCountry($request);
                 return [];
             });
+            if(!isset($data["zip_code"]) && !$data["use_zip_range"]) $data["zip_code"] = "*";
             $updated = $this->repository->update($data, $id);
         }
         catch( Exception $exception )
@@ -108,7 +114,9 @@ class TaxRateController extends BaseController
     {
         try
         {
-            $this->repository->delete($id);
+            $this->repository->delete($id, function($deleted) {
+                if($deleted->tax_rules->count() != 0) throw new TaxRateCanNotBeDeleted(__("core::app.response.delete-failed", ["name" => $this->model_name]));
+            });
         }
         catch( Exception $exception )
         {

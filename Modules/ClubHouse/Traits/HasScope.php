@@ -58,9 +58,6 @@ trait HasScope
 
     /**
      * Filter through scope for Club House
-     * @param string $scope
-     * @param string $element_scope
-     * @return bool
      */
     public function scopeFilter(string $scope, string $element_scope): bool
     {

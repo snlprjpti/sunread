@@ -32,7 +32,6 @@ class CategoryTest extends BaseTestCase
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
         $this->root_category_id = $this->model::oldest('id')->first()->id;
-        $this->hasStatusTest = true;
         $this->hasFilters = false;
         $this->hasStatusTest = false;
     }
@@ -140,7 +139,9 @@ class CategoryTest extends BaseTestCase
         $category = Category::inRandomOrder()->first();
         $post_data = [
             "parent_id" => !in_array($this->default_resource_id, [$category->id, $category->parent_id]) ? $category->id : null,
-            "position" => rand(1,10)
+            "position" => rand(1,10),
+            "scope" => "website",
+            "scope_id" => $category->website_id
         ];
         $response = $this->withHeaders($this->headers)->put($this->getRoute("position", [$this->default_resource_id]), $post_data);
 

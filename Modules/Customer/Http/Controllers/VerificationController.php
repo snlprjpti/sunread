@@ -3,6 +3,7 @@
 namespace Modules\Customer\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\Customer\Entities\Customer;
 use Exception;
@@ -48,10 +49,12 @@ class VerificationController extends BaseController
     /**
      * Customer verify their account
     */
-    public function verifyAccount(string $token): JsonResponse
+    public function verifyAccount(string $channel_code, string $store_code, string $token): JsonResponse
     {
         try
         {
+            CoreCache::getChannelWithCode($channel_code);
+            CoreCache::getStoreWithCode($store_code);
             $customer = $this->model::where("verification_token", $token)->firstOrFail();
 
             if(!$customer->is_email_verified) {

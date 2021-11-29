@@ -38,7 +38,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
         $this->staticFilterKeys = ["color", "size", "collection", "configurable_size", "configurable_color"];
 
-        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "rollover_image", "color", "color_value", "tax_class_id"];
+        $this->listSource = [ "id", "parent_id", "website_id", "name", "sku", "type", "is_in_stock", "stock_status_value", "url_key", "quantity", "visibility", "visibility_value", "price", "special_price", "special_from_date", "special_to_date", "new_from_date", "new_to_date", "base_image", "thumbnail_image", "rollover_image", "color", "color_value", "tax_class_id", "configurable_attributes"];
     }
 
     public function search(object $request): array
@@ -149,9 +149,10 @@ class ProductSearchRepository extends ElasticSearchRepository
             foreach($products as &$product)
             {
                 $product = $this->product_format_repo->getProductInFormat($product, $request, $store);
+                $product = $this->product_format_repo->changeProductStockStatus($product);
                 
                 $product["image"] = isset($product["thumbnail_image"]) ? $product["thumbnail_image"] : $product["base_image"];
-                $product["quantity"] = (int) $product["quantity"];
+                $product["quantity"] = isset($product["quantity"]) ? decodeJsonNumeric($product["quantity"]) : 0;
                 $product["color"] = isset($product["color"]) ? $product["color"] : null;
                 $product["color_value"] = isset($product["color_value"]) ? $product["color_value"] : null;
                 unset($product["thumbnail_image"], $product["base_image"]);      
@@ -215,6 +216,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $final_l[] = $data["query"];
             $final_l[] = $this->term("list_status", 1);
+            $final_l[] = $this->term("status", 1);
             $final_q = $this->whereQuery($final_l);
     
             $query = [
@@ -281,6 +283,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $final_l[] = $filter["query"];
             $final_l[] = $this->term("list_status", 1);
+            $final_l[] = $this->term("status", 1);
             $final_q = $this->whereQuery($final_l);
 
             $fetched = [
