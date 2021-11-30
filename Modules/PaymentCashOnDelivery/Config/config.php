@@ -31,7 +31,6 @@ return [
             "default" => "Cash On Delivery",
             "options" => [],
             "rules" => "",
-            "multiple" => false,
             "scope" => "channel",
             "is_required" => 0,
             "sort_by" => ""
@@ -84,7 +83,7 @@ return [
         [
             "title" => "Minimum Order Total",
             "path" => "payment_methods_cash_on_delivery_minimum_total_order",
-            "type" => "textt",
+            "type" => "text",
             "provider" => "",
             "pluck" => [],
             "default" => "",

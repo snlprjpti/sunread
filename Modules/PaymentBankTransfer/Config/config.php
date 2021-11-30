@@ -84,7 +84,7 @@ return [
         [
             "title" => "Minimum Order Total",
             "path" => "payment_methods_bank_transfer_minimum_total_order",
-            "type" => "textt",
+            "type" => "text",
             "provider" => "",
             "pluck" => [],
             "default" => "",
