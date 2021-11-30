@@ -10,7 +10,6 @@ class OrderStatusStateResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "status" => $this->status,
             "state" => $this->state,
             "is_default" => $this->is_default,
             "position" => $this->position,

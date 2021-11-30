@@ -72,7 +72,7 @@ return [
             "path" => "payment_methods_cash_on_delivery_payment_from_specific_countries",
             "type" => "select",
             "provider" => "Modules\Country\Entities\Country",
-            "pluck" => ["iso_2_code", "name"],
+            "pluck" => ["name", "iso_2_code"],
             "default" => "",
             "options" => [],
             "rules" => "exists:countries,iso_2_code",

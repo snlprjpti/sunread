@@ -103,7 +103,7 @@ return [
             "path" => "delivery_methods_free_shipping_ship_from_specific_countries",
             "type" => "select",
             "provider" => "Modules\Country\Entities\Country",
-            "pluck" => ["iso_2_code", "name"],
+            "pluck" => ["name", "iso_2_code"],
             "default" => "iso_2_code",
             "options" => [],
             "rules" => "exists:countries,iso_2_code",
