@@ -3,7 +3,9 @@
 namespace Modules\CheckOutMethods\Repositories;
 
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Http;
+use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\Core\Facades\CoreCache;
 
 class BaseDeliveryMethodRepository
@@ -12,13 +14,25 @@ class BaseDeliveryMethodRepository
     protected string $method_key;
     protected string $user_name, $password;
     protected array $rules;
+    protected object $coreCache;
 
     public function __construct(object $request, string $method_key, ?array $rules = [])
     {
         $this->request = $request;
         $this->method_key = $method_key;
         $this->rules = $rules;
+		$this->coreCache =  $this->getCoreCache();
     }
+    
+    public function object(array $attributes = []): mixed
+    {
+        return new MethodAttribute($attributes);
+    }
+
+    public function collection(array $attributes = []): Collection
+    {
+        return new Collection($attributes);
+    } 
 
     public function getCoreCache(): object
     {
