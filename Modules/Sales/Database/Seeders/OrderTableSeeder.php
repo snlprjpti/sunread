@@ -40,7 +40,7 @@ class OrderTableSeeder extends Seeder
             "customer_phone" => "+977 9846325415", 
             "customer_taxvat" => "", 
             "customer_ip_address" => "127.0.0.1", 
-            "status" => "pending",
+            "status" => "pending"
         ];
 
         DB::table("orders")->insert($data);
