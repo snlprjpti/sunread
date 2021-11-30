@@ -58,6 +58,12 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 	{
 		$this->request = $request;
 		$this->method_key = "klarna";
+		// $this->rules = [
+		// 	"status" => "sometimes|nullable",
+		// 	"locale" => "required",
+		// 	"customer" => "required|array",
+		// 	"options" => ""			
+		// ];
 
 		parent::__construct($this->request, $this->method_key);
 	}
@@ -67,6 +73,11 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 		   
 	}
 	
+
+	public function validateData()
+	{
+		# code...
+	}
 
 	
 
