@@ -53,7 +53,7 @@ class OrderController extends BaseController
         try
         {
             $order = $this->repository->store($request);
-            $response = $this->repository->fetch($order->id, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer"]);
+            $response = $this->repository->fetch($order->id, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer", "order_status.order_status_state"]);
         }
         catch( Exception $exception )
         {

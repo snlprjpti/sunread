@@ -41,7 +41,7 @@ class OrderController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer"]);
+            $fetched = $this->repository->fetchAll($request, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer", "order_status.order_status_state"]);
         }
         catch (Exception $exception)
         {
@@ -55,7 +55,7 @@ class OrderController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer"]);
+            $fetched = $this->repository->fetch($id, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer", "order_status.order_status_state"]);
         }
         catch (Exception $exception)
         {
