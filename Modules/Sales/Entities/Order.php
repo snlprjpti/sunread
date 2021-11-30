@@ -7,7 +7,6 @@ use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Customer\Entities\Customer;
 use Modules\Sales\Entities\OrderAddress;
-use Modules\Customer\Entities\CustomerAddress;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -65,5 +64,10 @@ class Order extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, "customer_id");
+    }
+
+    public function order_status(): BelongsTo
+    {
+        return $this->belongsTo(OrderStatus::class, "status", "slug");
     }
 }
