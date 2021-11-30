@@ -29,5 +29,6 @@
     "PaymentCashOnDelivery": true,
     "DeliveryFlatRate": true,
     "DeliveryFreeShipping": true,
-    "CheckOutMethods": true
+    "CheckOutMethods": true,
+    "PaymentKlarna": true
 }

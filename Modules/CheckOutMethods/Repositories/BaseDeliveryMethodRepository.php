@@ -3,12 +3,14 @@
 namespace Modules\CheckOutMethods\Repositories;
 
 use Exception;
+use Illuminate\Support\Facades\Http;
 use Modules\Core\Facades\CoreCache;
 
 class BaseDeliveryMethodRepository
 {
-    protected object $request;
-    protected string $method_key;
+	protected object $request;
+	protected string $method_key;
+    protected string $user_name, $password;
 
     public function __construct(object $request, string $method_key)
     {
@@ -31,5 +33,10 @@ class BaseDeliveryMethodRepository
         }
 
         return (object) $data;
+    }
+
+    public function basicAuth(string $user_name, string $password): object
+    {
+        return Http::withBasicAuth($user_name, $password);
     }
 }
