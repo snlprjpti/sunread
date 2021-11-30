@@ -5,6 +5,7 @@ namespace Modules\PaymentCashOnDelivery\Repositories;
 use Exception;
 use Modules\Core\Facades\SiteConfig;
 use Modules\CheckOutMethods\Contracts\PaymentMethodInterface;
+use Modules\Sales\Exceptions\CashOnDeliveryNotAllowedException;
 use Modules\CheckOutMethods\Repositories\BasePaymentMethodRepository;
 
 
@@ -17,7 +18,7 @@ class CashOnDeliveryRepository extends BasePaymentMethodRepository implements Pa
 	public function __construct(object $request, object $parameter)
 	{
 		$this->request = $request;
-		$this->method_key = "cash_on_delivey";
+		$this->method_key = "cash_on_delivery";
 		$this->parameter = $parameter;
 
 		parent::__construct($this->request, $this->method_key);
@@ -44,6 +45,7 @@ class CashOnDeliveryRepository extends BasePaymentMethodRepository implements Pa
         {
             throw $exception;
         }
+		return true;
 	}
 
 

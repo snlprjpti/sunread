@@ -41,6 +41,7 @@ trait HasOrderCalculation
             $discount_amount = (float) $this->calculateDiscount($order); // To-Do other discount will be added here...
 
             $check_out_method_helper = $this->check_out_method_helper;
+
             $check_out_method_helper = new $check_out_method_helper($request->shipping_method);
             $arr_shipping_amount = $check_out_method_helper->process($request, ["order" => $order]);
 
