@@ -39,5 +39,4 @@ class BasePaymentMethodRepository
     {
         return Http::withBasicAuth($user_name, $password);
     }
-
 }

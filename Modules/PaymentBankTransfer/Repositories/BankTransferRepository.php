@@ -2,19 +2,27 @@
 
 namespace Modules\PaymentMethods\Repositories;
 
+use Modules\CheckOutMethods\Contracts\PaymentMethodInterface;
 use Modules\CheckOutMethods\Repositories\BasePaymentMethodRepository;
 
 
-class BankTransferRepository extends BasePaymentMethodRepository
+class BankTransferRepository extends BasePaymentMethodRepository implements PaymentMethodInterface
 {
-	public function __construct()
-	{
-		$this->method_key = "bank_transfer";
-		$this->rules = [
-			"bank_transfer" => "required"
-		];
+	protected object $request;
+	protected object $parameter;
+	protected string $method_key;
 
-		parent::__construct($this->method_key, $this->rules);
+	public function __construct(object $request, object $parameter)
+	{
+		$this->request = $request;
+		$this->method_key = "bank_transfer";
+     
+		parent::__construct($this->request, $this->method_key);
+	}
+
+	public function get(): mixed
+	{
+		
 	}
 
 	
