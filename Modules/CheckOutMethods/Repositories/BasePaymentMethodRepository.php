@@ -9,14 +9,14 @@ use Modules\Core\Facades\CoreCache;
 class BasePaymentMethodRepository 
 {
     protected $payment_data, $encryptor, $user_name, $password, $headers;
-	protected object $request;
-	protected string $method_key;
+    protected object $request;
+    protected string $method_key;
 
-	public function __construct(object $request, string $method_key)
-	{
-		$this->request = $request;
-		$this->method_key = $method_key;
-	}
+    public function __construct(object $request, string $method_key)
+    {
+        $this->request = $request;
+        $this->method_key = $method_key;
+    }
 
     public function getCoreCache(): object
     {

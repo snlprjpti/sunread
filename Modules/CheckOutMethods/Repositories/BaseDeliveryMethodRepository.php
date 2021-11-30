@@ -8,8 +8,8 @@ use Modules\Core\Facades\CoreCache;
 
 class BaseDeliveryMethodRepository
 {
-	protected object $request;
-	protected string $method_key;
+    protected object $request;
+    protected string $method_key;
     protected string $user_name, $password;
 
     public function __construct(object $request, string $method_key)

@@ -58,6 +58,9 @@ trait HasOrderCalculation
             $total_tax_without_shipping = $total_tax - ($arr_shipping_amount['shipping_tax'] ? $arr_shipping_amount['shipping_amount'] : 0.00);
             $order_addresses = $order->order_addresses()->get();
 
+            $check_out_method_helper = new $check_out_method_helper($request->payment_method);
+            $arr_shipping_amount = $check_out_method_helper->process($request, ["order" => $order]);
+
             $order->update([
                 "sub_total" => $sub_total,
                 "sub_total_tax_amount" => $sub_total_tax_amount,

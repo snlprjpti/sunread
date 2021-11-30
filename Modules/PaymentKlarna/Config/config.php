@@ -58,7 +58,7 @@ return [
             "path" => "payment_methods_klarna_specific_countries",
             "type" => "select",
             "provider" => "Modules\Country\Entities\Country",
-            "pluck" => ["iso_2_code", "name"],
+            "pluck" => ["name", "iso_2_code"],
             "default" => "",
             "options" => [],
             "rules" => "exists:countries,iso_2_code",
