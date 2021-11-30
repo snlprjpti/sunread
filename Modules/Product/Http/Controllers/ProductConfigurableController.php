@@ -69,8 +69,6 @@ class ProductConfigurableController extends BaseController
                 $attributes = $this->product_attribute_repository->validateAttributes($created, $request, $scope, "store", "configurable");
                 $this->product_attribute_repository->syncAttributes($attributes, $created, $scope, $request, "store", "configurable");
 
-                $created->channels()->sync($request->get("channels"));
-
                 $this->repository->createVariants($created, $request, $scope, $attributes);
             });
 
@@ -109,8 +107,6 @@ class ProductConfigurableController extends BaseController
             $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope, $data) {
                 $attributes = $this->product_attribute_repository->validateAttributes($updated, $request, $scope, "update", "configurable");
                 $this->product_attribute_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
-
-                $updated->channels()->sync($request->get("channels"));
 
                 $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
 
