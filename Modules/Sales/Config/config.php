@@ -250,7 +250,7 @@ return [
                                     "sort_by" => ""
                                 ]
                             ]
-                        ]   
+                        ]
                     ]
                 ],
                 [
@@ -258,7 +258,10 @@ return [
                     "slug" => "payment_methods",
                     "subChildren" => [
                         config("paymentbanktransfer"),
-                        config("paymentcashondelivery"), 
+                        config("paymentcashondelivery"),
+                        config("paymentklarna"),
+                        config("paymentklarna.api_configuration"),
+                        config("paymentklarna.klarna_design")
                     ]
                 ],
                 [

@@ -42,7 +42,7 @@ class BasePaymentMethodRepository
         return Http::withBasicAuth($user_name, $password);
     }
 
-    public function get(string $url, ?array $parameter = []): mixed
+    public function getClient(string $url, ?array $parameter = []): mixed
     {
         return $this->basicAuth($this->user_name, $this->password)->get($url, $parameter);
     }

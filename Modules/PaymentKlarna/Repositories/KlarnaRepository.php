@@ -74,7 +74,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 	}
 	
 
-	public function validateData()
+	private function validateData()
 	{
 		# code...
 	}

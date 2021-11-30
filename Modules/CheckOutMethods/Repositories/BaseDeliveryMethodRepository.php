@@ -8,8 +8,8 @@ use Modules\Core\Facades\CoreCache;
 
 class BaseDeliveryMethodRepository
 {
-	protected object $request;
-	protected string $method_key;
+    protected object $request;
+    protected string $method_key;
     protected string $user_name, $password;
     protected array $rules;
 
