@@ -63,7 +63,7 @@ class BaseCheckOutMethods
     private function getRepositoryData(object $method_data, object $request, ?object $parameter): mixed
     {
         $method_repository = $method_data->repository;
-        if (!$method_repository) throw new Exception("Repository Path Not found.");
+        if (!class_exists($method_repository)) throw new Exception("Repository Path Not found.");
         $method_repository = new $method_repository($request, $parameter);
         $data = $method_repository->get();
         return $data;

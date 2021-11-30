@@ -10,12 +10,11 @@ use Modules\Core\Facades\SiteConfig;
 use Modules\Customer\Entities\Customer;
 use Modules\Sales\Entities\OrderTax;
 use Modules\Sales\Entities\OrderTaxItem;
-use Modules\CheckOutMethods\Traits\HasPayementCalculation;
 use Modules\CheckOutMethods\Traits\HasShippingCalculation;
 
 trait HasOrderCalculation
 {
-    use HasPayementCalculation, HasShippingCalculation;
+    use HasShippingCalculation;
 
     protected $discount_percent, $shipping_amount;
 
@@ -41,7 +40,6 @@ trait HasOrderCalculation
             
             $discount_amount = (float) $this->calculateDiscount($order); // To-Do other discount will be added here...
 
-            //TO-DO::check if the fn is working properly. test needed;
             $check_out_method_helper = $this->check_out_method_helper;
             $check_out_method_helper = new $check_out_method_helper($request->shipping_method);
             $arr_shipping_amount = $check_out_method_helper->process($request, ["order" => $order]);
@@ -55,6 +53,7 @@ trait HasOrderCalculation
 
             $total_tax_without_shipping = $total_tax - ($arr_shipping_amount['shipping_tax'] ? $arr_shipping_amount['shipping_amount'] : 0.00);
             $order_addresses = $order->order_addresses()->get();
+            
 
             $check_out_method_helper = new $check_out_method_helper($request->payment_method);
             $check_out_method_helper->process($request, ["order" => $order, "sub_total_tax_amount" => $sub_total_tax_amount]);

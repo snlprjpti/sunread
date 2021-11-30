@@ -3,7 +3,9 @@
 namespace Modules\CheckOutMethods\Repositories;
 
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Http;
+use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\Core\Facades\CoreCache;
 
 class BaseDeliveryMethodRepository
@@ -11,12 +13,26 @@ class BaseDeliveryMethodRepository
     protected object $request;
     protected string $method_key;
     protected string $user_name, $password;
+    protected array $rules;
+    protected object $coreCache;
 
-    public function __construct(object $request, string $method_key)
+    public function __construct(object $request, string $method_key, ?array $rules = [])
     {
         $this->request = $request;
         $this->method_key = $method_key;
+        $this->rules = $rules;
+		$this->coreCache =  $this->getCoreCache();
     }
+    
+    public function object(array $attributes = []): mixed
+    {
+        return new MethodAttribute($attributes);
+    }
+
+    public function collection(array $attributes = []): Collection
+    {
+        return new Collection($attributes);
+    } 
 
     public function getCoreCache(): object
     {
@@ -38,5 +54,18 @@ class BaseDeliveryMethodRepository
     public function basicAuth(string $user_name, string $password): object
     {
         return Http::withBasicAuth($user_name, $password);
+    }
+
+    public function rules(array $merge = []): array
+    {
+        return array_merge($this->rules, $merge);
+    }
+
+    public function validateData(object $request, array $merge = [], ?callable $callback = null): array
+    {
+        $data = $request->validate($this->rules($merge));
+        $append_data = $callback ? $callback($request) : [];
+
+        return array_merge($data, $append_data);
     }
 }
