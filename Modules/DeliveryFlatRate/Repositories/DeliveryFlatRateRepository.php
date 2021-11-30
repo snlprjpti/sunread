@@ -27,9 +27,10 @@ class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements
         try
         {
             $coreCache = $this->getCoreCache();
+            $channel_id = $coreCache?->channel->id;
             $arr_shipping = [ "shipping_amount" => 0.00, "shipping_tax" => false ];
-            $flat_type = SiteConfig::fetch("delivery_methods_{$this->method_key}_flat_type", "channel", $coreCache?->channel->id);
-            $flat_price = SiteConfig::fetch("delivery_methods_{$this->method_key}_flat_price", "channel", $coreCache?->channel->id);
+            $flat_type = SiteConfig::fetch("delivery_methods_{$this->method_key}_flat_type", "channel", $channel_id);
+            $flat_price = SiteConfig::fetch("delivery_methods_{$this->method_key}_flat_price", "channel", $channel_id);
             $total_shipping_amount = 0.00;
             if ($flat_type == "per_order") $total_shipping_amount = $flat_price;
             else {
@@ -52,6 +53,11 @@ class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements
                 $arr_shipping["shipping_tax"] = true;
             }
             $arr_shipping["shipping_amount"] = $total_shipping_amount;
+
+            $this->parameter->order->update([
+				"shipping_method" => $this->method_key,
+            	"shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
+			]);
         }
         catch ( Exception $exception )
         {

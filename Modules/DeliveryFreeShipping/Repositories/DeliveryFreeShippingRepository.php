@@ -27,8 +27,9 @@ class DeliveryFreeShippingRepository extends BaseDeliveryMethodRepository implem
         try
         {
             $coreCache = $this->getCoreCache();
-            $minimum_order_amt = SiteConfig::fetch("delivery_methods_{$this->method_key}_minimum_order_amt", "channel", $coreCache?->channel->id);
-            $incl_tax_to_amt = SiteConfig::fetch("delivery_methods_{$this->method_key}_include_tax_to_amt", "channel", $coreCache?->channel->id);
+            $channel_id = $coreCache?->channel->id;
+            $minimum_order_amt = SiteConfig::fetch("delivery_methods_{$this->method_key}_minimum_order_amt", "channel", $channel_id);
+            $incl_tax_to_amt = SiteConfig::fetch("delivery_methods_{$this->method_key}_include_tax_to_amt", "channel", $channel_id);
             
             $sub_total = $this->parameter->order->order_items->sum('row_total');
             $sub_total_incl_tax = $this->parameter->order->order_items->sum('row_total_incl_tax');
@@ -41,6 +42,11 @@ class DeliveryFreeShippingRepository extends BaseDeliveryMethodRepository implem
             }
 
             $arr_shipping = [ "shipping_amount" => 0.00, "shipping_tax" => false ];
+            
+            $this->parameter->order->update([
+				"shipping_method" => $this->method_key,
+            	"shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
+			]);
         }
         catch ( Exception $exception )
         {

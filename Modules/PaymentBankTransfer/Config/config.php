@@ -3,7 +3,7 @@
 return [
     "title" => "Bank Transfer Payment",
     "slug" => "bank_transfer",
-    "repository" => "Modules\PaymentMethods\Repositories\BankTransferRepository",
+    "repository" => "Modules\PaymentBankTransfer\Repositories\BankTransferRepository",
     "elements" => [
         [
             "title" => "Enabled",
@@ -77,6 +77,32 @@ return [
             "options" => [],
             "rules" => "exists:countries,iso_2_code",
             "multiple" => false,
+            "scope" => "channel",
+            "is_required" => 0,
+            "sort_by" => ""
+        ],
+        [
+            "title" => "Minimum Order Total",
+            "path" => "payment_methods_bank_transfer_minimum_total_order",
+            "type" => "textt",
+            "provider" => "",
+            "pluck" => [],
+            "default" => "",
+            "options" => [],
+            "rules" => "",
+            "scope" => "channel",
+            "is_required" => 0,
+            "sort_by" => ""
+        ],
+        [
+            "title" => "Maximum Order Total",
+            "path" => "payment_methods_bank_transfer_maximum_total_order",
+            "type" => "text",
+            "provider" => "",
+            "pluck" => [],
+            "default" => "",
+            "options" => [],
+            "rules" => "",
             "scope" => "channel",
             "is_required" => 0,
             "sort_by" => ""
