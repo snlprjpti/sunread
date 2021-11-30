@@ -6,24 +6,14 @@ use Illuminate\Database\Migrations\Migration;
 
 class UpdateStatusColumnOnOrderTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->foreign("status")->references("slug")->on("order_statuses")->onUpdate('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->dropForeign('orders_status_foreign');
