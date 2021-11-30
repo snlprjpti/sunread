@@ -14,7 +14,6 @@ return [
             "default" => "Klarna Payment",
             "options" => [],
             "rules" => "",
-            "multiple" => false,
             "scope" => "channel",
             "is_required" => 1,
             "sort_by" => ""
@@ -100,7 +99,6 @@ return [
                 "default" => "",
                 "options" => [],
                 "rules" => "",
-                "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 1,
                 "sort_by" => ""
@@ -114,7 +112,6 @@ return [
                 "default" => "",
                 "options" => [],
                 "rules" => "",
-                "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 1,
                 "sort_by" => ""
@@ -152,7 +149,6 @@ return [
                 "default" => "",
                 "options" => [],
                 "rules" => "",
-                "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 0,
                 "sort_by" => ""
@@ -166,7 +162,6 @@ return [
                 "default" => "",
                 "options" => [],
                 "rules" => "",
-                "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 0,
                 "sort_by" => ""
@@ -180,7 +175,6 @@ return [
                 "default" => "",
                 "options" => [],
                 "rules" => "",
-                "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 0,
                 "sort_by" => ""
@@ -194,7 +188,6 @@ return [
                 "default" => "",
                 "options" => [],
                 "rules" => "",
-                "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 0,
                 "sort_by" => ""
@@ -208,7 +201,6 @@ return [
                 "default" => "",
                 "options" => [],
                 "rules" => "",
-                "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 0,
                 "sort_by" => ""

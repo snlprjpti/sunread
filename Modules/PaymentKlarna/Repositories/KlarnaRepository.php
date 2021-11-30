@@ -11,7 +11,6 @@ class KlarnaRepository extends BasePaymentMethodRepository
 	{
 		$this->method_key = "klarna";
 		$this->request = $request;
-
 		parent::__construct($this->request, $this->method_key);
 	}
 
@@ -19,11 +18,4 @@ class KlarnaRepository extends BasePaymentMethodRepository
 	{
 		# code...
 	}
-	
-
-	
-
-
-
-
 }
