@@ -5,14 +5,15 @@ return [
             "type" => "long"
         ],
         "name" =>  [
-            "type" => "search_as_you_type",
-            // "fields" =>  [
-            //     "keyword" =>  [
-            //         "type" => "keyword",
-            //         "ignore_above" => 256
-            //     ]
-            // ],
-            // "fielddata"=> true
+            "type" => "text",
+            "analyzer" => "keyword",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ],
+            "fielddata"=> true
         ],
         "sku" =>  [
             "type" => "text",

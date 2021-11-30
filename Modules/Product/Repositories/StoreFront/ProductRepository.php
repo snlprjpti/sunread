@@ -95,6 +95,9 @@ class ProductRepository extends BaseRepository
                 ->whereStatus(1)->with($relations)->firstOrFail();    
             }
 
+            $channel_status = $product->channels()->whereChannelId($coreCache->store?->channel_id)->first();
+            if($channel_status) throw new ProductNotFoundIndividuallyException();
+
             $cache_name = "product_details_{$product->id}_{$coreCache->channel->id}_{$coreCache->store->id}";
 
             $product_details = json_decode(Redis::get($cache_name));

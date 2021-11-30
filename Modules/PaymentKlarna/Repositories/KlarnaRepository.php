@@ -66,11 +66,4 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 	{
 		   
 	}
-	
-
-	
-
-
-
-
 }

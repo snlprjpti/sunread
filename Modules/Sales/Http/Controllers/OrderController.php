@@ -17,13 +17,22 @@ class OrderController extends BaseController
 {
     protected $repository, $orderStatusUpdateRepository;
 
+    protected $with = [
+        "order_items.order",
+        "order_taxes.order_tax_items",
+        "website",
+        "billing_address", 
+        "shipping_address",
+        "customer",
+        "order_status.order_status_state"
+    ];
+
     public function __construct(OrderRepository $repository, Order $order, OrderStatusUpdateRepository $orderStatusUpdateRepository)
     {
         $this->model = $order;
         $this->model_name = "Order";
         $this->repository = $repository;
         $this->orderStatusUpdateRepository = $orderStatusUpdateRepository;
-
         parent::__construct($this->model, $this->model_name);
     }
 
@@ -41,7 +50,7 @@ class OrderController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetchAll($request, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer"]);
+            $fetched = $this->repository->fetchAll($request, $this->with);
         }
         catch (Exception $exception)
         {
@@ -55,7 +64,7 @@ class OrderController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->fetch($id, ["order_items.order", "order_taxes.order_tax_items", "website", "billing_address", "shipping_address", "customer"]);
+            $fetched = $this->repository->fetch($id, $this->with);
         }
         catch (Exception $exception)
         {
