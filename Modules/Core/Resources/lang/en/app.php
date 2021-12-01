@@ -158,5 +158,8 @@ return [
         "product-added" => "product added on cart",
         "product-qty-updated" => "product quantity updated on cart",
         "product-remove-due-to-channel-change" => "product removed from cart due to change in channel"
+    ],
+    "sales" => [
+        "payment-transfer-not-allowed" => "Total order must be between :minimum_order_total & :maximum_order_total"
     ]
 ];

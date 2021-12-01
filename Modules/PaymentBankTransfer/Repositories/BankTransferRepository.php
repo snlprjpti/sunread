@@ -33,7 +33,7 @@ class BankTransferRepository extends BasePaymentMethodRepository implements Paym
             $minimum_order_total = SiteConfig::fetch("payment_methods_{$this->method_key}_minimum_total_order", "channel", $channel_id);
             $maximum_order_total = SiteConfig::fetch("payment_methods_{$this->method_key}_maximum_total_order", "channel", $channel_id);
             if (($this->parameter->sub_total_tax_amount < $minimum_order_total) || ($this->parameter->sub_total_tax_amount > $maximum_order_total)) {
-                throw new BankTransferNotAllowedException("Total order must be between {$minimum_order_total} & {$maximum_order_total}", 403);
+                throw new BankTransferNotAllowedException(__("core::app.sales.payment-transfer-not-allowed", ["minimum_order_total" => $minimum_order_total, "maximum_order_total" => $maximum_order_total]), 403);
             }
             
             $this->parameter->order->update([
