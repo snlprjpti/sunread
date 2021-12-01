@@ -135,16 +135,16 @@ trait ElasticSearchFormat
         {
             $categories = $this->categories->map(function ($category) use ($store) {
 
-                $defaul_data = [
-                    "category_id" => $category->id,
-                    "scope" => "store",
-                    "scope_id" => $store->id 
-                ];
+                // $defaul_data = [
+                //     "category_id" => $category->id,
+                //     "scope" => "store",
+                //     "scope_id" => $store->id 
+                // ];
     
                 return [
                     "id" => $category->id,
-                    "slug" => $category->value($defaul_data, "slug"),
-                    "name" => $category->value($defaul_data, "name")
+                    // "slug" => $category->value($defaul_data, "slug"),
+                    // "name" => $category->value($defaul_data, "name")
                 ];
             })->toArray();
         }
