@@ -18,7 +18,7 @@ class StoreWiseProductIndexer implements ShouldQueue
 
     protected $product, $store;
 
-    public function __construct(object $product, $store)
+    public function __construct(object $product, object $store)
     {
         $this->product = $product;
         $this->store = $store;
