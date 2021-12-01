@@ -8,7 +8,9 @@ use Illuminate\Http\JsonResponse;
 use Modules\Core\Rules\ScopeRule;
 use Modules\Core\Entities\Website;
 use Illuminate\Support\Facades\Redis;
+use Modules\Core\Services\RedisHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Repositories\WebsiteRepository;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\NavigationMenu\Entities\NavigationMenu;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -23,19 +25,30 @@ use Modules\NavigationMenu\Repositories\NavigationMenuItemValueRepository;
 class NavigationMenuItemController extends BaseController
 {
     // Protected properties
-    protected $repository, $navigation_menu, $navigation_menu_repository, $navigation_menu_item_value_repository;
+    protected $repository, $navigation_menu, $navigation_menu_repository, $navigation_menu_item_value_repository, $redis_helper;
 
     /**
      * NavigationMenuItemController Class constructor
      */
-    public function __construct(NavigationMenuItemRepository $navigation_menu_item_repository, NavigationMenuItem $navigation_menu_item, NavigationMenuRepository $navigation_menu_repository, NavigationMenu $navigation_menu, NavigationMenuItemValueRepository $navigation_menu_item_value_repository)
+    public function __construct(
+        NavigationMenuItemRepository $navigation_menu_item_repository,
+        NavigationMenuItem $navigation_menu_item,
+        NavigationMenuRepository $navigation_menu_repository,
+        NavigationMenu $navigation_menu,
+        NavigationMenuItemValueRepository $navigation_menu_item_value_repository,
+        RedisHelper $redisHelper,
+        WebsiteRepository $websiteRepository
+    )
     {
         $this->repository = $navigation_menu_item_repository;
         $this->navigation_menu_item_value_repository = $navigation_menu_item_value_repository;
-
-        $this->model = $navigation_menu_item;
         $this->navigation_menu = $navigation_menu;
         $this->navigation_menu_repository = $navigation_menu_repository;
+        $this->redis_helper = $redisHelper;
+        $this->website_repository = $websiteRepository;
+
+
+        $this->model = $navigation_menu_item;
         $this->model_name = "Navigation Menu Item";
 
         // Calling Parent Constructor of BaseController

@@ -2,6 +2,8 @@
 
 namespace Modules\NavigationMenu\Entities;
 
+use Kalnoy\Nestedset\NodeTrait;
+use Illuminate\Support\Collection;
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -11,12 +13,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NavigationMenuItem extends Model
 {
-    use HasFactory, HasScope;
+    use HasFactory, HasScope, NodeTrait;
 
     /**
      * Arrays that are Mass Assignable
      */
-    protected $fillable = ["navigation_menu_id"];
+    protected $fillable = ["navigation_menu_id", "parent_id", "position"];
 
     // Append data with Values [NavigationMenuItem]
     protected $with = [ "values" ];
@@ -25,6 +27,23 @@ class NavigationMenuItem extends Model
     public static $SEARCHABLE = [];
 
     protected $casts = [];
+
+    public function getRootCategories(): Collection
+    {
+        return NavigationMenuItem::where('parent_id', null)->get();
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(NavigationMenuItem::class, 'parent_id');
+    }
+
+    public function getNavigationMenuItemTree(): Collection
+    {
+        return $this->id
+            ? $this::orderBy('position', 'ASC')->where('id', '!=', $this->id)->get()->toTree()
+            : $this::orderBy('position', 'ASC')->get()->toTree();
+    }
 
     /**
      * Get Image URL
