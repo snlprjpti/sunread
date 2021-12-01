@@ -107,9 +107,12 @@ class BasePaymentMethodRepository
         try
         {
             $response = $this->basicAuth($this->user_name, $this->password)
-            ->post("{$this->base_url}{$url}", $data)
-            ->throw()
-            ->json();
+            ->post("{$this->base_url}{$url}", $data);
+            
+            dd($data, $response->json());
+            // ->throw()
+            // ->json();
+
         }
         catch (Exception $exception )
         {

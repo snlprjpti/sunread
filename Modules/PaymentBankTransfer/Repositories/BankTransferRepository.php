@@ -20,7 +20,7 @@ class BankTransferRepository extends BasePaymentMethodRepository implements Paym
         $this->request = $request;
         $this->method_key = "bank_transfer";
         $this->parameter = $parameter;
-     
+        
         parent::__construct($this->request, $this->method_key);
     }
 

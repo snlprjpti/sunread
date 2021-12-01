@@ -57,7 +57,14 @@ trait HasOrderCalculation
             
 
             $check_out_method_helper = new $check_out_method_helper($request->payment_method);
-            $check_out_method_helper->process($request, ["order" => $order, "sub_total_tax_amount" => $sub_total_tax_amount]);
+            $payment_data = [
+                "order" => $order,
+                "sub_total_tax_amount" => $sub_total_tax_amount,
+                "grand_total" => $grand_total,
+                "total_tax" => $total_tax_without_shipping,
+                "sub_total" => $sub_total,
+                ];
+            $check_out_method_helper->process($request, $payment_data);
 
             $order->update([
                 "sub_total" => $sub_total,
