@@ -39,6 +39,9 @@ return [
         "status" =>  [
             "type" => "long"
         ],
+        "product_status" =>  [
+            "type" => "long"
+        ],
         "quantity"=> [
             "type"=> "text",
             "fields"=> [
