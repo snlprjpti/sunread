@@ -17,8 +17,8 @@ class BasePaymentMethodRepository
     use HasHandlePayementException;
 
     protected $payment_data, $encryptor;
-	protected object $request;
-	protected string $method_key;
+    protected object $request;
+    protected string $method_key;
     protected array $rules;
 
     public object $coreCache;
@@ -27,17 +27,17 @@ class BasePaymentMethodRepository
     public array $headers; 
     public string $user_name, $password;
 
-	public function __construct(object $request, string $method_key, ?array $rules = [])
-	{
-		$this->request = $request;
-		$this->method_key = $method_key;
+    public function __construct(object $request, string $method_key, ?array $rules = [])
+    {
+        $this->request = $request;
+        $this->method_key = $method_key;
         $this->rules = $rules;
-		$this->coreCache =  $this->getCoreCache();
+        $this->coreCache =  $this->getCoreCache();
         $this->method_detail = [
             "method_key" => $method_key
         ];
         $this->headers = [ "Accept" => "application/json" ];
-	}
+    }
 
     public function object(array $attributes = []): mixed
     {

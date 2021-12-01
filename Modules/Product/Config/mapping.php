@@ -6,6 +6,7 @@ return [
         ],
         "name" =>  [
             "type" => "text",
+            "analyzer" => "keyword",
             "fields" =>  [
                 "keyword" =>  [
                     "type" => "keyword",

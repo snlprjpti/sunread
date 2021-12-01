@@ -49,6 +49,9 @@ trait ElasticSearchFormat
         try
         {   
             $data = $this->select("id", "sku", "status", "website_id", "parent_id", "type")->where("id", $this->id)->first()->toArray();
+
+            $channel_status = $this->channels()->whereChannelId($store?->channel_id)->first();
+            if($channel_status) $data["status"] = 0;
             
             $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
             

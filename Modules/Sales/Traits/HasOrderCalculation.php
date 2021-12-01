@@ -41,26 +41,23 @@ trait HasOrderCalculation
             $discount_amount = (float) $this->calculateDiscount($order); // To-Do other discount will be added here...
 
             $check_out_method_helper = $this->check_out_method_helper;
-            // $check_out_method_helper = new $check_out_method_helper($request->shipping_method);
-            // $arr_shipping_amount = $check_out_method_helper->process($request, ["order" => $order]);
 
-            // $cal_shipping_amt = (float) ($arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount']);
+            $check_out_method_helper = new $check_out_method_helper($request->shipping_method);
+            $arr_shipping_amount = $check_out_method_helper->process($request, ["order" => $order]);
 
-            // $taxes = $order->order_taxes?->pluck('amount')->toArray();
-            // $total_tax = array_sum($taxes);
-               
-            // $cal_shipping_amt = (float) $arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount'];
-            
-            // $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
+            $cal_shipping_amt = (float) ($arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount']);
 
-            // $total_tax_without_shipping = $total_tax - ($arr_shipping_amount['shipping_tax'] ? $arr_shipping_amount['shipping_amount'] : 0.00);
-            // $order_addresses = $order->order_addresses()->get();
+            $taxes = $order->order_taxes?->pluck('amount')->toArray();
+            $total_tax = array_sum($taxes);
+                           
+            $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
+
+            $total_tax_without_shipping = $total_tax - ($arr_shipping_amount['shipping_tax'] ? $arr_shipping_amount['shipping_amount'] : 0.00);
+            $order_addresses = $order->order_addresses()->get();
             
 
             $check_out_method_helper = new $check_out_method_helper($request->payment_method);
-            dd($check_out_method_helper->process($request, ["order" => $order]));
-
-            $arr_shipping_amount = $check_out_method_helper->process($request, ["order" => $order]);
+            $check_out_method_helper->process($request, ["order" => $order, "sub_total_tax_amount" => $sub_total_tax_amount]);
 
             $order->update([
                 "sub_total" => $sub_total,
@@ -71,13 +68,6 @@ trait HasOrderCalculation
                 "total_items_ordered" => $total_items,
                 "total_qty_ordered" => $total_qty_ordered,
                 // "status" => SiteConfig::fetch(""), // TO-DO
-                "shipping_method" => SiteConfig::fetch("delivery_methods_{$request->shipping_method}_method_name", "channel", $channel_id),
-                "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$request->shipping_method}_title", "channel", $channel_id),
-                
-                "payment_method" => SiteConfig::fetch("payment_methods_{$request->payment_method}_title", "channel", $channel_id),
-                "payment_method_label" => SiteConfig::fetch("payment_methods_{$request->payment_method}_title", "channel", $channel_id),
-                
-                
                 "billing_address_id" => $order_addresses->where('address_type', "billing")->first()?->id,
                 "shipping_address_id" => $order_addresses->where('address_type', "shipping")->first()?->id
             ]);
