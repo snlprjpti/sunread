@@ -52,7 +52,7 @@ class ProductObserverIndexer implements ShouldQueue
                 })->flatten(1);
 
                 $remove_batch = Bus::batch([])->onQueue("index")->dispatch();
-                foreach ($stores as $store) $remove_batch->add(new RemoveIndexing($this->product, $store));
+                foreach ($stores as $store) $remove_batch->add(new RemoveDocument($this->product, $store));
             }
         }
         catch (Exception $exception)

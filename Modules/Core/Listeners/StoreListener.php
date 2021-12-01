@@ -5,6 +5,7 @@ namespace Modules\Core\Listeners;
 use Modules\Core\Entities\Store;
 use Modules\Core\Jobs\CoreCacheJob;
 use Modules\Product\Jobs\ReindexMigrator;
+use Modules\Product\Jobs\RemoveIndex;
 
 class StoreListener
 {
@@ -30,5 +31,8 @@ class StoreListener
     public function delete(object $store): void
     {
         CoreCacheJob::dispatch( "deleteStoreCache", collect($store) )->onQueue("high");
+
+        //remove index
+        RemoveIndex::dispatch(collect($store))->onQueue("index");
     }
 }
