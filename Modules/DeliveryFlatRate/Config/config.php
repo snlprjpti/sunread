@@ -73,7 +73,7 @@ return [
             "type" => "text",
             "provider" => "",
             "pluck" => [],
-            "default" => "",
+            "default" => "0.00",
             "options" => [],
             "rules" => "decimal",
             "multiple" => false,
