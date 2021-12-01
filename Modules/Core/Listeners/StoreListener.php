@@ -2,11 +2,9 @@
 
 namespace Modules\Core\Listeners;
 
-use Illuminate\Support\Facades\Bus;
 use Modules\Core\Entities\Store;
 use Modules\Core\Jobs\CoreCacheJob;
-use Modules\Product\Entities\Product;
-use Modules\Product\Jobs\SingleIndexing;
+use Modules\Product\Jobs\ReindexMigrator;
 
 class StoreListener
 {
@@ -15,10 +13,7 @@ class StoreListener
         CoreCacheJob::dispatch( "createStoreCache", $store )->onQueue("high");
 
         //indexing products in elasticsearch for new store
-        $website = $store?->channel?->website;
-        $products = Product::whereWebsiteId($website->id)->get();
-        $batch = Bus::batch([])->onQueue("index")->dispatch();
-        foreach($products as $product) $batch->add(new SingleIndexing($product, $store));
+        ReindexMigrator::dispatch($store)->onQueue("index");
     }
 
     public function beforeUpdate(int $store_id): void

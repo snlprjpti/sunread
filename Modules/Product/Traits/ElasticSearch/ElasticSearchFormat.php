@@ -34,7 +34,13 @@ trait ElasticSearchFormat
     
             $array['categories'] = $this->getCategoryData($store);
             $images = $this->getImages();
-            if($this->type == "simple" && !$this->parent_id) $array["list_status"] = 1;
+            
+            if($this->type == "simple" && !$this->parent_id) {
+                $visibility_att = Attribute::whereSlug("visibility")->first();
+                $visibility_id = AttributeOption::whereAttributeId($visibility_att->id)->whereName("Not Visible Individually")->first()?->id;
+                
+                $array["list_status"] = (isset($array["visibility"]) && ($array["visibility"] == $visibility_id)) ? 0 : 1;
+            }
         }
         catch (Exception $exception)
         {

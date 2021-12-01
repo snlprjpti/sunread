@@ -15,21 +15,31 @@ class ReindexMigrator implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct()
+    protected $store;
+
+    public function __construct(?object $store = null)
     {
-        //
+        $this->store = $store;
     }
 
     public function handle(): void
     {
-        $chunk_products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->whereParentId(null)->get()->chunk(100);
+        $chunk_products = Product::with(["variants", "categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"]);
+
+        if($this->store) {
+            $website = $this->store?->channel?->website;
+            $chunk_products = $chunk_products->whereWebsiteId($website->id);
+        }
         
+        $chunk_products = $chunk_products->whereParentId(null)->get()->chunk(100);
+
         foreach ($chunk_products as $products)
         {
             $batch = Bus::batch([])->onQueue("index")->dispatch();
             foreach ($products as $product)
             {
-                $batch->add(new ProductIndexer($product));
+                if($this->store) $batch->add(new StoreWiseProductIndexer($product, $this->store));
+                else $batch->add(new ProductIndexer($product));
             }
         }
     }
