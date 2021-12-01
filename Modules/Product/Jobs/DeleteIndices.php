@@ -9,25 +9,25 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Bus;
+use Modules\Core\Entities\Store;
 use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
-class RemoveDocument implements ShouldQueue
+class DeleteIndices implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 
-    public $product, $store;
-
-    public function __construct(object $product, object $store)
+    public function __construct()
     {
-        $this->product = $product;
-        $this->store = $store;
     }
 
     public function handle(): void
     {
         try
         {
-            $this->removeDocument($this->product, $this->store);
+            $stores = Store::get();
+            $batch = Bus::batch([])->onQueue("index")->dispatch();
+            foreach($stores as $store) $batch->add(new RemoveIndex($store));
         }
         catch (Exception $exception)
         {
