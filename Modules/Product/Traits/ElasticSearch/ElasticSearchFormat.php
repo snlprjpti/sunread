@@ -59,7 +59,7 @@ trait ElasticSearchFormat
             $channel_status = $this->channels()->whereChannelId($store?->channel_id)->first();
             if($channel_status) $data["status"] = 0;
 
-            $data["test_status"] = $data["status"];
+            $data["product_status"] = $data["status"];
             
             $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
             

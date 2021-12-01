@@ -216,7 +216,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $final_l[] = $data["query"];
             $final_l[] = $this->term("list_status", 1);
-            $final_l[] = $this->term("status", 1);
+            $final_l[] = $this->term("product_status", 1);
             $final_q = $this->whereQuery($final_l);
     
             $query = [
@@ -283,7 +283,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $final_l[] = $filter["query"];
             $final_l[] = $this->term("list_status", 1);
-            $final_l[] = $this->term("status", 1);
+            $final_l[] = $this->term("product_status", 1);
             $final_q = $this->whereQuery($final_l);
 
             $fetched = [
