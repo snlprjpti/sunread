@@ -5,7 +5,6 @@ namespace Modules\PaymentKlarna\Repositories;
 use Illuminate\Support\Collection;
 use Modules\CheckOutMethods\Contracts\PaymentMethodInterface;
 use Modules\CheckOutMethods\Repositories\BasePaymentMethodRepository;
-use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\Core\Facades\SiteConfig;
 
 class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMethodInterface
@@ -30,7 +29,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 		$this->base_url = $this->getBaseUrl();
 	}
 
-	public function getApiUrl(): Collection
+	private function getApiUrl(): Collection
 	{
 		return $this->collection([
 			[
@@ -76,7 +75,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 		]);
 	}
 
-	public function getBaseUrl(): string
+	private function getBaseUrl(): string
 	{
 		$data = $this->methodDetail();
 		$api_endpoint_data = $this->urls->where("type", $data->api_mode)->map(function ($mode) use ($data) {
@@ -86,7 +85,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 		return $api_endpoint_data->url;
 	}
 
-	public function data(): array
+	private function data(): array
 	{
 		$this->user_name = SiteConfig::fetch("payment_methods_klarna_api_config_username", "channel", $this->coreCache->channel?->id);
 		$this->password = SiteConfig::fetch("payment_methods_klarna_api_config_password", "channel", $this->coreCache->channel?->id);
@@ -100,15 +99,20 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 
 	public function get(): mixed
 	{
+
 		$coreCache = $this->getCoreCache();
 		$data = $this->methodDetail();
-		dd($this->getBasicClient("checkout/v3/orders/1"));
+
+		// PK21291_f93bbbc9e7cf refrence
+		dd($this->getBasicClient("checkout/v3/orders/840d3c8a-0be5-6087-8212-28b07bf4c4f3"));
 		dd($data);
-		// christoffer.iveslatt@sailracing.com sailracing1977
+	}
 
-		
-
-
+	public function postData(): array
+	{
+		return [
+			"staus" => ""
+		];
 	}
 
 	public function getConfigData(): mixed
