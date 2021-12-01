@@ -7,7 +7,7 @@ Route::group(["middleware" => ["api"]], function() {
         //Product Attribute Routes
         Route::post('products/attributes', [\Modules\Product\Http\Controllers\ProductAttributeController::class, "store"])->name("products.attributes.store");
 
-        Route::get('products/search', [\Modules\Product\Http\Controllers\ProductSearchController::class, "index"]);
+        // Route::get('products/search', [\Modules\Product\Http\Controllers\ProductSearchController::class, "index"]);
 
         //Route::post('products/bulk-reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "bulkReIndex"])->name('products.bulk-reindex');
         //Route::get('products/{id}/reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "reIndex"])->name('products.reindex');
