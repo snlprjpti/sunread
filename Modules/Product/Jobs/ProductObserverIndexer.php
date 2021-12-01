@@ -36,11 +36,6 @@ class ProductObserverIndexer implements ShouldQueue
                 })->flatten(1);
                 $product_batch = Bus::batch([])->onQueue("index")->dispatch();
 
-                if ($this->product->type == "configurable") {
-                    $all_variants = $this->product->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
-                    $chunk_variants = $all_variants->chunk(100);
-                } 
-
                 foreach ($stores as $store)
                 {
                     if ($this->product->type == "simple" && !$this->product->parent_id) $product_batch->add(new SingleIndexing($this->product, $store));
