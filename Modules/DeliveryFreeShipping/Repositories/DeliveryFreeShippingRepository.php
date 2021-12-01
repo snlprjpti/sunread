@@ -44,9 +44,9 @@ class DeliveryFreeShippingRepository extends BaseDeliveryMethodRepository implem
             $arr_shipping = [ "shipping_amount" => 0.00, "shipping_tax" => false ];
             
             $this->parameter->order->update([
-				"shipping_method" => $this->method_key,
-            	"shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
-			]);
+                "shipping_method" => $this->method_key,
+                "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
+            ]);
         }
         catch ( Exception $exception )
         {

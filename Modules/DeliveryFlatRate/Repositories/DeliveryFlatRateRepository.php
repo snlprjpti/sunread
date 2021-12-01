@@ -55,9 +55,9 @@ class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements
             $arr_shipping["shipping_amount"] = $total_shipping_amount;
 
             $this->parameter->order->update([
-				"shipping_method" => $this->method_key,
-            	"shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
-			]);
+                "shipping_method" => $this->method_key,
+                "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
+            ]);
         }
         catch ( Exception $exception )
         {
