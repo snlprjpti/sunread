@@ -13,9 +13,10 @@ use Modules\Sales\Facades\TransactionLog;
 use Modules\Sales\Transformers\OrderResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\CheckOutMethods\Services\MethodAttribute;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Sales\Repositories\StoreFront\OrderRepository;
+use Modules\Sales\Exceptions\BankTransferNotAllowedException;
 use Modules\Sales\Exceptions\FreeShippingNotAllowedException;
 
 class OrderController extends BaseController
@@ -42,7 +43,8 @@ class OrderController extends BaseController
         $this->model_name = "Order";
         $this->repository = $repository;
         $exception_statuses = [
-            FreeShippingNotAllowedException::class => 403
+            FreeShippingNotAllowedException::class => 403,
+            BankTransferNotAllowedException::class => 403
         ];
         
         parent::__construct($this->model, $this->model_name, $exception_statuses);
@@ -83,7 +85,7 @@ class OrderController extends BaseController
             $methods = collect(["delivery_methods", "payment_methods"]);
             $methods->map( function ($method) use ($channel, &$method_lists) {
                 $get_method = SiteConfig::get($method);
-                $get_method_list = $get_method->pluck("slug");
+                $get_method_list = $get_method->pluck("slug")->unique();
                 foreach ($get_method_list as $key => $list) {
                     $title = SiteConfig::fetch("{$method}_{$list}_title", "channel", $channel->id);
                     $method_lists[$method][$key]["slug"] = $list;
