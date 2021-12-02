@@ -78,4 +78,20 @@ class Customer extends Authenticatable implements  JWTSubject
     {
         return $this->addresses->where("default_shipping_address", 1)->first();
     }
+
+    public function getCustomerTypeAttribute(): string
+    {
+        switch ($this->account_type) {
+            case "company": 
+                $type = "organization";
+            break;
+
+            case "personal": 
+                $type = "person";
+            break;
+
+            default: $type = "person";
+        }
+        return $type;
+    }
 }
