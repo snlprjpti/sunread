@@ -3,11 +3,14 @@
 namespace Modules\PaymentKlarna\Repositories;
 
 use Exception;
+use Modules\Sales\Entities\Order;
 use Illuminate\Support\Collection;
+use Modules\Core\Facades\SiteConfig;
+use Modules\Sales\Repositories\OrderMetaRepository;
 use Modules\CheckOutMethods\Contracts\PaymentMethodInterface;
 use Modules\CheckOutMethods\Repositories\BasePaymentMethodRepository;
-use Modules\Core\Facades\SiteConfig;
-use Modules\Sales\Entities\Order;
+use Modules\Sales\Entities\OrderMeta;
+use Modules\Sales\Facades\TransactionLog;
 
 class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMethodInterface
 {
@@ -24,7 +27,6 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 		$this->method_key = "klarna";
 
 		parent::__construct($this->request, $this->method_key);
-		
 		$this->parameter = $parameter;
 		$this->method_detail = array_merge($this->method_detail, $this->data());
 		$this->urls = $this->getApiUrl();
@@ -101,18 +103,39 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 
 	public function get(): mixed
 	{
-		$data = $this->getPostData(function ($order) {	
-			$customer = [
-				"customer" => [
-					"date_of_birth" => $order->customer?->date_of_birth,
-					"type" => $order->customer?->customer_type,
-					"gender" => $order->customer?->gender
-				]
-			];
-			return ($order->customer_id) ? $customer : [];
-		});
-		$response = $this->postBasicClient("checkout/v3/orders", $data);
-		dd($response);
+		try
+		{
+			$data = $this->getPostData(function ($order) {	
+				$customer = [
+					"customer" => [
+						"date_of_birth" => $order->customer?->date_of_birth,
+						"type" => $order->customer?->customer_type,
+						"gender" => $order->customer?->gender
+					]
+				];
+				return ($order->customer_id) ? $customer : [];
+			});
+			$response = $this->postBasicClient("checkout/v3/orders", $data);
+
+			OrderMeta::create([
+				"order_id" => $this->parameter->order->id,
+				"meta_key" => $this->method_key,
+				"meta_value" => ["html_snippet" => $response["html_snippet"]]
+			]);
+			$coreCache = $this->getCoreCache();
+			$this->parameter->order->update([
+                "payment_method" => $this->method_key,
+                "payment_method_label" => SiteConfig::fetch("payment_methods_{$this->method_key}_title", "channel", $coreCache->channel?->id)
+            ]);
+		}
+		catch (Exception $exception)
+		{
+			throw $exception;
+		}
+		
+		// TODO::update transaction log on base repo
+       	TransactionLog::log($this->parameter->order, $data, $response, 201);
+		return $this->object(["html_snippet" => $response["html_snippet"]]);
 	}
 
 	private function getPostData(?callable $callback = null): array
@@ -131,6 +154,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 				"order_addresses.city",
 				"order_addresses.region",
 				"order_addresses.country",
+				"order_metas"
 			];
 			
 			$order = Order::whereId($this->parameter->order->id)->with($with)->first();
@@ -138,6 +162,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 			$sum_tax_amount = 0;
 			$sum_total_amount = 0;
 			$shipping_address = $this->getShippingDetail($order->order_addresses, "shipping");
+
 			$data = [
 				"purchase_country" => SiteConfig::fetch("default_country", "channel", $this->coreCache->channel?->id)?->iso_2_code,
 				"purchase_currency" => $order?->currency_code,
@@ -164,10 +189,8 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 						"total_tax_amount" => (float) $total_tax_amount,
 					];
 				})->toArray(),
-	
-				"order_amount" => (float) ($this->parameter->sub_total * 100  - $this->parameter->order->discount_amount_tax * 100),
+				"order_amount" => (float) ($order->sub_total * 100  - $order->discount_amount_tax * 100),
 				"order_tax_amount" => (float) $sum_tax_amount,
-				
 				"merchant_urls" => [
 				  "terms" => "https://www.example.com/terms.html",
 				  "checkout" => "https://www.example.com/checkout.html?order_id={checkout.order.id}",
@@ -175,18 +198,16 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 				  "push" => "https://www.example.com/push.html"
 				],
 				"merchant_reference1" => $order->id,
-	
 				"billing_address" => $this->getShippingDetail($order->order_addresses, "billing"),
 				"shipping_address" => $shipping_address,
-				
 				"selected_shipping_option" => [
-					"id" => 1, // TODO::update shipping id form order_meta table 
+					"id" => $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == $order->shipping_method))->first()?->id,
 					"name" => $order->shipping_method_label,
 					"description" => $order->shipping_method,
 					// "promo" => "Christmas Promotion", //TODO::add coupons code 
 					"price" => (float) $order->shipping_amount_tax,  // including tax
-					"tax_amount" => (float) $this->parameter->shipping_amount, 
-					//"tax_rate" => (float) $this->parameter->shipping_amount,
+					"tax_amount" => (float) $order->shipping_amount, 
+					// "tax_rate" => (float) $order->shipping_amount,
 					"shipping_method" => $order->shipping_method_label,
 					"delivery_details" => [
 						"pickup_location" => [
