@@ -51,11 +51,7 @@ class NavigationMenuController extends BaseController
         {
             return $this->handleException($exception);
         }
+        return $this->successResponse($fetched, $this->lang("fetch-list-success"));
 
-        return response()->json([
-            "status" => "success",
-            "payload" => ['data' => $fetched],
-            "message" => "Navigation Menu Fetched Successfully"
-        ]);
     }
 }
