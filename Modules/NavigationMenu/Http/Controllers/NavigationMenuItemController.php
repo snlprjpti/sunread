@@ -6,8 +6,6 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Modules\Core\Rules\ScopeRule;
-use Modules\Core\Entities\Website;
-use Illuminate\Support\Facades\Redis;
 use Modules\Core\Services\RedisHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Repositories\WebsiteRepository;

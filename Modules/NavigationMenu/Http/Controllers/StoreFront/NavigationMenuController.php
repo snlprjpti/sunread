@@ -10,17 +10,15 @@ use Modules\Core\Http\Controllers\BaseController;
 use Modules\NavigationMenu\Entities\NavigationMenu;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\NavigationMenu\Repositories\NavigationMenuRepository;
-use Modules\NavigationMenu\Repositories\NavigationMenuItemRepository;
 use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuResource;
 
 class NavigationMenuController extends BaseController
 {
-    protected $repository, $navigation_menu_item_repository;
+    protected $repository;
 
-    public function __construct(NavigationMenuRepository $navigation_menu_repository, NavigationMenuItemRepository $navigation_menu_item_repository, NavigationMenu $navigation_menu)
+    public function __construct(NavigationMenuRepository $navigation_menu_repository, NavigationMenu $navigation_menu)
     {
         $this->repository = $navigation_menu_repository;
-        $this->navigation_menu_item_repository = $navigation_menu_item_repository;
         $this->model = $navigation_menu;
         $this->model_name = "Navigation Menu";
 
@@ -45,7 +43,7 @@ class NavigationMenuController extends BaseController
     {
         try
         {
-            $fetched = $this->navigation_menu_item_repository->fetchItemsFromCache($request);
+            $fetched = $this->repository->fetchItemsFromCache($request);
         }
         catch (Exception $exception)
         {

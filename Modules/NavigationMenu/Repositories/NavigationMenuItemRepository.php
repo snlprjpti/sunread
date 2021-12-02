@@ -5,10 +5,7 @@ namespace Modules\NavigationMenu\Repositories;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Modules\Page\Entities\Page;
-use Modules\Core\Facades\CoreCache;
 use Illuminate\Support\Facades\Storage;
-use Modules\Category\Entities\Category;
 use Modules\NavigationMenu\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Services\RedisHelper;
@@ -178,58 +175,6 @@ class NavigationMenuItemRepository extends BaseRepository
         }
 
         return $status_value === 1 ? true : false;
-    }
-
-    /**
-     * Fetch Navigation From Redis
-     */
-    public function fetchItemsFromCache(object $request): object
-    {
-        $coreCache = $this->getCoreCache($request);
-        $website = $coreCache->website;
-        $channel = $coreCache->channel;
-        $store = $coreCache->channel;
-
-        $redis_nav_menu_key = "store_front_nav_menu_website_{$website->hostname}_channel_{$channel->code}_store_{$store->code}";
-
-        // if($this->redis_helper->checkIfRedisKeyExists($redis_nav_menu_key)) {
-            // $fetched = collect($this->redis_helper->getRedisData($redis_nav_menu_key));
-        // } else {
-            $fetched = $this->fetchWithItems($request, callback:function() use($website){
-                return $this->navigation_menu_repository->model()->where('status', 1)->whereNotNull('location')->where('website_id', $website->id);
-            });
-            // $this->redis_helper->storeCache($redis_nav_menu_key, $fetched);
-        // }
-
-        return $fetched;
-    }
-
-    /**
-     * Fetch Navigation Menu with Items
-     */
-    public function fetchWithItems(object $request, array $with = [], ?callable $callback = null): object
-    {
-        $navigation_menus = $this->navigation_menu_repository->fetchAll($request, $with, $callback);
-        $coreCache = $this->getCoreCache($request);
-        $channel = $coreCache->channel;
-        $store = $coreCache->channel;
-
-        foreach($navigation_menus as $nav_menu)
-        {
-            $items = $nav_menu->rootNavigationMenuItems;
-            $nav_menu->items = $this->fetchNavigationMenuItems($items, $store, $channel);
-        }
-
-        return NavigationMenuResource::collection($navigation_menus);
-    }
-
-
-    /**
-     * Get Navigation Menu Items
-     */
-    private function fetchNavigationMenuItems($navigationMenuItems)
-    {
-        return NavigationMenuItemResource::collection($navigationMenuItems);
     }
 
 }
