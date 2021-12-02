@@ -35,15 +35,6 @@ class ProductFeatureTest extends BaseTestCase
             ])->toArray(), $translations);
     }
 
-    public function getUpdateData(): array
-    {
-        Storage::fake();
-        $translations = $this->getTranslations();
-        return  array_merge($this->model::factory()->make([
-                "image" => UploadedFile::fake()->image("image.png")
-            ])->toArray(), $translations);
-    }
-
     public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
