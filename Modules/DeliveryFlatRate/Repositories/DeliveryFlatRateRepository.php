@@ -3,25 +3,24 @@
 namespace Modules\DeliveryFlatRate\Repositories;
 
 use Exception;
-use Modules\CheckOutMethods\Contracts\DeliveryMethodInterface;
-use Modules\CheckOutMethods\Repositories\BaseDeliveryMethodRepository;
 use Modules\Core\Facades\SiteConfig;
+use Modules\Sales\Entities\OrderMeta;
 use Modules\Sales\Entities\OrderTaxItem;
 use Modules\Sales\Repositories\OrderMetaRepository;
+use Modules\CheckOutMethods\Contracts\DeliveryMethodInterface;
+use Modules\CheckOutMethods\Repositories\BaseDeliveryMethodRepository;
 
 class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements DeliveryMethodInterface
 {
     protected object $request;
     protected string $method_key;
     protected object $parameter;
-    protected $orderMetaRepository;
 
     public function __construct(object $request, object $parameter)
     {
         $this->request = $request;
         $this->parameter = $parameter;
         $this->method_key = "flat_rate";
-        $this->orderMetaRepository = OrderMetaRepository::class;
         parent::__construct($this->request, $this->method_key);
     }
 
@@ -64,14 +63,14 @@ class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements
                 "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
             ]);
 
-            // $this->orderMetaRepository->create([
-            //     "order_id" => $this->parameter->order->id,
-            //     "meta_key" => "shipping",
-            //     "meta_value" => [
-            //         "shipping_method" => $this->method_key,
-            //         "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id),
-            //     ]
-            // ]);
+            OrderMeta::create([
+                "order_id" => $this->parameter->order->id,
+                "meta_key" => "shipping",
+                "meta_value" => [
+                    "shipping_method" => $this->method_key,
+                    "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id),
+                ]
+            ]);
 
         }
         catch ( Exception $exception )

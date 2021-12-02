@@ -111,8 +111,8 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 			];
 			return ($order->customer_id) ? $customer : [];
 		});
-		//$response = $this->postBasicClient("checkout/v3/orders", $data);
-		//dd($response['html_snippet'], $response);
+		$response = $this->postBasicClient("checkout/v3/orders", $data);
+		dd($response);
 	}
 
 	private function getPostData(?callable $callback = null): array
@@ -171,8 +171,8 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 				"merchant_urls" => [
 				  "terms" => "https://www.example.com/terms.html",
 				  "checkout" => "https://www.example.com/checkout.html?order_id={checkout.order.id}",
-				  "confirmation" => route("confirmation"),
-				  "push" => route("klarna")
+				  "confirmation" => "https://www.example.com/confirmation.html",
+				  "push" => "https://www.example.com/push.html"
 				],
 				"merchant_reference1" => $order->id,
 	
