@@ -7,18 +7,21 @@ use Modules\CheckOutMethods\Contracts\DeliveryMethodInterface;
 use Modules\CheckOutMethods\Repositories\BaseDeliveryMethodRepository;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Sales\Entities\OrderTaxItem;
+use Modules\Sales\Repositories\OrderMetaRepository;
 
 class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements DeliveryMethodInterface
 {
     protected object $request;
     protected string $method_key;
     protected object $parameter;
+    protected $orderMetaRepository;
 
     public function __construct(object $request, object $parameter)
     {
         $this->request = $request;
         $this->parameter = $parameter;
         $this->method_key = "flat_rate";
+        $this->orderMetaRepository = OrderMetaRepository::class;
         parent::__construct($this->request, $this->method_key);
     }
 
@@ -35,7 +38,9 @@ class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements
             if ($flat_type == "per_order") $total_shipping_amount = $flat_price;
             else {
                 $this->parameter->order->order_taxes->map( function ($order_tax) use (&$total_shipping_amount) {
-                    $order_item_total_amount = $order_tax->order_tax_items->filter(fn ($order_tax_item) => ($order_tax_item->tax_item_type == "product"))->map( function ($order_item) use ($order_tax, &$total_shipping_amount) {
+                    $order_item_total_amount = $order_tax->order_tax_items
+                    ->filter(fn ($order_tax_item) => ($order_tax_item->tax_item_type == "product"))
+                    ->map( function ($order_item) use ($order_tax, &$total_shipping_amount) {
                         $amount = (float) (($order_tax->percent/100) * $order_item->amount);
                         $total_shipping_amount += $amount;
                         $data = [
@@ -58,6 +63,16 @@ class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements
                 "shipping_method" => $this->method_key,
                 "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
             ]);
+
+            // $this->orderMetaRepository->create([
+            //     "order_id" => $this->parameter->order->id,
+            //     "meta_key" => "shipping",
+            //     "meta_value" => [
+            //         "shipping_method" => $this->method_key,
+            //         "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id),
+            //     ]
+            // ]);
+
         }
         catch ( Exception $exception )
         {
