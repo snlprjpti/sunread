@@ -12,13 +12,13 @@ class CreateOrderTransactionLogsTable extends Migration
             $table->id();
             $table->unsignedBigInteger("order_id");
             $table->decimal("amount");
-            $table->decimal("currency");
+            $table->string("currency");
             $table->string("ip_address")->nullable();
-            $table->json("request");
+            $table->json("request")->nullable();
             $table->json("response");
             $table->string("response_code", 20);
 
-            $table->foreign("order_id")->references("id")->on("orders");
+            $table->foreign("order_id")->references("id")->on("orders")->onDelete("cascade");
 
             $table->timestamps();
         });
