@@ -2,6 +2,8 @@
 
 namespace Modules\Product\Tests\Feature;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Modules\Core\Entities\Store;
 use Modules\Core\Tests\BaseTestCase;
@@ -26,30 +28,20 @@ class ProductFeatureTest extends BaseTestCase
 
     public function getCreateData(): array
     {
-        $translations = [
-            "translations" => [
-                [
-                    "store_id" => Store::factory()->create()->id,
-                    "name" => Str::random(10),
-                    "description" => Str::random(20)
-                ]
-            ]
-        ];
-        return array_merge($this->model::factory()->make()->toArray(), $translations);
+        Storage::fake();
+        $translations = $this->getTranslations();
+        return array_merge($this->model::factory()->make([
+                "image" => UploadedFile::fake()->image("image.png")
+            ])->toArray(), $translations);
     }
 
     public function getUpdateData(): array
     {
-        $translations = [
-            "translations" => [
-                [
-                    "store_id" => Store::factory()->create()->id,
-                    "name" => Str::random(10),
-                    "description" => Str::random(20)
-                ]
-            ]
-        ];
-        return  array_merge($this->model::factory()->make()->toArray(), $translations);
+        Storage::fake();
+        $translations = $this->getTranslations();
+        return  array_merge($this->model::factory()->make([
+                "image" => UploadedFile::fake()->image("image.png")
+            ])->toArray(), $translations);
     }
 
     public function getNonMandatoryCreateData(): array
@@ -64,5 +56,18 @@ class ProductFeatureTest extends BaseTestCase
         return array_merge($this->getCreateData(), [
             "name" => null
         ]);
+    }
+
+    public function getTranslations(): array
+    {
+        return [
+            "translations" => [
+                [
+                    "store_id" => Store::factory()->create()->id,
+                    "name" => Str::random(10),
+                    "description" => Str::random(20)
+                ]
+            ]
+        ];
     }
 }
