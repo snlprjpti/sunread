@@ -24,14 +24,15 @@ class FeatureRepository extends BaseRepository
         ];
     }
 
-    public function createImage(object $request): string
+    public function createImage(object $request): string|bool
     {
         DB::beginTransaction();
 
         try
         {
+            if(empty($request->image)) return true;
             $request->validate([
-                'image' => 'required|mimes:jpeg,jpg,png',
+                'image' => 'mimes:jpeg,jpg,png',
             ]);
 
             /** get image size */

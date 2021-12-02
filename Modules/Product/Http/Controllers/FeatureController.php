@@ -20,7 +20,7 @@ class FeatureController extends BaseController
     public function __construct(Feature $feature, FeatureRepository $featureRepository, FeatureTranslationRepository $featureTranslationRepository)
     {
         $this->model = $feature;
-        $this->model_name = "Product Feature";
+        $this->model_name = "Feature";
         $this->repository = $featureRepository;
         parent::__construct($this->model, $this->model_name);
         $this->featureTranslationRepository = $featureTranslationRepository;
