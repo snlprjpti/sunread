@@ -15,6 +15,7 @@ use Modules\Core\Services\RedisHelper;
 use Modules\NavigationMenu\Entities\NavigationMenuItem;
 use Modules\NavigationMenu\Entities\NavigationMenuItemValue;
 use Modules\NavigationMenu\Exceptions\NavigationMenuItemNotFoundException;
+use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuResource;
 use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuItemResource;
 
 class NavigationMenuItemRepository extends BaseRepository
@@ -180,28 +181,6 @@ class NavigationMenuItemRepository extends BaseRepository
     }
 
     /**
-     * Fetch Navigation Menu with Items
-     */
-    public function fetchWithItems(object $request, array $with = [], ?callable $callback = null): object
-    {
-        $data = $this->navigation_menu_repository->fetchAll($request, $with, $callback);
-        $store = CoreCache::getStoreWithCode($request->header("hc-store"));
-        $channel = CoreCache::getChannelWithCode($request->header("hc-channel"));
-
-        $scope_data = [
-            "scope" => "store",
-            "scope_id" => $store->id,
-        ];
-
-        $data->each(function($item) use($store, $channel, $scope_data) {
-            $item->items = $this->fetchNavigationMenuItems($item->navigationMenuItems()->withDepth()->having('depth', '=', 0)->get(), $scope_data, $store, $channel);
-            return $item;
-        });
-
-        return $data;
-    }
-
-    /**
      * Fetch Navigation From Redis
      */
     public function fetchItemsFromCache(object $request): object
@@ -213,139 +192,44 @@ class NavigationMenuItemRepository extends BaseRepository
 
         $redis_nav_menu_key = "store_front_nav_menu_website_{$website->hostname}_channel_{$channel->code}_store_{$store->code}";
 
-        if($this->redis_helper->checkIfRedisKeyExists($redis_nav_menu_key)) {
-            $fetched = collect($this->redis_helper->getRedisData($redis_nav_menu_key));
-        } else {
+        // if($this->redis_helper->checkIfRedisKeyExists($redis_nav_menu_key)) {
+            // $fetched = collect($this->redis_helper->getRedisData($redis_nav_menu_key));
+        // } else {
             $fetched = $this->fetchWithItems($request, callback:function() use($website){
                 return $this->navigation_menu_repository->model()->where('status', 1)->whereNotNull('location')->where('website_id', $website->id);
             });
-            $this->redis_helper->storeCache($redis_nav_menu_key, $fetched);
-        }
+            // $this->redis_helper->storeCache($redis_nav_menu_key, $fetched);
+        // }
 
         return $fetched;
+    }
+
+    /**
+     * Fetch Navigation Menu with Items
+     */
+    public function fetchWithItems(object $request, array $with = [], ?callable $callback = null): object
+    {
+        $navigation_menus = $this->navigation_menu_repository->fetchAll($request, $with, $callback);
+        $coreCache = $this->getCoreCache($request);
+        $channel = $coreCache->channel;
+        $store = $coreCache->channel;
+
+        foreach($navigation_menus as $nav_menu)
+        {
+            $items = $nav_menu->rootNavigationMenuItems;
+            $nav_menu->items = $this->fetchNavigationMenuItems($items, $store, $channel);
+        }
+
+        return NavigationMenuResource::collection($navigation_menus);
     }
 
 
     /**
      * Get Navigation Menu Items
      */
-    private function fetchNavigationMenuItems($navigationMenuItems, $scope_data, $store, $channel)
+    private function fetchNavigationMenuItems($navigationMenuItems)
     {
-        $navigationMenuItems->transform(function($item) use($scope_data, $channel, $store){
-
-            $item->title = $item->value($scope_data, "title");
-            $item->type = $item->value($scope_data, "type");
-            $item->status = (int) $item->value($scope_data, "status");
-            $item->link = $this->getFinalItemLink($item, $store, $channel);
-            $item->background_type = $item->value($scope_data, "background_type");
-            $item->background_image = $item->value($scope_data, "background_image");
-            $item->background_video_type = $item->value($scope_data, "background_video_type");
-            $item->background_video = $item->value($scope_data, "background_video");
-            $item->background_overlay_color = $item->value($scope_data, "background_overlay_color");
-
-            unset($item->values);
-
-            return $item;
-        });
-    }
-
-    public function getFinalItemLink(object $navigation_menu_item, $store, $channel)
-    {
-
-        $store_data = [
-            "scope" => "store",
-            "scope_id" => $store->id,
-        ];
-
-        $type = $navigation_menu_item->value($store_data, "type");
-        switch ($type) {
-            case 'category':
-                $type_id = $navigation_menu_item->value($store_data, "category_id");
-                $category = Category::find($type_id);
-                $slug = $category ? $category->value($store_data, "slug") : "";
-                $link = $this->getDynamicLink($slug, $store, $channel, "category/");
-                return $link;
-                break;
-
-            case 'page':
-                $type_id = $navigation_menu_item->value($store_data, "page_id");
-                $page = Page::find($type_id);
-                $link = $this->getDynamicLink($page ? $page->slug : null, $store, $channel, "page/");
-                return $link;
-                break;
-
-            case 'custom':
-                $custom_link = $navigation_menu_item->value($store_data, "custom_link");
-                return $custom_link;
-                break;
-
-            case 'dynamic':
-                $dynamic_link = $navigation_menu_item->value($store_data, "dynamic_link");
-                $link = $this->getDynamicLink($dynamic_link, $store, $channel);
-                return $link;
-                break;
-
-            default:
-                return null;
-                break;
-        }
-    }
-
-    public function getDynamicLink(?string $slug, object $store, $channel, ?string $prepend = null): mixed
-    {
-        try
-        {
-            $default_url = "{$channel->code}/{$store->code}/{$prepend}{$slug}";
-            $final_url = $default_url;
-        }
-        catch( Exception $exception )
-        {
-            throw $exception;
-        }
-
-        return $final_url;
-    }
-
-    public function getNavigationMenu(object $request): array
-    {
-        try
-        {
-            $fetched = [];
-            $coreCache = $this->getCoreCache($request);
-
-            $categories = $this->model->withDepth()->having('depth', '=', 0)->whereWebsiteId($coreCache->website->id)->get();
-            $scope = [
-                "scope" => "store",
-                "scope_id" => $coreCache->store->id
-            ];
-
-            $fetched = $this->getNavigationMenuItems($categories, $scope);
-        }
-        catch (Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $fetched;
-    }
-
-    public function getNavigationMenuItems(object $categories, array $scope): array
-    {
-        try
-        {
-            $fetched = [];
-            foreach($categories as $category)
-            {
-                if(!$this->checkStatus($category, $scope)) continue;
-                $fetched[] = new NavigationMenuItemResource($category);
-            }
-        }
-        catch(Exception $exception)
-        {
-            throw $exception;
-        }
-
-        return $fetched;
+        return NavigationMenuItemResource::collection($navigationMenuItems);
     }
 
 }

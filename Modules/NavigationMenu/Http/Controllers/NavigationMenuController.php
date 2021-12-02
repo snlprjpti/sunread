@@ -10,22 +10,24 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\NavigationMenu\Entities\NavigationMenu;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Services\RedisHelper;
 use Modules\NavigationMenu\Transformers\NavigationMenuResource;
 use Modules\NavigationMenu\Repositories\NavigationMenuRepository;
 
 class NavigationMenuController extends BaseController
 {
      // Protected properties
-     protected $repository;
+     protected $repository, $redis_helper;
 
      /**
       * NavigationMenuController Class constructor
       */
-     public function __construct(NavigationMenuRepository $navigationMenuRepository, NavigationMenu $navigationMenu)
+     public function __construct(NavigationMenuRepository $navigationMenuRepository, NavigationMenu $navigationMenu, RedisHelper $redis_helper)
      {
          $this->repository = $navigationMenuRepository;
 
          $this->model = $navigationMenu;
+         $this->redis_helper = $redis_helper;
          $this->model_name = "Navigation Menu";
 
          // Calling Parent Constructor of BaseController
@@ -80,8 +82,7 @@ class NavigationMenuController extends BaseController
 
              $created = $this->repository->createWithUniqueLocation($data);
 
-             // Delete Cache on Create Items
-             $this->repository->deleteCache("sf_nav_menu_website_*");
+             $this->redis_helper->deleteCache("store_front_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -123,7 +124,7 @@ class NavigationMenuController extends BaseController
 
             $updated = $this->repository->updateWithUniqueLocation($data, $id);
 
-            $this->repository->deleteCache("sf_nav_menu_website_*");
+            $this->redis_helper->deleteCache("store_front_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -144,7 +145,7 @@ class NavigationMenuController extends BaseController
 
              $this->repository->delete($id);
 
-             $this->repository->deleteCache("sf_nav_menu_website_*");
+             $this->redis_helper->deleteCache("store_front_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -163,7 +164,7 @@ class NavigationMenuController extends BaseController
          {
             $updated = $this->repository->updateStatus($request, $id);
 
-            $this->repository->deleteCache("sf_nav_menu_website_*");
+            $this->redis_helper->deleteCache("store_front_nav_menu_website_*");
          }
          catch (Exception $exception)
          {

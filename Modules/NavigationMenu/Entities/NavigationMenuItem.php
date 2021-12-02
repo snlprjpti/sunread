@@ -28,7 +28,7 @@ class NavigationMenuItem extends Model
 
     protected $casts = [];
 
-    public function getRootCategories(): Collection
+    public function getRootNavigationMenus(): Collection
     {
         return NavigationMenuItem::where('parent_id', null)->get();
     }
