@@ -4,17 +4,17 @@ namespace Modules\CheckOutMethods\Repositories;
 
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Modules\CheckOutMethods\Exceptions\MethodException;
 use Modules\CheckOutMethods\Services\MethodAttribute;
-use Modules\CheckOutMethods\Traits\HasHandlePayementException;
+use Modules\CheckOutMethods\Traits\HasBasePaymentMethod;
 use Modules\Core\Facades\CoreCache;
+use Modules\Sales\Repositories\OrderMetaRepository;
 
 class BasePaymentMethodRepository 
 {
-    use HasHandlePayementException;
+    use HasBasePaymentMethod;
 
     protected $payment_data, $encryptor;
     protected object $request;
@@ -26,6 +26,8 @@ class BasePaymentMethodRepository
     public string $base_url;
     public array $headers; 
     public string $user_name, $password;
+    public $orderMetaRepository;
+    public $order;
 
     public function __construct(object $request, string $method_key, ?array $rules = [])
     {
@@ -37,6 +39,7 @@ class BasePaymentMethodRepository
             "method_key" => $method_key
         ];
         $this->headers = [ "Accept" => "application/json" ];
+		$this->orderMetaRepository = OrderMetaRepository::class;
     }
 
     public function object(array $attributes = []): mixed
@@ -47,7 +50,7 @@ class BasePaymentMethodRepository
     public function collection(array $attributes = []): Collection
     {
         return new Collection($attributes);
-    } 
+    }
 
     public function getCoreCache(): object
     {
@@ -159,6 +162,11 @@ class BasePaymentMethodRepository
 
         Event::dispatch("{$this->method_key}.put-basic-auth", $response);
         return $response;
+    }
+
+    public function responseData(mixed $response): mixed
+    {
+        return $this->object(["response_data" => $response->json(), "response_status" => $response->status() ]);
     }
     
     public function rules(array $merge = []): array
