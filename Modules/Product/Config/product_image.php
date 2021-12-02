@@ -38,5 +38,11 @@ return [
                 "height" => 1800
             ]
         ],
+        "feature_image" => [
+            [
+                "width" => 180,
+                "height" => 180
+            ]
+        ],
     ]
 ];
