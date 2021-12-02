@@ -4,17 +4,9 @@ namespace Modules\NavigationMenu\Repositories;
 
 use Exception;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Modules\Core\Facades\CoreCache;
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Storage;
-use Modules\NavigationMenu\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\NavigationMenu\Rules\SlugUniqueRule;
 use Modules\NavigationMenu\Entities\NavigationMenu;
-use Modules\NavigationMenu\Entities\NavigationMenuValue;
 use Modules\NavigationMenu\Rules\NavigationMenuLocationRule;
-use Modules\NavigationMenu\Exceptions\NavigationMenuNotFoundException;
 
 class NavigationMenuRepository extends BaseRepository
 {
@@ -96,34 +88,6 @@ class NavigationMenuRepository extends BaseRepository
     {
         $navigation_menu = $this->model->where('slug', $slug)->first();
         return $navigation_menu;
-    }
-
-
-    /**
-     * Store Redis Cache
-     */
-    public function storeCache(string $key, object $data)
-    {
-        Redis::SETNX($key, $data);
-    }
-
-    /**
-     * Check if Redis Key Exists
-     */
-    public function checkIfRedisKeyExists(string $key)
-    {
-        return Redis::exists($key);
-    }
-
-    /**
-     * Delete Redis Cache through key
-     */
-    public function deleteCache(string $key)
-    {
-        if(Redis::exists($key))
-        {
-            Redis::del(Redis::keys($key));
-        }
     }
 
 }

@@ -87,16 +87,6 @@ return [
                     "is_required" => 0
                 ],
                 [
-                    "title" => "Order",
-                    "slug" => "order",
-                    "type" => "number",
-                    "value" => "",
-                    "scope" => "website",
-                    "options" => [],
-                    "rules" => "integer",
-                    "is_required" => 1
-                ],
-                [
                     "title" => "Status",
                     "slug" => "status",
                     "type" => "select",
@@ -195,8 +185,7 @@ return [
         "category_id" => "general.elements.3",
         "custom_link" => "general.elements.4",
         "dynamic_link" => "general.elements.5",
-        "order" => "general.elements.6",
-        "status" => "general.elements.7",
+        "status" => "general.elements.6",
         "background_type" => "additional_data.elements.0",
         "background_image" => "additional_data.elements.1",
         "background_video_type" => "additional_data.elements.2",

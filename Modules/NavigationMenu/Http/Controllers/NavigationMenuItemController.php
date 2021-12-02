@@ -84,9 +84,10 @@ class NavigationMenuItemController extends BaseController
             ]);
 
             $this->navigation_menu->findOrFail($navigation_menu_id);
+
             $fetched = $this->repository->fetchAll($request, ["values", "navigationMenu"], function() use($navigation_menu_id){
-                return $this->model->where('navigation_menu_id', $navigation_menu_id);
-            });
+                return $this->model->where('navigation_menu_id', $navigation_menu_id)->orderBy("_lft", "asc");
+            })->toTree();
         }
         catch (Exception $exception)
         {
@@ -103,8 +104,9 @@ class NavigationMenuItemController extends BaseController
     {
         try
         {
-            $data = $this->navigation_menu_item_value_repository->validateWithValuesCreate($request);
-            $navigation_menu = $this->navigation_menu->findOrFail($navigation_menu_id);
+            $navigation_menu = $this->navigation_menu_repository->fetch($navigation_menu_id);
+
+            $data = $this->navigation_menu_item_value_repository->validateWithValuesCreate($request, $navigation_menu->website_id);
 
             $data = array_merge($data, ['navigation_menu_id' => $navigation_menu_id]);
 
@@ -112,9 +114,10 @@ class NavigationMenuItemController extends BaseController
                 $this->navigation_menu_item_value_repository->createOrUpdate($data, $created);
             });
 
-            // Delete Cache on Create Items
-            $website = Website::findOrFail($navigation_menu->website_id);
-            $this->navigation_menu_repository->deleteCache("sf_nav_menu_website_{$website->hostname}_*");
+            $website = $this->website_repository->fetch($navigation_menu->website_id);
+
+            $this->redis_helper->deleteCache("store_front_nav_menu_website_{$website->hostname}_*");
+
         }
         catch (Exception $exception)
         {
@@ -136,8 +139,8 @@ class NavigationMenuItemController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
             ]);
 
-            $navigation_menu_item = $this->model->findOrFail($id);
-            $fetched = $this->repository->fetchWithAttributes($request, $navigation_menu_item);
+            $fetched = $this->repository->fetchWithAttributes($request, $navigation_menu_id);
+
             if($fetched["navigation_menu_id"] !== $navigation_menu_id) throw new NavigationMenuItemNotFoundException();
         }
         catch (Exception $exception)
@@ -155,21 +158,21 @@ class NavigationMenuItemController extends BaseController
     {
         try
         {
-            $navigation_menu = $this->navigation_menu->findOrFail($navigation_menu_id);
-            $navigation_menu_item = $this->model->findOrFail($id);
-            $data = $this->navigation_menu_item_value_repository->validateWithValuesUpdate($request, $navigation_menu_item);
-            $data = array_merge($data, ['navigation_menu_id' => $navigation_menu_id]);
+            $navigation_menu_item = $this->repository->fetch($id, ["navigationMenu"]);
 
             if($navigation_menu_item->navigation_menu_id !== $navigation_menu_id) throw new NavigationMenuItemNotFoundException();
+
+            $data = $this->navigation_menu_item_value_repository->validateWithValuesUpdate($request, $navigation_menu_item);
 
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->navigation_menu_item_value_repository->createOrUpdate($data, $updated);
                 $updated->load("values");
-            });
+            });;
 
-            // Delete Cache on Update Items
-            $website = Website::findOrFail($navigation_menu->website_id);
-            $this->navigation_menu_repository->deleteCache("sf_nav_menu_website_{$website->hostname}_*");
+            $website = $this->website_repository->fetch($navigation_menu_item->navigationMenu->website_id);
+
+            $this->redis_helper->deleteCache("store_front_nav_menu_website_{$website->hostname}_*");
+
         }
         catch (Exception $exception)
         {
@@ -186,17 +189,15 @@ class NavigationMenuItemController extends BaseController
     {
         try
         {
-            $navigation_menu = $this->navigation_menu->findOrFail($navigation_menu_id);
-
-            $fetched = $this->model->findOrFail($id);
+            $fetched = $this->repository->fetch($id, ['navigationMenu']);
 
             if($fetched->navigation_menu_id !== $navigation_menu_id) throw new NavigationMenuItemNotFoundException();
 
             $this->repository->delete($id);
 
-            // Delete Cache on Delete Items
-            $website = Website::findOrFail($navigation_menu->website_id);
-            $this->navigation_menu_repository->deleteCache("sf_nav_menu_website_{$website->hostname}_*");
+            $website = $this->website_repository->fetch($fetched->navigationMenu->website_id);
+
+            $this->redis_helper->deleteCache("store_front_nav_menu_website_{$website->hostname}_*");
         }
         catch (Exception $exception)
         {
@@ -213,13 +214,11 @@ class NavigationMenuItemController extends BaseController
     {
         try
         {
-            $navigation_menu = $this->navigation_menu->findOrFail($navigation_menu_id);
+            $navigation_menu = $this->navigation_menu_repository->fetch($navigation_menu_id);
             $updated = $this->repository->updateStatus($request, $id);
 
-            // Delete Cache on Update Items
-            $website = Website::findOrFail($navigation_menu->website_id);
-            $this->navigation_menu_repository->deleteCache("sf_nav_menu_website_{$website->hostname}_*");
-
+            $website = $this->website_repository->fetch($navigation_menu->website_id);
+            $this->redis_helper->deleteCache("store_front_nav_menu_website_{$website->hostname}_*");
         }
         catch (Exception $exception)
         {
