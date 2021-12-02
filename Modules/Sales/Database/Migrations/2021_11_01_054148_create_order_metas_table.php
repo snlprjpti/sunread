@@ -12,7 +12,7 @@ class CreateOrderMetasTable extends Migration
             $table->id();
             $table->unsignedBigInteger("order_id");
             $table->string("meta_key");
-            $table->text("meta_value");
+            $table->json("meta_value");
 
             $table->foreign("order_id")->references("id")->on("orders")->onDelete("cascade");
 
