@@ -34,7 +34,13 @@ trait ElasticSearchFormat
     
             $array['categories'] = $this->getCategoryData($store);
             $images = $this->getImages();
-            if($this->type == "simple" && !$this->parent_id) $array["list_status"] = 1;
+            
+            if($this->type == "simple" && !$this->parent_id) {
+                $visibility_att = Attribute::whereSlug("visibility")->first();
+                $visibility_id = AttributeOption::whereAttributeId($visibility_att->id)->whereName("Not Visible Individually")->first()?->id;
+                
+                $array["list_status"] = (isset($array["visibility"]) && ($array["visibility"] == $visibility_id)) ? 0 : 1;
+            }
         }
         catch (Exception $exception)
         {
@@ -49,6 +55,11 @@ trait ElasticSearchFormat
         try
         {   
             $data = $this->select("id", "sku", "status", "website_id", "parent_id", "type")->where("id", $this->id)->first()->toArray();
+
+            $channel_status = $this->channels()->whereChannelId($store?->channel_id)->first();
+            if($channel_status) $data["status"] = 0;
+
+            $data["product_status"] = $data["status"];
             
             $attributeIds = array_unique($this->product_attributes()->pluck("attribute_id")->toArray());
             
@@ -124,16 +135,16 @@ trait ElasticSearchFormat
         {
             $categories = $this->categories->map(function ($category) use ($store) {
 
-                $defaul_data = [
-                    "category_id" => $category->id,
-                    "scope" => "store",
-                    "scope_id" => $store->id 
-                ];
+                // $defaul_data = [
+                //     "category_id" => $category->id,
+                //     "scope" => "store",
+                //     "scope_id" => $store->id 
+                // ];
     
                 return [
                     "id" => $category->id,
-                    "slug" => $category->value($defaul_data, "slug"),
-                    "name" => $category->value($defaul_data, "name")
+                    // "slug" => $category->value($defaul_data, "slug"),
+                    // "name" => $category->value($defaul_data, "name")
                 ];
             })->toArray();
         }

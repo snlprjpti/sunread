@@ -335,19 +335,6 @@ class ProductConfigurableRepository extends BaseRepository
         return $visibility;
     }
 
-    public function configurableIndexing(object $configurable_product): void
-    {
-        try 
-        {
-            $batch = Bus::batch([])->onQueue("index")->dispatch();
-            $batch->add(new ProductIndexer($configurable_product)); 
-        }
-        catch ( Exception $exception )
-        {
-            throw $exception;
-        }
-    }
-
     public function createSlug(string $title, int $id = 0): string
     {
        try

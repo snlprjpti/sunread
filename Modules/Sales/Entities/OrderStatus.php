@@ -4,17 +4,18 @@ namespace Modules\Sales\Entities;
 
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Core\Traits\Sluggable;
 
 class OrderStatus extends Model
 {
-    use HasFactory;
+    use HasFactory, Sluggable;
 
-    protected $fillable = ["name", "slug"];
+    protected $fillable = ["name", "slug", "state_id"];
 
-    public function order_status_state(): HasMany
+    public function order_status_state(): BelongsTo
     {
-        return $this->hasMany(OrderStatusState::class, 'status', 'slug');
+        return $this->belongsTo(OrderStatusState::class, "state_id");
     }
     
 }

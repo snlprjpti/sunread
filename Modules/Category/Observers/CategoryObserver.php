@@ -9,6 +9,7 @@ use Modules\Category\Entities\Category;
 use Modules\UrlRewrite\Facades\UrlRewrite;
 use Illuminate\Support\Str;
 use Modules\Core\Entities\Website;
+use Modules\Product\Jobs\CategoryWiseReindexMigrator;
 use Modules\Product\Jobs\SingleIndexing;
 use Modules\Product\Traits\ElasticSearch\PrepareIndex;
 
@@ -36,7 +37,7 @@ class CategoryObserver
 
     public function deleting(Category $category)
     {
-        $this->preparingIndexData($category->products, "delete");
+        CategoryWiseReindexMigrator::dispatch($category->products)->onQueue("index");;
         Audit::log($category, __FUNCTION__);
         //UrlRewrite::handleUrlRewrite($category, __FUNCTION__);
     }

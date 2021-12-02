@@ -2,7 +2,12 @@
 
 namespace Modules\Sales\Transformers;
 
+use Modules\Core\Transformers\StoreResource;
+use Modules\Core\Transformers\WebsiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Customer\Transformers\CustomerResource;
+use Modules\Sales\Transformers\OrderStatusResource;
+use Modules\Sales\Transformers\OrderAddressResource;
 
 class OrderResource extends JsonResource
 {
@@ -12,13 +17,13 @@ class OrderResource extends JsonResource
             "id" => $this->id,
             "order_items" => OrderItemResource::collection($this->whenLoaded("order_items")),
             "order_taxes" => OrderTaxResource::collection($this->whenLoaded("order_taxes")),
-            "website_id" => $this->website_id,
-            "store_id" => $this->store_id,
-            "customer_id" => $this->customer_id,
+            "website" => new WebsiteResource($this->whenLoaded("website")),
+            "store" => new StoreResource($this->whenLoaded("store")),
             "store_name" => $this->store_name,
+            "customer" => $this->when($this->customer_id, new CustomerResource($this->whenLoaded("customer"))),
             "is_guest" => (bool) $this->is_guest,
-            "billing_address_id" => $this->billing_address_id,
-            "shipping_address_id" => $this->shipping_address_id,
+            "billing_address" => new OrderAddressResource($this->whenLoaded("billing_address")),
+            "shipping_address" => new OrderAddressResource($this->whenLoaded("shipping_address")),
             "shipping_method" => $this->shipping_method,
             "shipping_method_label" => $this->shipping_method_label,
             "payment_method" => $this->payment_method,
@@ -42,8 +47,9 @@ class OrderResource extends JsonResource
             "customer_phone" => $this->customer_phone,
             "customer_taxvat" => $this->customer_taxvat,
             "customer_ip_address" => $this->customer_ip_address,
-            "status" => $this->status,
-            "created_at" => $this->created_at?->format("M d, Y H:i A")
+            "status" => new OrderStatusResource($this->whenLoaded("order_status")),
+            "created_at" => $this->created_at?->format("M d, Y H:i A"),
+            "updated_at" => $this->updated_at?->format("M d, Y H:i A")
         ];
     }
 }

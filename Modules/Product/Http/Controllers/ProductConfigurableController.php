@@ -69,12 +69,8 @@ class ProductConfigurableController extends BaseController
                 $attributes = $this->product_attribute_repository->validateAttributes($created, $request, $scope, "store", "configurable");
                 $this->product_attribute_repository->syncAttributes($attributes, $created, $scope, $request, "store", "configurable");
 
-                $created->channels()->sync($request->get("channels"));
-
                 $this->repository->createVariants($created, $request, $scope, $attributes);
             });
-
-            $this->repository->configurableIndexing($created);
         }
         catch(Exception $exception)
         {
@@ -90,7 +86,8 @@ class ProductConfigurableController extends BaseController
         {
             $product = $this->model::findOrFail($id);
             $data = $this->repository->validateData($request, [
-                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)]
+                "scope_id" => ["sometimes", "integer", "min:0", new ScopeRule($request->scope), new WebsiteWiseScopeRule($request->scope ?? "website", $product->website_id)],
+                // "update_configurable_attributes" => "required|boolean"
             ], function ($request) use($product) {
                 return [
                     "scope" => $request->scope ?? "website",
@@ -105,17 +102,14 @@ class ProductConfigurableController extends BaseController
                 "scope_id" => $data["scope_id"]
             ];
 
-            $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope) {
+            $updated = $this->repository->update($data, $id, function(&$updated) use($request, $scope, $data) {
                 $attributes = $this->product_attribute_repository->validateAttributes($updated, $request, $scope, "update", "configurable");
                 $this->product_attribute_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
-
-                $updated->channels()->sync($request->get("channels"));
 
                 $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
 
                 $updated->load("variants");
             });
-            $this->repository->configurableIndexing($updated);
         }
         catch(Exception $exception)
         {

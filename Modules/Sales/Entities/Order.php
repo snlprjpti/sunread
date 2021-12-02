@@ -2,9 +2,13 @@
 
 namespace Modules\Sales\Entities;
 
+use Modules\Core\Entities\Website;
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Customer\Entities\Customer;
+use Modules\Sales\Entities\OrderAddress;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Order extends Model
 {
@@ -40,5 +44,30 @@ class Order extends Model
     public function order_transactions(): HasMany
     {
         return $this->hasMany(OrderTransactionLog::class);
+    }
+
+    public function website(): BelongsTo
+    {
+        return $this->belongsTo(Website::class, "website_id");
+    }
+
+    public function billing_address(): BelongsTo
+    {
+        return $this->belongsTo(OrderAddress::class, "billing_address_id");
+    }
+
+    public function shipping_address(): BelongsTo
+    {
+        return $this->belongsTo(OrderAddress::class, "shipping_address_id");
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, "customer_id");
+    }
+
+    public function order_status(): BelongsTo
+    {
+        return $this->belongsTo(OrderStatus::class, "status", "slug");
     }
 }

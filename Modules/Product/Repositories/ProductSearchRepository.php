@@ -149,6 +149,7 @@ class ProductSearchRepository extends ElasticSearchRepository
             foreach($products as &$product)
             {
                 $product = $this->product_format_repo->getProductInFormat($product, $request, $store);
+                $product = $this->product_format_repo->changeProductStockStatus($product);
                 
                 $product["image"] = isset($product["thumbnail_image"]) ? $product["thumbnail_image"] : $product["base_image"];
                 $product["quantity"] = isset($product["quantity"]) ? decodeJsonNumeric($product["quantity"]) : 0;
@@ -215,7 +216,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $final_l[] = $data["query"];
             $final_l[] = $this->term("list_status", 1);
-            $final_l[] = $this->term("status", 1);
+            $final_l[] = $this->term("product_status", 1);
             $final_q = $this->whereQuery($final_l);
     
             $query = [
@@ -282,7 +283,7 @@ class ProductSearchRepository extends ElasticSearchRepository
 
             $final_l[] = $filter["query"];
             $final_l[] = $this->term("list_status", 1);
-            $final_l[] = $this->term("status", 1);
+            $final_l[] = $this->term("product_status", 1);
             $final_q = $this->whereQuery($final_l);
 
             $fetched = [

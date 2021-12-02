@@ -14,6 +14,7 @@ class OrderItemResource extends JsonResource
             "store_id" => $this->store_id,
             "product_id" => $this->product_id,
             "order_id" => $this->order_id,
+            "currency_code" => $this->order->currency_code,
             "product_options" => $this->product_options,
             "product_type" => $this->product_type,
             "sku" => $this->sku,
@@ -32,7 +33,8 @@ class OrderItemResource extends JsonResource
             "row_total" => (float) $this->row_total,
             "row_total_incl_tax" => (float) $this->row_total_incl_tax,
             "row_weight" => (float) $this->row_weight,
-            "created_at" => $this->created_at?->format("M d, Y H:i A")
+            "created_at" => $this->created_at?->format("M d, Y H:i A"),
+            "updated_at" => $this->updated_at?->format("M d, Y H:i A")
         ];
     }
 }

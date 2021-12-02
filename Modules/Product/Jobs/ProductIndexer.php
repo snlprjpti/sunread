@@ -42,7 +42,7 @@ class ProductIndexer implements ShouldQueue
             foreach ($stores as $store)
             {
                 if ($this->product->type == "simple") $product_batch->add(new SingleIndexing($this->product, $store));
-                elseif ($this->product->type == "configurable") {
+                if ($this->product->type == "configurable") {
                     $product_batch->add(new ConfigurableIndexing($this->product, $store));
                     foreach ( $chunk_variants as $chunk_variant )
                     {

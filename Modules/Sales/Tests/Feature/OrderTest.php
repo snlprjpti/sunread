@@ -2,7 +2,6 @@
 
 namespace Modules\Sales\Tests\Feature;
 
-use Illuminate\Support\Arr;
 use Modules\Core\Tests\BaseTestCase;
 use Modules\Sales\Entities\Order;
 use Modules\Sales\Entities\OrderStatus;
@@ -27,12 +26,11 @@ class OrderTest extends BaseTestCase
 
     public function testAdminCanUpdateOrderStatus()
     {
-        $order_status = OrderStatus::get()->pluck("slug")->toArray();
+        $order_status_id = OrderStatus::first()->id;
         $order_id = Order::first()->id;
-        $post_data = [ "status" => Arr::shuffle($order_status) ];
-        $response = $this->withHeaders($this->headers)->post(route("admin.sales.order.status", ["order_id" =>$order_id]), $post_data);
-
-        $response->assertCreated();
+        $post_data = [ "order_status_id" => $order_status_id, "order_id" => $order_id];
+        $response = $this->withHeaders($this->headers)->post(route("admin.sales.order.status"), $post_data);
+        $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",
             "message" => __("core::app.response.update-success", ["name" => $this->model_name])

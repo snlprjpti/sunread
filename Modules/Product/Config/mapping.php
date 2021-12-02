@@ -5,14 +5,15 @@ return [
             "type" => "long"
         ],
         "name" =>  [
-            "type" => "search_as_you_type",
-            // "fields" =>  [
-            //     "keyword" =>  [
-            //         "type" => "keyword",
-            //         "ignore_above" => 256
-            //     ]
-            // ],
-            // "fielddata"=> true
+            "type" => "text",
+            "analyzer" => "keyword",
+            "fields" =>  [
+                "keyword" =>  [
+                    "type" => "keyword",
+                    "ignore_above" => 256
+                ]
+            ],
+            "fielddata"=> true
         ],
         "sku" =>  [
             "type" => "text",
@@ -36,6 +37,9 @@ return [
             ]
         ],
         "status" =>  [
+            "type" => "long"
+        ],
+        "product_status" =>  [
             "type" => "long"
         ],
         "quantity"=> [
@@ -384,24 +388,24 @@ return [
                 "id"=> [
                     "type"=> "long"
                 ],
-                "name" =>  [
-                    "type" => "text",
-                    "fields" =>  [
-                        "keyword" =>  [
-                            "type" => "keyword",
-                            "ignore_above" => 256
-                        ]
-                    ]
-                ],
-                "slug" =>  [
-                    "type" => "text",
-                    "fields" =>  [
-                        "keyword" =>  [
-                            "type" => "keyword",
-                            "ignore_above" => 256
-                        ]
-                    ]
-                ]
+                // "name" =>  [
+                //     "type" => "text",
+                //     "fields" =>  [
+                //         "keyword" =>  [
+                //             "type" => "keyword",
+                //             "ignore_above" => 256
+                //         ]
+                //     ]
+                // ],
+                // "slug" =>  [
+                //     "type" => "text",
+                //     "fields" =>  [
+                //         "keyword" =>  [
+                //             "type" => "keyword",
+                //             "ignore_above" => 256
+                //         ]
+                //     ]
+                // ]
             ]
         ]
     ],
