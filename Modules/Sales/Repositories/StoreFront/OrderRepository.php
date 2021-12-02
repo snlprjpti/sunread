@@ -90,14 +90,16 @@ class OrderRepository extends BaseRepository
             $validation = [ "shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ];
             if ($callback) $validation = array_merge($validation, $callback());
             $data = $this->validateData($request, $validation, function ($request) {
+                $data = [];
                 if (!auth("customer")->id()) {
-                    return [
+                    $data = array_merge($data, [
                         "email" => "required|email",
                         "first_name" => "required",
                         "last_name" => "required",
                         "phone" => "required",
-                    ];
+                    ]);
                 }
+                return $data;
             });
         }
         catch (Exception $exception)
