@@ -3,9 +3,11 @@
 namespace Modules\NavigationMenu\Traits;
 
 use Exception;
+use Modules\Page\Entities\Page;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Channel;
 use Illuminate\Support\Facades\Storage;
+use Modules\Category\Entities\Category;
 use Modules\NavigationMenu\Entities\NavigationMenuItem;
 use Modules\NavigationMenu\Entities\NavigationMenuItemValue;
 
@@ -104,5 +106,67 @@ trait HasScope
         $data = array_merge($data, [ "attribute" => $attribute], ["navigation_menu_item_id" => $this->id]);
         $attribute_value = $this->has($data) ? $this->getValues($data) : $this->getDefaultValues($data);
         return ($attribute_data["type"] == "file" && $attribute_value?->value) ? Storage::url($attribute_value?->value) : $attribute_value?->value;
+    }
+
+    public function getFinalItemLink($store, $channel): string
+    {
+
+        try
+        {
+            $store_data = [
+                "scope" => "store",
+                "scope_id" => $store->id,
+            ];
+
+            $type = $this->value($store_data, "type");
+            switch ($type) {
+                case 'category':
+                    $type_id = $this->value($store_data, "category_id");
+                    $category = Category::find($type_id);
+                    $slug = $category ? $category->value($store_data, "slug") : "";
+                    $link = $this->getDynamicLink($slug, $store, $channel, "category/");
+                    break;
+
+                case 'page':
+                    $type_id = $this->value($store_data, "page_id");
+                    $page = Page::find($type_id);
+                    $link = $this->getDynamicLink($page ? $page->slug : null, $store, $channel, "page/");
+                    break;
+
+                case 'custom':
+                    $custom_link = $this->value($store_data, "custom_link");
+                    return $custom_link;
+                    break;
+
+                case 'dynamic':
+                    $dynamic_link = $this->value($store_data, "dynamic_link");
+                    $link = $this->getDynamicLink($dynamic_link, $store, $channel);
+                    break;
+
+                default:
+                    $link = null;
+                    break;
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        return $link;
+    }
+
+    public function getDynamicLink(?string $slug, object $store, $channel, ?string $prepend = null): mixed
+    {
+        try
+        {
+            $default_url = "{$channel->code}/{$store->code}/{$prepend}{$slug}";
+            $final_url = $default_url;
+        }
+        catch( Exception $exception )
+        {
+            throw $exception;
+        }
+
+        return $final_url;
     }
 }
