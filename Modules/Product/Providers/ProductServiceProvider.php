@@ -4,6 +4,7 @@ namespace Modules\Product\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Product\Entities\Feature;
 use Modules\Product\Entities\Product;
 use Modules\Product\Entities\ProductAttribute;
 use Modules\Product\Entities\ProductAttributeBoolean;
@@ -12,6 +13,7 @@ use Modules\Product\Entities\ProductAttributeInteger;
 use Modules\Product\Entities\ProductAttributeString;
 use Modules\Product\Entities\ProductAttributeText;
 use Modules\Product\Entities\ProductAttributeTimestamp;
+use Modules\Product\Observers\FeatureObserver;
 use Modules\Product\Observers\ProductAttributeBooleanObserver;
 use Modules\Product\Observers\ProductAttributeDecimalObserver;
 use Modules\Product\Observers\ProductAttributeIntegerObserver;
@@ -143,5 +145,6 @@ class ProductServiceProvider extends ServiceProvider
         ProductAttributeInteger::observe(ProductAttributeIntegerObserver::class);
         ProductAttributeText::observe(ProductAttributeTextObserver::class);
         ProductAttributeTimestamp::observe(ProductAttributeTimestampObserver::class);
+        Feature::observe(FeatureObserver::class);
     }
 }
