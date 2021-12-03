@@ -11,24 +11,22 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Product\Traits\ElasticSearch\HasIndexing;
 
-class SingleIndexing implements ShouldQueue
+class RemoveIndex implements ShouldQueue
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, HasIndexing;
 
-    public $product, $store, $method;
+    public $store;
 
-    public function __construct(object $product, object $store, ?string $method = null)
+    public function __construct(object $store)
     {
-        $this->product = $product;
         $this->store = $store;
-        $this->method = $method;
     }
 
     public function handle(): void
     {
         try
         {
-            $this->singleIndexing($this->product, $this->store);
+            $this->removeIndex($this->store);
         }
         catch (Exception $exception)
         {

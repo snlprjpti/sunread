@@ -71,8 +71,6 @@ class ProductConfigurableController extends BaseController
 
                 $this->repository->createVariants($created, $request, $scope, $attributes);
             });
-
-            $this->repository->configurableIndexing($created);
         }
         catch(Exception $exception)
         {
@@ -112,7 +110,6 @@ class ProductConfigurableController extends BaseController
 
                 $updated->load("variants");
             });
-            $this->repository->configurableIndexing($updated);
         }
         catch(Exception $exception)
         {

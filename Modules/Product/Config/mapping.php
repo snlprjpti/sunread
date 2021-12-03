@@ -39,6 +39,9 @@ return [
         "status" =>  [
             "type" => "long"
         ],
+        "product_status" =>  [
+            "type" => "long"
+        ],
         "quantity"=> [
             "type"=> "text",
             "fields"=> [
@@ -385,24 +388,24 @@ return [
                 "id"=> [
                     "type"=> "long"
                 ],
-                "name" =>  [
-                    "type" => "text",
-                    "fields" =>  [
-                        "keyword" =>  [
-                            "type" => "keyword",
-                            "ignore_above" => 256
-                        ]
-                    ]
-                ],
-                "slug" =>  [
-                    "type" => "text",
-                    "fields" =>  [
-                        "keyword" =>  [
-                            "type" => "keyword",
-                            "ignore_above" => 256
-                        ]
-                    ]
-                ]
+                // "name" =>  [
+                //     "type" => "text",
+                //     "fields" =>  [
+                //         "keyword" =>  [
+                //             "type" => "keyword",
+                //             "ignore_above" => 256
+                //         ]
+                //     ]
+                // ],
+                // "slug" =>  [
+                //     "type" => "text",
+                //     "fields" =>  [
+                //         "keyword" =>  [
+                //             "type" => "keyword",
+                //             "ignore_above" => 256
+                //         ]
+                //     ]
+                // ]
             ]
         ]
     ],

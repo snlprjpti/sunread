@@ -11,6 +11,7 @@ use Modules\Erp\Console\ErpImport;
 use Modules\Erp\Console\ErpMigrate;
 use Modules\Product\Console\ElasticSearchImport;
 use Modules\GeoIp\Console\GeoIpDbUpdator;
+use Modules\Product\Console\DeleteIndices;
 use Modules\Product\Console\ProductUrlGenerator;
 
 class Kernel extends ConsoleKernel
@@ -30,6 +31,7 @@ class Kernel extends ConsoleKernel
         RedisClear::class,
         GeoIpDbUpdator::class,
         ProductUrlGenerator::class,
+        DeleteIndices::class
     ];
 
     /**

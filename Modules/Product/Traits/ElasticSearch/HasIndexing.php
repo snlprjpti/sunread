@@ -180,7 +180,7 @@ trait HasIndexing
         }
     }
 
-    public function removeIndex(object $product, object $store): void
+    public function removeDocument(object $product, object $store): void
     {
         try
         {
@@ -191,6 +191,23 @@ trait HasIndexing
             $exists = $this->checkDocumentIfExist($params);
 
             if ($exists) $this->client->delete($params);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
+    public function removeIndex(object $store): void
+    {
+        try
+        {
+            $params = [
+                "index" => $this->setIndexName($store["id"])
+            ];
+            $exists = $this->checkIndexIfExist($params);
+
+            if ($exists) $this->client->indices()->delete($params);
         }
         catch(Exception $exception)
         {
