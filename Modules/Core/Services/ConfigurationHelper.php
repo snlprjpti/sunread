@@ -174,7 +174,7 @@ class ConfigurationHelper
                 $fetched = is_array($values)
                     ? $model->whereIn($pluck, $values)->get()
                     : $model->where($pluck, $values)->first();
-                // if ( !$fetched ) throw ValidationException::withMessages(["path" => "Invalid value for configuration."]);
+                if ( !$fetched ) throw ValidationException::withMessages(["path" => "Invalid value for configuration."]);
             }
         }
         catch( Exception $exception )
