@@ -165,7 +165,7 @@ class NavigationMenuItemController extends BaseController
             $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
                 $this->navigation_menu_item_value_repository->createOrUpdate($data, $updated);
                 $updated->load("values");
-            });;
+            });
 
             $website = $this->website_repository->fetch($navigation_menu_item->navigationMenu->website_id);
 

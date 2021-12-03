@@ -4,16 +4,12 @@ namespace Modules\NavigationMenu\Repositories;
 
 use Exception;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Modules\NavigationMenu\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Core\Services\RedisHelper;
 use Modules\NavigationMenu\Entities\NavigationMenuItem;
 use Modules\NavigationMenu\Entities\NavigationMenuItemValue;
-use Modules\NavigationMenu\Exceptions\NavigationMenuItemNotFoundException;
-use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuResource;
-use Modules\NavigationMenu\Transformers\StoreFront\NavigationMenuItemResource;
 
 class NavigationMenuItemRepository extends BaseRepository
 {
@@ -80,32 +76,6 @@ class NavigationMenuItemRepository extends BaseRepository
         return $attributes;
     }
 
-    public function updateItemStatus(Request $request, int $navigation_menu_id, int $id)
-    {
-
-        $navigation_menu = $this->navigation_menu_repository->fetch($navigation_menu_id);
-        $updated = $this->updateStatus($request, $id);
-
-        $website = $this->website_repository->fetch($navigation_menu->website_id);
-        $this->redis_helper->deleteCache("store_front_nav_menu_website_{$website->hostname}_*");
-        return $updated;
-    }
-
-    public function deleteItem(int $navigation_menu_id, int $id)
-    {
-        $navigation_menu = $this->navigation_menu_repository->fetch($navigation_menu_id);
-
-        $fetched = $this->model->findOrFail($id);
-
-        if($fetched->navigation_menu_id !== $navigation_menu_id) throw new NavigationMenuItemNotFoundException();
-
-        $this->delete($id);
-
-        // Delete Cache on Delete Items
-        $website = $this->website_repository->fetch($navigation_menu->website_id);
-        $this->redis_helper->deleteCache("store_front_nav_menu_website_{$website->hostname}_*");
-    }
-
     /**
      * Get Attributes value from Config Data
      */
@@ -118,7 +88,7 @@ class NavigationMenuItemRepository extends BaseRepository
     /**
      * Get NavigationMenuItem with it's Attributes and Values
      */
-    public function fetchWithAttributes(object $request, int $navigation_menu_item_id)
+    public function fetchWithAttributes(object $request, int $navigation_menu_item_id): array
     {
         $navigation_menu_item = $this->model->findOrFail($navigation_menu_item_id);
 
@@ -145,7 +115,7 @@ class NavigationMenuItemRepository extends BaseRepository
     /**
      * Creates a Unique Slug for NavigationMenuItem
      */
-    public function createUniqueSlug(array $data, ?object $navigation_menu_item = null)
+    public function createUniqueSlug(array $data, ?object $navigation_menu_item = null): string
     {
         $slug = is_null($navigation_menu_item) ? Str::slug($data["items"]["title"]["value"]) : (isset($data["items"]["title"]["value"]) ? Str::slug($data["items"]["title"]["value"]) : $navigation_menu_item->value([ "scope" => $data["scope"], "scope_id" => $data["scope_id"] ], "slug"));
         $original_slug = $slug;

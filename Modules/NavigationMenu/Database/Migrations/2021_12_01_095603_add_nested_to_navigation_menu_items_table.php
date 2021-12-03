@@ -9,9 +9,8 @@ class AddNestedToNavigationMenuItemsTable extends Migration
     /**
      * Run the migrations.
      *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('navigation_menu_items', function (Blueprint $table) {
             $table->integer('position')->default(0)->after('navigation_menu_id');
@@ -21,10 +20,8 @@ class AddNestedToNavigationMenuItemsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('navigation_menu_items', function (Blueprint $table) {
             $table->dropColumn('position');

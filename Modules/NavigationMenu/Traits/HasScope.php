@@ -108,7 +108,7 @@ trait HasScope
         return ($attribute_data["type"] == "file" && $attribute_value?->value) ? Storage::url($attribute_value?->value) : $attribute_value?->value;
     }
 
-    public function getFinalItemLink($store, $channel)
+    public function getFinalItemLink($store, $channel): string
     {
 
         $store_data = [

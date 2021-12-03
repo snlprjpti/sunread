@@ -79,7 +79,7 @@ class ClubHouseRepository extends BaseRepository
     /**
      * Get ClubHouse with it's Attributes and Values
      */
-    public function fetchWithAttributes(object $request, ClubHouse $club_house)
+    public function fetchWithAttributes(object $request, ClubHouse $club_house): array
     {
         $data = [
             "scope" => $request->scope ?? "website",

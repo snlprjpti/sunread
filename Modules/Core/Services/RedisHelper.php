@@ -10,13 +10,10 @@ class RedisHelper {
     /**
      * Store Redis Cache
      */
-    public function storeCache(string $key, object $data)
+    public function storeCache(string $key, object $data): void
     {
-        try {
-
-            Redis::SETNX($key, $data);
-
-        } catch (Exception $exception) {
+        try { Redis::SETNX($key, $data);}
+        catch (Exception $exception) {
             throw $exception;
         }
     }
@@ -24,11 +21,9 @@ class RedisHelper {
     /**
      * Check if Redis Key Exists
      */
-    public function checkIfRedisKeyExists(string $key)
+    public function checkIfRedisKeyExists(string $key): bool
     {
-        try {
-
-            return Redis::exists($key);
+        try { return Redis::exists($key);
 
         } catch (Exception $exception) {
             throw $exception;
@@ -38,7 +33,7 @@ class RedisHelper {
     /**
      * Get Redis Data
      */
-    public function getRedisData(string $key)
+    public function getRedisData(string $key): object
     {
         try {
 
@@ -52,7 +47,7 @@ class RedisHelper {
     /**
      * Delete Redis Cache through key
      */
-    public function deleteCache(string $key)
+    public function deleteCache(string $key): void
     {
         try {
 
