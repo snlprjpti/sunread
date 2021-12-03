@@ -53,7 +53,7 @@ class ProductRepository extends BaseRepository
         try
         {
             $coreCache = $this->getCoreCache($request);
-            
+
             $relations = [
                 "catalog_inventories",
                 "images",
@@ -92,7 +92,7 @@ class ProductRepository extends BaseRepository
                 $product = Product::whereId($identifier)
                 ->whereParentId($parent_identifier)
                 ->whereWebsiteId($coreCache->website->id)
-                ->whereStatus(1)->with($relations)->firstOrFail();    
+                ->whereStatus(1)->with($relations)->firstOrFail();
             }
 
             $channel_status = $product->channels()->whereChannelId($coreCache->store?->channel_id)->first();
@@ -249,7 +249,7 @@ class ProductRepository extends BaseRepository
         {
             $product_builders = $product->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
             if($product_builders->isEmpty()) $product_builders = $product->getBuilderParentValues($match);
-           
+
             //fetch from parent product
             if($product_builders->isEmpty() && $product->parent_id) {
                 $product_builders = $product->parent->productBuilderValues()->whereScope("store")->whereScopeId($store->id)->get();
@@ -321,10 +321,10 @@ class ProductRepository extends BaseRepository
                         "must" => [
                             $this->search_repository->terms("id", $variant_ids)
                         ]
-                    ]   
+                    ]
                 ],
-            ]; 
-            $elastic_data =  $this->search_repository->searchIndex($elastic_fetched, $store); 
+            ];
+            $elastic_data =  $this->search_repository->searchIndex($elastic_fetched, $store);
             $elastic_variant_products = isset($elastic_data["hits"]["hits"]) ? collect($elastic_data["hits"]["hits"])->pluck("_source.show_configurable_attributes")->flatten(1)->toArray() : [];
         }
         catch(Exception $exception)
@@ -421,7 +421,7 @@ class ProductRepository extends BaseRepository
         {
             throw $exception;
         }
-         
+
         return [
             "url" => $path,
             "background_color" => $image?->background_color
