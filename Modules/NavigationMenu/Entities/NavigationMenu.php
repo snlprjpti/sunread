@@ -35,7 +35,7 @@ class NavigationMenu extends Model
 
     protected $casts = [];
 
-    protected $with = [ "navigationMenuItems"];
+    protected $with = [];
 
 
     /**
@@ -44,5 +44,10 @@ class NavigationMenu extends Model
     public function navigationMenuItems(): HasMany
     {
         return $this->hasMany(NavigationMenuItem::class);
+    }
+
+    public function rootNavigationMenuItems(): HasMany
+    {
+        return $this->navigationMenuItems()->whereNull('parent_id')->orderBy('position');
     }
 }
