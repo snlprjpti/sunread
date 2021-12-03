@@ -44,12 +44,13 @@ class RedisHelper {
     {
         try
         {
-            return json_decode(Redis::get($key));
+            $data = json_decode(Redis::get($key));
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
+        return $data;
     }
 
     /**

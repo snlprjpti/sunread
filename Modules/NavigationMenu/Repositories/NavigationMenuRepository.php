@@ -116,12 +116,13 @@ class NavigationMenuRepository extends BaseRepository
                 });
                 // $this->redis_helper->storeCache($redis_nav_menu_key, $fetched);
             // }
-
-            return $fetched;
-        } catch (\Throwable $exception)
+        }
+        catch (Exception $exception)
         {
             throw $exception;
         }
+        return $fetched;
+
     }
 
     /**
@@ -142,11 +143,13 @@ class NavigationMenuRepository extends BaseRepository
                 $nav_menu->items = $this->fetchNavigationMenuItems($items, $store, $channel);
             }
 
-            return NavigationMenuResource::collection($navigation_menus);
-        } catch (Exception $exception)
+        }
+        catch (Exception $exception)
         {
             throw $exception;
         }
+        return NavigationMenuResource::collection($navigation_menus);
+
     }
 
 
@@ -157,11 +160,13 @@ class NavigationMenuRepository extends BaseRepository
     {
         try
         {
-            return NavigationMenuItemResource::collection($navigationMenuItems);
-        } catch (Exception $exception)
+            $navigation_menu_items_resource = NavigationMenuItemResource::collection($navigationMenuItems);
+        }
+        catch (Exception $exception)
         {
             throw $exception;
         }
+        return $navigation_menu_items_resource;
     }
 
 }
