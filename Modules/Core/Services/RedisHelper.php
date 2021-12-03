@@ -16,7 +16,8 @@ class RedisHelper {
         {
             Redis::SETNX($key, $data);
         }
-        catch (Exception $exception) {
+        catch (Exception $exception)
+        {
             throw $exception;
         }
     }
@@ -30,7 +31,8 @@ class RedisHelper {
         {
             return Redis::exists($key);
         }
-        catch (Exception $exception) {
+        catch (Exception $exception)
+        {
             throw $exception;
         }
     }
@@ -44,7 +46,8 @@ class RedisHelper {
         {
             return json_decode(Redis::get($key));
         }
-        catch (Exception $exception) {
+        catch (Exception $exception)
+        {
             throw $exception;
         }
     }
@@ -58,7 +61,8 @@ class RedisHelper {
         {
             if(Redis::keys($key)) Redis::del(Redis::keys($key));
         }
-        catch (Exception $exception) {
+        catch (Exception $exception)
+        {
             throw $exception;
         }
 

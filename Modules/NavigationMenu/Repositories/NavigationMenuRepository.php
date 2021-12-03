@@ -99,7 +99,8 @@ class NavigationMenuRepository extends BaseRepository
      */
     public function fetchItemsFromCache(object $request): object
     {
-        try {
+        try
+        {
             $coreCache = $this->getCoreCache($request);
             $website = $coreCache->website;
             $channel = $coreCache->channel;
@@ -117,7 +118,8 @@ class NavigationMenuRepository extends BaseRepository
             // }
 
             return $fetched;
-        } catch (\Throwable $exception) {
+        } catch (\Throwable $exception)
+        {
             throw $exception;
         }
     }
@@ -127,7 +129,8 @@ class NavigationMenuRepository extends BaseRepository
      */
     public function fetchWithItems(object $request, array $with = [], ?callable $callback = null): object
     {
-        try {
+        try
+        {
             $navigation_menus = $this->fetchAll($request, $with, $callback);
             $coreCache = $this->getCoreCache($request);
             $channel = $coreCache->channel;
@@ -140,7 +143,8 @@ class NavigationMenuRepository extends BaseRepository
             }
 
             return NavigationMenuResource::collection($navigation_menus);
-        } catch (Exception $exception) {
+        } catch (Exception $exception)
+        {
             throw $exception;
         }
     }
@@ -151,9 +155,11 @@ class NavigationMenuRepository extends BaseRepository
      */
     private function fetchNavigationMenuItems($navigationMenuItems)
     {
-        try {
+        try
+        {
             return NavigationMenuItemResource::collection($navigationMenuItems);
-        } catch (Exception $exception) {
+        } catch (Exception $exception)
+        {
             throw $exception;
         }
     }
