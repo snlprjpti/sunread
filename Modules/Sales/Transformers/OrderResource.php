@@ -2,10 +2,11 @@
 
 namespace Modules\Sales\Transformers;
 
+use Modules\Core\Transformers\StoreResource;
 use Modules\Core\Transformers\WebsiteResource;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Core\Transformers\StoreResource;
 use Modules\Customer\Transformers\CustomerResource;
+use Modules\Sales\Transformers\OrderStatusResource;
 use Modules\Sales\Transformers\OrderAddressResource;
 
 class OrderResource extends JsonResource
@@ -46,7 +47,7 @@ class OrderResource extends JsonResource
             "customer_phone" => $this->customer_phone,
             "customer_taxvat" => $this->customer_taxvat,
             "customer_ip_address" => $this->customer_ip_address,
-            "status" => $this->status,
+            "status" => new OrderStatusResource($this->whenLoaded("order_status")),
             "created_at" => $this->created_at?->format("M d, Y H:i A"),
             "updated_at" => $this->updated_at?->format("M d, Y H:i A")
         ];

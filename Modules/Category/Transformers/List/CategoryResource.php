@@ -8,7 +8,7 @@ use Modules\Core\Transformers\ChannelResource;
 class CategoryResource extends JsonResource
 {
     public function toArray($request): array
-    {  
+    {
         $data = [
             "scope" => $request->scope ?? "website",
             "scope_id" => $request->scope_id ?? $request->website_id ?? $this->website_id

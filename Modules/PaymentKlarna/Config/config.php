@@ -3,7 +3,7 @@
 return [
     "title" => "Klarna Payments",
     "slug" => "klarna",
-    "repository" => "Modules\PaymentMethods\Repositories\KlarnaRepository",
+    "repository" => "Modules\PaymentKlarna\Repositories\KlarnaRepository",
     "elements" => [
         [
             "title" => "Title",
@@ -20,7 +20,7 @@ return [
         ],
         [
             "title" => "Enabled",
-            "path" => "payment_methods_klarna_enabled",
+            "path" => "payment_methods_klarna",
             "type" => "select",
             "provider" => "",
             "pluck" => [],
@@ -69,8 +69,8 @@ return [
     ],
     "api_configuration" => [
         "title" => "Klarna API Configuration",
-        "slug" => "klarna_api_config",
-        "repository" => "Modules\PaymentMethods\Repositories\KlarnaRepository",
+        "slug" => "klarna",
+        "repository" => "Modules\PaymentKlarna\Repositories\KlarnaRepository",
         "elements" => [
             [
                 "title" => "Endpoint",
@@ -78,13 +78,13 @@ return [
                 "type" => "select",
                 "provider" => "",
                 "pluck" => [],
-                "default" => "klarna_north_america",
+                "default" => "europe",
                 "options" => [
-                    [ "value" => "klarna_north_america", "label" => "Klarna Payments (North America)" ],
-                    [ "value" => "klarna_europe", "label" => "Klarna Payments (Europe)" ],
-                    [ "value" => "klarna_oceania", "label" => "Klarna Payments (Oceania)" ]
+                    [ "value" => "north_america", "label" => "Klarna Payments (North America)" ],
+                    [ "value" => "europe", "label" => "Klarna Payments (Europe)" ],
+                    [ "value" => "oceania", "label" => "Klarna Payments (Oceania)" ]
                 ],
-                "rules" => "in:klarna_north_america,klarna_europe,klarna_oceania",
+                "rules" => "in:north_america,europe,oceania",
                 "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 1,
@@ -137,8 +137,8 @@ return [
     ],
     "klarna_design" => [
         "title" => "Klarna Design",
-        "slug" => "klarna_design",
-        "repository" => "Modules\PaymentMethods\Repositories\KlarnaRepository",
+        "slug" => "klarna",
+        "repository" => "Modules\PaymentKlarna\Repositories\KlarnaRepository",
         "elements" => [
             [
                 "title" => "Detail Color",

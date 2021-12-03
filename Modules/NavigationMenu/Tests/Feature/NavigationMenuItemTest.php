@@ -54,9 +54,6 @@ class NavigationMenuItemTest extends TestCase
     //             "additional_data" => [
     //                 "value" => json_encode([])
     //             ],
-    //             "order" => [
-    //                 "value" => rand(0,10)
-    //             ],
     //         ]
     //     ]);
     // }

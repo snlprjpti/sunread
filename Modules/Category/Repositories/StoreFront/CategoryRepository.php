@@ -216,7 +216,7 @@ class CategoryRepository extends BaseRepository
                 $categories = $category->children;
                 $url_count = ++$count;
             }
-    
+
             $fetched = [];
             foreach($categories as $single_category)
             {

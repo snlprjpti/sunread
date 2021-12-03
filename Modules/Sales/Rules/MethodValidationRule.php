@@ -39,7 +39,7 @@ class MethodValidationRule implements Rule
     public function check(string $value, string $method): bool
     {
         $methods = SiteConfig::get($method);
-        $check_methods = $methods->pluck("slug")->toArray();
+        $check_methods = $methods->pluck("slug")->unique()->toArray();
         if (!in_array($value, $check_methods)) return false;
         $website = CoreCache::getWebsite($this->request->header("hc-host"));
         $channel = CoreCache::getChannel($website, $this->request->header("hc-channel"));
