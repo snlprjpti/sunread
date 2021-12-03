@@ -142,13 +142,14 @@ class NavigationMenuRepository extends BaseRepository
                 $items = $nav_menu->rootNavigationMenuItems;
                 $nav_menu->items = $this->fetchNavigationMenuItems($items, $store, $channel);
             }
+            $data = NavigationMenuResource::collection($navigation_menus);
 
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
-        return NavigationMenuResource::collection($navigation_menus);
+        return $data;
 
     }
 
