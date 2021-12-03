@@ -6,24 +6,14 @@ use Illuminate\Database\Migrations\Migration;
 
 class UpdateMetaValueColumnOrderMetasTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::table('order_metas', function (Blueprint $table) {
             $table->json("meta_value")->change();
         });
     }
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    
+    public function down(): void
     {
         Schema::table('order_metas', function (Blueprint $table) {
 

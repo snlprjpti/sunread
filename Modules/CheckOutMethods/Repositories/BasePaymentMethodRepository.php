@@ -39,7 +39,7 @@ class BasePaymentMethodRepository
             "method_key" => $method_key
         ];
         $this->headers = [ "Accept" => "application/json" ];
-		$this->orderMetaRepository = OrderMetaRepository::class;
+        $this->orderMetaRepository = OrderMetaRepository::class;
     }
 
     public function object(array $attributes = []): mixed

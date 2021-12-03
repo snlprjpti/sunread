@@ -6,7 +6,7 @@ use Exception;
 
 trait HasShippingCalculation
 {
-    public function updateOrderCalculation(array $arr_shipping_amount, object $order, float $sub_total, float $discount_amount, float $sub_total_tax_amount, float $total_qty_ordered, int $total_items) 
+    public function updateOrderCalculation(array $arr_shipping_amount, object $order, float $sub_total, float $discount_amount, float $sub_total_tax_amount, float $total_qty_ordered, int $total_items): void
     {
         $cal_shipping_amt = (float) ($arr_shipping_amount["shipping_tax"] ? 0.00 : $arr_shipping_amount["shipping_amount"]);
         $taxes = $order->order_taxes?->pluck("amount")->toArray();
