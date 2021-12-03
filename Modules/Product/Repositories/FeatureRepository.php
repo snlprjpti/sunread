@@ -15,7 +15,7 @@ class FeatureRepository extends BaseRepository
     public function __construct(Feature $feature)
     {
         $this->model = $feature;
-        $this->model_key = "catalog.product.features";
+        $this->model_key = "catalog.features";
         $this->rules = [
             "name" => "required",
             "description" => "nullable",

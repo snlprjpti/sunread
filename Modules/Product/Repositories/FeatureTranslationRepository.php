@@ -12,7 +12,7 @@ class FeatureTranslationRepository extends BaseRepository
     public function __construct(FeatureTranslation $featureTranslation)
     {
         $this->model = $featureTranslation;
-        $this->model_key = "feature.translations";
+        $this->model_key = "catalog.features.translations";
     }
 
     public function updateOrCreate(?array $data, object $parent): void
