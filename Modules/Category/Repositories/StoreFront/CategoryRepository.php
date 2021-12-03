@@ -109,7 +109,7 @@ class CategoryRepository extends BaseRepository
             $all_fetched_data = $this->getNestedcategory($coreCache, $scope, $category_slugs);
             $category = $all_fetched_data["category"];
 
-            $fetched["category"] = $this->getPages($category, $scope);
+            $fetched["category"] = $this->getCategoryDetails($category, $scope);
             $fetched["navigation"] = $this->getNavigation($category, $scope, $category_slugs);
             $fetched["breadcrumbs"] = $all_fetched_data["breadcrumbs"];
         }
@@ -173,14 +173,14 @@ class CategoryRepository extends BaseRepository
         return $fetched;
     }
 
-    public function getPages(object $category, array $scope): array
+    public function getCategoryDetails(object $category, array $scope): array
     {
         try
         {
             $data = [];
 
             $data["id"] = $category->id;
-            foreach(["name", "slug", "description"] as $key) $data[$key] = $category->value($scope, $key);
+            foreach(["name", "slug", "description", "layout_type", "categories", "no_of_items", "pagination"] as $key) $data[$key] = $category->value($scope, $key);
             foreach(["meta_title", "meta_keywords", "meta_description"] as $key) $data["seo"][$key] = $category->value($scope, $key);
 
             foreach($this->page_groups as $group)

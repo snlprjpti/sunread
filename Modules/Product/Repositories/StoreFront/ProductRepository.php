@@ -449,6 +449,7 @@ class ProductRepository extends BaseRepository
     {
         try
         {
+            $category_ids = [];
             $coreCache = $this->getCoreCache($request);
             $scope = [
                 "scope" => "store",
@@ -458,7 +459,20 @@ class ProductRepository extends BaseRepository
             $data = $this->categoryRepository->getNestedcategory($coreCache, $scope, $category_slugs, "productFilter");
             $category = $data["category"];
 
-            $fetched = $this->search_repository->getFilterOptions($category->id, $coreCache->store);
+            $layout_type = $category->value($scope, "layout_type");
+            if($layout_type && $layout_type == "multiple") {
+                $all_categories = $category->value($scope, "categories");
+                foreach($all_categories as $single_category) {
+                    $category_data = Category::find($single_category);
+                    if(!$category_data) continue;
+                    $category_ids[] = $single_category;
+                }
+            }
+
+            $category_ids[] = $category->id;
+
+
+            $fetched = $this->search_repository->getFilterOptions($category_ids, $coreCache->store);
         }
         catch(Exception $exception)
         {
@@ -484,6 +498,28 @@ class ProductRepository extends BaseRepository
             $category = $data["category"];
 
             $fetched = $this->search_repository->getFilterProducts($request, $category->id, $coreCache->store);
+
+            $layout_type = $category->value($scope, "layout_type");
+            if($layout_type && $layout_type == "multiple") {
+                $all_categories = $category->value($scope, "categories");
+                foreach($all_categories as $single_category) {
+                    $category_data = Category::find($single_category);
+                    if(!$category_data) continue;
+
+                    $category_val = [
+                        "id" => $category_data->id,
+                        "slug" => $category_data->value($scope, "slug"),
+                        "name" => $category_data->value($scope, "name")
+                    ];
+                    
+                    $limit = $category->value($scope, "no_of_items");
+                    $is_paginated = $category->value($scope, "pagination");
+
+                    $elastic_products = $this->search_repository->getFilterProducts($request, $category_data->id, $coreCache->store, $limit, $is_paginated); 
+                    $category_val = array_merge($category_val, $elastic_products);
+                    $fetched["other_categories"][] = $category_val;
+                }
+            }
         }
         catch (Exception $exception)
         {
@@ -492,77 +528,6 @@ class ProductRepository extends BaseRepository
 
         return $fetched;
     }
-
-    // public function getCategoryData(object $request, string $category_slug): ?array
-    // {
-    //     try
-    //     {
-    //         $fetched = [];
-
-    //         $coreCache = $this->getCoreCache($request);
-    //         $scope = [
-    //             "scope" => "store",
-    //             "scope_id" => $coreCache->store->id
-    //         ];
-
-    //         $category = $this->getCategory($scope, $category_slug);
-
-    //         $fetched["category"] = $this->getPages($category, $scope);
-    //         if($category->parent_id) $parent = Category::findOrFail($category->parent_id);
-    //         $fetched["navigation"] = $this->categoryRepository->getCategories(isset($parent) ? $parent->children : $category->children, $scope);
-    //         $fetched["breadcrumbs"] = $this->getBreadCumbs($category, isset($parent) ? $parent : null);
-    //     }
-    //     catch (Exception $exception)
-    //     {
-    //         throw $exception;
-    //     }
-
-    //     return $fetched;
-    // }
-
-    // public function getPages(object $category, array $scope): array
-    // {
-    //     try
-    //     {
-    //         $data = [];
-
-    //         $data["id"] = $category->id;
-    //         foreach(["name", "slug", "description"] as $key) $data[$key] = $category->value($scope, $key);
-
-    //         foreach($this->page_groups as $group)
-    //         {
-    //             $item = [];
-    //             $slugs = collect($this->config_fields[$group]["elements"])->pluck("slug");
-    //             foreach($slugs as $slug)
-    //             {
-    //                 $item[$slug] = $category->value($scope, $slug);
-    //             }
-    //             $data["pages"][$group] = $item;
-    //         }
-    //     }
-    //     catch(Exception $exception)
-    //     {
-    //         throw $exception;
-    //     }
-
-    //     return $data;
-    // }
-
-    // public function getBreadCumbs(object $category, ?object $parent): array
-    // {
-    //     try
-    //     {
-    //         $breadcumbs = [];
-    //         if($parent) $breadcumbs[] = new CategoryResource($parent);
-    //         $breadcumbs[] = new CategoryResource($category);
-    //     }
-    //     catch(Exception $exception)
-    //     {
-    //         throw $exception;
-    //     }
-
-    //     return $breadcumbs;
-    // }
 
     public function searchWiseProduct(object $request): ?array
     {

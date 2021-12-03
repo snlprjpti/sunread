@@ -11,7 +11,7 @@ class CategoryResource extends JsonResource
     {  
         $data = [
             "scope" => $request->scope ?? "website",
-            "scope_id" => $request->scope_id ?? $request->website_id
+            "scope_id" => $request->scope_id ?? $request->website_id ?? $this->website_id
         ];
 
         return [

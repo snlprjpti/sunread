@@ -12,6 +12,7 @@ use Modules\Category\Entities\Category;
 use Modules\Category\Entities\CategoryValue;
 use Modules\Category\Rules\SlugUniqueRule;
 use Modules\Category\Traits\HasScope;
+use Modules\Category\Transformers\List\CategoryResource;
 use Modules\Core\Repositories\BaseRepository;
 
 class CategoryRepository extends BaseRepository
@@ -63,7 +64,9 @@ class CategoryRepository extends BaseRepository
                     $element["value"] = $elementValue?->value ?? null;
                     if ($element["type"] == "file" && $element["value"]) $element["value"] = Storage::url($element["value"]);
                 }
-                unset($element["rules"]);
+
+                //if( $element["provider"] !== "") $element["options"] = $this->getOptions($element);
+                unset($element["rules"], $element["provider"], $element["pluck"]);
 
                 $children_data["elements"][] = $element;
             }
@@ -131,6 +134,32 @@ class CategoryRepository extends BaseRepository
         DB::commit();
 
         return $category;
+    }
+
+    public function getOptions(array $element): object
+    {
+        try
+        {
+            $provider = $element["provider"];
+            $pluck = $element["pluck"];
+
+            $model = new $provider();
+
+            if($provider == "Modules\Category\Entities\Category") {
+                $model = $this->model->orderBy("_lft", "asc")->get()->toTree();
+                $options = CategoryResource::collection($model);
+            }
+            else {
+                $model = $model->select("{$pluck[1]} AS value", "{$pluck[0]} AS label");
+                $options = $model->get();
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $options;
     }
 }
 
