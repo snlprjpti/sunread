@@ -15,6 +15,7 @@ use Modules\Core\Exceptions\DeleteUnauthorized;
 use Modules\Core\Exceptions\SlugCouldNotBeGenerated;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Modules\CheckOutMethods\Exceptions\MethodException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class BaseController extends Controller
@@ -60,7 +61,8 @@ class BaseController extends Controller
             QueryException::class => 400,
             UnauthorizedHttpException::class => 401,
             SlugCouldNotBeGenerated::class => 500,
-            DeleteUnauthorized::class => 401
+            DeleteUnauthorized::class => 401,
+            MethodException::class => 500,
         ], $exception_statuses);
     }
 
@@ -132,8 +134,9 @@ class BaseController extends Controller
     }
 
     public function getExceptionStatus(object $exception): int
-    {
-        return $this->exception_statuses[get_class($exception)] ?? 500;
+    {        
+        if (class_basename($exception) == "MethodException") return $exception->getCode(); 
+        else return $this->exception_statuses[get_class($exception)] ?? 500;
     }
 
     public function getExceptionMessage(object $exception): string

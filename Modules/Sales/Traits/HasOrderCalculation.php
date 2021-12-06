@@ -18,7 +18,7 @@ trait HasOrderCalculation
 
     protected $discount_percent, $shipping_amount;
 
-    public function orderCalculationUpdate(object $order, object $request, object $coreCache): void
+    public function orderCalculationUpdate(object $order, object $request, object $coreCache): mixed
     {
         try 
         {
@@ -44,39 +44,21 @@ trait HasOrderCalculation
 
             $check_out_method_helper = new $check_out_method_helper($request->shipping_method);
             $arr_shipping_amount = $check_out_method_helper->process($request, ["order" => $order]);
-
-            $cal_shipping_amt = (float) ($arr_shipping_amount['shipping_tax'] ? 0.00 : $arr_shipping_amount['shipping_amount']);
-
-            $taxes = $order->order_taxes?->pluck('amount')->toArray();
-            $total_tax = array_sum($taxes);
-                           
-            $grand_total = ($sub_total + $cal_shipping_amt + $total_tax - $discount_amount);
-
-            $total_tax_without_shipping = $total_tax - ($arr_shipping_amount['shipping_tax'] ? $arr_shipping_amount['shipping_amount'] : 0.00);
-            $order_addresses = $order->order_addresses()->get();
             
+            $this->updateOrderCalculation($arr_shipping_amount, $order, $sub_total, $discount_amount, $sub_total_tax_amount, $total_qty_ordered, $total_items);
 
-            $check_out_method_helper = new $check_out_method_helper($request->payment_method);
-            $check_out_method_helper->process($request, ["order" => $order, "sub_total_tax_amount" => $sub_total_tax_amount]);
+            $check_out_method_shipping_helper = new $check_out_method_helper($request->payment_method);
+            $payment_data = ["order" => $order];
+            $data = $check_out_method_shipping_helper->process($request, $payment_data);
 
-            $order->update([
-                "sub_total" => $sub_total,
-                "sub_total_tax_amount" => $sub_total_tax_amount,
-                "tax_amount" => $total_tax_without_shipping,
-                "shipping_amount" => $arr_shipping_amount['shipping_amount'],
-                "grand_total" => $grand_total,
-                "total_items_ordered" => $total_items,
-                "total_qty_ordered" => $total_qty_ordered,
-                // "status" => SiteConfig::fetch(""), // TO-DO
-                "billing_address_id" => $order_addresses->where('address_type', "billing")->first()?->id,
-                "shipping_address_id" => $order_addresses->where('address_type', "shipping")->first()?->id
-            ]);
-
+            // dd($payment_response);
         }
         catch ( Exception $exception )
         {
             throw $exception;
         }
+
+        return $data;
     }
 
     public function calculateItems(object $order_item_details): array
@@ -86,8 +68,8 @@ trait HasOrderCalculation
             $price = (float) $order_item_details->price;
             $qty = (float) $order_item_details->qty;
             $weight = (float) $order_item_details->weight;
-    
             $tax_amount = (float) $order_item_details->tax_rate_value;
+
             $tax_percent = (float) $order_item_details->tax_rate_percent;
     
             $price_incl_tax = (float) ($price + $tax_amount);

@@ -13,6 +13,8 @@ class OrderResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $order_meta = $this->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == $this->payment_method))->first();
+        
         return [
             "id" => $this->id,
             "order_items" => OrderItemResource::collection($this->whenLoaded("order_items")),
@@ -48,6 +50,7 @@ class OrderResource extends JsonResource
             "customer_taxvat" => $this->customer_taxvat,
             "customer_ip_address" => $this->customer_ip_address,
             "status" => new OrderStatusResource($this->whenLoaded("order_status")),
+            "payment_response" => new OrderMetaResource($order_meta),
             "created_at" => $this->created_at?->format("M d, Y H:i A"),
             "updated_at" => $this->updated_at?->format("M d, Y H:i A")
         ];

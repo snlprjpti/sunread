@@ -5,6 +5,9 @@ namespace Modules\Sales\Entities;
 use Modules\Core\Traits\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Country\Entities\City;
+use Modules\Country\Entities\Country;
+use Modules\Country\Entities\Region;
 
 class OrderAddress extends Model
 {
@@ -16,5 +19,19 @@ class OrderAddress extends Model
     {
         return $this->belongsTo(Order::class);
     }
-    
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
 }

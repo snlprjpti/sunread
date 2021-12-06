@@ -8,12 +8,9 @@ use Illuminate\Http\JsonResponse;
 use Modules\Sales\Entities\Order;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
-use Illuminate\Database\Eloquent\Model;
-use Modules\Sales\Facades\TransactionLog;
 use Modules\Sales\Transformers\OrderResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
-use Modules\CheckOutMethods\Services\MethodAttribute;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Sales\Repositories\StoreFront\OrderRepository;
 use Modules\Sales\Exceptions\BankTransferNotAllowedException;
@@ -23,14 +20,15 @@ class OrderController extends BaseController
 {
     protected $repository;
 
-    protected $with = [
+    protected $relations = [
         "order_items.order",
         "order_taxes.order_tax_items",
         "website",
         "billing_address", 
         "shipping_address",
         "customer",
-        "order_status.order_status_state"
+        "order_status.order_status_state",
+        "order_metas"
     ];
 
     public function __construct(OrderRepository $repository, Order $order)
@@ -64,8 +62,8 @@ class OrderController extends BaseController
     {
         try
         {
-            $order = $this->repository->store($request);
-            $response = $this->repository->fetch($order->id, $this->with);
+            $fetched = $this->repository->store($request);
+            $response = $this->repository->fetch($fetched->id, $this->relations);
         }
         catch( Exception $exception )
         {

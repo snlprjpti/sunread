@@ -59,7 +59,7 @@ return [
             "default" => "all_allowed_countries",
             "options" => [
                 [ "value" => "all_allowed_countries", "label" => "All Allowed Countries" ],
-                [ "value" => "specific_countries", "label" => "Specific Counrtry" ]
+                [ "value" => "specific_countries", "label" => "Specific Country" ]
             ],
             "rules" => "in:all_allowed_countries,specific_countries",
             "multiple" => false,

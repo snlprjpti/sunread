@@ -12,6 +12,10 @@ class OrderMeta extends Model
 
     protected $fillable = ["order_id", "meta_key", "meta_value"];
 
+    protected $casts = [
+        'meta_value' => 'array',
+    ];
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
