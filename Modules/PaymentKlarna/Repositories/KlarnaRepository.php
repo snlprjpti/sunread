@@ -134,7 +134,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         }
         
         // TODO::update transaction log on base repo
-           TransactionLog::log($this->parameter->order, $data, $response, 201);
+        TransactionLog::log($this->parameter->order, $data, $response, 201);
         return $this->object(["html_snippet" => $response["html_snippet"]]);
     }
 
@@ -143,6 +143,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         try
         {
             $coreCache = $this->getCoreCache();
+            $data = SiteConfig::getElement("payment_methods_klarna_design_color", "channel", $coreCache->channel?->id);
             $with = [
                 "order_items.order",
                 "order_taxes.order_tax_items",
@@ -216,6 +217,14 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
                             "address" => $shipping_address
                         ]
                     ]
+                ],
+                "options" => [
+                    "color_button" => SiteConfig::fetch("payment_methods_klarna_design_color", "channel", $this->coreCache->channel?->id),
+                    "color_button_text" => SiteConfig::fetch("payment_methods_klarna_design_text_color", "channel", $this->coreCache->channel?->id),
+                    "color_checkbox" => SiteConfig::fetch("payment_methods_klarna_design_color_checkbox", "channel", $this->coreCache->channel?->id),
+                    "color_checkbox_checkmark" => SiteConfig::fetch("payment_methods_klarna_design_color_checkbox_checkmark", "channel", $this->coreCache->channel?->id),
+                    "color_header" => SiteConfig::fetch("payment_methods_klarna_design_color_header", "channel", $this->coreCache->channel?->id),
+                    "color_link" => SiteConfig::fetch("payment_methods_klarna_design_color_link", "channel", $this->coreCache->channel?->id)
                 ]
             ];
             if ($callback) $data = array_merge($data, $callback($order));

@@ -4,10 +4,11 @@ namespace Modules\PaymentCashOnDelivery\Repositories;
 
 use Exception;
 use Modules\Core\Facades\SiteConfig;
+use Modules\Sales\Entities\OrderMeta;
+use Modules\Sales\Facades\TransactionLog;
 use Modules\CheckOutMethods\Contracts\PaymentMethodInterface;
 use Modules\Sales\Exceptions\CashOnDeliveryNotAllowedException;
 use Modules\CheckOutMethods\Repositories\BasePaymentMethodRepository;
-use Modules\Sales\Entities\OrderMeta;
 
 class CashOnDeliveryRepository extends BasePaymentMethodRepository implements PaymentMethodInterface
 {
@@ -56,6 +57,8 @@ class CashOnDeliveryRepository extends BasePaymentMethodRepository implements Pa
         {
             throw $exception;
         }
+
+        TransactionLog::log($this->parameter->order, $this->method_key, "success", 201);
         return true;
     }
 }

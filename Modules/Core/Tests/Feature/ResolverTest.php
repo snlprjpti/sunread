@@ -31,7 +31,6 @@ class ResolverTest extends BaseTestCase
     public function testWebsiteCanBeResolved(): void
     {
         $response = $this->get($this->getRoute("resolve"));
-
         $response->assertOk();
         $response->assertJsonFragment([
             "status" => "success",

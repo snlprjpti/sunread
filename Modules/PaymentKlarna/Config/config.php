@@ -146,7 +146,7 @@ return [
                 "type" => "text",
                 "provider" => "",
                 "pluck" => [],
-                "default" => "",
+                "default" => "#FF9900",
                 "options" => [],
                 "rules" => "",
                 "scope" => "channel",
@@ -159,7 +159,7 @@ return [
                 "type" => "text",
                 "provider" => "",
                 "pluck" => [],
-                "default" => "",
+                "default" => "blue",
                 "options" => [],
                 "rules" => "",
                 "scope" => "channel",
@@ -185,7 +185,7 @@ return [
                 "type" => "text",
                 "provider" => "",
                 "pluck" => [],
-                "default" => "",
+                "default" => "#FF9900",
                 "options" => [],
                 "rules" => "",
                 "scope" => "channel",
@@ -204,7 +204,60 @@ return [
                 "scope" => "channel",
                 "is_required" => 0,
                 "sort_by" => ""
-            ]
+            ],
+            [
+                "title" => "Color CheckBox",
+                "path" => "payment_methods_klarna_design_color_checkbox",
+                "type" => "text",
+                "provider" => "",
+                "pluck" => [],
+                "default" => "#FF9900",
+                "options" => [],
+                "rules" => "",
+                "scope" => "channel",
+                "is_required" => 0,
+                "sort_by" => ""
+            ],
+            [
+                "title" => "Color CheckBox CheckMark",
+                "path" => "payment_methods_klarna_design_color_checkbox_checkmark",
+                "type" => "text",
+                "provider" => "",
+                "pluck" => [],
+                "default" => "#FF9900",
+                "options" => [],
+                "rules" => "",
+                "scope" => "channel",
+                "is_required" => 0,
+                "sort_by" => ""
+            ],
+            [
+                "title" => "Color Header",
+                "path" => "payment_methods_klarna_design_color_header",
+                "type" => "text",
+                "provider" => "",
+                "pluck" => [],
+                "default" => "#FF9900",
+                "options" => [],
+                "rules" => "",
+                "scope" => "channel",
+                "is_required" => 0,
+                "sort_by" => ""
+            ],
+            [
+                "title" => "Color Link",
+                "path" => "payment_methods_klarna_design_color_link",
+                "type" => "text",
+                "provider" => "",
+                "pluck" => [],
+                "default" => "#FF9900",
+                "options" => [],
+                "rules" => "",
+                "scope" => "channel",
+                "is_required" => 0,
+                "sort_by" => ""
+            ],
+            
         ]
     ]
 ];
