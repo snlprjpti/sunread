@@ -497,8 +497,6 @@ class ProductRepository extends BaseRepository
             $data = $this->categoryRepository->getNestedcategory($coreCache, $scope, $category_slugs, "productFetch");
             $category = $data["category"];
 
-            $fetched = $this->search_repository->getFilterProducts($request, $category->id, $coreCache->store);
-
             $layout_type = $category->value($scope, "layout_type");
             if($layout_type && $layout_type == "multiple") {
                 $all_categories = $category->value($scope, "categories");
@@ -517,9 +515,10 @@ class ProductRepository extends BaseRepository
 
                     $elastic_products = $this->search_repository->getFilterProducts($request, $category_data->id, $coreCache->store, $limit, $is_paginated); 
                     $category_val = array_merge($category_val, $elastic_products);
-                    $fetched["other_categories"][] = $category_val;
+                    $fetched["categories"][] = $category_val;
                 }
             }
+            else $fetched = $this->search_repository->getFilterProducts($request, $category->id, $coreCache->store);
         }
         catch (Exception $exception)
         {
