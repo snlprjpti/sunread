@@ -27,7 +27,7 @@ Route::group(["middleware" => ["api"]], function() {
             Route::resource('image', ProductImageController::class)->only(['store', 'destroy']);
         });
 
-        Route::put("/features/{feature_id}/status", [\Modules\Product\Http\Controllers\FeatureController::class, "updateStatus"])->name('status');
+        Route::put("/features/{feature_id}/status", [\Modules\Product\Http\Controllers\FeatureController::class, "updateStatus"])->name("features.status");
         Route::resource("features", FeatureController::class)->except(["create", "edit"]);
 
         // Product Images Routes
