@@ -29,6 +29,7 @@ use Modules\Product\Transformers\VariantProductResource;
 use Modules\Attribute\Repositories\AttributeSetRepository;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Product\Entities\AttributeConfigurableProduct;
+use Modules\Product\Entities\Feature;
 use Modules\Product\Transformers\ProductGalleryRescouce;
 use Modules\Tax\Entities\ProductTaxGroup;
 
@@ -530,6 +531,7 @@ class ProductRepository extends BaseRepository
                             if(isset($attributesData["value"]) && !is_array($attributesData["value"])) {
 
                                 if($attribute->slug == "tax_class_id") $attribute_option_check = ProductTaxGroup::find($attributesData["value"]);
+                                elseif($attribute->slug == "features") $attribute_option_check = Feature::find($attributesData["value"]);
                                 else $attribute_option_check = AttributeOption::whereId($attributesData["value"])->whereAttributeId($attribute->id)->first();
                                 $attributesData["value"] = $attribute_option_check ? json_decode($attributesData["value"]) : null;
                             }

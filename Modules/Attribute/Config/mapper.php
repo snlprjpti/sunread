@@ -44,5 +44,10 @@ return [
         "module" => "Modules\Inventory\Entities\CatalogInventory",
         "options" => 0,
         "pluck" => []
+    ],
+    "features" => [
+        "module" => "Modules\Product\Entities\Feature",
+        "options" => 1,
+        "pluck" => [ "id", "name" ]
     ]
 ];

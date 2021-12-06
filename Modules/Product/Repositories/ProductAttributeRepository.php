@@ -18,6 +18,7 @@ use Modules\Attribute\Entities\AttributeOption;
 use Modules\Tax\Entities\CustomerTaxGroup;
 use Illuminate\Support\Str;
 use Modules\Core\Entities\Store;
+use Modules\Product\Entities\Feature;
 use Modules\Product\Entities\ProductAttributeString;
 
 class ProductAttributeRepository extends ProductRepository
@@ -179,6 +180,8 @@ class ProductAttributeRepository extends ProductRepository
                 $attribute_options = CustomerTaxGroup::pluck("id")->toArray();
                 $attribute_options[] = 0;
             }
+            if($attribute->slug == "features") $attribute_options = Feature::pluck("id")->toArray();
+
             if($attribute->slug == "quantity_and_stock_status") $attribute_options = [ 0 => 0, 1 => 1];
         }
         else $attribute_options = AttributeOption::whereAttributeId($attribute->id)->pluck("id")->toArray();

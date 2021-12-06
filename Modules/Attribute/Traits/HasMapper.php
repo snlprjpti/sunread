@@ -2,6 +2,7 @@
 
 namespace Modules\Attribute\Traits;
 
+use Illuminate\Support\Facades\Schema;
 
 trait HasMapper
 {
@@ -20,7 +21,9 @@ trait HasMapper
         {
             $configSlug = $this->mapper[$this->slug];
             $model = new $configSlug["module"];
-            $fetched =  $model->select($configSlug["pluck"][0], $configSlug["pluck"][1])->get();
+            $fetched =  $model->select($configSlug["pluck"][0], $configSlug["pluck"][1]);
+            if(Schema::hasColumn($model->getTable(), "status")) $fetched = $fetched->whereStatus(1);
+            $fetched = $fetched->get();
         }
         return $fetched;
     }
