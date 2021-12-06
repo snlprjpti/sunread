@@ -39,6 +39,11 @@ trait HasTranslation
     
     public function getStoreId(): ?string
     {
+        // $request = app()->request;
+        // if($request->scope == "store" && $request->scope_id) {
+        //     return Store::find($request->scope_id)?->code;
+        // }
+        // return $request->header('hc-store', null);
         return array_key_exists("hc-store", getallheaders()) ? getallheaders()["hc-store"] : null;
 	}
 
