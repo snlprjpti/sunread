@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\Sales\Services;
+
 use Exception;
 use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\OrderTransactionLog;
@@ -16,11 +17,10 @@ class TransactionLog {
                 "amount" => $order->grand_total,
                 "currency" => $order->currency_code,
                 "ip_address" => GeoIp::requestIp(),
-                "request" => $server_request,
-                "response" => $server_response,
+                "request" => json_encode($server_request),
+                "response" => json_encode($server_response),
                 "response_code" => $response_code
             ];
-
             OrderTransactionLog::create($data);
         }
         catch (Exception $exception)

@@ -4,15 +4,17 @@ namespace Modules\CheckOutMethods\Repositories;
 
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Modules\CheckOutMethods\Exceptions\MethodException;
 use Modules\CheckOutMethods\Services\MethodAttribute;
-use Modules\CheckOutMethods\Traits\HasHandlePayementException;
+use Modules\CheckOutMethods\Traits\HasBasePaymentMethod;
 use Modules\Core\Facades\CoreCache;
+use Modules\Sales\Repositories\OrderMetaRepository;
 
 class BasePaymentMethodRepository 
 {
-    use HasHandlePayementException;
+    use HasBasePaymentMethod;
 
     protected $payment_data, $encryptor;
     protected object $request;
@@ -24,6 +26,8 @@ class BasePaymentMethodRepository
     public string $base_url;
     public array $headers; 
     public string $user_name, $password;
+    public $orderMetaRepository;
+    public $order;
 
     public function __construct(object $request, string $method_key, ?array $rules = [])
     {
@@ -35,6 +39,7 @@ class BasePaymentMethodRepository
             "method_key" => $method_key
         ];
         $this->headers = [ "Accept" => "application/json" ];
+        $this->orderMetaRepository = OrderMetaRepository::class;
     }
 
     public function object(array $attributes = []): mixed
@@ -45,7 +50,7 @@ class BasePaymentMethodRepository
     public function collection(array $attributes = []): Collection
     {
         return new Collection($attributes);
-    } 
+    }
 
     public function getCoreCache(): object
     {
@@ -78,24 +83,90 @@ class BasePaymentMethodRepository
         return Http::withHeaders($this->headers)->withBasicAuth($user_name, $password);
     }
 
-    public function getBasicClient(string $url, ?array $query = []): mixed
+    public function  getBasicClient(string $url, ?array $query = []): mixed
     {
-        return $this->basicAuth($this->user_name, $this->password)->get("{$this->base_url}{$url}", $query);
+        Event::dispatch("{$this->method_key}.get-basic-auth.before");
+        
+        try
+        {
+            $response = $this->basicAuth($this->user_name, $this->password)
+            ->get("{$this->base_url}{$url}", $query)
+            ->throw()
+            ->json();
+        }
+        catch (Exception $exception )
+        {
+            throw new MethodException($exception->getMessage(), $exception->getCode());
+        }
+
+        Event::dispatch("{$this->method_key}.get-basic-auth", $response);
+        return $response;
     }
 
     public function postBasicClient(string $url, array $data = []): mixed
     {
-        return $this->basicAuth($this->user_name, $this->password)->post("{$this->base_url}{$url}", $data);
+        Event::dispatch("{$this->method_key}.post-basic-auth.before");
+        
+        try
+        {
+            $response = $this->basicAuth($this->user_name, $this->password)
+            ->post("{$this->base_url}{$url}", $data)
+            ->throw()
+            ->json();
+
+        }
+        catch (Exception $exception )
+        {
+            throw new MethodException($exception->getMessage(), $exception->getCode());
+        }
+
+        Event::dispatch("{$this->method_key}.post-basic-auth", $response);
+        return $response;
     }
 
     public function putBasicClient(string $url, array $data = []): mixed
     {
-        return $this->basicAuth($this->user_name, $this->password)->put("{$this->base_url}{$url}", $data);
+        Event::dispatch("{$this->method_key}.put-basic-auth.before");
+        
+        try
+        {
+            $response = $this->basicAuth($this->user_name, $this->password)
+            ->put("{$this->base_url}{$url}", $data)
+            ->throw()
+            ->json();
+        }
+        catch (Exception $exception )
+        {
+            throw new MethodException($exception->getMessage(), $exception->getCode());
+        }
+
+        Event::dispatch("{$this->method_key}.put-basic-auth", $response);
+        return $response;
     }
 
     public function deleteBasicClient(string $url, array $data = []): mixed
     {
-        return $this->basicAuth($this->user_name, $this->password)->delete("{$this->base_url}{$url}", $data);
+        Event::dispatch("{$this->method_key}.put-basic-auth.before");
+        
+        try
+        {
+            $response = $this->basicAuth($this->user_name, $this->password)
+            ->delete("{$this->base_url}{$url}", $data)
+            ->throw()
+            ->json();
+        }
+        catch (Exception $exception )
+        {
+            throw new MethodException($exception->getMessage(), $exception->getCode());
+        }
+
+        Event::dispatch("{$this->method_key}.put-basic-auth", $response);
+        return $response;
+    }
+
+    public function responseData(mixed $response): mixed
+    {
+        return $this->object(["response_data" => $response->json(), "response_status" => $response->status() ]);
     }
     
     public function rules(array $merge = []): array

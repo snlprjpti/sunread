@@ -50,9 +50,10 @@ class OrderRepository extends BaseRepository
         {
             $this->validateRequestData($request);
             $data = $this->orderData($request);
+            $coreCache = $this->getCoreCache($request);
+
             $order = $this->create($data, function ($order) use ($request) {
                 $this->orderAddressRepository->store($request, $order);
-                $this->orderMetaRepository->store($request, $order);
             });
 
             $items = CartItem::whereCartId($request->cart_id)->select("product_id", "qty")->get()->toArray();
@@ -63,7 +64,8 @@ class OrderRepository extends BaseRepository
                 $this->createOrderTax($order, $order_item_details);
             }
             $this->updateOrderTax($order, $request);
-        } 
+            $this->orderCalculationUpdate($order, $request, $coreCache);
+        }
         catch (Exception $exception)
         {
             DB::rollback();
@@ -90,14 +92,16 @@ class OrderRepository extends BaseRepository
             $validation = [ "shipping_method" => new MethodValidationRule($request), "payment_method" => new MethodValidationRule($request) ];
             if ($callback) $validation = array_merge($validation, $callback());
             $data = $this->validateData($request, $validation, function ($request) {
+                $data = [];
                 if (!auth("customer")->id()) {
-                    return [
+                    $data = array_merge($data, [
                         "email" => "required|email",
                         "first_name" => "required",
                         "last_name" => "required",
                         "phone" => "required",
-                    ];
+                    ]);
                 }
+                return $data;
             });
         }
         catch (Exception $exception)
@@ -159,14 +163,11 @@ class OrderRepository extends BaseRepository
 
     public function updateOrderTax(object $order, object $request): void
     {
-        $coreCache = $this->getCoreCache($request);
         $order->order_taxes->map( function ($order_tax) {
             $order_tax_item_amount = $order_tax->order_tax_items->map( function ($order_item) {
                 return $order_item->amount;
             })->toArray();
             $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
         });
-
-        $this->orderCalculationUpdate($order, $request, $coreCache);
     }
 }

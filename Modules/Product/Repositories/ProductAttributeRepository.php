@@ -18,6 +18,7 @@ use Modules\Attribute\Entities\AttributeOption;
 use Modules\Tax\Entities\CustomerTaxGroup;
 use Illuminate\Support\Str;
 use Modules\Core\Entities\Store;
+use Modules\Product\Entities\Feature;
 use Modules\Product\Entities\ProductAttributeString;
 
 class ProductAttributeRepository extends ProductRepository
@@ -42,7 +43,7 @@ class ProductAttributeRepository extends ProductRepository
             "gallery" => "gallery",
         ];
         $this->non_required_attributes = [ "price", "cost", "special_price", "special_from_date", "special_to_date", "quantity_and_stock_status" ];
-        $this->non_option_slug = [ "tax_class_id", "category_ids", "quantity_and_stock_status" ];
+        $this->non_option_slug = [ "tax_class_id", "category_ids", "quantity_and_stock_status", "features" ];
     }
 
     public function attributeSetCache(): object
@@ -179,6 +180,8 @@ class ProductAttributeRepository extends ProductRepository
                 $attribute_options = CustomerTaxGroup::pluck("id")->toArray();
                 $attribute_options[] = 0;
             }
+            if($attribute->slug == "features") $attribute_options = Feature::pluck("id")->toArray();
+
             if($attribute->slug == "quantity_and_stock_status") $attribute_options = [ 0 => 0, 1 => 1];
         }
         else $attribute_options = AttributeOption::whereAttributeId($attribute->id)->pluck("id")->toArray();

@@ -244,7 +244,7 @@ return[
                                 "type" => "select",
                                 "provider" => "Modules\Core\Entities\Locale",
                                 "pluck" => ["name", "id"],
-                                "default" => "",
+                                "default" => "232",
                                 "options" => [],
                                 "rules" => "exists:locales,id",
                                 "multiple" => false,
