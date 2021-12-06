@@ -371,7 +371,7 @@ class AttributeTableSeeder extends Seeder
                 "is_required" => 1,
                 "default_value" => "",
                 "options" => [],
-                "scope" => "channel"
+                "scope" => "store"
             ]
         ];
 
