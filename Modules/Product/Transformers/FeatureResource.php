@@ -14,6 +14,7 @@ class FeatureResource extends JsonResource
             "image" => $this->image_url,
             "description" => $this->description,
             "translations" => $this->whenLoaded("translations"),
+            "status" => (bool) $this->status,
             "created_at" => $this->created_at->format("M d, Y H:i A")
         ];
     }

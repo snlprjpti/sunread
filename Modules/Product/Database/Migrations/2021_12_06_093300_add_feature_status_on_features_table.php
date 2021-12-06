@@ -9,7 +9,7 @@ class AddFeatureStatusOnFeaturesTable extends Migration
     public function up(): void
     {
         Schema::table("features", function (Blueprint $table) {
-            $table->boolean("status")->default(1);
+            $table->boolean("status")->default(1)->after("description");
         });
     }
 

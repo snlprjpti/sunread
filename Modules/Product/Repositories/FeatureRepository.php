@@ -19,6 +19,7 @@ class FeatureRepository extends BaseRepository
         $this->rules = [
             "name" => "required",
             "description" => "nullable",
+            "status" => "sometimes|boolean",
             // translation validation
             "translations" => "nullable|array",
         ];
@@ -30,7 +31,7 @@ class FeatureRepository extends BaseRepository
 
         try
         {
-            if(empty($request->image)) return true;
+            if(empty($request->image)) return false;
             $request->validate([
                 'image' => 'mimes:jpeg,jpg,png',
             ]);
