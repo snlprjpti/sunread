@@ -166,7 +166,7 @@ class AttributeTableSeeder extends Seeder
                 "slug" => "tax_class_id",
                 "type" => "select",
                 "is_required" => 1,
-                "default_value" => "General",
+                "default_value" => "",
                 "options" => [],
                 "scope" => "channel"
             ],
@@ -300,7 +300,7 @@ class AttributeTableSeeder extends Seeder
                 "is_synchronized" => 0
             ],
             [
-                "name" => "Features",
+                "name" => "Erp Features",
                 "type" => "texteditor",
                 "scope" => "store",
                 "is_searchable" => 1,
@@ -364,6 +364,15 @@ class AttributeTableSeeder extends Seeder
                 "type" => "boolean",
                 "scope" => "website",
             ],
+            [
+                "name" => "Features",
+                "slug" => "features",
+                "type" => "select",
+                "is_required" => 1,
+                "default_value" => "",
+                "options" => [],
+                "scope" => "channel"
+            ]
         ];
 
 
