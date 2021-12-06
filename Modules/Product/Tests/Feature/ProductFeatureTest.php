@@ -24,6 +24,7 @@ class ProductFeatureTest extends BaseTestCase
         $this->route_prefix = "admin.catalog.features";
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
+        $this->hasStatusTest = true;
     }
 
     public function getCreateData(): array
