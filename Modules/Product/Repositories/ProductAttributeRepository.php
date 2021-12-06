@@ -43,7 +43,7 @@ class ProductAttributeRepository extends ProductRepository
             "gallery" => "gallery",
         ];
         $this->non_required_attributes = [ "price", "cost", "special_price", "special_from_date", "special_to_date", "quantity_and_stock_status" ];
-        $this->non_option_slug = [ "tax_class_id", "category_ids", "quantity_and_stock_status" ];
+        $this->non_option_slug = [ "tax_class_id", "category_ids", "quantity_and_stock_status", "features" ];
     }
 
     public function attributeSetCache(): object
