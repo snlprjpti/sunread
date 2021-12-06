@@ -11,7 +11,7 @@ class Feature extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ "name", "image", "description" ];
+    protected $fillable = [ "name", "image", "description", "status" ];
     protected $appends = [ "image_url" ];
 
     public function translations(): HasMany
