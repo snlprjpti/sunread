@@ -137,7 +137,7 @@ class NavigationMenuItemController extends BaseController
                 "scope_id" => [ "sometimes", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
             ]);
 
-            $fetched = $this->repository->fetchWithAttributes($request, $navigation_menu_id);
+            $fetched = $this->repository->fetchWithAttributes($request, $id);
 
             if($fetched["navigation_menu_id"] !== $navigation_menu_id) throw new NavigationMenuItemNotFoundException();
         }
