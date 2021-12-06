@@ -105,16 +105,15 @@ class NavigationMenuItemValueRepository
     /**
      * Validate the Request with Unique Slug and Create it
      */
-    public function validateWithValuesCreate(object $request): array
+    public function validateWithValuesCreate(object $request, int $website_id): array
     {
         try
         {
-            $navigation_menu = $this->navigation_menu_repository->fetch($request->navigation_menu_id);
             $data = $this->navigation_menu_item_repository->validateData($request, array_merge($this->getValidationRules($request),[
-            ]), function () use ($navigation_menu) {
+            ]), function () use ($website_id) {
                 return [
                     "scope" => "website",
-                    "scope_id" => $navigation_menu->website_id
+                    "scope_id" => $website_id
                 ];
             });
         }

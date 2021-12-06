@@ -5,26 +5,29 @@ namespace Modules\NavigationMenu\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
 use Modules\NavigationMenu\Entities\NavigationMenu;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\Core\Services\RedisHelper;
 use Modules\NavigationMenu\Transformers\NavigationMenuResource;
 use Modules\NavigationMenu\Repositories\NavigationMenuRepository;
 
 class NavigationMenuController extends BaseController
 {
      // Protected properties
-     protected $repository;
+     protected $repository, $redis_helper;
 
      /**
       * NavigationMenuController Class constructor
       */
-     public function __construct(NavigationMenuRepository $navigationMenuRepository, NavigationMenu $navigationMenu)
+     public function __construct(NavigationMenuRepository $navigationMenuRepository, NavigationMenu $navigationMenu, RedisHelper $redis_helper)
      {
          $this->repository = $navigationMenuRepository;
 
          $this->model = $navigationMenu;
+         $this->redis_helper = $redis_helper;
          $this->model_name = "Navigation Menu";
 
          // Calling Parent Constructor of BaseController
@@ -78,6 +81,8 @@ class NavigationMenuController extends BaseController
              $data = $this->repository->examineSlug($data);
 
              $created = $this->repository->createWithUniqueLocation($data);
+
+             $this->redis_helper->deleteCache("store_front_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -118,6 +123,8 @@ class NavigationMenuController extends BaseController
             $data = $this->repository->examineSlug($data);
 
             $updated = $this->repository->updateWithUniqueLocation($data, $id);
+
+            $this->redis_helper->deleteCache("store_front_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -130,13 +137,15 @@ class NavigationMenuController extends BaseController
      /**
       * Finds and Deletes NavigationMenu
       */
-     public function destroy(int $id): JsonResponse
+     public function destroy(Request $request, int $id): JsonResponse
      {
          try
          {
              $this->model->findOrFail($id);
 
              $this->repository->delete($id);
+
+             $this->redis_helper->deleteCache("store_front_nav_menu_website_*");
          }
          catch (Exception $exception)
          {
@@ -153,7 +162,9 @@ class NavigationMenuController extends BaseController
      {
          try
          {
-             $updated = $this->repository->updateStatus($request, $id);
+            $updated = $this->repository->updateStatus($request, $id);
+
+            $this->redis_helper->deleteCache("store_front_nav_menu_website_*");
          }
          catch (Exception $exception)
          {

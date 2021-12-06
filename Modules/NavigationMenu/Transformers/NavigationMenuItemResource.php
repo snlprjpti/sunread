@@ -24,8 +24,9 @@ class NavigationMenuItemResource extends JsonResource
             "custom_link" => $this->value($data, "custom_link"),
             "dynamic_link" => $this->value($data, "dynamic_link"),
             "type" => $this->value($data, "type"),
-            "order" => $this->value($data, "order"),
             "status" => $this->value($data, "status"),
+            "parent_id" => $this->parent_id,
+            "position" => $this->position,
             "values" => $this->values,
             "created_at" => $this->created_at->format('M d, Y H:i A')
         ];

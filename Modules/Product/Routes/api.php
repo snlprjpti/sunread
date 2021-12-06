@@ -26,8 +26,7 @@ Route::group(["middleware" => ["api"]], function() {
             Route::put('image/{id}/change-main-image', [\Modules\Product\Http\Controllers\ProductImageController::class,"changeMainImage"])->name("image.change_main_image");
             Route::resource('image', ProductImageController::class)->only(['store', 'destroy']);
         });
-
-
+        Route::resource("features", FeatureController::class)->except(["create", "edit"]);
 
         // Product Images Routes
         Route::get('products/{category_id}/category', [\Modules\Product\Http\Controllers\ProductController::class,"categoryWiseProducts"])->name("products.categoryWiseProducts");
