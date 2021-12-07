@@ -4,12 +4,17 @@ namespace Modules\NavigationMenu\Repositories;
 
 use Exception;
 use Illuminate\Support\Str;
+use Modules\Core\Rules\ScopeRule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Modules\Core\Services\RedisHelper;
 use Illuminate\Support\Facades\Storage;
 use Modules\NavigationMenu\Traits\HasScope;
 use Modules\Core\Repositories\BaseRepository;
-use Modules\Core\Services\RedisHelper;
+use Illuminate\Validation\ValidationException;
 use Modules\NavigationMenu\Entities\NavigationMenuItem;
 use Modules\NavigationMenu\Entities\NavigationMenuItemValue;
+use Modules\NavigationMenu\Rules\NavigationMenuItemScopeRule;
 
 class NavigationMenuItemRepository extends BaseRepository
 {
@@ -145,6 +150,55 @@ class NavigationMenuItemRepository extends BaseRepository
         }
 
         return $status_value === 1 ? true : false;
+    }
+
+    public function updatePosition(object $request, int $id): object
+    {
+        DB::beginTransaction();
+        Event::dispatch("{$this->model_key}.update.before");
+
+        try
+        {
+
+            $data = $request->validate([
+                "parent_id" => "nullable|numeric|exists:navigation_menu_item,id",
+                "position" => "required|numeric",
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
+            ]);
+
+            $navigation_menu_item = $this->model->findOrFail($id);
+
+            $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : null;
+
+            if($parent_id)
+            {
+                $parent = $this->model->findOrFail($parent_id);
+                if(($id == $parent_id) || ($parent->parent_id == $id)) throw ValidationException::withMessages([ "parent_id" => "Node must not be a descendant." ]);
+            }
+
+            if($parent_id != $navigation_menu_item->parent_id) $navigation_menu_item->update(["parent_id" => $parent_id]);
+
+            $all_navigation_menu_item = $parent_id ? $parent->children : $this->model->whereParentId(null)->get();
+            if($data["position"] > count($all_navigation_menu_item)) $data["position"] = count($all_navigation_menu_item);
+
+            $allnodes = $all_navigation_menu_item->sortBy('_lft')->values();
+            $nav_menu_item_position = $allnodes->get(($data["position"]-1));
+            $key = key(collect($allnodes)->where('id', $id)->toArray()) + 1;
+
+            ($nav_menu_item_position->_lft < $navigation_menu_item->_lft) ? $navigation_menu_item->up($key-$data["position"]) : $navigation_menu_item->down($data["position"]-$key);
+
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            throw $exception;
+        }
+
+        Event::dispatch("{$this->model_key}.update.after", $navigation_menu_item);
+        DB::commit();
+
+        return $navigation_menu_item;
     }
 
 }

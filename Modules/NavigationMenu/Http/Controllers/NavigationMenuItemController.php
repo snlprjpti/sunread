@@ -16,6 +16,7 @@ use Modules\NavigationMenu\Entities\NavigationMenuItem;
 use Modules\NavigationMenu\Rules\NavigationMenuItemScopeRule;
 use Modules\NavigationMenu\Repositories\NavigationMenuRepository;
 use Modules\NavigationMenu\Transformers\NavigationMenuItemResource;
+use Modules\NavigationMenu\Transformers\List\NavigationMenuItemResource as NavigationMenuItemResourceList;
 use Modules\NavigationMenu\Repositories\NavigationMenuItemRepository;
 use Modules\NavigationMenu\Exceptions\NavigationMenuItemNotFoundException;
 use Modules\NavigationMenu\Repositories\NavigationMenuItemValueRepository;
@@ -70,6 +71,14 @@ class NavigationMenuItemController extends BaseController
     }
 
     /**
+     * Returns NavigationMenuItemResource in List Collection
+     */
+    public function list(object $data): ResourceCollection
+    {
+        return NavigationMenuItemResourceList::collection($data);
+    }
+
+    /**
      * Fetches and returns the list of NavigationMenuItem
      */
     public function index(Request $request, int $navigation_menu_id): JsonResponse
@@ -92,7 +101,7 @@ class NavigationMenuItemController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->collection($fetched), $this->lang("fetch-list-success"));
+        return $this->successResponse($this->list($fetched), $this->lang("fetch-list-success"));
     }
 
     /**
@@ -213,7 +222,18 @@ class NavigationMenuItemController extends BaseController
         try
         {
             $navigation_menu = $this->navigation_menu_repository->fetch($navigation_menu_id);
-            $updated = $this->repository->updateStatus($request, $id);
+
+            $data = $request->validate([
+                "items.status.value" => "required|numeric",
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
+            ]);
+
+
+            $updated = $this->repository->update($data, $id, function ($updated) use ($data) {
+                $this->navigation_menu_item_value_repository->createOrUpdate($data, $updated);
+                $updated->load("values");
+            });
 
             $website = $this->website_repository->fetch($navigation_menu->website_id);
             $this->redis_helper->deleteCache("store_front_nav_menu_website_{$website->hostname}_*");
@@ -224,6 +244,20 @@ class NavigationMenuItemController extends BaseController
         }
 
         return $this->successResponse($this->resource($updated), $this->lang("status-updated"));
+    }
+
+    public function updatePosition(Request $request, int $navigation_menu_id, int $id): JsonResponse
+    {
+        try
+        {
+            $navigation_menu_item = $this->repository->updatePosition($request, $id);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($navigation_menu_item), $this->lang("update-success"));
     }
 
     /**

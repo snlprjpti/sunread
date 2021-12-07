@@ -21,6 +21,7 @@ Route::group(['middleware' => ['api']], function () {
 
         Route::group(["prefix" => "navigation-menu/", "as" => "navigation-menu."], function () {
             Route::put('{navigation_menu_id}/items/{navigation_menu_item_id}/status', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, 'updateStatus'])->name('items.status');
+            Route::put('{navigation_menu_id}/items/{navigation_menu_item_id}/position', [\Modules\NavigationMenu\Http\Controllers\NavigationMenuItemController::class, 'updatePosition'])->name('items.position');
             Route::resource('{navigation_menu_id}/items', NavigationMenuItemController::class)->except(["create","edit"]);
         });
 
