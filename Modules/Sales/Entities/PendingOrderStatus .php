@@ -5,7 +5,7 @@ namespace Modules\Sales\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Sales\Scope\OrderStatusScope;
 
-class OrderStatusCondition extends Model
+class PendingOrderStatus extends Model
 {
     protected $table = "order_statuses";
 

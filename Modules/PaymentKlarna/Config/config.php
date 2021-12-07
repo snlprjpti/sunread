@@ -39,7 +39,7 @@ return [
             "title" => "New Order Status",
             "path" => "payment_methods_klarna_new_order_status",
             "type" => "select",
-            "provider" => "Modules\Sales\Entities\OrderStatusCondition",
+            "provider" => "Modules\Sales\Entities\PendingOrderStatus",
             "pluck" => ["slug", "name"],
             "default" => "pending",
             "options" => [],
