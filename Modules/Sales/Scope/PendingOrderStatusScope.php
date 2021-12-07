@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Modules\Sales\Entities\OrderStatusState;
 
-class OrderStatusScope implements Scope
+class PendingOrderStatusScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {

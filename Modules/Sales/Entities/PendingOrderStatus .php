@@ -3,7 +3,7 @@
 namespace Modules\Sales\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\Sales\Scope\OrderStatusScope;
+use Modules\Sales\Scope\PendingOrderStatusScope;
 
 class PendingOrderStatus extends Model
 {
@@ -12,6 +12,6 @@ class PendingOrderStatus extends Model
     protected static function boot()
     {
         parent::boot();
-        return static::addGlobalScope(new OrderStatusScope());
+        return static::addGlobalScope(new PendingOrderStatusScope());
     }
 }
