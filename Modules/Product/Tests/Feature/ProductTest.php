@@ -245,4 +245,19 @@ class ProductTest extends BaseTestCase
         ];
 
     }
+
+    public function testAdminCanCreateResource()
+    {
+        if ( !$this->hasStoreTest ) $this->markTestSkipped("Store method not available.");
+
+        $post_data = $this->getCreateData();
+        $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
+        dd($response);
+
+        $response->assertCreated();
+        $response->assertJsonFragment([
+            "status" => "success",
+            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
+        ]);
+    }
 }
