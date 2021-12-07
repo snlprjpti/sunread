@@ -368,7 +368,6 @@ class AttributeTableSeeder extends Seeder
                 "name" => "Features",
                 "slug" => "features",
                 "type" => "select",
-                "is_required" => 1,
                 "default_value" => "",
                 "options" => [],
                 "scope" => "store"

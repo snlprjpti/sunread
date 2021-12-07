@@ -30,8 +30,6 @@ class ProductTest extends BaseTestCase
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
         $this->hasStatusTest = true;
-        $this->hasUpdateTest = false;
-
     }
 
     public function getCreateData(): array
@@ -45,7 +43,7 @@ class ProductTest extends BaseTestCase
         {
             foreach ($attribute_group->attributes as $attribute)
             {
-                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status", "component"])) continue;
+                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status", "component", "features"])) continue;
                 $attributes[] = [
                     "attribute_slug" => $attribute->slug,
                     "value" => $this->value($attribute)
