@@ -101,6 +101,28 @@ class ProductSearchRepository extends ElasticSearchRepository
         ];
     }
 
+    public function categoryFilter(array $category_id): array
+    {
+        try
+        {
+            $filter = [];
+            $sort = [];
+    
+            if($category_id) $filter[]= $this->terms("categories.id", $category_id);
+    
+            $query = $this->whereQuery($filter);   
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return [
+            "query" => $query,
+            "sort" => $sort
+        ];
+    }
+
     public function getStore(object $request): object
     {
         $website = Website::whereHostname($request->header("hc-host"))->firstOrFail();
@@ -110,29 +132,34 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $store;
     }
 
-    public function getFilterProducts(object $request, int $category_id, object $store): ?array
+    public function getFilterProducts(object $request, int $category_id, object $store, ?int $limit = null, ?int $is_paginated = 1): ?array
     {
         $filter = $this->filterAndSort($request, $category_id);
-        return $this->getProductWithPagination($filter, $request, $store);
+        if(!$limit) $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
+        return $this->getProductWithPagination($filter, $request, $store, $limit, $is_paginated);
     }
 
-    public function getSearchProducts(object $request, object $store): ?array
+    public function getSearchProducts(object $request, object $store, ?int $is_paginated = 1): ?array
     {
         $filter = $this->search($request);
-        return $this->getProductWithPagination($filter, $request, $store);
+        $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
+        return $this->getProductWithPagination($filter, $request, $store, $limit, $is_paginated);
     }
 
-    public function getProductWithPagination(array $filter, object $request, object $store): ?array
+    public function getProductWithPagination(array $filter, object $request, object $store, int $limit, ?int $is_paginated = 1): ?array
     {
         try
         {
             $data = [];
-            $data = $this->finalQuery($filter, $request, $store);
+            $data = $this->finalQuery($filter, $request, $store, $limit, $is_paginated);
             $total = isset($data["products"]["hits"]["total"]["value"]) ? $data["products"]["hits"]["total"]["value"] : 0;
             $products = isset($data["products"]["hits"]["hits"]) ? collect($data["products"]["hits"]["hits"])->pluck("_source")->toArray() : [];
             $data["products"] = $this->productWithFormat($request, $products, $store);
-            $data["last_page"] = (int) ceil($total/$data["limit"]);
-            $data["total"] = $total;    
+
+            if($is_paginated == 1) {
+                $data["last_page"] = (int) ceil($total/$data["limit"]);
+                $data["total"] = $total;   
+            } 
         }
         catch (Exception $exception)
         {
@@ -206,12 +233,12 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $aggregate;   
     }
 
-    public function getFilterOptions(int $category_id, object $store): ?array
+    public function getFilterOptions(array $category_ids, object $store): ?array
     {
         try
         {
             $filters = [];
-            $data = $this->filterAndSort(category_id:$category_id);
+            $data = $this->categoryFilter($category_ids);
             $aggregate = $this->aggregation();
 
             $final_l[] = $data["query"];
@@ -274,12 +301,11 @@ class ProductSearchRepository extends ElasticSearchRepository
         return $filters;
     }
 
-    public function finalQuery(array $filter, object $request, object $store): ?array
+    public function finalQuery(array $filter, object $request, object $store, int $limit, ?int $is_paginated = 1): ?array
     {
         try
         {
             $page = $request->page ?? 1;
-            $limit = SiteConfig::fetch("pagination_limit", "global", 0) ?? 10;
 
             $final_l[] = $filter["query"];
             $final_l[] = $this->term("list_status", 1);
@@ -291,23 +317,24 @@ class ProductSearchRepository extends ElasticSearchRepository
                 "from"=> ($page-1) * $limit,
                 "size"=> $limit,
                 "query"=> $final_q,
-                "sort" => (count($filter["sort"]) > 0) ? $filter["sort"] : [
-                    // ["id" => ["order" => "asc", "mode" => "avg"]]
-                ],
+                "sort" => (count($filter["sort"]) > 0) ? $filter["sort"] : [],
             ];
 
-            $data =  $this->searchIndex($fetched, $store);     
+            $data =  $this->searchIndex($fetched, $store); 
+            $final_data = ($is_paginated == 1) ? [
+                "products" => $data,
+                "current_page" => (int) $page,
+                "limit" => (int) $limit
+            ] : [
+                "products" => $data
+            ];
         }
         catch (Exception $exception)
         {
             throw $exception;
         }
 
-        return [
-            "products" => $data,
-            "current_page" => (int) $page,
-            "limit" => (int) $limit
-        ];
+        return $final_data;
     }
 
     public function reIndex(int $id, ?callable $callback = null): object

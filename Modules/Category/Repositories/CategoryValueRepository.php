@@ -36,8 +36,12 @@ class CategoryValueRepository
             $scope = $request->scope ?? "website";
             $all_rules = collect(config("category.attributes"))->pluck("elements")->flatten(1)->map(function($data) {
                 return $data;
-            })->reject(function ($data) use ($scope) {
-                return $this->scopeFilter($scope, $data["scope"]);
+            })->reject(function ($data) use ($scope, $request) {
+
+                $state = 1;
+                if (count($data["conditions"]) > 0) $state = $this->checkConditions($data, $request);
+
+                return (($state == 0) || ($this->scopeFilter($scope, $data["scope"])));
             })->mapWithKeys(function ($item) use ($scope, $id, $method, $request) {
 
                 $prefix = "items.{$item["slug"]}";
@@ -140,5 +144,32 @@ class CategoryValueRepository
 
         Event::dispatch("{$this->model_key}.create.after", $created_data);
         DB::commit();
+    }
+
+    public function checkConditions(array $element, object $request): int
+    {
+        try
+        {
+            $state = 0;
+            $items = $request->items;
+            foreach($element["conditions"]["condition"] as $conditions)
+            {
+                if ($state == 1) break;
+                foreach($conditions as $k => $condition)
+                {
+                    if (isset($items[$k]["value"]) && $items[$k]["value"] == $condition) $state = 1;
+                    else {
+                        $state = 0;
+                        break;
+                    }
+                }
+            }
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }  
+
+        return $state;     
     }
 }

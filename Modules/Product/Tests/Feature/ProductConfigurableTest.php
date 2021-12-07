@@ -29,7 +29,6 @@ class ProductConfigurableTest extends BaseTestCase
         $this->hasFilters = false;
         $this->hasIndexTest = false;
         $this->hasShowTest = false;
-        $this->hasUpdateTest = false;
         $this->hasDestroyTest = false;
         $this->hasBulkDestroyTest = false;
         $this->hasStatusTest = false;
@@ -46,7 +45,7 @@ class ProductConfigurableTest extends BaseTestCase
         {
             foreach ($attribute_group->attributes as $attribute)
             {
-                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status", "component"])) continue;
+                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status", "component", "features"])) continue;
                 $attributes[] = [
                     "attribute_slug" => $attribute->slug,
                     "value" => $this->value($attribute)

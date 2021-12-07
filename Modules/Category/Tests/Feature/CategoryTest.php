@@ -67,6 +67,9 @@ class CategoryTest extends BaseTestCase
                 ],
                 "include_in_menu" => [
                     "value" => rand(0,1)
+                ],
+                "layout_type" => [
+                    "value" => "single"
                 ]
             ]
         ]);
