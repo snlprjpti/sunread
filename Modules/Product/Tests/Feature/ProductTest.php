@@ -30,8 +30,6 @@ class ProductTest extends BaseTestCase
         $this->default_resource = $this->model::latest('id')->first();
         $this->default_resource_id = $this->default_resource->id;
         $this->hasStatusTest = true;
-        $this->hasUpdateTest = false;
-
     }
 
     public function getCreateData(): array
@@ -45,7 +43,7 @@ class ProductTest extends BaseTestCase
         {
             foreach ($attribute_group->attributes as $attribute)
             {
-                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status", "component"])) continue;
+                if (in_array($attribute->slug, ["category_ids", "gallery", "quantity_and_stock_status", "component", "features"])) continue;
                 $attributes[] = [
                     "attribute_slug" => $attribute->slug,
                     "value" => $this->value($attribute)
@@ -244,20 +242,5 @@ class ProductTest extends BaseTestCase
             "scope_id" => isset($scope_id) ? $scope_id : $websiteId
         ];
 
-    }
-
-    public function testAdminCanCreateResource()
-    {
-        if ( !$this->hasStoreTest ) $this->markTestSkipped("Store method not available.");
-
-        $post_data = $this->getCreateData();
-        $response = $this->withHeaders($this->headers)->post($this->getRoute("store"), $post_data);
-        dd($response);
-
-        $response->assertCreated();
-        $response->assertJsonFragment([
-            "status" => "success",
-            "message" => __("core::app.response.create-success", ["name" => $this->model_name])
-        ]);
     }
 }
