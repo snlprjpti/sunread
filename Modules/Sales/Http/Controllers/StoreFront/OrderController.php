@@ -76,7 +76,7 @@ class OrderController extends BaseController
     public function getShippingAndPaymentMethods(Request $request): JsonResponse
     {
         try
-        {  
+        {
             $website = CoreCache::getWebsite($request->header("hc-host"));
             $channel = CoreCache::getChannel($website, $request->header("hc-channel"));
             $method_lists = [];

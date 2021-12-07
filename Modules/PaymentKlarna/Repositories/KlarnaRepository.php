@@ -207,7 +207,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
                     "description" => $order->shipping_method,
                     // "promo" => "Christmas Promotion", //TODO::add coupons code 
                     "price" => (float) $order->shipping_amount_tax,  // including tax
-                    "tax_amount" => (float) $order->shipping_amount, 
+                    "tax_amount" => (float) $order->shipping_amount,
                     // "tax_rate" => (float) $order->shipping_amount,
                     "shipping_method" => $order->shipping_method_label,
                     "delivery_details" => [
