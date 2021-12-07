@@ -463,8 +463,8 @@ return [
                     "scope" => "store",
                     "options" => [],
                     "conditions" => [
-                        "operator"	=> "AND",
-                        "condition"	=> [
+                        "operator" => "AND",
+                        "condition" => [
                             [
                                 "layout_type" => "multiple"
                             ]
@@ -483,8 +483,8 @@ return [
                     "scope" => "store",
                     "options" => [],
                     "conditions" => [
-                        "operator"	=> "AND",
-                        "condition"	=> [
+                        "operator" => "AND",
+                        "condition" => [
                             [
                                 "layout_type" => "multiple"
                             ]
@@ -508,8 +508,8 @@ return [
                         [ "value" => "0", "label" => "No" ]
                     ],
                     "conditions" => [
-                        "operator"	=> "AND",
-                        "condition"	=> [
+                        "operator" => "AND",
+                        "condition" => [
                             [
                                 "layout_type" => "multiple"
                             ]
