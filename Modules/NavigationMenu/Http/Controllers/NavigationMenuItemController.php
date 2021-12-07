@@ -222,6 +222,7 @@ class NavigationMenuItemController extends BaseController
         try
         {
             $navigation_menu = $this->navigation_menu_repository->fetch($navigation_menu_id);
+
             $data = $request->validate([
                 "items.status.value" => "required|numeric",
                 "scope" => "required|in:website,channel,store",
@@ -249,14 +250,7 @@ class NavigationMenuItemController extends BaseController
     {
         try
         {
-            $data = $request->validate([
-                "parent_id" => "nullable|numeric|exists:navigation_menu_item,id",
-                "position" => "required|numeric",
-                "scope" => "required|in:website,channel,store",
-                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
-            ]);
-
-            $navigation_menu_item = $this->repository->updatePosition($data, $id);
+            $navigation_menu_item = $this->repository->updatePosition($request, $id);
         }
         catch (Exception $exception)
         {

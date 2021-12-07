@@ -4,6 +4,7 @@ namespace Modules\NavigationMenu\Repositories;
 
 use Exception;
 use Illuminate\Support\Str;
+use Modules\Core\Rules\ScopeRule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Modules\Core\Services\RedisHelper;
@@ -13,6 +14,7 @@ use Modules\Core\Repositories\BaseRepository;
 use Illuminate\Validation\ValidationException;
 use Modules\NavigationMenu\Entities\NavigationMenuItem;
 use Modules\NavigationMenu\Entities\NavigationMenuItemValue;
+use Modules\NavigationMenu\Rules\NavigationMenuItemScopeRule;
 
 class NavigationMenuItemRepository extends BaseRepository
 {
@@ -150,13 +152,21 @@ class NavigationMenuItemRepository extends BaseRepository
         return $status_value === 1 ? true : false;
     }
 
-    public function updatePosition(array $data, int $id): object
+    public function updatePosition(object $request, int $id): object
     {
         DB::beginTransaction();
         Event::dispatch("{$this->model_key}.update.before");
 
         try
         {
+
+            $data = $request->validate([
+                "parent_id" => "nullable|numeric|exists:navigation_menu_item,id",
+                "position" => "required|numeric",
+                "scope" => "required|in:website,channel,store",
+                "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
+            ]);
+
             $navigation_menu_item = $this->model->findOrFail($id);
 
             $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : null;
