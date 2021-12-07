@@ -11,7 +11,7 @@ class OrderStatusTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $state_statuses = ["new", "pending", "processing", "holded", "completed", "closed", "cancelled"];
+        $state_statuses = ["pending", "processing", "holded", "completed", "closed", "cancelled"];
 
         $states = OrderStatusState::all();
         foreach ($state_statuses as $key => $status) {
