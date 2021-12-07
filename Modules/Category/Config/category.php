@@ -478,7 +478,7 @@ return [
                     "slug" => "no_of_items",
                     "provider" => "",
                     "pluck" => [],
-                    "type" => "text",
+                    "type" => "number",
                     "value" => "",
                     "scope" => "store",
                     "options" => [],
