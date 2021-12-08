@@ -5,6 +5,8 @@ namespace Modules\CheckOutMethods\Repositories;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\Core\Facades\CoreCache;
 
@@ -67,5 +69,12 @@ class BaseDeliveryMethodRepository
         $append_data = $callback ? $callback($request) : [];
 
         return array_merge($data, $append_data);
+    }
+
+    public function customValidate(array $data, array $rules, ?array $message = []): array
+    {
+        $validator = Validator::make($data, $rules, $message);
+        if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+        return $validator->validated();
     }
 }
