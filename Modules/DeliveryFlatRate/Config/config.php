@@ -31,7 +31,6 @@ return [
             "default" => "Flat Rate",
             "options" => [],
             "rules" => "",
-            "multiple" => false,
             "scope" => "channel",
             "is_required" => 0,
             "sort_by" => ""
@@ -45,7 +44,6 @@ return [
             "default" => "Fixed",
             "options" => [],
             "rules" => "",
-            "multiple" => false,
             "scope" => "channel",
             "is_required" => 0,
             "sort_by" => ""
@@ -76,7 +74,6 @@ return [
             "default" => "50.00",
             "options" => [],
             "rules" => "decimal",
-            "multiple" => false,
             "scope" => "channel",
             "is_required" => 0,
             "sort_by" => ""
@@ -104,7 +101,7 @@ return [
             "type" => "select",
             "provider" => "Modules\Country\Entities\Country",
             "pluck" => ["name", "iso_2_code"],
-            "default" => "yes",
+            "default" => "",
             "options" => [],
             "rules" => "exists:countries,iso_2_code",
             "multiple" => false,

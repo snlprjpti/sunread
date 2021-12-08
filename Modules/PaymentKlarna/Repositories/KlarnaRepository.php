@@ -126,7 +126,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
             $this->parameter->order->update([
                 "payment_method" => $this->method_key,
                 "payment_method_label" => SiteConfig::fetch("payment_methods_{$this->method_key}_title", "channel", $coreCache->channel?->id),
-                "status" => SiteConfig::fetch("payment_methods_{$this->method_key}_new_order_status", "channel", $coreCache->channel?->id)
+                "status" => SiteConfig::fetch("payment_methods_{$this->method_key}_new_order_status", "channel", $coreCache->channel?->id)?->slug
             ]);
         }
         catch (Exception $exception)
