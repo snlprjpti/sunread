@@ -69,19 +69,21 @@ class FeatureController extends BaseController
         return $this->successResponse($this->resource($created), $this->lang('create-success'), 201);
     }
 
-
-    public function show(Request $request, int $id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try
         {
-            $fetched = $this->repository->fetch($id, [ "translations" ]);
+            $modelData = $this->repository->fetch($id);
+            $fetched = $modelData->toArray();
+            unset($fetched["image"]);
+            $fetched["translations"] = $this->featureTranslationRepository->show($id);
         }
         catch( Exception $exception )
         {
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($this->resource($fetched), $this->lang('fetch-success'));
+        return $this->successResponse($fetched, $this->lang('fetch-success'));
     }
 
     public function update(Request $request, int $id): JsonResponse
