@@ -3,7 +3,7 @@
 return [
     "title" => "Free Shipping",
     "slug" => "free_shipping",
-    "repository" => "Modules\DeliveryFlatRate\Repositories\DeliveryFreeShippingRepository",
+    "repository" => "Modules\DeliveryFreeShipping\Repositories\DeliveryFreeShippingRepository",
     "elements" => [
         [
             "title" => "Enabled",
