@@ -33,7 +33,8 @@ return [
     "tax_class_id" => [
         "module" => "Modules\Tax\Entities\ProductTaxGroup",
         "options" => 1,
-        "pluck" => [ "id", "name" ]
+        "pluck" => [ "id", "name" ],
+        "translations" => 0
     ],
     "quantity_and_stock_status" => [
         "module" => "Modules\Inventory\Entities\CatalogInventory",
@@ -48,6 +49,7 @@ return [
     "features" => [
         "module" => "Modules\Product\Entities\Feature",
         "options" => 1,
-        "pluck" => [ "id", "name" ]
+        "pluck" => [ "id", "name" ],
+        "translations" => 1
     ]
 ];
