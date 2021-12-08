@@ -88,7 +88,7 @@ trait ConfigurableProductHandler
 
                 //check translation on attribute options
                 $hasTranslation = $attribute->checkTranslation();
-                if($hasTranslation) $translated_val = $attribute_option->translations()->whereStoreId($store->id)->first();
+                if($hasTranslation) $translated_val = $attribute_option?->translations()->whereStoreId($store->id)->first();
                 
                 $items["configurable_{$attribute->slug}"][] = $variant_option;
                 $items["configurable_{$attribute->slug}_value"][] = isset($translated_val) ? $translated_val->name : $attribute_option->name;
@@ -148,7 +148,7 @@ trait ConfigurableProductHandler
 
                 //check translation on attribute options
                 $hasTranslation = $attribute->checkTranslation();
-                if($hasTranslation) $translated_val = $attribute_option->translations()->whereStoreId($store->id)->first();
+                if($hasTranslation) $translated_val = $attribute_option?->translations()->whereStoreId($store->id)->first();
                 
                 $catalog = CatalogInventory::whereProductId($variant->id)->first();
                 $store_data = [

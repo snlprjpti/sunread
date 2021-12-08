@@ -82,13 +82,13 @@ trait ElasticSearchFormat
                         $data[$attribute->slug] = $values->pluck("id")->toArray();
                         foreach($values as $key => $val)
                         {
-                            if($hasTranslation) $translated_val = $val->translations()->whereStoreId($store->id)->first();
+                            if($hasTranslation) $translated_val = $val?->translations()->whereStoreId($store->id)->first();
                             $data["{$attribute->slug}_{$key}_value"] = isset($translated_val) ? $translated_val->name : $val?->name;
                         }
                     }
                     else {
                         $data[$attribute->slug] = $values?->id;
-                        if($hasTranslation) $translated_value = $values->translations()->whereStoreId($store->id)->first();
+                        if($hasTranslation) $translated_value = $values?->translations()->whereStoreId($store->id)->first();
                         $data["{$attribute->slug}_value"] = isset($translated_value) ? $translated_value->name : $values?->name;
                     }
                 }
