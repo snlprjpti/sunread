@@ -58,7 +58,8 @@ class OrderAddressRepository extends BaseRepository
                 if (auth("customer")->id() && $type == "billing") {
                     $data = ["default_billing_address" => 1];
                     $orderAddressData["default_billing_address"] = 1;
-                } elseif (auth("customer")->id() && $type == "shipping") {
+                }
+                elseif (auth("customer")->id() && $type == "shipping") {
                     $data = ["default_shipping_address" => 1];
                     $orderAddressData["default_shipping_address"] = 1;
                 }
