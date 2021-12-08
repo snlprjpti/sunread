@@ -125,7 +125,8 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
             $coreCache = $this->getCoreCache();
             $this->parameter->order->update([
                 "payment_method" => $this->method_key,
-                "payment_method_label" => SiteConfig::fetch("payment_methods_{$this->method_key}_title", "channel", $coreCache->channel?->id)
+                "payment_method_label" => SiteConfig::fetch("payment_methods_{$this->method_key}_title", "channel", $coreCache->channel?->id),
+                "status" => SiteConfig::fetch("payment_methods_{$this->method_key}_new_order_status", "channel", $coreCache->channel?->id)
             ]);
         }
         catch (Exception $exception)
@@ -143,7 +144,6 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         try
         {
             $coreCache = $this->getCoreCache();
-            $data = SiteConfig::getElement("payment_methods_klarna_design_color", "channel", $coreCache->channel?->id);
             $with = [
                 "order_items.order",
                 "order_taxes.order_tax_items",
