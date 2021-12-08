@@ -77,16 +77,19 @@ trait ElasticSearchFormat
                 if(in_array($attribute->type, $this->options_fields))
                 {
                     $values = $this->value($match);
+                    $hasTranslation = $attribute->checkTranslation();
                     if ($values instanceof Collection) {
                         $data[$attribute->slug] = $values->pluck("id")->toArray();
                         foreach($values as $key => $val)
                         {
-                            $data["{$attribute->slug}_{$key}_value"] = $val?->name;
+                            if($hasTranslation) $translated_val = $val->translations()->whereStoreId($store->id)->first();
+                            $data["{$attribute->slug}_{$key}_value"] = isset($translated_val) ? $translated_val->name : $val?->name;
                         }
                     }
                     else {
                         $data[$attribute->slug] = $values?->id;
-                        $data["{$attribute->slug}_value"] = $values?->name;
+                        if($hasTranslation) $translated_value = $values->translations()->whereStoreId($store->id)->first();
+                        $data["{$attribute->slug}_value"] = isset($translated_value) ? $translated_value->name : $values?->name;
                     }
                 }
                 else  $data[$attribute->slug] = $this->value($match);

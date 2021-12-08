@@ -42,6 +42,14 @@ trait HasMapper
         return false;
     }
 
+    public function checkTranslation(): bool
+    {
+        if($this->checkMapper() && $this->checkOption()){
+            return ($this->mapper[$this->slug]["translations"] == 1);
+        }
+        else return true;
+    }
+
     public function checkCreateOrUpdate(): bool
     {
         if($this->checkMapper()){
