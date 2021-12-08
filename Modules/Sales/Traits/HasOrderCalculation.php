@@ -51,7 +51,6 @@ trait HasOrderCalculation
             $payment_data = ["order" => $order];
             $data = $check_out_method_shipping_helper->process($request, $payment_data);
 
-            // dd($payment_response);
         }
         catch ( Exception $exception )
         {
