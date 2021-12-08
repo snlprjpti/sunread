@@ -28,7 +28,8 @@ class BasePaymentMethodRepository
     public string $base_url;
     public array $headers; 
     public string $user_name, $password;
-    public $orderMetaRepository;
+    public $orderRepository;
+	public $orderMetaRepository;
     public $order;
 	public mixed $base_data;
 
@@ -43,7 +44,8 @@ class BasePaymentMethodRepository
             "method_key" => $method_key
         ];
         $this->headers = [ "Accept" => "application/json" ];
-        $this->orderMetaRepository = OrderMetaRepository::class;
+        $this->orderMetaRepository = new CheckOutOrderMetaRepository();
+        $this->orderRepository = new CheckOutOrderRepository();
     }
 
     public function object(array $attributes = []): mixed
