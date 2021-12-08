@@ -112,6 +112,8 @@ class NavigationMenuItemRepository extends BaseRepository
             "id" => $navigation_menu_item->id,
             "title" => $value?->value,
             "navigation_menu_id" => $navigation_menu_item->navigation_menu_id,
+            "position" => $navigation_menu_item->position,
+            "parent_id" => $navigation_menu_item->parent_id
         ];
         $fetched["attributes"] = $this->getConfigData($data, $navigation_menu_item);
         return $fetched;
@@ -161,7 +163,7 @@ class NavigationMenuItemRepository extends BaseRepository
         {
 
             $data = $request->validate([
-                "parent_id" => "nullable|numeric|exists:navigation_menu_item,id",
+                "parent_id" => "nullable|numeric|exists:navigation_menu_items,id",
                 "position" => "required|numeric",
                 "scope" => "required|in:website,channel,store",
                 "scope_id" => [ "required", "integer", "min:1", new ScopeRule($request->scope), new NavigationMenuItemScopeRule($request, $id)]
@@ -170,6 +172,7 @@ class NavigationMenuItemRepository extends BaseRepository
             $navigation_menu_item = $this->model->findOrFail($id);
 
             $parent_id = isset($data["parent_id"]) ? $data["parent_id"] : null;
+            $position = $data["position"];
 
             if($parent_id)
             {
@@ -187,6 +190,8 @@ class NavigationMenuItemRepository extends BaseRepository
             $key = key(collect($allnodes)->where('id', $id)->toArray()) + 1;
 
             ($nav_menu_item_position->_lft < $navigation_menu_item->_lft) ? $navigation_menu_item->up($key-$data["position"]) : $navigation_menu_item->down($data["position"]-$key);
+
+            $navigation_menu_item->update(['position' => $position]);
 
         }
         catch (Exception $exception)
