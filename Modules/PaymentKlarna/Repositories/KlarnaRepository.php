@@ -20,6 +20,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
     protected mixed $urls;
     public string $base_url;
     public string $user_name, $password;
+	public mixed $base_data;
 
     public function __construct(object $request, object $parameter)
     {
@@ -28,7 +29,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 
         parent::__construct($this->request, $this->method_key);
         $this->parameter = $parameter;
-        $this->method_detail = array_merge($this->method_detail, $this->data());
+        $this->method_detail = array_merge($this->method_detail, $this->createBaseData());
         $this->urls = $this->getApiUrl();
         $this->base_url = $this->getBaseUrl();
     }
@@ -89,7 +90,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         return $api_endpoint_data->url;
     }
 
-    private function data(): array
+    private function createBaseData(): array
     {
         $this->user_name = SiteConfig::fetch("payment_methods_klarna_api_config_username", "channel", $this->coreCache->channel?->id);
         $this->password = SiteConfig::fetch("payment_methods_klarna_api_config_password", "channel", $this->coreCache->channel?->id);
@@ -98,6 +99,14 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
             "api_endpoint" => SiteConfig::fetch("payment_methods_klarna_api_config_endpoint", "channel", $this->coreCache->channel?->id),
             "user_name" => $this->user_name,
             "password" =>  $this->password,
+			"color_button" => SiteConfig::fetch("payment_methods_klarna_design_color", "channel", $this->coreCache->channel?->id),
+			"color_button_text" => SiteConfig::fetch("payment_methods_klarna_design_text_color", "channel", $this->coreCache->channel?->id),
+			"color_checkbox" => SiteConfig::fetch("payment_methods_klarna_design_color_checkbox", "channel", $this->coreCache->channel?->id),
+			"color_checkbox_checkmark" => SiteConfig::fetch("payment_methods_klarna_design_color_checkbox_checkmark", "channel", $this->coreCache->channel?->id),
+			"color_header" => SiteConfig::fetch("payment_methods_klarna_design_color_header", "channel", $this->coreCache->channel?->id),
+			"color_link" => SiteConfig::fetch("payment_methods_klarna_design_color_link", "channel", $this->coreCache->channel?->id),
+			"locale" => SiteConfig::fetch("store_locale", "channel", $this->coreCache->channel?->id)?->code,
+			"purchase_country" => SiteConfig::fetch("default_country", "channel", $this->coreCache->channel?->id)?->iso_2_code,
         ];
     }
 
@@ -105,18 +114,19 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
     {
         try
         {
-            $data = $this->getPostData(function ($order) {	
-                $customer = [
-                    "customer" => [
-                        "date_of_birth" => $order->customer?->date_of_birth,
-                        "type" => $order->customer?->customer_type,
-                        "gender" => $order->customer?->gender
-                    ]
-                ];
-                return ($order->customer_id) ? $customer : [];
+            $data = $this->getPostData(function ($order, $shipping_address) {	
+                return [
+					"customer" => ($order->customer_id) ? $this->getCustomer($order) : [],
+					"order_lines" => $this->getOrderLine($order),
+					"merchant_urls" => $this->getMerchantUrl(),
+					"selected_shipping_option" => $this->getSelectedShippingOption($order, $shipping_address),
+					"options" => $this->getDesignOption(),
+					"shipping_options" => $this->getShippingOptions($order, $shipping_address)
+				];
             });
+			dd($data);
             $response = $this->postBasicClient("checkout/v3/orders", $data);
-
+			// dd($response);
             OrderMeta::create([
                 "order_id" => $this->parameter->order->id,
                 "meta_key" => $this->method_key,
@@ -142,9 +152,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
     {
         try
         {
-            $coreCache = $this->getCoreCache();
-            $data = SiteConfig::getElement("payment_methods_klarna_design_color", "channel", $coreCache->channel?->id);
-            $with = [
+			$with = [
                 "order_items.order",
                 "order_taxes.order_tax_items",
                 "website",
@@ -157,77 +165,17 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
                 "order_addresses.country",
                 "order_metas"
             ];
-            
             $order = Order::whereId($this->parameter->order->id)->with($with)->first();
-    
-            $sum_tax_amount = 0;
-            $sum_total_amount = 0;
-            $shipping_address = $this->getShippingDetail($order->order_addresses, "shipping");
-
+			$shipping_address = $this->getShippingDetail($order->order_addresses, "shipping");
             $data = [
-                "purchase_country" => SiteConfig::fetch("default_country", "channel", $this->coreCache->channel?->id)?->iso_2_code,
+                "purchase_country" => $this->base_data->purchase_country,
                 "purchase_currency" => $order?->currency_code,
-                "locale" => SiteConfig::fetch("store_locale", "channel", $coreCache->channel?->id)?->code,
-                "order_lines" => $order->order_items->map(function ($order_item) use (&$sum_tax_amount, &$sum_total_amount) {
-                
-                    $total_amount =  (($order_item->price * 100) * ($order_item->qty) - ($order_item->discount_amount_tax * 100));
-                    $tax_rate = (float) ($order_item->tax_percent * $order_item->qty * 100);
-                    
-                    $total_tax_amount = ($total_amount - $total_amount * 10000 / (10000 + $tax_rate));
-                    $sum_tax_amount += $total_tax_amount;
-                    $sum_total_amount += $total_amount; 
-
-                    return [
-                        "type" => "physical",
-                        "reference" => $order_item->sku,
-                        "name" => $order_item->name,
-                        "quantity" => (float) $order_item->qty,
-                        "quantity_unit" => "pcs", // TODO:: add unit
-                        "unit_price" => (float) ($order_item->price * 100),
-                        "tax_rate" => $tax_rate,
-                        "total_amount" => (float) $total_amount,
-                        "total_discount_amount" => (float) ($order_item->discount_amount_tax * 100),
-                        "total_tax_amount" => (float) $total_tax_amount,
-                    ];
-                })->toArray(),
-                "order_amount" => (float) ($order->sub_total * 100  - $order->discount_amount_tax * 100),
-                "order_tax_amount" => (float) $sum_tax_amount,
-                "merchant_urls" => [
-                  "terms" => "https://www.example.com/terms.html",
-                  "checkout" => "https://www.example.com/checkout.html?order_id={checkout.order.id}",
-                  "confirmation" => "https://www.example.com/confirmation.html",
-                  "push" => "https://www.example.com/push.html"
-                ],
+                "locale" => $this->base_data->locale,
                 "merchant_reference1" => $order->id,
                 "billing_address" => $this->getShippingDetail($order->order_addresses, "billing"),
                 "shipping_address" => $shipping_address,
-                "selected_shipping_option" => [
-                    "id" => $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == $order->shipping_method))->first()?->id,
-                    "name" => $order->shipping_method_label,
-                    "description" => $order->shipping_method,
-                    // "promo" => "Christmas Promotion", //TODO::add coupons code 
-                    "price" => (float) $order->shipping_amount_tax,  // including tax
-                    "tax_amount" => (float) $order->shipping_amount, 
-                    // "tax_rate" => (float) $order->shipping_amount,
-                    "shipping_method" => $order->shipping_method_label,
-                    "delivery_details" => [
-                        "pickup_location" => [
-                            "id" => $shipping_address["reference"],
-                            "name" => $shipping_address["street_address"],
-                            "address" => $shipping_address
-                        ]
-                    ]
-                ],
-                "options" => [
-                    "color_button" => SiteConfig::fetch("payment_methods_klarna_design_color", "channel", $this->coreCache->channel?->id),
-                    "color_button_text" => SiteConfig::fetch("payment_methods_klarna_design_text_color", "channel", $this->coreCache->channel?->id),
-                    "color_checkbox" => SiteConfig::fetch("payment_methods_klarna_design_color_checkbox", "channel", $this->coreCache->channel?->id),
-                    "color_checkbox_checkmark" => SiteConfig::fetch("payment_methods_klarna_design_color_checkbox_checkmark", "channel", $this->coreCache->channel?->id),
-                    "color_header" => SiteConfig::fetch("payment_methods_klarna_design_color_header", "channel", $this->coreCache->channel?->id),
-                    "color_link" => SiteConfig::fetch("payment_methods_klarna_design_color_link", "channel", $this->coreCache->channel?->id)
-                ]
             ];
-            if ($callback) $data = array_merge($data, $callback($order));
+            if ($callback) $data = array_merge($data, $callback($order, $shipping_address));
         }
         catch (Exception $exception)
         {
@@ -236,6 +184,38 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         
         return $data;
     }
+
+	private function getOrderLine(object $order): array
+	{
+		$sum_tax_amount = 0;
+		$sum_total_amount = 0;
+		return [
+			"order_lines" => $order->order_items->map(function ($order_item) use (&$sum_tax_amount, &$sum_total_amount) {
+   
+				$total_amount =  (($order_item->price * 100) * ($order_item->qty) - ($order_item->discount_amount_tax * 100));
+				$tax_rate = (float) ($order_item->tax_percent * $order_item->qty * 100);
+				
+				$total_tax_amount = ($total_amount - $total_amount * 10000 / (10000 + $tax_rate));
+				$sum_tax_amount += $total_tax_amount;
+				$sum_total_amount += $total_amount; 
+
+				return [
+					"type" => "physical",
+					"reference" => $order_item->sku,
+					"name" => $order_item->name,
+					"quantity" => (float) $order_item->qty,
+					"quantity_unit" => "pcs", // TODO:: add unit
+					"unit_price" => (float) ($order_item->price * 100),
+					"tax_rate" => $tax_rate,
+					"total_amount" => (float) $total_amount,
+					"total_discount_amount" => (float) ($order_item->discount_amount_tax * 100),
+					"total_tax_amount" => (float) $total_tax_amount,
+				];
+			})->toArray(),
+			"order_amount" => (float) ($order->sub_total * 100  - $order->discount_amount_tax * 100),
+			"order_tax_amount" => (float) $sum_tax_amount,
+		];
+	}
 
     private function getShippingDetail(mixed $order_addresses, string $address_type): array
     {
@@ -267,4 +247,120 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 
         return $address_data;
     }
+
+	private function getSelectedShippingOption(object $order, mixed $shipping_address): array
+	{
+		return [
+			"id" => $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == $order->shipping_method))->first()?->id,
+			"name" => $order->shipping_method_label,
+			"description" => $order->shipping_method,
+			// "promo" => "Christmas Promotion", //TODO::add coupons code 
+			"price" => (float) $order->shipping_amount_tax,  // including tax
+			"tax_amount" => (float) $order->shipping_amount, 
+			// "tax_rate" => (float) $order->shipping_amount,
+			"shipping_method" => $order->shipping_method_label,
+			"delivery_details" => [
+				"pickup_location" => [
+					"id" => $shipping_address["reference"],
+					"name" => $shipping_address["street_address"],
+					"address" => $shipping_address
+				]
+			]
+		];
+	}
+
+	private function getShippingOptions(object $order, mixed $shipping_address): array
+	{
+		return [
+			[
+				"id" => $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == $order->shipping_method))->first()?->id ?? 1,
+				"name" => $order->shipping_method_label,
+				"description" => $order->shipping_method,
+				//"promo" => "Christmas Promotion",
+				"price" => (float) $order->shipping_amount,  // including tax
+				"tax_amount" => (float) $order->shipping_amount_tax,
+				"preselected" => true,
+				"tax_rate" => (float) $order->shipping_amount_tax,
+				"shipping_method" => $order->shipping_method_label,
+				"delivery_details" => [
+					"carrier" => "string",
+					"class" => "string",
+					"product" => [
+						"name" => "string",
+						"identifier" => "string"
+					],
+					"timeslot" => [
+						"id" => "string",
+						"start" => "string",
+						"end" => "string"
+					],
+					"pickup_location" => [
+						"id" => $shipping_address["reference"],
+						"name" => $shipping_address["street_address"],
+						"address" => $shipping_address
+					]
+				]
+			],
+			[
+				"id" => "free",
+				"name" => "free",
+				"description" => "Delivery by 4:30 pm",
+				"promo" => "Christmas Promotion",
+				"price" => 0,
+				"preselected" => false,
+				"tax_amount" => 0,
+				"tax_rate" => 0,
+				"shipping_method" => "PickUpStore",
+				"delivery_details" => [
+					"carrier" => "string",
+					"class" => "string",
+					"product" => [
+						"name" => "string",
+						"identifier" => "string"
+					],
+					"timeslot" => [
+						"id" => "string",
+						"start" => "string",
+						"end" => "string"
+					],
+					"pickup_location" => [
+						"id" => $shipping_address["reference"],
+						"name" => $shipping_address["street_address"],
+						"address" => $shipping_address
+					]
+				]
+			],
+		];
+	}
+
+	private function getDesignOption(): array
+	{
+		return [
+			"color_button" => $this->base_data->color_button,
+			"color_button_text" => $this->base_data->color_button_text,
+			"color_checkbox" => $this->base_data->color_checkbox,
+			"color_checkbox_checkmark" => $this->base_data->color_checkbox_checkmark,
+			"color_header" => $this->base_data->color_header,
+			"color_link" => $this->base_data->color_link,
+		];
+	}
+
+	private function getMerchantUrl(): array
+	{
+		return [
+			"terms" => $this->base_data?->terms,
+			"checkout" => $this->base_data?->checkout,
+			"confirmation" => $this->base_data?->confirmation,
+			"push" => $this->base_data?->push,
+		];
+	}
+	
+	private function getCustomer(object $order): array
+	{
+		return [
+			"date_of_birth" => $order->customer?->date_of_birth,
+			"type" => $order->customer?->customer_type,
+			"gender" => $order->customer?->gender
+		];
+	}
 }
