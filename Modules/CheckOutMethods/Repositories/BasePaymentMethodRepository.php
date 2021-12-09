@@ -120,8 +120,7 @@ class BasePaymentMethodRepository
             ->post("{$this->base_url}{$url}", $data)
             ->throw()
             ->json();
-
-        }
+         }
         catch (Exception $exception )
         {
             throw new MethodException($exception->getMessage(), $exception->getCode());
