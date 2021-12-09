@@ -30,9 +30,9 @@ class BasePaymentMethodRepository
     public array $headers; 
     public string $user_name, $password;
     public $orderRepository;
-	public $orderMetaRepository;
+    public $orderMetaRepository;
     public $order;
-	public mixed $base_data;
+    public mixed $base_data;
     public object $orderModel;
     public array $relations;
 

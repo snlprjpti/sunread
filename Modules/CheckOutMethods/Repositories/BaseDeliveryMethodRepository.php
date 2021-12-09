@@ -19,7 +19,7 @@ class BaseDeliveryMethodRepository
     protected array $rules;
     protected object $coreCache;
     public $orderRepository;
-	public $orderMetaRepository;
+    public $orderMetaRepository;
 
     public function __construct(object $request, string $method_key, ?array $rules = [])
     {
