@@ -100,7 +100,7 @@ return [
             "type" => "text",
             "provider" => "",
             "pluck" => [],
-            "default" => 0.00,
+            "default" => 1000000.00,
             "options" => [],
             "rules" => "",
             "scope" => "channel",

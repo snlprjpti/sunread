@@ -3,7 +3,7 @@
 return [
     "title" => "Free Shipping",
     "slug" => "free_shipping",
-    "repository" => "Modules\DeliveryFlatRate\Repositories\DeliveryFreeShippingRepository",
+    "repository" => "Modules\DeliveryFreeShipping\Repositories\DeliveryFreeShippingRepository",
     "elements" => [
         [
             "title" => "Enabled",
@@ -28,7 +28,7 @@ return [
             "type" => "text",
             "provider" => "",
             "pluck" => [],
-            "default" => "Flat Rate",
+            "default" => "Free Shipping",
             "options" => [],
             "rules" => "",
             "multiple" => false,
@@ -104,7 +104,7 @@ return [
             "type" => "select",
             "provider" => "Modules\Country\Entities\Country",
             "pluck" => ["name", "iso_2_code"],
-            "default" => "iso_2_code",
+            "default" => "",
             "options" => [],
             "rules" => "exists:countries,iso_2_code",
             "multiple" => false,

@@ -4,6 +4,8 @@ namespace Modules\Product\Repositories;
 
 use Illuminate\Support\Facades\Event;
 use Exception;
+use Modules\Core\Entities\Channel;
+use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Product\Entities\FeatureTranslation;
 
@@ -39,5 +41,38 @@ class FeatureTranslationRepository extends BaseRepository
         }
 
         Event::dispatch("{$this->model_key}.create.after", $created);
+    }
+
+
+    public function show(int $id): array
+    {
+        $selected_stores = array_unique($this->model->pluck('store_id')->toArray());
+        $selected_channels = array_unique(Store::whereIn('id', $selected_stores)->pluck('channel_id')->toArray());
+
+        $data = [];
+        foreach($selected_channels as $selected_channel)
+        {
+            $channel = Channel::find($selected_channel);
+
+            $item = [
+                "id" =>  $channel->id,
+                "name" => $channel->name
+            ];
+
+            foreach($channel->stores as $store)
+            {
+                $feature = $this->model->whereStoreId($store->id)->first();
+                if(!isset($store)) continue;
+
+                $item["stores"][] = [
+                    "id" => $store->id,
+                    "name" => $store->name,
+                    "feature_name" => $feature->name ?? null,
+                    "feature_description" => $feature->description ?? null
+                ];
+            }
+            $data["data"][] = $item;
+        }
+        return $data;
     }
 }

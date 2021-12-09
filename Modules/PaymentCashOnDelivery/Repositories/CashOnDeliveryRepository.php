@@ -41,7 +41,8 @@ class CashOnDeliveryRepository extends BasePaymentMethodRepository implements Pa
                 "payment_method" => $this->method_key,
                 "payment_method_label" => SiteConfig::fetch("payment_methods_{$this->method_key}_title", "channel", $channel_id),
                 "minimum_order_total" => $minimum_order_total,
-                "maximum_order_total" => $maximum_order_total
+                "maximum_order_total" => $maximum_order_total,
+                "status" => SiteConfig::fetch("payment_methods_{$this->method_key}_new_order_status", "channel", $channel_id)?->slug
             ];
             OrderMeta::create([
 				"order_id" => $this->parameter->order->id,
