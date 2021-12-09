@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Modules\Core\Facades\SiteConfig;
 use Modules\CheckOutMethods\Contracts\PaymentMethodInterface;
 use Modules\CheckOutMethods\Repositories\BasePaymentMethodRepository;
+use Modules\CheckOutMethods\Services\BaseCheckOutMethods;
 use Modules\Sales\Facades\TransactionLog;
 
 class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMethodInterface
@@ -20,6 +21,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
     public string $base_url;
     public string $user_name, $password;
 	public mixed $base_data;
+	public array $relations;
 
     public function __construct(object $request, object $parameter)
     {
@@ -118,6 +120,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         try
         {
             $coreCache = $this->getCoreCache();
+			$this->createKlarnaData();
             $data = $this->getPostData(function ($order, $shipping_address) {	
                 return [
 					"merchant_urls" => $this->getMerchantUrl(),
@@ -150,24 +153,28 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         return $this->object(["html_snippet" => $response["html_snippet"]]);
     }
 
+	private function createKlarnaData(): void
+    {
+		$coreCache = $this->getCoreCache();
+        $methods = SiteConfig::get("delivery_methods");
+        $check_methods = $methods->pluck("slug")->unique()->toArray();
+        $shipping_methods = array_filter($check_methods, function ($check_method) use ($coreCache) {
+            $value = SiteConfig::fetch("delivery_methods_{$check_method}", "channel", $coreCache->channel->id);
+            return ($value == 1) ? true : false;
+        });
+
+        $this->orderMetaRepository->create([
+            "order_id" => $this->parameter->order->id,
+            "meta_key" => "shipping_collection",
+            "meta_value" => $shipping_methods
+        ]);
+    }
+
     private function getPostData(?callable $callback = null): array
     {
         try
         {
-			$with = [
-                "order_items.order",
-                "order_taxes.order_tax_items",
-                "website",
-                "billing_address", 
-                "shipping_address",
-                "customer",
-                "order_status.order_status_state",
-                "order_addresses.city",
-                "order_addresses.region",
-                "order_addresses.country",
-                "order_metas"
-            ];
-            $order = Order::whereId($this->parameter->order->id)->with($with)->first();
+            $order = $this->orderModel->whereId($this->parameter->order->id)->first();
 			$shipping_address = $this->getShippingDetail($order->order_addresses, "shipping");
             $data = [
                 "purchase_country" => $this->base_data->purchase_country,
@@ -275,17 +282,17 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 
 	private function getShippingOptions(object $order, mixed $shipping_address): array
 	{
-		return [
-			[
-				"id" => $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == $order->shipping_method))->first()?->id ?? 1,
+		$order_shipping_collection_meta = $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == "shipping_collection"))->first();
+		$shipping_data = [];
+		foreach ( $order_shipping_collection_meta->meta_value as $shipping_method )
+		{
+			$shipping_calculated_data = $this->calculateShipping($order, $shipping_method);
+			$shipping_data[] = array_merge($shipping_calculated_data, [
+				"id" => ($shipping_method == $order->shipping_method) ? $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == $order->shipping_method))->first()?->id : $order_shipping_collection_meta->id,
 				"name" => $order->shipping_method_label,
 				"description" => $order->shipping_method,
+				"preselected" => ($shipping_method == $order->shipping_method) ? true : false,
 				//"promo" => "Christmas Promotion",
-				"price" => (float) $order->shipping_amount,  // including tax
-				"tax_amount" => (float) $order->shipping_amount_tax,
-				"preselected" => true,
-				"tax_rate" => (float) $order->shipping_amount_tax,
-				"shipping_method" => $order->shipping_method_label,
 				"delivery_details" => [
 					"carrier" => "string",
 					"class" => "string",
@@ -304,36 +311,27 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 						"address" => $shipping_address
 					]
 				]
-			],
-			[
-				"id" => "free",
-				"name" => "free",
-				"description" => "Delivery by 4:30 pm",
-				"promo" => "Christmas Promotion",
-				"price" => 0,
-				"preselected" => false,
-				"tax_amount" => 0,
-				"tax_rate" => 0,
-				"shipping_method" => "PickUpStore",
-				"delivery_details" => [
-					"carrier" => "string",
-					"class" => "string",
-					"product" => [
-						"name" => "string",
-						"identifier" => "string"
-					],
-					"timeslot" => [
-						"id" => "string",
-						"start" => "string",
-						"end" => "string"
-					],
-					"pickup_location" => [
-						"id" => $shipping_address["reference"],
-						"name" => $shipping_address["street_address"],
-						"address" => $shipping_address
-					]
-				]
-			],
+			]);
+		}
+		dd($shipping_data);
+
+		return $shipping_data;
+	}
+
+	private function calculateShipping(object $order, string $shipping_method): array
+	{		
+		$checkout_method_helper = new BaseCheckOutMethods($shipping_method);
+		$shipping_method_repository = $checkout_method_helper->process($this->request, ["order" => $order]);
+		$shipping_method_repository_data = $this->object($shipping_method_repository);
+		dd($shipping_method_repository_data);
+
+		$shipping_method_repository_data->shipping_tax;
+
+		return [
+			"price" => (float) $shipping_method_repository_data->shipping_amount,  // including tax
+			"tax_amount" => (float) $order->shipping_amount_tax,
+			"tax_rate" => (float) $order->shipping_amount_tax,
+			"shipping_method" => $order->shipping_method_label,
 		];
 	}
 
