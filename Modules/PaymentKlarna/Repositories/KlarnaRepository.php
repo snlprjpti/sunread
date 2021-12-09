@@ -132,10 +132,10 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
             $response = $this->postBasicClient("checkout/v3/orders", $data);
 
 			$this->orderRepository->update([
-                "payment_method" => $this->method_key,
-                "payment_method_label" => SiteConfig::fetch("payment_methods_{$this->method_key}_title", "channel", $coreCache->channel?->id),
-                "status" => SiteConfig::fetch("payment_methods_{$this->method_key}_new_order_status", "channel", $coreCache->channel?->id)?->slug
-            ], $this->parameter->order->id, function ($order) use ($response) {
+				"payment_method" => $this->method_key,
+				"payment_method_label" => SiteConfig::fetch("payment_methods_{$this->method_key}_title", "channel", $coreCache->channel?->id),
+				"status" => SiteConfig::fetch("payment_methods_{$this->method_key}_new_order_status", "channel", $coreCache->channel?->id)?->slug
+			], $this->parameter->order->id, function ($order) use ($response) {
 				$this->orderMetaRepository->create([
 					"order_id" => $order->id,
 					"meta_key" => $this->method_key,
@@ -157,11 +157,15 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
     {
 		$coreCache = $this->getCoreCache();
         $methods = SiteConfig::get("delivery_methods");
-        $check_methods = $methods->pluck("slug")->unique()->toArray();
-        $shipping_methods = array_filter($check_methods, function ($check_method) use ($coreCache) {
-            $value = SiteConfig::fetch("delivery_methods_{$check_method}", "channel", $coreCache->channel->id);
-            return ($value == 1) ? true : false;
-        });
+        $shipping_methods = $methods->map(function ($method) use ($coreCache) {
+			return [
+				"is_enable" => SiteConfig::fetch("delivery_methods_{$method["slug"]}", "channel", $coreCache->channel->id),
+				"label" => SiteConfig::fetch("delivery_methods_{$method["slug"]}_method_name", "channel", $coreCache->channel->id),
+				"shipping_method" => $method["slug"],
+				"name" => SiteConfig::fetch("delivery_methods_{$method["slug"]}_title", "channel", $coreCache->channel->id),
+				"repository" => $method["repository"]
+			];
+		})->reject(fn ($method) => $method["is_enable"] == 0)->toArray();
 
         $this->orderMetaRepository->create([
             "order_id" => $this->parameter->order->id,
@@ -282,56 +286,68 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
 
 	private function getShippingOptions(object $order, mixed $shipping_address): array
 	{
-		$order_shipping_collection_meta = $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == "shipping_collection"))->first();
-		$shipping_data = [];
-		foreach ( $order_shipping_collection_meta->meta_value as $shipping_method )
+		try
 		{
-			$shipping_calculated_data = $this->calculateShipping($order, $shipping_method);
-			$shipping_data[] = array_merge($shipping_calculated_data, [
-				"id" => ($shipping_method == $order->shipping_method) ? $order->order_metas->filter(fn ($order_meta) => ($order_meta->meta_key == $order->shipping_method))->first()?->id : $order_shipping_collection_meta->id,
-				"name" => $order->shipping_method_label,
-				"description" => $order->shipping_method,
-				"preselected" => ($shipping_method == $order->shipping_method) ? true : false,
-				//"promo" => "Christmas Promotion",
-				"delivery_details" => [
-					"carrier" => "string",
-					"class" => "string",
-					"product" => [
-						"name" => "string",
-						"identifier" => "string"
-					],
-					"timeslot" => [
-						"id" => "string",
-						"start" => "string",
-						"end" => "string"
-					],
-					"pickup_location" => [
-						"id" => $shipping_address["reference"],
-						"name" => $shipping_address["street_address"],
-						"address" => $shipping_address
+			$order_shipping_collection_meta = $order->order_metas->where("meta_key", "shipping_collection")->first();
+			$order_shipping_id = $order->order_metas->where("meta_key", "shipping")->first()?->id;
+			
+			$shipping_data = [];
+			foreach ( $order_shipping_collection_meta->meta_value as $shipping_method )
+			{
+				if ($shipping_method["shipping_method"] !== $order->shipping_method) break;
+				$shipping_calculated_data = $this->calculateShipping($order, $shipping_method["shipping_method"]);
+				$id = ($shipping_method["shipping_method"] == $order->shipping_method) ? $order_shipping_id : $order_shipping_collection_meta->id;
+				$shipping_data[] = array_merge($shipping_calculated_data, [
+					"id" => $id,
+					"name" => $shipping_method["name"],
+					"description" => $shipping_method["name"],
+					"preselected" => ($shipping_method["shipping_method"] == $order->shipping_method) ? true : false,
+					//"promo" => "Christmas Promotion",
+					"delivery_details" => [
+						"carrier" => $shipping_method["name"],
+						"class" => $shipping_method["repository"],
+						"product" => [
+							"name" => $shipping_method["name"],
+							"identifier" => $id
+						],
+						//TODO::merge dynamic timeslot
+						// "timeslot" => [
+						// 	"id" => "string",
+						// 	"start" => "string",
+						// 	"end" => "string"
+						// ],
+						"pickup_location" => [
+							"id" => $shipping_address["reference"],
+							"name" => $shipping_address["street_address"],
+							"address" => $shipping_address
+						]
 					]
-				]
-			]);
+				]);
+
+			}
 		}
-		dd($shipping_data);
+		catch (Exception $exception)
+        {
+            throw $exception;
+        }
 
 		return $shipping_data;
 	}
 
 	private function calculateShipping(object $order, string $shipping_method): array
 	{		
-		$checkout_method_helper = new BaseCheckOutMethods($shipping_method);
-		$shipping_method_repository = $checkout_method_helper->process($this->request, ["order" => $order]);
-		$shipping_method_repository_data = $this->object($shipping_method_repository);
-		dd($shipping_method_repository_data);
-
-		$shipping_method_repository_data->shipping_tax;
-
+		// $checkout_method_helper = new BaseCheckOutMethods($shipping_method);
+		// $shipping_method_repository = $checkout_method_helper->process($this->request, ["order" => $order]);
+		// $shipping_method_repository_data = $this->object($shipping_method_repository);
+		// $coreCache = $this->getCoreCache();
+		//TODO::calculate all options taxes.
+		
 		return [
-			"price" => (float) $shipping_method_repository_data->shipping_amount,  // including tax
-			"tax_amount" => (float) $order->shipping_amount_tax,
-			"tax_rate" => (float) $order->shipping_amount_tax,
-			"shipping_method" => $order->shipping_method_label,
+			"shipping_method" => $shipping_method,
+			"price" => 0,
+			"tax_price" => 0.00,
+			"tax_rate" => 0.00,
+			"tax_amount" => 0
 		];
 	}
 
