@@ -14,6 +14,7 @@ use Modules\Core\Http\Controllers\BaseController;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\Sales\Repositories\StoreFront\OrderRepository;
 use Modules\Sales\Exceptions\BankTransferNotAllowedException;
+use Modules\Sales\Exceptions\CashOnDeliveryNotAllowedException;
 use Modules\Sales\Exceptions\FreeShippingNotAllowedException;
 
 class OrderController extends BaseController
@@ -42,7 +43,8 @@ class OrderController extends BaseController
         $this->repository = $repository;
         $exception_statuses = [
             FreeShippingNotAllowedException::class => 403,
-            BankTransferNotAllowedException::class => 403
+            BankTransferNotAllowedException::class => 403,
+            CashOnDeliveryNotAllowedException::class => 403
         ];
         
         parent::__construct($this->model, $this->model_name, $exception_statuses);

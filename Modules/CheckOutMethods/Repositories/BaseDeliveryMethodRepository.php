@@ -5,8 +5,11 @@ namespace Modules\CheckOutMethods\Repositories;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\Core\Facades\CoreCache;
+use Modules\Sales\Entities\Order;
 
 class BaseDeliveryMethodRepository
 {
@@ -15,6 +18,8 @@ class BaseDeliveryMethodRepository
     protected string $user_name, $password;
     protected array $rules;
     protected object $coreCache;
+    public $orderRepository;
+    public $orderMetaRepository;
 
     public function __construct(object $request, string $method_key, ?array $rules = [])
     {
@@ -22,6 +27,27 @@ class BaseDeliveryMethodRepository
         $this->method_key = $method_key;
         $this->rules = $rules;
         $this->coreCache =  $this->getCoreCache();
+        $this->orderMetaRepository = new CheckOutOrderMetaRepository();
+        $this->orderRepository = new CheckOutOrderRepository();
+        $this->relations = [
+            "order_items.order",
+            "order_taxes.order_tax_items",
+            "website",
+            "billing_address", 
+            "shipping_address",
+            "customer",
+            "order_status.order_status_state",
+            "order_addresses.city",
+            "order_addresses.region",
+            "order_addresses.country",
+            "order_metas"
+        ];
+        $this->orderModel = $this->getModel();
+    }
+
+    public function getModel(): object
+    {
+        return Order::query()->with($this->relations);
     }
     
     public function object(array $attributes = []): mixed
@@ -67,5 +93,12 @@ class BaseDeliveryMethodRepository
         $append_data = $callback ? $callback($request) : [];
 
         return array_merge($data, $append_data);
+    }
+
+    public function customValidate(array $data, array $rules, ?array $message = []): array
+    {
+        $validator = Validator::make($data, $rules, $message);
+        if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+        return $validator->validated();
     }
 }
