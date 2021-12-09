@@ -44,15 +44,16 @@ class BankTransferRepository extends BasePaymentMethodRepository implements Paym
                 "maximum_order_total" => $maximum_order_total,
                 "status" => SiteConfig::fetch("payment_methods_{$this->method_key}_new_order_status", "channel", $channel_id)?->slug
             ];
-            
-            OrderMeta::create([
-				"order_id" => $this->parameter->order->id,
-				"meta_key" => $this->method_key,
-				"meta_value" => $payment_method_data
-			]);
+            $order_data = $payment_method_data;
+            unset($order_data["minimum_order_total"], $order_data["maximum_order_total"]);
 
-            unset($payment_method_data["minimum_order_total"], $payment_method_data["maximum_order_total"]);
-            $this->parameter->order->update($payment_method_data);
+            $this->orderRepository->update($order_data, $this->parameter->order->id, function ($order) use ($payment_method_data) {
+                $this->orderMetaRepository->create([
+                    "order_id" => $order->id,
+                    "meta_key" => $this->method_key,
+                    "meta_value" => $payment_method_data
+                ]);
+            });
         }
         catch ( Exception $exception )
         {
@@ -60,7 +61,6 @@ class BankTransferRepository extends BasePaymentMethodRepository implements Paym
         }
         
         TransactionLog::log($this->parameter->order, $this->method_key, "success", 201);
-
         return true;
     }
 }
