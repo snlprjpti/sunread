@@ -21,13 +21,25 @@ trait ConfigurableProductHandler
         try
         {
             $variants = $parent->variants()->with(["categories", "product_attributes", "catalog_inventories", "attribute_options_child_products"])->get();
-            
-            $variant_attribute_options = $variants->map(function($variant) {
-                return $variant->attribute_options_child_products->pluck("attribute_option_id", "product_id")->toArray();
-            })->flatten(1)->unique();
+            $variant_attribute_options = [];
+
+            $options = $variants->map( function ($variant) {
+                return $variant->attribute_options_child_products->pluck("attribute_option_id");
+            })->flatten(1)->unique()->toArray();
+
+            foreach($options as $option)
+            {
+                $option_values = AttributeOptionsChildProduct::whereIn("product_id", $variants->pluck("id")->toArray())->whereAttributeOptionId($option)->get();
+                foreach($option_values as $option_value)
+                {
+                    if(!in_array($option, $variant_attribute_options) && !isset($variant_attribute_options[$option_value->product_id])) {
+                        $variant_attribute_options[$option_value->product_id] = $option;
+                    } 
+                } 
+            }
 
             $product_format = $parent->documentDataStructure($store); 
-            $final_parent = array_merge($product_format, $this->getAttributeData($variant_attribute_options, $parent, $store));
+            $final_parent = array_merge($product_format, $this->getAttributeData(collect($variant_attribute_options), $parent, $store));
 
             if(count($final_parent) > 0) {
                 $final_parent["list_status"] = ($this->checkVisibility($parent, $store)) ? 1 : 0;
