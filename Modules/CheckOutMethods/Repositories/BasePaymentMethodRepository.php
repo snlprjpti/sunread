@@ -59,7 +59,8 @@ class BasePaymentMethodRepository
             "order_addresses.city",
             "order_addresses.region",
             "order_addresses.country",
-            "order_metas"
+            "order_metas",
+            "order_tax_items"
         ];
         $this->orderModel = $this->getModel();
     }
