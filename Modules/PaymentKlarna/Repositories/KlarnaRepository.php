@@ -191,7 +191,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
             $order = $this->orderModel->whereId($this->parameter->order->id)->first();
             $shipping_address = $this->getShippingDetail($order->order_addresses, "shipping");
             $data = [
-                "purchase_country" => $this->base_data->purchase_country,
+                "purchase_country" => $this->base_data->purchase_country?->iso_code,
                 "purchase_currency" => $order?->currency_code,
                 "locale" => $this->base_data->locale,
                 "merchant_reference1" => $order->id,
