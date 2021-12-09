@@ -17,6 +17,8 @@ class BaseDeliveryMethodRepository
     protected string $user_name, $password;
     protected array $rules;
     protected object $coreCache;
+    public $orderRepository;
+	public $orderMetaRepository;
 
     public function __construct(object $request, string $method_key, ?array $rules = [])
     {
@@ -24,6 +26,8 @@ class BaseDeliveryMethodRepository
         $this->method_key = $method_key;
         $this->rules = $rules;
         $this->coreCache =  $this->getCoreCache();
+        $this->orderMetaRepository = new CheckOutOrderMetaRepository();
+        $this->orderRepository = new CheckOutOrderRepository();
     }
     
     public function object(array $attributes = []): mixed
