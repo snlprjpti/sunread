@@ -116,6 +116,8 @@ class ProductRepository extends BaseRepository
             $this->final_product_val = [];
 
             if ( $product->type == "configurable" || ($product->type == "simple" && isset($product->parent_id))) {
+                $product_details["is_group_by_attribute"] = $this->checkGroupByAttributes($product);
+                
                 $this->getConfigurableAttributes($product, $coreCache->store);
                 $product_details["configurable_products"] = $this->final_product_val;
             }
@@ -225,6 +227,22 @@ class ProductRepository extends BaseRepository
         }
 
         return $fetched;
+    }
+
+    public function checkGroupByAttributes(object $product): ?int
+    {
+        try
+        {
+            if($product->parent_id) $product = $product->parent;
+            $group_by_attributes = $product->attribute_configurable_products()->whereUsedInGrouping(1)->first();  
+            $bool = $group_by_attributes ? 1 : 0;    
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $bool;
     }
 
     public function getConfigurableAttributes(object $product, object $store): void
