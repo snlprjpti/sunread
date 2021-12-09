@@ -37,16 +37,6 @@ class AttributeTableSeeder extends Seeder
                 "scope" => "website",
                 "is_synchronized" => 0
             ],
-            // [
-            //     "name" => "New",
-            //     "type" => "boolean",
-            //     "default_value" => 0
-            // ],
-            // [
-            //     "name" => "Featured",
-            //     "type" => "boolean",
-            //     "default_value" => 0
-            // ],
             [
                 "name" => "Price",
                 "type" => "price",
@@ -115,24 +105,6 @@ class AttributeTableSeeder extends Seeder
                 "default_value" => "No",
                 "scope" => "website"
             ],
-            // [
-            //     "name" => "Width",
-            //     "type" => "text",
-            //     "validation" => "decimal",
-            //     "is_user_defined" => 1
-            // ],
-            // [
-            //     "name" => "Height",
-            //     "type" => "text",
-            //     "validation" => "decimal",
-            //     "is_user_defined" => 1
-            // ],
-            // [
-            //     "name" => "Depth",
-            //     "type" => "text",
-            //     "validation" => "decimal",
-            //     "is_user_defined" => 1
-            // ],
             [
                 "name" => "Weight",
                 "type" => "text",
@@ -370,6 +342,41 @@ class AttributeTableSeeder extends Seeder
                 "type" => "select",
                 "default_value" => "",
                 "options" => [],
+                "scope" => "store"
+            ],
+            [
+                "name" => "Fit",
+                "type" => "texteditor",
+                "scope" => "store"
+            ],
+            [
+                "name" => "Constructed For",
+                "type" => "texteditor",
+                "scope" => "store"
+            ],
+            [
+                "name" => "Technical Details",
+                "type" => "texteditor",
+                "scope" => "store"
+            ],
+            [
+                "name" => "Measurements",
+                "type" => "texteditor",
+                "scope" => "store"
+            ],
+            [
+                "name" => "Wash & Care",
+                "type" => "texteditor",
+                "scope" => "store"
+            ],
+            [
+                "name" => "Factory",
+                "type" => "texteditor",
+                "scope" => "store"
+            ],
+            [
+                "name" => "Delivery & Returns",
+                "type" => "texteditor",
                 "scope" => "store"
             ]
         ];
