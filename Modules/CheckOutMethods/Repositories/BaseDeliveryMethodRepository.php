@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\Core\Facades\CoreCache;
+use Modules\Sales\Entities\Order;
 
 class BaseDeliveryMethodRepository
 {
@@ -28,6 +29,25 @@ class BaseDeliveryMethodRepository
         $this->coreCache =  $this->getCoreCache();
         $this->orderMetaRepository = new CheckOutOrderMetaRepository();
         $this->orderRepository = new CheckOutOrderRepository();
+        $this->relations = [
+            "order_items.order",
+            "order_taxes.order_tax_items",
+            "website",
+            "billing_address", 
+            "shipping_address",
+            "customer",
+            "order_status.order_status_state",
+            "order_addresses.city",
+            "order_addresses.region",
+            "order_addresses.country",
+            "order_metas"
+        ];
+        $this->orderModel = $this->getModel();
+    }
+
+    public function getModel(): object
+    {
+        return Order::query()->with($this->relations);
     }
     
     public function object(array $attributes = []): mixed

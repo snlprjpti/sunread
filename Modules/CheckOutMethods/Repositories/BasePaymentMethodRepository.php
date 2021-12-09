@@ -12,6 +12,7 @@ use Modules\CheckOutMethods\Exceptions\MethodException;
 use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\CheckOutMethods\Traits\HasBasePaymentMethod;
 use Modules\Core\Facades\CoreCache;
+use Modules\Sales\Entities\Order;
 use Modules\Sales\Repositories\OrderMetaRepository;
 
 class BasePaymentMethodRepository 
@@ -32,7 +33,8 @@ class BasePaymentMethodRepository
 	public $orderMetaRepository;
     public $order;
 	public mixed $base_data;
-
+    public object $orderModel;
+    public array $relations;
 
     public function __construct(object $request, string $method_key, ?array $rules = [])
     {
@@ -46,6 +48,25 @@ class BasePaymentMethodRepository
         $this->headers = [ "Accept" => "application/json" ];
         $this->orderMetaRepository = new CheckOutOrderMetaRepository();
         $this->orderRepository = new CheckOutOrderRepository();
+        $this->relations = [
+            "order_items.order",
+            "order_taxes.order_tax_items",
+            "website",
+            "billing_address", 
+            "shipping_address",
+            "customer",
+            "order_status.order_status_state",
+            "order_addresses.city",
+            "order_addresses.region",
+            "order_addresses.country",
+            "order_metas"
+        ];
+        $this->orderModel = $this->getModel();
+    }
+
+    public function getModel(): object
+    {
+        return Order::query()->with($this->relations);
     }
 
     public function object(array $attributes = []): mixed
