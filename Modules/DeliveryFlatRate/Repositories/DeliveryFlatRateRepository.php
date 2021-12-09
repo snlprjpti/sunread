@@ -43,22 +43,24 @@ class DeliveryFlatRateRepository extends BaseDeliveryMethodRepository implements
                     ->map( function ($order_item) use ($order_tax, &$total_shipping_amount) {
                         $amount = (float) (($order_tax->percent/100) * $order_item->amount);
                         $total_shipping_amount += $amount;
-                        $data = [
+                        
+                        OrderTaxItem::create([
                             "tax_id" => $order_tax->id,
                             "tax_percent" => (float) $order_tax->percent,
                             "amount" => $amount,
                             "tax_item_type" => "shipping"
-                        ];
-                        OrderTaxItem::create($data);
+                        ]);
+                        
                         return ($order_item->amount + $amount);
                     })->toArray();
     
                     $order_tax->update(["amount" => array_sum($order_item_total_amount)]);
                 });
+                
                 $arr_shipping["shipping_tax"] = true;
             }
             $arr_shipping["shipping_amount"] = $total_shipping_amount;
-
+            
             $this->orderRepository->update([
                 "shipping_method" => $this->method_key,
                 "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
