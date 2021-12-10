@@ -69,9 +69,7 @@ class FeatureRepository extends BaseRepository
     {
         try
         {
-            if (!$deleted->image) {
-                return true;
-            }
+            if (!$deleted->image) return true;
 
             $this->removeFolder($deleted);
         }
@@ -88,9 +86,7 @@ class FeatureRepository extends BaseRepository
         try
         {
             $updated = $this->model->findOrFail($id);
-            if (!$updated->image) {
-                return $updated;
-            }
+            if (!$updated->image) return $updated;
 
             $this->removeFolder($updated);
 
