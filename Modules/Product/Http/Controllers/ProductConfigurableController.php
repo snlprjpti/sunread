@@ -106,7 +106,7 @@ class ProductConfigurableController extends BaseController
                 $attributes = $this->product_attribute_repository->validateAttributes($updated, $request, $scope, "update", "configurable");
                 $this->product_attribute_repository->syncAttributes($attributes, $updated, $scope, $request, "update", "configurable");
 
-                if($data["update_configurable_attributes"] == 1) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
+                $this->repository->updateVariants($data, $request, $updated, $scope, $attributes);
 
                 $updated->load("variants");
             });
