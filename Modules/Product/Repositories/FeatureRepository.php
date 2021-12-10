@@ -73,7 +73,43 @@ class FeatureRepository extends BaseRepository
                 return true;
             }
 
-            $path_array = explode("/", $deleted->image);
+            $this->removeFolder($deleted);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
+    }
+
+    public function removeOldImage(int $id): object
+    {
+        try
+        {
+            $updated = $this->model->findOrFail($id);
+            if (!$updated->image) {
+                return $updated;
+            }
+
+            $this->removeFolder($updated);
+
+            $updated->fill(["image" => null]);
+            $updated->save();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $updated;
+    }
+
+    public function removeFolder(object $data): bool
+    {
+        try
+        {
+            $path_array = explode("/", $data->image);
             unset($path_array[count($path_array) - 1]);
 
             $delete_folder = implode("/", $path_array);
