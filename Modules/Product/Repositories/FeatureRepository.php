@@ -25,13 +25,11 @@ class FeatureRepository extends BaseRepository
         ];
     }
 
-    public function createImage(object $request): string|bool
+    public function createImage(object $request): ?string
     {
-        DB::beginTransaction();
-
         try
         {
-            if(empty($request->image)) return false;
+            if(empty($request->image)) return null;
             $request->validate([
                 'image' => 'mimes:jpeg,jpg,png',
             ]);
@@ -60,22 +58,18 @@ class FeatureRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
-            DB::rollBack();
             throw $exception;
         }
-        DB::commit();
+
         return $data;
     }
 
 
     public function removeImage(object $deleted): bool
     {
-        DB::beginTransaction();
-
         try
         {
             if (!$deleted->image) {
-                DB::commit();
                 return true;
             }
 
@@ -87,11 +81,8 @@ class FeatureRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
-            DB::rollBack();
             throw $exception;
         }
-
-        DB::commit();
 
         return true;
     }
