@@ -181,6 +181,7 @@ trait ConfigurableProductHandler
                     "label" => isset($translated_val) ? $translated_val->name : $attribute_option->name,
                     "code" => $attribute_option->code ?? $attribute_option->name,
                     "product_id" => $variant->id,
+                    "parent_id" => $variant->parent_id,
                     "product_sku" => $variant->sku,
                     "url_key" => $variant->value(array_merge($store_data, ["attribute_slug" => "url_key"])),
                     "visibility" => $visibility_data_val->id,
