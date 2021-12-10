@@ -70,12 +70,20 @@ class ProductConfigurableTest extends BaseTestCase
     {
         $websiteId = $this->default_resource->website_id;
         $updateData = $this->getCreateData();
-        return array_merge($updateData, $this->getScope($websiteId));
+        return array_merge($updateData, $this->getScope($websiteId), ["update_configurable_attributes" => Arr::random([1,0])]);
     }
 
     public function getNonMandatoryCreateData(): array
     {
         return array_merge($this->getCreateData(), [
+            "parent_id" => null,
+            "brand_id" => null
+        ]);
+    }
+
+    public function getNonMandatoryUpdateData(): array
+    {
+        return array_merge($this->getUpdateData(), [
             "parent_id" => null,
             "brand_id" => null
         ]);
