@@ -389,7 +389,7 @@ class ProductConfigurableRepository extends BaseRepository
     {
         try
         {
-           if($data["update_configurable_attributes"] == 1) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
+           if($data["update_configurable_attributes"] == 1) $this->createVariants($updated, $request, $scope, $attributes, "update");
            else {
                 if($request->update_variants && $request->update_attributes) {
                     $update_productAttributes = collect($attributes)->whereIn("attribute_slug", $request->update_attributes)->toArray();
