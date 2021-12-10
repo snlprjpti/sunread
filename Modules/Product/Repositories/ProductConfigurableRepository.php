@@ -384,4 +384,25 @@ class ProductConfigurableRepository extends BaseRepository
             ->where('id', '<>', $id)
             ->exists();
     }
+
+    public function updateVariants(array $data, object $request, object $updated, array $scope, array $attributes): void
+    {
+        try
+        {
+           if($data["update_configurable_attributes"] == 1) $this->repository->createVariants($updated, $request, $scope, $attributes, "update");
+           else {
+                if($request->update_variants && $request->update_attributes) {
+                    $update_productAttributes = collect($attributes)->whereIn("attribute_slug", $request->update_attributes)->toArray();
+                    foreach($request->update_variants as $variant_id) {
+                        $variant = Product::find($variant_id);
+                        if($variant) $this->product_attribute_repository->syncAttributes($update_productAttributes, $variant, $scope, $request, "store");
+                    }
+                }
+            }
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
+    }
 }
