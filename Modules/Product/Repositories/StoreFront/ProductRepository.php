@@ -379,12 +379,15 @@ class ProductRepository extends BaseRepository
                         if($attribute_value["attribute_slug"] == "color") {
                             $visibility_item = collect($attribute_values)->where("visibility", 8)->where("id", $attribute_value["id"])->first();
                             $product_val_array["url_key"] = isset($visibility_item["url_key"]) ? $visibility_item["url_key"] : $attribute_value["url_key"];
+                            $product_val_array["product_id"] = isset($visibility_item["product_id"]) ? $visibility_item["product_id"] : $attribute_value["product_id"];                          
+                            $product_val_array["parent_id"] = isset($visibility_item["parent_id"]) ? $visibility_item["parent_id"] : $attribute_value["parent_id"];
                             $product_val_array["image"] = isset($visibility_item["image"]) ? $visibility_item["image"] : $attribute_value["image"];
                         }
                         if(count($attribute_slugs) == 1) {
                             $fake_array = array_merge($this->nested_product, [$attribute_value["attribute_slug"] => $attribute_value["id"]]);
                             $dot_product = collect($this->config_products)->where("attribute_combination", $fake_array)->first();
                             $product_val_array["product_id"] = isset($dot_product["product_id"]) ? $dot_product["product_id"] : 0;
+                            $product_val_array["parent_id"] = isset($dot_product["parent_id"]) ? $dot_product["parent_id"] : 0;
                             $product_val_array["sku"] = isset($dot_product["product_sku"]) ? $dot_product["product_sku"] : 0;
                             $product_val_array["stock_status"] = isset($dot_product["stock_status"]) ? $dot_product["stock_status"] : 0;
                             //if($count == ($j+1)) $this->nested_product = [];
