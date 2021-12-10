@@ -25,13 +25,11 @@ class FeatureRepository extends BaseRepository
         ];
     }
 
-    public function createImage(object $request): string|bool
+    public function createImage(object $request): ?string
     {
-        DB::beginTransaction();
-
         try
         {
-            if(empty($request->image)) return false;
+            if(empty($request->image)) return null;
             $request->validate([
                 'image' => 'mimes:jpeg,jpg,png',
             ]);
@@ -60,26 +58,58 @@ class FeatureRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
-            DB::rollBack();
             throw $exception;
         }
-        DB::commit();
+
         return $data;
     }
 
 
     public function removeImage(object $deleted): bool
     {
-        DB::beginTransaction();
-
         try
         {
             if (!$deleted->image) {
-                DB::commit();
                 return true;
             }
 
-            $path_array = explode("/", $deleted->image);
+            $this->removeFolder($deleted);
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return true;
+    }
+
+    public function removeOldImage(int $id): object
+    {
+        try
+        {
+            $updated = $this->model->findOrFail($id);
+            if (!$updated->image) {
+                return $updated;
+            }
+
+            $this->removeFolder($updated);
+
+            $updated->fill(["image" => null]);
+            $updated->save();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $updated;
+    }
+
+    public function removeFolder(object $data): bool
+    {
+        try
+        {
+            $path_array = explode("/", $data->image);
             unset($path_array[count($path_array) - 1]);
 
             $delete_folder = implode("/", $path_array);
@@ -87,11 +117,8 @@ class FeatureRepository extends BaseRepository
         }
         catch (Exception $exception)
         {
-            DB::rollBack();
             throw $exception;
         }
-
-        DB::commit();
 
         return true;
     }

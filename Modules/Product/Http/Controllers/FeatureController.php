@@ -91,6 +91,7 @@ class FeatureController extends BaseController
         try
         {
             $data = $this->repository->validateData($request);
+            $this->repository->removeOldImage($id);
             $data["image"] = $this->repository->createImage($request);
 
             $updated = $this->repository->update($data, $id, function($updated) use($request) {
