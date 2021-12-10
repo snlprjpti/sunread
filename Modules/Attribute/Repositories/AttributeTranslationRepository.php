@@ -28,9 +28,7 @@ class AttributeTranslationRepository
 
         try
         {
-            foreach ($data as $row){
-                //if(!$row["name"]) continue;
-                
+            foreach ($data as $row) {
                 $check = [
                     "store_id" => $row["store_id"],
                     "attribute_id" => $parent->id
