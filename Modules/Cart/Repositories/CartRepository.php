@@ -508,7 +508,8 @@ class CartRepository extends BaseRepository
         {
             $cacheData = $this->getCoreCache($request);
             $website_ids = $product->website->channels->pluck("id")->toArray();
-            if (!in_array($cacheData?->channel?->id, $website_ids)) throw new ProductNotFoundIndividuallyException();
+            $channel_status = $product->channels()->whereChannelId($cacheData->store?->channel_id)->first();
+            if (!in_array($cacheData?->channel?->id, $website_ids) || $channel_status) throw new ProductNotFoundIndividuallyException();
         }
         catch (Exception $exception)
         {
