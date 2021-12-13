@@ -25,6 +25,6 @@ class ReindexController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse([], $this->lang('reindex-success'));
+        return $this->successResponse([], __("core::app.response.reindex-success"));
     }
 }
