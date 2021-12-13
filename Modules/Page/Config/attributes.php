@@ -1597,7 +1597,7 @@ return [
                                         "options" => [],
                                         "conditions" => [],
                                         "description" => "",
-                                        "rules" => "url",
+                                        "rules" => "",
                                         "is_required" => 0
                                     ],
                                     [
