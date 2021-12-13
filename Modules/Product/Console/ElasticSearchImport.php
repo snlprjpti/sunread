@@ -19,6 +19,6 @@ class ElasticSearchImport extends Command
     public function handle(): void
     {
         ReindexMigrator::dispatch()->onQueue("index");
-        $this->info("All data imported successfully");
+        $this->info("All data reindexed successfully");
     }
 }
