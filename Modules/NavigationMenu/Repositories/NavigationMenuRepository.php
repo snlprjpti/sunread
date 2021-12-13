@@ -104,7 +104,7 @@ class NavigationMenuRepository extends BaseRepository
             $coreCache = $this->getCoreCache($request);
             $website = $coreCache->website;
             $channel = $coreCache->channel;
-            $store = $coreCache->channel;
+            $store = $coreCache->store;
 
             $redis_nav_menu_key = "store_front_nav_menu_website_{$website->hostname}_channel_{$channel->code}_store_{$store->code}";
 
