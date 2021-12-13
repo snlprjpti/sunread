@@ -9,6 +9,7 @@ use Modules\Customer\Entities\Customer;
 use Modules\Sales\Entities\OrderAddress;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Order extends Model
 {
@@ -39,6 +40,11 @@ class Order extends Model
     public function order_taxes(): HasMany
     {
         return $this->hasMany(OrderTax::class);
+    }
+
+    public function order_tax_items(): HasManyThrough
+    {
+        return $this->hasManyThrough(OrderTaxItem::class, OrderTax::class, "order_id", "tax_id");
     }
     
     public function order_transactions(): HasMany

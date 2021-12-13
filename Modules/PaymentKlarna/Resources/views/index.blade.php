@@ -5,5 +5,5 @@
 
     <p>
         This view is loaded from module: {!! config('paymentklarna.name') !!}
-    </p>
+    </p> 
 @endsection

@@ -6,10 +6,13 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Modules\CheckOutMethods\Exceptions\MethodException;
 use Modules\CheckOutMethods\Services\MethodAttribute;
 use Modules\CheckOutMethods\Traits\HasBasePaymentMethod;
 use Modules\Core\Facades\CoreCache;
+use Modules\Sales\Entities\Order;
 use Modules\Sales\Repositories\OrderMetaRepository;
 
 class BasePaymentMethodRepository 
@@ -26,8 +29,12 @@ class BasePaymentMethodRepository
     public string $base_url;
     public array $headers; 
     public string $user_name, $password;
+    public $orderRepository;
     public $orderMetaRepository;
     public $order;
+    public mixed $base_data;
+    public object $orderModel;
+    public array $relations;
 
     public function __construct(object $request, string $method_key, ?array $rules = [])
     {
@@ -39,7 +46,28 @@ class BasePaymentMethodRepository
             "method_key" => $method_key
         ];
         $this->headers = [ "Accept" => "application/json" ];
-        $this->orderMetaRepository = OrderMetaRepository::class;
+        $this->orderMetaRepository = new CheckOutOrderMetaRepository();
+        $this->orderRepository = new CheckOutOrderRepository();
+        $this->relations = [
+            "order_items.order",
+            "order_taxes.order_tax_items",
+            "website",
+            "billing_address", 
+            "shipping_address",
+            "customer",
+            "order_status.order_status_state",
+            "order_addresses.city",
+            "order_addresses.region",
+            "order_addresses.country",
+            "order_metas",
+            "order_tax_items"
+        ];
+        $this->orderModel = $this->getModel();
+    }
+
+    public function getModel(): object
+    {
+        return Order::query()->with($this->relations);
     }
 
     public function object(array $attributes = []): mixed
@@ -71,11 +99,12 @@ class BasePaymentMethodRepository
 
     public function methodDetail(): object
     {
-        if (array_key_exists("user_name", $this->method_detail) && array_key_exists("user_name", $this->method_detail)) {
+        if (array_key_exists("user_name", $this->method_detail) && array_key_exists("password", $this->method_detail)) {
             $this->user_name = $this->method_detail["user_name"];
             $this->password = $this->method_detail["password"];
-        }
-        return $this->object($this->method_detail);
+        } 
+        $this->base_data = $this->object($this->method_detail);
+        return $this->base_data;
     }
 
     public function basicAuth(string $user_name, string $password): object
@@ -83,7 +112,7 @@ class BasePaymentMethodRepository
         return Http::withHeaders($this->headers)->withBasicAuth($user_name, $password);
     }
 
-    public function  getBasicClient(string $url, ?array $query = []): mixed
+    public function getBasicClient(string $url, ?array $query = []): mixed
     {
         Event::dispatch("{$this->method_key}.get-basic-auth.before");
         
@@ -113,8 +142,7 @@ class BasePaymentMethodRepository
             ->post("{$this->base_url}{$url}", $data)
             ->throw()
             ->json();
-
-        }
+         }
         catch (Exception $exception )
         {
             throw new MethodException($exception->getMessage(), $exception->getCode());
@@ -177,8 +205,15 @@ class BasePaymentMethodRepository
     public function validateData(object $request, array $merge = [], ?callable $callback = null): array
     {
         $data = $request->validate($this->rules($merge));
-        $append_data = $callback ? $callback($request) : [];
 
+        $append_data = $callback ? $callback($request) : [];
         return array_merge($data, $append_data);
+    }
+
+    public function customValidate(array $data, array $rules, ?array $message = []): array
+    {
+        $validator = Validator::make($data, $rules, $message);
+        if ( $validator->fails() ) throw ValidationException::withMessages($validator->errors()->toArray());
+        return $validator->validated();
     }
 }

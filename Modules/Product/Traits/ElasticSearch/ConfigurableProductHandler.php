@@ -82,7 +82,7 @@ trait ConfigurableProductHandler
                         $variant_attribute_options = AttributeOptionsChildProduct::whereIn("product_id", $related_variants->pluck("product_id")->toArray())->where("attribute_option_id", "!=", $is_group_attribute?->id)->get()->pluck("attribute_option_id", "product_id");
                     }
                 }
-                else $variant_attribute_options = $variant->attribute_options_child_products->pluck("attribute_option_id", "product_id")->toArray();
+                else $variant_attribute_options = $variant->attribute_options_child_products->pluck("attribute_option_id", "product_id");
     
                 $final_variant = array_merge($product_format, $this->getAttributeData($variant_attribute_options, $variant, $store));  
                 if(count($final_variant) > 0) $this->configurableIndexing($final_variant, $store); 
