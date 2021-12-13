@@ -193,21 +193,14 @@ class PageRepository extends BaseRepository
         try
         {
             $dynamic_bool = getDotToArray("dynamic_link", $values);
-            if($dynamic_bool == "1") {
-                $array_url = explode("/", $default_url);
-                $array_url[0] = $coreCache->channel->code;
-                $array_url[1] = $coreCache->store->code;
-                $default_url = implode("/", $array_url);
-            }
-            $final_url = url($default_url);
-
+            if($dynamic_bool == "1") $default_url = "{$coreCache->channel->code}/{$coreCache->store->code}/{$default_url}";
         }
         catch( Exception $exception )
         {
             throw $exception;
         }
 
-        return $final_url;
+        return $default_url;
     }
 
 }
