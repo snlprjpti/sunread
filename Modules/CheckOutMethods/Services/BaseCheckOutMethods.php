@@ -11,11 +11,13 @@ class BaseCheckOutMethods
     protected array $checkout_methods;
     protected array $method_attributes;
     protected mixed $check_out_method;
+    protected bool $get_initial_repository;
 
-    public function __construct(?string $check_out_method = null)
+    public function __construct(?string $check_out_method = null, ?bool $get_initial_repository = false)
     {
         $this->checkout_methods = ["delivery_methods", "payment_methods"];
         $this->check_out_method = isset($check_out_method) ?  $this->fetch($check_out_method) : $check_out_method;
+        $this->get_initial_repository = $get_initial_repository;
     }
 
     public function object(array $attributes = []): mixed
@@ -65,6 +67,7 @@ class BaseCheckOutMethods
         $method_repository = $method_data->repository;
         if (!class_exists($method_repository)) throw new Exception("Repository Path Not found.");
         $method_repository = new $method_repository($request, $parameter);
+        if ($this->get_initial_repository) return $method_repository;
         $data = $method_repository->get();
         return $data;
     }
