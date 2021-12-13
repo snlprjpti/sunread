@@ -4,6 +4,7 @@
 namespace Modules\Attribute\Repositories;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Modules\Attribute\Entities\AttributeOptionTranslation;
 
@@ -25,16 +26,19 @@ class AttributeOptionTranslationRepository
 
         try
         {
+            $translation_data = [];
             foreach ($data as $row) {
+                
                 $check = [
                     "store_id" => $row["store_id"],
                     "attribute_option_id" => $parent->id
                 ];
     
                 $created = $this->model->firstorNew($check);
-                $created->fill($row);
+                $translation_data[] = $created->fill($row);
                 $created->save();
             }
+            $parent->translations()->whereNotIn('id', array_filter(Arr::pluck($translation_data, 'id')))->delete();
         }
         catch (Exception $exception)
         {
