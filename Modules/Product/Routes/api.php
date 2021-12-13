@@ -4,13 +4,7 @@ Route::group(["middleware" => ["api"]], function() {
     // ADMIN PRODUCT ROUTES
     Route::group(["prefix" => "admin/catalog", "as" => "admin.catalog.", "middleware" => ["admin", "language"]], function() {
 
-        //Product Attribute Routes
-        Route::post('products/attributes', [\Modules\Product\Http\Controllers\ProductAttributeController::class, "store"])->name("products.attributes.store");
-
-        // Route::get('products/search', [\Modules\Product\Http\Controllers\ProductSearchController::class, "index"]);
-
-        //Route::post('products/bulk-reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "bulkReIndex"])->name('products.bulk-reindex');
-        //Route::get('products/{id}/reindex', [\Modules\Product\Http\Controllers\ProductSearchController::class, "reIndex"])->name('products.reindex');
+        Route::get('products/reindex', [\Modules\Product\Http\Controllers\ReindexController::class, "reIndex"])->name('products.reindex');
 
         // Catalog Product Routes
         Route::get("product/configurations", [\Modules\Product\Http\Controllers\ProductController::class, "configurations"])->name("products.configurations");

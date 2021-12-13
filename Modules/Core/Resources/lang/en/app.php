@@ -51,6 +51,7 @@ return [
         "country-not-allow" => "Country is not allowed",
         'cannot-update-default' => 'Cannot update the default :name',
         'clear-success' => ':name clear successfully',
+        'reindex-success' => 'All data reindexed successfully'
     ],
     'users' => [
         'forget-password' => [
