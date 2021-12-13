@@ -6,6 +6,7 @@ namespace Modules\Attribute\Repositories;
 use Exception;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Modules\Attribute\Entities\AttributeTranslation;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
@@ -28,16 +29,19 @@ class AttributeTranslationRepository
 
         try
         {
-            foreach ($data as $row) {
+            $translation_data = [];
+            foreach ($data as $row){
+                
                 $check = [
                     "store_id" => $row["store_id"],
                     "attribute_id" => $parent->id
                 ];
     
                 $created = $this->model->firstorNew($check);
-                $created->fill($row);
+                $translation_data[] = $created->fill($row);
                 $created->save();
             }
+            $parent->translations()->whereNotIn('id', array_filter(Arr::pluck($translation_data, 'id')))->delete();
         }
         catch (Exception $exception)
         {
