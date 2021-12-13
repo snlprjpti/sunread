@@ -4,6 +4,7 @@ namespace Modules\Product\Repositories;
 
 use Illuminate\Support\Facades\Event;
 use Exception;
+use Illuminate\Support\Arr;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Repositories\BaseRepository;
@@ -24,6 +25,7 @@ class FeatureTranslationRepository extends BaseRepository
 
         try
         {
+            $translation_data = [];
             foreach ($data as $row) {
                 $check = [
                     "store_id" => $row["store_id"],
@@ -31,9 +33,10 @@ class FeatureTranslationRepository extends BaseRepository
                 ];
 
                 $created = $this->model->firstorNew($check);
-                $created->fill($row);
+                $translation_data[] = $created->fill($row);
                 $created->save();
             }
+            $parent->translations()->whereNotIn('id', array_filter(Arr::pluck($translation_data, 'id')))->delete();
         }
         catch (Exception $exception)
         {
