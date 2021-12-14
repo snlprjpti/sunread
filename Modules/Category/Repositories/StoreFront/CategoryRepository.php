@@ -207,15 +207,7 @@ class CategoryRepository extends BaseRepository
         try
         {
             $count = count($slugs);
-
-            if(isset($category->parent)) {
-                $categories = $category->parent->children;
-                $url_count = --$count;
-            }
-            else {
-                $categories = $category->children;
-                $url_count = ++$count;
-            }
+            $categories = $category->children;
 
             $fetched = [];
             foreach($categories as $single_category)
@@ -224,7 +216,7 @@ class CategoryRepository extends BaseRepository
                 if(!$this->checkStatus($category, $scope)) continue;
 
                 $slug =  $single_category->value($scope, "slug");
-                $slugs[$url_count] = $slug;
+                $slugs[++$count] = $slug;
 
                 $fetched[] = [
                     "id" => $single_category->id,
