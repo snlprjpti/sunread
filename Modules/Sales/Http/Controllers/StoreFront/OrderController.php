@@ -79,19 +79,7 @@ class OrderController extends BaseController
     {
         try
         {
-            $website = CoreCache::getWebsite($request->header("hc-host"));
-            $channel = CoreCache::getChannel($website, $request->header("hc-channel"));
-            $method_lists = [];
-            $methods = collect(["delivery_methods", "payment_methods"]);
-            $methods->map( function ($method) use ($channel, &$method_lists) {
-                $get_method = SiteConfig::get($method);
-                $get_method_list = $get_method->pluck("slug")->unique();
-                foreach ($get_method_list as $key => $list) {
-                    $title = SiteConfig::fetch("{$method}_{$list}_title", "channel", $channel->id);
-                    $method_lists[$method][$key]["slug"] = $list;
-                    $method_lists[$method][$key]["title"] = $title;
-                }
-            });
+            $method_lists = $this->repository->getMethodList($request);
         }
         catch( Exception $exception )
         {
