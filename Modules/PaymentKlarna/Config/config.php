@@ -87,6 +87,20 @@ return [
         "repository" => "Modules\PaymentKlarna\Repositories\KlarnaRepository",
         "elements" => [
             [
+                "title" => "Allow Custom Shipping handler",
+                "path" => "payment_methods_klarna_api_config_allow_custom_shipping_handler",
+                "type" => "select",
+                "provider" => "Modules\Country\Entities\Country",
+                "pluck" => ["name", "iso_2_code"],
+                "default" => ["SE"],
+                "options" => [],
+                "rules" => "exists:countries,iso_2_code",
+                "multiple" => true,
+                "scope" => "channel",
+                "is_required" => 0,
+                "sort_by" => ""
+            ],
+            [
                 "title" => "Endpoint",
                 "path" => "payment_methods_klarna_api_config_endpoint",
                 "type" => "select",
