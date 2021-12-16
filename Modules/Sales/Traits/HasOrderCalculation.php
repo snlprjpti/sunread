@@ -37,7 +37,7 @@ trait HasOrderCalculation
                 $total_items += 1;
                 $item_discount_amount += (float) $item->discount_amount_tax;
             }
-            
+
             $discount_amount = (float) $this->calculateDiscount($order); // To-Do other discount will be added here...
 
             $check_out_method_helper = $this->check_out_method_helper;
@@ -109,7 +109,7 @@ trait HasOrderCalculation
         try
         {
             $get_zip_code = $request->get("address")["shipping"];
-            $zip_code = isset($get_zip_code['postcode']) ? $get_zip_code['postal_code'] : null;
+            $zip_code = isset($get_zip_code['postcode']) ? $get_zip_code['postcode'] : null;
 
             $product_data = $this->getProductDetail($request, $order);
             if ( auth("customer")->id() ) {
