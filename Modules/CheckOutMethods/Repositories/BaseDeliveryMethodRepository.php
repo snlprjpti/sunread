@@ -74,7 +74,7 @@ class BaseDeliveryMethodRepository
             throw $exception;
         }
 
-        return (object) $data;
+        return $this->object($data);
     }
 
     public function basicAuth(string $user_name, string $password): object
