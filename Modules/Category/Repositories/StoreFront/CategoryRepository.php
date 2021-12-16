@@ -207,15 +207,8 @@ class CategoryRepository extends BaseRepository
         try
         {
             $count = count($slugs);
-
-            if(isset($category->parent)) {
-                $categories = $category->parent->children;
-                $url_count = --$count;
-            }
-            else {
-                $categories = $category->children;
-                $url_count = ++$count;
-            }
+            $categories = $category->children;
+            $url_count = ++$count;
 
             $fetched = [];
             foreach($categories as $single_category)
