@@ -12,17 +12,13 @@ use Modules\Customer\Repositories\StoreFront\AddressRepository;
 
 class CustomerAddressAccountController extends BaseController
 {
-    protected $repository, $customer;
+    protected $repository;
 
     public function __construct(AddressRepository $addressRepository, CustomerAddress $customerAddress)
     {
         $this->repository = $addressRepository;
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
-        $this->customer = $this->middleware(function ($request, $next) {
-            $this->customer = auth()->guard("customer")->user();
-            return $next($request);
-        });
         $this->middleware('validate.website.host');
         $this->middleware('validate.channel.code');
         $this->middleware('validate.store.code');
@@ -33,7 +29,8 @@ class CustomerAddressAccountController extends BaseController
     {
         try
         {
-            $fetched = $this->repository->getCustomerAddress($request, $this->customer);
+            $customer = auth()->guard("customer")->user();
+            $fetched = $this->repository->getCustomerAddress($request, $customer);
         }
         catch (Exception $exception)
         {
@@ -47,7 +44,8 @@ class CustomerAddressAccountController extends BaseController
     {
         try
         {
-            $created = $this->repository->createOrUpdate($request, $this->customer->id);
+            $customer = auth()->guard("customer")->user();
+            $created = $this->repository->createOrUpdate($request, $customer->id);
         }
         catch (Exception $exception)
         {
