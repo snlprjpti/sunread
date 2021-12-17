@@ -19,7 +19,10 @@ class CustomerAddressAccountController extends BaseController
         $this->repository = $addressRepository;
         $this->model = $customerAddress;
         $this->model_name = "Customer Address";
-        $this->customer = auth()->guard("customer")->user();
+        $this->customer = $this->middleware(function ($request, $next) {
+            $this->customer = auth()->guard("customer")->user();
+            return $next($request);
+        });
         $this->middleware('validate.website.host');
         $this->middleware('validate.channel.code');
         $this->middleware('validate.store.code');
