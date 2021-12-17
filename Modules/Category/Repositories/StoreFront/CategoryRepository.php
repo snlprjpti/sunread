@@ -207,13 +207,37 @@ class CategoryRepository extends BaseRepository
         try
         {
             $fetched = [];
-            $count = count($slugs);
             $category =Category::withDepth()->find($category->id);
 
-            $parent_categories = ($category->parent && $category->depth != 1) ? $category->parent->parent->children : [];
-            $parent_slugs = $slugs;
-            $parent_count = $count;
-            unset($parent_slugs[--$parent_count]);
+            $fetched["parent"] = $this->getParentNavigation($category, $scope, $slugs);
+            $fetched["children"] = $this->getChildNavigation($category, $scope, $slugs);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function getParentNavigation(object $category, array $scope, array $slugs): array
+    {
+        try
+        {
+            $parent_data = [];
+            $parent_categories = [];
+
+            $count = count($slugs);
+
+            if($category->parent ) {
+                if($category->depth == 1) {
+                    $parent_categories = $category->parent->children;
+                }
+                else {
+                    $parent_categories = $category->parent->parent->children;
+                    unset($slugs[--$count]);
+                }
+            }
 
             foreach($parent_categories as $single_parent_category)
             {
@@ -221,19 +245,33 @@ class CategoryRepository extends BaseRepository
                 if(!$this->checkStatus($category, $scope)) continue;
 
                 $slug =  $single_parent_category->value($scope, "slug");
-                $parent_slugs[$parent_count-1] = $slug;
+                $slugs[$count-1] = $slug;
 
-                $fetched["parent"][] = [
+                $parent_data[] = [
                     "id" => $single_parent_category->id,
                     "slug" => $slug,
                     "name" => $single_parent_category->value($scope, "name"),
-                    "url" => implode("/", $parent_slugs)
+                    "url" => implode("/", $slugs)
                 ];
             }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
 
-            $hasChildren = count($category->children) > 0;
-            $categories = $hasChildren ? $category->children : $category->parent->children;
-            $url_count = $hasChildren ? ++$count : --$count;
+        return $parent_data;
+    }
+
+    public function getChildNavigation(object $category, array $scope, array $slugs): array
+    {
+        try
+        {
+            $child_data = [];
+
+            $count = count($slugs);
+            $categories = $category->children;
+            $url_count = ++$count;
 
             foreach($categories as $single_category)
             {
@@ -243,7 +281,7 @@ class CategoryRepository extends BaseRepository
                 $slug =  $single_category->value($scope, "slug");
                 $slugs[$url_count] = $slug;
 
-                $fetched["children"][] = [
+                $child_data[] = [
                     "id" => $single_category->id,
                     "slug" => $slug,
                     "name" => $single_category->value($scope, "name"),
@@ -256,7 +294,7 @@ class CategoryRepository extends BaseRepository
             throw $exception;
         }
 
-        return $fetched;
+        return $child_data;
     }
 
     public function checkScopeForUrlKey(?int $category_id, object $coreCache, ?string $custom_scope, ?int $parent_id): void
