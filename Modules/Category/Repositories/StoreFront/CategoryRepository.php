@@ -230,9 +230,7 @@ class CategoryRepository extends BaseRepository
             $count = count($slugs);
 
             if($category->parent ) {
-                if($category->depth == 1) {
-                    $parent_categories = $category->parent->children;
-                }
+                if($category->depth == 1) $parent_categories = $category->parent->children;
                 else {
                     $parent_categories = $category->parent->parent->children;
                     unset($slugs[--$count]);
@@ -270,8 +268,16 @@ class CategoryRepository extends BaseRepository
             $child_data = [];
 
             $count = count($slugs);
-            $categories = $category->children;
-            $url_count = ++$count;
+            if($category->parent && $category->depth == 2) {
+                $categories = $category->parent->children;
+                $fake_slugs = $slugs;
+                unset($fake_slugs[$count-1]);
+                $url_count = $count - 1;
+            }
+            else {
+                $categories = $category->children;
+                $url_count = ++$count;
+            }
 
             foreach($categories as $single_category)
             {
