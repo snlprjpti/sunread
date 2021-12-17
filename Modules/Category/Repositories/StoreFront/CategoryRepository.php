@@ -206,11 +206,73 @@ class CategoryRepository extends BaseRepository
     {
         try
         {
+            $fetched = [];
+            $category =Category::withDepth()->find($category->id);
+
+            $fetched["parent"] = $this->getParentNavigation($category, $scope, $slugs);
+            $fetched["children"] = $this->getChildNavigation($category, $scope, $slugs);
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $fetched;
+    }
+
+    public function getParentNavigation(object $category, array $scope, array $slugs): array
+    {
+        try
+        {
+            $parent_data = [];
+            $parent_categories = [];
+
+            $count = count($slugs);
+
+            if($category->parent ) {
+                if($category->depth == 1) {
+                    $parent_categories = $category->parent->children;
+                }
+                else {
+                    $parent_categories = $category->parent->parent->children;
+                    unset($slugs[--$count]);
+                }
+            }
+
+            foreach($parent_categories as $single_parent_category)
+            {
+                if(!$this->checkMenuStatus($category, $scope)) continue;
+                if(!$this->checkStatus($category, $scope)) continue;
+
+                $slug =  $single_parent_category->value($scope, "slug");
+                $slugs[$count-1] = $slug;
+
+                $parent_data[] = [
+                    "id" => $single_parent_category->id,
+                    "slug" => $slug,
+                    "name" => $single_parent_category->value($scope, "name"),
+                    "url" => implode("/", $slugs)
+                ];
+            }
+        }
+        catch(Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $parent_data;
+    }
+
+    public function getChildNavigation(object $category, array $scope, array $slugs): array
+    {
+        try
+        {
+            $child_data = [];
+
             $count = count($slugs);
             $categories = $category->children;
             $url_count = ++$count;
 
-            $fetched = [];
             foreach($categories as $single_category)
             {
                 if(!$this->checkMenuStatus($category, $scope)) continue;
@@ -219,7 +281,7 @@ class CategoryRepository extends BaseRepository
                 $slug =  $single_category->value($scope, "slug");
                 $slugs[$url_count] = $slug;
 
-                $fetched[] = [
+                $child_data[] = [
                     "id" => $single_category->id,
                     "slug" => $slug,
                     "name" => $single_category->value($scope, "name"),
@@ -232,7 +294,7 @@ class CategoryRepository extends BaseRepository
             throw $exception;
         }
 
-        return $fetched;
+        return $child_data;
     }
 
     public function checkScopeForUrlKey(?int $category_id, object $coreCache, ?string $custom_scope, ?int $parent_id): void
