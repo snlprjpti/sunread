@@ -12,14 +12,12 @@ class BaseCheckOutMethods
     protected array $method_attributes;
     protected mixed $check_out_method;
     protected bool $get_initial_repository;
-    protected mixed $check_out_process_resolver;
 
     public function __construct(?string $check_out_method = null, ?bool $get_initial_repository = false)
     {
         $this->checkout_methods = ["delivery_methods", "payment_methods"];
         $this->check_out_method = isset($check_out_method) ?  $this->fetch($check_out_method) : $check_out_method;
         $this->get_initial_repository = $get_initial_repository;
-        $this->check_out_process_resolver = CheckOutProcessResolver::class;
     }
 
     public function object(array $attributes = []): mixed
@@ -66,16 +64,22 @@ class BaseCheckOutMethods
 
     private function getRepositoryData(object $method_data, object $request, ?object $parameter): mixed
     {
-        $resolver = $this->check_out_process_resolver;
-        $resolver = new $resolver($request);
-        if ($resolver->can_initilize($method_data->check_out_method)) return false;
-
-        $method_repository = $method_data->repository;
-        if (!class_exists($method_repository)) throw new Exception("Repository Path Not found.");
-        $method_repository = new $method_repository($request, $parameter);
-        if ($this->get_initial_repository) return $method_repository;
-        $data = $method_repository->get();
-
+        try
+        {
+            $resolver = new CheckOutProcessResolver($request, $method_data);
+            $method_data = $resolver->resolveCheckOutMethod($method_data);
+            $method_repository = $method_data->repository;
+            
+            if (!class_exists($method_repository)) throw new Exception("Repository Path Not found.");
+            $method_repository = new $method_repository($request, $parameter);
+            if ($this->get_initial_repository) return $method_repository;
+            $data = $method_repository->get();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
         return $data;
     }
 
