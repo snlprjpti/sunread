@@ -206,11 +206,35 @@ class CategoryRepository extends BaseRepository
     {
         try
         {
-            $count = count($slugs);
-            $categories = $category->children;
-            $url_count = ++$count;
-
             $fetched = [];
+            $count = count($slugs);
+            $category =Category::withDepth()->find($category->id);
+
+            $parent_categories = ($category->parent && $category->depth != 1) ? $category->parent->parent->children : [];
+            $parent_slugs = $slugs;
+            $parent_count = $count;
+            unset($parent_slugs[--$parent_count]);
+
+            foreach($parent_categories as $single_parent_category)
+            {
+                if(!$this->checkMenuStatus($category, $scope)) continue;
+                if(!$this->checkStatus($category, $scope)) continue;
+
+                $slug =  $single_parent_category->value($scope, "slug");
+                $parent_slugs[$parent_count-1] = $slug;
+
+                $fetched["parent"][] = [
+                    "id" => $single_parent_category->id,
+                    "slug" => $slug,
+                    "name" => $single_parent_category->value($scope, "name"),
+                    "url" => implode("/", $parent_slugs)
+                ];
+            }
+
+            $hasChildren = count($category->children) > 0;
+            $categories = $hasChildren ? $category->children : $category->parent->children;
+            $url_count = $hasChildren ? ++$count : --$count;
+
             foreach($categories as $single_category)
             {
                 if(!$this->checkMenuStatus($category, $scope)) continue;
@@ -219,7 +243,7 @@ class CategoryRepository extends BaseRepository
                 $slug =  $single_category->value($scope, "slug");
                 $slugs[$url_count] = $slug;
 
-                $fetched[] = [
+                $fetched["children"][] = [
                     "id" => $single_category->id,
                     "slug" => $slug,
                     "name" => $single_category->value($scope, "name"),
