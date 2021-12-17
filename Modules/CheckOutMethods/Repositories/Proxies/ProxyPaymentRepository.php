@@ -7,7 +7,7 @@ use Modules\CheckOutMethods\Repositories\BaseDeliveryMethodRepository;
 
 class ProxyPaymentRepository extends BaseDeliveryMethodRepository implements PaymentMethodInterface
 {
-	protected object $request;
+    protected object $request;
     protected object $parameter;
     protected string $method_key;
 
@@ -20,9 +20,9 @@ class ProxyPaymentRepository extends BaseDeliveryMethodRepository implements Pay
         parent::__construct($this->request, $this->method_key);
     }
 
-	public function get(): mixed
-	{
-		return true;
-	}
+    public function get(): mixed
+    {
+        return true;
+    }
 
 }

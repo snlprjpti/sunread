@@ -21,15 +21,15 @@ class ProxyDeliveryRepository extends BaseDeliveryMethodRepository implements De
         parent::__construct($this->request, $this->method_key);
     }
 
-	public function get(): mixed
-	{
-		try
-		{
-			$coreCache = $this->getCoreCache();
+    public function get(): mixed
+    {
+        try
+        {
+            $coreCache = $this->getCoreCache();
             $channel_id = $coreCache?->channel->id;
-			$arr_shipping = [ "shipping_amount" => 0.00, "shipping_tax" => false ];
+            $arr_shipping = [ "shipping_amount" => 0.00, "shipping_tax" => false ];
 
-			$this->orderRepository->update([
+            $this->orderRepository->update([
                 "shipping_method" => $this->method_key,
                 "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
             ], $this->parameter->order->id, function ($order) use ($arr_shipping) {
@@ -39,18 +39,18 @@ class ProxyDeliveryRepository extends BaseDeliveryMethodRepository implements De
                     "meta_value" => [
                         "shipping_method" => "proxy_shipping_method",
                         "shipping_method_label" => "proxy_shipping_method",
-						"initiated_by" => $this->request->payment_method,
+                        "initiated_by" => $this->request->payment_method,
                         "taxes" => $arr_shipping
                     ]
                 ]);
             });
-		}
+        }
         catch ( Exception $exception )
         {
             throw $exception;
         }
 
         return $arr_shipping;
-	}
+    }
 
 }
