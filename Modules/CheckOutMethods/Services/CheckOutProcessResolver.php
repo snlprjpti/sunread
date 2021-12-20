@@ -88,12 +88,12 @@ class CheckOutProcessResolver
         switch ($checkout_method) {
             case "delivery_methods": 
                 $method = collect(Arr::get($this->getCheckOutMethods(), "payment_methods"))->where("custom_logic", true)->first();
-                $condition = $this->is_custom_logic_implemented(condition:$condition, method_data:$method);
+                if ($method) $condition = $this->is_custom_logic_implemented($method["slug"], $condition);
             break;
 
             case "payment_methods":
                 $method = collect(Arr::get($this->getCheckOutMethods(), "delivery_methods"))->where("custom_logic", true)->first();
-                $condition = $this->is_custom_logic_implemented(condition:$condition, method_data:$method);
+                if ($method) $condition = $this->is_custom_logic_implemented($method["slug"], $condition);
             break;				
         }
 
