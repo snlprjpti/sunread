@@ -31,7 +31,7 @@ class ProxyDeliveryRepository extends BaseDeliveryMethodRepository implements De
 
             $this->orderRepository->update([
                 "shipping_method" => $this->method_key,
-                "shipping_method_label" => SiteConfig::fetch("delivery_methods_{$this->method_key}_title", "channel", $channel_id)
+                "shipping_method_label" => $this->method_key
             ], $this->parameter->order->id, function ($order) use ($arr_shipping) {
                 $this->orderMetaRepository->create([
                     "order_id" => $order->id,
