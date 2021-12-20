@@ -28,20 +28,6 @@ class CheckOutProcessResolver
             
         ];
     }
-
-    public function is_checkout_disabled(string $checkout_method): bool
-    {
-        switch ($checkout_method) {
-            case "delivery_methods": 
-                $condition = $this->can_initilize("delivery_methods");
-            break;
-
-            case "payment_methods":
-                $condition = false; // TODO::add condition if need to disable payment checkout
-            break;
-        }
-        return $condition;
-    }
     
     public function check(string $value, string $checkout_method): bool
     {
@@ -49,18 +35,16 @@ class CheckOutProcessResolver
         switch ($checkout_method) {
             case "delivery_methods": 
                 $request_payment_method = $this->request->payment_method;
-                $method_data = Arr::get($this->custom_checkout_handler, $request_payment_method);
-                if ($method_data) {
-                    $condition = in_array("delivery_methods", $method_data["handles"]) && $this->is_custom_checkout_enabled($method_data["configuration_path"]) ? ($value == "proxy_checkout_method") : $this->is_custom_checkout_enabled($method_data["configuration_path"]);
-                }
+                $condition = $this->is_custom_logic_implemented($request_payment_method, $condition, callback:function ($method_data, $condition) use ($value) {
+                    return ($condition) ? (in_array("delivery_methods", $method_data["handles"]) && (($condition) ? ($value == "proxy_checkout_method") : $condition)) : $condition;
+                });
             break;
 
             case "payment_methods":
                 $request_delivery_method = $this->request->shipping_method;
-                $method_data = Arr::get($this->custom_checkout_handler, $request_delivery_method);
-                if ($method_data) {
-                    $condition = in_array("payment_methods", $method_data["handles"]) && $this->is_custom_checkout_enabled($method_data["configuration_path"]) ? ($value == "proxy_checkout_method") : $this->is_custom_checkout_enabled($method_data["configuration_path"]);
-                }
+                $condition = $this->is_custom_logic_implemented($request_delivery_method, $condition, callback:function ($method_data, $condition) use ($value) {
+                    return ($condition) ? (in_array("payment_methods", $method_data["handles"]) && (($condition) ? ($value == "proxy_checkout_method") : $condition)) : $condition;
+                });
             break;				
         }
         return $condition;
@@ -72,19 +56,28 @@ class CheckOutProcessResolver
         switch ($checkout_method) {
             case "delivery_methods": 
                 $request_payment_method = $this->request->payment_method;
-                $method_data = Arr::get($this->custom_checkout_handler, $request_payment_method);
-                if ($method_data) {
-                    $condition = in_array("delivery_methods", $method_data["handles"]) && $this->is_custom_checkout_enabled($method_data["configuration_path"]);
-                }
+                $condition = $this->is_custom_logic_implemented($request_payment_method, $condition, callback:function($method_data, $condition) {
+                    return ($condition) ? (in_array("delivery_methods", $method_data["handles"])) : $condition;
+                });
             break;
 
             case "payment_methods":
                 $request_delivery_method = $this->request->shipping_method;
-                $method_data = Arr::get($this->custom_checkout_handler, $request_delivery_method);
-                if ($method_data) {
-                    $condition = in_array("payment_methods", $method_data["handles"]) && $this->is_custom_checkout_enabled($method_data["configuration_path"]);
-                }
+                $condition = $this->is_custom_logic_implemented($request_delivery_method, $condition, callback:function($method_data, $condition) {
+                    return ($condition) ? (in_array("payment_methods", $method_data["handles"])) : $condition;
+                });
             break;				
+        }
+        return $condition;
+    }
+
+    public function is_custom_logic_implemented(?string $method = null, bool $condition, mixed $method_data = null, ?callable $callback = null): bool
+    {
+        $get_method_data = Arr::get($this->custom_checkout_handler, $method);
+        if ($method_data) $get_method_data = $method_data;
+        if (!is_null($get_method_data)) {
+            $condition = $this->is_custom_checkout_enabled($get_method_data["configuration_path"]);
+            if ($callback) $condition = $callback($get_method_data, $condition);
         }
         return $condition;
     }
@@ -95,14 +88,12 @@ class CheckOutProcessResolver
         switch ($checkout_method) {
             case "delivery_methods": 
                 $method = collect(Arr::get($this->getCheckOutMethods(), "payment_methods"))->where("custom_logic", true)->first();
-                $method_data = Arr::get($this->custom_checkout_handler, $method["slug"]);
-                if ($method) $condition = $this->is_custom_checkout_enabled($method_data["configuration_path"]);
+                $condition = $this->is_custom_logic_implemented(condition:$condition, method_data:$method);
             break;
 
             case "payment_methods":
                 $method = collect(Arr::get($this->getCheckOutMethods(), "delivery_methods"))->where("custom_logic", true)->first();
-                $method_data = Arr::get($this->custom_checkout_handler, $method["slug"]);
-                if ($method) $condition = $this->is_custom_checkout_enabled($method_data["configuration_path"]);
+                $condition = $this->is_custom_logic_implemented(condition:$condition, method_data:$method);
             break;				
         }
 
