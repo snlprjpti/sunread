@@ -165,8 +165,8 @@ class OrderRepository extends BaseRepository
 
     public function updateOrderTax(object $order, object $request): void
     {
-        $order->order_taxes->map( function ($order_tax) {
-            $order_tax_item_amount = $order_tax->order_tax_items->map( function ($order_item) {
+        $order->order_taxes()->get()->map( function ($order_tax) {
+            $order_tax_item_amount = $order_tax->order_tax_items()->get()->map( function ($order_item) {
                 return $order_item->amount;
             })->toArray();
             $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
