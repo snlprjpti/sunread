@@ -11,11 +11,13 @@ class BaseCheckOutMethods
     protected array $checkout_methods;
     protected array $method_attributes;
     protected mixed $check_out_method;
+    protected bool $get_initial_repository;
 
-    public function __construct(?string $check_out_method = null)
+    public function __construct(?string $check_out_method = null, ?bool $get_initial_repository = false)
     {
         $this->checkout_methods = ["delivery_methods", "payment_methods"];
         $this->check_out_method = isset($check_out_method) ?  $this->fetch($check_out_method) : $check_out_method;
+        $this->get_initial_repository = $get_initial_repository;
     }
 
     public function object(array $attributes = []): mixed
@@ -62,19 +64,33 @@ class BaseCheckOutMethods
 
     private function getRepositoryData(object $method_data, object $request, ?object $parameter): mixed
     {
-        $method_repository = $method_data->repository;
-        if (!class_exists($method_repository)) throw new Exception("Repository Path Not found.");
-        $method_repository = new $method_repository($request, $parameter);
-        $data = $method_repository->get();
+        try
+        {
+            $resolver = new CheckOutProcessResolver($request, $method_data);
+            $method_data = $resolver->resolveCheckOutMethod($method_data);
+            $method_repository = $method_data->repository;
+            
+            if (!class_exists($method_repository)) throw new Exception("Repository Path Not found.");
+            $method_repository = new $method_repository($request, $parameter);
+            if ($this->get_initial_repository) return $method_repository;
+            $data = $method_repository->get();
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+        
         return $data;
     }
 
     private function getData(string $checkout_method, ?callable $callback = null): mixed
     {
-        return SiteConfig::get($checkout_method)->map(function ($method) use ($callback) {
+        $proxy_method_data = [ [ "title" => "Proxy Checkout Method", "slug" => "proxy_checkout_method" ] ];
+        return SiteConfig::get($checkout_method)->merge($proxy_method_data)->map(function ($method) use ($callback, $checkout_method) {
             $data = [
                 "title" => $method["title"],
                 "slug" => $method["slug"],
+                "check_out_method" => $checkout_method,
                 "repository" => array_key_exists("repository", $method) ? $method["repository"] : null
             ];
             if ($callback) $data = array_merge($data, $callback($method));

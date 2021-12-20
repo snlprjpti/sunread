@@ -18,11 +18,11 @@ class ProductTableSeeder extends Seeder
             ],
             [
                 "attribute_id" => $this->attributeId("price"),
-                "value" => 75000.00 
+                "value" => 750.00 
             ],
             [
                 "attribute_id" => $this->attributeId("cost"),
-                "value" => 75000.00 
+                "value" => 750.00 
             ],
             [
                 "attribute_id" => $this->attributeId("tax_class_id"),

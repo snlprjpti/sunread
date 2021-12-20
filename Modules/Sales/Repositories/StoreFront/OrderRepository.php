@@ -8,6 +8,8 @@ use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
 use Modules\Cart\Entities\CartItem;
 use Modules\CheckOutMethods\Services\BaseCheckOutMethods;
+use Modules\CheckOutMethods\Services\CheckOutProcessResolver;
+use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Sales\Rules\MethodValidationRule;
@@ -125,8 +127,8 @@ class OrderRepository extends BaseRepository
                 "store_name" => $coreCache?->store->name,
                 "is_guest" => auth("customer")->id() ? 0 : 1,
                 "currency_code" => $currency_code->code,
-                "shipping_method" => $request->shipping_method,
-                "shipping_method_label" => $request->shipping_method_label ?? "free-delivery",
+                "shipping_method" => $request->shipping_method ?? "proxy_checkout_method",
+                "shipping_method_label" => $request->shipping_method_label ?? "proxy_checkout_method",
                 "payment_method" => $request->payment_method,
                 "payment_method_label" => $request->payment_method_label ?? "cash-on-delivery",
                 "status" => "pending",
@@ -163,11 +165,39 @@ class OrderRepository extends BaseRepository
 
     public function updateOrderTax(object $order, object $request): void
     {
-        $order->order_taxes->map( function ($order_tax) {
-            $order_tax_item_amount = $order_tax->order_tax_items->map( function ($order_item) {
-                return $order_item->amount;
-            })->toArray();
-            $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
-        });
+        try
+        {
+            $order->order_taxes()->get()->map( function ($order_tax) {
+                $order_tax_item_amount = $order_tax->order_tax_items()->get()->map( function ($order_item) {
+                    return $order_item->amount;
+                })->toArray();
+                $order_tax->update(["amount" => array_sum($order_tax_item_amount)]);
+            });
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+    }
+
+    public function getMethodList(object $request): mixed
+    {
+        try
+        {
+            $check_out_resolver = new CheckOutProcessResolver($request);
+            $check_out_methods = $check_out_resolver->getCheckOutMethods(callback:function ($methods, $check_out_method) use ($check_out_resolver) {
+                if ($check_out_method == "delivery_methods") {
+                    $check_custom_handler = $check_out_resolver->allow_custom_checkout("delivery_methods");
+                    if ($check_custom_handler) $methods = [ [ "slug" => "proxy_checkout_method", "title" => "Proxy Checkout Method", "custom_logic" => true, "visible" => false ] ];
+                }
+                return $methods;
+            });
+        }
+        catch (Exception $exception)
+        {
+            throw $exception;
+        }
+
+        return $check_out_methods;
     }
 }
