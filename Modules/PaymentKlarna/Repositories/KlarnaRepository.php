@@ -268,7 +268,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
                 "email" => $address->email,
                 "street_address" => $address->address_line_1,
                 "street_address2" => $address->address_line_2,
-                "postal_code" => $address->postal_code,
+                "postal_code" => $address->postcpde,
                 "city" => $city,
                 "region" => $region,
                 "phone" => $address->phone,
