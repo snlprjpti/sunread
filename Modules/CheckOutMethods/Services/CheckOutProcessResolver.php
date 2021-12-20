@@ -36,14 +36,14 @@ class CheckOutProcessResolver
             case "delivery_methods": 
                 $request_payment_method = $this->request->payment_method;
                 $condition = $this->is_custom_logic_implemented($request_payment_method, $condition, callback:function ($method_data, $condition) use ($value) {
-                    return ($condition) ? (in_array("delivery_methods", $method_data["handles"]) && (($condition) ? ($value == "proxy_checkout_method") : $condition)) : $condition;
+                    return ($condition) ? (in_array("delivery_methods", $method_data["handles"]) && ($value == "proxy_checkout_method")) : $condition;
                 });
             break;
 
             case "payment_methods":
                 $request_delivery_method = $this->request->shipping_method;
                 $condition = $this->is_custom_logic_implemented($request_delivery_method, $condition, callback:function ($method_data, $condition) use ($value) {
-                    return ($condition) ? (in_array("payment_methods", $method_data["handles"]) && (($condition) ? ($value == "proxy_checkout_method") : $condition)) : $condition;
+                    return ($condition) ? (in_array("payment_methods", $method_data["handles"]) && ($value == "proxy_checkout_method")) : $condition;
                 });
             break;				
         }
