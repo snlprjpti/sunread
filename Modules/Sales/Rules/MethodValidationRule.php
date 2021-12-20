@@ -30,19 +30,18 @@ class MethodValidationRule implements Rule
         $this->attribute = $attribute;
         $this->value = $value;
         if (empty($value)) return false;
-        
-        if ( ($attribute == "shipping_method") && !($this->check_out_process_resolver->is_checkout_disabled("delivery_methods"))) {   
-            $condition = $this->check($value, "delivery_methods");
-            if (!$this->check_out_process_resolver->check($value, "delivery_methods")) return $condition;
-            return $condition;
+        if ( ($attribute == "shipping_method")) {   
+            if (($this->check_out_process_resolver->can_initilize("delivery_methods"))) {
+                return $this->check_out_process_resolver->check($value, "delivery_methods");
+            }
+            return $this->check($value, "delivery_methods");
         }
-        elseif (($attribute == "shipping_method") && ($this->check_out_process_resolver->is_checkout_disabled("delivery_methods"))) {
-            return ($value == "proxy_checkout_method");
-        }
-        elseif ( ($attribute == "payment_method") && !($this->check_out_process_resolver->is_checkout_disabled("payment_methods"))) {
-            $condition = $this->check($value, "payment_methods"); 
-            if (!$this->check_out_process_resolver->check($value, "payment_methods")) return $condition;
-            return $condition;
+        elseif ( ($attribute == "payment_method")) {
+            
+            if (($this->check_out_process_resolver->can_initilize("payment_methods"))) {
+                return $this->check_out_process_resolver->check($value, "payment_methods"); 
+            }
+            return $this->check($value, "payment_methods");
         }
 
         return true;
