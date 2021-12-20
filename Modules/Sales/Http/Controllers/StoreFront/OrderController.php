@@ -86,7 +86,7 @@ class OrderController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse($method_lists, $this->lang('fetch-list-success'));
+        return $this->successResponse($method_lists, $this->lang('fetch-list-success', ["name" => "Check Out"]));
     }
 
 }
