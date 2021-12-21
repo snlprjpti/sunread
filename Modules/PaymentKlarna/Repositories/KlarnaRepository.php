@@ -139,7 +139,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
                     "shipping_options" => $this->getShippingOptions($order, $shipping_address),
                 ];
             });
-            $response = $this->postBasicClient("checkout/v3/orders", $data);
+            $response = $this->postClient("checkout/v3/orders", $data);
 
             $this->orderRepository->update([
                 "payment_method" => $this->method_key,
