@@ -107,16 +107,23 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
     
     private function getPostData(object $config_data): array
     {
-        $order = $this->orderModel->whereId($this->parameter->order->id)->first();
-        return [
-            "merchantAccount" => $config_data->api_merchant_account,
-            "amount" => [
-              "value" => 100, //$order?->grand_total,
-              "currency" => $order->currency_code,
-            ],
-            "returnUrl" => "https://your-company.com/checkout?shopperOrder=12xy..",
-            "reference" => "sail-racing-{$order->id}",
-            "countryCode" => $config_data->default_country,
-        ];
+        try
+        {
+            $order = $this->orderModel->whereId($this->parameter->order->id)->first();
+            return [
+                "merchantAccount" => $config_data->api_merchant_account,
+                "amount" => [
+                "value" => 100, //$order?->grand_total,
+                "currency" => $order->currency_code,
+                ],
+                "returnUrl" => "https://your-company.com/checkout?shopperOrder=12xy..",
+                "reference" => "sail-racing-{$order->id}",
+                "countryCode" => $config_data->default_country,
+            ];
+        }
+        catch ( Exception $exception )
+        {
+            throw $exception;
+        }
     }
 }

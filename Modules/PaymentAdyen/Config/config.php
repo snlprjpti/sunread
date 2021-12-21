@@ -87,20 +87,6 @@ return [
         "repository" => "Modules\PaymentAdyen\Repositories\AdyenRepository",
         "elements" => [
             [
-                "title" => "Base Url",
-                "path" => "payment_methods_adyen_api_config_base_url",
-                "type" => "text",
-                "provider" => "",
-                "pluck" => [],
-                "default" => "https://checkout-test.adyen.com",
-                "options" => [],
-                "rules" => "",
-                "multiple" => false,
-                "scope" => "channel",
-                "is_required" => 1,
-                "sort_by" => ""
-            ],
-            [
                 "title" => "Adyan Merchant Account",
                 "path" => "payment_methods_adyen_api_config_merchant_account",
                 "type" => "text",
