@@ -32,11 +32,11 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
         return $this->collection([
             [
                 "type" => "production",
-                "url" => "https://checkout-test.adyen.com/checkout"	
+                "url" => "https://checkout-test.adyen.com/checkout/"	
             ],
             [
                 "type" => "playground",
-                "url" => "https://checkout-test.adyen.com/checkout"	
+                "url" => "https://checkout-test.adyen.com/checkout/"	// TODO:: change base url
             ],
         ]);
     }
@@ -44,21 +44,27 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
     private function getBaseUrl(): string
     {
         $data = $this->createBaseData();
-        $api_endpoint_data = $this->urls->where("type", $data->api_mode)->first();
-        return $api_endpoint_data['url'];
+        return $this->urls->where("type", $data->api_mode)->first()["url"];
     }
 
     private function createBaseData(): object
     {
         try
         {
-            $data = [];
+            $api_key = SiteConfig::fetch("payment_methods_adyen_api_config_api_key", "channel", $this->coreCache->channel?->id);
+            $this->headers = array_merge($this->headers, [ 
+                "Content-Type" => "application/json",
+                "X-API-Key" => $api_key
+            ]);
+            $data = [ "api_key" => $api_key ];
             $paths = [
                 "api_mode" => "payment_methods_adyen_api_config_mode",
                 "api_base_url" => "payment_methods_adyen_api_config_base_url",
                 "api_merchant_account" => "payment_methods_adyen_api_config_merchant_account",
-                "api_key" => "payment_methods_adyen_api_config_api_key",
                 "client_key" => "payment_methods_adyen_api_config_client_key",
+                "default_country" => "default_country",
+                "payment_method_label" => "payment_methods_adyen_title",
+                "status" => "payment_methods_adyen_new_order_status"
             ];
             foreach ($paths as $key => $path) $data[$key] = SiteConfig::fetch($path, "channel", $this->coreCache->channel?->id);
         }
@@ -74,43 +80,19 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
     {
         try 
         {
-            $coreCache = $this->getCoreCache();
             $config_data = $this->createBaseData();
-            $channel_id = $coreCache?->channel->id;
-            $order = $this->orderModel->whereId($this->parameter->order->id)->first();
-            $url = "{$this->base_url}/v68/sessions";
-            $data =  [
-                'merchantAccount' => $config_data["api_merchant_account"],
-                'amount' => [
-                  'value' => 100, //$order?->grand_total,
-                  'currency' => $order->currency_code,
-                ],
-                'returnUrl' => 'https://your-company.com/checkout?shopperOrder=12xy..',
-                'reference' => "{$order->id}",
-                'countryCode' => $coreCache?->channel->code,
-            ];
-
-            $headers = [ 
-                "Content-Type" => "application/json",
-                "X-API-Key" => $config_data["api_key"]
-            ];
-            $response = Http::withHeaders($headers)
-                        ->post("{$url}", $data)
-                        ->throw()
-                        ->json();
-            dd($response);
-
-            $order_data = [
-                "payment_method" => $this->method_key,
-                "payment_method_label" => SiteConfig::fetch("payment_methods_{$this->method_key}_title", "channel", $channel_id),
-                "status" => SiteConfig::fetch("payment_methods_{$this->method_key}_new_order_status", "channel", $channel_id)?->slug
-            ];
+            $data =  $this->getPostData($config_data);
+            $response = $this->postClient("v68/sessions", $data);
             
-            $this->orderRepository->update($order_data, $this->parameter->order->id, function ($order) use ($order_data) {
+            $this->orderRepository->update([
+                "payment_method" => $this->method_key,
+                "payment_method_label" => $config_data->payment_method_label,
+                "status" => $config_data->status?->slug
+            ], $this->parameter->order->id, function ($order) use ($response) {
                 $this->orderMetaRepository->create([
                     "order_id" => $order->id,
                     "meta_key" => $this->method_key,
-                    "meta_value" => $order_data
+                    "meta_value" => [ "sessionData" => $response["sessionData"] ]
                 ]);
             });
         }
@@ -121,5 +103,20 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
         
         TransactionLog::log($this->parameter->order, $this->method_key, $response);
         return true;
+    }
+    
+    private function getPostData(object $config_data): array
+    {
+        $order = $this->orderModel->whereId($this->parameter->order->id)->first();
+        return [
+            "merchantAccount" => $config_data->api_merchant_account,
+            "amount" => [
+              "value" => 100, //$order?->grand_total,
+              "currency" => $order->currency_code,
+            ],
+            "returnUrl" => "https://your-company.com/checkout?shopperOrder=12xy..",
+            "reference" => $order->id,
+            "countryCode" => $config_data->default_country,
+        ];
     }
 }
