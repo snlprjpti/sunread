@@ -3,6 +3,7 @@
 namespace Modules\PaymentAdyen\Repositories;
 
 use Exception;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Sales\Facades\TransactionLog;
@@ -20,14 +21,38 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
         $this->request = $request;
         $this->method_key = "adyen";
         $this->parameter = $parameter;
-        
+
         parent::__construct($this->request, $this->method_key);
+        $this->urls = $this->getApiUrl();
+        $this->base_url = $this->getBaseUrl();
     }
 
-    private function createBaseData(): array
+    private function getApiUrl(): Collection
+    {
+        return $this->collection([
+            [
+                "type" => "production",
+                "url" => "https://checkout-test.adyen.com/checkout"	
+            ],
+            [
+                "type" => "playground",
+                "url" => "https://checkout-test.adyen.com/checkout"	
+            ],
+        ]);
+    }
+
+    private function getBaseUrl(): string
+    {
+        $data = $this->createBaseData();
+        $api_endpoint_data = $this->urls->where("type", $data->api_mode)->first();
+        return $api_endpoint_data['url'];
+    }
+
+    private function createBaseData(): object
     {
         try
         {
+            $data = [];
             $paths = [
                 "api_mode" => "payment_methods_adyen_api_config_mode",
                 "api_base_url" => "payment_methods_adyen_api_config_base_url",
@@ -42,7 +67,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             throw $exception;
         }
 
-        return $data;
+        return $this->object($data);
     }
 
     public function get(): mixed
@@ -52,29 +77,29 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $coreCache = $this->getCoreCache();
             $config_data = $this->createBaseData();
             $channel_id = $coreCache?->channel->id;
-            $url = "{$config_data['api_base_url']}/v68/sessions";
+            $order = $this->orderModel->whereId($this->parameter->order->id)->first();
+            $url = "{$this->base_url}/v68/sessions";
             $data =  [
                 'merchantAccount' => $config_data["api_merchant_account"],
                 'amount' => 
                 [
-                  'value' => 100,
-                  'currency' => 'EUR',
+                  'value' => 100, //$order?->grand_total,
+                  'currency' => $order->currency_code,
                 ],
                 'returnUrl' => 'https://your-company.com/checkout?shopperOrder=12xy..',
-                'reference' => 'firoz payment',
-                'countryCode' => 'NL',
+                'reference' => "{$order->id}",
+                'countryCode' => $coreCache?->channel->code,
             ];
 
-           $headers = [
-               "Content-Type" => "application/json",
-               "X-API-Key" => $config_data["api_key"]
+            $headers = [ 
+                "Content-Type" => "application/json",
+                "X-API-Key" => $config_data["api_key"]
             ];
-
             $response = Http::withHeaders($headers)
                         ->post("{$url}", $data)
                         ->throw()
                         ->json();
-            dd($response); 
+            dd($response);
 
             $order_data = [
                 "payment_method" => $this->method_key,
