@@ -11,6 +11,7 @@ class OrderMetaResource extends JsonResource
         return [
             "id" => $this->id,
             "has_script" => ($this->meta_key == "klarna") ? true : false,
+            "has_encrypted" => ($this->meta_key == "adyen") ? true : false,
             "meta_key" => $this->meta_key,
             "meta_value" => $this->meta_value,
             "created_at" => $this->created_at?->format("M d, Y H:i A"),

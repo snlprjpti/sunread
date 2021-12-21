@@ -115,7 +115,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
               "currency" => $order->currency_code,
             ],
             "returnUrl" => "https://your-company.com/checkout?shopperOrder=12xy..",
-            "reference" => $order->id,
+            "reference" => "sail-racing-{$order->id}",
             "countryCode" => $config_data->default_country,
         ];
     }
