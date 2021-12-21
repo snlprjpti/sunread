@@ -110,7 +110,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
         try
         {
             $order = $this->orderModel->whereId($this->parameter->order->id)->first();
-            return [
+            $data = [
                 "merchantAccount" => $config_data->api_merchant_account,
                 "amount" => [
                 "value" => 100, //$order?->grand_total,
@@ -125,5 +125,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
         {
             throw $exception;
         }
+
+        return $data;
     }
 }
