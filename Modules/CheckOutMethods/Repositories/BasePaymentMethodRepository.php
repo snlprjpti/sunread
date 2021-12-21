@@ -4,6 +4,7 @@ namespace Modules\CheckOutMethods\Repositories;
 
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -107,18 +108,18 @@ class BasePaymentMethodRepository
         return $this->base_data;
     }
 
-    public function basicAuth(string $user_name, string $password): object
+    public function http(): PendingRequest
     {
-        return Http::withHeaders($this->headers)->withBasicAuth($user_name, $password);
+        return (array_key_exists("user_name", $this->method_detail) && array_key_exists("password", $this->method_detail)) ? Http::withHeaders($this->headers)->withBasicAuth($this->user_name, $this->password) : Http::withHeaders($this->headers);
     }
 
-    public function getBasicClient(string $url, ?array $query = []): mixed
+    public function getClient(string $url, ?array $query = []): mixed
     {
         Event::dispatch("{$this->method_key}.get-basic-auth.before");
         
         try
         {
-            $response = $this->basicAuth($this->user_name, $this->password)
+            $response = $this->http()
             ->get("{$this->base_url}{$url}", $query)
             ->throw()
             ->json();
@@ -132,13 +133,13 @@ class BasePaymentMethodRepository
         return $response;
     }
 
-    public function postBasicClient(string $url, array $data = []): mixed
+    public function postClient(string $url, array $data = []): mixed
     {
         Event::dispatch("{$this->method_key}.post-basic-auth.before");
         
         try
         {
-            $response = $this->basicAuth($this->user_name, $this->password)
+            $response = $this->http()
             ->post("{$this->base_url}{$url}", $data)
             ->throw()
             ->json();
@@ -152,13 +153,13 @@ class BasePaymentMethodRepository
         return $response;
     }
 
-    public function putBasicClient(string $url, array $data = []): mixed
+    public function putClient(string $url, array $data = []): mixed
     {
         Event::dispatch("{$this->method_key}.put-basic-auth.before");
         
         try
         {
-            $response = $this->basicAuth($this->user_name, $this->password)
+            $response = $this->http()
             ->put("{$this->base_url}{$url}", $data)
             ->throw()
             ->json();
@@ -172,13 +173,13 @@ class BasePaymentMethodRepository
         return $response;
     }
 
-    public function deleteBasicClient(string $url, array $data = []): mixed
+    public function deleteClient(string $url, array $data = []): mixed
     {
         Event::dispatch("{$this->method_key}.put-basic-auth.before");
         
         try
         {
-            $response = $this->basicAuth($this->user_name, $this->password)
+            $response = $this->http()
             ->delete("{$this->base_url}{$url}", $data)
             ->throw()
             ->json();

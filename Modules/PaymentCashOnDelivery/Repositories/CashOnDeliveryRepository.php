@@ -60,7 +60,7 @@ class CashOnDeliveryRepository extends BasePaymentMethodRepository implements Pa
             throw $exception;
         }
 
-        TransactionLog::log($this->parameter->order, $this->method_key, "success", 201);
+        TransactionLog::log($this->parameter->order, $this->method_key, "success");
         return true;
     }
 }

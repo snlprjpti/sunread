@@ -30,5 +30,6 @@
     "DeliveryFlatRate": true,
     "DeliveryFreeShipping": true,
     "CheckOutMethods": true,
-    "PaymentKlarna": true
+    "PaymentKlarna": true,
+    "PaymentAdyen": true
 }

@@ -261,7 +261,9 @@ return [
                         config("paymentcashondelivery"),
                         config("paymentklarna"),
                         config("paymentklarna.api_configuration"),
-                        config("paymentklarna.klarna_design")
+                        config("paymentklarna.klarna_design"),
+                        config("paymentadyen"),
+                        config("paymentadyen.api_configuration")
                     ]
                 ],
                 [
