@@ -94,7 +94,7 @@ class BasePaymentMethodRepository
             throw $exception;
         }
 
-        return (object) $data;
+        return $this->object($data);
     }
 
     public function methodDetail(): object

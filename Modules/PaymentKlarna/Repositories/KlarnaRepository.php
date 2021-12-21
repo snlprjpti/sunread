@@ -268,7 +268,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
                 "email" => $address->email,
                 "street_address" => $address->address_line_1,
                 "street_address2" => $address->address_line_2,
-                "postal_code" => $address->postal_code,
+                "postal_code" => $address->postcode,
                 "city" => $city,
                 "region" => $region,
                 "phone" => $address->phone,
@@ -335,7 +335,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
                     //"promo" => "Christmas Promotion",
                     "delivery_details" => [
                         "carrier" => $shipping_method["name"],
-                        "class" => $shipping_method["repository"],
+                        "class" => "standard",
                         "product" => [
                             "name" => $shipping_method["name"],
                             "identifier" => $id
@@ -373,7 +373,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         //TODO::calculate all options taxes.
         
         return [
-            "shipping_method" => $shipping_method,
+            "shipping_method" => "Home",
             "price" => 0,
             "tax_price" => 0.00,
             "tax_rate" => 0.00,

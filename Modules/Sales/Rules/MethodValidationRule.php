@@ -3,16 +3,19 @@
 namespace Modules\Sales\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
+use Modules\CheckOutMethods\Services\CheckOutProcessResolver;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
 
 class MethodValidationRule implements Rule
 {
     protected $request, $attribute, $value;
+    protected mixed $check_out_process_resolver;
 
     public function __construct(object $request)
     {
         $this->request = $request;
+        $this->check_out_process_resolver = new CheckOutProcessResolver($this->request);
     }
 
     /**
@@ -26,8 +29,21 @@ class MethodValidationRule implements Rule
     {
         $this->attribute = $attribute;
         $this->value = $value;
-        if ( $attribute ==  "shipping_method" ) return $this->check($value, "delivery_methods");
-        elseif ( $attribute ==  "payment_method" ) return $this->check($value, "payment_methods");
+        if (empty($value)) return false;
+        if ( ($attribute == "shipping_method")) {   
+            if (($this->check_out_process_resolver->can_initilize("delivery_methods"))) {
+                return $this->check_out_process_resolver->check($value, "delivery_methods");
+            }
+            return $this->check($value, "delivery_methods");
+        }
+        elseif ( ($attribute == "payment_method")) {
+            
+            if (($this->check_out_process_resolver->can_initilize("payment_methods"))) {
+                return $this->check_out_process_resolver->check($value, "payment_methods"); 
+            }
+            return $this->check($value, "payment_methods");
+        }
+
         return true;
     }
 
