@@ -81,8 +81,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $url = "{$this->base_url}/v68/sessions";
             $data =  [
                 'merchantAccount' => $config_data["api_merchant_account"],
-                'amount' => 
-                [
+                'amount' => [
                   'value' => 100, //$order?->grand_total,
                   'currency' => $order->currency_code,
                 ],
@@ -120,7 +119,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             throw $exception;
         }
         
-        TransactionLog::log($this->parameter->order, $this->method_key, "success", 201);
+        TransactionLog::log($this->parameter->order, $this->method_key, $response);
         return true;
     }
 }

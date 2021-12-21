@@ -159,7 +159,7 @@ class KlarnaRepository extends BasePaymentMethodRepository implements PaymentMet
         }
         
         // TODO::update transaction log on base repo
-        TransactionLog::log($this->parameter->order, $data, $response, 201);
+        TransactionLog::log($this->parameter->order, $data, $response);
         return $this->object(["html_snippet" => $response["html_snippet"]]);
     }
 
