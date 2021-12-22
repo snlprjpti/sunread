@@ -35,7 +35,7 @@ class BaseCheckOutMethods
         $check_out_methods = $this->collection($this->checkout_methods);
         return $check_out_methods->map( function ($check_out_method) use ($callback) {
             return [
-                $check_out_method => $this->getData($check_out_method, $callback)->toArray()
+                $check_out_method => $this->getData($check_out_method, $callback)->unique("slug")->toArray()
             ];
         });
     }
