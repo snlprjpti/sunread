@@ -59,7 +59,6 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $data = [ "api_key" => $api_key ];
             $paths = [
                 "api_mode" => "payment_methods_adyen_api_config_mode",
-                "api_base_url" => "payment_methods_adyen_api_config_base_url",
                 "api_merchant_account" => "payment_methods_adyen_api_config_merchant_account",
                 "client_key" => "payment_methods_adyen_api_config_client_key",
                 "default_country" => "default_country",
@@ -100,7 +99,6 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
         {
             throw $exception;
         }
-        
         TransactionLog::log($this->parameter->order, $this->method_key, $response);
         return true;
     }
