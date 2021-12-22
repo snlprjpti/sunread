@@ -39,8 +39,8 @@ class BaseCheckOutMethodsTest extends TestCase
 
     public function test_class_has_all_method(): void
     {
-        $method_list = $this->base_checkout_method_class->all()->toArray();
-        // dd($method_list);
+        $method_list = $this->base_checkout_method_class->all();
+        dd($method_list);
         $this->assertArrayHasKey("delivery_methods", $method_list);
         $this->assertArrayHasKey("payment_methods", $method_list);
         foreach ($method_list as $method) {
