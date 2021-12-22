@@ -119,8 +119,7 @@ class CheckOutProcessResolver
             foreach( ["delivery_methods", "payment_methods"] as $check_out_method )
             {
                 $get_method = SiteConfig::get($check_out_method);
-                $get_method_list = $get_method->pluck("slug")->unique();
-    
+                $get_method_list = $get_method->pluck("slug")->unique()->values()->toArray();
                 foreach ($get_method_list as $key => $method) {
                     $value = SiteConfig::fetch("{$check_out_method}_{$method}", "channel", $coreCache->channel?->id);
                     if ($filter_list && !$value) continue;

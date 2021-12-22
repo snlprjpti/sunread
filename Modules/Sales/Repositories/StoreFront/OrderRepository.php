@@ -110,7 +110,6 @@ class OrderRepository extends BaseRepository
         {
             throw $exception;
         }
-
         return $data;
     }
 

@@ -141,6 +141,25 @@ return [
                 "scope" => "channel",
                 "is_required" => 1,
                 "sort_by" => ""
+            ],
+            [
+                "title" => "Enviroment",
+                "path" => "payment_methods_adyen_environment",
+                "type" => "select",
+                "provider" => "",
+                "pluck" => [],
+                "default" => "test",
+                "options" => [
+                    [ "value" => "test", "label" => "Test" ],
+                    [ "value" => "live", "label" => "Europe Live" ],
+                    [ "value" => "live-au", "label" => "Australia Live" ],
+                    [ "value" => "live-us", "label" => "US Live" ]
+                ],
+                "rules" => "in:test,live,live-au,live-us",
+                "multiple" => false,
+                "scope" => "channel",
+                "is_required" => 1,
+                "sort_by" => ""
             ]
         ]
     ]
