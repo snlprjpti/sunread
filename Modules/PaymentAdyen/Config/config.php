@@ -155,7 +155,7 @@ return [
                     [ "value" => "live-au", "label" => "Australia Live" ],
                     [ "value" => "live-us", "label" => "US Live" ]
                 ],
-                "rules" => "in:playground,production",
+                "rules" => "in:test,live,live-au,live-us",
                 "multiple" => false,
                 "scope" => "channel",
                 "is_required" => 1,
