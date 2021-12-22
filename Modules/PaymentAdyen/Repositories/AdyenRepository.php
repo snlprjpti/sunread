@@ -32,11 +32,11 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
         return $this->collection([
             [
                 "type" => "production",
-                "url" => "https://checkout-test.adyen.com/checkout/"	
+                "url" => "https://checkout-test.adyen.com/checkout/"   // TODO:: take base url of production
             ],
             [
                 "type" => "playground",
-                "url" => "https://checkout-test.adyen.com/checkout/"	// TODO:: change base url
+                "url" => "https://checkout-test.adyen.com/checkout/"
             ],
         ]);
     }
@@ -63,7 +63,8 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
                 "client_key" => "payment_methods_adyen_api_config_client_key",
                 "default_country" => "default_country",
                 "payment_method_label" => "payment_methods_adyen_title",
-                "status" => "payment_methods_adyen_new_order_status"
+                "status" => "payment_methods_adyen_new_order_status",
+                "environment" => "payment_methods_adyen_environment",
             ];
             foreach ($paths as $key => $path) $data[$key] = SiteConfig::fetch($path, "channel", $this->coreCache->channel?->id);
         }
@@ -82,16 +83,24 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $config_data = $this->createBaseData();
             $data =  $this->getPostData($config_data);
             $response = $this->postClient("v68/sessions", $data);
-            
+
+            $credentials =  [ 'merchantAccount' => 'SailRacingInternationalABECOM'];
+            $payment_methods = $this->postClient("v68/paymentMethods", $credentials);
             $this->orderRepository->update([
                 "payment_method" => $this->method_key,
                 "payment_method_label" => $config_data->payment_method_label,
                 "status" => $config_data->status?->slug
-            ], $this->parameter->order->id, function ($order) use ($response) {
+            ], $this->parameter->order->id, function ($order) use ($response, $config_data, $payment_methods) {
                 $this->orderMetaRepository->create([
                     "order_id" => $order->id,
                     "meta_key" => $this->method_key,
-                    "meta_value" => [ "sessionData" => $response["sessionData"] ]
+                    "meta_value" => [ 
+                        "clientKey" => $config_data->client_key,
+                        "merchantAccount" => $config_data->api_merchant_account,
+                        "environment" => $config_data->environment,
+                        "sessionData" => $response["sessionData"],
+                        "paymentMethods" => $payment_methods['paymentMethods']
+                    ]
                 ]);
             });
         }

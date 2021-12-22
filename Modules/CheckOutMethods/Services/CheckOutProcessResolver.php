@@ -131,6 +131,7 @@ class CheckOutProcessResolver
                         "visible" => true
                     ];
                 }
+
                 if ($callback) $method_lists[$check_out_method] = $callback($method_lists[$check_out_method], $check_out_method);
             }
         }

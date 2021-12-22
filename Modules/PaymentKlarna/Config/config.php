@@ -92,7 +92,7 @@ return [
                 "type" => "select",
                 "provider" => "Modules\Country\Entities\Country",
                 "pluck" => ["name", "iso_2_code"],
-                "default" => ["SE"],
+                "default" => ["NP"],
                 "options" => [],
                 "rules" => "array",
                 "value_rules" => "exists:countries,iso_2_code",
