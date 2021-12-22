@@ -43,7 +43,6 @@ trait HasOrderCalculation
             $check_out_method_helper = $this->check_out_method_helper;
             $check_out_method_helper = new $check_out_method_helper($request->shipping_method);
             $arr_shipping_amount = $check_out_method_helper->process($request, ["order" => $order]);
-
             //TODO:: move this fn to respective repo and this should on queue.       
             $this->updateOrderCalculation($arr_shipping_amount, $order, $sub_total, $discount_amount, $sub_total_tax_amount, $total_qty_ordered, $total_items);
 
