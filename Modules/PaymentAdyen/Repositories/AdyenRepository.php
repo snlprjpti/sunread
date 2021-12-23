@@ -83,7 +83,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $config_data = $this->createBaseData();
             $data =  $this->getPostData($config_data);
             $response = $this->postClient("v68/sessions", $data);
-            $payment_methods_data =  ['merchantAccount' => $config_data['api_merchant_account'], "countryCode" => $config_data->default_country->iso_2_code];
+            $payment_methods_data =  ["merchantAccount" => $config_data["api_merchant_account"], "countryCode" => $config_data->default_country->iso_2_code];
             $payment_methods = $this->postClient("v68/paymentMethods", $payment_methods_data);
             $this->orderRepository->update([
                 "payment_method" => $this->method_key,
@@ -97,7 +97,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
                         "clientKey" => $config_data->client_key,
                         "environment" => $config_data->environment,
                         "response" => $response,
-                        "paymentMethods" => $payment_methods['paymentMethods']
+                        "paymentMethods" => $payment_methods["paymentMethods"]
                     ]
                 ]);
             });
