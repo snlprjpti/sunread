@@ -71,7 +71,7 @@ class CheckOutProcessResolver
         return $condition;
     }
 
-    public function is_custom_logic_implemented(?string $method = null, bool $condition, mixed $method_data = null, ?callable $callback = null): bool
+    private function is_custom_logic_implemented(?string $method = null, bool $condition, mixed $method_data = null, ?callable $callback = null): bool
     {
         $get_method_data = Arr::get($this->custom_checkout_handler, $method);
         if ($method_data) $get_method_data = $method_data;
@@ -100,7 +100,7 @@ class CheckOutProcessResolver
         return $condition;
     }
 
-    public function is_custom_checkout_enabled(string $configuration_path): bool
+    private function is_custom_checkout_enabled(string $configuration_path): bool
     {
         $coreCache = $this->getCoreCache();
         $allow_custom_shipping_handler = SiteConfig::fetch($configuration_path, "channel", $coreCache->channel->id)?->pluck("iso_2_code")->toArray();
