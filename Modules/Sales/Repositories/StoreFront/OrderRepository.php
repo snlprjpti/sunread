@@ -187,7 +187,7 @@ class OrderRepository extends BaseRepository
             $check_out_methods = $check_out_resolver->getCheckOutMethods(callback:function ($methods, $check_out_method) use ($check_out_resolver) {
                 if ($check_out_method == "delivery_methods") {
                     $check_custom_handler = $check_out_resolver->allow_custom_checkout("delivery_methods");
-                    if ($check_custom_handler) $methods = [ [ "slug" => "proxy_checkout_method", "title" => "Proxy Checkout Method", "custom_logic" => true, "visible" => false ] ];
+                    if ($check_custom_handler) $methods[] = [ "slug" => "proxy_checkout_method", "title" => "Proxy Checkout Method", "custom_logic" => true, "visible" => false ];
                 }
                 return $methods;
             });
