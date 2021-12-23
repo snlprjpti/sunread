@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutEvents;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\Request;
 use Modules\Core\Entities\Channel;
 use Modules\Core\Entities\Store;
 use Modules\Core\Entities\Website;
@@ -17,15 +18,16 @@ class BaseUnitTestCase extends TestCase
     
     public array $headers;
     public array $request_data;
+    public bool $hasWebsiteHost, $hasChanel, $hasStore;
+    public mixed $website, $channel, $store;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->headers = $this->createHeader();
-
         $this->hasWebsiteHost = true;
         $this->hasChannel = true;
         $this->hasStore = true;
+        $this->createHeader();
     }
 
     public function createHeader(): void
@@ -60,9 +62,12 @@ class BaseUnitTestCase extends TestCase
         return Store::create($storeData);
     }
 
-    public function createRequest(): object
+    public function createRequest(?string $url = null, ?string $method = "GET", ?array $parameters = []): object
     {
-        dd($this->headers);  
+        if (!$url) $url = \Str::random();
+        $request = Request::create($url, $method, $parameters);
+        $request->headers->add($this->headers);
+        return $request;
     }
 
 
