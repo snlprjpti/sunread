@@ -83,8 +83,8 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $config_data = $this->createBaseData();
             $data =  $this->getPostData($config_data);
             $response = $this->postClient("v68/sessions", $data);
-            $credentials =  [ 'merchantAccount' => $config_data['api_merchant_account']];
-            $payment_methods = $this->postClient("v68/paymentMethods", $credentials);
+            $payment_methods_data =  ["merchantAccount" => $config_data["api_merchant_account"], "countryCode" => $config_data->default_country->iso_2_code];
+            $payment_methods = $this->postClient("v68/paymentMethods", $payment_methods_data);
             $this->orderRepository->update([
                 "payment_method" => $this->method_key,
                 "payment_method_label" => $config_data->payment_method_label,
@@ -97,7 +97,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
                         "clientKey" => $config_data->client_key,
                         "environment" => $config_data->environment,
                         "response" => $response,
-                        "paymentMethods" => $payment_methods['paymentMethods']
+                        "paymentMethods" => $payment_methods["paymentMethods"]
                     ]
                 ]);
             });
@@ -123,7 +123,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
                 ],
                 "returnUrl" => "https://your-company.com/checkout?shopperOrder=12xy..",
                 "reference" => "sail-racing-{$order->id}",
-                "countryCode" => $config_data->default_country,
+                "countryCode" => $config_data->default_country->iso_2_code,
             ];
         }
         catch ( Exception $exception )
