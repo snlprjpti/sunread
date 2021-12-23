@@ -11,8 +11,6 @@ use Modules\CheckOutMethods\Services\BaseCheckOutMethods;
 
 class BaseCheckOutMethodsTest extends TestCase
 {
-    use WithoutMiddleware, WithoutEvents;
-
     protected object $base_checkout_method_class;
     protected string $class;
     protected array $class_attributes;
@@ -47,5 +45,10 @@ class BaseCheckOutMethodsTest extends TestCase
             dd($method);
             
         }
+    }
+
+    public function test_class_get_method_has_keys(): void
+    {
+        $method = 
     }
 }
