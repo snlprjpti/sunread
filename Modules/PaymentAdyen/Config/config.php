@@ -11,7 +11,7 @@ return [
             "type" => "text",
             "provider" => "",
             "pluck" => [],
-            "default" => "Adyem Payment",
+            "default" => "Adyen Payment",
             "options" => [],
             "rules" => "",
             "scope" => "channel",

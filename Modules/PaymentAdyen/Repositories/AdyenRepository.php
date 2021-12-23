@@ -83,8 +83,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $config_data = $this->createBaseData();
             $data =  $this->getPostData($config_data);
             $response = $this->postClient("v68/sessions", $data);
-
-            $credentials =  [ 'merchantAccount' => 'SailRacingInternationalABECOM'];
+            $credentials =  [ 'merchantAccount' => $config_data['api_merchant_account']];
             $payment_methods = $this->postClient("v68/paymentMethods", $credentials);
             $this->orderRepository->update([
                 "payment_method" => $this->method_key,
@@ -96,9 +95,8 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
                     "meta_key" => $this->method_key,
                     "meta_value" => [ 
                         "clientKey" => $config_data->client_key,
-                        "merchantAccount" => $config_data->api_merchant_account,
                         "environment" => $config_data->environment,
-                        "sessionData" => $response["sessionData"],
+                        "response" => $response,
                         "paymentMethods" => $payment_methods['paymentMethods']
                     ]
                 ]);
