@@ -1,9 +1,15 @@
 {
     "name": "laravel/laravel",
-    "type": "project",
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "type": "project",
     "require": {
         "php": "^7.3|^8.0",
         "ext-intl": "*",
@@ -30,18 +36,50 @@
         "laravel/telescope": "^4.6",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
-        "phpunit/phpunit": "^9.3.3"
+        "phpstan/phpstan": "^0.12",
+        "phpunit/phpunit": "^9.3.3",
+        "symplify/monorepo-builder": "^10.0"
     },
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Modules\\": "Modules/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Modules\\Attribute\\": "Modules/Attribute/",
+            "Modules\\Brand\\": "Modules/Brand/",
+            "Modules\\Cart\\": "Modules/Cart/",
+            "Modules\\Category\\": "Modules/Category/",
+            "Modules\\CheckOutMethods\\": "Modules/CheckOutMethods/",
+            "Modules\\ClubHouse\\": "Modules/ClubHouse/",
+            "Modules\\Core\\": "Modules/Core/",
+            "Modules\\Country\\": "Modules/Country/",
+            "Modules\\Coupon\\": "Modules/Coupon/",
+            "Modules\\Customer\\": "Modules/Customer/",
+            "Modules\\DeliveryFlatRate\\": "Modules/DeliveryFlatRate/",
+            "Modules\\DeliveryFreeShipping\\": "Modules/DeliveryFreeShipping/",
+            "Modules\\EmailTemplate\\": "Modules/EmailTemplate/",
+            "Modules\\Erp\\": "Modules/Erp/",
+            "Modules\\GeoIp\\": "Modules/GeoIp/",
+            "Modules\\Inventory\\": "Modules/Inventory/",
+            "Modules\\NavigationMenu\\": "Modules/NavigationMenu/",
+            "Modules\\Notification\\": "Modules/Notification/",
+            "Modules\\Page\\": "Modules/Page/",
+            "Modules\\PaymentAdyen\\": "Modules/PaymentAdyen/",
+            "Modules\\PaymentBankTransfer\\": "Modules/PaymentBankTransfer/",
+            "Modules\\PaymentCashOnDelivery\\": "Modules/PaymentCashOnDelivery/",
+            "Modules\\PaymentKlarna\\": "Modules/PaymentKlarna/",
+            "Modules\\ProductStockAlert\\": "Modules/ProductStockAlert/",
+            "Modules\\Product\\": "Modules/Product/",
+            "Modules\\Review\\": "Modules/Review/",
+            "Modules\\Sales\\": "Modules/Sales/",
+            "Modules\\Tax\\": "Modules/Tax/",
+            "Modules\\UrlRewrite\\": "Modules/UrlRewrite/",
+            "Modules\\User\\": "Modules/User/"
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "Symplify\\Tests\\": "tests",
             "Tests\\": "tests/"
         }
     },
@@ -59,6 +97,13 @@
     },
     "extra": {
         "laravel": {
+            "providers": [
+                "Modules\\User\\Providers\\UserServiceProvider",
+                "Modules\\Customer\\Providers\\CustomerServiceProvider",
+                "Modules\\Core\\Providers\\CoreServiceProvider",
+                "Modules\\Category\\Providers\\CategoryServiceProvider",
+                "Modules\\Attribute\\Providers\\AttributeServiceProvider"
+            ],
             "dont-discover": [
                 "laravel/telescope"
             ]
@@ -68,6 +113,38 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
+    },
+    "replace": {
+        "nwidart/attribute": "self.version",
+        "nwidart/brand": "self.version",
+        "nwidart/cart": "self.version",
+        "nwidart/category": "self.version",
+        "nwidart/checkoutmethods": "self.version",
+        "nwidart/clubhouse": "self.version",
+        "nwidart/core": "self.version",
+        "nwidart/country": "self.version",
+        "nwidart/coupon": "self.version",
+        "nwidart/customer": "self.version",
+        "nwidart/deliveryflatrate": "self.version",
+        "nwidart/deliveryfreeshipping": "self.version",
+        "nwidart/emailtemplate": "self.version",
+        "nwidart/erp": "self.version",
+        "nwidart/geoip": "self.version",
+        "nwidart/inventory": "self.version",
+        "nwidart/navigationmenu": "self.version",
+        "nwidart/notification": "self.version",
+        "nwidart/page": "self.version",
+        "nwidart/paymentadyen": "self.version",
+        "nwidart/paymentbanktransfer": "self.version",
+        "nwidart/paymentcashondelivery": "self.version",
+        "nwidart/paymentklarna": "self.version",
+        "nwidart/product": "self.version",
+        "nwidart/productstockalert": "self.version",
+        "nwidart/review": "self.version",
+        "nwidart/sales": "self.version",
+        "nwidart/tax": "self.version",
+        "nwidart/urlrewrite": "self.version",
+        "nwidart/user": "self.version"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
