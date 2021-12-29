@@ -3,6 +3,7 @@
 namespace Modules\PaymentAdyen\Repositories;
 
 use Exception;
+use Modules\Cart\Entities\Cart;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
 use Modules\Sales\Entities\OrderMeta;
