@@ -2,12 +2,32 @@
 
 namespace Modules\PaymentAdyen\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Http\JsonResponse;
+use Modules\Sales\Entities\Order;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Core\Http\Controllers\BaseController;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Modules\PaymentAdyen\Repositories\AdyenPaymentStatusRepository;
+use Modules\PaymentAdyen\Transformers\AdyenPaymentStatusUpdateResource;
 
-class PaymentAdyenController extends Controller
+class PaymentAdyenController extends BaseController
 {
+    protected $adyenPaymentStatusRepository;
+
+    public function __construct(AdyenPaymentStatusRepository $adyenPaymentStatusRepository, Order $order)
+    {
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.channel.code');
+        $this->middleware('validate.store.code');
+        $this->adyenPaymentStatusRepository = $adyenPaymentStatusRepository;
+        $this->model = $order;
+        $this->model_name = "Order";
+        parent::__construct($this->model, $this->model_name);
+    }
+
     /**
      * Display a listing of the resource.
      * @return Renderable
@@ -75,5 +95,25 @@ class PaymentAdyenController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function resource(array $data): JsonResource
+    {
+        return new AdyenPaymentStatusUpdateResource($data);
+    }
+
+    public function updateOrderStatus(Request $request): JsonResponse
+    {
+        try
+        {
+            $response = $this->adyenPaymentStatusRepository->updateOrderStatus($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($this->resource($response), __("core::app.response.order-status-updated"));
+
     }
 }

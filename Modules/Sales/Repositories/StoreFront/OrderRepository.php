@@ -7,16 +7,17 @@ use Modules\GeoIp\Facades\GeoIp;
 use Modules\Sales\Entities\Order;
 use Illuminate\Support\Facades\DB;
 use Modules\Cart\Entities\CartItem;
-use Modules\CheckOutMethods\Services\BaseCheckOutMethods;
-use Modules\CheckOutMethods\Services\CheckOutProcessResolver;
 use Modules\Core\Facades\CoreCache;
 use Modules\Core\Facades\SiteConfig;
 use Modules\Core\Repositories\BaseRepository;
 use Modules\Sales\Rules\MethodValidationRule;
 use Modules\Sales\Traits\HasOrderCalculation;
 use Modules\Sales\Traits\HasOrderProductDetail;
+use Modules\Inventory\Jobs\LogCatalogInventoryItem;
 use Modules\Sales\Repositories\OrderMetaRepository;
 use Modules\Sales\Repositories\OrderAddressRepository;
+use Modules\CheckOutMethods\Services\BaseCheckOutMethods;
+use Modules\CheckOutMethods\Services\CheckOutProcessResolver;
 use Modules\Sales\Repositories\StoreFront\OrderItemRepository;
 
 class OrderRepository extends BaseRepository
@@ -56,6 +57,13 @@ class OrderRepository extends BaseRepository
 
             $order = $this->create($data, function ($order) use ($request) {
                 $this->orderAddressRepository->store($request, $order);
+                $this->orderMetaRepository->create([
+                    "order_id" => $order->id,
+                    "meta_key" => "cart",
+                    "meta_value" => [ 
+                        "cart_id" => $request->cart_id
+                    ]
+                ]);
             });
 
             $items = CartItem::whereCartId($request->cart_id)->select("product_id", "qty")->get()->toArray();
@@ -64,6 +72,7 @@ class OrderRepository extends BaseRepository
                 $order_item_details = $this->getProductItemData($request, $order_item);
                 $this->orderItemRepository->store($request, $order, $order_item_details); 
                 $this->createOrderTax($order, $order_item_details);
+                $this->updateInventoryItem($order, $order_item, $coreCache);
             }
             $this->updateOrderTax($order, $request);
             $this->orderCalculationUpdate($order, $request, $coreCache);
@@ -198,5 +207,17 @@ class OrderRepository extends BaseRepository
         }
 
         return $check_out_methods;
+    }
+
+    private function updateInventoryItem(object $order, array $order_item, object $coreCache): void
+    {
+        LogCatalogInventoryItem::dispatchSync([
+            "product_id" => $order_item["product_id"],
+            "website_id" => $coreCache?->website->id,
+            "event" => "{$this->model_key}.deduction",
+            "adjustment_type" => "deduction",
+            "quantity" => $order_item["qty"],
+            "order_id" => $order->id
+        ]);
     }
 }
