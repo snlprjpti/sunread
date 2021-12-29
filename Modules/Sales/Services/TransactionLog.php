@@ -8,7 +8,7 @@ use Modules\Sales\Entities\OrderTransactionLog;
 
 class TransactionLog {
 
-    public function log(object $order, mixed $server_request, mixed $server_response, ?int $response_code = 201): bool
+    public function log(object $order, mixed $server_request, mixed $server_response, int|string $response_code = 201): bool
     {
         try
         {

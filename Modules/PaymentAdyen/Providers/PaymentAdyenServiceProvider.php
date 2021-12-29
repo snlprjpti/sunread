@@ -28,6 +28,7 @@ class PaymentAdyenServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        include __DIR__ . '/../Helpers/minor_unit_conversion.php';
     }
 
     /**

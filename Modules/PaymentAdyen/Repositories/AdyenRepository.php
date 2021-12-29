@@ -3,6 +3,7 @@
 namespace Modules\PaymentAdyen\Repositories;
 
 use Exception;
+use minor_unit_conversion;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Modules\Core\Facades\SiteConfig;
@@ -83,21 +84,18 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $config_data = $this->createBaseData();
             $data =  $this->getPostData($config_data);
             $response = $this->postClient("v68/sessions", $data);
-            $payment_methods_data =  ["merchantAccount" => $config_data["api_merchant_account"], "countryCode" => $config_data->default_country->iso_2_code];
-            $payment_methods = $this->postClient("v68/paymentMethods", $payment_methods_data);
             $this->orderRepository->update([
                 "payment_method" => $this->method_key,
                 "payment_method_label" => $config_data->payment_method_label,
                 "status" => $config_data->status?->slug
-            ], $this->parameter->order->id, function ($order) use ($response, $config_data, $payment_methods) {
+            ], $this->parameter->order->id, function ($order) use ($response, $config_data) {
                 $this->orderMetaRepository->create([
                     "order_id" => $order->id,
                     "meta_key" => $this->method_key,
                     "meta_value" => [ 
                         "clientKey" => $config_data->client_key,
                         "environment" => $config_data->environment,
-                        "response" => $response,
-                        "paymentMethods" => $payment_methods["paymentMethods"]
+                        "response" => $response
                     ]
                 ]);
             });
@@ -118,8 +116,8 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $data = [
                 "merchantAccount" => $config_data->api_merchant_account,
                 "amount" => [
-                "value" => 100, //$order?->grand_total,
-                "currency" => $order->currency_code,
+                "value" => $order?->grand_total * place_decimal($order->currency_code),
+                "currency" => $order->currency_code
                 ],
                 "returnUrl" => "https://your-company.com/checkout?shopperOrder=12xy..",
                 "reference" => "sail-racing-{$order->id}",

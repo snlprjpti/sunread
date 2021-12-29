@@ -2,12 +2,26 @@
 
 namespace Modules\PaymentAdyen\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Support\Renderable;
+use Modules\Core\Http\Controllers\BaseController;
+use Modules\PaymentAdyen\Repositories\AdyenPaymentStatusRepository;
 
-class PaymentAdyenController extends Controller
+class PaymentAdyenController extends BaseController
 {
+    protected $adyenPaymentStatusRepository;
+
+    public function __construct(AdyenPaymentStatusRepository $adyenPaymentStatusRepository)
+    {
+        $this->middleware('validate.website.host');
+        $this->middleware('validate.channel.code');
+        $this->middleware('validate.store.code');
+
+        $this->adyenPaymentStatusRepository = $adyenPaymentStatusRepository;
+    }
+
     /**
      * Display a listing of the resource.
      * @return Renderable
@@ -75,5 +89,20 @@ class PaymentAdyenController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function updateAdyenPaymentStatus(Request $request): JsonResponse
+    {
+        try
+        {
+            $response = $this->adyenPaymentStatusRepository->updateAdyenPaymentStatus($request);
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse($response, "adyen payment status updated");
+
     }
 }
