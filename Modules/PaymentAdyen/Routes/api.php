@@ -13,5 +13,5 @@ use Illuminate\Http\Request;
 |
 */
 Route::group(['middleware' => ['api','proxies']], function () {
-Route::post("checkout/payment/adyen/order/status", [\Modules\PaymentAdyen\Http\Controllers\PaymentAdyenController::class, "updateOrderStatus"])->name("adyen.update.order.status");
+Route::post("public/checkout/payment/adyen/order/status", [\Modules\PaymentAdyen\Http\Controllers\PaymentAdyenController::class, "updateOrderStatus"])->name("adyen.update.order.status");
 });

@@ -26,16 +26,13 @@ class AdyenPaymentStatusRepository extends BaseRepository
         DB::beginTransaction();
         try {
             $this->validateData($request);
-
-            $resultCode = $request->result_code;
             $orderMetaCartData = OrderMeta::whereOrderId($request->order_id)->whereMetaKey('cart')->pluck('meta_value')->first();
-            $cartId = $orderMetaCartData['cart_id'];
             $order = $this->model::find($request->order_id);
             $message = "";
             $status = "pending";
-            switch ($resultCode) {
+            switch ($request->result_code) {
                 case "Authorised":
-                    Cart::whereId($cartId)->delete();
+                    Cart::whereId($orderMetaCartData['cart_id'])->delete();
                     $message = "payment is authorised";
                     $status = "processing";
                     break;
@@ -49,12 +46,13 @@ class AdyenPaymentStatusRepository extends BaseRepository
                     $status = "cancelled";
             }
             $this->update(["status" => $status], $order->id);
-            TransactionLog::log($order, $request, "Payment Authorised & Processing", $resultCode);
+            TransactionLog::log($order, $request, "Payment Authorised & Processing", $request->result_code);
             $data = [
                 "message" => $message,
-                "result_code" => $resultCode
+                "result_code" => $request->result_code
             ];
-        } catch (Exception $exception) {
+        }
+        catch (Exception $exception) {
             DB::rollBack();
             throw $exception;
         }
