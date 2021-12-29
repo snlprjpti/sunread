@@ -10,7 +10,7 @@
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::group(['middleware' => ['api','proxies'], 'prefix' => 'public/checkout/payment/adyen', "as" => "adyen."], function () {
-Route::post("order/status", [\Modules\PaymentAdyen\Http\Controllers\PaymentAdyenController::class, "updateOrderStatus"])->name("update.order.status");
-Route::post("notification/webhook", [\Modules\PaymentAdyen\Http\Controllers\PaymentAdyenController::class, "notificationWebhook"])->name("notification.webhook");
+Route::group(['middleware' => ['api','proxies'], 'prefix' => 'public/checkout/payment/adyen', 'as' => 'adyen.'], function () {
+    Route::post("order/status", [\Modules\PaymentAdyen\Http\Controllers\PaymentAdyenController::class, "updateOrderStatus"])->name("update.order.status");
+    Route::post("notification/webhook", [\Modules\PaymentAdyen\Http\Controllers\PaymentAdyenController::class, "notificationWebhook"])->name("notification.webhook");
 });

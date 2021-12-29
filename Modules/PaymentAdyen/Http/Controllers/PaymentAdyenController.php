@@ -151,6 +151,6 @@ class PaymentAdyenController extends BaseController
             return $this->handleException($exception);
         }
 
-        return $this->successResponse("[accepted]", __("core::app.response.order-status-updated"));;
+        return "[accepted]";
     }
 }
