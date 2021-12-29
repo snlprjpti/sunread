@@ -16,7 +16,7 @@ class AdyenPaymentStatusRepository extends BaseRepository
         $this->model = $order;
         $this->model_key = "orders";
         $this->rules = [
-            "resultCode" => "required",
+            "result_code" => "required",
             "order_id" => "required|exists:orders,id",
         ];
     }
@@ -24,19 +24,18 @@ class AdyenPaymentStatusRepository extends BaseRepository
     public function updateOrderStatus(object $request): ?array
     {
         DB::beginTransaction();
-        try
-        {
+        try {
             $this->validateData($request);
 
-            $resultCode = $request->resultCode;
+            $resultCode = $request->result_code;
             $orderMetaCartData = OrderMeta::whereOrderId($request->order_id)->whereMetaKey('cart')->pluck('meta_value')->first();
             $cartId = $orderMetaCartData['cart_id'];
             $order = $this->model::find($request->order_id);
             $message = "";
             $status = "pending";
-            switch($resultCode){
+            switch ($resultCode) {
                 case "Authorised":
-                    Cart::whereId($cartId)->delete();                    
+                    Cart::whereId($cartId)->delete();
                     $message = "payment is authorised";
                     $status = "processing";
                     break;
@@ -53,11 +52,9 @@ class AdyenPaymentStatusRepository extends BaseRepository
             TransactionLog::log($order, $request, "Payment Authorised & Processing", $resultCode);
             $data = [
                 "message" => $message,
-                "resultCode" => $resultCode
+                "result_code" => $resultCode
             ];
-        }
-        catch (Exception $exception)
-        {
+        } catch (Exception $exception) {
             DB::rollBack();
             throw $exception;
         }

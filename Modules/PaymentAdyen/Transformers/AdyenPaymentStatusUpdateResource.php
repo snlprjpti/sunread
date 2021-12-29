@@ -10,7 +10,7 @@ class AdyenPaymentStatusUpdateResource extends JsonResource
     {
         return [
            "message" => $this['message'],
-           "resultCode" => $this['resultCode']
+           "result_code" => $this['result_code']
         ];
     }
 }
