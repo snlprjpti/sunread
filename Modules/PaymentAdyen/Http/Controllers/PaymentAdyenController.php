@@ -4,12 +4,12 @@ namespace Modules\PaymentAdyen\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Adyen\Util\HmacSignature;
 use Illuminate\Http\JsonResponse;
 use Modules\Sales\Entities\Order;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Core\Http\Controllers\BaseController;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Modules\PaymentAdyen\Repositories\AdyenPaymentStatusRepository;
 use Modules\PaymentAdyen\Transformers\AdyenPaymentStatusUpdateResource;
 
@@ -114,6 +114,43 @@ class PaymentAdyenController extends BaseController
         }
 
         return $this->successResponse($this->resource($response), __("core::app.response.order-status-updated"));
+    }
 
+    public function notificationWebhook(Request $request)
+    {
+        try
+        {
+            // YOUR_HMAC_KEY from the Customer Area
+            $hmacKey = "6FBAE6B12B752662156C6553ED870451312A927359F675AF5019A76BC835C0B8";
+            // Notification Request JSON
+            $jsonRequest = "NOTIFICATION_REQUEST_JSON";
+            $notificationRequest = json_decode($jsonRequest, true);
+            $hmac = new HmacSignature();
+            // Handling multiple notificationRequests
+
+            dump($notificationRequest["notificationItems"]);
+
+            foreach ( $notificationRequest["notificationItems"] as $notificationRequestItem )
+            {
+                $params = $notificationRequestItem["NotificationRequestItem"];
+                // Handle the notification
+                if ( $hmac->isValidNotificationHMAC($hmacKey, $params) )
+                {
+                    // Process the notification based on the eventCode
+                    $eventcode = $params['eventCode'];
+                    dump($eventcode);
+                }
+                else {
+                    // Non valid NotificationRequest
+                    dump('non valid notification request send');
+                }
+            }
+        }
+        catch (Exception $exception)
+        {
+            return $this->handleException($exception);
+        }
+
+        return $this->successResponse("[accepted]", __("core::app.response.order-status-updated"));;
     }
 }

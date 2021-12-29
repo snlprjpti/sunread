@@ -4,8 +4,59 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ad8cd7bf3ca71ab0c6e25a9bd850fd2",
+    "content-hash": "eb12fd3cae186521634c0caab50e6ac4",
     "packages": [
+        {
+            "name": "adyen/php-api-library",
+            "version": "11.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Adyen/adyen-php-api-library.git",
+                "reference": "c2207139042d09c46954512f2333eac7330cef34"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Adyen/adyen-php-api-library/zipball/c2207139042d09c46954512f2333eac7330cef34",
+                "reference": "c2207139042d09c46954512f2333eac7330cef34",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ctype": "*",
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "ext-openssl": "*",
+                "monolog/monolog": "^1.16 || ^2.0",
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "dms/phpunit-arraysubset-asserts": "0.3.0",
+                "friendsofphp/php-cs-fixer": "*",
+                "php-coveralls/php-coveralls": "2.4.3",
+                "phpunit/phpunit": "9.5.10",
+                "squizlabs/php_codesniffer": "3.6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Adyen\\": "src/Adyen/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A PHP client library for accessing Adyen APIs",
+            "homepage": "https://github.com/Adyen/adyen-php-api-library",
+            "keywords": [
+                "adyen"
+            ],
+            "support": {
+                "issues": "https://github.com/Adyen/adyen-php-api-library/issues",
+                "source": "https://github.com/Adyen/adyen-php-api-library/tree/11.0.0"
+            },
+            "time": "2021-10-18T07:52:10+00:00"
+        },
         {
             "name": "asm89/stack-cors",
             "version": "v2.0.3",
@@ -9604,5 +9655,5 @@
         "ext-intl": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.0.0"
 }
