@@ -72,7 +72,7 @@ class OrderRepository extends BaseRepository
                 $order_item_details = $this->getProductItemData($request, $order_item);
                 $this->orderItemRepository->store($request, $order, $order_item_details); 
                 $this->createOrderTax($order, $order_item_details);
-                $this->updateInventoryItem($order_item, $coreCache);
+                $this->updateInventoryItem($order, $order_item, $coreCache);
             }
             $this->updateOrderTax($order, $request);
             $this->orderCalculationUpdate($order, $request, $coreCache);
@@ -209,14 +209,15 @@ class OrderRepository extends BaseRepository
         return $check_out_methods;
     }
 
-    private function updateInventoryItem(array $order_item, object $coreCache): void
+    private function updateInventoryItem(object $order, array $order_item, object $coreCache): void
     {
         LogCatalogInventoryItem::dispatchSync([
             "product_id" => $order_item["product_id"],
             "website_id" => $coreCache?->website->id,
             "event" => "{$this->model_key}.deduction",
             "adjustment_type" => "deduction",
-            "quantity" => $order_item["qty"]
+            "quantity" => $order_item["qty"],
+            "order_id" => $order->id
         ]);
     }
 }

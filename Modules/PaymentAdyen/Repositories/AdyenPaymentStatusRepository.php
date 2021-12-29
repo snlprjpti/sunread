@@ -15,13 +15,19 @@ class AdyenPaymentStatusRepository extends BaseRepository
     {
         $this->model = $order;
         $this->model_key = "orders";
+        $this->rules = [
+            "resultCode" => "required",
+            "order_id" => "required|exists:orders,id",
+        ];
     }
 
-    public function updateAdyenPaymentStatus(object $request): ?array
+    public function updateOrderStatus(object $request): ?array
     {
         DB::beginTransaction();
         try
         {
+            $this->validateData($request);
+
             $resultCode = $request->resultCode;
             $orderMetaCartData = OrderMeta::whereOrderId($request->order_id)->whereMetaKey('cart')->pluck('meta_value')->first();
             $cartId = $orderMetaCartData['cart_id'];
@@ -30,20 +36,17 @@ class AdyenPaymentStatusRepository extends BaseRepository
             $status = "pending";
             switch($resultCode){
                 case "Authorised":
-                    Cart::where('id', $cartId)->delete();                    
+                    Cart::whereId($cartId)->delete();                    
                     $message = "payment is authorised";
                     $status = "processing";
                     break;
                 case "Refused":
-                    $message = "payment is refused";
-                    $status = "cancelled";
-                    break;
                 case "Expired":
-                    $message = "payment process expired";
+                    $message = "order cancelled";
                     $status = "cancelled";
                     break;
                 default:
-                    $message = "something went wrong";
+                    $message = "something went wrong! order is cancelled";
                     $status = "cancelled";
             }
             $this->update(["status" => $status], $order->id);

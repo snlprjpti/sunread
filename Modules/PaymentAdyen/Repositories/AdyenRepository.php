@@ -116,7 +116,7 @@ class AdyenRepository extends BasePaymentMethodRepository implements PaymentMeth
             $data = [
                 "merchantAccount" => $config_data->api_merchant_account,
                 "amount" => [
-                "value" => $order?->grand_total * place_decimal($order->currency_code),
+                "value" => (float) $order?->grand_total * place_decimal($order->currency_code),
                 "currency" => $order->currency_code
                 ],
                 "returnUrl" => "https://your-company.com/checkout?shopperOrder=12xy..",

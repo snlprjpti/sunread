@@ -17,4 +17,6 @@ Route::middleware('auth:api')->get('/paymentadyen', function (Request $request) 
     return $request->user();
 });
 
-Route::post("update/adyen/payment-status", [\Modules\PaymentAdyen\Http\Controllers\PaymentAdyenController::class, "updateAdyenPaymentStatus"])->name("get.adyen.payment.status");
+Route::group(['middleware' => ['api','proxies']], function () {
+Route::post("checkout/payment/adyen/order/status", [\Modules\PaymentAdyen\Http\Controllers\PaymentAdyenController::class, "updateOrderStatus"])->name("adyen.update.order.status");
+});
