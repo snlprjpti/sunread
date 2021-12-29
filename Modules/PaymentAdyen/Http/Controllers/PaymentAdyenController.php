@@ -19,9 +19,9 @@ class PaymentAdyenController extends BaseController
 
     public function __construct(AdyenPaymentStatusRepository $adyenPaymentStatusRepository, Order $order)
     {
-        $this->middleware('validate.website.host');
-        $this->middleware('validate.channel.code');
-        $this->middleware('validate.store.code');
+        // $this->middleware('validate.website.host');
+        // $this->middleware('validate.channel.code');
+        // $this->middleware('validate.store.code');
         $this->adyenPaymentStatusRepository = $adyenPaymentStatusRepository;
         $this->model = $order;
         $this->model_name = "Order";
