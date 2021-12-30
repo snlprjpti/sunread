@@ -46,36 +46,45 @@ jobs:
         steps:
             -   uses: actions/checkout@v2
 
+            - id: step1
+              uses: ASzc/change-string-case-action@v1
+              with:
+                  string: ${{ matrix.package }}
+
+            - id: step2
+              run: echo "::set-output name=test::${{ steps.step1.outputs.capitalized }}"
+
             # no tag
             -
                 if: "!startsWith(github.ref, 'refs/tags/')"
                 # Uses an action in the root directory
-                name: Monorepo Split of ${{ matrix.package }}
+                name: Monorepo Split of ${{ steps.step2.outputs.test }}
                 uses: symplify/github-action-monorepo-split@2.0
                 env:
                     GITHUB_TOKEN: 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
                 with:
-                    package-directory: 'Modules/${{ matrix.package }}'
+                    package-directory: 'Modules/${{ steps.step2.outputs.test }}'
                     split-repository-organization: 'snlprjti'
-                    split-repository-name: '${{ matrix.package }}'
+                    split-repository-name: '${{ steps.step2.outputs.test }}'
                     user-name: "snlprjti"
                     user-email: "snlprjpti@gmail.com"
                     branch: "main"
+
 
             # with tag
             -
                 if: "startsWith(github.ref, 'refs/tags/')"
                 # Uses an action in the root directory
-                name: Monorepo Tagged Split of ${{ matrix.package }}
+                name: Monorepo Tagged Split of ${{ steps.step2.outputs.test }}
                 uses: symplify/github-action-monorepo-split@2.0
                 env:
                     GITHUB_TOKEN: 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
                 with:
                     tag: ${GITHUB_REF#refs/tags/}
 
-                    package-directory: 'Modules/${{ matrix.package }}'
+                    package-directory: 'Modules/${{ steps.step2.outputs.test }}'
                     split-repository-organization: 'snlprjti'
-                    split-repository-name: '${{ matrix.package }}'
+                    split-repository-name: '${{ steps.step2.outputs.test }}'
                     user-name: "snlprjti"
                     user-email: "snlprjpti@gmail.com"
                     branch: "main"
