@@ -7,6 +7,10 @@
         {
             "name": "Nicolas Widart",
             "email": "n.widart@gmail.com"
+        },
+        {
+            "name": "Rupesh Shrestha",
+            "email": "rupeshshrestha9818@gmail.com"
         }
     ],
     "type": "project",
@@ -45,7 +49,7 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Modules\\Attribute\\": "Modules/Attribute/",
+            "Modules\\Attribute\\": "Modules/Attribute/src",
             "Modules\\Brand\\": "Modules/Brand/",
             "Modules\\Cart\\": "Modules/Cart/",
             "Modules\\Category\\": "Modules/Category/",
@@ -115,7 +119,6 @@
         "sort-packages": true
     },
     "replace": {
-        "nwidart/attribute": "self.version",
         "nwidart/brand": "self.version",
         "nwidart/cart": "self.version",
         "nwidart/category": "self.version",
@@ -144,7 +147,8 @@
         "nwidart/sales": "self.version",
         "nwidart/tax": "self.version",
         "nwidart/urlrewrite": "self.version",
-        "nwidart/user": "self.version"
+        "nwidart/user": "self.version",
+        "rupesh/attribute": "self.version"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
