@@ -59,7 +59,7 @@ jobs:
                     split-repository-organization: 'snlprjti'
                     split-repository-name: '${{ matrix.package }}'
                     user-name: "snlprjti"
-                    user-email: "rupeshshrestha9818@gmail.com"
+                    user-email: "snlprjpti@gmail.com"
                     branch: "main"
 
             # with tag
