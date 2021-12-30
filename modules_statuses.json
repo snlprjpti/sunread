@@ -31,5 +31,6 @@
     "DeliveryFreeShipping": true,
     "CheckOutMethods": true,
     "PaymentKlarna": true,
-    "PaymentAdyen": true
+    "PaymentAdyen": true,
+    "Test": true
 }
