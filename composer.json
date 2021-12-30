@@ -49,7 +49,7 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Modules\\Attribute\\": "Modules/Attribute/src",
+            "Modules\\Attribute\\": "Modules/Attribute/",
             "Modules\\Brand\\": "Modules/Brand/",
             "Modules\\Cart\\": "Modules/Cart/",
             "Modules\\Category\\": "Modules/Category/",
