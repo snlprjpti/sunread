@@ -80,7 +80,7 @@
             "Modules\\Tax\\": "Modules/Tax/",
             "Modules\\UrlRewrite\\": "Modules/UrlRewrite/",
             "Modules\\User\\": "Modules/User/",
-            "YourMonorepo\\FirstPackage\\": "Modules/First-package/src"
+            "YourMonorepo\\SecondPackage\\": "Modules/Second-package/src"
         }
     },
     "autoload-dev": {
@@ -151,7 +151,7 @@
         "nwidart/urlrewrite": "self.version",
         "nwidart/user": "self.version",
         "rupesh/attribute": "self.version",
-        "rupesh/first-package": "self.version"
+        "rupesh/second-package": "self.version"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
