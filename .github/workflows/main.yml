@@ -53,12 +53,12 @@ jobs:
                 name: Monorepo Split of ${{ matrix.package }}
                 uses: symplify/github-action-monorepo-split@2.0
                 env:
-                    GITHUB_TOKEN: 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
+                    GITHUB_TOKEN: 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
                 with:
                     package-directory: 'Modules/${{ matrix.package }}'
-                    split-repository-organization: 'rupeshstha'
+                    split-repository-organization: 'snlprjti'
                     split-repository-name: '${{ matrix.package }}'
-                    user-name: "rupeshstha"
+                    user-name: "snlprjti"
                     user-email: "rupeshshrestha9818@gmail.com"
                     branch: "main"
 
@@ -69,13 +69,13 @@ jobs:
                 name: Monorepo Tagged Split of ${{ matrix.package }}
                 uses: symplify/github-action-monorepo-split@2.0
                 env:
-                    GITHUB_TOKEN: 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
+                    GITHUB_TOKEN: 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
                 with:
                     tag: ${GITHUB_REF#refs/tags/}
 
                     package-directory: 'Modules/${{ matrix.package }}'
-                    split-repository-organization: 'rupeshstha'
+                    split-repository-organization: 'snlprjti'
                     split-repository-name: '${{ matrix.package }}'
-                    user-name: "rupeshstha"
-                    user-email: "rupeshshrestha9818@gmail.com"
+                    user-name: "snlprjti"
+                    user-email: "snlprjpti@gmail.com"
                     branch: "main"
