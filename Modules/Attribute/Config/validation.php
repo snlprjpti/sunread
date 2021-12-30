@@ -16,5 +16,4 @@ return [
 	"checkbox" => null,
 	"multiimages" => "array",
 	"builder" => "array",
-	"test" => "test",
 ];
