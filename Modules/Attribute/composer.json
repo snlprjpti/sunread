@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Attribute\\": ""
+            "Modules\\Attribute\\": "src"
         }
     }
 }
