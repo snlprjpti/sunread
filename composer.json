@@ -15,7 +15,7 @@
     ],
     "type": "project",
     "require": {
-        "php": "^7.2",
+        "php": "^8.0.8",
         "ext-intl": "*",
         "adyen/php-api-library": "^11.0",
         "doctrine/dbal": "^3.1",
