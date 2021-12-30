@@ -151,7 +151,7 @@
         "nwidart/tax": "self.version",
         "nwidart/urlrewrite": "self.version",
         "nwidart/user": "self.version",
-        "rupesh/attribute": "self.version",
+        "snlprjti/attribute": "self.version",
         "your-monorepo/second-package": "self.version"
     },
     "minimum-stability": "dev",
