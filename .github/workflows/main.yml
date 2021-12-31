@@ -67,7 +67,7 @@ jobs:
                     split-repository-organization: 'snlprjti'
                     split-repository-name: '${{ steps.step2.outputs.test }}'
                     user-name: "snlprjti"
-                    user-email: "snlprjpti@gmail.com"
+                    user-email: "snlprsjpti@gmail.com"
                     branch: "main"
 
 
