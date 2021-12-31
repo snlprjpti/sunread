@@ -1,158 +1,40 @@
 {
-    "name": "laravel/laravel",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "name": "snlprjti/laramono",
+    "description": "the laravel monorepo demo",
     "license": "MIT",
     "authors": [
         {
-            "name": "Nicolas Widart",
-            "email": "n.widart@gmail.com"
-        },
-        {
-            "name": "Rupesh Shrestha",
-            "email": "rupeshshrestha9818@gmail.com"
+            "name": "Sunil Prajapati",
+            "email": "sunil.prajapati@hazesoft.co"
         }
     ],
-    "type": "project",
     "require": {
         "php": "^8.0.8",
-        "ext-intl": "*",
-        "adyen/php-api-library": "^11.0",
-        "doctrine/dbal": "^3.1",
-        "elasticsearch/elasticsearch": "^7.14",
-        "fideloper/proxy": "^4.4",
-        "fruitcake/laravel-cors": "^2.0",
-        "geoip2/geoip2": "~2.0",
-        "guzzlehttp/guzzle": "^7.0.1",
-        "intervention/image": "^2.5",
-        "kalnoy/nestedset": "^6.0",
-        "laravel/framework": "^8.48.0",
-        "laravel/octane": "^1.0",
-        "laravel/tinker": "^2.5",
-        "nwidart/laravel-modules": "^8.0",
-        "predis/predis": "^1.1",
         "symfony/dependency-injection": "^5.0",
-        "symfony/http-kernel": "^5.0",
-        "tymon/jwt-auth": "^1.0"
+        "doctrine/dbal": "^3.1",
+        "symfony/http-kernel": "^5.0"
     },
-    "require-dev": {
-        "facade/ignition": "^2.5",
-        "fakerphp/faker": "^1.9.1",
-        "laravel/sail": "^1.0.1",
-        "laravel/telescope": "^4.6",
-        "mockery/mockery": "^1.4.2",
-        "nunomaduro/collision": "^5.0",
-        "phpstan/phpstan": "^0.12",
-        "phpunit/phpunit": "^9.3.3",
-        "symplify/monorepo-builder": "^10.0"
-    },
+    "bin": [
+        "bin/monorepo-builder"
+    ],
+
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/",
-            "Modules\\Attribute\\": "Modules/Attribute/",
-            "Modules\\Brand\\": "Modules/Brand/",
-            "Modules\\Cart\\": "Modules/Cart/",
-            "Modules\\Category\\": "Modules/Category/",
-            "Modules\\CheckOutMethods\\": "Modules/CheckOutMethods/",
-            "Modules\\ClubHouse\\": "Modules/ClubHouse/",
-            "Modules\\Core\\": "Modules/Core/",
-            "Modules\\Country\\": "Modules/Country/",
-            "Modules\\Coupon\\": "Modules/Coupon/",
-            "Modules\\Customer\\": "Modules/Customer/",
-            "Modules\\DeliveryFlatRate\\": "Modules/DeliveryFlatRate/",
-            "Modules\\DeliveryFreeShipping\\": "Modules/DeliveryFreeShipping/",
-            "Modules\\EmailTemplate\\": "Modules/EmailTemplate/",
-            "Modules\\Erp\\": "Modules/Erp/",
-            "Modules\\GeoIp\\": "Modules/GeoIp/",
-            "Modules\\Inventory\\": "Modules/Inventory/",
-            "Modules\\NavigationMenu\\": "Modules/NavigationMenu/",
-            "Modules\\Notification\\": "Modules/Notification/",
-            "Modules\\Page\\": "Modules/Page/",
-            "Modules\\PaymentAdyen\\": "Modules/PaymentAdyen/",
-            "Modules\\PaymentBankTransfer\\": "Modules/PaymentBankTransfer/",
-            "Modules\\PaymentCashOnDelivery\\": "Modules/PaymentCashOnDelivery/",
-            "Modules\\PaymentKlarna\\": "Modules/PaymentKlarna/",
-            "Modules\\ProductStockAlert\\": "Modules/ProductStockAlert/",
-            "Modules\\Product\\": "Modules/Product/",
-            "Modules\\Review\\": "Modules/Review/",
-            "Modules\\Sales\\": "Modules/Sales/",
-            "Modules\\Tax\\": "Modules/Tax/",
-            "Modules\\UrlRewrite\\": "Modules/UrlRewrite/",
-            "Modules\\User\\": "Modules/User/",
-            "YourMonorepo\\SecondPackage\\": "Modules/second-package/src"
+            "Modules\\attribute\\": "Modules/attribute"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Symplify\\Tests\\": "tests",
-            "Tests\\": "tests/"
-        }
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "symplify/monorepo-builder": "^10.0",
+        "phpstan/phpstan": "^0.12"
     },
-    "scripts": {
-        "post-autoload-dump": [
-            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
-        ],
-        "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-        ],
-        "post-create-project-cmd": [
-            "@php artisan key:generate --ansi"
-        ]
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Modules\\User\\Providers\\UserServiceProvider",
-                "Modules\\Customer\\Providers\\CustomerServiceProvider",
-                "Modules\\Core\\Providers\\CoreServiceProvider",
-                "Modules\\Category\\Providers\\CategoryServiceProvider",
-                "Modules\\Attribute\\Providers\\AttributeServiceProvider"
-            ],
-            "dont-discover": [
-                "laravel/telescope"
-            ]
-        }
+    "replace": {
+        "snlprjti/attribute": "self.version"
     },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
-    },
-    "replace": {
-        "nwidart/brand": "self.version",
-        "nwidart/cart": "self.version",
-        "nwidart/category": "self.version",
-        "nwidart/checkoutmethods": "self.version",
-        "nwidart/clubhouse": "self.version",
-        "nwidart/core": "self.version",
-        "nwidart/country": "self.version",
-        "nwidart/coupon": "self.version",
-        "nwidart/customer": "self.version",
-        "nwidart/deliveryflatrate": "self.version",
-        "nwidart/deliveryfreeshipping": "self.version",
-        "nwidart/emailtemplate": "self.version",
-        "nwidart/erp": "self.version",
-        "nwidart/geoip": "self.version",
-        "nwidart/inventory": "self.version",
-        "nwidart/navigationmenu": "self.version",
-        "nwidart/notification": "self.version",
-        "nwidart/page": "self.version",
-        "nwidart/paymentadyen": "self.version",
-        "nwidart/paymentbanktransfer": "self.version",
-        "nwidart/paymentcashondelivery": "self.version",
-        "nwidart/paymentklarna": "self.version",
-        "nwidart/product": "self.version",
-        "nwidart/productstockalert": "self.version",
-        "nwidart/review": "self.version",
-        "nwidart/sales": "self.version",
-        "nwidart/tax": "self.version",
-        "nwidart/urlrewrite": "self.version",
-        "nwidart/user": "self.version",
-        "snlprjti/attribute": "self.version",
-        "your-monorepo/second-package": "self.version"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
